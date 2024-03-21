@@ -15,7 +15,7 @@ all_enrolled_people = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(next_year,1,1)}
+      "effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -173,7 +173,7 @@ post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
       "product_id" => { "$ne" => nil},
       "created_at" => { "$gte" => time_period },
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(next_year,1,1)}
+      "effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -212,7 +212,7 @@ has_been_renewed = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(next_year,1,1)},
+      "effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)},
       '$or' => [
         {'workflow_state_transitions.from_state': { '$in' => renewal_statuses }},
         {'workflow_state_transitions.to_state': { '$in' => renewal_statuses }}
@@ -275,9 +275,10 @@ auto_and_active_enrolled_families = HbxEnrollment.where(coverage_kind: "health",
                                                         :"external_enrollment".ne => true,
                                                         :"consumer_role_id".ne => nil,
                                                         :"aasm_state".in => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
-                                                        :"effective_on".gte => Date.new(next_year,1,1)).pluck(:family_id).uniq
+                                                        :"effective_on".gte => Date.new(next_year,1,1),
+                                                        :"effective_on".lt => Date.new(next_year+1,1,1)).pluck(:family_id).uniq
 
-families_created_after_10_31_22 = Family.where(:"created_at".gte => Date.new(year,11,1)).pluck(:_id).uniq
+families_created_after_10_31_22 = Family.where(:"created_at".gte => Date.new(year,11,1), :"created_at".lt => Date.new(next_year+1,1,1)).pluck(:_id).uniq
 families_with_2023_assistance = ::FinancialAssistance::Application.renewal_eligible.by_year(next_year).pluck(:family_id).uniq
 all_submitted_families = Set.new(auto_and_active_enrolled_families) | Set.new(families_created_after_10_31_22) | Set.new(families_with_2023_assistance)
 
@@ -474,7 +475,7 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
 
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
         # grab all tax households for any tax household groups starting in the next year
-        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year), :"start_on".lt => Date.new(next_year+1)).map(&:tax_households).flatten
         # grab all instances of tax household members that are determined medicaid eligible
         all_medicaid_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_medicaid_chip_eligible)
         
@@ -501,7 +502,7 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
 end
 
 if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(next_year) } })
+  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(next_year), :"start_on".lt => Date.new(next_year+1) } })
 else
   families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(next_year) } })
 end
@@ -531,7 +532,7 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
       primary = family.primary_person
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
         # grab all tax households for any tax household groups starting in the next year
-        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year), :"start_on".lt => Date.new(next_year+1)).map(&:tax_households).flatten
         # grab all instances of tax household members that are determined medicaid eligible
         all_medicaid_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_medicaid_chip_eligible)
         # remove duplicate members (those determined medicaid eligible in multiple determinations)
@@ -601,7 +602,7 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
 
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
         # grab all tax households for any tax household groups starting in the next year
-        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year), :"start_on".lt => Date.new(next_year+1)).map(&:tax_households).flatten
 
         # grab all instances of tax household members that are determined ia eligible
         all_ia_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_ia_eligible)
@@ -645,7 +646,7 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
 end
 
 if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(next_year) } })
+  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(next_year), :"start_on".lt => Date.new(next_year+1) } })
 else
   families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(next_year) } })
 end
