@@ -117,8 +117,7 @@ jobs:
             'notifier',
             'sponsored_benefits',
             'transport_gateway',
-            'transport_profiles' #,
-            # 'financial_assistance',
+            'transport_profiles'
           ]
     steps:
       - uses: actions/checkout@v3
@@ -173,11 +172,13 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           root=`pwd -P`
           cd $root/components/${{ matrix.engine-name }}
           cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage
@@ -249,55 +250,15 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: 'components/financial_assistance/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-      # - name: Install node dependencies
-      #   if: steps.npm-cache.outputs.cache-hit != 'true'
-      #   run: yarn install
-      # - name: Restore Project Gems
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: vendor/bundle
-      #     key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
-      #     restore-keys: |
-      #       benefit_sponsors-
-      # - name: bundle install
-      #   run: |
-      #     gem update --system --quiet --silent
-      #     bundle config path vendor/bundle
-      #     bundle install
-      #     cd components/benefit_sponsors
-      #     bundle config path ../../vendor/bundle
-      #     bundle install
-      #     gem install treye-semaphore_test_boosters --version '2.5.2'
-      # - name: Restore Node Modules
-      #   id: npm-cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: node_modules
-      #     key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
-      # - name: yarn install
-      #   if: steps.npm-cache.outputs.cache-hit != 'true'
-      #   run: yarn install
-      # - name: run webpack
-      #   run: |
-      #     bundle config path vendor/bundle
-      #     NODE_ENV=test RAILS_ENV=test ./bin/webpack
-      # - name: test engine
-      #   env:
-      #     RSPEC_SPLIT_CONFIGURATION_PATH: '${{ github.workspace }}/ci/benefit_sponsors-split-config.json'
-      #     COVERAGE: 'true'
-      #   run: |
-      #     cd components/benefit_sponsors
-      #     bundle config path ../../vendor/bundle
-      #     rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   benefit-sponsors:
     needs: [brakeman-engines]
     runs-on: ubuntu-20.04
@@ -385,10 +346,12 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cd components/benefit_sponsors
           cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage
@@ -486,10 +449,12 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/financial_assistance,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
@@ -605,10 +570,12 @@ jobs:
           COVERAGE: 'true'
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
@@ -626,6 +593,7 @@ jobs:
         if: needs[env.CHECK].result != 'success'
         run: exit 1
   code-coverage-summary:
+    if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
@@ -656,12 +624,10 @@ jobs:
       - name: Write to Job Summary
         run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
       - name: copy coverage badge
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           mkdir coverage-save
           cp coveragereport/badge_linecoverage.svg coverage-save/
       - name: Publish coverage badge to coverage-badge branch
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: coverage-artifacts
