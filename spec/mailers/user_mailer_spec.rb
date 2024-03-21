@@ -145,7 +145,7 @@ RSpec.describe UserMailer, "sending an approval linked notification email for a 
   include Config::SiteHelper
 
   before do
-    allow(EnrollRegistry[:enroll_app].setting(:broker_linked_invitation_email_login_url)).to receive(:item).and_return('https://www.dchealthlink.com/')
+    allow(EnrollRegistry[:enroll_app].setting(:login_url)).to receive(:item).and_return('https://www.dchealthlink.com/')
   end
 
   let(:email) { "some-broker@adomain.com"}
@@ -166,7 +166,7 @@ RSpec.describe UserMailer, "sending an approval linked notification email for br
   include Config::SiteHelper
 
   before do
-    allow(EnrollRegistry[:enroll_app].setting(:broker_linked_invitation_email_login_url)).to receive(:item).and_return('https://www.dchealthlink.com/')
+    allow(EnrollRegistry[:enroll_app].setting(:login_url)).to receive(:item).and_return('https://www.dchealthlink.com/')
   end
 
   let(:email) { "some-broker@adomain.com"}
