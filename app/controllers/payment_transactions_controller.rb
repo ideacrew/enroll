@@ -3,7 +3,12 @@ class PaymentTransactionsController < ApplicationController
 
   include OneLogin::RubySaml
 
+  # TODO: Rename this controller and it's actions.  What's actually happening
+  #       here is a set of actions being executed in order to implment PayNow
+  #       functionality - we should alter the nomenclature to reflect that.
   def generate_saml_response
+    @hbx_enrollment = ::HbxEnrollment.by_hbx_id(params[:enrollment_id]).first
+    authorize @hbx_enrollment, :pay_now?
     issuer = issuer_name(params[:enrollment_id])
     status = carrier_connect_test(issuer) if Rails.env.production? #checks to see if EA can connect to carrier payment portal.
     result = Operations::GenerateSamlResponse.new.call({enrollment_id: params[:enrollment_id], source: params[:source]})

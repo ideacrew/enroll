@@ -8,6 +8,7 @@ class Insured::PlanShoppingsController < ApplicationController
   extend Acapi::Notifiers
   include Aptc
   include Config::AcaHelper
+  include L10nHelper
 
   before_action :find_hbx_enrollment
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
@@ -15,6 +16,8 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :validate_rating_address, only: [:show]
 
   def checkout
+    (redirect_back(fallback_location: root_path) and return) unless agreed_to_thankyou_ivl_page_terms
+
     authorize @hbx_enrollment, :checkout?
     @enrollment = @hbx_enrollment
 
@@ -272,6 +275,20 @@ class Insured::PlanShoppingsController < ApplicationController
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
   private
+
+  # Determines if the user has agreed to the terms on the individual market thank you page.
+  # The user has agreed if the 'thankyou_page_agreement_terms' parameter is set to 'agreed'.
+  # This check is only performed for enrollments of individual market kinds.
+  #
+  # @return [Boolean] Returns true if the user has agreed to the terms or the enrollment is not of individual market kind, false otherwise.
+  # @note This method sets a flash error message if the user has not agreed to the terms.
+  def agreed_to_thankyou_ivl_page_terms
+    return true unless HbxEnrollment::IVL_KINDS.include?(@hbx_enrollment.kind)
+    return true if params['thankyou_page_agreement_terms'] == 'agreed'
+
+    flash[:error] = l10n('insured.plan_shopping.thankyou.agreement_terms_conditions')
+    false
+  end
 
   def show_ivl(hbx_enrollment_id)
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'

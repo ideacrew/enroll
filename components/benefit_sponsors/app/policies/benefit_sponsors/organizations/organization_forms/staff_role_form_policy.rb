@@ -3,9 +3,9 @@
 module BenefitSponsors
   module Organizations
     module OrganizationForms
-      # NOTE: for now this class is inheriting from BenefitSponsors::ApplicationPolicy, due to not being able to pass the GHAs
-      # Once the GHA workflow has been updated, this will inherit from the main app ApplicationPolicy
-      class StaffRoleFormPolicy < BenefitSponsors::ApplicationPolicy
+      # NOTE: to pass the GHAs, this file pulls from components/benefit_sponsors/spec/dummy/app/policies/application_policy.rb
+      # but in a production env will inherit from the main app ApplicationPolicy
+      class StaffRoleFormPolicy < ::ApplicationPolicy
 
         attr_reader :service
 

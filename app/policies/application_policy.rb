@@ -21,7 +21,7 @@ class ApplicationPolicy
   def account_holder_person
     return @account_holder_person if defined? @account_holder_person
 
-    @account_holder_person = account_holder.person
+    @account_holder_person = account_holder&.person
   end
 
   # Returns the individual market role of the account holder person.
@@ -410,6 +410,10 @@ class ApplicationPolicy
 
   def staff_can_access_user_account_tab?
     permission&.can_access_user_account_tab
+  end
+
+  def staff_can_access_pay_now?
+    permission&.can_access_pay_now
   end
 
   def staff_can_add_pdc?
