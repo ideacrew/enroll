@@ -787,8 +787,15 @@ $(document).on('click', '#terms_check_thank_you', function() {
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
 
+  // Appends a query parameter to the 'btn-continue' button's href attribute to indicate that the user has disagreed to the terms on the thank you page.
+  document.getElementById('btn-continue').href += "&thankyou_page_agreement_terms=disagreed";
+
   if($(this).prop("checked") == true){
     if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
+
+      // Appends a query parameter to the 'btn-continue' button's href attribute to indicate that the user has agreed to the terms on the thank you page.
+      document.getElementById('btn-continue').href += "&thankyou_page_agreement_terms=agreed";
+
       $('#btn-continue').removeClass('disabled');
     } else {
       $('#btn-continue').addClass('disabled');
@@ -815,16 +822,21 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
 
+  // Appends a query parameter to the 'btn-continue' button's href attribute to indicate that the user has disagreed to the terms on the thank you page.
+  document.getElementById('btn-continue').href += "&thankyou_page_agreement_terms=disagreed";
+
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
     if($("#terms_check_thank_you").prop("checked") == true){
       if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
-        $('#btn-continue').removeClass('disabled');
 
+        // Appends a query parameter to the 'btn-continue' button's href attribute to indicate that the user has agreed to the terms on the thank you page.
+        document.getElementById('btn-continue').href += "&thankyou_page_agreement_terms=agreed";
+
+        $('#btn-continue').removeClass('disabled');
       } else {
         $('#btn-continue').addClass('disabled');
-
       }
     }
   }

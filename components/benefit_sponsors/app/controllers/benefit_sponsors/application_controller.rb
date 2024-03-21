@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
+  # application controller for the benefit sponsors engine
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
     before_action :set_last_portal_visited
@@ -8,7 +11,7 @@ module BenefitSponsors
 
     helper BenefitSponsors::Engine.helpers
 
-    rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+    rescue_from Pundit::NotAuthorizedError, Pundit::NotDefinedError, with: :user_not_authorized
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
     # for current_user
@@ -144,9 +147,9 @@ module BenefitSponsors
     end
 
     def user_not_authorized(exception)
-      policy_name = exception.policy.class.to_s.underscore
+      error_type = exception&.class == Pundit::NotDefinedError ? exception&.class : exception&.query
 
-      flash[:error] = "Access not allowed for #{exception.query}, (Pundit policy)" unless broker_agency_or_general_agency?
+      flash[:error] = "Access not allowed for #{error_type}, (Pundit policy)" unless broker_agency_or_general_agency?
       respond_to do |format|
         format.json { render nothing: true, status: :forbidden }
         format.html { redirect_to(session[:custom_url] || request.referrer || main_app.root_path)}

@@ -31,14 +31,15 @@ module FinancialAssistance
       edit?
     end
 
-    # Determines if the current user has permission to edit an applicant.
-    # The user can edit an applicant if they are a primary family member in the individual market, an active associated broker in the individual market who has verified their identity, or an admin in the individual market.
+    # Determines if the current user has permission to edit the applicant.
+    # The user can edit the applicant if they are a primary family member,
+    # an admin, an active associated broker staff, or an active associated broker in the individual market.
     #
-    # @return [Boolean] Returns true if the user has permission to edit an applicant, false otherwise.
+    # @return [Boolean] Returns true if the user has permission to edit the applicant, false otherwise.
     def edit?
       return true if individual_market_primary_family_member?
-      return true if active_associated_individual_market_ridp_verified_family_broker_staff?
-      return true if active_associated_individual_market_ridp_verified_family_broker?
+      return true if active_associated_individual_market_family_broker_staff?
+      return true if active_associated_individual_market_family_broker?
       return true if individual_market_admin?
 
       false
@@ -113,6 +114,22 @@ module FinancialAssistance
     #
     # @return [Boolean] Returns true if the user has permission to destroy an applicant, false otherwise.
     def destroy?
+      edit?
+    end
+
+    # Determines if the current user has permission to upload a document for an applicant.
+    # The user can upload a document for the applicant if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to upload a document for an applicant, false otherwise.
+    def upload?
+      edit?
+    end
+
+    # Determines if the current user has permission to download a document from an applicant.
+    # The user can download a document from the applicant if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to download a document from an applicant, false otherwise.
+    def download?
       edit?
     end
 

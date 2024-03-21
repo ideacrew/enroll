@@ -32,15 +32,6 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
-  namespace :uis do
-    resources :bootstrap3_examples do
-      collection do
-        get :index
-        get :components
-        get :getting_started
-      end
-    end
-  end
   get 'datatables/*path.:json', to: 'application#resource_not_found'
   get 'insured/consumer_role/help_paying_coverage.:inc', to: 'application#resource_not_found'
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -121,14 +112,6 @@ Rails.application.routes.draw do
           post 'expire_sep_type'
           get 'clone'
         end
-      end
-    end
-
-    resources :scheduled_events do
-      collection do
-        get 'current_events'
-        get 'delete_current_event'
-        get 'list'
       end
     end
 
@@ -286,7 +269,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :fdsh_ridp_verifications, format: false, only: [:create, :new, :update] do
+    resources :fdsh_ridp_verifications, format: false, only: [:create, :new] do
       collection do
         get 'failed_validation'
         get 'service_unavailable'
@@ -509,31 +492,8 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
-    resources :profiles, only: [:new, :create, :show, :index, :edit, :update] do
-      get :inbox
 
-      collection do
-        get :family_index
-        get :employers
-        get :messages
-        get :staff_index
-        get :agency_messages
-        get :assign_history
-        get :commission_statements
-      end
-      member do
-        get :general_agency_index
-        get :manage_employers
-        post :clear_assign_for_employer
-        get :assign
-        post :update_assign
-        post :employer_datatable
-        post :family_datatable
-        post :set_default_ga
-        get :download_commission_statement
-        get :show_commission_statement
-      end
-
+    resources :profiles, except: [:new, :create, :show, :index, :edit, :update, :destory] do
       resources :applicants
     end
 
@@ -662,8 +622,7 @@ Rails.application.routes.draw do
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
   get "document/cartafact_download/:model/:model_id/:relation/:relation_id" => "documents#cartafact_download", as: :cartafact_document_download
 
-  resources :documents, only: [:new, :create, :destroy, :update] do
-    get :document_reader,on: :member
+  resources :documents, only: [:destroy] do
     get :autocomplete_organization_legal_name, :on => :collection
     collection do
       put :change_person_aasm_state
@@ -673,13 +632,7 @@ Rails.application.routes.draw do
       get :enrollment_verification
       put :extend_due_date
       get :fed_hub_request
-      post 'download_documents'
-      post 'delete_documents'
       post :fed_hub_request
-    end
-
-    member do
-      get :download_employer_document
     end
   end
 

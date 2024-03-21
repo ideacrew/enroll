@@ -2,6 +2,18 @@ FactoryBot.define do
   factory :message do
     subject { "phoenix project" }
     body    { "welcome to the hbx" }
+
+    trait :inbox_folder do
+      folder { 'inbox' }
+    end
+
+    trait :sent_folder do
+      folder { 'sent' }
+    end
+
+    trait :deleted_folder do
+      folder { 'deleted' }
+    end
   end
 
   factory :message1, :class=>:Message do

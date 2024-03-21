@@ -64,9 +64,6 @@
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" Admin
             i.fas.fa-caret-down
             ul.dropdown-menu aria-labelledby="dropdownMenu1"
-              - if EnrollRegistry.feature_enabled?(:calendar_tab)
-                li
-                  = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'calendar', link_path: main_app.exchanges_scheduled_events_path, display_name: 'Calendar', active_tab: 'calendar', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
               - if policy_helper(HbxProfile).view_the_configuration_tab?
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'configuration', link_path: main_app.configuration_exchanges_hbx_profiles_path, display_name: 'Config', active_tab: 'config', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }

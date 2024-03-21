@@ -30,7 +30,6 @@ describe Insured::FdshRidpVerificationsController do
     end
 
     context "with no records" do
-
       before do
         controller.instance_variable_set(:@person, person2)
       end
@@ -76,18 +75,83 @@ describe Insured::FdshRidpVerificationsController do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("failed_validation")
       end
-
-      context "when tried to access unauthorized person" do
-        let(:person_B){ FactoryBot.create(:person, :with_consumer_role) }
-        let!(:user_B){ FactoryBot.create(:user, person: person_B) }
-
-        it "should redirect with authorization error" do
-          get :failed_validation, params: {person_id: person_B.id.to_s}
-
-          expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for person_policy.can_access_identity_verifications?, (Pundit policy)")
-        end
-      end
     end
+  end
+end
+
+describe Insured::FdshRidpVerificationsController, "given an unauthorized user" do
+  let(:mock_user) do
+    instance_double(
+      User,
+      :has_hbx_staff_role? => false,
+      :person => mock_person
+    )
+  end
+  let(:mock_person) do
+    double(
+      policy_class: PersonPolicy,
+      :agent? => false
+    )
+  end
+  let(:mock_policy) do
+    instance_double(
+      PersonPolicy,
+      :complete_ridp? => false
+    )
+  end
+
+  before :each do
+    allow(PersonPolicy).to receive(:new).with(mock_user, mock_person).and_return(mock_policy)
+    sign_in(mock_user)
+  end
+
+  it "denies access to GET #new" do
+    get :new
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to POST #create" do
+    post :create, params: {}
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to GET #service_unavailable" do
+    get :service_unavailable
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to GET #failed_validation" do
+    get :failed_validation
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to GET #wait_for_primary_response" do
+    get :wait_for_primary_response
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to GET #wait_for_secondary_response" do
+    get :wait_for_secondary_response
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to GET #check_primary_response_received" do
+    get :check_primary_response_received
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to GET #check_secondary_response_received" do
+    get :check_secondary_response_received
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to GET #primary_response" do
+    get :primary_response
+    expect(response.status).to eq 302
+  end
+
+  it "denies access to GET #secondary_response" do
+    get :secondary_response
+    expect(response.status).to eq 302
   end
 end

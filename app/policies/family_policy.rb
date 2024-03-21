@@ -43,39 +43,184 @@ class FamilyPolicy < ApplicationPolicy
   # the ACA Shop market, the Non-ACA Fehb market, or the coverall market.
   #
   # @return [Boolean] Returns true if the user has permission to view the record, false otherwise.
+  # @note This method checks for permissions across multiple markets and roles.
   def show?
     return true if individual_market_primary_family_member?
-    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
-    return true if active_associated_individual_market_ridp_verified_family_broker?
+    return true if individual_market_admin?
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
+
+    return true if shop_market_primary_family_member?
+    return true if shop_market_admin?
+    return true if active_associated_shop_market_family_broker?
+    return true if active_associated_shop_market_general_agency?
+
+    return true if fehb_market_primary_family_member?
+    return true if fehb_market_admin?
+    return true if active_associated_fehb_market_family_broker?
+    return true if active_associated_fehb_market_general_agency?
+
+    return true if coverall_market_primary_family_member?
+    return true if coverall_market_admin?
+    return true if active_associated_coverall_market_family_broker?
+
+    false
+  end
+
+  def request_help?
+    return true if individual_market_non_ridp_primary_family_member?
+    show?
+  end
+
+  def hire_broker_agency?
+    return true if individual_market_primary_family_member?
+    return true if individual_market_non_ridp_primary_family_member?
     return true if individual_market_admin?
 
     return true if shop_market_primary_family_member?
+    return true if shop_market_admin?
+
     return true if fehb_market_primary_family_member?
+    return true if fehb_market_admin?
 
     return true if coverall_market_primary_family_member?
-    return true if active_associated_coverall_market_family_broker?
     return true if coverall_market_admin?
 
     false
+  end
+
+  def admin_show?
+    return true if individual_market_admin?
+    return true if shop_market_admin?
+    return true if fehb_market_admin?
+    return true if coverall_market_admin?
+
+    false
+  end
+
+  def home?
+    show?
+  end
+
+  def enrollment_history?
+    show?
+  end
+
+  def manage_family?
+    show?
+  end
+
+  def personal?
+    show?
+  end
+
+  def inbox?
+    show?
+  end
+
+  def verification?
+    show?
+  end
+
+  def find_sep?
+    show?
+  end
+
+  def record_sep?
+    show?
+  end
+
+  def purchase?
+    show?
+  end
+
+  def check_qle_reason?
+    show?
+  end
+
+  def check_qle_date?
+    show?
+  end
+
+  def sep_zip_compare?
+    show?
+  end
+
+  def upload_application?
+    admin_show?
+  end
+
+  def upload_notice?
+    admin_show?
+  end
+
+  def upload_notice_form?
+    admin_show?
+  end
+
+  def transition_family_members?
+    admin_show?
+  end
+
+  def brokers?
+    show?
+  end
+
+  def delete_consumer_broker?
+    return true if individual_market_primary_family_member?
+    return true if individual_market_admin?
+
+    return true if shop_market_primary_family_member?
+    return true if shop_market_admin?
+
+    return true if fehb_market_primary_family_member?
+    return true if fehb_market_admin?
+
+    return true if coverall_market_primary_family_member?
+    return true if coverall_market_admin?
+
+    false
+  end
+
+  def resident_index?
+    show?
+  end
+
+  def new_resident_dependent?
+    show?
+  end
+
+  def edit_resident_dependent?
+    show?
+  end
+
+  def show_resident_dependent?
+    show?
   end
 
   # Determines if the current user has permission to create a new family record.
   # TODO: Implement the logic to check if the user has permission to create a new family record.
   #
   # @return [Boolean] Returns true if the user has permission to create a new record, false otherwise.
-  def create?; end
+  def create?
+    show?
+  end
 
   # Determines if the current user has permission to update the family record.
   # TODO: Implement the logic to check if the user has permission to update the family record.
   #
   # @return [Boolean] Returns true if the user has permission to update the record, false otherwise.
-  def update?; end
+  def update?
+    show?
+  end
 
   # Determines if the current user has permission to destroy the family record.
   # TODO: Implement the logic to check if the user has permission to destroy the family record.
   #
   # @return [Boolean] Returns true if the user has permission to destroy the record, false otherwise.
-  def destroy?; end
+  def destroy?
+    show?
+  end
 
   # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def legacy_show?

@@ -11,7 +11,7 @@ module FinancialAssistance
     before_action :set_document, only: [:destroy]
 
     def upload
-      authorize record, :can_upload?
+      authorize @applicant
 
       @doc_errors = []
       if params[:file].blank?
@@ -40,7 +40,7 @@ module FinancialAssistance
     end
 
     def download
-      authorize record, :can_download?
+      authorize @applicant
 
       @document = get_document(params[:key])
 
@@ -55,7 +55,7 @@ module FinancialAssistance
     end
 
     def destroy
-      authorize record, :can_destroy?
+      authorize @applicant
 
       @document.delete if @evidence.type_unverified?
       if @document.destroyed?

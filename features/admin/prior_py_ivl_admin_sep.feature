@@ -23,6 +23,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
+    And the person named Patrick Doe is RIDP verified
     And I click on Shop For Plans banner button
     And I click Shop for new plan button on CHH page
     And I should not see any plan which premium is 0
@@ -47,6 +48,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
+    And the person named Patrick Doe is RIDP verified
     And I click on Shop For Plans banner button
     And I click Shop for new plan button on CHH page
     And I should not see any plan which premium is 0
@@ -70,6 +72,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
+    And the person named Patrick Doe is RIDP verified
     And I click on Shop For Plans banner button
     And I click Shop for new plan button on CHH page
     And I should not see any plan which premium is 0
@@ -93,6 +96,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
+    And the person named Patrick Doe is RIDP verified
     And I click on Shop For Plans banner button
     And I click Shop for new plan button on CHH page
     And I should not see any plan which premium is 0
@@ -116,6 +120,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
+    And the person named Patrick Doe is RIDP verified
     And I click on Shop For Plans banner button
     And I click Shop for new plan button on CHH page
     And I should not see any plan which premium is 0
@@ -140,6 +145,7 @@ Feature: IVL consumer or Admin adding a SEP which falls in prior plan year,
     When Admin clicks confirm on popup
     Then I see a SEP success message for Patrick Doe
     When I click the name of Patrick Doe from family list
+    And the person named Patrick Doe is RIDP verified
     And I click on Shop For Plans banner button
     And I click Shop for new plan button on CHH page
     And I should not see any plan which premium is 0
