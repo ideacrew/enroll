@@ -50,7 +50,7 @@ registry:
           - key: :main_web_address_url
             item: 'https://www.coverme.gov'
           - key: :broker_linked_invitation_email_login_url
-            item: <%= ENV['BROKER_LINKED_INVITATION_EMAIL_LOGIN_URL'] || 'https://www.coverme.gov' %>
+            item: <%= ENV['BROKER_LINKED_INVITATION_EMAIL_LOGIN_URL'] %>
           - key: :invoice_bill_url
             item: ''
           - key: :payment_pdf_url

@@ -209,7 +209,7 @@ module Config
     end
 
     def site_broker_linked_invitation_email_login_url
-      EnrollRegistry[:enroll_app].setting(:broker_linked_invitation_email_login_url).item
+      EnrollRegistry[:enroll_app].setting(:broker_linked_invitation_email_login_url).item.present? ? EnrollRegistry[:enroll_app].setting(:broker_linked_invitation_email_login_url).item : site_main_web_address_url
     end
 
     def site_main_web_link

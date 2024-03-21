@@ -50,7 +50,7 @@ registry:
           - key: :main_web_address_url
             item: "https://www.dchealthlink.com/"
           - key: :broker_linked_invitation_email_login_url
-            item: <%= ENV['BROKER_LINKED_INVITATION_EMAIL_LOGIN_URL'] || '' %>
+            item: <%= ENV['BROKER_LINKED_INVITATION_EMAIL_LOGIN_URL'] %>
           - key: :invoice_bill_url
             item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
           - key: :payment_pdf_url
