@@ -17,6 +17,8 @@ registry:
             item: 'enroll_me'
           - key: :copyright_period_start
             item: ''
+          - key: :login_url
+            item: <%= ENV['EA_LOGIN_URL'] %>
           - key: :policies_url
             item: ''
           - key: :faqs_url
