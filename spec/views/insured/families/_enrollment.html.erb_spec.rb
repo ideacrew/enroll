@@ -248,7 +248,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should open the sbc pdf" do
       expect(rendered).to have_selector(
-        "a[href='#{"/document/product_sbc_download/#{product.id}?content_type=application/pdf&filename=APlanName.pdf"\
+        "a[href='#{"/documents/#{sbc_document.id}/product_sbc_download?product_id=#{product.id}&content_type=application/pdf&filename=APlanName.pdf"\
         '&disposition=inline'}']"
       )
     end

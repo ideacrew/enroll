@@ -618,13 +618,13 @@ Rails.application.routes.draw do
     end
   end
 
-  get "document/employer_attestation_documents_download/:document_id" => "documents#employer_attestation_documents_download", as: :document_employer_attestation_documents_download
   get "document/employees_template_download" => "documents#employees_template_download", as: :document_employees_template_download
-  get "document/product_sbc_download/:product_id" => "documents#product_sbc_download", as: :document_product_sbc_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
   get "document/cartafact_download/:model/:model_id/:relation/:relation_id" => "documents#cartafact_download", as: :cartafact_document_download
 
   resources :documents, only: [:destroy] do
+    get :product_sbc_download
+    get :employer_attestation_document_download
     get :autocomplete_organization_legal_name, :on => :collection
     collection do
       put :change_person_aasm_state

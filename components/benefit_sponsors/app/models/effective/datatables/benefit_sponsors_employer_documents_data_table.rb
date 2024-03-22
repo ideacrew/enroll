@@ -24,7 +24,7 @@ module Effective
         table_column :date, :label => 'Submitted At', :proc => Proc.new { |row| TimeKeeper.local_time(row.created_at).strftime('%m/%d/%Y %I:%M%p') }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
-           ['Download',  main_app.employer_attestation_documents_download(row.id) + "?id=#{@employer_profile.id}&content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}",'static'],
+           ['Download',  main_app.document_employer_attestation_document_download_path(row.id) + "?id=#{@employer_profile.id}&content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}",'static'],
            ['Delete', main_app.employers_employer_attestation_delete_attestation_documents_path(row.id), (@employer_profile.employer_attestation.editable? && row.submitted?) ? 'delete ajax with confirm' : 'disabled',  'Do you want to Delete this document?']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html

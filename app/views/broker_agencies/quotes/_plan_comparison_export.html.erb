@@ -56,12 +56,12 @@
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
-           <% if qhp.plan.sbc_document.present? %>
+           <% if qhp.product.sbc_document.present? %>
             <th colspan="2">
               <div class="plan_comparison">
                 <% link_text = qhp.plan.coverage_kind == 'health' ? "Summary of Benefits and Coverage" : 'Plan Summary' %>
-                <%= sanitize link_to(link_text, root_url + document_product_sbc_download_path(qhp.product.id) +
-                                                  "?content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.
+                <%= sanitize link_to(link_text, root_url + document_product_sbc_download_path(qhp.product.sbc_document.id) +
+                                                  "?product_id=#{qhp.product.id}&content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.
                                                   pdf&disposition=inline") %>
               </div>
             </th>

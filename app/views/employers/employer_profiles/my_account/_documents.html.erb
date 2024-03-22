@@ -26,11 +26,11 @@
             <div class="document-modal-body">
               <h4>MA DOR FORM-X</h4>
               <p class='document-modal-buttons'>
-                 <a href="<%= employer_attestation_documents_download(doc.id) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}" %>" ><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+                 <a href="<%= document_employer_attestation_document_download_path(doc.id) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}" %>" ><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
                 <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
               </p>
               <p id="print_<%=doc.id%>">
-                <iframe src="<%= employer_attestation_documents_download(doc.id) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" width="100%" height="600" frameborder="0" scrolling="no" name="iframe_<%= doc.id%>"></iframe>
+                <iframe src="<%= document_employer_attestation_document_download_path(doc.id) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" width="100%" height="600" frameborder="0" scrolling="no" name="iframe_<%= doc.id%>"></iframe>
               </p>
             </div>
           </div>

@@ -39,8 +39,8 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
 
   it "should have the sbc link" do
     expect(rendered).to have_selector(
-      "a[href='#{"/document/product_sbc_download/#{mock_plan.id}?content_type=application/"\
-      'pdf&filename=APlanName.pdf&disposition=inline'}']"
+      "a[href='#{"/documents/#{mock_plan.sbc_document.id}/product_sbc_download?product_id=#{mock_plan.id}&content_type=application/pdf&filename=APlanName.pdf"\
+      '&disposition=inline'}']"
     )
   end
 

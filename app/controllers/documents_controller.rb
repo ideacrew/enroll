@@ -66,7 +66,7 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def employer_attestation_documents_download
+  def employer_attestation_document_download
     authorize current_user, :can_download_employer_attestation_doc?
 
     begin

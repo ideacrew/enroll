@@ -16,8 +16,6 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
     let!(:sponsored_benefit) {benefit_sponsorship.benefit_applications.first.benefit_packages.first.health_sponsored_benefit}
     let!(:update_sponsored_benefit) {sponsored_benefit.update_attributes(product_package_kind: :single_product)}
     let(:employer_profile) { benefit_sponsorship.profile }
-
-
     let(:person) {FactoryBot.create(:person)}
     let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
     let!(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: benefit_sponsorship.profile) }

@@ -123,7 +123,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
 
     it "should have a link to download the sbc pdf" do
       expect(rendered).to have_selector(
-        "a[href='#{"/document/product_sbc_download/#{mock_product.id}?content_type=application/pdf&filename=APlanName.pdf"\
+        "a[href='#{"/documents/#{document.id}/product_sbc_download?product_id=#{mock_product.id}&content_type=application/pdf&filename=APlanName.pdf"\
         '&disposition=inline'}']"
       )
     end
