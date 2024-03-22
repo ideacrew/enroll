@@ -54,7 +54,8 @@ class DocumentsController < ApplicationController
   end
 
   def product_sbc_download
-    authorize current_user, :can_download_sbc_documents?
+    set_current_person
+    authorize @person, :can_download_sbc_documents?
 
     begin
       sbc_document = fetch_product_sbc_document
