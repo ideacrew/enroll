@@ -7,20 +7,16 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new]
-    if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-      before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :edit, :eligibility_results, :review_and_submit, :review,
-                                               :submit_your_application, :wait_for_eligibility_response, :preferences, :application_publish_error, :eligibility_response_error, :index, :index_with_filter]
-    end
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
     include ActionView::Helpers::SanitizeHelper
+    include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
     include ::FileUploadHelper
-    include FinancialAssistance::NavigationHelper
     require 'securerandom'
 
     before_action :check_eligibility, only: [:copy]
-    before_action :init_cfl_service, only: [:review_and_submit, :review, :raw_application]
+    before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
     # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
@@ -48,7 +44,8 @@ module FinancialAssistance
       :update_application_year
     ]
 
-    layout :resolve_layout
+    layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
+    layout "bs4_financial_assistance_nav", only: %i[application_checklist edit]
 
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
@@ -95,70 +92,64 @@ module FinancialAssistance
       respond_to :html
     end
 
-    def preferences
-      authorize @application, :preferences?
-
-      save_faa_bookmark(request.original_url)
-      respond_to :html
-    end
-
-    def save_preferences
-      raise ActionController::UnknownFormat unless request.format.html?
-
-      authorize @application, :save_preferences?
-      if params[:application].present?
-        @application.assign_attributes(permit_params(params[:application]))
-
-        if @application.save
-          redirect_to submit_your_application_application_path(@application)
-        else
-          @application.save!(validate: false)
-          flash[:error] = build_error_messages(@application).join(", ")
-          render 'preferences'
-        end
-      else
-        render 'preferences'
-      end
-    end
-
-    def submit_your_application
-      authorize @application, :submit_your_application?
-      save_faa_bookmark(request.original_url)
-      set_admin_bookmark_url
-      respond_to :html
-    end
-
-    def submit_your_application_save
-      raise ActionController::UnknownFormat unless request.format.html?
-
-      authorize @application, :submit?
-      if params[:application].present?
-        @application.assign_attributes(permit_params(params[:application]))
-
-        if @application.save
-          submit_location = submit_and_publish_application_redirect_path
-          submit_location[:flash].present? ? redirect_to(submit_location[:path], flash: submit_location[:flash]) : redirect_to(submit_location[:path])
-        else
-          @application.save!(validate: false)
-          flash[:error] = build_error_messages(@application).join(", ")
-          render 'submit_your_application'
-        end
-      else
-        render 'submit_your_application'
-      end
-    end
-
+    # rubocop:disable Metrics/AbcSize
     def step
       raise ActionController::UnknownFormat unless request.format.html?
 
       authorize @application, :step?
+      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
+      set_admin_bookmark_url
+      flash[:error] = nil
+      model_name = @model.class.to_s.split('::').last.downcase
+      model_params = params[model_name]
+      @model.clean_conditional_params(model_params) if model_params.present?
+      @model.assign_attributes(permit_params(model_params)) if model_params.present?
+      @model.attributes = @model.attributes.except(:_id) unless @model.persisted?
 
-      if params[:step] == "1"
-        redirect_to preferences_application_path(@application)
+      # rubocop:disable Metrics/BlockNesting
+      if params.key?(model_name)
+        if @model.save
+          @current_step = @current_step.next_step if @current_step.next_step.present?
+          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
+          if params[:commit] == "Submit Application"
+            if @application.imported?
+              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
+              return
+            end
+            if @application.complete?
+              publish_result = determination_request_class.new.call(application_id: @application.id)
+              if publish_result.success?
+                redirect_to wait_for_eligibility_response_application_path(@application)
+              else
+                @application.unsubmit! if @application.may_unsubmit?
+                flash_message = case publish_result.failure
+                                when Dry::Validation::Result
+                                  { error: validation_errors_parser(publish_result.failure) }
+                                when Exception
+                                  { error: publish_result.failure.message }
+                                else
+                                  { error: "Submission Error: #{publish_result.failure}" }
+                                end
+                redirect_to application_publish_error_application_path(@application), flash: flash_message
+              end
+            else
+              redirect_to application_publish_error_application_path(@application), flash: { error: build_error_messages(@model) }
+            end
+          else
+            render 'workflow/step'
+          end
+        else
+          @model.assign_attributes(workflow: { current_step: @current_step.to_i })
+          @model.save!(validate: false)
+          flash[:error] = build_error_messages(@model).join(", ")
+          render 'workflow/step'
+        end
       else
-        redirect_to submit_your_application_application_path(@application)
+        render 'workflow/step'
       end
+      # rubocop:enable Metrics/BlockNesting
     end
+    # rubocop:enable Metrics/AbcSize
 
     def copy
       authorize @application, :copy?
@@ -167,7 +158,7 @@ module FinancialAssistance
         if copy_result.success?
           @application = copy_result.success
 
-          @application.configure_assistance_year
+          @application.set_assistance_year
           assistance_year_page = EnrollRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || EnrollRegistry.feature_enabled?(:iap_year_selection_form))
           redirect_path = assistance_year_page ? application_year_selection_application_path(@application) : edit_application_path(@application)
 
@@ -187,13 +178,16 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      respond_to :html
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance' }
+      end
     end
 
     def application_checklist
       authorize @application, :application_checklist?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
+
       respond_to :html
     end
 
@@ -292,22 +286,25 @@ module FinancialAssistance
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
 
-      respond_to :html
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance' }
+      end
     end
 
     def eligibility_results
       authorize @application, :eligibility_results?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @in_application_flow = true if params.keys.include?('cur')
-      respond_to :html
+      respond_to do |format|
+        format.html { render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance') }
+      end
     end
 
     def application_publish_error
       authorize @application, :application_publish_error?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @override_flash = true if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
       respond_to :html
     end
 
@@ -400,26 +397,6 @@ module FinancialAssistance
 
     def set_family
       @family = @person.primary_family
-    end
-
-    def enable_bs4_layout
-      @bs4 = true
-    end
-
-    def resolve_layout
-      case action_name
-      when "edit", "submit_your_application", "preferences", "review_and_submit", "review", "step", "eligibility_response_error", "application_publish_error"
-        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
-      when "application_year_selection", "application_checklist", "index", "index_with_filter"
-        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
-      when "eligibility_results"
-        return "financial_assistance_progress" if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-        params.keys.include?('cur') ? "financial_assistance_nav" : "financial_assistance"
-      when "wait_for_eligibility_response"
-        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "bs4_financial_assistance" : "financial_assistance"
-      else
-        "financial_assistance"
-      end
     end
 
     def determination_token_present?(application)
@@ -523,15 +500,17 @@ module FinancialAssistance
     end
 
     def generate_income_hash(applicant)
-      assistance_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!.to_s
       income_hash = {
-        "#{l10n('faa.incomes.from_employer', assistance_year: assistance_year)}*" => human_boolean(applicant.has_job_income),
+        strip_tags(l10n('faa.incomes.from_employer', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_job_income),
         "jobs" => generate_employment_hash(applicant.incomes.jobs),
-        l10n('faa.incomes.from_self_employment',
-             assistance_year: assistance_year) => human_boolean(applicant.has_self_employment_income),
-        l10n('faa.other_incomes.other_sources', assistance_year: assistance_year) => human_boolean(applicant.has_other_income)
+        strip_tags(l10n('faa.incomes.from_self_employment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_self_employment_income)
       }
-      income_hash.merge!(l10n('faa.other_incomes.unemployment', assistance_year: assistance_year) => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
+      if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
+        income_hash.merge!(strip_tags(l10n('faa.other_incomes.unemployment',
+                                           assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_unemployment_income))
+      end
+      income_hash.merge!(strip_tags(l10n('faa.other_incomes.other_sources',
+                                         assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_other_income))
       income_hash
     end
 
@@ -585,26 +564,5 @@ module FinancialAssistance
         hash[applicant.person_hbx_id] = applicant.full_name
       end
     end
-
-    def submit_and_publish_application_redirect_path
-      return { path: application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" } } if @application.imported?
-      return { path: application_publish_error_application_path(@application), flash: { error: build_error_messages(@application) } } unless @application.complete?
-
-      publish_result = determination_request_class.new.call(application_id: @application.id)
-      return { path: wait_for_eligibility_response_application_path(@application) } if publish_result.success?
-
-      @application.unsubmit! if @application.may_unsubmit?
-
-      flash_message = case publish_result.failure
-                      when Dry::Validation::Result
-                        { error: validation_errors_parser(publish_result.failure) }
-                      when Exception
-                        { error: publish_result.failure.message }
-                      else
-                        { error: "Submission Error: #{publish_result.failure}" }
-                      end
-      { path: application_publish_error_application_path(@application), flash: flash_message }
-    end
   end
 end
-
