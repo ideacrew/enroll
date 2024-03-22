@@ -48,6 +48,23 @@ footer {
   }
 }
 
+footer.page-footer{
+  background-color: var(--grey-030);
+  color: var(--grey-150);
+
+  .flex-column{
+    :first-child{
+      font-weight: bold;
+    }
+
+    a, a:hover {
+      color: var(--grey-150);
+      text-decoration: underline;
+    }
+  }
+}
+
+
 .welcome-text {
   margin-top: $spacer * 2;
 }
