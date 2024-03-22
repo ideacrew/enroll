@@ -276,6 +276,103 @@ describe "match a person in db" do
           expect(subject.uniq_name_ssn_dob).to eq nil
         end
       end
+
+      context 'when person ssn is blank' do
+        let(:person1) { Person.create!(first_name: 'Joe', last_name: 'Kramer',   dob: '1993-03-30', ssn: nil)}
+        let(:user1){FactoryBot.create(:user)}
+        let(:consumer_role) { person1.consumer_role }
+
+        let!(:params) do
+          {
+            :dob => '2012-10-12',
+            :ssn => nil,
+            :first_name => 'yo',
+            :last_name => 'guy',
+            :gender => 'm',
+            :user_id => 20,
+            :is_applying_coverage => false
+          }
+        end
+
+        let(:subject) { Forms::ConsumerCandidate.new(params) }
+
+
+        before do
+          allow(db_person).to receive(:broker_role).and_return(nil)
+          allow(search_params).to receive(:ssn).and_return('517991234')
+          db_person.save!
+        end
+
+        it 'returns nil if matched person has broker agency staff role' do
+          binding.irb
+          allow(subject).to receive(:match_person).and_return(db_person)
+          expect(subject.uniq_name_ssn_dob).to eq true
+        end
+      end
+
+      context 'when there is no person with given ssn' do
+        let(:person1) { Person.create!(first_name: 'Joe', last_name: 'Kramer',   dob: '1993-03-30', ssn: '517991234')}
+        let(:user1){FactoryBot.create(:user)}
+        let(:consumer_role) { person1.consumer_role }
+
+        let!(:params) do
+          {
+            :dob => '2012-10-12',
+            :ssn => '517991234',
+            :first_name => 'yo',
+            :last_name => 'guy',
+            :gender => 'm',
+            :user_id => 20,
+            :is_applying_coverage => false
+          }
+        end
+
+        let(:subject) { Forms::ConsumerCandidate.new(params) }
+
+
+        before do
+          allow(db_person).to receive(:broker_role).and_return(nil)
+          allow(search_params).to receive(:ssn).and_return('517991234')
+          db_person.save!
+        end
+
+        it 'returns nil if matched person has broker agency staff role' do
+          binding.irb
+          allow(subject).to receive(:match_person).and_return(db_person)
+          expect(subject.uniq_name_ssn_dob).to eq nil
+        end
+      end
+
+      context 'when person match && input params have different ssn' do
+        let(:person1) { Person.create!(first_name: 'Joe', last_name: 'Kramer',   dob: '1993-03-30', ssn: '517991234')}
+        let(:user1){FactoryBot.create(:user)}
+        let(:consumer_role) { person1.consumer_role }
+
+        let!(:params) do
+          {
+            :dob => '2012-10-12',
+            :ssn => '517998787',
+            :first_name => 'yo',
+            :last_name => 'guy',
+            :gender => 'm',
+            :user_id => 20,
+            :is_applying_coverage => false
+          }
+        end
+
+        let(:subject) { Forms::ConsumerCandidate.new(params) }
+
+        before do
+          allow(db_person).to receive(:broker_role).and_return(nil)
+          db_person.save!
+        end
+
+        it 'returns nil if matched person has broker agency staff role' do
+          binding.irb
+          allow(subject).to receive(:match_person).and_return(db_person)
+          expect(subject.uniq_name_ssn_dob).to eq nil
+        end
+      end
     end
   end
 
