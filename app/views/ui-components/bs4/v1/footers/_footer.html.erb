@@ -1,40 +1,13 @@
-<footer class="page-footer page-footer fixed-bottom">
-  <div class="container">
-    <div class="row pt-3 pb-3">
-      <div class="col-md-6">
-        <%= copyright_notice %>
+<footer class="page-footer fixed-bottom">
+    <div id="footer-info" class="d-flex flex-row justify-content-between py-4 container">
+      <div id="left-column" class="d-flex flex-column">
+        <span><%= l10n("layout.footer.copyright", year: TimeKeeper.date_of_record.year, site_name: EnrollRegistry[:enroll_app].setting(:long_name).item) %></span>
+        <span><%= l10n("layout.footer.all_rights") %></span>
       </div>
-      <div class="col-md-6">
-        <ul class="list-unstyled list-group list-group-horizontal float-right">
-          <li class="mr-3">
-            <a class="call-customer-service" href="tel:<%= contact_center_short_number %>">
-              <span>
-                <i class="fas fa-phone fa-lg fa-rotate-90"></i>
-                &nbsp;
-                <%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %>
-              </span>
-            </a>
-          </li>
-          <% if contact_center_email_address_is_enabled? %>
-            <li class="mr-3">
-              <%= mail_to contact_center_email_address, target: '_blank', rel: 'noopener noreferrer' do %>
-                <span>
-                  <i class="fas fa-envelope fa-lg"></i>
-                  &nbsp;
-                  <%= EnrollRegistry[:enroll_app].setting(:mail_address).item %>
-                </span>
-              <% end %>
-            </li>
-          <% end %>
-          <li>
-            <%= link_to site_faqs_url, target: '_blank', rel: 'noopener noreferrer' do %>
-              <i class="fas fa-question fa-lg"></i>
-              &nbsp;
-              GET HELP
-            <% end %>
-          </li>
-        </ul>
+      <div id="right-column" class="d-flex flex-column">
+        <span><%= l10n("layout.footer.get_help") %></span>
+        <span><%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %></span>
+        <a><%= EnrollRegistry[:enroll_app].setting(:mail_address).item %></a>
       </div>
     </div>
-  </div>
 </footer>
