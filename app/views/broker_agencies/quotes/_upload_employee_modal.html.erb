@@ -3,7 +3,7 @@
   <h2><%= l10n("upload_employee_roster")%></h2>
   <h4><%= l10n("broker_agencies.quotes.template_upload")%></h4>
   <% file_name = EnrollRegistry[:census_employee_roster].settings(:roster_upload_file_name).item %>
-  <%= link_to(document_download_path(env_bucket_name("templates"), s3_template_bucket_key) + "?contenttype=application/vnd.ms-excel&filename=#{file_name}", class: "download") do %>
+  <%= link_to(document_employees_template_download_path + "?contenttype=application/vnd.ms-excel&filename=#{file_name}", class: "download") do %>
     <h4>Need the template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
       Download it now.
     </h4>

@@ -1,7 +1,7 @@
 <div class="employee-upload">
   <i class="fa fa-times fa-3x pull-right modal-close"></i>
   <h4> <strong> Unrecognized Employee Census spreadsheet format.</strong> </h4>
-  <%= link_to(main_app.document_download_path(env_bucket_name("templates"), "b4c0e3e6-cf9b-4b00-8194-403b110b4e01") + "?contenttype=application/vnd.ms-excel&filename=DCHL Employee Census.xlsx", class: "download") do %>
+  <%= link_to(main_app.document_employees_template_download_path+"?contenttype=application/vnd.ms-excel&filename=DCHL Employee Census.xlsx", class: "download") do %>
       <h4>Need the new template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
             Download it now.
       <% end %>
