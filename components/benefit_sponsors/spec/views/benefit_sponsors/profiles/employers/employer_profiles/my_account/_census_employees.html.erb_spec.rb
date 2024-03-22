@@ -33,6 +33,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
       view.extend Config::AcaHelper
 
       assign(:employer_profile, employer_profile)
+      allow(view).to receive(:link_to).and_return("/")
       allow(view).to receive(:plan_match_tool_is_enabled?).and_return(false)
       allow(view).to receive(:render_datatable).and_return(true)
       allow(view).to receive(:show_oop_pdf_link).and_return(false)
@@ -50,6 +51,5 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
       render template: "benefit_sponsors/profiles/employers/employer_profiles/my_account/_census_employees.html.erb"
       expect(rendered).to_not match(/Terminate Employee Roster Enrollments/)
     end
-
   end
 end
