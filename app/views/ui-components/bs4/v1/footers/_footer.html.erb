@@ -1,10 +1,10 @@
 <footer class="page-footer fixed-bottom">
-    <div id="footer-info" class="d-flex flex-row justify-content-between py-4 container">
-      <div id="left-column" class="d-flex flex-column">
+    <div id="footer-info" class="d-flex flex-column flex-sm-row justify-content-between py-4 container">
+      <div id="left-column" class="footer-column d-flex flex-column">
         <span><%= l10n("layout.footer.copyright", year: TimeKeeper.date_of_record.year, site_name: EnrollRegistry[:enroll_app].setting(:long_name).item) %></span>
         <span><%= l10n("layout.footer.all_rights") %></span>
       </div>
-      <div id="right-column" class="d-flex flex-column">
+      <div id="right-column" class="footer-column d-flex flex-column">
         <span><%= l10n("layout.footer.get_help") %></span>
         <span><%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %></span>
         <a><%= EnrollRegistry[:enroll_app].setting(:mail_address).item %></a>
