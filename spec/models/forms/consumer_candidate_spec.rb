@@ -304,7 +304,6 @@ describe "match a person in db" do
         end
 
         it 'returns nil if matched person has broker agency staff role' do
-          binding.irb
           allow(subject).to receive(:match_person).and_return(db_person)
           expect(subject.uniq_name_ssn_dob).to eq true
         end
@@ -337,7 +336,6 @@ describe "match a person in db" do
         end
 
         it 'returns nil if matched person has broker agency staff role' do
-          binding.irb
           allow(subject).to receive(:match_person).and_return(db_person)
           expect(subject.uniq_name_ssn_dob).to eq nil
         end
@@ -368,7 +366,6 @@ describe "match a person in db" do
         end
 
         it 'returns nil if matched person has broker agency staff role' do
-          binding.irb
           allow(subject).to receive(:match_person).and_return(db_person)
           expect(subject.uniq_name_ssn_dob).to eq nil
         end
