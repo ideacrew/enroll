@@ -8,18 +8,7 @@ module BenefitSponsors
       before_action :set_current_user
       before_action :find_inbox_provider
       before_action :find_message
-      before_action :set_sent_box, only: [:show, :destroy], if: :is_broker?
-
-      def new
-      end
-
-      def create
-        if @inbox_provider.instance_of?(Person)
-          authorize @inbox_provider, :can_read_inbox?, policy_class: BenefitSponsors::PersonPolicy
-        else
-          authorize @inbox_provider, :can_read_inbox?
-        end
-      end
+      before_action :set_sent_box, if: :is_broker?
 
       def show
         if @inbox_provider.instance_of?(Person)
@@ -93,12 +82,6 @@ module BenefitSponsors
 
       def find_message
         @message = @inbox_provider.inbox.messages.by_message_id(params["message_id"]).to_a.first
-      end
-
-      def set_inbox_and_assign_message
-      end
-
-      def successful_save_path
       end
     end
   end
