@@ -295,8 +295,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     it "should open the sbc pdf" do
       expect(rendered).to have_selector(
-        "a[href='#{"/document/download/#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
-        "-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf"\
+        "a[href='#{"/document/product_sbc_download/#{product.id}?content_type=application/pdf&filename=APlanName.pdf"\
         '&disposition=inline'}']"
       )
     end

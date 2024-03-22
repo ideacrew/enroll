@@ -7,6 +7,7 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
   let(:mock_plan) do
     double(
       "Plan",
+      :id => BSON::ObjectId.new,
       :name => "A Plan Name",
       :carrier_profile_id => "a carrier profile id",
       :carrier_profile => mock_carrier_profile,
@@ -38,8 +39,7 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
 
   it "should have the sbc link" do
     expect(rendered).to have_selector(
-      "a[href='#{"/document/download/#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
-      "-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/"\
+      "a[href='#{"/document/product_sbc_download/#{mock_plan.id}?content_type=application/"\
       'pdf&filename=APlanName.pdf&disposition=inline'}']"
     )
   end
@@ -53,7 +53,5 @@ RSpec.describe "shared/plan_shoppings/_sbc_link.html.erb" do
     it "should have the sbc link with dental text" do
       expect(rendered).to have_selector('a', text: 'Plan Summary')
     end
-
   end
-
 end

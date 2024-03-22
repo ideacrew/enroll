@@ -60,9 +60,9 @@
             <th colspan="2">
               <div class="plan_comparison">
                 <% link_text = qhp.plan.coverage_kind == 'health' ? "Summary of Benefits and Coverage" : 'Plan Summary' %>
-                <%= link_to link_text, root_url + document_product_sbc_download_path(qhp.product.id) +
+                <%= sanitize link_to(link_text, root_url + document_product_sbc_download_path(qhp.product.id) +
                                                   "?content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.
-                                                  pdf&disposition=inline" %>
+                                                  pdf&disposition=inline") %>
               </div>
             </th>
             <%end%>
