@@ -91,6 +91,8 @@ module Insured
       end
     end
 
+    private
+
     def process_successful_interactive_verification(service_response)
       consumer_role = @person.consumer_role
       consumer_user = @person.user
