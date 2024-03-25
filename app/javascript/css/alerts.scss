@@ -37,3 +37,40 @@
   background-color: var(--error-tint);
   border-color: var(--error-tint);
 }
+
+.alert {
+  padding: .25em;
+  border-radius: 3px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.notice {
+  padding: .25em;
+  border-radius: 6px;
+}
+
+.alert-warning, .notice-warning {
+  background-color: var(--warning-tint);
+  border-color: var(--warning-color);
+  color: var(--grey-190);
+}
+
+.alert-success, .notice-success {
+  background-color: var(--success-tint);
+  border-color: var(--success-color);
+  color: var(--grey-190);
+}
+
+.icon {
+  width: 1em;
+  margin-right: .25em;
+}
+
+.warning-icon {
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.49845 2.29672C10.5292 0.234426 13.4708 0.234426 14.5016 2.29672L22.9501 19.2003C23.8802 21.0612 22.5273 23.25 20.4485 23.25H3.55146C1.47273 23.25 0.11977 21.0612 1.0499 19.2003L9.49845 2.29672Z' fill='%23FFD600' stroke='%233B3A39' stroke-width='1.5'/%3E%3Cpath d='M13.0089 15.8215H11.0074L10.589 7.80707H13.4273L13.0089 15.8215ZM10.5562 18.627C10.5562 18.1676 10.6793 17.8203 10.9254 17.5852C11.1714 17.35 11.5297 17.2325 12 17.2325C12.4539 17.2325 12.8039 17.3528 13.05 17.5934C13.3015 17.834 13.4273 18.1786 13.4273 18.627C13.4273 19.059 13.3015 19.4008 13.05 19.6524C12.7984 19.8985 12.4484 20.0215 12 20.0215C11.5406 20.0215 11.1851 19.9012 10.9336 19.6606C10.682 19.4145 10.5562 19.07 10.5562 18.627Z' fill='%233B3A39'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  color: transparent !important;
+  font-size: 27px !important;
+}
