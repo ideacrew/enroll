@@ -18,7 +18,7 @@ registry:
           - key: :copyright_period_start
             item: "2013"
           - key: :login_url
-            item: <%= ENV['EA_LOGIN_URL'] %>
+            item: <%= ENV['ENROLL_LOGIN_URL'] %>
           - key: :policies_url
             item: "https://dchealthlink.com/"
           - key: :faqs_url
