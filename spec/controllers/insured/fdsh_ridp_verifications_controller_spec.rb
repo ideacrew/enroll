@@ -19,13 +19,13 @@ describe Insured::FdshRidpVerificationsController do
     end
 
     it 'finds a primary response' do
-      expect(controller.find_response('primary')).to eq(primary_event)
+      expect(controller.send(:find_response, 'primary')).to eq(primary_event)
     end
 
     context "with nil deleted at dates" do
 
       it "should not include eligibility response models" do
-        expect(controller.find_response('primary').to_a.count).to eql(1)
+        expect(controller.send(:find_response, 'primary').to_a.count).to eql(1)
       end
     end
 
@@ -35,7 +35,7 @@ describe Insured::FdshRidpVerificationsController do
       end
 
       it "should return nil" do
-        expect(controller.find_response('primary')).to eql(nil)
+        expect(controller.send(:find_response, 'primary')).to eql(nil)
       end
     end
 
@@ -46,14 +46,14 @@ describe Insured::FdshRidpVerificationsController do
       end
 
       it "should only return records related to one primary hbx_id" do
-        expect(controller.find_response('primary').to_a.count).to eql(1)
+        expect(controller.send(:find_response, 'primary').to_a.count).to eql(1)
       end
     end
 
     context "with different event kinds" do
 
       it "should only return one event kind" do
-        expect(controller.find_response('secondary')).to eql(fifth_event)
+        expect(controller.send(:find_response, 'secondary')).to eql(fifth_event)
       end
     end
   end
