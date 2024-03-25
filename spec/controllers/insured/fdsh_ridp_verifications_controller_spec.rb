@@ -53,7 +53,7 @@ describe Insured::FdshRidpVerificationsController do
     context "with different event kinds" do
 
       it "should only return one event kind" do
-        expect(controller.find_response('secondary')).to eql(fifth_event)
+        expect(controller.send(:find_response, 'secondary')).to eql(fifth_event)
       end
     end
   end
