@@ -43,7 +43,7 @@ module FinancialAssistance
 
           def find_families(params)
             if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-              Family.active_assisted_tax_households_for_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
+              fetch_pvc_families_for_assistance_year(params[:assistance_year], params[:csr_list])
             else
               Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
             end
@@ -78,6 +78,32 @@ module FinancialAssistance
             rescue StandardError => e
               pvc_logger.error("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
             end
+          end
+
+          def fetch_pvc_families_for_assistance_year(assistance_year, csr_list)
+            family_collection = Family.collection.aggregate([
+              { '$unwind' => '$tax_household_groups' },
+              { '$match' => {
+                "$expr" => { "$eq" => [{ "$year" => "$tax_household_groups.start_on" }, assistance_year] },
+                'tax_household_groups.end_on' => nil,
+                'tax_household_groups.tax_households' => {
+                  '$elemMatch' => {
+                    'max_aptc.cents' => {'$gt' => 0},
+                    'tax_household_members.csr_percent_as_integer' => { '$in' => csr_list }
+                  }
+                }
+              }},
+              { '$lookup' => {
+                'from' => 'hbx_enrollments',
+                'localField' => '_id',
+                'foreignField' => 'family_id',
+                'as' => 'hbx_enrollments'
+              }},
+              { '$unwind' => '$hbx_enrollments' },
+              { '$match' => { 'hbx_enrollments.aasm_state' => { '$in' => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES } } }
+            ], allow_disk_use: true)
+
+            family_collection.collect{|f| f["_id"]}.uniq
           end
 
           def build_event(payload)
