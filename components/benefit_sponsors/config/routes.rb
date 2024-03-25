@@ -12,7 +12,6 @@ BenefitSponsors::Engine.routes.draw do
           get :family_index
           get :messages
           get :staff_index
-          get :agency_messages
           get :commission_statements
           get :general_agency_index
           post :email_guide

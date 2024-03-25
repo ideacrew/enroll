@@ -146,7 +146,7 @@ class ApplicationPolicy
     broker = account_holder_person&.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
-    broker_agency_account = family.active_broker_agency_account
+    broker_agency_account = family&.active_broker_agency_account
     return false if broker_agency_account.blank?
 
     broker_agency_account.benefit_sponsors_broker_agency_profile_id == broker.benefit_sponsors_broker_agency_profile_id &&

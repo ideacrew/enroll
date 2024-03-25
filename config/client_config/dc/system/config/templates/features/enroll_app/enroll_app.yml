@@ -261,6 +261,8 @@ registry:
             item: 20
           - key: :default_password_length_range
             item: 8..20
+          - key: :employees_template_key
+            item: "b4c0e3e6-cf9b-4b00-8194-403b110b4e01"
       - key: :data_seeds_ui
         item: :data_seed_ui
         is_enabled: true

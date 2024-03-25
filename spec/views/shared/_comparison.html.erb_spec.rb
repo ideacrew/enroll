@@ -39,7 +39,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
   
   let(:mock_qhp){instance_double("Products::QhpCostShareVariance", :product => product, :plan => plan, :plan_marketing_name=> product.title)}
   let(:mock_qhps) {[mock_qhp]}
-  let(:sbc_document) { double("SbcDocument", identifier: "download#abc") }
+  let(:sbc_document) { double("SbcDocument", id: BSON::ObjectId.new, identifier: "download#abc") }
   let(:mock_family){ double("Family") }
 
   before :each do
@@ -79,7 +79,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     before :each do
       assign :coverage_kind, "health"
       assign :market_kind, 'aca_shop'
-      allow(product).to receive(:sbc_document).and_return double("Document", :identifier => "identifier")
+      allow(product).to receive(:sbc_document).and_return double("Document", id: BSON::ObjectId.new, :identifier => "identifier")
       render "shared/comparison", :qhps => mock_qhps
     end
 
