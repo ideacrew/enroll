@@ -98,7 +98,6 @@ class Family
   index({"households.tax_households.effective_ending_on" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
   index({"tax_household_groups.tax_households._id" => 1})
-
   index({"households.tax_households.eligibility_determinations._id" => 1})
   index({"households.tax_households.eligibility_determinations.e_pdc_id" => 1})
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
@@ -178,21 +177,6 @@ class Family
                              .and(:"households.tax_households.effective_ending_on" => nil)
                              .and(:"households.tax_households.effective_starting_on".gte => Date.new(assistance_year).beginning_of_year)
                              .and(:"households.tax_households.effective_starting_on".lte => Date.new(assistance_year).end_of_year)
-  }
-
-  scope :active_assisted_tax_households_for_year, lambda { |assistance_year|
-    where(:"tax_household_groups.end_on" => nil)
-      .and(:"tax_household_groups.start_on".gte => Date.new(assistance_year).beginning_of_year)
-      .and(:"tax_household_groups.start_on".lte => Date.new(assistance_year).end_of_year)
-      .and(:"tax_household_groups.tax_households.max_aptc.cents".gt => 0)
-  }
-
-  scope :with_csr, ->(csr_set) { any_in("tax_household_groups.tax_households.tax_household_members.csr_percent_as_integer": csr_set) }
-
-  scope :verifiable_for_year_with_csr_and_aptc, lambda { |assistance_year, csr_set|
-    all_enrolled_and_renewal_enrollments
-      .active_assisted_tax_households_for_year(assistance_year)
-      .with_csr(csr_set)
   }
 
   scope :using_aptc_csr_assistance,      ->{where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0)}
