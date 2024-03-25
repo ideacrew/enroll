@@ -116,19 +116,23 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  # Only when "broker_role_consumer_enhancement" (cr-95) is enabled, the below email will be sent to the broker.
+  # site_broker_linked_invitation_email_login_url only applies when "broker_role_consumer_enhancement" is enabled.
   def broker_linked_invitation_email(email, person_name)
     return if email.blank?
 
     mail({to: email, subject: l10n("user_mailer.broker_linked_notification_email.subject")}) do |format|
-      format.html { render "broker_linked_notification_email", :locals => { :person_name => person_name, :login_url => site_main_web_address_url }}
+      format.html { render "broker_linked_notification_email", :locals => { :person_name => person_name, :login_url => site_broker_linked_invitation_email_login_url }}
     end
   end
 
+  # Only when "broker_role_consumer_enhancement" (cr-95) is enabled, the below email will be sent to the broker staff.
+  # site_broker_linked_invitation_email_login_url only applies when "broker_role_consumer_enhancement" is enabled.
   def broker_staff_linked_invitation_email(email, person_name)
     return if email.blank?
 
     mail({to: email, subject: l10n("user_mailer.broker_staff_linked_notification_email.subject")}) do |format|
-      format.html { render "broker_staff_linked_notification_email", :locals => { :person_name => person_name, :login_url => site_main_web_address_url }}
+      format.html { render "broker_staff_linked_notification_email", :locals => { :person_name => person_name, :login_url => site_broker_linked_invitation_email_login_url }}
     end
   end
 

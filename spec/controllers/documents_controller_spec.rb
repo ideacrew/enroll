@@ -533,4 +533,170 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       end
     end
   end
+
+  describe "GET employees_template_download" do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:profile) { benefit_sponsorship.organization.profiles.first }
+    let(:employer_staff_person) { FactoryBot.create(:person) }
+    let(:employer_staff_user) { FactoryBot.create(:user, person: employer_staff_person) }
+    let(:er_staff_role) { FactoryBot.create(:benefit_sponsor_employer_staff_role, benefit_sponsor_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) }
+    let(:document) {profile.documents.create(identifier: "urn:opentest:terms:t1:test_storage:t3:bucket:test-test-id-verification-test#sample-key")}
+
+    context 'employer staff role' do
+      context 'for a user with POC role' do
+        before do
+          employer_staff_person.employer_staff_roles << er_staff_role
+          employer_staff_person.save!
+          sign_in employer_staff_user
+        end
+
+        it 'current user employer should be able to download' do
+          get :employees_template_download
+          expect(response).to be_successful
+        end
+      end
+
+      context 'for a user without POC role' do
+
+        before do
+          sign_in employer_staff_user
+        end
+
+        it 'current user without employer staff role should not be able to download' do
+          get :employees_template_download
+          expect(response).to have_http_status(:found)
+          expect(flash[:error]).to eq("Access not allowed for user_policy.can_download_employees_template?, (Pundit policy)")
+        end
+      end
+    end
+
+    context 'broker role' do
+      context 'with authorized account' do
+        before do
+          profile.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                               writing_agent_id: broker_role.id,
+                                                                                               start_on: Time.now,
+                                                                                               is_active: true)
+          sign_in broker_role_user
+        end
+
+        it 'broker should be able to download' do
+          get :employees_template_download
+          expect(response).to be_successful
+        end
+      end
+
+      context 'with inactive broker role' do
+        before do
+          broker_role.update!(aasm_state: 'inactive')
+          sign_in broker_role_user
+        end
+
+        it 'broker should be able to download' do
+          get :employees_template_download
+          expect(response).to have_http_status(:found)
+          expect(flash[:error]).to eq("Access not allowed for user_policy.can_download_employees_template?, (Pundit policy)")
+        end
+      end
+    end
+
+    context 'hbx staff role' do
+      context 'with permission to access' do
+        before do
+          sign_in admin_user
+        end
+
+        it 'hbx staff should be able to download' do
+          get :employees_template_download
+          expect(response).to be_successful
+        end
+      end
+    end
+  end
+
+  describe "GET product_sbc_download" do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:profile) { benefit_sponsorship.organization.profiles.first }
+    let(:employee_person) { FactoryBot.create(:person, :with_family, :with_employee_role) }
+    let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: profile, employee_role_id: person.employee_role.id) }
+    let(:employee_user) { FactoryBot.create(:user, person: employee_person) }
+    let(:product) do
+      product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')
+      product.create_sbc_document(identifier: "urn:opentest:terms:t1:test_storage:t3:bucket:test-test-id-verification-test#sample-key")
+      product.save
+      product
+    end
+
+    context 'employee role' do
+      context 'for a user with employee role' do
+        it 'current user employer should be able to download' do
+          sign_in employee_user
+
+          get :product_sbc_download, params: { document_id: product.sbc_document.id, product_id: product.id }
+          expect(response).to be_successful
+        end
+      end
+
+      context 'for a user without any role' do
+        let(:user_without_roles) { FactoryBot.create(:user, person: FactoryBot.create(:person)) }
+        before do
+          sign_in user_without_roles
+        end
+
+        it 'current user without any role should not be able to download' do
+          get :product_sbc_download, params: { document_id: product.sbc_document.id, product_id: product.id }
+          expect(response).to have_http_status(:found)
+          expect(flash[:error]).to eq("Access not allowed for person_policy.can_download_sbc_documents?, (Pundit policy)")
+        end
+      end
+    end
+
+    context 'broker role' do
+      context 'with authorized account' do
+        before do
+          broker_agency_profile.update!(market_kind: 'both')
+          employee_person.primary_family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                                      writing_agent_id: broker_role.id,
+                                                                                                                      start_on: Time.now,
+                                                                                                                      is_active: true)
+          sign_in broker_role_user
+        end
+
+        it 'broker should be able to download' do
+          get :product_sbc_download, params: { document_id: product.sbc_document.id, product_id: product.id }, session: { person_id: employee_person.id }
+          expect(response).to be_successful
+        end
+      end
+
+      context 'with inactive broker role' do
+        before do
+          broker_role.update!(aasm_state: 'inactive')
+          sign_in broker_role_user
+        end
+
+        it 'broker should be able to download' do
+          get :product_sbc_download, params: { document_id: product.sbc_document.id, product_id: product.id }, session: { person_id: employee_person.id }
+          expect(response).to have_http_status(:found)
+          expect(flash[:error]).to eq("Access not allowed for person_policy.can_download_sbc_documents?, (Pundit policy)")
+        end
+      end
+    end
+
+    context 'hbx staff role' do
+      context 'with permission to access' do
+        before do
+          sign_in admin_user
+        end
+
+        it 'hbx staff should be able to download' do
+          get :product_sbc_download, params: { document_id: product.sbc_document.id, product_id: product.id }
+          expect(response).to be_successful
+        end
+      end
+    end
+  end
 end

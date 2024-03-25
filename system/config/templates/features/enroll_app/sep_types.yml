@@ -130,7 +130,8 @@ registry:
               {first_of_next_month_reporting: First of Month after Reporting},
               {first_of_month: 15th of the Month},
               {first_of_next_month_coinciding: First of Next Month (Coinciding)},
-              {first_of_next_month_plan_selection: First of Next Month (Plan Selection)}]
+              {first_of_next_month_plan_selection: First of Next Month (Plan Selection)},
+              {first_of_the_month_plan_shopping: First of the Month (Plan Shopping)}]
               content_type: :checkbox_select
               default: ''
               description: ''

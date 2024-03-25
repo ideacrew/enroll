@@ -69,6 +69,31 @@ class PersonPolicy < ApplicationPolicy
     has_broker_role? && (matches_individual_broker_account? || matches_shop_broker_account?)
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def can_download_sbc_documents?
+    return true if individual_market_primary_family_member?
+    return true if individual_market_admin?
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
+
+    return true if shop_market_primary_family_member?
+    return true if shop_market_admin?
+    return true if active_associated_shop_market_family_broker?
+    return true if active_associated_shop_market_general_agency?
+
+    return true if fehb_market_primary_family_member?
+    return true if fehb_market_admin?
+    return true if active_associated_fehb_market_family_broker?
+    return true if active_associated_fehb_market_general_agency?
+
+    return true if coverall_market_primary_family_member?
+    return true if coverall_market_admin?
+    return true if active_associated_coverall_market_family_broker?
+
+    false
+  end
+  # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+
   private
 
   def allowed_to_modify?

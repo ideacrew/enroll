@@ -16,8 +16,6 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
     let!(:sponsored_benefit) {benefit_sponsorship.benefit_applications.first.benefit_packages.first.health_sponsored_benefit}
     let!(:update_sponsored_benefit) {sponsored_benefit.update_attributes(product_package_kind: :single_product)}
     let(:employer_profile) { benefit_sponsorship.profile }
-
-
     let(:person) {FactoryBot.create(:person)}
     let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
     let!(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: benefit_sponsorship.profile) }
@@ -35,6 +33,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
       view.extend Config::AcaHelper
 
       assign(:employer_profile, employer_profile)
+      allow(view).to receive(:link_to).and_return("/")
       allow(view).to receive(:plan_match_tool_is_enabled?).and_return(false)
       allow(view).to receive(:render_datatable).and_return(true)
       allow(view).to receive(:show_oop_pdf_link).and_return(false)
@@ -52,6 +51,5 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
       render template: "benefit_sponsors/profiles/employers/employer_profiles/my_account/_census_employees.html.erb"
       expect(rendered).to_not match(/Terminate Employee Roster Enrollments/)
     end
-
   end
 end
