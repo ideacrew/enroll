@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 describe Events::SsaVerificationRequestsController do
@@ -11,22 +13,23 @@ describe Events::SsaVerificationRequestsController do
     before do
       @event_name = ""
       @body = nil
-      event_subscriber = ActiveSupport::Notifications.subscribe(outbound_event_name) do |e_name, s_at, e_at, m_id, payload|
+      event_subscriber = ActiveSupport::Notifications.subscribe(outbound_event_name) do |e_name, _s_at, _e_at, _m_id, payload|
         @event_name = e_name
         @body = payload
       end
       allow(Time).to receive(:now).and_return(mock_now)
       expect(controller).to receive(:render_to_string).with(
-          "events/lawful_presence/ssa_verification_request", {:formats => ["xml"], :locals => {
+        "events/lawful_presence/ssa_verification_request", {:formats => [:xml], :locals => {
           :individual => person
-      }}).and_return(rendered_template)
-      controller.call(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, nil, nil, nil, {:person => person} )
+        }}
+      ).and_return(rendered_template)
+      controller.call(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, nil, nil, nil, {:person => person})
       ActiveSupport::Notifications.unsubscribe(event_subscriber)
     end
 
     xit "should send out a message to the bus with the request to validate ssa" do
       expect(@event_name).to eq outbound_event_name
-      expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
+      expect(@body).to eq({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
     end
 
     it "stores verification history element" do
@@ -43,7 +46,8 @@ describe Events::SsaVerificationRequestsController do
 
     xit "stores reference to event_request document" do
       expect(person.consumer_role.lawful_presence_determination.ssa_requests.first.id).to eq BSON::ObjectId.from_string(
-          person.verification_types.active.where(type_name: "Social Security Number").first.type_history_elements.first.event_request_record_id)
+        person.verification_types.active.where(type_name: "Social Security Number").first.type_history_elements.first.event_request_record_id
+      )
     end
   end
 

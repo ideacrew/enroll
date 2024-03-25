@@ -27,7 +27,7 @@ describe Api::V1::SlcspController, :type => :controller do
       allow(HappyMapper).to receive(:parse).with(anything).and_raise(Exception.new)
       allow_any_instance_of(Api::V1::SlcspController).to receive(:find_slcsp).with(anything).and_return(plan)
 
-      post :plan, {:format => "xml"}
+      post :plan, {:format => :xml}
       expect(response.status).to eq(422)
     end
   end

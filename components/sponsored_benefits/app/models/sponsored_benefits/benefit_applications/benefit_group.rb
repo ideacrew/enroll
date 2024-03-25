@@ -1,7 +1,10 @@
 module SponsoredBenefits
   module BenefitApplications
     class BenefitGroup < ::BenefitGroup
-      embedded_in :benefit_application
+      embedded_in :benefit_application, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+
+      field :_type, type: String, default: self.name
+
       delegate :effective_period, to: :benefit_application
       delegate :sic_code, to: :benefit_application
       delegate :start_on, to: :benefit_application

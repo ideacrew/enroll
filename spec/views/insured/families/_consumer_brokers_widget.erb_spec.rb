@@ -30,11 +30,13 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
     end
 
     it 'should display broker widget for consumer' do
-      expect(rendered).to have_text('h3', "Your Broker")
+      expect(rendered).to have_selector('h3')
+      expect(rendered).to have_text("Your Broker")
     end
 
     it 'should display correctly formatted broker name' do
-      expect(rendered).to have_text('span', formatted_name)
+      expect(rendered).to have_selector('span')
+      expect(rendered).to have_text(formatted_name)
     end
 
     it 'should display brokers email' do
@@ -64,23 +66,21 @@ RSpec.describe '_consumer_brokers_widget.html.erb' do
       assign :family_members, [family_member]
       allow(person).to receive(:primary_family).and_return(family)
       allow(family).to receive(:current_broker_agency).and_return(nil)
-      #allow(person).to receive_message_chain('primary_family.current_broker_agency.present?').and_return(false)
-      #allow(person).to receive_message_chain('primary_family.current_broker_agency.writing_agent').and_return(writing_agent)
       render 'insured/families/consumer_brokers_widget'
     end
 
     it 'should display broker widget for consumer' do
-      expect(rendered).to have_text('h3', 'Select a Broker or Assister')
+      expect(rendered).to have_selector('h3')
+      expect(rendered).to have_text('Select a Broker or Assister')
     end
 
     it 'should display get help signing up button' do
-      expect(rendered).to have_text('a', 'Get Help Signing Up')
+      expect(rendered).to have_selector('a')
+      expect(rendered).to have_text('Get Help Signing Up')
     end
 
     it 'should display get help signing up button' do
-      # I know I'm flipping this test but when it was previously have_selector it wasn't working correctly
-      # when broker_agency.present? returns false this should not be rendered, check the view, line 55
-      expect(rendered).to_not have_text('a', 'Find Assistance Another Way')
+      expect(rendered).to_not have_text('Find Assistance Another Way')
     end
   end
 end

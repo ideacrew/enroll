@@ -209,7 +209,7 @@ module BenefitSponsors
 
           it "should not throw an exception" do
             expect(response).to redirect_to('http://test.host/users/sign_in')
-            expect(assigns(:agency).portal).to eq('true')
+            expect(assigns(:agency).portal).to eq(true)
           end
         end
         context "signed in" do
@@ -220,7 +220,7 @@ module BenefitSponsors
 
           it "should not throw an exception and render new template" do
             expect(response).to render_template :new
-            expect(assigns(:agency).portal).to eq('true')
+            expect(assigns(:agency).portal).to eq(true)
           end
         end
       end
@@ -243,7 +243,7 @@ module BenefitSponsors
           end
 
           it "should set the value of portal on form instance to true" do
-            expect(assigns(:agency).portal).to eq "true"
+            expect(assigns(:agency).portal).to eq true
           end
         end
 
@@ -266,7 +266,7 @@ module BenefitSponsors
           end
 
           it "should set the value of portal on form instance to true" do
-            expect(assigns(:agency).portal).to eq "true"
+            expect(assigns(:agency).portal).to eq true
           end
         end
       end

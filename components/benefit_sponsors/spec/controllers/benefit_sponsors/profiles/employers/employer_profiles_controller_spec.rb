@@ -13,13 +13,12 @@ module BenefitSponsors
 
     let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_sponsor)       { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let(:employer_profile)      { benefit_sponsor.employer_profile }
+    let(:employer_profile)       { benefit_sponsor.employer_profile }
     let!(:rating_area)           { FactoryBot.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)          { FactoryBot.create_default :benefit_markets_locations_service_area }
     let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
     before do
-      controller.prepend_view_path("../../app/views")
       person.employer_staff_roles.create! benefit_sponsor_employer_profile_id: employer_profile.id
     end
 

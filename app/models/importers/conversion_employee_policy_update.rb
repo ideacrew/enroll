@@ -226,7 +226,7 @@ module Importers
       if update_enrollment_members(family, enrollment, people)
 
         passive_renewal = get_passively_renewed_coverage(employer, family)
-        return passive_renewal if passive_renewal.is_a?(Boolean)
+        return passive_renewal if passive_renewal.is_a?(Mongoid::Boolean)
         people_for_removal += filter_people_for_removal.call(passive_renewal, people)
 
         if update_enrollment_members(family, passive_renewal, people, true)

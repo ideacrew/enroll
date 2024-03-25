@@ -9,7 +9,7 @@ module Events
       individual = Person.by_hbx_id(individual_id).first
       begin
         if !individual.nil?
-          response_payload = render_to_string "created", :formats => ["xml"], :locals => { :individual => individual }
+          response_payload = render_to_string "created", :formats => [:xml], :locals => { :individual => individual }
           reply_with(connection, reply_to, "200", response_payload, individual_id)
         else
           reply_with(connection, reply_to, "404", "", individual_id)

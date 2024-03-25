@@ -70,7 +70,7 @@ module BenefitSponsors
         end
 
         it "should render js template" do
-          expect(response.content_type).to eq Mime[:js]
+          expect(response.content_type).to eq "text/javascript"
         end
 
         it "should be a success" do
@@ -97,7 +97,7 @@ module BenefitSponsors
         end
 
         it 'should render js template' do
-          expect(response.content_type).to eq Mime[:js]
+          expect(response.content_type).to eq "text/javascript"
         end
 
 
@@ -121,7 +121,7 @@ module BenefitSponsors
         end
 
         it 'should render js template' do
-          expect(response.content_type).to eq Mime[:js]
+          expect(response.content_type).to eq "text/javascript"
         end
 
         it 'should get javascript content' do

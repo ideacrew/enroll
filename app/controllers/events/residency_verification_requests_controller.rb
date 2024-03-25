@@ -8,7 +8,7 @@ module Events
 
     def call(event_name, e_start, e_end, msg_id, payload)
       individual = payload.stringify_keys["person"]
-      event_payload = render_to_string "events/residency/verification_request", :formats => ["xml"], :locals => { :individual => individual }
+      event_payload = render_to_string "events/residency/verification_request", :formats => [:xml], :locals => { :individual => individual }
       event_request_record = EventRequest.new({requested_at: Time.now, body: event_payload})
       individual.consumer_role.local_residency_requests << event_request_record
       if EnrollRegistry.feature_enabled?(:location_residency_verification_type)

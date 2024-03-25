@@ -56,9 +56,9 @@ module BenefitMarkets
 
     def comparable_attrs
       [
-        :application_period, :product_kind, :package_kind, :title, :description, :product_multiplicity,
-        :contribution_model, :pricing_model
-        ]
+        :application_period, :product_kind, :package_kind, :title, :description,
+        :product_multiplicity, :contribution_model, :pricing_model
+      ]
     end
 
     def products=(attributes)
@@ -176,7 +176,7 @@ module BenefitMarkets
 
     def products_for_plan_option_choice(product_option_choice)
       if package_kind == :metal_level
-        products.by_metal_level_kind(product_option_choice)
+        products.by_metal_level_kind(product_option_choice.to_sym)
       elsif package_kind == :multi_product
         products
       else

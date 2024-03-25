@@ -3,7 +3,7 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :contribution_unit, inverse_of: :member_relationship_maps
+    embedded_in :contribution_unit, class_name: "::BenefitMarkets::ContributionModels::ContributionUnit", inverse_of: :member_relationship_maps
 
     field :relationship_name, type: Symbol
     field :operator, type: Symbol, default: :==

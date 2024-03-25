@@ -187,8 +187,8 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(assigns(:staff).class).to eq staff_class
         end
 
-        it "should return a 200" do
-          expect(response.status).to eq(200)
+        it "should render js template" do
+          expect(response.content_type).to eq "text/javascript"
         end
 
         it "should be a success" do
@@ -216,8 +216,8 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           post :create, params: staff_params, format: :js, xhr: true
         end
 
-        it 'should return a 200' do
-          expect(response.status).to eq(200)
+        it 'should render js template' do
+          expect(response.content_type).to eq "text/javascript"
         end
 
         it 'should not create a new staff role' do

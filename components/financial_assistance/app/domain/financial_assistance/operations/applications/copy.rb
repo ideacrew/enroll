@@ -262,8 +262,8 @@ module FinancialAssistance
                                                                   :has_eligible_medicaid_cubcare, :medicaid_cubcare_due_on, :has_eligibility_changed, :has_household_income_changed,
                                                                   :person_coverage_end_on, :has_dependent_with_coverage, :dependent_job_end_on, :transfer_referral_reason,
                                                                   :five_year_bar_applies, :five_year_bar_met, :qualified_non_citizen)
-          source_appli_params.deep_symbolize_keys!
-          source_appli_params.merge(applicant_mergable_params)
+
+          source_appli_params.merge(applicant_mergable_params).deep_symbolize_keys
         end
       end
     end

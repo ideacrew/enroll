@@ -24,7 +24,8 @@ RSpec.describe ExceptionsController, :type => :controller, :dbclean => :after_ea
         end
 
         it "should redirect to custom exception view" do
-          expect(response).to render_template(:file => "#{Rails.root}/public/500.html")
+          expect(subject.status).to eq(500)
+          expect(response.body).to include("We're sorry, but something went wrong (500)")
         end
       end
     end

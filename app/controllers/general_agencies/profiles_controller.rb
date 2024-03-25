@@ -29,7 +29,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
     sanitize_agency_profile_params
 
     @organization = Organization.find(params[:organization][:id])
-    @organization_dup = @organization.office_locations.as_json
+    @organization_dup = @organization.office_locations.serializable_hash
 
     #clear office_locations, don't worry, we will recreate
     @organization.assign_attributes(:office_locations => [])

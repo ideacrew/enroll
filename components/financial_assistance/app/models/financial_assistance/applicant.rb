@@ -512,8 +512,8 @@ module FinancialAssistance
     end
 
     def strictly_boolean
-      errors.add(:base, 'is_ia_eligible should be a boolean') unless is_ia_eligible.is_a?(Boolean)
-      errors.add(:base, 'is_medicaid_chip_eligible should be a boolean') unless is_medicaid_chip_eligible.is_a? Boolean
+      errors.add(:base, 'is_ia_eligible should be a boolean') unless is_ia_eligible.is_a?(Mongoid::Boolean)
+      errors.add(:base, 'is_medicaid_chip_eligible should be a boolean') unless is_medicaid_chip_eligible.is_a?(Mongoid::Boolean)
     end
 
     def tax_filing?

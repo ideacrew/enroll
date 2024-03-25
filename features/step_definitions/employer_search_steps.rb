@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 When(/^the user enters fein of employer ABC Widgets in search bar$/) do
-  find("input[type=search]").set(employer('ABC Widgets').fein)
+  find("input[type=search]").set(employer("ABC Widgets").fein)
 end
 
 Then(/^the user will see ABC Widgets Employer$/) do

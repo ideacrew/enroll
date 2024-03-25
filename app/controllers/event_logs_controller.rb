@@ -15,6 +15,10 @@ class EventLogsController < ApplicationController
 
   private
 
+  def event_params
+    params[:events] || []
+  end
+
   def check_hbx_staff_role
     redirect_to root_path, flash: { error: "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
   end

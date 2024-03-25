@@ -116,15 +116,15 @@ module Insured
     end
 
     def render_session_start
-      render_to_string "events/identity_verification/interactive_session_start", :formats => ["xml"], :locals => { :individual => @person }
+      render_to_string "events/identity_verification/interactive_session_start", :formats => [:xml], :locals => { :individual => @person }
     end
 
     def render_question_responses(session)
-      render_to_string "events/identity_verification/interactive_questions_response", :formats => ["xml"], :locals => { :session => session }
+      render_to_string "events/identity_verification/interactive_questions_response", :formats => [:xml], :locals => { :session => session }
     end
 
     def render_verification_override(transaction_id)
-      render_to_string "events/identity_verification/interactive_verification_override", :formats => ["xml"], :locals => { :transaction_id => transaction_id }
+      render_to_string "events/identity_verification/interactive_verification_override", :formats => [:xml], :locals => { :transaction_id => transaction_id }
     end
   end
 end

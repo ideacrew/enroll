@@ -30,7 +30,7 @@ module Operations
         result = ::Operations::Families::Find.new.call(id: valid_params[:family_id])
         return Failure("Unable to find BrokerAgencyAccount with ID #{valid_params[:broker_account_id]} for Family #{valid_params[:family_id]}.") unless result&.success?
 
-        account = result.success.broker_agency_accounts.unscoped.find(id: valid_params[:broker_account_id])
+        account = result.success.broker_agency_accounts.unscoped.find(valid_params[:broker_account_id])
         account.present? ? Success(account) : Failure("Unable to find BrokerAgencyAccount with ID #{valid_params[:broker_account_id]} for Family #{valid_params[:family_id]}.")
       rescue StandardError
         Failure("Unable to find BrokerAgencyAccount with ID #{valid_params[:broker_account_id]} for Family #{valid_params[:family_id]}.")

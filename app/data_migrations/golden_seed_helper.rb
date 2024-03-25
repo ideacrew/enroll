@@ -19,9 +19,9 @@ module GoldenSeedHelper
     [nil, '', "n/a", "n", "no", "false", "none", false].exclude?(value)
   end
 
-  def site
-    @site = BenefitSponsors::Site.all.first
-  end
+  # def site
+  #   @site = BenefitSponsors::Site.all.first
+  # end
 
   def counter_number
     (0..999).to_a.sample

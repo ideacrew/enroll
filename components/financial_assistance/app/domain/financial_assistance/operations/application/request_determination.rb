@@ -53,7 +53,7 @@ module FinancialAssistance
         def construct_payload(application)
           payload = ::FinancialAssistance::ApplicationController.new.render_to_string(
             "financial_assistance/events/financial_assistance_application",
-            :formats => ["xml"],
+            :formats => [:xml],
             :locals => { :financial_assistance_application => application }
           )
 

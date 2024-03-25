@@ -13,7 +13,7 @@ module SponsoredBenefits
       field :area_code, type: String, default: ""
       field :number, type: String, default: ""
       field :extension, type: String, default: ""
-      field :primary, type: Boolean
+      field :primary, type: Mongoid::Boolean
       field :full_phone_number, type: String, default: ""
 
       before_validation :save_phone_components

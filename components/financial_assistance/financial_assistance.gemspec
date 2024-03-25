@@ -19,8 +19,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   spec.test_files = Dir["spec/**/*"]
 
-  spec.add_dependency "rails",                     "~> 5.2.3"
-  spec.add_dependency "mongoid",                   "~> 7.0.2"
+  spec.add_dependency 'rails', '~> 6.0.6.1'
+  spec.add_dependency 'mongoid', '~> 7.5.4'
   spec.add_dependency 'mongoid-autoinc',           '~> 6.0'
   spec.add_dependency "aasm",                      "~> 4.8"
   spec.add_dependency 'config',                    '~> 2.0'
@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'
   spec.add_development_dependency "mongoid-rspec",             '~> 4.0.1'
   spec.add_development_dependency 'rails-perftest',            '~> 0.0.7'
-  spec.add_development_dependency "rspec-rails",               '~> 3.8'
+  spec.add_development_dependency "rspec-rails",               '~> 5.0.1'
   spec.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   spec.add_development_dependency 'simplecov',                 '~> 0.22.0'
   spec.add_development_dependency 'simplecov-cobertura',       '~> 2.1.0'

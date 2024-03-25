@@ -24,7 +24,7 @@ RSpec.describe BenefitSponsors::Entities::EnrollmentEligibility do
         market_kind: market_kind,
         benefit_sponsorship_id: benefit_sponsorship_id,
         benefit_application_kind: benefit_application_kind,
-        service_areas: [service_area.as_json]
+        service_areas: [service_area.serializable_hash]
       }
     end
 

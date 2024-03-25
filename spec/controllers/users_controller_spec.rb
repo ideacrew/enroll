@@ -186,7 +186,7 @@ describe UsersController, dbclean: :after_each do
   describe '#unsupportive_browser' do
     it 'should be succesful' do
       get :unsupported_browser
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
