@@ -122,6 +122,8 @@ module Insured
       render "failed_validation"
     end
 
+    private
+
     def received_response(event_kind)
       find_params = {primary_member_hbx_id: @person.primary_family.primary_applicant.hbx_id, event_kind: event_kind}
       Operations::Fdsh::Ridp::FindEligibilityResponse.new.call(find_params)

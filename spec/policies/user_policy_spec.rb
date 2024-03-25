@@ -5,7 +5,7 @@ describe UserPolicy do
 
   describe "given a current user with no person" do
     let(:current_user_person) { nil }
-    let(:target_user) { instance_double(User) }
+    let(:target_user) { instance_double(User, :person => nil) }
     subject { UserPolicy.new(user, target_user) }
 
     it "is not lockable" do
@@ -21,7 +21,7 @@ describe UserPolicy do
     - a current user with a person
     - who does not have an hbx_staff_role
   " do
-    let(:current_user_person) { instance_double(Person, :hbx_staff_role => nil) }
+    let(:current_user_person) { instance_double(Person, :hbx_staff_role => nil, :primary_family => nil) }
     let(:user) { instance_double(User, :person => current_user_person) }
     let(:target_user) { instance_double(User) }
     subject { UserPolicy.new(user, target_user) }
@@ -42,7 +42,7 @@ describe UserPolicy do
   " do
     let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => nil) }
 
-    let(:current_user_person) { instance_double(Person, :hbx_staff_role => hbx_staff_role) }
+    let(:current_user_person) { instance_double(Person, :hbx_staff_role => hbx_staff_role, :primary_family => nil) }
     let(:user) { instance_double(User, :person => current_user_person) }
     let(:target_user) { instance_double(User) }
     subject { UserPolicy.new(user, target_user) }
@@ -76,7 +76,7 @@ describe UserPolicy do
 
     let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => permission ) }
 
-    let(:current_user_person) { instance_double(Person, :hbx_staff_role => hbx_staff_role) }
+    let(:current_user_person) { instance_double(Person, :hbx_staff_role => hbx_staff_role, :primary_family => nil) }
     let(:user) { instance_double(User, :person => current_user_person) }
     let(:target_user) { instance_double(User) }
     subject { UserPolicy.new(user, target_user) }
@@ -110,7 +110,7 @@ describe UserPolicy do
 
     let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => permission ) }
 
-    let(:current_user_person) { instance_double(Person, :hbx_staff_role => hbx_staff_role) }
+    let(:current_user_person) { instance_double(Person, :hbx_staff_role => hbx_staff_role, :primary_family => nil) }
     let(:user) { instance_double(User, :person => current_user_person) }
     let(:target_user) { instance_double(User) }
     subject { UserPolicy.new(user, target_user) }
