@@ -1,27 +1,54 @@
-<% if (application.present? && application.ready_for_attestation?) %>
-  <div class="household-status ready-4-review">
-  	<span class="note purple"> </span>
-    <div class="whitebox">
-      <% if FinancialAssistanceRegistry.feature_enabled?(:iap_assistance_year_display) %>
-        <%= render partial: 'financial_assistance/shared/status_header', locals: {application: application} %>
-      <% else %>
-        <p>Your Application for Premium Reductions</p>
-      <% end %>
-      <p class="info-needed"><i class="fa fa-check fa-lg success-status-hide" aria-hidden="true"></i> <span><%=l10n("ready_for_review")%></span></p>
-      <p class="sub-desc">You must enter all required information for everyone in your household.</p>
+<% if bs4 %>
+  <% if (application.present? && application.ready_for_attestation?) %>
+    <div class="alert alert-warning d-flex" role="alert">
+      <div>
+        <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+      </div>
+      <div class="mt-1">
+        <% if FinancialAssistanceRegistry.feature_enabled?(:iap_assistance_year_display) %>
+          <%= render partial: 'financial_assistance/shared/status_header', locals: {application: application, bs4: true} %>
+        <% else %>
+          <p><%= l10n('faa.application_for_premium_reductions') %></p>
+        <% end %>
+        <p class="mb-1"><%= l10n('faa.all_required_info') %></p>
+      </div>
     </div>
-  </div>
+  <% else %>
+    <div class="alert alert-success" role="alert">
+      <% if FinancialAssistanceRegistry.feature_enabled?(:iap_assistance_year_display) %>
+        <%= render partial: 'financial_assistance/shared/status_header', locals: {application: application, bs4: true} %>
+      <% else %>
+        <p><%= l10n('faa.application_for_premium_reductions') %></p>
+      <% end %>
+      <p class="sub-desc"><%= l10n('faa.all_required_info') %></p>
+    </div>
+  <% end %>
 <% else %>
-	<div class="household-status">
-    <span class="note purple"> </span>
-    <div class="whitebox">
-      <% if FinancialAssistanceRegistry.feature_enabled?(:iap_assistance_year_display) %>
-        <%= render partial: 'financial_assistance/shared/status_header', locals: {application: application} %>
-      <% else %>
-        <p>Your Application for Premium Reductions</p>
-      <% end %>
-      <p class="info-needed"><i class="fa fa-refresh fa-refresh-faa fa-lg warning-status-hide" alt="warning" aria-hidden="true"></i><span class="black">Info Needed</span></p>
-      <p class="sub-desc">You must enter all required information for everyone in your household.</p>
+  <% if (application.present? && application.ready_for_attestation?) %>
+    <div class="household-status ready-4-review">
+      <span class="note purple"> </span>
+      <div class="whitebox">
+        <% if FinancialAssistanceRegistry.feature_enabled?(:iap_assistance_year_display) %>
+          <%= render partial: 'financial_assistance/shared/status_header', locals: {application: application} %>
+        <% else %>
+          <p>Your Application for Premium Reductions</p>
+        <% end %>
+        <p class="info-needed"><i class="fa fa-check fa-lg success-status-hide" aria-hidden="true"></i> <span><%=l10n("ready_for_review")%></span></p>
+        <p class="sub-desc">You must enter all required information for everyone in your household.</p>
+      </div>
     </div>
-  </div>
+  <% else %>
+    <div class="household-status">
+      <span class="note purple"> </span>
+      <div class="whitebox">
+        <% if FinancialAssistanceRegistry.feature_enabled?(:iap_assistance_year_display) %>
+          <%= render partial: 'financial_assistance/shared/status_header', locals: {application: application} %>
+        <% else %>
+          <p>Your Application for Premium Reductions</p>
+        <% end %>
+        <p class="info-needed"><i class="fa fa-refresh fa-refresh-faa fa-lg warning-status-hide" alt="warning" aria-hidden="true"></i><span class="black">Info Needed</span></p>
+        <p class="sub-desc">You must enter all required information for everyone in your household.</p>
+      </div>
+    </div>
+  <% end %>
 <% end %>

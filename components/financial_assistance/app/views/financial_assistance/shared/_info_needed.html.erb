@@ -1,17 +1,16 @@
-<% if @bs4 %>
-    <% if applicant.applicant_validation_complete? %>
-      <div class="alert alert-success alert-sm d-flex align-items-center p-2 mb-0 ml-4" role="alert">
-        <div class="success-icon icon icon-sm" alt="success" aria-hidden="true">&nbsp;</div>
-        <%=l10n("information_complete")%>
-      </div>
-    <% else %>
-      <div class="alert alert-warning d-flex align-items-center p-2 mb-0 ml-4" role="alert">
+<% if bs4 %>
+  <% if applicant.applicant_validation_complete? %>
+    <div class="notice notice-success" role="alert"><%=l10n("info_complete")%></div>
+  <% else %>
+    <div class="notice notice-warning d-flex" role="alert">
+      <div>
         <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
-        <%= l10n("additional_info_needed") %>
-        <%= ": (#{l10n("ssn_not_present")}" if applicant.is_applying_coverage && !applicant.ssn_present? %>
-        <%= ": #{l10n("tax_covering_applicant_not_present")}" unless applicant.covering_applicant_exists? %>
       </div>
-    <% end %>
+      <div class="mt-1">
+        <%=l10n("info_needed")%>
+      </div>
+    </div>
+  <% end %>
 <% else %>
   <% if applicant.applicant_validation_complete? %>
     <span class="success-notice"><span class="glyphicon glyphicon-ok complete-icon success-status-hide"></span>&nbsp;<span class="complete-icon-text"><%=l10n("info_complete")%></span></span>
