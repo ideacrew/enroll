@@ -334,9 +334,6 @@ describe 'user permission' do
   end
 end
 
-
-
-
 describe FamilyPolicy, "#hire_broker_agency?" do
   RSpec.shared_examples_for "a FamilyPolicy given a user with a needed permission" do |check|
     before :each do
@@ -435,4 +432,119 @@ describe FamilyPolicy, "#request_help?" do
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_fehb_market_family_broker?
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_fehb_market_general_agency?
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_coverall_market_family_broker?
+end
+
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+  RSpec.describe FamilyPolicy, dbclean: :after_each, type: :model do
+    subject { described_class }
+
+    let(:person) { FactoryBot.create(:person, :with_resident_role, :with_active_resident_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+    permissions :upload_paper_application? do
+      context 'when the user is a hbx staff' do
+        let(:hbx_profile) do
+          FactoryBot.create(
+            :hbx_profile,
+            :normal_ivl_open_enrollment,
+            us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+            cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+          )
+        end
+        let(:hbx_staff_person) { FactoryBot.create(:person) }
+        let(:hbx_staff_role) do
+          hbx_staff_person.create_hbx_staff_role(
+            permission_id: permission.id,
+            subrole: permission.name,
+            hbx_profile: hbx_profile
+          )
+        end
+        let(:hbx_admin_user) do
+          FactoryBot.create(:user, person: hbx_staff_person)
+          hbx_staff_role.person.user
+        end
+
+        let(:logged_in_user) { hbx_admin_user }
+
+        context 'when the hbx staff has the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it 'grants access' do
+            expect(subject).to permit(logged_in_user, family)
+          end
+        end
+
+        context 'when the hbx staff does not have the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it 'denies access' do
+            expect(subject).not_to permit(logged_in_user, family)
+          end
+        end
+      end
+
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, family)
+        end
+      end
+    end
+
+    permissions :download_paper_application? do
+      context 'when the user is a hbx staff' do
+        let(:hbx_profile) do
+          FactoryBot.create(
+            :hbx_profile,
+            :normal_ivl_open_enrollment,
+            us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+            cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+          )
+        end
+        let(:hbx_staff_person) { FactoryBot.create(:person) }
+        let(:hbx_staff_role) do
+          hbx_staff_person.create_hbx_staff_role(
+            permission_id: permission.id,
+            subrole: permission.name,
+            hbx_profile: hbx_profile
+          )
+        end
+        let(:hbx_admin_user) do
+          FactoryBot.create(:user, person: hbx_staff_person)
+          hbx_staff_role.person.user
+        end
+
+        let(:logged_in_user) { hbx_admin_user }
+
+        context 'when the hbx staff has the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it 'grants access' do
+            expect(subject).to permit(logged_in_user, family)
+          end
+        end
+
+        context 'when the hbx staff does not have the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it 'denies access' do
+            expect(subject).not_to permit(logged_in_user, family)
+          end
+        end
+      end
+
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, family)
+        end
+      end
+    end
+  end
 end

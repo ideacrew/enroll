@@ -146,6 +146,26 @@ class FamilyPolicy < ApplicationPolicy
     show?
   end
 
+  # Determines if the user has permission to upload a paper application.
+  # This feature is only applicable for the Coverall Market.
+  # The user can upload a paper application if they are an admin in the coverall market.
+  #
+  # @return [Boolean] Returns true if the user has permission to upload a paper application, false otherwise.
+  # @note This method is used in the upload_paper_application action of the PaperApplicationsController.
+  def upload_paper_application?
+    coverall_market_admin?
+  end
+
+  # Determines if the user has permission to download a paper application.
+  # This feature is only applicable for the Coverall Market.
+  # The user can download a paper application if they are an admin in the coverall market.
+  #
+  # @return [Boolean] Returns true if the user has permission to download a paper application, false otherwise.
+  # @note This method is used in the download_paper_application action of the PaperApplicationsController.
+  def download_paper_application?
+    coverall_market_admin?
+  end
+
   def upload_application?
     admin_show?
   end
