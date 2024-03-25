@@ -23,10 +23,10 @@
     = render "benefit_sponsors/profiles/registrations/general_agency_form", f: f
 
 javascript:
-  (function() {
+  document.addEventListener("ready turbolinks:load", function() {
     initDatepicker('inputDOB',new Date('<%= Date.today.beginning_of_month-100.years %>'),new Date('<%= Date.today.beginning_of_month-16.years %>'))
     var cleave = new Cleave('#inputDOB', {
         date: true,
         datePattern: ['m', 'd', 'Y']
     });
-  })();
+  });
