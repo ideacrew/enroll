@@ -7,10 +7,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities_versioning_test.git
-  revision: cbd03dfb90c2c5eeee3810ef5a8b56111777a634
-  tag: v0.10.0
+  revision: 2253357341adaa15dd4a570e6165bf6f92296fbd
+  tag: v0.10.1
   specs:
-    aca_entities (0.10.0)
+    aca_entities (0.10.1)
       deep_merge
       dry-monads (~> 1.2)
       dry-struct (~> 1.0)

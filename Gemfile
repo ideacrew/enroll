@@ -26,7 +26,7 @@ gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git
 # Local components/engines
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
-gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities_versioning_test.git', tag: 'v0.10.0'
+gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities_versioning_test.git', tag: 'v0.10.1'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
