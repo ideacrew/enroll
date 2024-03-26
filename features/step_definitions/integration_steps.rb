@@ -1301,3 +1301,15 @@ Then(/^I should see Shop for new plan button$/) do
   shop_for_new_plan_input = page.all('input').detect { |input| input[:value] == 'Shop for new plan' }
   expect(shop_for_new_plan_input.present?).to eq(true)
 end
+
+And(/^.+ last signed in more than 60 days ago$/) do
+  User.first.update_attributes!(last_activity_at: Time.now - 61.days)
+end
+
+Then(/^.+ should be signed in successfully$/) do
+  expect(page).to have_content(/logout/i)
+end
+
+Then(/^.+ should not be able to log in$/) do
+  expect(page).to have_content(l10n('devise.failure.expired'))
+end

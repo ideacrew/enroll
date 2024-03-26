@@ -27,3 +27,5 @@ registry:
           is_enabled: <%= ENV['RETRO_FEATURE_IS_ENABLED'] || false %>
         - key: :resend_broker_email_button
           is_enabled: <%= ENV['RESEND_BROKER_EMAIL_BUTTON_IS_ENABLED'] || false %>
+        - key: :admin_account_autolock
+          is_enabled: <%= ENV['ADMIN_ACCOUNT_AUTOLOCK_IS_ENABLED'] || false %>
