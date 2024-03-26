@@ -3,7 +3,7 @@
 </div>
 
 <script>
-  $(function() {
+  $(document).on('ready turbolinks:load', function () {
     $( "#doc_date_field" ).datepicker({
       dateFormat: 'mm/dd/yy'
    });
