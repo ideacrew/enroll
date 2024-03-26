@@ -6,9 +6,9 @@ GIT
       rails (>= 3.0)
 
 GIT
-  remote: https://github.com/ideacrew/aca_entities.git
-  revision: d10013bfa0d5c772238eed7791a8d34d47adcbad
-  branch: trunk
+  remote: https://github.com/ideacrew/aca_entities_versioning_test.git
+  revision: cbd03dfb90c2c5eeee3810ef5a8b56111777a634
+  tag: v0.10.0
   specs:
     aca_entities (0.10.0)
       deep_merge
