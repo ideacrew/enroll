@@ -17,6 +17,8 @@
     --soft-blue: #D6EBFF; //home page right nav text color
 
     --status-red: #A21E1F; //status danger
+    --status-red-hover: #85191A; //status danger
+    --status-red-active: #671314; //status danger
     --status-blue: #003260; //status pending
     --status-yellow: #E5A900; //status needs info
     --status-green: #027314; //status complete
@@ -32,9 +34,25 @@
     --input-text-color: #454545;
     --form-element-text-color: #454545;
 
-    --button-default-color: #4A7EA6;
-    --button-default-hover-color: #345F80;
-    --button-default-active-color: #274760;
+    --button-default-color: #3D5D6F;
+    --button-default-hover-color: #314A59;
+    --button-default-active-color: #253843;
+
+    --button-primary-color: #3D5D6F;
+    --button-primary-hover-color: #314A59;
+    --button-primary-active-color: #253843;
+
+    --button-secondary-color: #4A7EA6;
+    --button-secondary-hover-color: #345F80;
+    --button-secondary-active-color: #274760;
+
+    --button-tertiary-color: #647F3A;
+    --button-tertiary-hover-color: #50662E;
+    --button-tertiary-active-color: #3C4C23;
+
+    --button-error-color: var(--status-red);
+    --button-error-hover-color: var(--status-red-hover);
+    --button-error-active-color: var(--status-red-active);
 
     --enrollment-status-red: #A21E1F;
     --enrollment-status-green: #027314;
