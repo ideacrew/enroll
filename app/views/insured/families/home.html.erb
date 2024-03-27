@@ -27,11 +27,13 @@
       <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present? %>
 
       <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+        <% Rails.logger.error {"pivotal_187271860 home.html.erb page inside pundit_allow: #{pundit_allow(Family, :can_view_entire_family_enrollment_history?)}"}%>
         <% enrollments = @all_hbx_enrollments_for_admin %>
       <% else %>
         <% enrollments = @hbx_enrollments %>
       <% end %>
       <% Rails.logger.error {"pivotal_187271860 home.html.erb page: #{EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)}"}%>
+      <% Rails.logger.error {"pivotal_187271860 home.html.erb page enrollments: #{enrollments.pluck(:hbx_id, :aasm_state)}"}%>
       <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
         <% Rails.logger.error {"pivotal_187271860 home.html.erb page inside condition"} %>
         <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false } %>
