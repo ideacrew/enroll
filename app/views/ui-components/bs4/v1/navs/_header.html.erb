@@ -1,8 +1,8 @@
 <hidden id='dchbx_enroll_date_of_record' class='d-none'><%= TimeKeeper.date_of_record.iso8601 %></hidden>
-<header class="bg-white navbar-main py-2 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
+<header class="bg-white navbar-primary py-2 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
 
   <nav class="navbar navbar-expand-lg container py-1">
-    <a class="navbar-brand border-right-0 mr-0" href="#">
+    <a class="navbar-brand mr-0" href="#">
       <%= image_pack_tag "logo_#{ENV['CLIENT'] || 'ic'}.svg" %>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-dynamic-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,14 +11,14 @@
     <div class="collapse navbar-collapse" id="nav-dynamic-collapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-divider"></li>
-        <li class="nav-item d-flex flex-column">
-          <span>Maine's Health Insurance Marketplace</span>
-          <span>Individual & Family</span>
+        <li class="nav-item d-flex flex-column site-name-market">
+          <span><%= l10n('welcome.index.welcome_to_site_header')%></span>
+          <%= bs4_portal_type(controller_name) %>
         </li>
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item d-flex flex-column">
-          <span><%= l10n("layout.header.customer_service")%></span>
+          <span><%= image_pack_tag "icons/phone.svg" %><%= l10n("layout.header.customer_service")%></span>
           <a><%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %></a>
         </li>
         <li class="nav-divider"></li>
@@ -40,13 +40,42 @@
 
 
 <style>
-  header.navbar-main {
+  header.navbar-primary {
     font-size: 14px;
+    background-color: var(--grey-000);
+    border-bottom: solid 3px var(--theme-primary-blue, #007bc4);
+
+    a {
+      text-decoration: underline;
+    }
+
+    .navbar-brand img {
+        max-height: 40px;
+      }
+
+    .nav-item img{
+      max-height: 16px;
+      padding-right: .5rem;
+    }
+
+    .site-name-market{
+      font-size: 16px;
+
+      :first-child {
+        font-size: 12px;
+        font-weight: bold;
+        line-height: 13px;
+      }
+    }
 
     .nav-divider {
-      background-color: #ccc;
+      background-color: var(--grey-050);
       width: 1px ;
       margin: -.75rem 0.5rem;
+    }
+
+    navbar-toggler {
+      border: 1px solid var(--grey-050);
     }
   }
 </style>
