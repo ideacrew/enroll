@@ -3,50 +3,30 @@
   <div id="personal_info">
     <%= hidden_field "people","id" %>
     <%= f.hidden_field :dob_check  %>
-    <div class="d-flex mb-4">
-      <div class="mr-3">
-        <%= f.label :first_name, "First Name", class: "required" %>
+    <div class="d-flex mb-md-4 row col-sm">
+      <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+        <%= f.label :first_name, l10n("First Name"), class: "required" %>
         <%= f.text_field :first_name, class: "required", required: true, placeholder: 'FIRST NAME *', autocomplete: :off %>
       </div>
-      <div>
+      <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :middle_name, "Middle Name" %>
         <%= f.text_field :middle_name, class: "required", required: false, placeholder: 'MIDDLE NAME', autocomplete: :off %>
       </div>
-    </div>
-    <div class="d-flex mb-4">
-      <div class="mr-3">
+      <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :last_name, "Last Name", class: "required" %>
         <%= f.text_field :last_name, class: "required", required: true, placeholder: 'LAST NAME *', autocomplete: :off %>
       </div>
-      <div>
+      <div class="col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :name_sfx, "Suffix" %>
         <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', autocomplete: :off %>
       </div>
     </div>
-    <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
-    <%# need to redo this partial: %>
-    <fieldset>
-      <legend id="is_applying_coverage_value">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage? * <a href="#is_applying_coverage" data-toggle="modal" data-target="#is_applying_coverage">Not sure?</a></legend>
-      <div class="d-flex mb-4 align-items-center">
-        <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
-      </div>
-    </fieldset>
-    <div class="d-flex mb-4">
-      <div class="mr-3">
+    <div class="d-flex mb-md-4 row col-sm">
+      <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :dob, "Date of Birth", class: "required" %>
         <%= f.date_field :dob, placeholder:"MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
       </div>
-      <div>
-        <%= f.label :gender, "Gender" %>
-        <%= f.select :gender, [ ['Male', 'male'], ['Female', 'female'] ], autocomplete: :off %>
-        <span>
-          <i tabindex="0" class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
-          <span class="hide"> "<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"</span>
-        </span>
-      </div>
-    </div>
-    <div class="d-flex mb-4">
-      <div class="mr-3">
+      <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :ssn, "Social Security" %>
         <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
           <%= f.text_field :ssn, placeholder: "#{l10n("social_security").to_s.upcase}", class: "required",
@@ -57,7 +37,7 @@
             readonly: f.object.is_a?(Forms::EmployeeRole) %>
         <% end %>
       </div>
-      <div class="pt-4">
+      <div class="col-sm col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
         <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
           <%= f.check_box :no_ssn %><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
         <% end %><span>
@@ -65,7 +45,24 @@
           <span class="hide"> "<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"</span>
         </span>
       </div>
+      <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+        <div>
+        <%= f.label :gender, l10n("Sex"), class: 'd-inline'  %>
+          <i tabindex="0" class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
+          <span class="hide"> "<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"</span>
+        </div>
+        <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], autocomplete: :off %>
+      </div>
     </div>
+    <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
+    <%# need to redo this partial: %>
+    <fieldset>
+      <legend id="is_applying_coverage_value">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage? *</legend>
+      <div class="d-flex align-items-center">
+        <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+      </div>
+    </fieldset>
+    <a href="#is_applying_coverage" data-toggle="modal" data-target="#is_applying_coverage" class="d-block mb-4">Not sure?</a>
   </div>
 <% else %>
   <div id="personal_info" class="focus_effect module">
