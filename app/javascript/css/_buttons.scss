@@ -1,0 +1,51 @@
+
+@mixin solid-button($button-color: var(--button-primary-color), $color: var(--grey-000), $hover: var(--button-primary-hover-color),
+                    $active: var(--button-primary-active-color)) {
+  background-color: $button-color;
+  font-weight: 600;
+  padding: 8px 12px;
+  text-decoration: none;
+  cursor: pointer;
+  color: $color;
+  border-radius: 4px;
+  border: 0;
+  &:visited {
+    color: $color;
+  }
+  &:hover {
+    background-color: $hover;
+  }
+  &:active {
+    background-color: var(--button-default-active-color);
+  }
+  &:focus {
+    background-color: $hover;
+    outline: 2px solid var(--grey-190);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    background-color: var(--grey-040);
+    color: var(--grey-090);
+  }
+}
+
+.button, button, .button-primary, .btn, .btn-primary {
+  @include solid-button;
+}
+
+button.secondary, .button.secondary, .btn.secondary, .btn-secondary {
+  @include solid-button(var(--button-secondary-color), var(--grey-000), var(--button-secondary-hover-color), var(--button-secondary-active-color));
+}
+
+button.tertiary, .button.tertiary, .btn.tertiary, .btn-tertiary {
+  @include solid-button(var(--button-tertiary-color), var(--grey-000), var(--button-tertiary-hover-color), var(--button-tertiary-active-color));
+}
+
+button.error, .button.error, .btn.error, .btn-error {
+  @include solid-button(var(--button-error-color), var(--grey-000), var(--button-error-hover-color), var(--button-error-active-color));
+}
+
+a.button:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
