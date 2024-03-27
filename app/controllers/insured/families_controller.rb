@@ -64,6 +64,9 @@ class Insured::FamiliesController < FamiliesController
       @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
     end
 
+    Rails.logger.error { "families controller home action hbx_enrollments : #{@hbx_enrollments.count} | #{@hbx_enrollments.pluck(:hbx_id, :aasm_state)}" }
+    Rails.logger.error { "families controller home action all_hbx_enrollments_for_admin : #{@all_hbx_enrollments_for_admin.count} | #{@all_hbx_enrollments_for_admin.pluck(:hbx_id, :aasm_state)}"}
+
     respond_to do |format|
       format.html
       format.any { head :ok }
