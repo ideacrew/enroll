@@ -172,7 +172,7 @@
 
 body {
   font-family: var(--font);
-  color: var(--default-font-color);
+  color: var(--text-primary);
 }
 
 input,
@@ -218,20 +218,4 @@ p {
   font-size: 20px;
   font-weight: 600;
   line-height: 28px;
-}
-
-.weight-n {
-  font-weight: 400;
-}
-
-.primary-text {
-  color: var(--primary-color);
-}
-
-.secondary-text {
-  color: var(--secondary-font-color);
-}
-
-.default-text {
-  color: var(--default-font-color);
 }
