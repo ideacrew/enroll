@@ -31,8 +31,9 @@
       <% else %>
         <% enrollments = @hbx_enrollments %>
       <% end %>
-
+      <% Rails.logger.error {"pivotal_187271860 home.html.erb page: #{EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)}"}%>
       <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+        <% Rails.logger.error {"pivotal_187271860 home.html.erb page inside condition"} %>
         <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false } %>
       <% else %>
         <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
