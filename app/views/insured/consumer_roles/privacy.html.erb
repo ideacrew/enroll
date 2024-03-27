@@ -1,10 +1,10 @@
-<div class="container privacy <%= 'mt-5' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)%>">
-  <h1><%= l10n("your_information") %></h1>
-  <p class="starter">
-    <%= l10n("privacy_statement") %></p>
-  <br>
-  <div>
-    <%= link_to 'CONTINUE', search_insured_consumer_role_index_path(@search_path), :class => "btn btn-lg btn-primary  interaction-click-control-continue" %>
+<div class="container privacy <%= 'mt-3' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)%>">
+  <div class="col-10 mb-4">
+    <h1><%= l10n("your_information") %></h1>
+    <p class="starter">
+      <%= l10n("privacy_statement") %></p>
+    <div class="mb-5">
+      <%= link_to l10n("continue_next"), search_insured_consumer_role_index_path(@search_path), :class => "btn interaction-click-control-continue" %>
+    </div>
   </div>
-  <br><br>
 </div>
