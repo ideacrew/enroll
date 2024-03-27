@@ -46,12 +46,16 @@ label, legend {
   color: var(--text-secondary);
 }
 
+label.required:after {
+  content: '*';
+  margin-left: 0.25ch;
+}
+
 input,
 select,
 .input {
   box-sizing: border-box;
   height: 36px;
-  width: 250px;
   padding: 6px 8px;
   background: var(--grey-000);
   border: 1px solid var(--grey-100);
@@ -91,10 +95,10 @@ select {
 input[type='checkbox'], input[type='radio'] {
   vertical-align: middle;
   position: relative;
-  scale: 3;
-  margin-right: 1em;
-  margin-left: 1em;
-  width: auto;
+  width: 36px;
+  margin-right: $spacer*.25;
+  margin-left: 0;
+  accent-color: var(--button-primary-color);
 }
 
 fieldset {
