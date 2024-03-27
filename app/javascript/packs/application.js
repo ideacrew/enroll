@@ -26,6 +26,7 @@ Turbolinks.start()
 
 const importAll = (r) => r.keys().map(r)
 importAll(require.context('../images', false, /\.(png|jpe?g|svg|ico)$/));
+importAll(require.context('../images/icons', false, /\.(png|jpe?g|svg|ico)$/));
 
 const application = Application.start()
 
