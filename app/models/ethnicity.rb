@@ -4,10 +4,11 @@
 # It includes fields for attested ethnicities and other ethnicity (if 'other' is selected).
 # It also includes constants for defined ethnicity options, other ethnicity options, CMS reporting groups, and their mappings.
 class Ethnicity
-  include Mongoid::Document
-  include Mongoid::Timestamps
+  include HistoryTracking
 
   extend L10nHelper
+
+  VERSION_SOURCE_KINDS = %w[self_attested].freeze
 
   # @!attribute [rw] demographics
   #   @return [Demographics] The demographics associated with the ethnicity.
