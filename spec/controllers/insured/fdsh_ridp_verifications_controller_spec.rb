@@ -75,6 +75,14 @@ describe Insured::FdshRidpVerificationsController do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("failed_validation")
       end
+
+      it "should render template when correct person id is passed" do
+        allow_any_instance_of(ConsumerRole).to receive(:move_identity_documents_to_outstanding).and_return(true)
+        get :failed_validation, params: { person_id: person.id }
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("failed_validation")
+      end
     end
 
     context "when unauthorized person id is passed in params" do
