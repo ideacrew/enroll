@@ -15,6 +15,11 @@ class Demographics
   #   This is a polymorphic association, so it can be any object that declares itself as 'demographable'.
   embedded_in :demographable, polymorphic: true
 
+  # @!attribute [rw] gender
+  #   @return [Gender] The gender of the individual.
+  #   @!parse extend Mongoid::Association::Embedded::EmbedsOne
+  embeds_one :gender
+
   # @!attribute [rw] ethnicity
   #   @return [Ethnicity] The ethnicity of the individual.
   #   @!parse extend Mongoid::Association::Embedded::EmbedsOne
