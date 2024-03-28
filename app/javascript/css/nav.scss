@@ -1,286 +1,55 @@
-// site header
+
 header.navbar-primary {
-  font-size: 14px;
-  background-color: var(--grey-000);
-  border-bottom: solid 3px var(--theme-primary-blue, #007bc4);
+    font-size: 14px;
+    background-color: var(--grey-000);
+    border-bottom: solid 3px var(--theme-primary-blue, #007bc4);
 
-  .navbar-brand img {
-    max-height: 40px;
-  }
+    .navbar-brand img {
+      max-height: 40px;
+    }
 
-  .navbar-nav {
-    .nav-item {
-      a {
-        text-decoration: underline;
-      }
-
-      .user-icon {
-        width: 32px;
-      }
-
-      .horizontal-links {
-        span::after {
-          content: "|";
-          color: var(--grey-060);
-          padding: 0 .3rem;
-        }
-
-        span:last-child::after {
-          content: "";
-        }
-      }
-
-      &.site-name-market {
-        font-size: 16px;
-        font-weight: 600;
-        line-height: 24px;
+    .navbar-nav {
+      .nav-item {
         a {
-          color: var(--primary-color);
-          text-decoration: none;
-        }
-      }
-    }
-
-    .nav-item-divider {
-      background-color: var(--grey-050);
-      width: 1px;
-      height: 60px;
-      margin: -.75rem 0.5rem;
-    }
-  }
-
-  .navbar-toggler-icon.open {
-    display: none;
-  }
-  .navbar-toggler-icon.closed {
-    display: block;
-  }
-
-  .navbar-toggler-icon path {
-    fill: var(--theme-secondary);
-    stroke: var(--theme-secondary);
-  }
-
-  .collapsed {
-    .navbar-toggler-icon.open {
-      display: block;
-    }
-    .navbar-toggler-icon.closed {
-      display: none;
-    }
-  }
-
-  #nav-overlay {
-    position: fixed;
-    top: 75px;
-    left: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .show + #nav-overlay {
-    background: hsla(0, 0%, 0%, 1);
-    opacity: 0.5;
-    z-index: 100;
-    width: 100vw;
-    height: 100vh;
-  }
-
-  .multi-role-dropdown {
-    top: 35px;
-    width: 250px;
-    font-size: inherit;
-    left: -130px;
-    box-shadow: 0px 3.2px 7.2px 0px var(--nav-dropdown-drop-shadow);
-  }
-}
-
-// progress layout nav pane
-.progress-nav {
-  background-color: var(--grey-000);
-  border: 1px solid var(--grey-050);
-  border-radius: 5px;
-  padding: 15px 10px;
-  margin-bottom: $spacer;
-
-  a {
-    color: var(--default-font-color);
-    text-decoration: none;
-  }
-}
-
-.progress-wrapper {
-  padding: 0;
-
-    li {
-      padding: 0px;
-      list-style: none;
-      padding-right: 35px;
-      margin-bottom: 10px;
-
-      .vertical-line-progress {
-        background-color: #cacaca;
-        width: 2px;
-        height: 28px;
-        position: absolute;
-        right: 38px;
-        margin-top: 12px;
-      }
-
-      span.circle-progress {
-        border-radius: 50px;
-        background: var(--grey-000);
-        border: 2px solid #cacaca;
-        width: 12px;
-        height: 12px;
-        position: absolute;
-        right: 33px;
-        margin-top: 8px;
-        z-index: 5;
-      }
-
-      &.complete {
-        .vertical-line-progress {
-          background-color: var(--theme-primary-blue, #007bc4);
+          text-decoration: underline;
         }
 
-        span.circle-progress {
-          background-color: var(--theme-primary-blue, #007bc4);
-          border: none;
-          width: 14px;
-          right: 32px;
-          height: 14px;
-          margin-top: 6px;
+        img {
+          max-height: 16px;
+          padding-right: .5rem;
+        }
+
+        .horizontal-links {
+          span::after {
+            content: "|";
+            color: var(--grey-060);
+            padding: 0 .1rem;
+          }
+
+          span:last-child::after {
+            content: "";
+          }
+        }
+
+        &.site-name-market {
+          font-size: 16px;
+
+          :first-child {
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 13px;
+          }
         }
       }
 
-      &.active {
-        font-weight: bold;
-        color: var(--theme-primary-blue, #007bc4);
-
-        .vertical-line-progress {
-          background-color: #cacaca;
-        }
-
-        span.circle-progress {
-          background-color: var(--grey-000);
-          border: 2px solid var(--theme-primary-blue, #007bc4);
-          width: 14px;
-          right: 32px;
-          height: 14px;
-          margin-top: 6px;
-        }
-      }
-
-      &:last-child .vertical-line-progress {
-        display: none;
+      .nav-item-divider {
+        background-color: var(--grey-050);
+        width: 1px;
+        margin: -.75rem 0.5rem;
       }
     }
 
-}
-
-// breadcrumbs
-ul.breadcrumbs {
-  padding: 0;
-  list-style: none;
-  margin-bottom: 3ch;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-
-  li {
-    display: inline;
-    a {
-      color: var(--text-secondary);
-      text-decoration: none;
+    navbar-toggler {
+      border: 1px solid var(--grey-050);
     }
   }
-
-  li:last-of-type {
-    font-weight: bold;
-    a {
-      color: var(--text-primary);
-    }
-  }
-
-  li:not(:last-of-type):after {
-    padding: 1ch;
-    content: '/';
-  }
-}
-
-// family side nav
-.portal-nav {
-  background: var(--primary-color);
-  color: var(--grey-000);
-  border-radius: 6px;
-
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: ($spacer/2) 0;
-    li {
-      padding: ($spacer/2) $spacer;
-      font-weight: 500;
-      width: 100%;
-    }
-  }
-
-  .message-unread {
-    padding: ($spacer / 3) ($spacer / 2);
-    background: var(--enrollment-status-yellow);
-    color: var(--default-font-color);
-    margin-left: $spacer / 3;
-  }
-
-  .verifications-warning-icon {
-    width: 20px;
-    height: 20px;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none"><path d="M7.35631 2.13451C8.44557 -0.0448384 11.5544 -0.0448359 12.6437 2.13451L19.6841 16.2208C20.6668 18.1868 19.2377 20.5 17.0405 20.5H2.95955C0.762308 20.5 -0.666776 18.1868 0.315858 16.2208L7.35631 2.13451Z" fill="%23E5A900"/><path d="M10.8408 13.6846H9.17285L8.82422 7.00586H11.1895L10.8408 13.6846ZM8.79688 16.0225C8.79688 15.6396 8.89941 15.3503 9.10449 15.1543C9.30957 14.9583 9.60807 14.8604 10 14.8604C10.3783 14.8604 10.6699 14.9606 10.875 15.1611C11.0846 15.3617 11.1895 15.6488 11.1895 16.0225C11.1895 16.3825 11.0846 16.6673 10.875 16.877C10.6654 17.082 10.3737 17.1846 10 17.1846C9.61719 17.1846 9.32096 17.0843 9.11133 16.8838C8.90169 16.6787 8.79688 16.3916 8.79688 16.0225Z" fill="%23201F1E"/></svg>');
-    background-repeat: no-repeat;
-    background-position: center;
-    color: transparent !important;
-    font-size: 27px !important;
-    margin-left: $spacer / 3;
-  }
-
-  a {
-    color: var(--grey-000);
-    text-decoration: none;
-    font-size: 18px;
-    &.active {
-      font-weight: 600;
-    }
-    &:hover, &:focus {
-      text-decoration: underline;
-    }
-  }
-}
-
-.message-unread {
-  padding: ($spacer / 3) ($spacer / 2);
-  background: var(--enrollment-status-yellow);
-  color: var(--default-font-color);
-  margin-left: $spacer / 3;
-}
-
-.broker-nav {
-  background: var(--grey-020);
-  padding: ($spacer / 2) 0;
-  li {
-    padding: ($spacer / 2);
-    font-size: 16px;
-    line-height: 24px;
-    a {
-      color: var(--text-primary);
-      text-decoration: none;
-    }
-  }
-  li:first-of-type {
-    padding-left: 0;
-  }
-  .active {
-    font-weight: 600;
-  }
-}
