@@ -62,18 +62,35 @@ describe Insured::FdshRidpVerificationsController do
     let(:user){ FactoryBot.create(:user, :consumer, person: person) }
     let(:person){ FactoryBot.create(:person, :with_consumer_role) }
 
-    context "GET failed_validation", dbclean: :after_each do
-      before(:each) do
-        sign_in user
-        allow(user).to receive(:person).and_return(person)
-      end
+    before(:each) do
+      sign_in user
+      allow(user).to receive(:person).and_return(person)
+    end
 
+    context "GET failed_validation", dbclean: :after_each do
       it "should render template" do
         allow_any_instance_of(ConsumerRole).to receive(:move_identity_documents_to_outstanding).and_return(true)
         get :failed_validation, params: {}
 
         expect(response).to have_http_status(:success)
         expect(response).to render_template("failed_validation")
+      end
+
+      it "should render template when correct person id is passed" do
+        allow_any_instance_of(ConsumerRole).to receive(:move_identity_documents_to_outstanding).and_return(true)
+        get :failed_validation, params: { person_id: person.id }
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("failed_validation")
+      end
+    end
+
+    context "when unauthorized person id is passed in params" do
+      let(:duplicate_person) { FactoryBot.create(:person, :with_consumer_role) }
+
+      it "should fail pundit policy" do
+        get :failed_validation, params: { person_id: duplicate_person.id }
+        expect(response.status).to eq 302
       end
     end
   end
