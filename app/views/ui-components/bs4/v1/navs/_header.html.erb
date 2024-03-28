@@ -3,14 +3,14 @@
 
   <nav class="navbar navbar-expand-lg container py-1">
     <a class="navbar-brand mr-0" href="#">
-      <%= image_pack_tag "logo_#{ENV['CLIENT'] || 'ic'}.svg" %>
+      <%= image_pack_tag "logo_bs4_#{ENV['CLIENT'] || 'ic'}.svg", alt: "#{ENV['CLIENT']} logo"%>
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-dynamic-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon">!!!!</span>
+      <span class="navbar-toggler-icon"><%= image_pack_tag "icons/menu-burger.svg", class:"h-100", alt:"navbar collapse burger" %></span>
     </button>
     <div class="collapse navbar-collapse" id="nav-dynamic-collapse">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-divider"></li>
+        <li class="nav-item-divider"></li>
         <li class="nav-item d-flex flex-column site-name-market">
           <span><%= l10n('welcome.index.welcome_to_site_header')%></span>
           <%= bs4_portal_type(controller_name) %>
@@ -18,64 +18,22 @@
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item d-flex flex-column">
-          <span><%= image_pack_tag "icons/phone.svg" %><%= l10n("layout.header.customer_service")%></span>
+          <span><%= image_pack_tag "icons/phone.svg", alt:"phone icon" %><%= l10n("layout.header.customer_service")%></span>
           <a><%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %></a>
         </li>
-        <li class="nav-divider"></li>
-        <li class="nav-item d-flex flex-column">
-          <span><%= l10n("layout.header.user_and_id", name: user_first_name_last_name_and_suffix, id: current_user.try(:person).try(:hbx_id)[0,8]) %></span>
-          <span>
-            <%= render partial: "shared/my_portal_links" %>
-            <span>|</span>
-            <%= link_to 'Help', 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer" %>
-            <span>|</span>
-            <%= link_to 'Logout', main_app.destroy_user_session_path, method: 'delete' %>
-          </span>
-        </li>
+        <% if signed_in? %>
+          <li class="nav-item-divider"></li>
+          <li class="nav-item d-flex flex-column">
+            <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= l10n('layout.header.user_and_id', name: user_first_name_last_name_and_suffix, id: current_user.try(:person).try(:hbx_id)) %></span>
+            <span class="horizontal-links">
+              <%= render partial: "shared/my_portal_links" %>
+              <span><%= link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer" %></span>
+              <span><%= link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete' %></span>
+            </span>
+          </li>
+        <% end %>
       </ul>
     </div>
   </nav>
 
 </header>
-
-
-<style>
-  header.navbar-primary {
-    font-size: 14px;
-    background-color: var(--grey-000);
-    border-bottom: solid 3px var(--theme-primary-blue, #007bc4);
-
-    a {
-      text-decoration: underline;
-    }
-
-    .navbar-brand img {
-        max-height: 40px;
-      }
-
-    .nav-item img{
-      max-height: 16px;
-      padding-right: .5rem;
-    }
-
-    .site-name-market{
-      font-size: 16px;
-
-      :first-child {
-        font-size: 12px;
-        font-weight: bold;
-        line-height: 13px;
-      }
-    }
-
-    .nav-divider {
-      background-color: var(--grey-050);
-      width: 1px ;
-      margin: -.75rem 0.5rem;
-    }
-
-    navbar-toggler {
-      border: 1px solid var(--grey-050);
-    }
-  }
-</style>
