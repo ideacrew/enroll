@@ -37,7 +37,7 @@ $(document).on('click', 'input#select_all_tag', function(){
   if($(this).is(':checked')){
     $('input.employer_id_checkbox').prop('checked', true);
   }else{
-    $('input.employer_id_checkbox').removeProp('checked');
+    $('input.employer_id_checkbox').removeAttr('checked');
   }
   check_allow_assign(this);
 });

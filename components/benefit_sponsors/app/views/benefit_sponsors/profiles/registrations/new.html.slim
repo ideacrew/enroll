@@ -31,8 +31,8 @@ javascript:
 
   $("#broker_agency_form").tabs({
     activate: function (event, ui) {
-      if (ui.newPanel.selector == "#broker_agency_staff") {
-        var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new"
+      if (ui.newPanel.attr('id') == "broker_agency_staff") {
+        var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new?profile_type"
         if(!$("#loaded").length) {
           $.ajax({
             url: url,
@@ -57,7 +57,7 @@ javascript:
 
   $("#general_agency_form").tabs({
     activate: function (event, ui) {
-      if (ui.newPanel.selector == "#general_agency_staff") {
+      if (ui.newPanel.attr('id') == "general_agency_staff") {
         var url = "/benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/new"
         if(!$("#loaded").length) {
           $.ajax({

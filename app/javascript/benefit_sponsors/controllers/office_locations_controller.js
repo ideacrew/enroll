@@ -9,61 +9,73 @@
 
 import { Controller } from "stimulus"
 
+let alreadyConnected = false;
+
 export default class extends Controller {
   static targets = [ "officeLocations", "officeLocation" ];
 
   connect() {
-    // Remove space in primary select option and phone option
-    document.getElementById('kindSelect')[0].remove();
-    document.getElementById('agency_organization_profile_attributes_office_locations_attributes_0_phone_attributes_kind')[0].remove();
+    if (this.element.getAttribute('data-controller-connected')) {
+      alreadyConnected = true;
+    } else {
+      this.element.setAttribute('data-controller-connected', 'true');
+      document.getElementById('kindSelect')[0].remove();
+      document.getElementById('agency_organization_profile_attributes_office_locations_attributes_0_phone_attributes_kind')[0].remove();
+    }
   }
 
-  addLocation() {
+  addLocation(event) {
+    if (!alreadyConnected) {
       event.preventDefault();
-    //clone new location node, unhide remove button, modify name attribute
-    var newLocation = document.importNode(this.officeLocationTarget, true)
-    var totalLocations = document.importNode(this.officeLocationsTarget, true)
-    // totalLocationsCount includes currently loaded OL form too
-    var totalLocationsCount = totalLocations.querySelectorAll('.ol_title').length;
-    newLocation.querySelectorAll('.js-remove').forEach(function(element) {
-      element.remove()
-    });
+      //clone new location node, unhide remove button, modify name attribute
+      var newLocation = document.importNode(this.officeLocationTarget, true)
+      console.log(this.officeLocationTarget);
+      var totalLocations = document.importNode(this.officeLocationsTarget, true)
+      // totalLocationsCount includes currently loaded OL form too
+      var totalLocationsCount = totalLocations.querySelectorAll('.ol_title').length;
+      delete newLocation.dataset.target;
+      newLocation.querySelectorAll('.js-remove').forEach(function(element) {
+        element.remove()
+      });
 
-    newLocation.querySelectorAll('.ol_title').forEach(function(element) {
-      element.innerHTML = "Office Location"
-    });
+      newLocation.querySelectorAll('.ol_title').forEach(function(element) {
+        element.innerHTML = "Office Location"
+      });
 
-    newLocation.querySelectorAll('input').forEach(function(input) {
-      var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
-      input.setAttribute('name', name)
-      input.value = ''
-    })
-
-    newLocation.querySelector('input[placeholder="ZIP"]').setAttribute('data-action', "")
-
-    newLocation.querySelectorAll('select').forEach(function(input) {
-      var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
-      input.setAttribute('name', name)
-
-      if (input.value != "work" && input.id != "kindSelect") {
+      newLocation.querySelectorAll('input').forEach(function(input) {
+        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
+        input.setAttribute('name', name)
         input.value = ''
-      }
+      })
 
-      if (input.id == "kindSelect") {
-        input[0].remove();
-      }
+      newLocation.querySelector('input[placeholder="ZIP"]').setAttribute('data-action', "")
 
-    })
+      newLocation.querySelectorAll('select').forEach(function(input) {
+        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
+        input.setAttribute('name', name)
 
-    this.officeLocationsTarget.appendChild(newLocation)
+        if (input.value != "work" && input.id != "kindSelect") {
+          input.value = ''
+        }
+
+        if (input.id == "kindSelect") {
+          input[0].remove();
+        }
+
+      })
+
+      this.officeLocationsTarget.appendChild(newLocation)
+    }
   }
 
   removeLocation(event) {
-    event.preventDefault();
-    //remove itself
-    event.target.closest('.js-office-location').querySelectorAll('input[id="delete_location"]').forEach(function(input) {
-      input.setAttribute('value', true)
-    })
-    $(event.target).closest('.js-office-location').hide();
+    if (!alreadyConnected) {
+      event.preventDefault();
+      //remove itself
+      event.target.closest('.js-office-location').querySelectorAll('input[id="delete_location"]').forEach(function(input) {
+        input.setAttribute('value', true)
+      })
+      $(event.target).closest('.js-office-location').hide();
+    }
   }
 }

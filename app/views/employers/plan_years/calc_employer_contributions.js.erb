@@ -22,7 +22,7 @@ $("#<%= @location_id %> .edit-add-dental .btn-default").on('click', function () 
 
 $(document).on('click', "#<%= @location_id %> .fa.fa-trash-o", function () {
   // clear dental plan form
-  $(this).closest('.dental').find('input:checked:enabled').removeProp("checked");
+  $(this).closest('.dental').find('input:checked:enabled').removeAttr("checked");
   $(this).closest('.dental').find('input.hidden-param').val("");
   $(this).closest('.dental').find('input.hidden-param').attr("value","");
   $(this).closest('.dental').find('input.hidden-param.contribution_handler.premium-storage-input').val("0");
@@ -40,7 +40,7 @@ if ( $("#<%= @location_id %> .dental-ref-plan").val().length == 0 ) {
   $("#<%= @location_id %> .edit-add-dental").show();
 };
 
-//$('#<%#= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
+//$('#<%#= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').prop('disabled', true);
 $('#<%= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label i.fa').attr('data-toggle','tooltip');
 
 $("#<%= @location_id %> .dental .dental-config-links, #<%= @location_id %> <%= @coverage_type %> .change-dental-reference-plan").show();

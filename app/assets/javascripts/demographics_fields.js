@@ -58,19 +58,19 @@ function applyListenersFor(target) {
   $("input[name='" + target + "[us_citizen]']").change(function () {
     $('#vlp_documents_container').hide();
     $('#vlp_documents_container .vlp_doc_area').html('');
-    $("input[name='" + target + "[naturalized_citizen]']").attr(
+    $("input[name='" + target + "[naturalized_citizen]']").prop(
       'checked',
       false
     );
-    $("input[name='" + target + "[eligible_immigration_status]']").attr(
+    $("input[name='" + target + "[eligible_immigration_status]']").prop(
       'checked',
       false
     );
     if ($(this).val() == 'true') {
       $('#naturalized_citizen_container').show();
       $('#immigration_status_container').hide();
-      $('#' + target + '_naturalized_citizen_true').attr('required');
-      $('#' + target + '_naturalized_citizen_false').attr('required');
+      $('#' + target + '_naturalized_citizen_true').prop('required');
+      $('#' + target + '_naturalized_citizen_false').prop('required');
     } else {
       $('#naturalized_citizen_container').hide();
       $('#immigration_status_container').show();
@@ -222,10 +222,9 @@ function applyListeners() {
 
 var PersonValidations = (function (window, undefined) {
   function manageRequiredValidations(this_obj) {
-    hidden_requireds = $('[required]').not(':visible');
-    $('[required]').not(':visible').removeProp('required');
+    $('[required]').not(':visible').removeAttr('required');
     this_obj.closest('div').find('button[type="submit"]').trigger('click');
-    this_obj.closest('div').find('.dependent-disable').attr('disabled', 'disabled');
+    this_obj.closest('div').find('.dependent-disable').prop('disabled', true);
   }
 
   function restoreRequiredAttributes(e) {
@@ -262,7 +261,7 @@ var PersonValidations = (function (window, undefined) {
       $('#tribal-name-alert').addClass('hide');
     });
 
-    if ($('input[name="person[is_applying_coverage]"]').length > 0 
+    if ($('input[name="person[is_applying_coverage]"]').length > 0
     && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
@@ -280,7 +279,7 @@ var PersonValidations = (function (window, undefined) {
       $('#tribal-state').val("");
       $('input#tribal-name').val("");
       $('#tribal-id').val("");
-      $('.tribe_codes:checked').removeAttr('checked'); 
+      $('.tribe_codes:checked').removeAttr('checked');
     }
 
     if (tribe_member_yes){
@@ -291,7 +290,7 @@ var PersonValidations = (function (window, undefined) {
 
       if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
         var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
-        if (tribe_codes_array.length < 1) { 
+        if (tribe_codes_array.length < 1) {
           alert("At least one tribe must be selected.");
           PersonValidations.restoreRequiredAttributes(e);
         }
@@ -304,7 +303,7 @@ var PersonValidations = (function (window, undefined) {
         if (!tribe_codes_array.includes("OT")){
           $('input#tribal-name').val("");
         }
-      } 
+      }
       else if ($('input#tribal-name').val() == ""){
           $('#tribal-name-alert').show();
           PersonValidations.restoreRequiredAttributes(e);

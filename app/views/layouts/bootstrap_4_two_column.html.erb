@@ -7,10 +7,10 @@
     <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => EnrollRegistry[:enroll_app].settings(:favicon_tab_icon).item %>
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
-    <%= javascript_pack_tag 'application' %>
-    <%= stylesheet_pack_tag 'application' %>
-    <%= javascript_pack_tag ENV['CLIENT'] %>
-    <%= stylesheet_pack_tag ENV['CLIENT'] %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
     <%= csrf_meta_tags %>
 
 

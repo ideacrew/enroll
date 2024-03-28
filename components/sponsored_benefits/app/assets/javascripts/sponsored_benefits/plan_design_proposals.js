@@ -471,7 +471,7 @@ function disableActionButtons() {
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     });
-    $('.plan_design_proposals .save-action').attr('disabled', 'disabled');
+    $('.plan_design_proposals .save-action').prop('disabled', true);
     $('.plan_design_proposals .plan-selection-button-group').attr({
      'data-toggle': "tooltip",
      'data-placement': "top",
@@ -617,9 +617,7 @@ function saveProposalAndPublish(event) {
   event.preventDefault();
   event.stopImmediatePropagation();
   data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
-
-  } else {
+  if (!proposalIsInvalid(data)) {
     var url = $("#benefit_groups_url").val();
     $.ajax({
       type: "POST",
@@ -628,6 +626,7 @@ function saveProposalAndPublish(event) {
     }).done(function(data) {
       var publish_url = $('#publish_proposal_url').val();
       $.ajax({
+        dataType: 'json',
         url: publish_url,
         type: 'POST',
         data: {
@@ -637,8 +636,9 @@ function saveProposalAndPublish(event) {
           window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
         },
         error: function(data) {
-          var resp = $.parseJSON(data.responseText);
-          window.location.href = resp.url + "&profile_id=" + $("#profile_id").val();
+          console.log("error fetching proposal url: " + data.url);
+          var assembled_url = data.url + "&profile_id=" + $("#profile_id").val();
+          window.location.replace(assembled_url)
         }
       });
     });

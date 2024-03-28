@@ -802,7 +802,7 @@ And(/^\w+ fill in QLE date (.*) the range eligiblity date period$/) do |date|
   if date == 'outside'
     fill_in "qle_date", with: (TimeKeeper.date_of_record - 3.months).strftime('%m/%d/%Y').to_s
   else
-    fill_in "qle_date", with: TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y').to_s
+    fill_in "qle_date", with: TimeKeeper.date_of_record.strftime('%m/%d/%Y').to_s
   end
 end
 

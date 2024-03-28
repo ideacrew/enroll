@@ -34,7 +34,7 @@ toggleClosestBulkActionsButton = ($wrapper) ->
   if $wrapper.find("input[data-role='bulk-actions-resource']:checked").length > 0
     $bulkActions.removeAttr('disabled')
   else
-    $bulkActions.attr('disabled', 'disabled')
+    $bulkActions.prop('disabled', 'disabled')
 
 
 #### Bulk Action link behaviour
@@ -54,7 +54,7 @@ $(document).on 'click', '.buttons-bulk-actions a', (event) ->
   return unless url && values
 
   # Disable the Bulk Actions dropdown, so only one can be run at a time
-  $bulkAction.closest('button').attr('disabled', 'disabled')
+  $bulkAction.closest('button').prop('disabled', 'disabled')
 
   # Show Processing...
   $processing.show().data('bulk-actions-processing', true)

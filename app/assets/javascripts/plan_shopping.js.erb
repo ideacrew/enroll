@@ -50,7 +50,7 @@ function filterPlanByRange(type, combinedSelectors) {
 function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
   var selectedPlanTypes = [];
   var spCheckboxes = $('input.' + cbKlass + ':checked');
-  if (spCheckboxes.size() > 0) {
+  if (spCheckboxes.length > 0) {
     spCheckboxes.each(function(idx, ele) {
       var ptName = $(ele).attr(cbFilterKlass);
       var qstring = "[" + planValueTag  + "='" + ptName + "']";
@@ -248,7 +248,7 @@ $(function() {
 
   $(document).on('click', '.all-filters-row .reset-btn', function(){
     resetAptc();
-    $("#filter-sidebar input[type='checkbox']").attr("checked", false);
+    $("#filter-sidebar input[type='checkbox']").prop("checked", false);
     $("#filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
     $("#filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
     $("#filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");

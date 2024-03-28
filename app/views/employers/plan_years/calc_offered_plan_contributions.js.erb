@@ -29,7 +29,7 @@ function setOpenEnrollmentDatePicker(){
 
 //unbind checkbox handlers
 //$('#<%= @location_id %> <%= @coverage_type %> .checkbox label input[type="checkbox"]').unbind();
-//$('#<%#= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
+//$('#<%#= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').prop('disabled', true);
 
 // show dental config links
 
@@ -43,7 +43,7 @@ if ( $("#<%= @location_id %> .edit-add-dental").is(':hidden') ) {
 
 $(document).on('click', "#<%= @location_id %> .fa.fa-trash-o", function () {
   // clear dental plan form
-  $(this).closest('.dental').find('input:checked:enabled').removeProp("checked");
+  $(this).closest('.dental').find('input:checked:enabled').removeAttr("checked");
   $(this).closest('.dental').find('input.hidden-param').val("");
   $(this).closest('.dental').find('input.hidden-param').attr("value","");
   $(this).closest('.dental').find('input.hidden-param.contribution_handler.premium-storage-input').val("0");

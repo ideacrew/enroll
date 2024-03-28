@@ -119,7 +119,7 @@ And(/^.+ updates the start date$/) do
 end
 
 And(/^.+ clicks on Select Health Benefits button$/) do
-  find(BrokerCreateQuotePage.select_health_benefits_btn).click
+  find("a.btn", :text => /SELECT HEALTH BENEFITS/i).click
 end
 
 When(/^.+ clicks Actions for that Employer$/) do
@@ -138,16 +138,16 @@ end
 
 
 Then(/^.+ publishes the quote$/) do
-  wait_for_ajax(3, 2)
-  find(BrokerHealthBenefitsPage.select_refrence_plan).click
-  wait_for_ajax(3, 2)
+  wait_for_ajax(5, 2)
+  find(BrokerHealthBenefitsPage.select_reference_plan).click
+  wait_for_ajax(5, 2)
   find(BrokerHealthBenefitsPage.publish_quote_btn).click
   expect(page).to have_content("Quote Published")
 end
 
 Then(/^.+ selects plan offerings by metal level and enters (.*) for employee and deps$/) do |int|
   wait_for_ajax(3, 2)
-  find(BrokerHealthBenefitsPage.by_meta_level_tab).click
+  find(BrokerHealthBenefitsPage.by_metal_level_tab).click
   wait_for_ajax(3, 2)
   expect(page).to have_content("Gold")
   choose(BrokerHealthBenefitsPage.gold_radiobtn)
@@ -164,7 +164,7 @@ end
 
 And(/^.+ publishes the quote and sees successful message of published quote$/) do
   wait_for_ajax(3, 2)
-  find(BrokerHealthBenefitsPage.select_refrence_plan).click
+  find(BrokerHealthBenefitsPage.select_reference_plan).click
   wait_for_ajax(3, 2)
   Capybara.ignore_hidden_elements = false
 
@@ -379,7 +379,7 @@ And(/^Primary broker clicks Actions dropdown and clicks Create Quote$/) do
   find(BrokerEmployersPage.actions_dropdown).click
   wait_for_ajax
   expect(page).to have_css('.btn.btn-xs', text: 'Create Quote')
-  find(BrokerEmployersPage.create_quote).click
+  find(:css,'div[id^="plan_design_"]').find(:css, 'ul>li:nth-child(2)>a').click
 end
 
 And(/^Primary broker clicks Actions dropdown and clicks Assign General Agency$/) do

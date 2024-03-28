@@ -63,10 +63,10 @@ $(document).on('change','#option1_date, #option2_date, #option3_date', function(
       data:{effective_date: $("#calculated_effective_date").val(), date_option1: $('#option1_date').val(), date_option2: $('#option2_date').val(), date_option3: $('#option3_date').val(), person: $('#person').val(), id: idVal },
       success: function (response) {
         if (response["renewalFlagStatus"]) {
-          $("#coverage_renewal_flag").attr('disabled',false);
+          $("#coverage_renewal_flag").prop('disabled',false);
           $('.coverage-renewal-flag').show();
         } else {
-          $("#coverage_renewal_flag").attr('disabled',true);
+          $("#coverage_renewal_flag").prop('disabled',true);
           $(  '.coverage-renewal-flag').hide();
         }
       }

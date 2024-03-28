@@ -6,7 +6,7 @@ ready = function() {
   $('.health .offerings input[type=checkbox]').on('change', function() {
     var checkedValue = $(this).closest('label').find('span').find('p').text();
     if ( $(this).is(':checked') ) {
-      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').removeProp('disabled', false);
+      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').removeAttr('disabled', false);
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').trigger('click');
       $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').prop('disabled');
 
@@ -14,7 +14,7 @@ ready = function() {
 
 
     } else {
-      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').removeProp('checked');
+      $(this).closest('.benefit-group-fields').find('.dental-benefits-fields').find('label span p:contains('+checkedValue+')').closest('label').find('input[type=checkbox]').removeAttr('checked');
 
     }
   });
@@ -66,7 +66,7 @@ ready = function() {
       $(this).closest('.row').slideUp();
       $(this).closest('.row').fadeOut();
       $(this).closest('.benefit-group-fields').find('.dental #edit_employer_cost_info_btn').hide();
-      $(this).closest('.benefit-group-fields').find('.dental .nav-tabs input').removeProp("checked");
+      $(this).closest('.benefit-group-fields').find('.dental .nav-tabs input').removeAttr("checked");
       $(this).closest('.benefit-group-fields').find('.dental h1:first').html('Dental - Add Benefit Package <i class="fa fa-trash-o pull-right" style="margin-top: 10px;" data-toggle="tooltip" title="Remove"></i>');
       $(this).closest('.benefit-group-fields').find('.dental .currently-offered').text("Select which plans your employees will choose from.");
       $(this).closest('.benefit-group-fields').find('.dental #edit_employer_cost_info_btn').hide();
@@ -119,7 +119,7 @@ ready = function() {
         original_ref = $(this).closest('.benefit-group-fields').find('.health .ref-plan').val();
       }
       $('.interaction-click-control-save-plan-year').addClass('disabled');
-      $('.interaction-click-control-save-plan-year').attr('disabled',true);
+      $('.interaction-click-control-save-plan-year').prop('disabled',true);
       $(this).closest('.benefit-group-fields').find(coverage_type+' .reference-steps input').prop('checked', false);
       $(this).closest(coverage_type+' .edit-offering').hide();
       $(this).closest('.benefit-group-fields').find(coverage_type+' .reference-steps').show();
@@ -686,7 +686,7 @@ function calcEmployerContributions(url, location, coverage_type) {
 
   $('#new_plan_year, #edit_plan_year').on('submit', function() {
     $('.interaction-click-control-create-plan-year').prop('disabled', true)
-    $('.dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').removeProp('disabled');
+    $('.dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').removeAttr('disabled');
   });
 }
 
