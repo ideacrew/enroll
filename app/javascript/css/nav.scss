@@ -1,0 +1,55 @@
+
+header.navbar-primary {
+    font-size: 14px;
+    background-color: var(--grey-000);
+    border-bottom: solid 3px var(--theme-primary-blue, #007bc4);
+
+    .navbar-brand img {
+      max-height: 40px;
+    }
+
+    .navbar-nav {
+      .nav-item {
+        a {
+          text-decoration: underline;
+        }
+
+        img {
+          max-height: 16px;
+          padding-right: .5rem;
+        }
+
+        .horizontal-links {
+          span::after {
+            content: "|";
+            color: var(--grey-060);
+            padding: 0 .1rem;
+          }
+
+          span:last-child::after {
+            content: "";
+          }
+        }
+
+        &.site-name-market {
+          font-size: 16px;
+
+          :first-child {
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 13px;
+          }
+        }
+      }
+
+      .nav-item-divider {
+        background-color: var(--grey-050);
+        width: 1px;
+        margin: -.75rem 0.5rem;
+      }
+    }
+
+    navbar-toggler {
+      border: 1px solid var(--grey-050);
+    }
+  }
