@@ -16,9 +16,9 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "~> 5.2.4.3"
+  s.add_dependency 'rails', '~> 6.0.6.1'
   s.add_dependency "slim", "~> 3.0.8"
-  s.add_dependency "mongoid", "~> 7.0.2"
+  s.add_dependency 'mongoid', '~> 7.5.4'
   s.add_dependency "aasm", "~> 4.8.0"
   s.add_dependency 'devise',                    '~> 4.5'
   s.add_dependency 'config',  '~> 2.0'
@@ -41,12 +41,12 @@ Gem::Specification.new do |s|
 
   s.test_files = Dir["spec/**/*"]
 
-  s.add_development_dependency "rspec-rails"
+  s.add_development_dependency "rspec-rails",                '5.0.1'
   s.add_development_dependency 'simplecov',                 '~> 0.22.0'
   s.add_development_dependency 'simplecov-cobertura',       '~> 2.1.0'
   s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
-  s.add_development_dependency 'database_cleaner'
+  s.add_development_dependency 'database_cleaner-mongoid',  '~> 2.0'
   s.add_development_dependency 'capybara',                  '~> 3.12'
   s.add_development_dependency 'factory_bot_rails',         '~> 4'
   s.add_development_dependency 'forgery',                   '~> 0.7.0'

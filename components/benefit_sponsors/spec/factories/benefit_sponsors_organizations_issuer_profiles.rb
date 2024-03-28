@@ -28,5 +28,9 @@ FactoryBot.define do
     trait :anthm_profile do
       legal_name {"Anthem Blue Cross and Blue Shield"}
     end
+
+    trait :default do
+      legal_name { "Blue Cross Blue Shield" }
+    end
   end
 end

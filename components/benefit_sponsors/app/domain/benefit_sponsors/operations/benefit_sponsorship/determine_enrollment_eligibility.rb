@@ -34,8 +34,8 @@ module BenefitSponsors
         end
 
         def build_benefit_sponsorship_params(benefit_sponsorship)
-          sponsorship_params = benefit_sponsorship.as_json.symbolize_keys.except(:benefit_applications)
-          sponsorship_params[:benefit_applications] = benefit_sponsorship.benefit_applications.collect{|ba| ba.as_json.symbolize_keys.except(:benefit_packages)}
+          sponsorship_params = benefit_sponsorship.serializable_hash.symbolize_keys.except(:benefit_applications)
+          sponsorship_params[:benefit_applications] = benefit_sponsorship.benefit_applications.collect{|ba| ba.serializable_hash.symbolize_keys.except(:benefit_packages)}
           sponsorship_params[:market_kind] = benefit_sponsorship.market_kind
           Success(sponsorship_params)
         end
