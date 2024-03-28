@@ -28,10 +28,9 @@ module Subscribers
         logger.info "AtpSubscriber: acked with success: #{result.success}"
       else
         transfer_details[:result] = "Failed"
-        transfer_details[:failure] = "Unsuccessfully ingested by Enroll - #{result.failure.full_messages.join(', ')}"
-        errors = result.failure
+        transfer_details[:failure] = "Unsuccessfully ingested by Enroll - #{result.failure}"
         nack(delivery_info.delivery_tag)
-        logger.info "AtpSubscriber: nacked with failure, errors: #{errors.full_messages.join(', ')}"
+        logger.info "AtpSubscriber: nacked with failure, errors: #{result.failure}"
       end
       FinancialAssistance::Operations::Transfers::MedicaidGateway::PublishTransferResponse.new.call(transfer_details)
     rescue StandardError => e
