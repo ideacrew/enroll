@@ -61,17 +61,20 @@ module Services
       end
 
       def csr_value
-        family = @hbx_enrollment.family
-        active_tax_house_hold = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-                                  family.active_thhg(enrollment_year).latest_active_tax_household_with_year(enrollment_year) if family.active_thhg(enrollment_year).present?
-                                else
-                                  @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
-                                end
+        return fetch_csr if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
+        active_tax_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
         return '-01' unless active_tax_house_hold
 
         csr_kind = active_tax_house_hold.valid_csr_kind(hbx_enrollment)
-        '-' + EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
+        "-#{EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}"
+      end
+
+      def fetch_csr
+        shopping_family_member_ids = @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
+        csr_kind = ::Operations::PremiumCredits::FindCsrValue.new.call({ family: @hbx_enrollment.family, year: @hbx_enrollment.effective_on.year, family_member_ids: shopping_family_member_ids }).value!
+
+        "-#{EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}"
       end
 
       def aptc_value
