@@ -14,7 +14,7 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
   before_action :validate_rating_address, only: [:show]
-  before_action :already_submitted_enrollment, only: [:thankyou]
+  before_action :check_enrollment_state, only: [:thankyou]
   before_action :set_cache_headers, only: [:thankyou]
 
   def checkout
@@ -298,12 +298,16 @@ class Insured::PlanShoppingsController < ApplicationController
     response.headers["Pragma"] = "no-cache"
   end
 
-  # Determines if the user has already submitted an enrollment.
-  # The user has already submitted an enrollment if the current enrollment is not in the shopping state.
+  # check the enrollment state of the current HBX enrollment.
+  # This method is used to prevent users from clicking the browser's back button
+  # and resubmitting an enrollment that has already been submitted.
   #
-  # User navigates to the thank you page after submitting an enrollment, using browser back button
-  # @note This method sets a flash error message if the user has already submitted an enrollment.
-  def already_submitted_enrollment
+  # If the enrollment is in the 'shopping' state, no action is taken.
+  # Otherwise, a notice flash message is displayed, and the user is redirected
+  # to the family account page.
+  #
+  # @return [void]
+  def check_enrollment_state
     return if @hbx_enrollment.shopping?
 
     flash[:notice] = l10n("insured.active_enrollment_warning")
