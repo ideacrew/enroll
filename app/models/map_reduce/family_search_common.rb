@@ -32,7 +32,7 @@ module MapReduce
     def people_hash_for(person_ids)
       person_data = {}
       Person.where({"_id" => {"$in" => person_ids}}).each do |pers|
-        person_data[pers._id.to_s] = pers.as_json(:except => [
+        person_data[pers._id.to_s] = pers.serializable_hash(:except => [
           :inbox, :versions, :version,
           :is_disabled, :is_tobacco_user,
           :phones, :emails, :addresses,

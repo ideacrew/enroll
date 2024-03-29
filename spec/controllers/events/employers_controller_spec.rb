@@ -18,7 +18,7 @@ describe Events::EmployersController do
       allow(controller).to receive(:render_to_string).with(
         "events/v2/employers/updated",
         {
-          :formats => ["xml"],
+          :formats => [:xml],
           :locals => {
             :employer => employer_profile,
             manual_gen: false,
@@ -66,7 +66,7 @@ describe Events::EmployersController do
         allow(controller).to receive(:render_to_string).with(
           "events/v2/employers/updated",
           {
-            :formats => ["xml"],
+            :formats => [:xml],
             :locals => {
               :employer => employer_profile,
               benefit_application_id: "benefit_application_id",

@@ -123,9 +123,8 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
 
     it "should have a link to download the sbc pdf" do
       expect(rendered).to have_selector(
-        "a[href='#{"/document/download/#{EnrollRegistry[:enroll_app].setting(:s3_prefix).item}"\
-        '-enroll-sbc-qa/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename'\
-        '=APlanName.pdf&disposition=inline'}']"
+        "a[href='#{"/documents/#{document.id}/product_sbc_download?product_id=#{mock_product.id}&content_type=application/pdf&filename=APlanName.pdf"\
+        '&disposition=inline'}']"
       )
     end
 
