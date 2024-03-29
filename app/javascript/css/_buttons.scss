@@ -14,14 +14,17 @@
   }
   &:hover {
     background-color: $hover;
+    color: $color;
   }
   &:active {
     background-color: var(--button-default-active-color);
+    color: $color;
   }
   &:focus {
     background-color: $hover;
     outline: 2px solid var(--grey-190);
     outline-offset: 2px;
+    color: $color;
   }
   &:disabled {
     background-color: var(--grey-040);
