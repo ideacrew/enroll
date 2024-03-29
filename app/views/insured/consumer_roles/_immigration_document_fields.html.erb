@@ -1,21 +1,47 @@
 <% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
 <% document_upload = (defined? document_upload) ? document_upload : false %>
+<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+  <div class="<%= 'hidden_field' if !document_upload && !show_vlp_documents_container(f.object) %>" id="vlp_documents_container">
+    <div class="<%= 'hidden_field' if !document_upload && !show_immigration_doc_type(f.object) %>" id='immigration_doc_type_select'>
+      <label for="immigration_doc_type"><%= l10n("insured.consumer_roles.select_doc_type") %></label>
+      <%= select_tag :immigration_doc_type, options_for_select(VlpDocument.immigration_document_types, selected: vlp_doc_subject), {id: 'immigration_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
+    </div>
+    <div class="<%= 'hidden_field' unless show_naturalization_doc_type(f.object) %>" id="naturalization_doc_type_select">
+      <label for="naturalization_doc_type"><%= l10n("insured.consumer_roles.select_doc_type") %></label>
+      <%= select_tag :naturalization_doc_type, options_for_select([['Certificate of citizenship','Certificate of Citizenship'], ['Naturalization certificate', 'Naturalization Certificate']], selected: vlp_doc_subject), {id: 'naturalization_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
+    </div>
+    <input id="vlp_doc_target_id" value='<%= f.object.id %>' type='hidden' />
+    <input id="vlp_doc_target_type" value='<%= f.object.class %>' type='hidden' />
 
-<div class="row row-form-wrapper no-buffer <%= 'hidden_field' if !document_upload && !show_vlp_documents_container(f.object) %>" id="vlp_documents_container">
-  <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' if !document_upload && !show_immigration_doc_type(f.object) %>" id='immigration_doc_type_select'>
-    <%= select_tag :immigration_doc_type, options_for_select(VlpDocument.immigration_document_types, selected: vlp_doc_subject), {id: 'immigration_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
+    <div class="vlp_doc_area col-md-12">
+    </div>
+    <!-- to do: need to fix all the templates for the various immigration partials to use the structure below -->
+    <div class="d-flex mb-md-4 row col-sm">
+      <div class="mr-auto col-sm col-md-6 p-0">
+
+      </div>
+      <div class="col-sm col-md-6 p-0">
+
+      </div>
+    </div>
   </div>
+<% else %>
+  <div class="row row-form-wrapper no-buffer <%= 'hidden_field' if !document_upload && !show_vlp_documents_container(f.object) %>" id="vlp_documents_container">
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' if !document_upload && !show_immigration_doc_type(f.object) %>" id='immigration_doc_type_select'>
+      <%= select_tag :immigration_doc_type, options_for_select(VlpDocument.immigration_document_types, selected: vlp_doc_subject), {id: 'immigration_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
+    </div>
 
-  <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' unless show_naturalization_doc_type(f.object) %>" id="naturalization_doc_type_select">
-    <%= select_tag :naturalization_doc_type, options_for_select([['Certificate of citizenship','Certificate of Citizenship'], ['Naturalization certificate', 'Naturalization Certificate']], selected: vlp_doc_subject), {id: 'naturalization_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
+    <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' unless show_naturalization_doc_type(f.object) %>" id="naturalization_doc_type_select">
+      <%= select_tag :naturalization_doc_type, options_for_select([['Certificate of citizenship','Certificate of Citizenship'], ['Naturalization certificate', 'Naturalization Certificate']], selected: vlp_doc_subject), {id: 'naturalization_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
+    </div>
+
+    <input id="vlp_doc_target_id" value='<%= f.object.id %>' type='hidden' />
+    <input id="vlp_doc_target_type" value='<%= f.object.class %>' type='hidden' />
+
+    <div class="vlp_doc_area col-md-12">
+    </div>
   </div>
-
-  <input id="vlp_doc_target_id" value='<%= f.object.id %>' type='hidden' />
-  <input id="vlp_doc_target_type" value='<%= f.object.class %>' type='hidden' />
-
-  <div class="vlp_doc_area col-md-12">
-  </div>
-</div>
+<% end %>
 
 
 <% if vlp_doc_subject.present? %>
