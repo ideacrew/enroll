@@ -2,18 +2,18 @@
   <nav class="progress-nav">
     <h3><%= l10n('account_setup') %></h3>
     <ul class="progress-wrapper">
-      <li class="<%= 'active' if account_registration_active? %>">
+      <li class="<%= 'complete' if !account_registration_active? %> <%= 'active' if account_registration_active? %>">
         <span class="circle-progress"></span>
         <div class="vertical-line-progress"></div>
         <a><%= l10n('personal_information') %></a>
 
       </li>
-      <li class="<%= 'done' if tell_us_about_yourself_active? %> <%= 'active' if tell_us_about_yourself_current_step? %>">
+      <li class="<%= 'complete' if tell_us_about_yourself_active? %> <%= 'active' if tell_us_about_yourself_current_step? %>">
         <span class="circle-progress"></span>
         <div class="vertical-line-progress"></div>
         <a class="<%= 'cna disabled' unless tell_us_about_yourself_active? or tell_us_about_yourself_current_step? %>">Tell Us About Yourself</a>
       </li>
-      <li class="<%= 'done' if family_members_index_active? %> <%= 'active' if family_members_index_current_step? %>">
+      <li class="<%= 'complete' if family_members_index_active? %> <%= 'active' if family_members_index_current_step? %>">
         <span class="circle-progress"></span>
         <div class="vertical-line-progress"></div>
         <a class="<%= 'cna disabled' unless family_members_index_active? or family_members_index_current_step? %>"><%= l10n('family_info') %></a>
