@@ -101,6 +101,10 @@ nav .login-options li {
   @extend .sr-only;
 }
 
+.hidden_field {
+  display: none;
+}
+
 .nav-stacked li {
   padding: $spacer;
   margin-bottom: ($spacer * .25);
@@ -172,7 +176,7 @@ ul.progress-wrapper li {
 }
 span.circle-progress {
   border-radius: 50px;
-  background: #fff;
+  background: var(--grey-000);
   border: 2px solid #cacaca;
   width: 12px;
   height: 12px;
@@ -180,12 +184,6 @@ span.circle-progress {
   right: 33px;
   margin-top: 8px;
   z-index: 5;
-}
-ul.progress-wrapper li.complete {
-  padding: 5px 0px;
-  list-style: none;
-  padding-left: 35px;
-  color: var(--theme-primary-blue, #007bc4);
 }
 ul.progress-wrapper li.complete span.circle-progress {
   background-color: var(--theme-primary-blue, #007bc4);
@@ -200,7 +198,7 @@ ul.progress-wrapper li.active {
   color: var(--theme-primary-blue, #007bc4);
 }
 ul.progress-wrapper li.active span.circle-progress {
-  background-color: #ffffff;
+  background-color: var(--grey-000);
   border: 2px solid var(--theme-primary-blue, #007bc4);
   width: 14px;
   right: 32px;
@@ -238,9 +236,19 @@ ul.progress-wrapper li:last-child .vertical-line-progress {
   }
 }
 
+.ethnicity-container {
+  label {
+    font-weight: 400;
+  }
+}
+
 @media screen and (max-width: 767px) {
   .sm-space, .col-sm {
     margin-bottom: $spacer;
+  }
+
+  .ethnicity-container label {
+    width: 100%;
   }
 }
 
