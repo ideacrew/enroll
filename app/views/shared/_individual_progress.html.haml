@@ -40,8 +40,13 @@
 - if step == 1 && search_page == true
   = link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary btn-block', data: { disable_with: 'Continue' }
 - elsif step == 1
+<<<<<<< HEAD
   %span{tabindex: '0', onkeydown: "handleButtonKeyDown(event, 'continue_button')", id: 'continue_button', class: 'btn btn-lg btn-primary btn-br btn-block', onkeydown: 'handleButtonKeyDown(event, "continue_button");', onclick: 'PersonValidations.manageRequiredValidations($(this));'} CONTINUE
   %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue.hidden{type: 'submit', 'data-disable-with': l10n("please_wait")}
+=======
+  %span{tabindex: '0', onkeydown: "handleButtonKeyDown(event, 'continue_button')", id: 'continue_button', class: 'btn', onkeydown: 'handleButtonKeyDown(event, "continue_button");', onclick: 'PersonValidations.manageRequiredValidations($(this));'} CONTINUE
+  %button.btn.interaction-click-control-continue.hidden{type: 'submit'}
+>>>>>>> 6c5bc854cf (registration process)
     CONTINUE
 - elsif ridp == true && step == 2
   - if next_link.present?  && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper")
