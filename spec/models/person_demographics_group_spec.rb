@@ -2,14 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe Demographics, type: :model do
+RSpec.describe PersonDemographicsGroup, type: :model do
   let(:person) { FactoryBot.create(:person) }
   let(:demographics) do
-    FactoryBot.create(:demographics, :with_race_and_ethnicity, demographable: person)
+    FactoryBot.create(:person_demographics_group, :with_race_and_ethnicity, demographable: person)
   end
 
-  let(:race) { demographics.race }
-  let(:ethnicity) { demographics.ethnicity }
+  let(:race) { demographics.races.first }
+  let(:ethnicity) { demographics.ethnicities.first }
 
   describe 'associations' do
 
@@ -21,17 +21,17 @@ RSpec.describe Demographics, type: :model do
     end
 
     context 'child associations' do
-      context 'race' do
+      context 'races' do
         it 'returns correct association' do
-          expect(demographics.race).to eq(race)
-          expect(demographics.race).to be_a(Race)
+          expect(demographics.races.to_a).to include(race)
+          expect(demographics.races.first).to be_a(Race)
         end
       end
 
-      context 'ethnicity' do
+      context 'ethnicities' do
         it 'returns correct association' do
-          expect(demographics.ethnicity).to be_a(Ethnicity)
-          expect(demographics.ethnicity).to eq(ethnicity)
+          expect(demographics.ethnicities.first).to be_a(Ethnicity)
+          expect(demographics.ethnicities.to_a).to include(ethnicity)
         end
       end
     end

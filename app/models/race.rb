@@ -4,16 +4,20 @@
 # It includes fields for attested races and other race (if 'other' is selected).
 # It also includes constants for defined race options, other race options, CMS reporting groups, and their mappings.
 class Race
-  include Mongoid::Document
-  include Mongoid::Timestamps
+  # Race class representing a person's race.
+  # This class includes the DocumentVersion module.
+  #
+  # @note The DocumentVersion module provides versioning capabilities to the Race class.
+  include DocumentVersion
 
+  # Localization helper module for handling localized strings.
   extend L10nHelper
 
-  # @!attribute [rw] demographics
-  #   @return [Demographics] The demographics associated with the race.
-  #   This is an instance of the Demographics class.
-  #   The Demographics class that the Race class is embedded in.
-  embedded_in :demographics, class_name: 'Demographics'
+  # @!attribute [rw] person_demographics_group
+  #   @return [PersonDemographicsGroup] The demographics group associated with the ethnicity.
+  #   This is an instance of the PersonDemographicsGroup class.
+  #   The PersonDemographicsGroup class that the Ethnicity class is embedded in.
+  embedded_in :person_demographics_group, class_name: 'PersonDemographicsGroup'
 
   # The defined race options.
   # @return [Array<String>] An array of defined race options.

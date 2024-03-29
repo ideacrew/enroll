@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-# @module HistoryTrackingUtils
+# @module DocumentVersion
 # This module provides utility methods for tracking the history of an object.
 #
 # @example Include the module in a class to add history tracking related fields, scopes and methods.
 #   class MyClass
-#     include HistoryTrackingUtils
+#     include DocumentVersion
 #   end
-module HistoryTrackingUtils
+module DocumentVersion
   extend ActiveSupport::Concern
 
   # @!parse include Mongoid::Document
@@ -31,6 +31,18 @@ module HistoryTrackingUtils
     #   @return [Symbol] The lifecycle state or status of the record.
     field :status, type: Symbol
 
+    # @!attribute [rw] is_active
+    #   @return [Mongoid::Boolean] Indicates whether the object is active or not.
+    #   This field can used to determine if there are more than one active objects for the same person.
+    field :is_active, type: Mongoid::Boolean
+
+    # @!attribute [rw] subject
+    #   @return [String] The globalid of the source object this document version is associated with.
+    #   This field is used to find/track the source object.
+    #   It is a global identifier.
+    #   This field could be potentially used for Visitor pattern implementation to find the source object.
+    field :subject, type: String
+
     # @!attribute [rw] event
     #   @return [Symbol] The event that changed the status of the object.
     field :event, type: Symbol
@@ -40,6 +52,8 @@ module HistoryTrackingUtils
     #   This field is typically populated with the value 'changed',
     #   but in rare cases (such as developer intervention to correct data),
     #   it may be populated with the value 'corrected'.
+    # @note SSN and DOB are the ones that are most likely to be corrected and not changed.
+    # Date of Death could be both changed and corrected.
     field :changed_or_corrected, type: Symbol
 
     # @!attribute [rw] sequence_id
@@ -62,5 +76,6 @@ module HistoryTrackingUtils
 
     # Scopes
     scope :latest, -> { order(created_at: :desc) }
+    scope :earliest, -> { order(created_at: :asc) }
   end
 end

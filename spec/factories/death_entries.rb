@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ethnicity, class: 'Ethnicity' do
+  factory :death_entry, class: 'DeathEntry' do
     association :person_demographics_group
 
-    hispanic_or_latino { 'yes' }
-    attested_ethnicities { ['cuban'] }
-    attestation { 'non_attested' }
-    other_ethnicity { nil }
+    is_deceased { false }
+    date_of_death { nil }
 
     started_at { DateTime.now }
     ended_at { nil }
@@ -25,6 +23,24 @@ FactoryBot.define do
     # to avoid name collision with the EventSource::Event.
     before(:create) do |instance|
       instance.event = :create
+    end
+
+    trait :deceased do
+      is_deceased   { true }
+      date_of_death { TimeKeeper.date_of_record }
+    end
+
+    trait :with_death_evidence do
+      after(:create) do |death_entry|
+        death_entry.create_death_evidence(
+          key: :death,
+          title: 'Death',
+          aasm_state: 'pending',
+          due_on: TimeKeeper.date_of_record.prev_day,
+          verification_outstanding: true,
+          is_satisfied: false
+        )
+      end
     end
   end
 end

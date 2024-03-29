@@ -156,7 +156,6 @@ class Person
 
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
-  #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
 
   embeds_one :csr_role, cascade_callbacks: true, validate: true
   embeds_one :assister_role, cascade_callbacks: true, validate: true
@@ -174,12 +173,10 @@ class Person
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
-  # @!attribute [rw] demographics
-  #   @return [Array<Demographics>] The demographics associated with the person.
-  #   @!parse extend Mongoid::Association::Embedded::EmbedsMany
-  #   This is an array of Demographics objects, with each object representing a demographic.
-  #   The array is empty by default.
-  embeds_many :demographics, as: :demographable, class_name: 'Demographics'
+  # @!attribute [rw] person_demographics_group
+  #   @return [PersonDemographicsGroup] The demographics information for the person.
+  #   This is a polymorphic association that can be associated with any model that can have demographics information.
+  embeds_one :person_demographics_group, as: :demographable, class_name: 'PersonDemographicsGroup'
 
   attr_accessor :effective_date, :skip_person_updated_event_callback, :is_consumer_role, :is_resident_role
 
