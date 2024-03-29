@@ -98,7 +98,6 @@ class Family
   index({"households.tax_households.effective_ending_on" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
   index({"tax_household_groups.tax_households._id" => 1})
-
   index({"households.tax_households.eligibility_determinations._id" => 1})
   index({"households.tax_households.eligibility_determinations.e_pdc_id" => 1})
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
@@ -345,6 +344,23 @@ class Family
     :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
+
+  # Scope to find families with APTC CSRs grants for a specific year.
+  # @param assistance_year [Integer] The year of assistance.
+  # @param csr_list [Array] The list of CSR values.
+  # @return [Mongo::Collection::View] The families that match the criteria.
+  scope :with_aptc_csr_grants_for_year, lambda { |assistance_year, csr_list|
+                                          where({ "$and" => [
+                                                              {"eligibility_determination.grants" => {"$elemMatch": {"key" => "AdvancePremiumAdjustmentGrant", "assistance_year" => assistance_year, "value" => { "$gt" => "0" }}}},
+                                                              {"eligibility_determination.subjects.eligibility_states.grants" => {"$elemMatch" => {"key" => "CsrAdjustmentGrant", "assistance_year" => assistance_year, "value" => {"$in" => csr_list}}}}
+                                                            ] })
+                                        }
+
+  # Scope to find families with active coverage and APTC CSR grants for a specific year.
+  # @param assistance_year [Integer] The year of assistance.
+  # @param csr_list [Array] The list of CSR values.
+  # @return [Mongo::Collection::View] The families that match the criteria.
+  scope :with_active_coverage_and_aptc_csr_grants_for_year, ->(assistance_year, csr_list){ all_enrolled_and_renewal_enrollments.with_aptc_csr_grants_for_year(assistance_year, csr_list) }
 
   # It fetches active or renewal application for the family based on the year passed
   def active_financial_assistance_application(year = TimeKeeper.date_of_record.year)

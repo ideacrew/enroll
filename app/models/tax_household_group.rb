@@ -25,7 +25,6 @@ class TaxHouseholdGroup
                          message: "%{value} is not a valid source kind" }
 
   embeds_many :tax_households, cascade_callbacks: true
-  embedded_in :family
 
   before_save :generate_hbx_id
 
