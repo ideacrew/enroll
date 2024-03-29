@@ -1,0 +1,24 @@
+<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+  <div class="alert alert-info d-flex" role="alert">
+    <div>
+      <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
+    </div>
+    <div class="mt-1 mb-1">
+      <% if @consumer_candidate&.match_person.present? && EnrollRegistry.feature_enabled?(:pii_match_success_message) %>
+        <%= l10n("insured.consumer_roles.match_info", site_short_name: site_short_name) %>
+      <% else %>
+      <%= l10n("insured.consumer_roles.no_match_info", site_short_name: site_short_name) %>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+    <div class="alert alert-success alert-dismissible">
+      <% if @consumer_candidate&.match_person.present? && EnrollRegistry.feature_enabled?(:pii_match_success_message) %>
+        <%= l10n("insured.consumer_roles.match_info", site_short_name: site_short_name) %>
+      <% else %>
+        <%= l10n("insured.consumer_roles.no_match_info", site_short_name: site_short_name) %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
