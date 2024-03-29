@@ -70,7 +70,7 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
 
       it "should add errors" do
         subject.uniq_ssn_dob
-        expect(subject.errors[:base].to_s).to include('Please check your information and try again')
+        expect(subject.errors[:base]).to eq ["This Social Security Number and Date-of-Birth is invalid in our records. Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}."]
       end
     end
 
