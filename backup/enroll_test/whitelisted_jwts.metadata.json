@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_test.whitelisted_jwts"}],"uuid":"9022cda4f22648ce8836b1187d20c5b8"}

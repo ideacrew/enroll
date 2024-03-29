@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_development.hra_client_sessions"}],"uuid":"28f85b89af64484f9fd61a62d4bd6731"}

@@ -1,0 +1,1 @@
+[{"severity":"convention","location":{"begin_pos":338,"end_pos":340},"message":"Layout/SpaceAroundOperators: Surrounding space missing for operator `=>`.","cop_name":"Layout/SpaceAroundOperators","status":"uncorrected"}]

@@ -1,0 +1,1 @@
+[{"severity":"convention","location":{"begin_pos":634,"end_pos":8454},"message":"Metrics/ModuleLength: Module has too many lines. [102/100]","cop_name":"Metrics/ModuleLength","status":"unsupported"}]

@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_development.rating_areas"}],"uuid":"9d63dd8d07ac487daecf0ea4d5ecf695"}

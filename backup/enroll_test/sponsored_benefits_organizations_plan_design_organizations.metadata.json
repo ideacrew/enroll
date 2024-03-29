@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_test.sponsored_benefits_organizations_plan_design_organizations"}],"uuid":"662a20e26c504a8d952562c0d116cf23"}

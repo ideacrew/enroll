@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"crm_gateway_development.events"}],"uuid":"052d4a0c0a214b449fe5eb2d16f2486b"}

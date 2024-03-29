@@ -1,0 +1,1 @@
+[{"severity":"convention","location":{"begin_pos":1383,"end_pos":1795},"message":"Metrics/CyclomaticComplexity: Cyclomatic complexity for build_details is too high. [11/10]","cop_name":"Metrics/CyclomaticComplexity","status":"unsupported"}]

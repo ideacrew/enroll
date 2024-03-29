@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"fdsh_gateway_test.transmittable_transactions_transmissions"}],"uuid":"8161e395061149dd9fd7f9a1820e9cae"}

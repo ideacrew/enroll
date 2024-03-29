@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_test.carrier_service_areas"}],"uuid":"ae2ce5ba30e24456b9f3c9225cf50ed4"}

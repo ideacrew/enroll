@@ -1,0 +1,1 @@
+[{"severity":"warning","location":{"begin_pos":749,"end_pos":778},"message":"Lint/UselessAssignment: Useless assignment to variable - `updated_transmittable_objects`. Did you mean `updated_consumer_role`?","cop_name":"Lint/UselessAssignment","status":"unsupported"}]

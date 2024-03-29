@@ -1,0 +1,1 @@
+[{"severity":"warning","location":{"begin_pos":1144,"end_pos":1148},"message":"Lint/SafeNavigationChain: Do not chain ordinary method call after safe navigation operator.","cop_name":"Lint/SafeNavigationChain","status":"unsupported"}]

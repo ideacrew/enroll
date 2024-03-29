@@ -1,0 +1,1 @@
+[{"severity":"convention","location":{"begin_pos":48,"end_pos":53},"message":"Style/Documentation: Missing top-level class documentation comment.","cop_name":"Style/Documentation","status":"unsupported"}]

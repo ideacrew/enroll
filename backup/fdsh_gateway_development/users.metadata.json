@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"fdsh_gateway_development.users"}],"uuid":"3d9e5fa8064f470da3d5198a9da0c9d8"}

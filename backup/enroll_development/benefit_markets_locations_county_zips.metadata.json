@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_development.benefit_markets_locations_county_zips"}],"uuid":"26dd4fc95f564d1e93536c7fa4704b74"}

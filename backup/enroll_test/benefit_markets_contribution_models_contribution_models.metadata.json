@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_test.benefit_markets_contribution_models_contribution_models"}],"uuid":"d1adf47270394ddf99b3ad921373ac47"}

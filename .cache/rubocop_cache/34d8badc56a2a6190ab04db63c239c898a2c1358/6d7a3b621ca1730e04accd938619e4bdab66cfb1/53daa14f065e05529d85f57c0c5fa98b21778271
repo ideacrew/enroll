@@ -1,0 +1,1 @@
+[{"severity":"error","location":{"begin_pos":20969,"end_pos":20970},"message":"Lint/Syntax: unexpected token tCOMMA\n(Using Ruby 2.5 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)","cop_name":"Lint/Syntax","status":"unsupported"}]

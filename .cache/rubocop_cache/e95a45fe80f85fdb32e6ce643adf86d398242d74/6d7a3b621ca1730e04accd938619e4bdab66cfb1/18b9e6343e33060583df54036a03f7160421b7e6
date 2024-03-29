@@ -1,0 +1,1 @@
+[{"severity":"convention","location":{"begin_pos":1959,"end_pos":1962},"message":"Style/CaseEquality: Avoid the use of the case equality operator `===`.","cop_name":"Style/CaseEquality","status":"unsupported"}]

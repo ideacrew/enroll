@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_test.scheduled_events"}],"uuid":"b47a7b5160994ed382ac7d935276c265"}

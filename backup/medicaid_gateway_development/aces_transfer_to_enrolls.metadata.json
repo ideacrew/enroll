@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"medicaid_gateway_development.aces_transfer_to_enrolls"}],"uuid":"4366d6e14da14bbbb6bb6319295b16de"}

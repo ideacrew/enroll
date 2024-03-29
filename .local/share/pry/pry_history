@@ -1,0 +1,187 @@
+families = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.aasm_state".in => statuses).distinct(:family_id)
+statuses = ["negative_response_received", "outstanding", "pending", "rejected"]
+families = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.aasm_state".in => statuses).distinct(:family_id)
+families.map{|f| ::FinancialAssistance::Application.where(family_id: f, aasm_state: 'determined')&.max_by(&:created_at)}
+applications =  families.map{|f| ::FinancialAssistance::Application.where(family_id: f, aasm_state: 'determined')&.max_by(&:created_at)}
+applications.uniq
+applications.map {|a| a.applicants.where(:"income_evidence.aasm_state".in => statuses)}
+applications.map {|a| a.applicants.where(:"income_evidence.aasm_state".in => statuses)}.count
+applications.map {|a| a.applicants.where(:"income_evidence.aasm_state".in => statuses)}.first
+applications.map {|a| a.applicants.where(:"income_evidence.aasm_state".in => statuses)}
+applications.map {|a| a.applicants.where(:"income_evidence.aasm_state".in => statuses).to_a}
+applications =  families.map{|f| ::FinancialAssistance::Application.where(family_id: f, aasm_state: 'determined')&.max_by(&:created_at).map {|a| a.applicants.where(:"income_evidence.aasm_state".in => statuses).to_a}}
+applications =  families.map{|f| ::FinancialAssistance::Application.where(family_id: f, aasm_state: 'determined')&.max_by(&:created_at).applicants.where(:"income_evidence.aasm_state".in => statuses).to_a}
+FinancialAssistance::Application.determined.where(:"applicants.income_evidence.aasm_state".in => statuses).select{|a| a.active_approved_application}
+exit
+families = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.aasm_state".in => statuses).select{|a| a.current_application?}
+statuses = ["negative_response_received", "outstanding", "pending", "rejected"]
+families = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.aasm_state".in => statuses).select{|a| a.current_application?}
+applications =  families.map {|a| a.applicants.where(:"income_evidence.aasm_state".in => statuses).to_a}
+exit
+def fetch_csv_headers
+  %w[PersonHbxId IncomeStatus DueOn HiosId AppliedAptc ProgramEligibility]
+end
+def fetch_eligibility(applicant)
+  if applicant.present?
+    if applicant.is_ia_eligible
+      "IA Eligible"
+    elsif applicant.is_medicaid_chip_eligible
+      "Medicaid Chip Eligible"
+    elsif is_non_magi_medicaid_eligible
+      "Non Magi Medicaid Eligible"
+    elsif applicant.is_totally_ineligible
+      "Totally Ineligible"
+    elsif applicant.is_without_assistance
+      "Without Assistance"
+    else
+      ""
+    end
+  else
+    "applicant not found in faa application"
+  end
+end
+log_file = "#{Rails.root}/log/ifsv_retry_initial_results_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+@logger = Logger.new(log_file)
+csv_file_builder = ::Decorators::CSVFileBuilder.new("#{Rails.root}/ifsv_retry_initial_results_#{Time.now.to_i}.csv", fetch_csv_headers)
+@report = ::Decorators::BuildReport.new(csv_file_builder, @logger)
+statuses = ["negative_response_received", "outstanding", "pending", "rejected"]
+update_reason = "Tax information not available rule implemented"
+def append_data_to_csv(family, enrollments, determined_app)
+  data_to_append = []
+  enrollments.each do |enr|
+    enr.hbx_enrollment_members.each do |enr_member|
+      fm = enr_member.family_member
+      applicant = determined_app&.active_applicants&.where(family_member_id: fm.id)&.first
+      income_evidence = applicant&.income_evidence
+      next if statuses.include?(income_evidence&.aasm_state)
+      program_eligibility = fetch_eligibility(applicant)
+      data_to_append << [
+        family&.primary_applicant_person&.hbx_id,
+        income_evidence&.aasm_state,
+        income_evidence&.due_on
+        enr.product.hios_id,
+        enr.applied_aptc_amount.to_s,
+        program_eligibility
+]
+end
+@report.append_data(data_to_append)
+rescue StandardError => e
+@logger.error "Error: Failed to append data to CSV: application: #{determined_app.id}, #{e.message}, backtrace: #{e.backtrace}"
+end
+def process_families(families, batch_size)
+  (0..families.count).step(batch_size) do |offset|
+    batch = families.skip(offset).limit(batch_size)
+    process_family_batch(batch)
+  end
+end
+def fetch_application(family)
+  applications = FinancialAssistance::Application.determined.where(
+    family_id: family.id,
+  :"applicants.income_evidence.aasm_state".in => statuses)
+  applications.max_by(&:created_at)
+end
+def process_family_batch(batch)
+  batch.each do |family|
+    next unless famiy.has_aptc_hbx_enrollment?
+    enrollments = family.hbx_enrollments.by_health.enrolled_and_renewal.with_aptc
+    determined_application = fetch_application(family)
+    next unless determined_application.present?
+    append_data_to_csv(family, enrollments, determined_application)
+    process_ifsv_retry(determined_application)
+  end
+end
+def process_ifsv_retry(determined_application)
+  updated_applicants = []
+  determined_application.active_applicants.each do |applicant|
+    evidence_state = applicant&.income_evidence&.aasm_state
+    next unless evidence_state
+    updated_applicants << applicant if statuses.include?(evidence_state)
+  end
+  # retry = FinancialAssistance::Operations::Applications::RetryEvidences.new.call(applicants: updated_applicants, update_reason: update_reason, evidence_type: :income)
+  retry = true
+if retry.success?
+  @total_applications_published += 1
+  @logger.info "Successfully retried income evidences for determined application #{determined_application.id}"
+else
+  @logger.error "Error publishing retried income evidences for determined application #{determined_application.id}"
+end
+def ifsv_retry
+  batch_size = 1000
+  @total_applications_published = 0
+  families = Family.in(_id: HbxEnrollment.by_health.enrolled_and_renewal.with_aptc.distinct(:family_id))
+  process_families(families, batch_size)
+  @logger.info "MedicaidGateway::RunPeriodicDataMatching Completed periodic data matching for #{@total_applications_published} applications"
+  Success(total_applications_published: @total_applications_published)
+rescue StandardError => e
+  @logger.error "Error in filter_and_call_mec_service with message: #{e.message}, backtrace: #{e.backtrace}"
+end
+ifsv_retry
+fetch_csv_headers
+def process_ifsv_retry(determined_application)
+  updated_applicants = []
+  determined_application.active_applicants.each do |applicant|
+    evidence_state = applicant&.income_evidence&.aasm_state
+    next unless evidence_state
+    updated_applicants << applicant if statuses.include?(evidence_state)
+  end
+  # retry = FinancialAssistance::Operations::Applications::RetryEvidences.new.call(applicants: updated_applicants, update_reason: update_reason, evidence_type: :income)
+  # if retry.success?
+  @total_applications_published += 1
+  @logger.info "Successfully retried income evidences for determined application #{determined_application.id}"
+  # else
+  #   @logger.error "Error publishing retried income evidences for determined application #{determined_application.id}"
+  # end
+end
+ifsv_retry
+@logger
+exit
+find(:xpath, "/html")
+expect(page).to have_css('html[data-bs4="true"]')
+expect(page).to have_css('html[data-bs4]')
+expect(page).to have_css('html[data-bs4="false"]')
+find(:xpath, "/html")["data-bs4"]
+fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
+user[oim_id]
+find("form.***")
+find("form.***").all(':scope > *').map {|el| el['outerHTML']}
+find("form.***").all(:xpath, './/child::*').map {|el| el['outerHTML']}
+page.body
+find("#new_person_wrapper")
+CreateAccount.password
+CreateAccount.password_confirmation
+CreateAccount.email_or_username
+find("user[oim_id]")
+find("input[name='user[oim_id]'")
+fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
+fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+fill_in input[name='user[oim_id]', :with => "aA1!aA1!aA1!"
+fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
+CreateAccount.email_or_username
+CreateAccount.email_or_username[disabled]
+CreateAccount.email_or_username["disabled"]
+CreateAccount.email_or_username
+exit
+expect(page).to have_css('html[data-bs4="true"]')
+exit
+CreateAccount.email_or_username
+CreateAccount.password
+CreateAccount.password_confirmation
+CreateAccount.create_account_btn
+fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
+CreateAccount.email_or_username
+CreateAccount.email_or_username['disabled']
+fill_in email_or_username, :with => "testflow@test.com"
+fill_in "email_or_username", :with => "testflow@test.com"
+exit
+IvlPersonalInformation.gender
+select "male", from: IvlPersonalInformation.gender
+exit
+IvlPersonalInformation.continue_btn
+find("continue_button).click
+IvlPersonalInformation.continue_btn
+find(IvlPersonalInformation.continue_btn).click
+exit
+EnrollRegistry[:drop_enrollment_members].feature
+EnrollRegistry[:bootstrap_4]
+EnrollRegistry[:bs4_consumer_flow]
+EnrollRegistry[:generic_redirect]

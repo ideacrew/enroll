@@ -1,0 +1,30 @@
+<% if @bs4 %>
+  <% content_for :head do %>
+    <title>Benefit Sponsors</title>
+    <%= javascript_include_tag 'financial_assistance/application', media: 'all' %>
+    <%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+  <% end %>
+
+  <%= render template: 'layouts/progress' %>
+<% else %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BenefitSponsors</title>
+    <%= stylesheet_link_tag "benefit_sponsors/application", media: "all" %>
+    <%= javascript_include_tag "benefit_sponsors/application" %>
+    <%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+    <%= csrf_meta_tags %>
+  </head>
+  <body>
+    <%= render partial: './ui-components/v1/navs/header' %>
+    <div class="container">
+      <%= yield %>
+    </div>
+  </body>
+</html>
+<% end %>

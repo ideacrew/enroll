@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"ite_api_development.api_v1_providers"}],"uuid":"4e89a347e5a140be8a56c71915139754"}

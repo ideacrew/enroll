@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"dummy_test.financial_assistance_applications"}],"uuid":"d419075b1da24e78aa708cd837483f6d"}

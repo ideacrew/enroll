@@ -1,0 +1,1 @@
+[{"severity":"convention","location":{"begin_pos":3116,"end_pos":3117},"message":"Layout/MultilineHashBraceLayout: Closing hash brace must be on the same line as the last hash element when opening brace is on the same line as the first hash element.","cop_name":"Layout/MultilineHashBraceLayout","status":"uncorrected"}]

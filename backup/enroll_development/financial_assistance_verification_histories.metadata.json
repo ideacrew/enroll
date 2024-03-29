@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_development.financial_assistance_verification_histories"}],"uuid":"c687c089e5a64e19ad4f986ce52fdfa3"}

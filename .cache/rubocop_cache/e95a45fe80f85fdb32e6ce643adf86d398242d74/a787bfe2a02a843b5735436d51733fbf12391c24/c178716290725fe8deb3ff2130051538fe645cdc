@@ -1,0 +1,1 @@
+[{"severity":"convention","location":{"begin_pos":1953,"end_pos":1968},"message":"Style/ClassEqualityComparison: Use `instance_of?(Person)` instead of comparing classes.","cop_name":"Style/ClassEqualityComparison","status":"uncorrected"}]

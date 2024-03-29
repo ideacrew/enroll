@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_development.benefit_markets_benefit_markets"}],"uuid":"485a00faf7cc4bb389a9ba139a07f728"}

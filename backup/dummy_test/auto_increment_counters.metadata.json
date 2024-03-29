@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"dummy_test.auto_increment_counters"}],"uuid":"defc8970676d45f6971b01c5093a02b9"}

@@ -1,0 +1,1 @@
+[{"severity":"convention","location":{"begin_pos":469,"end_pos":484},"message":"Style/RedundantCondition: Use double pipes `||` instead.","cop_name":"Style/RedundantCondition","status":"uncorrected"}]

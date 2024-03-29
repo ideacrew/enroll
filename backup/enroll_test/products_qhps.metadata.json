@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_test.products_qhps"}],"uuid":"6254c6ee672e4c719fb5f5e5c2e368b1"}

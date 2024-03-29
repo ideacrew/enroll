@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_test.census_members"}],"uuid":"690d3f86b321459e9e00d6f8c4564c9e"}

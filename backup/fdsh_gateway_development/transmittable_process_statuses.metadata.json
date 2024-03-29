@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"fdsh_gateway_development.transmittable_process_statuses"}],"uuid":"6b2c25a43b794272bcfca7e99ccc6b0a"}

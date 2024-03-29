@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"enroll_test.transmittable_transmissions"}],"uuid":"59b4882acdb147bbb0fa4dd3192b6956"}

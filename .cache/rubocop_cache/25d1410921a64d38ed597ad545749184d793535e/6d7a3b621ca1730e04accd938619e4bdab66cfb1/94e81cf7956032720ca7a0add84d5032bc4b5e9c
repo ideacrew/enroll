@@ -1,0 +1,1 @@
+[{"severity":"warning","location":{"begin_pos":7049,"end_pos":7056},"message":"Lint/UselessAccessModifier: Useless `private` access modifier.","cop_name":"Lint/UselessAccessModifier","status":"uncorrected"}]
