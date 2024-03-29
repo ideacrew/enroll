@@ -79,134 +79,134 @@ RSpec.describe Family, dbclean: :around_each do
     let(:primary) {  FactoryBot.create(:person, :with_consumer_role)}
     let(:primary_applicant) { family.primary_applicant }
     let(:dependents) { family.dependents }
-      let!(:tax_household_group_current) do
-        family.tax_household_groups.create!(
-          assistance_year: assistance_year,
-          source: 'Admin',
-          start_on: date.beginning_of_year,
-          tax_households: [
-            FactoryBot.build(:tax_household, household: family.active_household, effective_starting_on: date.beginning_of_year, effective_ending_on: TimeKeeper.date_of_record.end_of_year, max_aptc: 1000.00)
-          ]
+    let!(:tax_household_group_current) do
+      family.tax_household_groups.create!(
+        assistance_year: assistance_year,
+        source: 'Admin',
+        start_on: date.beginning_of_year,
+        tax_households: [
+          FactoryBot.build(:tax_household, household: family.active_household, effective_starting_on: date.beginning_of_year, effective_ending_on: TimeKeeper.date_of_record.end_of_year, max_aptc: 1000.00)
+        ]
+      )
+    end
+
+    let!(:tax_household_group_previous) do
+      family.tax_household_groups.create!(
+        assistance_year: assistance_year,
+        source: 'Admin',
+        start_on: date.beginning_of_year,
+        tax_households: [
+          FactoryBot.build(:tax_household, household: family.active_household, effective_starting_on: date.beginning_of_year - 1.year, effective_ending_on: TimeKeeper.date_of_record.end_of_year - 1.year, max_aptc: 1000.00)
+        ]
+      )
+    end
+
+    let!(:inactive_tax_household_group) do
+      family.tax_household_groups.create!(
+        created_at: date - 1.months,
+        assistance_year: assistance_year,
+        source: 'Admin',
+        start_on: date.beginning_of_year,
+        end_on: date.end_of_year,
+        tax_households: [
+          FactoryBot.build(:tax_household, household: family.active_household)
+        ]
+      )
+    end
+
+    let(:tax_household_current) do
+      tax_household_group_current.tax_households.first
+    end
+
+    let(:tax_household_previous) do
+      tax_household_group_previous.tax_households.first
+    end
+
+    let!(:tax_household_member) { tax_household_current.tax_household_members.create(applicant_id: family.family_members[0].id, csr_percent_as_integer: 87, csr_eligibility_kind: "csr_87") }
+
+    let!(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :individual_shopping,
+                        :with_silver_health_product,
+                        :with_enrollment_members,
+                        enrollment_members: [primary_applicant],
+                        effective_on: date.beginning_of_month,
+                        family: family,
+                        aasm_state: :coverage_selected)
+    end
+    let!(:thh_start_on) { tax_household_current.effective_starting_on }
+
+    let(:family_member1) { family.family_members[0] }
+    let(:family_member2) { family.family_members[1] }
+    let!(:ivl_enr_member2)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member2.id, hbx_enrollment: hbx_enrollment, eligibility_date: thh_start_on) }
+
+
+
+    let!(:eligibility_determination_current) do
+      determination = family.create_eligibility_determination(effective_date: date.beginning_of_year)
+      determination.grants.create(
+        key: "AdvancePremiumAdjustmentGrant",
+        value: yearly_expected_contribution_current,
+        start_on: date.beginning_of_year,
+        end_on: date.end_of_year,
+        assistance_year: date.year,
+        member_ids: family.family_members.map(&:id).map(&:to_s),
+        tax_household_id: tax_household_current.id
+      )
+
+      members_csr_set.each do |family_member, csr_value|
+        subject = determination.subjects.create(
+          gid: "gid://enroll/FamilyMember/#{family_member.id}",
+          is_primary: family_member.is_primary_applicant,
+          person_id: family_member.person.id
+        )
+
+        state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
+        state.grants.create(
+          key: "CsrAdjustmentGrant",
+          value: csr_value,
+          start_on: TimeKeeper.date_of_record.beginning_of_year,
+          end_on: TimeKeeper.date_of_record.end_of_year,
+          assistance_year: TimeKeeper.date_of_record.year,
+          member_ids: family.family_members.map(&:id)
         )
       end
 
-      let!(:tax_household_group_previous) do
-        family.tax_household_groups.create!(
-          assistance_year: assistance_year,
-          source: 'Admin',
-          start_on: date.beginning_of_year,
-          tax_households: [
-            FactoryBot.build(:tax_household, household: family.active_household, effective_starting_on: date.beginning_of_year - 1.year, effective_ending_on: TimeKeeper.date_of_record.end_of_year - 1.year, max_aptc: 1000.00)
-          ]
+      determination
+    end
+
+    let!(:eligibility_determination_previous) do
+      determination = family.eligibility_determination
+      determination.grants.create(
+        key: "AdvancePremiumAdjustmentGrant",
+        value: yearly_expected_contribution_previous,
+        start_on: date.beginning_of_year - 1.year,
+        end_on: date.end_of_year - 1.year,
+        assistance_year: date.year - 1,
+        member_ids: family.family_members.map(&:id).map(&:to_s),
+        tax_household_id: tax_household_previous.id
+      )
+
+      members_csr_set.each do |family_member, csr_value|
+        subject = determination.subjects.create(
+          gid: "gid://enroll/FamilyMember/#{family_member.id}",
+          is_primary: family_member.is_primary_applicant,
+          person_id: family_member.person.id
+        )
+
+        state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
+        state.grants.create(
+          key: "CsrAdjustmentGrant",
+          value: csr_value,
+          start_on: TimeKeeper.date_of_record.beginning_of_year - 1.year,
+          end_on: TimeKeeper.date_of_record.end_of_year - 1.year,
+          assistance_year: TimeKeeper.date_of_record.year - 1,
+          member_ids: family.family_members.map(&:id)
         )
       end
 
-      let!(:inactive_tax_household_group) do
-        family.tax_household_groups.create!(
-          created_at: date - 1.months,
-          assistance_year: assistance_year,
-          source: 'Admin',
-          start_on: date.beginning_of_year,
-          end_on: date.end_of_year,
-          tax_households: [
-            FactoryBot.build(:tax_household, household: family.active_household)
-          ]
-        )
-      end
-
-      let(:tax_household_current) do
-        tax_household_group_current.tax_households.first
-      end
-
-      let(:tax_household_previous) do
-        tax_household_group_previous.tax_households.first
-      end
-
-      let!(:tax_household_member) { tax_household_current.tax_household_members.create(applicant_id: family.family_members[0].id, csr_percent_as_integer: 87, csr_eligibility_kind: "csr_87") }
-
-      let!(:hbx_enrollment) do
-        FactoryBot.create(:hbx_enrollment,
-                          :individual_shopping,
-                          :with_silver_health_product,
-                          :with_enrollment_members,
-                          enrollment_members: [primary_applicant],
-                          effective_on: date.beginning_of_month,
-                          family: family,
-                          aasm_state: :coverage_selected)
-      end
-      let!(:thh_start_on) { tax_household_current.effective_starting_on }
-
-      let(:family_member1) { family.family_members[0] }
-      let(:family_member2) { family.family_members[1] }
-      let!(:ivl_enr_member2)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member2.id, hbx_enrollment: hbx_enrollment, eligibility_date: thh_start_on) }
-
-
-
-      let!(:eligibility_determination_current) do
-        determination = family.create_eligibility_determination(effective_date: date.beginning_of_year)
-        determination.grants.create(
-          key: "AdvancePremiumAdjustmentGrant",
-          value: yearly_expected_contribution_current,
-          start_on: date.beginning_of_year,
-          end_on: date.end_of_year,
-          assistance_year: date.year,
-          member_ids: family.family_members.map(&:id).map(&:to_s),
-          tax_household_id: tax_household_current.id
-        )
-
-        members_csr_set.each do |family_member, csr_value|
-          subject = determination.subjects.create(
-            gid: "gid://enroll/FamilyMember/#{family_member.id}",
-            is_primary: family_member.is_primary_applicant,
-            person_id: family_member.person.id
-          )
-
-          state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
-          state.grants.create(
-            key: "CsrAdjustmentGrant",
-            value: csr_value,
-            start_on: TimeKeeper.date_of_record.beginning_of_year,
-            end_on: TimeKeeper.date_of_record.end_of_year,
-            assistance_year: TimeKeeper.date_of_record.year,
-            member_ids: family.family_members.map(&:id)
-          )
-        end
-
-        determination
-      end
-
-      let!(:eligibility_determination_previous) do
-        determination = family.eligibility_determination
-        determination.grants.create(
-          key: "AdvancePremiumAdjustmentGrant",
-          value: yearly_expected_contribution_previous,
-          start_on: date.beginning_of_year - 1.year,
-          end_on: date.end_of_year - 1.year,
-          assistance_year: date.year - 1,
-          member_ids: family.family_members.map(&:id).map(&:to_s),
-          tax_household_id: tax_household_previous.id
-        )
-
-        members_csr_set.each do |family_member, csr_value|
-          subject = determination.subjects.create(
-            gid: "gid://enroll/FamilyMember/#{family_member.id}",
-            is_primary: family_member.is_primary_applicant,
-            person_id: family_member.person.id
-          )
-
-          state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
-          state.grants.create(
-            key: "CsrAdjustmentGrant",
-            value: csr_value,
-            start_on: TimeKeeper.date_of_record.beginning_of_year - 1.year,
-            end_on: TimeKeeper.date_of_record.end_of_year - 1.year,
-            assistance_year: TimeKeeper.date_of_record.year - 1 ,
-            member_ids: family.family_members.map(&:id)
-          )
-        end
-
-        determination
-      end
+      determination
+    end
 
     context 'when family has aptc and same csr for all members ' do
       let(:yearly_expected_contribution_current) { 125.00 * 12 }
