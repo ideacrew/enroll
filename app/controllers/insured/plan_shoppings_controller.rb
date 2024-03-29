@@ -298,7 +298,6 @@ class Insured::PlanShoppingsController < ApplicationController
     response.headers["Pragma"] = "no-cache"
   end
 
-
   # Determines if the user has already submitted an enrollment.
   # The user has already submitted an enrollment if the current enrollment is not in the shopping state.
   #
