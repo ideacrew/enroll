@@ -54,7 +54,7 @@ module BenefitSponsors
     end
 
     def as_json(params = {})
-      super(except: ['product', 'previous_product']).merge({ product: product.as_json(except: 'premium_tables'), previous_product: previous_product.as_json(except: 'premium_tables') })
+      super(except: ['product', 'previous_product']).merge({ product: product&.serializable_hash(except: 'premium_tables'), previous_product: previous_product&.serializable_hash(except: 'premium_tables') })
     end
 
     alias total_employee_cost employee_cost_total

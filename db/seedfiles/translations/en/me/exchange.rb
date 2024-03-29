@@ -56,6 +56,7 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.new_question" => "New Question",
   "en.exchange.employer_applications.security_questions" => "Security Questions",
   "en.documents.controller.missing_document_message" => "Unable to find document with specified ID. Please contact customer service at %{contact_center_phone_number}.",
+  "en.documents.need_employee_template" => "Need the new template? Download it now.",
   "en.exchange.seeds.page_title" => "Data Seeds",
   "en.exchange.error" => "Error",
   'en.exchanges.security_questions.denied_access_message' => 'Security Questions feature is not enabled. You are not allowed to create, edit, view or delete security questions.'

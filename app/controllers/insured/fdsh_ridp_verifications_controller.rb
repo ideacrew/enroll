@@ -113,14 +113,16 @@ module Insured
     end
 
     def failed_validation
-      authorize @person, :complete_ridp?
       @person = Person.find(params[:person_id]) if params[:person_id].present?
+      authorize @person, :complete_ridp?
+
       @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
-      @person = Person.find(params[:person_id]) if params[:person_id].present?
       @person.consumer_role.move_identity_documents_to_outstanding
       render "failed_validation"
     end
+
+    private
 
     def received_response(event_kind)
       find_params = {primary_member_hbx_id: @person.primary_family.primary_applicant.hbx_id, event_kind: event_kind}

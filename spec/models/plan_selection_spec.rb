@@ -84,6 +84,7 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
     context 'When previous continuous coverage is not present' do
       let(:previous_enrollment_status) {'coverage_terminated'}
       let(:terminated_on) {effective_on - 10.days}
+
       it 'should not set predecessor_enrollment_id' do
         subject.verify_and_set_member_coverage_start_dates
         expect(hbx_enrollment.predecessor_enrollment_id).to eq nil
@@ -127,7 +128,7 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
     end
 
     after do
-      TimeKeeper.set_date_of_record_unprotected!(Time.zone.today)
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     context 'when active coverage present' do

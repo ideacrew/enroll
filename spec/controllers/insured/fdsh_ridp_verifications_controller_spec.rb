@@ -19,13 +19,13 @@ describe Insured::FdshRidpVerificationsController do
     end
 
     it 'finds a primary response' do
-      expect(controller.find_response('primary')).to eq(primary_event)
+      expect(controller.send(:find_response, 'primary')).to eq(primary_event)
     end
 
     context "with nil deleted at dates" do
 
       it "should not include eligibility response models" do
-        expect(controller.find_response('primary').to_a.count).to eql(1)
+        expect(controller.send(:find_response, 'primary').to_a.count).to eql(1)
       end
     end
 
@@ -35,7 +35,7 @@ describe Insured::FdshRidpVerificationsController do
       end
 
       it "should return nil" do
-        expect(controller.find_response('primary')).to eql(nil)
+        expect(controller.send(:find_response, 'primary')).to eql(nil)
       end
     end
 
@@ -46,14 +46,14 @@ describe Insured::FdshRidpVerificationsController do
       end
 
       it "should only return records related to one primary hbx_id" do
-        expect(controller.find_response('primary').to_a.count).to eql(1)
+        expect(controller.send(:find_response, 'primary').to_a.count).to eql(1)
       end
     end
 
     context "with different event kinds" do
 
       it "should only return one event kind" do
-        expect(controller.find_response('secondary')).to eql(fifth_event)
+        expect(controller.send(:find_response, 'secondary')).to eql(fifth_event)
       end
     end
   end
@@ -62,18 +62,35 @@ describe Insured::FdshRidpVerificationsController do
     let(:user){ FactoryBot.create(:user, :consumer, person: person) }
     let(:person){ FactoryBot.create(:person, :with_consumer_role) }
 
-    context "GET failed_validation", dbclean: :after_each do
-      before(:each) do
-        sign_in user
-        allow(user).to receive(:person).and_return(person)
-      end
+    before(:each) do
+      sign_in user
+      allow(user).to receive(:person).and_return(person)
+    end
 
+    context "GET failed_validation", dbclean: :after_each do
       it "should render template" do
         allow_any_instance_of(ConsumerRole).to receive(:move_identity_documents_to_outstanding).and_return(true)
         get :failed_validation, params: {}
 
         expect(response).to have_http_status(:success)
         expect(response).to render_template("failed_validation")
+      end
+
+      it "should render template when correct person id is passed" do
+        allow_any_instance_of(ConsumerRole).to receive(:move_identity_documents_to_outstanding).and_return(true)
+        get :failed_validation, params: { person_id: person.id }
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("failed_validation")
+      end
+    end
+
+    context "when unauthorized person id is passed in params" do
+      let(:duplicate_person) { FactoryBot.create(:person, :with_consumer_role) }
+
+      it "should fail pundit policy" do
+        get :failed_validation, params: { person_id: duplicate_person.id }
+        expect(response.status).to eq 302
       end
     end
   end

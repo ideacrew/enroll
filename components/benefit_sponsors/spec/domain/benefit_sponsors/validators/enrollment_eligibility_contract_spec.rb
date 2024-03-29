@@ -35,7 +35,7 @@ RSpec.describe BenefitSponsors::Validators::EnrollmentEligibilityContract do
 
   context "Given valid required parameters" do
     context "with all/required params" do
-      let(:all_params) { missing_params.merge({benefit_application_kind: benefit_application_kind, service_areas: [service_area.as_json] }) }
+      let(:all_params) { missing_params.merge({benefit_application_kind: benefit_application_kind, service_areas: [service_area.serializable_hash] }) }
 
       it "should pass validation" do
         expect(subject.call(all_params).success?).to be_truthy

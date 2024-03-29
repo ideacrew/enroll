@@ -15,7 +15,7 @@ describe Events::IndividualsController do
     before :each do
       allow(Person).to receive(:by_hbx_id).with(individual_id).and_return(found_individuals)
       allow(controller).to receive(:render_to_string).with(
-        "created", {:formats => ["xml"], :locals => {
+        "created", {:formats => [:xml], :locals => {
          :individual => individual
         }}).and_return(rendered_template)
     end
