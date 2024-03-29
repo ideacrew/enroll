@@ -14,6 +14,8 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
   before_action :validate_rating_address, only: [:show]
+  before_action :already_submitted_enrollment, only: [:thankyou]
+  before_action :set_cache_headers, only: [:thankyou]
 
   def checkout
     (redirect_back(fallback_location: root_path) and return) unless agreed_to_thankyou_ivl_page_terms
@@ -276,6 +278,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   private
 
+
   # Determines if the user has agreed to the terms on the individual market thank you page.
   # The user has agreed if the 'thankyou_page_agreement_terms' parameter is set to 'agreed'.
   # This check is only performed for enrollments of individual market kinds.
@@ -288,6 +291,24 @@ class Insured::PlanShoppingsController < ApplicationController
 
     flash[:error] = l10n('insured.plan_shopping.thankyou.agreement_terms_conditions')
     false
+  end
+
+  def set_cache_headers
+    response.headers["Cache-Control"] = "no-cache, no-store, private, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+  end
+
+
+  # Determines if the user has already submitted an enrollment.
+  # The user has already submitted an enrollment if the current enrollment is not in the shopping state.
+  #
+  # User navigates to the thank you page after submitting an enrollment, using browser back button
+  # @note This method sets a flash error message if the user has already submitted an enrollment.
+  def already_submitted_enrollment
+    return if @hbx_enrollment.shopping?
+
+    flash[:notice] = l10n("insured.active_enrollment_warning")
+    redirect_to family_account_path
   end
 
   def show_ivl(hbx_enrollment_id)
