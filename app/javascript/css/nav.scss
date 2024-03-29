@@ -49,7 +49,16 @@ header.navbar-primary {
       }
     }
 
-    navbar-toggler {
+    .navbar-toggler {
       border: 1px solid var(--grey-050);
+    }
+
+    .navbar-collapse.collapse.show{
+      margin-top: 1rem;
+      flex-direction: row;
+
+      .nav-item-divider {
+        display: none;
+      }
     }
   }
