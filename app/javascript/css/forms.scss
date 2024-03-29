@@ -64,8 +64,8 @@ select,
     border-color: var(--grey-120);
   }
   &:disabled {
-    background: var(--grey-120);
-    color: var(--grey-120);
+    background: var(--grey-090);
+    color: var(--grey-000);
   }
   &:active,
   &:focus {
