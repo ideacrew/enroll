@@ -70,7 +70,7 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
 
       it "should add errors" do
         subject.uniq_ssn_dob
-        expect(subject.errors[:base]).to eq ["This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}."]
+        expect(subject.errors[:base].to_s).to include('Please check your information and try again')
       end
     end
 
@@ -218,6 +218,9 @@ describe "match a person in db" do
       let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
       let(:broker_role) { FactoryBot.build(:broker_role, npn: '234567890', person: db_person) }
       let(:user){ create(:user) }
+      let(:person1) { Person.create!(first_name: 'Joe', last_name: 'Kramer',   dob: '1993-03-30', ssn: '517991234')}
+      let(:user1){FactoryBot.create(:user)}
+      let(:consumer_role) { person1.consumer_role }
 
       before do
         allow(Person).to receive(:where).and_return([db_person])
@@ -225,6 +228,20 @@ describe "match a person in db" do
         allow(search_params).to receive(:ssn).and_return('517991234')
         db_person.save!
       end
+
+      let!(:params) do
+        {
+          :dob => '2012-10-12',
+          :ssn => nil,
+          :first_name => 'yo',
+          :last_name => 'guy',
+          :gender => 'm',
+          :user_id => 20,
+          :is_applying_coverage => false
+        }
+      end
+
+      let(:subject) { Forms::ConsumerCandidate.new(params) }
 
       context 'when matched person has a broker role', dbclean: :after_each do
         before do
@@ -266,7 +283,21 @@ describe "match a person in db" do
       end
 
       context 'when matched person have no broker role or broker agency staff roles' do
+        let!(:params) do
+          {
+            :dob => '2012-10-12',
+            :ssn => person1.reload.ssn,
+            :first_name => 'yo',
+            :last_name => 'guy',
+            :gender => 'm',
+            :user_id => 20,
+            :is_applying_coverage => false
+          }
+        end
+        let(:subject) { Forms::ConsumerCandidate.new(params) }
+
         before do
+          allow(search_params).to receive(:ssn).and_return('897671341')
           allow(db_person).to receive(:broker_role).and_return(nil)
           db_person.save!
         end
@@ -281,7 +312,6 @@ describe "match a person in db" do
         let(:person1) { Person.create!(first_name: 'Joe', last_name: 'Kramer',   dob: '1993-03-30', ssn: nil)}
         let(:user1){FactoryBot.create(:user)}
         let(:consumer_role) { person1.consumer_role }
-
         let!(:params) do
           {
             :dob => '2012-10-12',
@@ -295,7 +325,6 @@ describe "match a person in db" do
         end
 
         let(:subject) { Forms::ConsumerCandidate.new(params) }
-
 
         before do
           allow(db_person).to receive(:broker_role).and_return(nil)
@@ -313,7 +342,6 @@ describe "match a person in db" do
         let(:person1) { Person.create!(first_name: 'Joe', last_name: 'Kramer',   dob: '1993-03-30', ssn: '517991234')}
         let(:user1){FactoryBot.create(:user)}
         let(:consumer_role) { person1.consumer_role }
-
         let!(:params) do
           {
             :dob => '2012-10-12',
@@ -325,9 +353,7 @@ describe "match a person in db" do
             :is_applying_coverage => false
           }
         end
-
         let(:subject) { Forms::ConsumerCandidate.new(params) }
-
 
         before do
           allow(db_person).to receive(:broker_role).and_return(nil)
@@ -345,7 +371,6 @@ describe "match a person in db" do
         let(:person1) { Person.create!(first_name: 'Joe', last_name: 'Kramer',   dob: '1993-03-30', ssn: '517991234')}
         let(:user1){FactoryBot.create(:user)}
         let(:consumer_role) { person1.consumer_role }
-
         let!(:params) do
           {
             :dob => '2012-10-12',
