@@ -6,21 +6,27 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-ENV['RAILS_ENV'] ||= 'test'
+ENV["RAILS_ENV"] ||= 'test'
+puts "------------------------------------------------------------------------"
+puts "RAILS_ENV: #{ENV['RAILS_ENV']}"
+puts "------------------------------------------------------------------------"
+puts "------------ THIS ENV FILE HAS BEEN HACKED BY DOCKER ! -----------------"
+puts "---------- see ea_enterprise README for more information ---------------"
+
 $LOADING_CUCUMBER_ENV = true
-require File.expand_path("#{File.dirname(__FILE__)}/testing_environment_variables")
 if ENV["COVERAGE"]
   require 'simplecov'
   SimpleCov.command_name "specs_#{Process.pid}_#{ENV['TEST_ENV_NUMBER'] || '1'}"
   SimpleCov.start 'rails'
 end
-require 'webdrivers'
+# require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
 # require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 require 'axe-cucumber-steps'
+require "selenium-webdriver"
 
 Dir[File.expand_path("#{Rails.root}/lib/test/**/*.rb")].each { |f| load f }
 require File.expand_path("#{File.dirname(__FILE__)}/../../config/environment")
@@ -80,15 +86,18 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 
 # Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 # Capybara::Screenshot.prune_strategy = :keep_last_run
-Webdrivers.cache_time = 86_400
+# Webdrivers.cache_time = 86_400
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 Capybara.register_driver :selenium_chrome do |app|
-  options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument("headless")
+  options = Selenium::WebDriver::Chrome::Options.new(binary: "/usr/bin/chromium")
+  # options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument("--headless")
   options.add_argument("--window-size=1920,1080")
   options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
+  options.add_argument("--no-sandbox")
+  options.add_argument("--disable-dev-shm-usage")
 
   client = Selenium::WebDriver::Remote::Http::Default.new
   client.open_timeout = 240 # instead of the default 60
