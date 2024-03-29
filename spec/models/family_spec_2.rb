@@ -263,7 +263,7 @@ RSpec.describe Family, dbclean: :around_each do
       let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
 
       it 'returns families' do
-        result = Family.with_aptc_csr_grant_and_active_coverage_for_year(assistance_year, csr)
+        result = Family.with_active_coverage_and_aptc_csr_grants_for_year(assistance_year, csr)
 
         expect(result).to include(family)
         expect(result.count).to eq(1)
@@ -277,7 +277,7 @@ RSpec.describe Family, dbclean: :around_each do
 
       it 'should not return families' do
         hbx_enrollment.update(aasm_state: 'coverage_canceled')
-        result = Family.with_aptc_csr_grant_and_active_coverage_for_year(assistance_year, csr)
+        result = Family.with_active_coverage_and_aptc_csr_grants_for_year(assistance_year, csr)
 
         expect(result).not_to include(family)
         expect(result.count).to eq(0)

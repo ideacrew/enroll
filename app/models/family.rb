@@ -181,15 +181,6 @@ class Family
 
   scope :using_aptc_csr_assistance,      ->{where(:"households.tax_households.eligibility_determinations.max_aptc.cents".gt => 0)}
 
-  scope :with_aptc_csr_grants_for_year, lambda { |assistance_year, csr_list|
-                                          where({ "$and" => [
-                                                              {"eligibility_determination.grants" => {"$elemMatch": {"key" => "AdvancePremiumAdjustmentGrant", "assistance_year" => assistance_year, "value" => { "$gt" => "0" }}}},
-                                                              {"eligibility_determination.subjects.eligibility_states.grants" => {"$elemMatch" => {"key" => "CsrAdjustmentGrant", "assistance_year" => assistance_year, "value" => {"$in" => csr_list}}}}
-                                                            ] })
-                                        }
-
-  scope :with_aptc_csr_grant_and_active_coverage_for_year, ->(assistance_year, csr_list){ all_enrolled_and_renewal_enrollments.with_aptc_csr_grants_for_year(assistance_year, csr_list) }
-
   scope :periodic_verifiable_for_assistance_year,      ->(assistance_year, csr_list){ all_enrolled_and_renewal_enrollments.all_active_assistance_receiving_for_assistance_year(assistance_year).plan_includes_csrs(csr_list) }
 
   # @todo verify dental plans will not be on the list (may be 01) alternative: plan.health_plan
@@ -353,6 +344,23 @@ class Family
     :"family_id".in => active_family_ids
     ).distinct(:family_id)
   ) }
+
+  # Scope to find families with APTC CSRs grants for a specific year.
+  # @param assistance_year [Integer] The year of assistance.
+  # @param csr_list [Array] The list of CSR values.
+  # @return [Mongo::Collection::View] The families that match the criteria.
+  scope :with_aptc_csr_grants_for_year, lambda { |assistance_year, csr_list|
+                                          where({ "$and" => [
+                                                              {"eligibility_determination.grants" => {"$elemMatch": {"key" => "AdvancePremiumAdjustmentGrant", "assistance_year" => assistance_year, "value" => { "$gt" => "0" }}}},
+                                                              {"eligibility_determination.subjects.eligibility_states.grants" => {"$elemMatch" => {"key" => "CsrAdjustmentGrant", "assistance_year" => assistance_year, "value" => {"$in" => csr_list}}}}
+                                                            ] })
+                                        }
+
+  # Scope to find families with active coverage and APTC CSR grants for a specific year.
+  # @param assistance_year [Integer] The year of assistance.
+  # @param csr_list [Array] The list of CSR values.
+  # @return [Mongo::Collection::View] The families that match the criteria.
+  scope :with_active_coverage_and_aptc_csr_grants_for_year, ->(assistance_year, csr_list){ all_enrolled_and_renewal_enrollments.with_aptc_csr_grants_for_year(assistance_year, csr_list) }
 
   # It fetches active or renewal application for the family based on the year passed
   def active_financial_assistance_application(year = TimeKeeper.date_of_record.year)
