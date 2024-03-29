@@ -401,9 +401,7 @@ class Family
   end
 
   def existing_coverage_query_expr(enrollment, include_matching_effective_date)
-    query_criteria = {
-      :_id.ne => enrollment.id, :kind => enrollment.kind
-    }
+    query_criteria = { :_id.ne => enrollment.id, :kind => enrollment.kind }
 
     if include_matching_effective_date
       query_criteria.merge!({:effective_on.lte => enrollment.effective_on})
@@ -425,11 +423,15 @@ class Family
   def current_enrolled_or_termed_coverages(enrollment, include_matching_effective_date = false)
     coverages = active_household.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind)
     query_expr = existing_coverage_query_expr(enrollment, include_matching_effective_date)
-    coverages.where(query_expr).or(
-      {:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES},
-      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => enrollment.effective_on.prev_day},
-      {:aasm_state.in => ['coverage_expired'], effective_on: { "$gte" => enrollment.effective_on.beginning_of_year, "$lte" => enrollment.effective_on.end_of_year} }
-    ).order('effective_on DESC')
+
+    coverages.where(query_expr).where(
+      "$or" => [
+        {"aasm_state" => { "$in" => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES }},
+        {"aasm_state" => { "$in" => HbxEnrollment::TERMINATED_STATUSES}, :terminated_on.gte => enrollment.effective_on.prev_day},
+        {"aasm_state" => { "$in" => ['coverage_expired'] }, effective_on: { "$gte" => enrollment.effective_on.beginning_of_year, "$lte" => enrollment.effective_on.end_of_year }}
+
+      ]
+    ).order_by(effective_on: :desc)
   end
   # rubocop:enable Style/OptionalBooleanParameter
 

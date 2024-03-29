@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 5.2.4.3'
+gem 'rails', '~> 6.0.6.1'
 gem 'sidekiq'
 gem 'globalid'
 #######################################################
@@ -12,7 +12,6 @@ gem 'globalid'
 
 # Update to use features from new version
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
-# gem 'jquery-datatables-rails', '3.4.0'config/initializers/effective_datatables.rb
 
 # Verify this gem git reference is necessary.  Otherwise point it to release level
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
@@ -43,13 +42,12 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
-gem 'mongoid',                  '~> 7.0.2'
+gem 'mongoid',                  '~> 7.5.4'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
-# gem 'mongoid-versioning',       '~> 1.2.0'
-gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
+gem 'mongoid_userstamp',        '~> 0.4', :path => './project_gems/mongoid_userstamp-0.4.0'
 gem 'mongoid_rails_migrations', '~> 1.2'
 
 ## General gems
@@ -61,13 +59,13 @@ gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
 gem 'browser',                  '2.7.0'
 gem 'ckeditor',                 '~> 4.2.4'
-gem 'coffee-rails',             '~> 4.2.2'
+gem 'coffee-rails',             '~> 5.0.0'
 gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
-gem 'devise-jwt', "0.9.0"
-gem 'warden-jwt_auth', "0.6.0"
+gem 'devise-jwt',               '0.9.0'
+gem 'warden-jwt_auth',          '0.6.0'
 gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
@@ -148,7 +146,7 @@ group :development, :test do
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
-  gem 'rspec-rails'
+  gem 'rspec-rails',            '~> 5.0.1'
   gem 'rspec_junit_formatter'
   gem 'sdoc',                    '~> 1.0'
   gem 'stimulus_reflex_testing', '~> 0.3.0'
@@ -163,7 +161,7 @@ group :test do
   gem 'cucumber-rails',               '2.0', :require => false
 
   ## Verify Rails 5 eliminates need for this gem with MongoDB
-  gem 'database_cleaner',             '~> 1.7'
+  gem 'database_cleaner-mongoid',     '~> 2.0', '>= 2.0.1'
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
@@ -180,6 +178,7 @@ group :test do
 end
 
 group :production do
-  gem 'newrelic_rpm', '~> 5.0'
+  gem 'newrelic_rpm', '~> 9.6'
+  gem 'unicorn',      '~> 4.8'
   gem 'puma',         '~> 3.12.4'
 end

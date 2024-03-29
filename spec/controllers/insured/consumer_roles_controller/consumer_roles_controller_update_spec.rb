@@ -116,7 +116,8 @@ RSpec.describe Insured::ConsumerRolesController do
       subject { get :help_paying_coverage }
 
       it 'renders help_paying_coverage template' do
-        expect(subject).to render_template(:file => "#{Rails.root}/public/404.html")
+        expect(subject.status).to eq(404)
+        expect(response.body).to include("The page you were looking for doesn't exist (404)")
       end
     end
   end

@@ -75,7 +75,7 @@ describe BrokerRole, dbclean: :around_each do
       let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
       let(:employer_profile) { FactoryBot.create(:employer_profile, aasm_state: "registered") }
       let!(:organization) { employer_profile.organization }
-      let(:person) { FactoryBot.create(:person)}
+      let(:person) { FactoryBot.create(:person, :with_work_email)}
       let(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
 
       before :each do
@@ -105,7 +105,7 @@ describe BrokerRole, dbclean: :around_each do
     end
 
     context "decertify" do
-      let(:person) { FactoryBot.create(:person)}
+      let(:person) { FactoryBot.create(:person, :with_work_email)}
       let(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
       let(:writing_agent)  do
@@ -139,7 +139,7 @@ describe BrokerRole, dbclean: :around_each do
     end
 
     context 'allow_alphanumeric_npn' do
-      let(:person) { FactoryBot.create(:person)}
+      let(:person) { FactoryBot.create(:person, :with_work_email)}
       let(:broker_role) { FactoryBot.create(:broker_role, npn: "7775588", person: person, provider_kind: provider_kind) }
       let(:new_npn) { 'abc1234567' }
 
@@ -167,7 +167,7 @@ describe BrokerRole, dbclean: :around_each do
     end
 
     context "a broker registers" do
-      let(:person)  { FactoryBot.build(:person) }
+      let(:person)  { FactoryBot.build(:person, :with_work_email) }
       let(:registered_broker_role) { BrokerRole.new(person: person, npn: "2323334", provider_kind: "broker") }
 
       it "should initialize to applicant state" do
