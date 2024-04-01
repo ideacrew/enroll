@@ -65,8 +65,12 @@ module AuthorizationConcern
 
     has_many :whitelisted_jwts
 
+    def active_for_authentication?
+      super && !expired?
+    end
+
     def expired?
-      return false unless has_hbx_staff_role? && EnrollRegistry.feature_enabled?(:admin_account_autolock)
+      return false unless EnrollRegistry.feature_enabled?(:admin_account_autolock) && self.hbx_staff_role?
       return expired_at < Time.now.utc unless expired_at.nil?
 
       # if it is not set, check the last activity against configured expire_after time range
