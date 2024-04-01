@@ -283,5 +283,18 @@ RSpec.describe Family, dbclean: :around_each do
         expect(result.count).to eq(0)
       end
     end
+
+    context 'enrolled family with aptc and csr_87 for all members' do
+      let(:yearly_expected_contribution_current) { 1000 }
+      let(:yearly_expected_contribution_previous) { 0 }
+      let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+
+      it 'when csr is passed as array of integer values' do
+        result = Family.with_active_coverage_and_aptc_csr_grants_for_year(assistance_year, [87, 94])
+
+        expect(result).to include(family)
+        expect(result.count).to eq(1)
+      end
+    end
   end
 end

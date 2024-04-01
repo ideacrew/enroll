@@ -352,7 +352,7 @@ class Family
   scope :with_aptc_csr_grants_for_year, lambda { |assistance_year, csr_list|
                                           where({ "$and" => [
                                                               {"eligibility_determination.grants" => {"$elemMatch": {"key" => "AdvancePremiumAdjustmentGrant", "assistance_year" => assistance_year, "value" => { "$gt" => "0" }}}},
-                                                              {"eligibility_determination.subjects.eligibility_states.grants" => {"$elemMatch" => {"key" => "CsrAdjustmentGrant", "assistance_year" => assistance_year, "value" => {"$in" => csr_list}}}}
+                                                              {"eligibility_determination.subjects.eligibility_states.grants" => {"$elemMatch" => {"key" => "CsrAdjustmentGrant", "assistance_year" => assistance_year, "value" => {"$in" => csr_list.map(&:to_s)}}}}
                                                             ] })
                                         }
 
