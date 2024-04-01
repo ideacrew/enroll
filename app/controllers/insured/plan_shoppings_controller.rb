@@ -293,6 +293,23 @@ class Insured::PlanShoppingsController < ApplicationController
     false
   end
 
+  # Sets the HTTP response headers to prevent caching.
+  #
+  # This method sets the `Cache-Control` and `Pragma` headers in the HTTP response
+  # to instruct browsers and caches to always request a fresh copy of the response
+  # from the server, rather than serving a cached version.
+  #
+  # The `Cache-Control` header is set with the following directives:
+  #
+  # - `no-cache`: The response may be stored by caches, but they must first validate
+  #   the response with the server before using it.
+  # - `no-store`: The response must not be stored in any cache, including browser caches.
+  # - `private`: The response should only be cached by a single user's browser, not by
+  #   shared caches.
+  # - `must-revalidate`: Caches must verify the status of the response with the server
+  #   before using a cached copy.
+  #
+  # @return [void]
   def set_cache_headers
     response.headers["Cache-Control"] = "no-cache, no-store, private, must-revalidate"
     response.headers["Pragma"] = "no-cache"
