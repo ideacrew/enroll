@@ -11,7 +11,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Create, dbclean: 
   let(:many_simultaneous_contribution_units)  { true }
   let(:product_multiplicities)                { [:product_multiplicities1, :product_multiplicities2] }
   let(:member_relationship_map_params)        { {relationship_name: 'Employee', count: 1} }
-  let(:member_relationship_map)               { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(member_relationship_map_params).as_json }
+  let(:member_relationship_map)               { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(member_relationship_map_params).serializable_hash }
   let(:member_relationship_maps)              { [member_relationship_map] }
   let(:contribution_unit) do
     ::BenefitMarkets::ContributionModels::ContributionUnit.new(
@@ -30,8 +30,8 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Create, dbclean: 
     )
   end
 
-  let(:contribution_units)                    { [contribution_unit.as_json] }
-  let(:member_relationships)                  { [member_relationship.as_json] }
+  let(:contribution_units)                    { [contribution_unit.serializable_hash] }
+  let(:member_relationships)                  { [member_relationship.serializable_hash] }
 
   let(:params) do
     {

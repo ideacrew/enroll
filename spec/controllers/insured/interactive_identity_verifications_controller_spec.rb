@@ -23,7 +23,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         allow(controller).to receive(:render_to_string).with(
           "events/identity_verification/interactive_session_start",
           {
-            :formats => ["xml"],
+            :formats => [:xml],
             :locals => { :individual => mock_person }
           }
         ).and_return(mock_template_result)
@@ -55,7 +55,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(controller).to receive(:render_to_string).with(
             "events/identity_verification/interactive_session_start",
             {
-              :formats => ["xml"],
+              :formats => [:xml],
               :locals => { :individual => mock_person }
             }
           ).and_return(mock_template_result)
@@ -130,7 +130,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           allow(controller).to receive(:render_to_string).with(
             "events/identity_verification/interactive_questions_response",
             {
-              :formats => ["xml"],
+              :formats => [:xml],
               :locals => { :session => mock_session }
             }
           ).and_return(mock_template_result)
@@ -205,7 +205,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         allow(controller).to receive(:render_to_string).with(
           "events/identity_verification/interactive_verification_override",
           {
-            :formats => ["xml"],
+            :formats => [:xml],
             :locals => { :transaction_id => transaction_id }
           }
         ).and_return(mock_template_result)

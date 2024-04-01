@@ -158,9 +158,6 @@ module BenefitSponsors
           end
         end
 
-        # no auth required for this action
-        def agency_messages; end
-
         def inbox
           @sent_box = true
           if params["id"].present?

@@ -26,7 +26,7 @@ FactoryBot.define do
     service_area { create(:benefit_markets_locations_service_area) }
 
     transient do
-      build_premium_tables true
+      build_premium_tables { true }
       premium_factor { 0 } # multiplier for premium increments
       issuer_name { 'BlueChoice' }
     end

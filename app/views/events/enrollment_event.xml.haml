@@ -28,4 +28,4 @@
               %market= "urn:openhbx:terms:v1:aca_marketplace#shop"
             -elsif hbx_enrollment.kind == 'coverall'
               %market= "urn:openhbx:terms:v1:aca_marketplace#coverall"
-            = render "events/hbx_enrollment/policy", :formats => ["xml"], :hbx_enrollment => hbx_enrollment
+            = render "events/hbx_enrollment/policy", :formats => [:xml], :hbx_enrollment => hbx_enrollment

@@ -38,6 +38,14 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         expect(app.transferred_at).not_to eq nil
       end
 
+      it 'should persist the person name' do
+        app = FinancialAssistance::Application.find(@result.value!)
+        @transformed.deep_symbolize_keys!
+        expect(app.applicants.first.first_name).to eq(@transformed[:family][:family_members][0][:person][:person_name][:first_name])
+        expect(app.applicants.first.last_name).to eq(@transformed[:family][:family_members][0][:person][:person_name][:last_name])
+        expect(app.applicants.first.middle_name).to eq(@transformed[:family][:family_members][0][:person][:person_name][:middle_name])
+      end
+
       context "two applicants share the same first and last name" do
         before do
           record = serializer.parse(xml)

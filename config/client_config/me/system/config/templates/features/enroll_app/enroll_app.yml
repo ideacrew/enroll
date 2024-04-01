@@ -18,7 +18,7 @@ registry:
           - key: :copyright_period_start
             item: ''
           - key: :login_url
-            item: <%= ENV['EA_LOGIN_URL'] %>
+            item: <%= ENV['ENROLL_LOGIN_URL'] %>
           - key: :policies_url
             item: ''
           - key: :faqs_url
@@ -280,6 +280,8 @@ registry:
             item: 20
           - key: :default_password_length_range
             item: 8..20
+          - key: :employees_template_key
+            item: "b4c0e3e6-cf9b-4b00-8194-403b110b4e01"
       - key: :data_seeds_ui
         item: :data_seeds_ui
         is_enabled: true

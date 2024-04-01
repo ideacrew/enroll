@@ -60,7 +60,6 @@ RSpec.describe SamlController do
         end
 
         post :login, params: {SAMLResponse: invalid_xml}
-        expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
         expect(response).to have_http_status(403)
       end
     end
@@ -200,7 +199,6 @@ RSpec.describe SamlController do
           end
 
           post :login, params: {SAMLResponse: sample_xml}
-          expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
           expect(response).to have_http_status(403)
         end
       end

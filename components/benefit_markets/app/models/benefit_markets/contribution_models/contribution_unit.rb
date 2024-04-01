@@ -4,7 +4,7 @@ module BenefitMarkets
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      embedded_in :contribution_model, inverse_of: :contribution_units
+      embedded_in :contribution_model, class_name: "::BenefitMarkets::ContributionModels::ContributionModel", inverse_of: :contribution_units
 
       field :name, type: String
       field :display_name, type: String
