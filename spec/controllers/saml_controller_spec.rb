@@ -11,6 +11,7 @@ RSpec.describe SamlController do
     context "user with admin role" do
       let(:admin_user) { FactoryBot.create(:user, last_portal_visited: family_account_path, roles: ["hbx_staff"])}
       let(:admin_person) { FactoryBot.create(:person, :user => admin_user)}
+      let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: admin_person) }
       sample_xml = File.read("spec/saml/invalid_saml_response.xml")
       let(:name_id) { admin_user.oim_id }
       let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id)}
@@ -24,6 +25,14 @@ RSpec.describe SamlController do
       context "with admin account autolock feature enabled", dbclean: :after_each do
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_account_autolock).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:notify_address_changed).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+          hbx_staff_role
         end
 
         it "redirects to root path" do
