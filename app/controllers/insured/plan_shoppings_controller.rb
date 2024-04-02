@@ -14,6 +14,8 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
   before_action :validate_rating_address, only: [:show]
+  before_action :check_enrollment_state, only: [:thankyou]
+  before_action :set_cache_headers, only: [:thankyou]
 
   def checkout
     (redirect_back(fallback_location: root_path) and return) unless agreed_to_thankyou_ivl_page_terms
@@ -276,6 +278,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   private
 
+
   # Determines if the user has agreed to the terms on the individual market thank you page.
   # The user has agreed if the 'thankyou_page_agreement_terms' parameter is set to 'agreed'.
   # This check is only performed for enrollments of individual market kinds.
@@ -288,6 +291,44 @@ class Insured::PlanShoppingsController < ApplicationController
 
     flash[:error] = l10n('insured.plan_shopping.thankyou.agreement_terms_conditions')
     false
+  end
+
+  # Sets the HTTP response headers to prevent caching.
+  #
+  # This method sets the `Cache-Control` and `Pragma` headers in the HTTP response
+  # to instruct browsers and caches to always request a fresh copy of the response
+  # from the server, rather than serving a cached version.
+  #
+  # The `Cache-Control` header is set with the following directives:
+  #
+  # - `no-cache`: The response may be stored by caches, but they must first validate
+  #   the response with the server before using it.
+  # - `no-store`: The response must not be stored in any cache, including browser caches.
+  # - `private`: The response should only be cached by a single user's browser, not by
+  #   shared caches.
+  # - `must-revalidate`: Caches must verify the status of the response with the server
+  #   before using a cached copy.
+  #
+  # @return [void]
+  def set_cache_headers
+    response.headers["Cache-Control"] = "no-cache, no-store, private, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+  end
+
+  # check the enrollment state of the current HBX enrollment.
+  # This method is used to prevent users from clicking the browser's back button
+  # and resubmitting an enrollment that has already been submitted.
+  #
+  # If the enrollment is in the 'shopping' state, no action is taken.
+  # Otherwise, a notice flash message is displayed, and the user is redirected
+  # to the family account page.
+  #
+  # @return [void]
+  def check_enrollment_state
+    return if @hbx_enrollment.shopping?
+
+    flash[:notice] = l10n("insured.active_enrollment_warning")
+    redirect_to family_account_path
   end
 
   def show_ivl(hbx_enrollment_id)
