@@ -18,6 +18,7 @@ concurrency:
 env:
   RABBITMQ_DEFAULT_USER: 'guest'
   RABBITMQ_DEFAULT_PASS: 'guest'
+  SYSDIG_SECURE_ENDPOINT: "https://us2.app.sysdig.com"
 
 jobs:
   prep:
@@ -170,14 +171,42 @@ jobs:
             HOSTNAME=172.17.0.1
             CLIENT=${{ matrix.client }}
 
+      - name: Setup sysdig cache
+        uses: actions/cache@v3
+        with:
+          path: cache
+          key: ${{ runner.os }}-cache-${{ hashFiles('**/sysdig-cli-scanner', '**/latest_version.txt', '**/db/main.db.meta.json', '**/scanner-cache/inlineScannerCache.db') }}
+          restore-keys: ${{ runner.os }}-cache-
+
       - name: Scan Docker image
         if: github.event_name != 'pull_request'
         id: scan
         uses: anchore/scan-action@v3
         with:
           image: ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
+          acs-report-enable: true
           fail-build: false
           severity-cutoff: critical
+
+      - name: Download sysdig scanner if needed and scan the image
+        env:
+          SECURE_API_TOKEN: ${{ secrets.SECURE_API_TOKEN }}
+        run: |
+          curl -sLO https://download.sysdig.com/scanning/sysdig-cli-scanner/latest_version.txt
+          mkdir -p "${GITHUB_WORKSPACE}/cache/db/"
+          if [ ! -f "${GITHUB_WORKSPACE}/cache/latest_version.txt" ] || [ "$(cat ./latest_version.txt)" != "$(cat ${GITHUB_WORKSPACE}/cache/latest_version.txt)" ]; then
+            cp ./latest_version.txt "${GITHUB_WORKSPACE}/cache/latest_version.txt"
+            curl -sL -o "${GITHUB_WORKSPACE}/cache/sysdig-cli-scanner" "https://download.sysdig.com/scanning/bin/sysdig-cli-scanner/$(cat ${GITHUB_WORKSPACE}/cache/latest_version.txt)/linux/amd64/sysdig-cli-scanner"
+            chmod +x "${GITHUB_WORKSPACE}/cache/sysdig-cli-scanner"
+          else
+            echo "Latest version of sysdig cli scanner is already downloaded"
+          fi
+          ${GITHUB_WORKSPACE}/cache/sysdig-cli-scanner \
+            --apiurl "${SYSDIG_SECURE_ENDPOINT}" \
+            ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryGhcr, needs.prep.outputs.taggedImage, matrix.client) }} \
+            --console-log \
+            --dbpath="${GITHUB_WORKSPACE}/cache/db/" \
+            --cachepath="${GITHUB_WORKSPACE}/cache/scanner-cache/"
 
       - name: upload Anchore scan SARIF report
         if: github.event_name != 'pull_request'
