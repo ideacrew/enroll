@@ -214,6 +214,11 @@ jobs:
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
 
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
   new-image-notification:
     if: github.repository_owner == 'ideacrew' && github.event_name != 'pull_request'
     needs: [prep, build-and-upload-image]
