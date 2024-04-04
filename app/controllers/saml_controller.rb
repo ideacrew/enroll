@@ -18,6 +18,11 @@ class SamlController < ApplicationController
       oim_user = User.where(oim_id: /^#{Regexp.escape(username)}$/i).first
 
       if oim_user.present?
+        if oim_user.expired?
+          redirect_to main_app.root_path, flash: { error: l10n('devise.failure.expired') }
+          return
+        end
+
         oim_user.idp_verified = true
         oim_user.oim_id = response.name_id
 
