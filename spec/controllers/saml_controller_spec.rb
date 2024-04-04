@@ -8,6 +8,58 @@ RSpec.describe SamlController do
 
     invalid_xml = File.read("spec/saml/invalid_saml_response.xml")
 
+    context "user with admin role" do
+      let(:admin_user) { FactoryBot.create(:user, last_portal_visited: family_account_path, roles: ["hbx_staff"])}
+      let(:admin_person) { FactoryBot.create(:person, :user => admin_user)}
+      let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: admin_person) }
+      sample_xml = File.read("spec/saml/invalid_saml_response.xml")
+      let(:name_id) { admin_user.oim_id }
+      let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id)}
+      let(:attributes_double) { { 'mail' => admin_user.email} }
+
+      before :each do
+        admin_person.user.update_attributes!(last_activity_at: Time.now - 61.days)
+        allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return(valid_saml_response)
+      end
+
+      context "with admin account autolock feature enabled", dbclean: :after_each do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_account_autolock).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:notify_address_changed).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+          hbx_staff_role
+        end
+
+        it "redirects to root path" do
+          post :login, params: {SAMLResponse: sample_xml}
+          expect(response).to redirect_to(root_path)
+        end
+
+        it "shows error message" do
+          post :login, params: {SAMLResponse: sample_xml}
+          expect(flash[:error]).to eq l10n('devise.failure.expired')
+        end
+      end
+
+      context "with admin account autolock feature disabled", dbclean: :after_each do
+
+        it "redirects to last portal visited" do
+          post :login, params: {SAMLResponse: sample_xml}
+          expect(response).to redirect_to(admin_user.last_portal_visited)
+        end
+
+        it "shows success message" do
+          post :login, params: {SAMLResponse: sample_xml}
+          expect(flash[:notice]).to eq "Signed in Successfully."
+        end
+      end
+    end
+
     context "with invalid saml response" do
 
       it "should render a 403" do
