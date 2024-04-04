@@ -23,7 +23,7 @@ class SamlController < ApplicationController
 
       if oim_user.present?
         if oim_user.expired?
-          redirect_to account_expired_saml_index_path
+          redirect_to main_app.root_path, flash: { error: l10n('devise.failure.expired') }
           return
         end
 
