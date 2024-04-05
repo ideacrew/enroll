@@ -265,4 +265,10 @@ Devise.setup do |config|
   # When using omniauth, Devise cannot automatically set Omniauth path,
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
+  user_account_lock_period = 60
+  unless ENV['DEVISE_USER_INACTIVITY_LOCK_PERIOD_IN_DAYS'].blank?
+    period_in_days_env = ENV['DEVISE_USER_INACTIVITY_LOCK_PERIOD_IN_DAYS']
+    user_account_lock_period = period_in_days_env.to_i
+  end
+  config.expire_after = user_account_lock_period.days
 end
