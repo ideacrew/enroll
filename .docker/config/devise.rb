@@ -268,7 +268,7 @@ Devise.setup do |config|
   user_account_lock_period = 60
   unless ENV['DEVISE_USER_INACTIVITY_LOCK_PERIOD_IN_DAYS'].blank?
     period_in_days_env = ENV['DEVISE_USER_INACTIVITY_LOCK_PERIOD_IN_DAYS']
-    user_account_lock_period = period_i pn_days_env.to_i
+    user_account_lock_period = period_in_days_env.to_i
   end
   config.expire_after = user_account_lock_period.days
 end
