@@ -184,7 +184,7 @@ jobs:
         uses: anchore/scan-action@v3
         with:
           image: ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
-          acs-report-enable: true
+          # acs-report-enable: true // disable that option as it is no longer supported
           fail-build: false
           severity-cutoff: critical
 
