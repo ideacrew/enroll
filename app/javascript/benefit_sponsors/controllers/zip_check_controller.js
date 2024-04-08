@@ -31,10 +31,14 @@ export default class extends Controller {
             newOption.text = option;
             newOption.value = option;
             this.countySelectTarget.add(newOption)
+            if (response.data.length == 1) {
+              this.countySelectTarget.value = option;
+            }
           }
         }
 
       } else {
+        this.countySelectTarget.value = null;
         this.countySelectTarget.setAttribute('disabled', true);
         this.countySelectTarget.options.length = 0;
         let newOption = document.createElement("option")
