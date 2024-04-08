@@ -1,4 +1,4 @@
-<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+<% if @bs4 %>
   <label for="is_applying_coverage_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_applying_coverage_true')" class="radio">
     <%= f.radio_button :is_applying_coverage, true, class: "required floatlabel", id: 'is_applying_coverage_true', checked: first_checked%>
     <span class="yes_no_pair">Yes</span>
