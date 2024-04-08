@@ -74,6 +74,10 @@ select,
   }
 }
 
+input.full-width, select.full-width, .input.full-width {
+  width: 100%;
+}
+
 input + label,
 input + fieldset,
 select + label,
