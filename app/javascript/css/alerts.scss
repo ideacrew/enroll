@@ -30,6 +30,9 @@
     color: var(--grey-160);
     text-align: left;
   }
+  a.close {
+    text-decoration: none;
+  }
 }
 
 .alert-error {
