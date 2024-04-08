@@ -279,6 +279,10 @@ ul.list-right-section {
   li {
     margin-bottom: $spacer;
   }
+
+  .sm-hide {
+    display: none;
+  }
 }
 
 .card {
