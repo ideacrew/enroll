@@ -376,6 +376,10 @@ ul.list-right-section {
   .navbar-brand img {
     padding-left: $spacer / 2;
   }
+
+  .sm-hide {
+    display: none;
+  }
 }
 
 // large breakpoint
