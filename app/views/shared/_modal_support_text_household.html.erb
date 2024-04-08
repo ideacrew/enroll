@@ -1,15 +1,36 @@
-<div class="modal fade" id="<%= key %>" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header support-header">
-        <i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-       <%= l10n("support_texts.#{key}") %>
+<% if @bs4 %>
+  <div class="modal fade" id="<%= key %>" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header support-header d-flex align-items-center">
+          <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
+          <div class="">
+            <%= l10n("not_sure") %>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <%= l10n("support_texts.#{key}") %>
+        </div>
       </div>
     </div>
   </div>
-</div>
+<% else %>
+  <div class="modal fade" id="<%= key %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header support-header">
+          <i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <%= l10n("support_texts.#{key}") %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
