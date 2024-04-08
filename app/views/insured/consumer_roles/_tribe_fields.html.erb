@@ -1,4 +1,4 @@
-<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+<% if @bs4 %>
   <div class="mb-4 <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>
 <%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
     <input type="hidden" id="is_indian_alaskan_tribe_details_enabled" value="<%= EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>">
@@ -11,12 +11,12 @@
         <%= l10n("insured.tribe_member_pt2") %>
       </legend>
       <div class="d-flex align-items-center">
-        <label for="indian_tribe_member_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_true')" class="radio">
-          <%= f.radio_button :indian_tribe_member, true, class: "required", id: 'indian_tribe_member_true' %>
+        <label for="indian_tribe_member_yes" tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_yes')" class="radio">
+          <%= f.radio_button :indian_tribe_member, true, class: "required", id: 'indian_tribe_member_yes' %>
           <span class="yes_no_pair">Yes</span>
         </label>
-        <label for="indian_tribe_member_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_false')" class="radio">
-          <%= f.radio_button :indian_tribe_member, false, class: "required", id: 'indian_tribe_member_false' %>
+        <label for="indian_tribe_member_no" tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_no')" class="radio">
+          <%= f.radio_button :indian_tribe_member, false, class: "required", id: 'indian_tribe_member_no' %>
           <span class="yes_no_pair">No</span>
         </label>
       </div>
@@ -53,7 +53,7 @@
 
       <div class="mb-4 tribal-name-container hide">
         <label for="tribal-name"><%= l10n("insured.tribal_name") %></label>
-        <div id="tribal-name-alert">
+        <div id="tribal-name-alert" class="hide">
           <div class="alert alert-warning d-flex" role="alert">
             <div>
               <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
@@ -68,7 +68,7 @@
     <% else %>
       <div class="mb-4">
         <label for="tribal_id"><%= l10n("insured.tribal_name") %></label>
-        <div id="tribal-id-alert">
+        <div id="tribal-id-alert" class="hide">
           <div class="alert alert-warning d-flex" role="alert">
             <div>
               <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
