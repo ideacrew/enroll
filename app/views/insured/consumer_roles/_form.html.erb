@@ -1,7 +1,6 @@
-<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+<% if @bs4 %>
   <div class="container mt-4" id="new_person_wrapper">
     <div id="new_person_wrapper">
-      <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
         <div class="row">
           <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0">
             <%= render partial: 'shared/left_nav.html.erb' %>
@@ -11,7 +10,7 @@
           <div class="col-sm-12 col-md-12 col-lg-9">
             <% if current_user.has_hbx_staff_role? %>
               <div class="row_align_application_type mb-3">
-                <label for="application_type" class="required">Application Type</label>
+                <label for="application_type_id" class="required">Application Type</label>
                 <%= f.fields_for :family do |f| %>
                   <%= f.select(:application_type, options_for_select(*consumer_role_application_type_options(@person)), {include_blank: @person.primary_family.e_case_id.present? ? nil : "choose *"}, required: !@person.primary_family.e_case_id.present?, id:'application_type_id' ) %>
                 <% end %>
@@ -30,25 +29,30 @@
               <%= render 'shared/consumer_fields', f: f %>
             </div>
             <h3 class="beta mt-4">Contact Information for <%= @person.full_name %></h3>
-            <h4>Home Address</h4>
-            <p>This is where you legally reside. If you prefer to receive mail at another address such as your office of PO Box, select “Add Mailing Address”.</p>
-            <div class="mb-4">
-              <%= render 'shared/consumer_home_address_fields', f: f %>
-            </div>
-            <!-- To Do:
-            <br>
-            <%= render 'shared/phone_fields', f: f %><br>
-            <div id="email_info" class="row row-form-wrapper no-buffer">
-              <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-                <%= render 'shared/email_fields', f: email %>
-              <% end %>
-            </div>
-            <%= render 'shared/contact_preferences', {f: f, role: :consumer_role, contact_preferences_mapping: nil } %>
-            -->
+            <section class="mb-4">
+              <h4 class="gamma">Home Address</h4>
+              <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
+            </section>
+            <section class="mb-4">
+              <h4 class="gamma mb-0">Phone and Email</h4>
+              <p>Please provide as much information as possible</p>
+              <%= render partial: 'shared/phone_fields', locals: {f: f, bs4: true} %>
+              <div id="email_info" class="">
+                <div class="email d-flex mb-md-4 row col-sm">
+                  <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+                    <%= render partial: 'shared/email_fields', locals: {f: email, bs4: true} %>
+                  <% end %>
+                </div>
+              </div>
+            </section>
+
+            <section class="mb-4 mt-4">
+              <%= render 'shared/contact_preferences', {f: f, role: :consumer_role, contact_preferences_mapping: nil, bs4: true } %>
+            </section>
+
             <%= render  partial: 'shared/individual_progress', locals: {step: '1'} %>
           </div>
         </div>
-      <% end %>
     </div>
   </div>
 <% else %>
