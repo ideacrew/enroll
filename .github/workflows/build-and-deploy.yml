@@ -10,9 +10,6 @@ on:
     branches:
       - 'trunk'
       - 'rails-upgrade-5.2-6.0'
-  pull_request:
-    branches:
-      - 'trunk'
 
 concurrency:
   group: docker-${{ github.ref }}
