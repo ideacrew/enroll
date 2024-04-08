@@ -8,7 +8,10 @@ function isApplyingCoverage(target) {
     if ($(fields).not(':checked').val() == 'true') {
       $('.consumer_fields_for_applying_coverage').hide();
       $('#employer-coverage-msg').show();
-      if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
+      if (
+        $("input[name='" + target + "[ssn]']").val() == '' &&
+        !$("input[name='" + target + "[no_ssn]']").is(':checked')
+      ) {
         $('#ssn-coverage-msg').show();
       }
     }
@@ -16,7 +19,10 @@ function isApplyingCoverage(target) {
       if ($(fields).not(':checked').val() == 'true') {
         $('.consumer_fields_for_applying_coverage').hide();
         $('#employer-coverage-msg').show();
-        if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
+        if (
+          $("input[name='" + target + "[ssn]']").val() == '' &&
+          !$("input[name='" + target + "[no_ssn]']").is(':checked')
+        ) {
           $('#ssn-coverage-msg').show();
         }
       } else {
@@ -32,7 +38,12 @@ function addEventOnNoSsn(target) {
   $("input[name='" + target + "[no_ssn]']").change(function () {
     if ($(this).is(':checked')) {
       $('#ssn-coverage-msg').hide();
-    } else if ($("input[name='" + target + "[ssn]']").val() == '' && $("input[name='" + target + "[is_applying_coverage]']").not(':checked').val() == 'true') {
+    } else if (
+      $("input[name='" + target + "[ssn]']").val() == '' &&
+      $("input[name='" + target + "[is_applying_coverage]']")
+        .not(':checked')
+        .val() == 'true'
+    ) {
       $('#ssn-coverage-msg').show();
     }
   });
@@ -54,7 +65,7 @@ function addEventOnSsn(target) {
 }
 
 function enableContinueButton() {
-  var continueButton =  $('.interaction-click-control-continue.hidden');
+  var continueButton = $('.interaction-click-control-continue.hidden');
   if (continueButton.is(':disabled')) {
     continueButton.prop('disabled', false);
   }
@@ -122,7 +133,7 @@ function applyListenersFor(target) {
   );
 
   //start tribe option controls
-  $("input[name='" + target + "[indian_tribe_member]']").change(function() {
+  $("input[name='" + target + "[indian_tribe_member]']").change(function () {
     if (this.value === 'true') {
       $('.tribal-container').removeClass('hide');
     } else {
@@ -131,24 +142,33 @@ function applyListenersFor(target) {
   });
 
   // tribal-state change - select from options
-  $('select#tribal-state').on("change", function() {
+  $('select#tribal-state').on('change', function () {
     enableContinueButton();
     var enroll_state_abbr = $('#enroll_state_abbr').val();
-    var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
+    var is_indian_alaskan_tribe_details_enabled =
+      $('#is_indian_alaskan_tribe_details_enabled').val() === 'true';
 
     if (is_indian_alaskan_tribe_details_enabled) {
-      var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
-      var tribe_codes_array = $('.tribe_codes:checked').map(function() {
-        return $(this).val();
-      }).get();
-      var tribal_name_container_show_on_select = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
+      var is_featured_tribes_selection_enabled =
+        $('#is_featured_tribes_selection_enabled').val() === 'true';
+      var tribe_codes_array = $('.tribe_codes:checked')
+        .map(function () {
+          return $(this).val();
+        })
+        .get();
+      var tribal_name_container_show_on_select =
+        typeof tribe_codes_array != 'undefined' &&
+        tribe_codes_array.includes('OT');
 
-      if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
+      if (
+        is_featured_tribes_selection_enabled &&
+        this.value == enroll_state_abbr
+      ) {
         $('.featured-tribe-container').removeClass('hide');
         if (tribal_name_container_show_on_select) {
           $('.tribal-name-container').removeClass('hide');
         } else {
-          $('#tribal-name').val("");
+          $('#tribal-name').val('');
           $('.tribal-name-container').addClass('hide');
         }
       } else {
@@ -159,8 +179,8 @@ function applyListenersFor(target) {
     }
   });
 
-  $("input#" + target + "_tribe_codes_ot").change(function() {
-    if (this.checked){
+  $('input#' + target + '_tribe_codes_ot').change(function () {
+    if (this.checked) {
       $('.tribal-name-container').removeClass('hide');
     } else {
       $('.tribal-name-container').addClass('hide');
@@ -170,27 +190,27 @@ function applyListenersFor(target) {
 
   $('input[name="person[is_incarcerated]"]').change(function () {
     enableContinueButton();
-  })
+  });
 
   $('input[name="person[tribal_id]"]').change(function () {
     enableContinueButton();
-  })
+  });
 
   $('input[name="person[tribal_name]"]').change(function () {
     enableContinueButton();
-  })
+  });
 
-  $('.mobile-phone-number').change(function() {
+  $('.mobile-phone-number').change(function () {
     enableContinueButton();
-  })
+  });
 
-  $('.tribe_codes').change(function() {
+  $('.tribe_codes').change(function () {
     enableContinueButton();
-  })
+  });
 
-  $('input[name="person[indian_tribe_member]"]').change(function() {
+  $('input[name="person[indian_tribe_member]"]').change(function () {
     enableContinueButton();
-  })
+  });
 }
 
 function showOnly(selected) {
@@ -295,69 +315,83 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validationForIndianTribeMember(e) {
-    if ($('#indian_tribe_area').length == 0){
+    if ($('#indian_tribe_area').length == 0) {
       return false;
     }
 
-    $('.close').click(function() {
+    $('.close').click(function () {
       $('#tribal-id-alert').addClass('hide');
       $('#tribal-state-alert').addClass('hide');
       $('#tribal-name-alert').addClass('hide');
     });
 
-    if ($('input[name="person[is_applying_coverage]"]').length > 0
-    && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+    if (
+      $('input[name="person[is_applying_coverage]"]').length > 0 &&
+      $('input[name="person[is_applying_coverage]"]').not(':checked').val() ==
+        'true'
+    ) {
       return true;
     }
 
-    var tribe_member_yes = $("input#indian_tribe_member_yes").is(':checked');
-    var tribe_member_no = $("input#indian_tribe_member_no").is(':checked');
-    var tribe_member_visible = $(".no_coverage_tribe_details").is(':visible')
+    var tribe_member_yes = $('input#indian_tribe_member_yes').is(':checked');
+    var tribe_member_no = $('input#indian_tribe_member_no').is(':checked');
+    var tribe_member_visible = $('.no_coverage_tribe_details').is(':visible');
 
-    if (!tribe_member_yes && !tribe_member_no && tribe_member_visible){
+    if (!tribe_member_yes && !tribe_member_no && tribe_member_visible) {
       resetConfirmButton();
-      alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
+      alert(
+        "Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'"
+      );
       PersonValidations.restoreRequiredAttributes(e);
-    };
+    }
 
-    if (tribe_member_no){
-      $('#tribal-state').val("");
-      $('input#tribal-name').val("");
-      $('#tribal-id').val("");
+    if (tribe_member_no) {
+      $('#tribal-state').val('');
+      $('input#tribal-name').val('');
+      $('#tribal-id').val('');
       $('.tribe_codes:checked').removeAttr('checked');
     }
 
-    if (tribe_member_yes){
-      if ($('#tribal-state').length > 0 && $('#tribal-state').val() == ""){
+    if (tribe_member_yes) {
+      if ($('#tribal-state').length > 0 && $('#tribal-state').val() == '') {
         resetConfirmButton();
         $('#tribal-state-alert').show();
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
-        var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
+      if (
+        $('.featured_tribes_selection').length > 0 &&
+        $('#tribal-state').val() == $('#enroll_state_abbr').val()
+      ) {
+        var tribe_codes_array = $('.tribe_codes:checked')
+          .map(function () {
+            return $(this).val();
+          })
+          .get();
         if (tribe_codes_array.length < 1) {
-         resetConfirmButton();
-          alert("At least one tribe must be selected.");
+          resetConfirmButton();
+          alert('At least one tribe must be selected.');
           PersonValidations.restoreRequiredAttributes(e);
         }
 
-        if (tribe_codes_array.includes("OT") && $('input#tribal-name').val() == ""){
+        if (
+          tribe_codes_array.includes('OT') &&
+          $('input#tribal-name').val() == ''
+        ) {
           resetConfirmButton();
           alert("Please provide an answer for 'Other' tribe name.");
           PersonValidations.restoreRequiredAttributes(e);
         }
 
-        if (!tribe_codes_array.includes("OT")){
-          $('input#tribal-name').val("");
+        if (!tribe_codes_array.includes('OT')) {
+          $('input#tribal-name').val('');
         }
-      }
-      else if ($('input#tribal-name').val() == ""){
-          $('#tribal-name-alert').show();
-          PersonValidations.restoreRequiredAttributes(e);
+      } else if ($('input#tribal-name').val() == '') {
+        $('#tribal-name-alert').show();
+        PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('#tribal-id').length > 0 && $('#tribal-id').val().length != 9){
+      if ($('#tribal-id').length > 0 && $('#tribal-id').val().length != 9) {
         resetConfirmButton();
         $('#tribal-id-alert').show();
         PersonValidations.restoreRequiredAttributes(e);
@@ -664,30 +698,49 @@ var PersonValidations = (function (window, undefined) {
       $('.contact-method input').each(function (i, el) {
         if ($(el).prop('checked')) {
           isChecked = true;
-        }});
+        }
+      });
       if (isChecked == false) {
-        var alertMsg = 'Warning: You must select at least one contact method.'
-        if($('.contact-method').hasClass('flag-enabled')){
-          alertMsg += ' An additional method must be checked if selecting Text.';
+        var alertMsg = 'Warning: You must select at least one contact method.';
+        if ($('.contact-method').hasClass('flag-enabled')) {
+          alertMsg +=
+            ' An additional method must be checked if selecting Text.';
         }
         alert(alertMsg);
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email').prop('checked')) {
+      if (
+        $(
+          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email'
+        ).prop('checked')
+      ) {
         if (!$('#person_emails_attributes_0_address').val()) {
-          alert('You must enter an email address to receive notices and updates by email.');
+          alert(
+            'You must enter an email address to receive notices and updates by email.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
 
-      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text').prop('checked')) {
+      if (
+        $(
+          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text'
+        ).prop('checked')
+      ) {
         if (document.querySelector('.mobile-phone-number').value.length < 1) {
-          alert('You must enter a mobile phone number to receive notices and updates by text.');
+          alert(
+            'You must enter a mobile phone number to receive notices and updates by text.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
-        if ($('.contact-method input:checked').length <= 1 && $('.contact-method').hasClass('flag-enabled')){
-          alert('An additional contact method is required if only Text is selected.');
+        if (
+          $('.contact-method input:checked').length <= 1 &&
+          $('.contact-method').hasClass('flag-enabled')
+        ) {
+          alert(
+            'An additional contact method is required if only Text is selected.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
@@ -699,7 +752,8 @@ var PersonValidations = (function (window, undefined) {
     manageRequiredValidations: manageRequiredValidations,
     validationForUsCitizenOrUsNational: validationForUsCitizenOrUsNational,
     validationForNaturalizedCitizen: validationForNaturalizedCitizen,
-    validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
+    validationForEligibleImmigrationStatuses:
+      validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
     validationForTobaccoUser: validationForTobaccoUser,
@@ -716,8 +770,10 @@ $(document).on('turbolinks:load', function () {
 function demographicValidations() {
   applyListeners();
 
-  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(
+  $('form.edit_person, form.new_dependent, form.edit_dependent').on(
+    'submit',
     function (e) {
+      $('.mailing-div .stateInput').not(':visible').val('');
       PersonValidations.validationForUsCitizenOrUsNational(e);
       PersonValidations.validationForNaturalizedCitizen(e);
       PersonValidations.validationForEligibleImmigrationStatuses(e);
@@ -726,7 +782,11 @@ function demographicValidations() {
       PersonValidations.validationForTobaccoUser(e);
       PersonValidations.validationForVlpDocuments(e);
       PersonValidations.validationForContactMethod(e);
-      if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
+      if (
+        $('#showWarning').length &&
+        !$('#showWarning').hasClass('hidden') &&
+        !$('#showWarning').hasClass('shown')
+      ) {
         var btn = document.querySelector('.applicant-confirm-member');
         if (btn) {
           btn.textContent = 'Confirm Member';
@@ -736,7 +796,8 @@ function demographicValidations() {
         e.preventDefault();
         return false;
       }
-    });
+    }
+  );
 
   isApplyingCoverage('person');
 }
