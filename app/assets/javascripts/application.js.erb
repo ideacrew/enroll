@@ -51,15 +51,21 @@ var disableSelectric = false;
 $(document).on('page:load turbolinks:load', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
-  indicateRequiredFields();
+  Responsive.setSizeListeners();
+  if (controllerName() === 'families' && actionName() === 'verification'){
+    $('.verification-update-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
+    $('.return-for-def-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
+  }
 });
 
-function indicateRequiredFields() {
-  $('label.required, legend.required').each(function() {
-    if ($(this).find('.sr-only').length == 0) {
-      $(this).append('<span class="sr-only sr-required-indicator">*</span>');
-    }
-  });
+function controllerName() {
+  const body = document.body;
+  return body.dataset.controller;
+}
+
+function actionName() {
+  const body = document.body;
+  return body.dataset.action;
 }
 
 function applyJQDatePickerSetup(ele) {
@@ -286,8 +292,7 @@ $(document).on('turbolinks:load', function () {
     $('.filter-options').hide();
   });
 
-  $('a.back').off('click');
-  $('a.back').on('click', function(){
+  $('a.back').click(function(){
     parent.history.back();
     return false;
   });
@@ -820,6 +825,7 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
 
   // Appends a query parameter to the 'btn-continue' button's href attribute to indicate that the user has disagreed to the terms on the thank you page.
   document.getElementById('btn-continue').href += "&thankyou_page_agreement_terms=disagreed";
+
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
@@ -828,11 +834,10 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
 
         // Appends a query parameter to the 'btn-continue' button's href attribute to indicate that the user has agreed to the terms on the thank you page.
         document.getElementById('btn-continue').href += "&thankyou_page_agreement_terms=agreed";
-        $('#btn-continue').removeAttr('disabled');
+
         $('#btn-continue').removeClass('disabled');
       } else {
         $('#btn-continue').addClass('disabled');
-        $('#btn-continue').attr('disabled', true)
       }
     }
   }
@@ -860,22 +865,12 @@ Freebies.popover();
 $(document).on('click', '#address_info + span.form-action', function(){
   if ($(this).text() == "Add Mailing Address"){
     $(this).text('Remove Mailing Address');
-    if($(this).attr('id') == "add_dependent_mailing_address"){
-      $(this).attr('id', 'remove_dependent_mailing_address');
-      $(this).addClass('btn-error');
-      $(this).removeClass('btn-secondary');
-    }
     $('.mailing-div').show();
     $("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip,  #dependent_addresses_1_city").each(function() {
       $(this).prop('required', true);
     })
   }else if ($(this).text() == "Remove Mailing Address"){
     $(this).text('Add Mailing Address');
-    if($(this).attr('id') == "remove_dependent_mailing_address"){
-      $(this).attr('id', 'add_dependent_mailing_address');
-      $(this).removeClass('btn-error');
-      $(this).addClass('btn-secondary');
-    }
     $('.mailing-div').hide();
     $(".mailing-div input[type='text']").val("");
     $(".mailing-div #state_id_mailing").val("")
@@ -889,89 +884,6 @@ $(document).on('click', '#address_info + span.form-action', function(){
     } else {
       $("#person_addresses_attributes_0__destroy").val(true);
     }
-  }
-});
-
-const mailingAddressInputFieldIds = () => {
-  return [
-    '#person_addresses_attributes_1_address_1',
-    '#person_addresses_attributes_1_city',
-    '#person_addresses_attributes_1_zip',
-    '#applicant_addresses_attributes_1_address_1',
-    '#applicant_addresses_attributes_1_city',
-    '#applicant_addresses_attributes_1_zip',
-    '#dependent_addresses_1_address_1',
-    '#dependent_addresses_1_city',
-    '#dependent_addresses_1_zip',
-  ].join(', ');
-};
-
-const mailingAddressDestroyFieldIds = () => {
-  return [
-    '#person_addresses_attributes_1__destroy',
-    '#applicant_addresses_attributes_1__destroy',
-    '#dependent_addresses_1__destroy'
-  ].join(', ');
-};
-
-document.addEventListener('click', function(event) {
-  if (event.target.matches('button#add_mailing_address')) {
-    event.preventDefault();
-    const addButton = event.target;
-    addButton.classList.add('d-none');
-    const removeButton = addButton.cloneNode(true);
-    removeButton.textContent = 'Remove Mailing Address';
-    removeButton.id = 'remove_mailing_address';
-    removeButton.classList.add('interaction-click-control-remove-mailing-address', 'error');
-    removeButton.classList.remove("d-none", "btn-secondary", "interaction-click-control-add-mailing-address");
-    addButton.parentNode.insertBefore(removeButton, addButton);
-    document.querySelectorAll(".mailing-div").forEach(el => {
-      el.classList.remove('d-none');
-      el.classList.add('d-block');
-    });
-    document.querySelectorAll(mailingAddressInputFieldIds()).forEach(function(element) {
-      element.required = true;
-    });
-  }
-});
-
-document.addEventListener('click', function(event) {
-  if (event.target.matches('button#remove_mailing_address')) {
-    event.preventDefault();
-    const removeButton = event.target;
-    removeButton.remove();
-    const addButton = document.getElementById('add_mailing_address');
-    addButton.classList.remove('d-none');
-    document.querySelectorAll(".mailing-div").forEach(el => {
-      el.classList.add('d-none');
-      el.classList.remove('d-block');
-    });
-
-    // NOTE: not sure if this #state_id_mailing id will still be used after bs4 updates, keeping for now
-    stateIdMailing = document.querySelector(".mailing-div #state_id_mailing");
-    stateIdMailing ? stateIdMailing.value = "" : null;
-
-    document.querySelectorAll(mailingAddressInputFieldIds()).forEach(function(element) {
-      element.required = false;
-    });
-
-    // Mailing address form may appear before or after home address form
-    document.querySelectorAll(mailingAddressDestroyFieldIds()).forEach(function(element) {
-      let previous = element.previousElementSibling;
-      let next = element.nextElementSibling;
-
-      if ((previous && previous.id && previous.id.includes('_1_kind') && previous.value == 'mailing') ||
-        (next && next.id && next.id.includes('_1_kind') && next.value == 'mailing')) {
-        element.value = true;
-      } else {
-        // NOTE: this second condition may not be necessary, 
-        // both family_member and applicant dependent controllers
-        // handle removing a dependent home address if the 'same_as_primary' param is true
-        let homeAddressId = element.id.replace('_1__', '_0__');
-        let homeAddressElement = document.querySelector(homeAddressId);
-		    if (homeAddressElement) homeAddressElement.value = true;
-      }
-    });
   }
 });
 

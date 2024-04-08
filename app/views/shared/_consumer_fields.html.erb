@@ -5,7 +5,7 @@
     <% if FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) %>
       <%= render :partial => 'shared/optional_field_warning' %>
     <% end %>
-    <% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+    <% if @bs4 %>
       <div class="consumer_fields_for_applying_coverage">
         <div class="mb-4">
           <fieldset>

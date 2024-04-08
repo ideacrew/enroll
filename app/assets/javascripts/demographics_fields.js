@@ -2,7 +2,6 @@ function isApplyingCoverage(target) {
   fields = "input[name='" + target + "[is_applying_coverage]']";
   $('#employer-coverage-msg').hide();
   $('#ssn-coverage-msg').hide();
-  $('.ssn-coverage-msg').hide();
   if ($(fields).length > 0) {
     addEventOnNoSsn(target);
     addEventOnSsn(target);
@@ -25,13 +24,11 @@ function isApplyingCoverage(target) {
           !$("input[name='" + target + "[no_ssn]']").is(':checked')
         ) {
           $('#ssn-coverage-msg').show();
-          $('.ssn-coverage-msg').show();
         }
       } else {
         $('.consumer_fields_for_applying_coverage').show();
         $('#employer-coverage-msg').hide();
         $('#ssn-coverage-msg').hide();
-        $('.ssn-coverage-msg').hide();
       }
     });
   }
@@ -89,15 +86,15 @@ function applyListenersFor(target) {
       false
     );
     if ($(this).val() == 'true') {
-      $(this).closest('.consumer_fields_for_applying_coverage').find('#naturalized_citizen_container').removeClass('hidden_field');
-      $(this).closest('.consumer_fields_for_applying_coverage').find('#immigration_status_container').addClass('hidden_field');
-      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_true').attr('required', true);
-      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_false').attr('required', true);
+      $('#naturalized_citizen_container').show();
+      $('#immigration_status_container').hide();
+      $('#' + target + '_naturalized_citizen_true').prop('required');
+      $('#' + target + '_naturalized_citizen_false').prop('required');
     } else {
-      $(this).closest('.consumer_fields_for_applying_coverage').find('#naturalized_citizen_container').addClass('hidden_field');
-      $(this).closest('.consumer_fields_for_applying_coverage').find('#immigration_status_container').removeClass('hidden_field');
-      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_true').removeAttr('required')
-      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_false').removeAttr('required')
+      $('#naturalized_citizen_container').hide();
+      $('#immigration_status_container').show();
+      $('#' + target + '_naturalized_citizen_true').removeAttr('required');
+      $('#' + target + '_naturalized_citizen_false').removeAttr('required');
     }
   });
 
@@ -249,7 +246,6 @@ function showOnly(selected) {
   $('.vlp_doc_area').html('<span>waiting...</span>');
   var target_id = $('input#vlp_doc_target_id').val();
   var target_type = $('input#vlp_doc_target_type').val();
-  var bs4 = document.documentElement.dataset.bs4;
   $.ajax({
     type: 'get',
     url: '/insured/consumer_role/immigration_document_options',
@@ -259,7 +255,6 @@ function showOnly(selected) {
       target_type: target_type,
       vlp_doc_target: vlp_doc_target,
       vlp_doc_subject: selected,
-      bs4: bs4,
     },
   });
 }
@@ -482,17 +477,15 @@ var PersonValidations = (function (window, undefined) {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
     if (!document.getElementById('dependent_ul') && immigration_field) {
-      var us_citizen =
-        document.getElementById('person_us_citizen_false') ||
-        document.getElementById('us_citizen_false');
-      var naturalized_citizen =
-        document.getElementById('person_naturalized_citizen_true') ||
-        document.getElementById('naturalized_citizen_true');
-      return us_citizen.checked || naturalized_citizen.checked;
+      return (
+        document.getElementById('person_us_citizen_false').checked ||
+        document.getElementById('person_naturalized_citizen_true').checked
+      );
     } else if (immigration_field) {
-      var us_citizen = document.getElementById('dependent_us_citizen_false') || document.getElementById('us_citizen_false');
-      var naturalized_citizen = document.getElementById('dependent_naturalized_citizen_true') || document.getElementById('naturalized_citizen_true');
-      return ( us_citizen.checked || naturalized_citizen.checked );
+      return (
+        document.getElementById('dependent_us_citizen_false').checked ||
+        document.getElementById('dependent_naturalized_citizen_true').checked
+      );
     }
   }
 
@@ -717,7 +710,11 @@ var PersonValidations = (function (window, undefined) {
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('#contact_type_email').prop('checked')) {
+      if (
+        $(
+          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email'
+        ).prop('checked')
+      ) {
         if (!$('#person_emails_attributes_0_address').val()) {
           alert(
             'You must enter an email address to receive notices and updates by email.'
@@ -726,7 +723,11 @@ var PersonValidations = (function (window, undefined) {
         }
       }
 
-      if ($('#contact_type_text').prop('checked')) {
+      if (
+        $(
+          '.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text'
+        ).prop('checked')
+      ) {
         if (document.querySelector('.mobile-phone-number').value.length < 1) {
           alert(
             'You must enter a mobile phone number to receive notices and updates by text.'

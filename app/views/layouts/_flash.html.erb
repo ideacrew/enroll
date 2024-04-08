@@ -1,26 +1,10 @@
-<% if @bs4 %>
-  <div class="container p-0">
-    <div class="alert alert-<%= type %> d-flex align-items-start">
-      <div class="d-flex pl-1">
-        <div class="<%= type %>-icon icon" alt="info">&nbsp;</div>
-      </div>
-      <div class="col mr-auto p-0 align-self-center">
-        <%= h(message) %>
-      </div>
-      <div class="d-flex pl-1">
-        <a class="close-icon icon icon-sm pr-1" alt="<%= l10n("close") %>" href="#">&nbsp;<span class="sr-only"><%= l10n("close") %></span></a>
+<div class="row flash module">
+  <div class="alert alert-<%= type %>" style="width: 100%; margin-top: 0px !important;">
+    <div class="container">
+      <div class="col-xs-12" style="width: 100%; max-width: 1170px; margin: auto;">
+        <a class="close" data-dismiss="alert" href="#">×</a>
+        <%= raw message %>
       </div>
     </div>
   </div>
-<% else %>
-  <div class="row flash module">
-    <div class="alert alert-<%= type %>" style="width: 100%; margin-top: 0px !important;">
-      <div class="container">
-        <div class="col-xs-12" style="width: 100%; max-width: 1170px; margin: auto;">
-          <a class="close" data-dismiss="alert" href="#">×</a>
-          <%= raw message %>
-        </div>
-      </div>
-    </div>
-  </div>
-<% end %>
+</div>
