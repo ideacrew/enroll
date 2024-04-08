@@ -698,22 +698,22 @@ $(document).on('turbolinks:load', function () {
 function demographicValidations() {
   applyListeners();
 
-  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(
-    function (e) {
-      PersonValidations.validationForUsCitizenOrUsNational(e);
-      PersonValidations.validationForNaturalizedCitizen(e);
-      PersonValidations.validationForEligibleImmigrationStatuses(e);
-      PersonValidations.validationForIndianTribeMember(e);
-      PersonValidations.validationForIncarcerated(e);
-      PersonValidations.validationForTobaccoUser(e);
-      PersonValidations.validationForVlpDocuments(e);
-      PersonValidations.validationForContactMethod(e);
-      if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
-        $('#showWarning').addClass('shown');
-        e.preventDefault();
-        return false;
-      }
-    });
+  $('form.edit_person, form.new_dependent, form.edit_dependent').on('submit', function (e) {
+    $('.mailing-div .stateInput').not(':visible').val('');
+    PersonValidations.validationForUsCitizenOrUsNational(e);
+    PersonValidations.validationForNaturalizedCitizen(e);
+    PersonValidations.validationForEligibleImmigrationStatuses(e);
+    PersonValidations.validationForIndianTribeMember(e);
+    PersonValidations.validationForIncarcerated(e);
+    PersonValidations.validationForTobaccoUser(e);
+    PersonValidations.validationForVlpDocuments(e);
+    PersonValidations.validationForContactMethod(e);
+    if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
+      $('#showWarning').addClass('shown');
+      e.preventDefault();
+      return false;
+    }
+  });
 
   isApplyingCoverage('person');
 }
