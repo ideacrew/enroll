@@ -599,7 +599,7 @@ $(document).on('turbolinks:load', function () {
   });
 
 
-  $("#person_ssn").focusout(function( event ) {
+  $("#person_ssn:not(.keep-label)").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
       $("[for='person_ssn']").css('display', 'none');
       $("[for='person_ssn']").css('opacity', 0);
@@ -851,7 +851,7 @@ Freebies.popover();
 $(document).on('click', '#address_info + span.form-action', function(){
   if ($(this).text() == "Add Mailing Address"){
     $(this).text('Remove Mailing Address');
-    $('.row-form-wrapper.mailing-div').show();
+    $('.mailing-div').show();
     $("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip,  #dependent_addresses_1_city").each(function() {
       $(this).prop('required', true);
     })
