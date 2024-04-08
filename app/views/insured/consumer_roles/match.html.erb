@@ -3,13 +3,13 @@
     <%= render partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
   <% end %>
 <% end %>
-<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+<% if @bs4 %>
   <div class="container mt-4">
     <div id="new_person_wrapper">
       <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
         <div class="row">
           <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0">
-            <%= render partial: 'shared/left_nav.html.erb' %>
+            <%= render partial: 'shared/left_nav.html.erb', locals: {step: '1', search_page: true} %>
           </div>
           <div class="col-sm-12 col-md-12 col-lg-9">
             <h1>
