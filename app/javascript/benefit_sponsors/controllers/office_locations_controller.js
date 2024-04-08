@@ -22,10 +22,22 @@ export default class extends Controller {
       document.getElementById('kindSelect')[0].remove();
       document.getElementById('agency_organization_profile_attributes_office_locations_attributes_0_phone_attributes_kind')[0].remove();
     }
+    this.officeLocationTargets.forEach(target => {
+      target.classList.add("existing-location");
+    });
   }
 
   addLocation(event) {
-    if (!alreadyConnected) {
+    const locations = document.querySelectorAll('.js-office-location');
+    const lastLocation = locations[locations.length-1];
+    let emptyLocation = true;
+    lastLocation.querySelectorAll('input').forEach(function(input) {
+      if (input.value != "") {
+        emptyLocation = false;
+        return;
+      }
+    })
+    if (!emptyLocation) {
       event.preventDefault();
       //clone new location node, unhide remove button, modify name attribute
       var newLocation = document.importNode(this.officeLocationTarget, true)
@@ -37,6 +49,8 @@ export default class extends Controller {
       newLocation.querySelectorAll('.js-remove').forEach(function(element) {
         element.remove()
       });
+
+      newLocation.classList.add('new-location');
 
       newLocation.querySelectorAll('.ol_title').forEach(function(element) {
         element.innerHTML = "Office Location"
