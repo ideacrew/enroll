@@ -5,19 +5,13 @@
 # It also includes constants for defined ethnicity options, other ethnicity options, CMS reporting groups, and their mappings.
 class Ethnicity
   # Ethnicity class representing a person's ethnicity.
-  # This class includes the DocumentVersion module.
+  # This class includes the Orms::Mongoid::DocumentVersion module.
   #
-  # @note The DocumentVersion module provides versioning capabilities to the Ethnicity class.
-  include DocumentVersion
+  # @note The Orms::Mongoid::DocumentVersion module provides versioning capabilities to the Ethnicity class.
+  include Orms::Mongoid::DocumentVersion
 
   # Localization helper module for handling localized strings.
   extend L10nHelper
-
-  # @!attribute [r] VERSION_SOURCE_KINDS
-  #   @return [Array<String>] The kinds of sources for the version of the ethnicity.
-  #   Currently, the only kind is 'self_attested'.
-  #   Array of kinds of sources for the version of the ethnicity.
-  VERSION_SOURCE_KINDS = %w[self_attested].freeze
 
   # @!attribute [rw] person_demographics_group
   #   @return [PersonDemographicsGroup] The demographics group associated with the ethnicity.

@@ -10,9 +10,9 @@ FactoryBot.define do
       end
     end
 
-    trait :with_death_entry do
+    trait :with_alive_status do
       after(:create) do |person_demographics_group, _evaluator|
-        create_list(:death_entry, 1, :with_death_evidence, person_demographics_group: person_demographics_group)
+        create_list(:alive_status, 1, :with_alive_evidence, person_demographics_group: person_demographics_group)
       end
     end
   end

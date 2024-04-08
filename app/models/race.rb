@@ -5,10 +5,10 @@
 # It also includes constants for defined race options, other race options, CMS reporting groups, and their mappings.
 class Race
   # Race class representing a person's race.
-  # This class includes the DocumentVersion module.
+  # This class includes the Orms::Mongoid::DocumentVersion module.
   #
-  # @note The DocumentVersion module provides versioning capabilities to the Race class.
-  include DocumentVersion
+  # @note The Orms::Mongoid::DocumentVersion module provides versioning capabilities to the Race class.
+  include Orms::Mongoid::DocumentVersion
 
   # Localization helper module for handling localized strings.
   extend L10nHelper
