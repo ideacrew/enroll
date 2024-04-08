@@ -1,11 +1,24 @@
-<% kind = f.object.kind.upcase %>
-<div class="email">
-  <div class="col-md-6 col-sm-6 no-pd">
-    <div class="form-group form-group-lg <%= 'border_bottom_no_zero' if kind.eql?('HOME') %>">
-
+<% if @bs4 %>
+  <% kind = f.object.kind %>
+  <div class="col-sm col-md-6 p-0">
+    <div class="col-md-12 <%= f.index.even? ? 'pl-0' : 'pr-0'%>">
       <%= f.hidden_field :kind %>
       <%= f.hidden_field :_destroy %>
-      <%= f.email_field :address, placeholder:  kind.eql?('HOME') ? l10n("personal_email_address") : "#{kind.capitalize} Email Address", class: "floatlabel form-control" %>
+      <%= f.label :address, kind.upcase.eql?('HOME') ? l10n("personal_email_address") : l10n(kind + " Email Address").titleize %>
+      <%= f.email_field :address, placeholder: "example@mail.com", class: "full-width" %>
     </div>
   </div>
-</div>
+<% else %>
+
+  <% kind = f.object.kind.upcase %>
+  <div class="email">
+    <div class="col-md-6 col-sm-6 no-pd">
+      <div class="form-group form-group-lg <%= 'border_bottom_no_zero' if kind.eql?('HOME') %>">
+
+        <%= f.hidden_field :kind %>
+        <%= f.hidden_field :_destroy %>
+        <%= f.email_field :address, placeholder:  kind.eql?('HOME') ? l10n("personal_email_address") : "#{kind.capitalize} Email Address", class: "floatlabel form-control" %>
+      </div>
+    </div>
+  </div>
+<% end %>
