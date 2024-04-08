@@ -1,6 +1,6 @@
 <% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
 <% document_upload = (defined? document_upload) ? document_upload : false %>
-<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+<% if @bs4 %>
   <div class="<%= 'hidden_field' if !document_upload && !show_vlp_documents_container(f.object) %>" id="vlp_documents_container">
     <div class="<%= 'hidden_field' if !document_upload && !show_immigration_doc_type(f.object) %>" id='immigration_doc_type_select'>
       <label for="immigration_doc_type"><%= l10n("insured.consumer_roles.select_doc_type") %></label>
