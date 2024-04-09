@@ -71,7 +71,7 @@ module FinancialAssistance
               when "verified"
                 applicant.set_income_evidence_verified
               when "outstanding"
-                if enrolled?(applicant, enrollments) || is_aptc_used?(applicant, enrollments)
+                if enrolled?(applicant, enrollments) && is_aptc_used?(applicant, enrollments)
                   applicant.set_evidence_outstanding(income_evidence)
                 else
                   applicant.set_evidence_to_negative_response(income_evidence)
