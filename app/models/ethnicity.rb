@@ -56,13 +56,13 @@ class Ethnicity
   # We could expand ATTESTATION_KINDS to include 'self_attested' 'broker_attested' and 'admin_attested'.
   ATTESTATION_KINDS = %w[non_attested].freeze
 
-  # @!attribute [rw] attestation
+  # @!attribute [rw] attestation_kind
   #   @return [String, nil] The source of attestation for the ethnicity information.
   #   This field is used to track the source of attestation.
   #   It can be updated with the value 'non_attested' when we do not have ethnicity
   #   information when migrating from the old data model to the new data model.
   #   It is nil by default.
-  field :attestation, type: String
+  field :attestation_kind, type: String
 
   # @!attribute [rw] hispanic_or_latino
   #   @return [String] The hispanic or latino option that the user has selected.

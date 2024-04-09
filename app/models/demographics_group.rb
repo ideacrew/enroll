@@ -17,11 +17,11 @@ class DemographicsGroup
 
   # @!attribute [rw] ethnicities
   #   @return [Array<Ethnicity>] The ethnicities associated with this DemographicsGroup.
-  embed_one :ethnicities, class_name: 'Ethnicity', cascade_callbacks: true, validate: true
+  embeds_one :ethnicity, cascade_callbacks: true, validate: true
 
   # @!attribute [rw] races
   #   @return [Array<Race>] The races associated with this DemographicsGroup.
-  embed_one :races, class_name: 'Race', cascade_callbacks: true, validate: true
+  embeds_one :race, cascade_callbacks: true, validate: true
 
   # @!attribute [rw] alive_status
   #   @return [AliveStatus] The alive status of the individual.
