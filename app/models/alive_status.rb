@@ -4,7 +4,6 @@
 # This class is embedded in the DemographicsGroup model.
 # By default, a person is considered alive unless a source indicates otherwise.
 # If the person is deceased, the date of death is stored in the date_of_death field.
-# This class does not implement DocumentVersion as it has an evidence that has verification history.
 class AliveStatus
   include Mongoid::Document
   include Mongoid::Timestamps

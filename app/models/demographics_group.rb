@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Class representing a group of demographic information for a person.
+# Class representing a group of demographic information for an individual.
 # This class is embedded in any model that declares itself as 'demographable'.
 class DemographicsGroup
   include Mongoid::Document
@@ -24,10 +24,9 @@ class DemographicsGroup
   embed_one :races, class_name: 'Race', cascade_callbacks: true, validate: true
 
   # @!attribute [rw] alive_status
-  #   @return [AliveStatus] The alive status of the person.
+  #   @return [AliveStatus] The alive status of the individual.
   #   This model is embedded in the DemographicsGroup model.
-  #   It contains information about the person's status, such as whether they are alive or deceased.
-  #   It does not implement DocumentVersion as this model has an evidence that has verification history.
+  #   It contains information about the individual's status, such as whether they are alive or deceased.
   embeds_one :alive_status, class_name: "AliveStatus", cascade_callbacks: true
 
   # @note The birth_entries is not implemented yet.
