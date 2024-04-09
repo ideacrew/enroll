@@ -7,14 +7,14 @@ RSpec.describe AliveStatus, type: :model do
 
   describe 'associations' do
     let(:demographics) do
-      FactoryBot.create(:person_demographics_group, :with_alive_status, demographable: person)
+      FactoryBot.create(:demographics_group, :with_alive_status, demographable: person)
     end
 
     let(:alive_status) { demographics.alive_status }
 
     it 'returns correct parent association' do
-      expect(alive_status.person_demographics_group).to eq(demographics)
-      expect(alive_status.person_demographics_group).to be_a(PersonDemographicsGroup)
+      expect(alive_status.demographics_group).to eq(demographics)
+      expect(alive_status.demographics_group).to be_a(DemographicsGroup)
     end
 
     it 'returns correct child association' do

@@ -15,8 +15,8 @@ FactoryBot.define do
       create_list(:employee_role, 1, person: p) unless p.employee_roles
     end
 
-    trait :with_person_demographics_group do
-      person_demographics_group { FactoryBot.build(:person_demographics_group) }
+    trait :with_demographics_group do
+      demographics_group { FactoryBot.build(:demographics_group) }
     end
 
     trait :with_mailing_address do
@@ -29,7 +29,7 @@ FactoryBot.define do
       tribe_codes { ["HM", "AM"] }
     end
 
-    trait :with_bad_mailing_address do 
+    trait :with_bad_mailing_address do
       addresses { [FactoryBot.build(:address, :mailing_kind, :without_address_1, :without_city, :without_state, :without_zip)] }
     end
 

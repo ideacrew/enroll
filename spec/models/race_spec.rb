@@ -7,22 +7,22 @@ RSpec.describe Race, type: :model do
 
   describe 'associations' do
     let(:demographics) do
-      FactoryBot.create(:person_demographics_group, :with_race_and_ethnicity, demographable: person)
+      FactoryBot.create(:demographics_group, :with_race_and_ethnicity, demographable: person)
     end
 
     let(:race) { demographics.races.first }
 
     it 'returns correct association' do
-      expect(race.person_demographics_group).to eq(demographics)
-      expect(race.person_demographics_group).to be_a(PersonDemographicsGroup)
+      expect(race.demographics_group).to eq(demographics)
+      expect(race.demographics_group).to be_a(DemographicsGroup)
     end
   end
 
   describe 'scopes' do
-    let(:demographics) { FactoryBot.create(:person_demographics_group, demographable: person) }
+    let(:demographics) { FactoryBot.create(:demographics_group, demographable: person) }
 
-    let(:race1) { FactoryBot.create(:race, person_demographics_group: demographics) }
-    let(:race2) { FactoryBot.create(:race, person_demographics_group: demographics, created_at: race1.created_at.prev_day) }
+    let(:race1) { FactoryBot.create(:race, demographics_group: demographics) }
+    let(:race2) { FactoryBot.create(:race, demographics_group: demographics, created_at: race1.created_at.prev_day) }
 
     before { race2 }
 
@@ -40,8 +40,8 @@ RSpec.describe Race, type: :model do
   end
 
   describe '#cms_reporting_group' do
-    let(:demographics) { FactoryBot.create(:person_demographics_group, demographable: person) }
-    let(:race) { FactoryBot.create(:race, person_demographics_group: demographics, attested_races: attested_races) }
+    let(:demographics) { FactoryBot.create(:demographics_group, demographable: person) }
+    let(:race) { FactoryBot.create(:race, demographics_group: demographics, attested_races: attested_races) }
 
     context 'when attested_races' do
       shared_examples_for 'CMS Reporting Group for attested_races' do |races, reporting_group|

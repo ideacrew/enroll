@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :alive_status, class: 'AliveStatus' do
-    association :person_demographics_group
+    association :demographics_group
 
     is_deceased { false }
     date_of_death { nil }

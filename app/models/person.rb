@@ -173,10 +173,10 @@ class Person
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
-  # @!attribute [rw] person_demographics_group
-  #   @return [PersonDemographicsGroup] The demographics information for the person.
+  # @!attribute [rw] demographics_group
+  #   @return [DemographicsGroup] The demographics information for the person.
   #   This is a polymorphic association that can be associated with any model that can have demographics information.
-  embeds_one :person_demographics_group, as: :demographable, class_name: 'PersonDemographicsGroup'
+  embeds_one :demographics_group, as: :demographable, class_name: 'DemographicsGroup'
 
   attr_accessor :effective_date, :skip_person_updated_event_callback, :is_consumer_role, :is_resident_role
 

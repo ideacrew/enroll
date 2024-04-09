@@ -7,22 +7,22 @@ RSpec.describe Ethnicity, type: :model do
 
   describe 'associations' do
     let(:demographics) do
-      FactoryBot.create(:person_demographics_group, :with_race_and_ethnicity, demographable: person)
+      FactoryBot.create(:demographics_group, :with_race_and_ethnicity, demographable: person)
     end
 
     let(:ethnicity) { demographics.ethnicities.first }
 
     it 'returns correct association' do
-      expect(ethnicity.person_demographics_group).to eq(demographics)
-      expect(ethnicity.person_demographics_group).to be_a(PersonDemographicsGroup)
+      expect(ethnicity.demographics_group).to eq(demographics)
+      expect(ethnicity.demographics_group).to be_a(DemographicsGroup)
     end
   end
 
   describe 'scopes' do
-    let(:demographics) { FactoryBot.create(:person_demographics_group, demographable: person) }
+    let(:demographics) { FactoryBot.create(:demographics_group, demographable: person) }
 
-    let(:ethnicity1) { FactoryBot.create(:ethnicity, person_demographics_group: demographics) }
-    let(:ethnicity2) { FactoryBot.create(:ethnicity, person_demographics_group: demographics, created_at: ethnicity1.created_at.prev_day) }
+    let(:ethnicity1) { FactoryBot.create(:ethnicity, demographics_group: demographics) }
+    let(:ethnicity2) { FactoryBot.create(:ethnicity, demographics_group: demographics, created_at: ethnicity1.created_at.prev_day) }
 
     before { ethnicity2 }
 
@@ -40,8 +40,8 @@ RSpec.describe Ethnicity, type: :model do
   end
 
   describe '#cms_reporting_group' do
-    let(:demographics) { FactoryBot.create(:person_demographics_group, demographable: person) }
-    let(:ethnicity) { FactoryBot.create(:ethnicity, person_demographics_group: demographics, hispanic_or_latino: hispanic_or_latino) }
+    let(:demographics) { FactoryBot.create(:demographics_group, demographable: person) }
+    let(:ethnicity) { FactoryBot.create(:ethnicity, demographics_group: demographics, hispanic_or_latino: hispanic_or_latino) }
 
     context 'when hispanic_or_latino' do
       shared_examples_for 'CMS Reporting Group for hispanic_or_latino' do |input_ethnicity, reporting_group|

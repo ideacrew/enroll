@@ -2,10 +2,10 @@
 
 require 'rails_helper'
 
-RSpec.describe PersonDemographicsGroup, type: :model do
+RSpec.describe DemographicsGroup, type: :model do
   let(:person) { FactoryBot.create(:person) }
   let(:demographics) do
-    FactoryBot.create(:person_demographics_group, :with_race_and_ethnicity, demographable: person)
+    FactoryBot.create(:demographics_group, :with_race_and_ethnicity, demographable: person)
   end
 
   let(:race) { demographics.races.first }

@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :ethnicity, class: 'Ethnicity' do
-    association :person_demographics_group
+    association :demographics_group
 
     hispanic_or_latino { 'yes' }
     attested_ethnicities { ['cuban'] }

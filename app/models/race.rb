@@ -4,20 +4,14 @@
 # It includes fields for attested races and other race (if 'other' is selected).
 # It also includes constants for defined race options, other race options, CMS reporting groups, and their mappings.
 class Race
-  # Race class representing a person's race.
-  # This class includes the Orms::Mongoid::DocumentVersion module.
-  #
-  # @note The Orms::Mongoid::DocumentVersion module provides versioning capabilities to the Race class.
-  include Orms::Mongoid::DocumentVersion
-
   # Localization helper module for handling localized strings.
   extend L10nHelper
 
-  # @!attribute [rw] person_demographics_group
-  #   @return [PersonDemographicsGroup] The demographics group associated with the ethnicity.
-  #   This is an instance of the PersonDemographicsGroup class.
-  #   The PersonDemographicsGroup class that the Ethnicity class is embedded in.
-  embedded_in :person_demographics_group, class_name: 'PersonDemographicsGroup'
+  # @!attribute [rw] demographics_group
+  #   @return [DemographicsGroup] The demographics group associated with the ethnicity.
+  #   This is an instance of the DemographicsGroup class.
+  #   The DemographicsGroup class that the Ethnicity class is embedded in.
+  embedded_in :demographics_group, class_name: 'DemographicsGroup'
 
   # The defined race options.
   # @return [Array<String>] An array of defined race options.

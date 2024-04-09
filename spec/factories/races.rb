@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :race, class: 'Race' do
-    association :person_demographics_group
+    association :demographics_group
 
     attested_races { ['white'] }
     attestation { 'non_attested' }
