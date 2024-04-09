@@ -13,7 +13,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "trunk" ]
+    branches: [ "trunk", "test_codeql" ]
   pull_request:
     branches: [ "trunk" ]
   schedule:
