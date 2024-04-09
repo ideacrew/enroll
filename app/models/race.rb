@@ -14,12 +14,9 @@ class Race
   embedded_in :demographics_group, class_name: 'DemographicsGroup'
 
   # The defined race options.
+  # These are expected to correspond to the keys in DEFINED_RACE_OPTIONS_MAPPING.
   # @return [Array<String>] An array of defined race options.
-  DEFINED_RACE_OPTIONS = %w[
-    white black_or_african_american asian_indian chinese filipino japanese korean
-    vietnamese other_asian samoan native_hawaiian guamanian_or_chamorro
-    other_pacific_islander american_indian_or_alaskan_native other
-  ].freeze
+  DEFINED_RACE_OPTIONS = DEFINED_RACE_OPTIONS_MAPPING.keys.freeze
 
   # The mapping of defined race options to their display names or reporting names.
   # @return [Hash] A hash mapping defined race options to their display names or reporting names.
@@ -60,19 +57,19 @@ class Race
   # @return [Array<String>] An array of CMS reporting group kinds.
   CMS_REPORTING_GROUP_KINDS = %w[
     white black_or_african_american american_indian_or_alaskan_native asian
-    native_hawaiian_or_other_pacific_islander multi_racial
+    native_hawaiian_or_other_pacific_islander multi_racial unknown
   ].freeze
 
   # The mapping of CMS reporting group kinds to their human readable forms.
   # @return [Hash] A hash mapping CMS reporting group kinds to their human readable forms.
   CMS_REPORTING_GROUP_KINDS_MAPPING = {
-    'white' => 'White',
-    'black_or_african_american' => 'Black or African American',
-    'american_indian_or_alaskan_native' => 'American Indian or Alaskan Native',
-    'asian' => 'Asian',
-    'native_hawaiian_or_other_pacific_islander' => 'Native Hawaiian or Other Pacific Islander',
-    'multi_racial' => 'Multi Racial',
-    'unknown' => 'Unknown'
+    'white' => l10n('demographics.race.cms_reporting_group.white'),
+    'black_or_african_american' => l10n('demographics.race.cms_reporting_group.black_or_african_american'),
+    'american_indian_or_alaskan_native' => l10n('demographics.race.cms_reporting_group.american_indian_or_alaskan_native'),
+    'asian' => l10n('demographics.race.cms_reporting_group.asian'),
+    'native_hawaiian_or_other_pacific_islander' => l10n('demographics.race.cms_reporting_group.native_hawaiian_or_other_pacific_islander'),
+    'multi_racial' => l10n('demographics.race.cms_reporting_group.multi_racial'),
+    'unknown' => l10n('demographics.race.cms_reporting_group.unknown')
   }.freeze
 
   # The Races for each CMS reporting groups.

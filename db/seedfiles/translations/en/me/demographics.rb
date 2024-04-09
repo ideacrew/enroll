@@ -17,9 +17,19 @@ DEMOGRAPHICS_TRANSLATIONS = {
   :'en.demographics.race.guamanian_or_chamorro' => 'Guamanian or Chamorro',
   :'en.demographics.race.other_pacific_islander' => 'Other Pacific Islander',
   :'en.demographics.race.american_indian_or_alaskan_native' => 'American Indian or Alaskan Native',
+  :'en.demographics.race.cms_reporting_group.white' => 'White',
+  :'en.demographics.race.cms_reporting_group.black_or_african_american' => 'Black or African American',
+  :'en.demographics.race.cms_reporting_group.american_indian_or_alaskan_native' => 'American Indian or Alaskan Native',
+  :'en.demographics.race.cms_reporting_group.asian' => 'Asian',
+  :'en.demographics.race.cms_reporting_group.native_hawaiian_or_other_pacific_islander' => 'Native Hawaiian or Other Pacific Islander',
+  :'en.demographics.race.cms_reporting_group.multi_racial' => 'Multi Racial',
+  :'en.demographics.race.cms_reporting_group.unknown' => 'Unknown',
 
   # Demographics Ethnicity
   :'en.demographics.ethnicity.cuban' => 'Cuban',
   :'en.demographics.ethnicity.mexican_mexican_american_or_chicano' => 'Mexican, Mexican American or Chicano/a',
   :'en.demographics.ethnicity.puerto_rican' => 'Puerto Rican',
+  :'en.demographics.ethnicity.cms_reporting_group.hispanic_or_latino' => 'Hispanic or Latino',
+  :'en.demographics.ethnicity.cms_reporting_group.not_hispanic_or_latino' => 'Not Hispanic or Latino',
+  :'en.demographics.ethnicity.cms_reporting_group.unknown' => 'Unknown',
 }.freeze

@@ -15,8 +15,9 @@ class Ethnicity
 
   # 'Cuban', 'Mexican, Mexican American or Chicano/a', 'Puerto Rican', 'Other'
   # The ethnicity options.
+  # These are expected to correspond to the keys in ETHNICITY_OPTIONS_MAPPING.
   # @return [Array<String>] An array of ethnicity options.
-  ETHNICITY_OPTIONS = %w[cuban mexican_mexican_american_or_chicano puerto_rican other].freeze
+  ETHNICITY_OPTIONS = ETHNICITY_OPTIONS_MAPPING.keys.freeze
 
   # The mapping of ethnicity options to their human readable forms.
   # @return [Hash] A hash mapping ethnicity options to their human readable forms.
@@ -34,8 +35,9 @@ class Ethnicity
   # The mapping of CMS reporting group kinds to their human readable forms.
   # @return [Hash] A hash mapping CMS reporting group kinds to their human readable forms.
   CMS_REPORTING_GROUP_KINDS_MAPPING = {
-    'hispanic_or_latino' => 'Hispanic or Latino',
-    'not_hispanic_or_latino' => 'Not Hispanic or Latino'
+    'hispanic_or_latino' => l10n('demographics.ethnicity.cms_reporting_group.hispanic_or_latino'),
+    'not_hispanic_or_latino' => l10n('demographics.ethnicity.cms_reporting_group.not_hispanic_or_latino'),
+    'unknown' => l10n('demographics.ethnicity.cms_reporting_group.unknown')
   }.freeze
 
   # The defined hispanic or latino options.
