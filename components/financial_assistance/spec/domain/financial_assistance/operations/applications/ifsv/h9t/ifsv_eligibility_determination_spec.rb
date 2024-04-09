@@ -107,36 +107,34 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             expect(@result).to be_success
           end
 
-          context 'with aptc used' do
-
-            it 'returns negative_response_received' do
-              @applicant.reload
-              income_evidence = @applicant.income_evidence
-              expect(income_evidence.negative_response_received?).to be_truthy
-              expect(income_evidence.verification_outstanding).to be_falsey
-            end
-          end
-
-          context 'without aptc used' do
-
-            it 'returns outstanding' do
-              @applicant.reload
-              income_evidence = @applicant.income_evidence
-              expect(income_evidence.negative_response_received?).to be_truthy
-              expect(income_evidence.verification_outstanding).to be_falsey
-            end
+          it 'should return negative_response_received' do
+            @applicant.reload
+            income_evidence = @applicant.income_evidence
+            expect(income_evidence.negative_response_received?).to be_truthy
+            expect(income_evidence.verification_outstanding).to be_falsey
           end
         end
 
         context 'when enrolled' do
+          let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product, family: family, enrollment_members: family.family_members ) }
+
           it 'should return success' do
             expect(@result).to be_success
           end
 
           context 'with aptc used' do
-            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_aptc_enrollment_members, family: family, enrollment_members: family.family_members) }
+
+            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_aptc_enrollment_members, :with_health_product, family: family, enrollment_members: family.family_members) }
+            before(:each) do
+              subject.call(payload: response_payload)
+              enrollment_member = enrollment.hbx_enrollment_members.first
+              enrollment_member.person.update(hbx_id: '1629165429385938')
+              enrollment.reload
+            end
 
             it 'returns outstanding' do
+              subject.call(payload: response_payload)
+
               @applicant.reload
               income_evidence = @applicant.income_evidence
               expect(income_evidence.outstanding?).to be_truthy
@@ -145,7 +143,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
           end
 
           context 'without aptc used' do
+            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product, family: family, enrollment_members: family.family_members) }
+
             it 'returns negative_response_received' do
+              enrollment.product.update(csr_variant_id: '01')
+              enrollment.reload
+              subject.call(payload: response_payload)
+
               @applicant.reload
               income_evidence = @applicant.income_evidence
               expect(income_evidence.negative_response_received?).to be_truthy
@@ -154,7 +158,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
           end
 
           context 'with csr used' do
-            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,family: family, enrollment_members: family.family_members) }
+            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product, family: family, enrollment_members: family.family_members ) }
 
             let!(:applicant) do
               FactoryBot.create(:financial_assistance_applicant,
@@ -172,6 +176,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             end
 
             it 'returns outstanding' do
+              subject.call(payload: response_payload)
+
               @applicant.reload
               income_evidence = @applicant.income_evidence
               expect(income_evidence.outstanding?).to be_truthy
