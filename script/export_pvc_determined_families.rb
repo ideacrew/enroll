@@ -12,22 +12,11 @@ family_ids = Family.with_active_coverage_and_aptc_csr_grants_for_year(assistance
 
 p "found #{family_ids.count} families"  unless Rails.env.test?
 
-CSV.open("export_pvc_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
-  csv << [
-    'Primary HbxId',
-    "Most recent determined #{assistance_year} application ID",
-    "Most recent determined #{assistance_year} application determination date",
-    "Latest active #{assistance_year} health plan HIOS-ID",
-    "Latest active #{assistance_year} health plan state (autorenewing, coverage_selected etc)",
-    'APTC applied on latest active health plan',
-    'Applicants person hbx_id with out SSN'
-  ]
-
+CSV.open("export_pvc_determined_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
   csv << [
       "Primary Person Hbx ID",
       "Applicant Person Hbx ID",
-      "Determined Application Hbx ID",
-      "Determined At",
+      "Most recent Determined #{assistance_year} Application Hbx ID",
       "Is SSN Present",
       "Non ESI Evidence Title",
       "Workflow Transition From State",
@@ -68,7 +57,6 @@ CSV.open("export_pvc_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.
           primary_person.hbx_id,
           applicant.person_hbx_id,
           determined_application.hbx_id,
-          determined_at&.strftime('%m/%d/%Y'),
           applicant.encrypted_ssn.present?,
           non_esi_evidence.title,
           workflow_transition&.from_state,
