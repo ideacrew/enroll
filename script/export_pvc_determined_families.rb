@@ -45,11 +45,11 @@ CSV.open("export_pvc_determined_families_#{TimeKeeper.date_of_record.strftime('%
     determined_application.active_applicants.each do |applicant|
       non_esi_evidence = applicant.non_esi_evidence
       next if non_esi_evidence.blank?
-      request_result = non_esi_evidence.request_results.max_by(&:created_at)
+      request_result = non_esi_evidence.request_results.max_by(&:date_of_action)
       pvc_determination = request_result&.result || 'no pvc result found'
       workflow_transition = non_esi_evidence.workflow_state_transitions.max_by(&:created_at)
 
-      verification_history = non_esi_evidence.verification_histories.max_by(&:created_at)
+      verification_history = non_esi_evidence.verification_histories.max_by(&:date_of_action)
 
       counter += 1
 
