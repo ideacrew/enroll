@@ -97,7 +97,8 @@ module FinancialAssistance
               return false if enrollments.blank?
 
               enrollment_members = enrollments.flat_map(&:hbx_enrollment_members)
-              enrollment_members.select{|member| member.hbx_id == applicant.person_hbx_id && member.applied_aptc_amount > 0}
+              enrollment_members.select{ |member| member.hbx_id == applicant.person_hbx_id && member.applied_aptc_amount > 0 }
+              enrollment_members.present?
             end
 
             def enrolled?(applicant, enrollments)

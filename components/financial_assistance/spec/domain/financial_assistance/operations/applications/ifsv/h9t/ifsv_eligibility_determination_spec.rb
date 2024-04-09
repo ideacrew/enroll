@@ -107,10 +107,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             expect(@result).to be_success
           end
 
-
-          # 2
           context 'with aptc used' do
-            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_aptc_enrollment_members, family: family, enrollment_members: family.family_members) }
 
             it 'returns negative_response_received' do
               @applicant.reload
@@ -120,27 +117,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             end
           end
 
-          # 3
           context 'without aptc used' do
-            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,family: family, enrollment_members: family.family_members) }
 
             it 'returns outstanding' do
               @applicant.reload
               income_evidence = @applicant.income_evidence
-              expect(income_evidence.outstanding?).to be_truthy
-              expect(income_evidence.verification_outstanding).to be_truthy
+              expect(income_evidence.negative_response_received?).to be_truthy
+              expect(income_evidence.verification_outstanding).to be_falsey
             end
           end
         end
 
         context 'when enrolled' do
-          let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members) }
-
           it 'should return success' do
             expect(@result).to be_success
           end
 
-          # 1
           context 'with aptc used' do
             let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_aptc_enrollment_members, family: family, enrollment_members: family.family_members) }
 
@@ -152,10 +144,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             end
           end
 
-          # 4
           context 'without aptc used' do
-            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,family: family, enrollment_members: family.family_members) }
-
             it 'returns negative_response_received' do
               @applicant.reload
               income_evidence = @applicant.income_evidence
@@ -165,6 +154,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
           end
 
           context 'with csr used' do
+            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,family: family, enrollment_members: family.family_members) }
+
             let!(:applicant) do
               FactoryBot.create(:financial_assistance_applicant,
                                 :with_income_evidence,
