@@ -44,6 +44,8 @@ module FinancialAssistance
 
               response_app_entity.applicants.each do |response_applicant_entity|
                 applicant = find_matching_applicant(application, response_applicant_entity)
+                Rails.logger.error {"IfsvEligibilityDetermination : applicant - #{applicant.inspect}"}
+
                 if applicant.income_evidence.blank?
                   Rails.logger.error("Income Evidence Not Found for applicant with person_hbx_id: #{applicant.person_hbx_id} in application with hbx_id: #{application.hbx_id}")
                   next
@@ -71,6 +73,7 @@ module FinancialAssistance
               when "verified"
                 applicant.set_income_evidence_verified
               when "outstanding"
+                Rails.logger.error {"IfsvEligibilityDetermination : outstanding - #{income_evidence.enrolled_in_any_aptc_csr_enrollments?(enrollments)}"}
                 if income_evidence.enrolled_in_any_aptc_csr_enrollments?(enrollments)
                   applicant.set_evidence_outstanding(income_evidence)
                 else

@@ -11,6 +11,9 @@ module Subscribers
         logger.info "FTIGateway::IfsvDeterminationSubscriber: invoked on_ifsv_eligibility_determined with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
         payload = JSON.parse(response, :symbolize_names => true)
 
+        Rails.logger.error {"IfsvDeterminationSubscriber : payload #{payload}"}
+        Rails.logger.error {"IfsvDeterminationSubscriber : response #{response}"}
+        Rails.logger.error {"IfsvDeterminationSubscriber : delivery_info #{delivery_info}"}
 
         result = FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvEligibilityDetermination.new.call(payload: payload)
 
