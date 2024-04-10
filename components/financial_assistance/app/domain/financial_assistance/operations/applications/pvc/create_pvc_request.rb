@@ -56,7 +56,6 @@ module FinancialAssistance
             end
 
             Success(true)
-
           rescue StandardError => e
             pvc_logger.error("Failed to create non_esi_evidences for application with hbx_id #{application.hbx_id} due to #{e.inspect}")
             Failure("Failed to create non_esi_evidences for application with hbx_id #{application.hbx_id}")
@@ -125,10 +124,6 @@ module FinancialAssistance
 
           def update_evidence_to_default_state(evidence)
             evidence&.determine_mec_evidence_aasm_status
-          end
-
-          def add_verification_history(evidence, action, update_reason, update_by)
-            evidence.add_verification_history(action, update_reason, update_by)
           end
 
           def build_event(cv3_application)

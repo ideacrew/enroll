@@ -139,7 +139,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
     before do
       application.update(aasm_state: :draft)
     end
-    
+
     it 'will return a failure' do
       result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
       applicant.reload
@@ -162,7 +162,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
       allow(::Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules).to receive(:new).and_return(service_object)
       allow(service_object).to receive(:call).and_return(Dry::Monads::Result::Failure.new("transformation failure"))
     end
-    
+
     it 'will return a failure' do
       result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
       applicant.reload
