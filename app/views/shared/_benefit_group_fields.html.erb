@@ -188,7 +188,7 @@
 </fieldset>
 
 <% if i < 50 %>
-	<script>
+	<script nonce="<%= content_security_policy_nonce %>">
 $(document).on('page:update', function() {
 	//validate plan year create for title, referencce plan, and premium Percentage
 	if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {

@@ -92,14 +92,14 @@
                   | Notices
 
 
-javascript:
-  document.addEventListener('DOMContentLoaded', function() {
-    window.localStorage.removeItem("jwt");
-    const agencyStaffLink = document.getElementById('agencyStaffLinkToExternal');
-    agencyStaffLink.addEventListener('click', function(event) {
-      event.preventDefault();
-      const jwtToken = agencyStaffLink.dataset.jwtToken;
-      window.localStorage.setItem("jwt", jwtToken);
-      window.location.href = agencyStaffLink.href;
-    });
-  });
+= javascript_tag nonce: true do
+  | document.addEventListener('DOMContentLoaded', function() {
+  |   window.localStorage.removeItem("jwt");
+  |   const agencyStaffLink = document.getElementById('agencyStaffLinkToExternal');
+  |   agencyStaffLink.addEventListener('click', function(event) {
+  |     event.preventDefault();
+  |     const jwtToken = agencyStaffLink.dataset.jwtToken;
+  |    window.localStorage.setItem("jwt", jwtToken);
+  |    window.location.href = agencyStaffLink.href;
+  |  });
+  | });

@@ -102,7 +102,7 @@
 </div>
 <% end %>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
     $(document).ready(function() {
         Insured.custom_upload_init();
     });

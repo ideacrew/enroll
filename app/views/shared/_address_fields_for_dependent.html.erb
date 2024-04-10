@@ -128,7 +128,7 @@
   <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_dependent_mailing_address')" id="add_dependent_mailing_address" class="form-action btn btn-default">Add Mailing Address</span>
 <% end %>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 $(document).ready(function () {
   $('#state_id').change(function(){
     if (!$("#no_dc_address").is(':checked') && $(this).val() != 'DC') {alert('You have selected a Non DC state, please check No DC Address')}

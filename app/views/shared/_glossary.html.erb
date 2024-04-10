@@ -22,7 +22,7 @@
   </button>
 <%= term_display %></span>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 $(document).click(function(e){
   if (e.target.className == 'glossary') {
     e.preventDefault();

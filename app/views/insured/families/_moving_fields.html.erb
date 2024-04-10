@@ -58,7 +58,7 @@
   </div>
 </div>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="<%= content_security_policy_nonce %>">
   <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
     $('#qle_submit_reason').on('click keydown', function(event) {
       if (event.type === 'click' || (event.type === 'keydown' && event.keyCode === 13)) {

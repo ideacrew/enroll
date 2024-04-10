@@ -19,7 +19,7 @@
 
 
 <% if vlp_doc_subject.present? %>
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="<%= content_security_policy_nonce %>">
     $(document).ready(function(){
       showOnly("<%= vlp_doc_subject %>");
     });

@@ -1,5 +1,5 @@
 <% if load_captcha_widget? %>
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="<%= content_security_policy_nonce %>">
     site_key = '<%= ENV['RECAPTCHA_SITE_KEY'] %>'
     setCaptchaSiteKey(site_key);
   </script>

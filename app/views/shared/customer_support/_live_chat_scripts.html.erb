@@ -3,7 +3,7 @@
   onload="javascript:CXBus.configure({debug:false,pluginsPath:'https://apps.usw2.pure.cloud/widgets/9.0/plugins/'}); CXBus.loadPlugin('widgets-core');"
 ></script>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   window._genesys = {
     widgets: {
       webchat: {

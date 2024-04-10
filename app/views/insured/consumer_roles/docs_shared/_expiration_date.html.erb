@@ -2,7 +2,7 @@
   <%= v.text_field :expiration_date, {id: "doc_date_field", class: "#{!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "required" : "" } date-field doc_fields", placeholder: l10n("insured.consumer_roles.docs_shared.expiration_date", name: name)} %><br>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   $(function() {
     $( "#doc_date_field" ).datepicker({
       dateFormat: 'mm/dd/yy'

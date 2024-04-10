@@ -4,24 +4,25 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
     <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => EnrollRegistry[:enroll_app].settings(:favicon_tab_icon).item %>
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= stylesheet_link_tag "application", :media => "all" %>
     <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
-    <%= javascript_include_tag "application" %>
-    <%= javascript_include_tag "sponsored_benefits/application" %>
-    <%= javascript_pack_tag 'ui_components', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag "application", nonce: true %>
+    <%= javascript_include_tag "sponsored_benefits/application", nonce: true %>
+    <%= javascript_pack_tag 'ui_components', 'data-turbolinks-track': 'reload', nonce: true %>
+    <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload', nonce: true %>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-    <%= csrf_meta_tags %>
 
-    
-    <%= javascript_pack_tag ENV['CLIENT'] %>
+
+    <%= javascript_pack_tag ENV['CLIENT'], nonce: true %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
 
     <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
-      <%= javascript_pack_tag 'contrast_level_aa' %>
+      <%= javascript_pack_tag 'contrast_level_aa', nonce: true %>
       <%= stylesheet_pack_tag 'contrast_level_aa' %>
     <% end %>
 

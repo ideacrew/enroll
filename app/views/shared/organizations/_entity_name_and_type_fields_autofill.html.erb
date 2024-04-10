@@ -25,7 +25,7 @@
   <div id="sicHelperWrapper" class="hidden row row-form-wrapper no-buffer">
     <%= render "sic_help" , sicFieldId: 'organization_sic_code' %>
   </div>
-<script type="text/javascript">
+<script type="text/javascript" nonce="<%= content_security_policy_nonce %>">
   $(".chosen-select").chosen({
     width: "100%"
   });

@@ -29,7 +29,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 $(function(){
   $('.orphans-back-link').click(function(){
     $('#show_orphan_account').hide();

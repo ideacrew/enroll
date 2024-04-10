@@ -44,7 +44,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   window.addEventListener('DOMContentLoaded', (event) => {
     let fdshEnabled = <%= EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>;
     const path = fdshEnabled ? "/insured/fdsh_ridp_verifications/new" : "/insured/interactive_identity_verifications/new"

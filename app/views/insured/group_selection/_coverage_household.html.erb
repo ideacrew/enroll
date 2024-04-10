@@ -95,7 +95,7 @@
 
 <% end %>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   $(document).on('turbolinks:load', function() {
     $(document).on("change", "input[type=checkbox]", function () {
       var isCheckboxChecked = this.checked;

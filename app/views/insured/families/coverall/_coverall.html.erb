@@ -42,7 +42,7 @@
   <%= render partial: "insured/families/verification/documents_verification_list" %>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   $(document).ready(function() {
     Freebies.tooltip();
     Insured.custom_upload_init();

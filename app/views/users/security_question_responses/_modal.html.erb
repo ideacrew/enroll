@@ -2,7 +2,7 @@
 
   <%= render 'users/security_question_responses/edit_modal', { action: 'create', method: 'POST' } %>
 
-  <script>
+  <script nonce="<%= content_security_policy_nonce %>">
     $('#securityQuestionModal').modal({
       backdrop: 'static',
       keyboard: false

@@ -184,7 +184,7 @@
 
 <%= f.hidden_field :is_consumer_role, value: 'true' %>
 
-<script type="text/javascript">
+<script type="text/javascript" nonce="<%= content_security_policy_nonce %>">
   $(document).ready(function () {
     demographicsNew.init();
     $('form.edit_person').submit(function(e){

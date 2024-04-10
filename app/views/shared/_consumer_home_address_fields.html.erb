@@ -168,7 +168,7 @@
 
 
 <% if EnrollRegistry.feature_enabled?(:address_verification) %>
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 
   const baseFormValues = {
     address1: '',

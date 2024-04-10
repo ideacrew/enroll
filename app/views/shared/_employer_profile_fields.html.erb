@@ -28,7 +28,7 @@
   </div>
 <% end %>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   $(function(){
     Freebies.selectric();
     $(".chosen-select").chosen({width: "100%"});

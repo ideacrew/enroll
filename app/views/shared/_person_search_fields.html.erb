@@ -1,6 +1,6 @@
 <%= render "shared/person/personal_information", f: f %>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 	$(document).ready(function(){
 		Freebies.floatlabels();
 	});

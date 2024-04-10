@@ -17,6 +17,52 @@ var filterParams = {
   deductibleToAmountValue: new String
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+  // Select all elements with the class 'plan-type-selection-filter'
+  var planTypeInputs = document.querySelectorAll('.plan-type-selection-filter');
+
+  // Add a click event listener to each checkbox
+  planTypeInputs.forEach(function(planTypeInput) {
+    planTypeInput.addEventListener('click', function() {
+      filterPlanType(this);
+    });
+  });
+
+  // Select all elements with the class 'plan-type-selection-filter'
+  var metalLevelInputs = document.querySelectorAll('.plan-metal-level-selection-filter');
+
+  // Add a click event listener to each checkbox
+  metalLevelInputs.forEach(function(metalLevelInput) {
+    metalLevelInput.addEventListener('click', function() {
+      filterMetalLevel(this);
+    });
+  });
+
+  // Select all elements with the class 'plan-type-selection-filter'
+  var metalNetworkInputs = document.querySelectorAll('.plan-metal-network-selection-filter');
+
+  // Add a click event listener to each checkbox
+  metalNetworkInputs.forEach(function(metalNetworkInput) {
+    metalNetworkInput.addEventListener('click', function() {
+      filterMetalLevel(this);
+    });
+  });
+
+  var carrierSelect = document.querySelector('.plan-carrier-selection-filter');
+  if (carrierSelect) {
+    carrierSelect.addEventListener('change', function() {
+      filterPlanCarriers(this);
+    });
+  }
+
+  var hsaSelectionFilter = document.querySelector('.plan-hsa-eligibility-selection-filter');
+  if (hsaSelectionFilter) {
+    hsaSelectionFilter.addEventListener('change', function() {
+      filterHSAEligibility(this);
+    });
+  }
+});
+
 function filterMetalLevel(element) {
   processValues(element)
 }
@@ -93,7 +139,7 @@ function clearAll() {
   var inputs = document.querySelectorAll("#filter-sidebar .filter-input-block input");
   // Clears slections from view
   // clearSelections()
-  
+
   for(var i = 0; i < inputs.length; i++) {
       inputs[i].checked = false;
       inputs[i].value = "";

@@ -3,7 +3,7 @@
 <% else %>
 	<%= render 'people/landing_pages/personal' %>
 <% end %>
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 	Freebies.floatlabels();
 	$('select').not('.no-selectric').selectric();
 </script>

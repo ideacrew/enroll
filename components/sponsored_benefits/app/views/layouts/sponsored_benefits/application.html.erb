@@ -2,13 +2,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
   <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item} | #{EnrollRegistry[:enroll_app].setting(:short_name).item}" %></title>
   <%= stylesheet_link_tag    "application", media: "all" %>
 	<%= stylesheet_link_tag    "sponsored_benefits/application", media: "all" %>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 	<%= javascript_include_tag "application" %>
 	<%= javascript_include_tag "sponsored_benefits/application" %>
-  <%= csrf_meta_tags %>
 </head>
 <body class="font">
     <%= render './ui-components/v1/navs/header' %>

@@ -103,7 +103,7 @@
           </div>
         </div>
 
-        <script type="text/javascript">
+        <script type="text/javascript" nonce="<%= content_security_policy_nonce %>">
           $(document).on('ready page:load turbolinks:load', function () {
             $(".interaction-choice-control-value-agreement-terminate-confirm-yes").click(function(){
               $(".interaction-click-control-terminate").attr("disabled", false);

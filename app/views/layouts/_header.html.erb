@@ -61,7 +61,7 @@
 </div>
 
 <% if user_signed_in? %>
-  <script>
+  <script nonce="<%= content_security_policy_nonce %>">
     // check time until logout
     function check_time_until_logout(){
       $.ajax({
@@ -77,7 +77,7 @@
     var logout_check_timer = setTimeout(check_time_until_logout, 87000);
   </script>
 <% end %>
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   if (bowser.msie && bowser.version <= 8 || bowser.chrome && bowser.version <= 28 || bowser.firefox && bowser.version <= 22) {
     $('body').before('<div id="modal-wrapper"></div>')
     $('#modal-wrapper').html('<%= escape_javascript(render(:partial => "shared/update_browser_warning")) %>');

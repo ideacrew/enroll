@@ -1,6 +1,6 @@
 <%= render "shared/person/resident_information", f: f %>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 	$(document).on('ready page:load', function () {
 		Freebies.allFreebies();
 	});

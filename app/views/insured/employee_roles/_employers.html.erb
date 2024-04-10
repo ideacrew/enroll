@@ -28,7 +28,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   $(".change_personal_info").click(function(){
     $('.search-btn-row').removeClass('hidden');
     $('#employer-info').html("");
