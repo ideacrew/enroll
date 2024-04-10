@@ -63,12 +63,12 @@ module FinancialAssistance
           end
 
           def transform_and_validate_application(application)
-            payload_entity = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
+            payload_entity = ::Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
             record_application_failure(application, payload_entity.failure.messages) if payload_entity.failure?
 
             if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors) && payload_entity.success?
               all_applicants_valid = validate_applicants(payload_entity, application)
-              return all_applicants_valid.any?(&:last) ? payload_entity : Failure("Failed to transform application with hbx_id #{application.hbx_id} due to all applicants being invalid")
+              return all_applicants_valid.all?(true) ? payload_entity : Failure("Failed to transform application with hbx_id #{application.hbx_id} due to all applicants being invalid")
             end
 
             payload_entity
@@ -79,40 +79,40 @@ module FinancialAssistance
           end
 
           def validate_applicants(payload_entity, application)
-            eligible_applicants = application.active_applicants.select(&:non_esi_evidence)
             applicants_entity = payload_entity.value!.applicants
+            results_array = []
 
-            eligible_applicants.map do |eligible_applicant|
+            application.active_applicants.map do |eligible_applicant|
               applicant_entity = applicants_entity.detect { |appl_entity| eligible_applicant.person_hbx_id == appl_entity.person_hbx_id }
-              result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
+              result = ::Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
 
               if result.success?
-                [applicant_entity.person_hbx_id, true]
+                results_array << true
               else
-                record_applicant_failure(eligible_applicant.non_esi_evidence, result)
-                [applicant_entity.person_hbx_id, false]
+                record_applicant_failure(eligible_applicant.non_esi_evidence, result.failure)
+                results_array << false
               end
             end
+
+            results_array
           end
 
-          def record_applicant_failure(evidence, result)
-            add_verification_history(evidence, 'PVC_Submission_Failed', "PVC - Periodic verifications submission failed due to #{result.failure}", 'system')
+          def record_applicant_failure(evidence, error_messages)
+            add_verification_history(evidence, 'PVC_Submission_Failed', "PVC - Periodic verifications submission failed due to #{error_messages}", 'system')
             update_evidence_to_default_state(evidence)
           end
 
           def record_application_failure(application, error_messages)
-            create_evidence_history(application, 'PVC_Submission_Failed', "PVC - Periodic verifications submission failed due to #{error_messages}", 'system')
-            update_evidence_state_for_all_applicants(application)
+            application.active_applicants.each do |applicant|
+              evidence = applicant.non_esi_evidence
+              next unless evidence.present?
+
+              record_applicant_failure(evidence, error_messages)
+            end
           end
 
           def add_verification_history(evidence, action, update_reason, update_by)
             evidence.add_verification_history(action, update_reason, update_by) if evidence.present?
-          end
-
-          def update_evidence_state_for_all_applicants(application)
-            application.active_applicants.each do |applicant|
-              update_evidence_to_default_state(applicant.non_esi_evidence)
-            end
           end
 
           def create_evidence_history(application, action, update_reason, update_by)
