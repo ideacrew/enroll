@@ -463,6 +463,7 @@ module FinancialAssistance
             phash = {
               first_name: person_hash['person_name']['first_name'],
               last_name: person_hash['person_name']['last_name'],
+              middle_name: person_hash['person_name']['middle_name'],
               full_name: person_hash['person_name']['full_name'],
               ssn: person_hash['person_demographics']['ssn'],
               no_ssn: transform_no_ssn(person_hash['person_demographics']['ssn']), # update in aca entities contracts to receive as string

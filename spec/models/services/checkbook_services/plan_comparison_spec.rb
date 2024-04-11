@@ -116,37 +116,73 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     let!(:ivl_tax_household){ FactoryBot.create(:tax_household, household: ivl_household, effective_ending_on: nil) }
     let!(:ivl_ed)           { FactoryBot.create(:eligibility_determination, tax_household: ivl_tax_household) }
     let!(:thh_start_on)     { ivl_tax_household.effective_starting_on }
-    let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, effective_on: thh_start_on, family: ivl_family, kind: 'individual', household: ivl_family.active_household , consumer_role_id: ivl_person.consumer_role.id.to_s) }
+    let!(:ivl_enrollment)   { FactoryBot.create(:hbx_enrollment, effective_on: thh_start_on, family: ivl_family, kind: 'individual', household: ivl_family.active_household, consumer_role_id: ivl_person.consumer_role.id.to_s) }
     let!(:ivl_enr_member)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm_id, hbx_enrollment: ivl_enrollment, eligibility_date: thh_start_on) }
     let!(:ivl_thhm)         { ivl_tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: primary_fm_id, is_ia_eligible: true) }
 
     subject { ::Services::CheckbookServices::PlanComparision.new(ivl_enrollment,false) }
 
-    context 'when all members are aptc eligible' do
-      let(:tax_household_group) do
-        ivl_family.tax_household_groups.create!(
-          assistance_year: TimeKeeper.date_of_record.year,
-          source: 'Admin',
-          start_on: TimeKeeper.date_of_record.beginning_of_year,
-          tax_households: [ivl_tax_household]
-        )
-      end
-
+    context 'when MTTH feature is enabled and members with different csrs' do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
-
       end
 
-      ::EligibilityDetermination::CSR_KINDS.each do |csr_kind|
-        it "should return a value mapped to #{csr_kind} as all members are aptc eligible" do
-          ivl_thhm.first.update_attributes!(csr_eligibility_kind: csr_kind)
-          ivl_family.tax_household_groups << tax_household_group
-          ivl_family.save
-          ivl_family.reload
-          csr = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
-          expect(subject.csr_value).to eq ("-" + csr)
+      let(:family_member1) { ivl_family.family_members[0] }
+      let(:family_member2) { ivl_family.family_members[1] }
+      let(:family_member3) { ivl_family.family_members[2] }
+
+      let!(:ivl_enr_member2)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member2.id, hbx_enrollment: ivl_enrollment, eligibility_date: thh_start_on) }
+      let!(:ivl_enr_member3)   { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member3.id, hbx_enrollment: ivl_enrollment, eligibility_date: thh_start_on) }
+
+      let!(:eligibility_determination) do
+        determination = ivl_family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+        members_csr_set.each do |family_member, csr_value|
+          subject = determination.subjects.create(
+            gid: "gid://enroll/FamilyMember/#{family_member.id}",
+            is_primary: family_member.is_primary_applicant,
+            person_id: family_member.person.id
+          )
+
+          state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
+          state.grants.create(
+            key: "CsrAdjustmentGrant",
+            value: csr_value,
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            end_on: TimeKeeper.date_of_record.end_of_year,
+            assistance_year: TimeKeeper.date_of_record.year,
+            member_ids: ivl_family.family_members.map(&:id)
+          )
+        end
+
+        determination
+      end
+
+      context 'when all members are aptc eligible and have same csr' do
+        let(:members_csr_set) { {family_member1 => '87', family_member2 => '87', family_member3 => '87'} }
+
+        it "should return a value mapped to  all members are aptc eligible" do
+          csr = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_87"]
+          expect(subject.csr_value).to eq("-#{csr}")
+        end
+      end
+
+      context "when all members are aptc eligible and have different csr ['73', '87', '94']" do
+        let(:members_csr_set) { {family_member1 => '73', family_member2 => '87', family_member3 => '94'} }
+
+        it "should return lowest of ['73', '87', '94']" do
+          csr = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_73"]
+          expect(subject.csr_value).to eq("-#{csr}")
+        end
+      end
+
+      context "when all members are aptc eligible and have different csr ['73', 'limited', '94']" do
+        let(:members_csr_set) { {family_member1 => '73', family_member2 => 'limited', family_member3 => '94'} }
+
+        it "should return csr_0 if the csr set is ['73', 'limited', '94']" do
+          csr = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_0"]
+          expect(subject.csr_value).to eq("-#{csr}")
         end
       end
     end

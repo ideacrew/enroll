@@ -42,7 +42,7 @@ class TaxHousehold
   embeds_one :aptc_accumulator
   embeds_one :contribution_accumulator
 
-  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
+  scope :tax_household_with_year, ->(year) { where(effective_starting_on: Date.new(year)..Date.new(year).end_of_year) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
   scope :inactive, ->{ where(:effective_ending_on.ne => nil) }
   scope :current_and_prospective_by_year, ->(year) { where(:effective_starting_on.gte => Date.new(year)) }

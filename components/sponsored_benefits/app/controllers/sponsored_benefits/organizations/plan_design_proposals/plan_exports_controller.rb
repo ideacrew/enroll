@@ -72,7 +72,7 @@ module SponsoredBenefits
                 dental_plan_option_kind:  persisted_benefit_group.dental_plan_option_kind
               }
             end
-            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build((benefit_params || dental_benefit_params).as_json)
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build((benefit_params || dental_benefit_params).serializable_hash)
             @benefit_group.assign_attributes({
               relationship_benefits: persisted_benefit_group.relationship_benefits,
               reference_plan_id: persisted_benefit_group.reference_plan_id,
@@ -81,10 +81,10 @@ module SponsoredBenefits
               plan_option_kind: persisted_benefit_group.plan_option_kind
             })
           elsif benefit_group_params.present?
-            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params.as_json)
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(benefit_group_params.serializable_hash)
             @benefit_group.elected_plans = @benefit_group.elected_plans_by_option_kind.to_a
           else
-            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(persisted_benefit_group.as_json)
+            @benefit_group = sponsorship.benefit_applications.first.benefit_groups.build(persisted_benefit_group.serializable_hash)
             @benefit_group.elected_plans = @benefit_group.elected_plans_by_option_kind.to_a
           end
         end

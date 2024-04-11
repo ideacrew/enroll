@@ -3,10 +3,7 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
-RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbclean: :after_each do
-  before do
-    DatabaseCleaner.clean
-  end
+RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbclean: :around_each do
 
   let!(:effective_period_start_on) { TimeKeeper.date_of_record.beginning_of_year }
   let!(:effective_period_end_on)   { TimeKeeper.date_of_record.end_of_year }
@@ -370,14 +367,10 @@ end
 
 def setup_contribution_models(benefit_sponsor_catalog)
   benefit_sponsor_catalog.product_packages.each do |pp|
-    if pp.assigned_contribution_model.nil?
-      pp.assigned_contribution_model = pp.contribution_model
-      pp.save!
-    end
-    if pp.contribution_models.blank?
-      pp.contribution_models = [pp.contribution_model]
-      pp.save!
-    end
+    next if benefit_sponsor_catalog.product_packages.any?{ |p_package| p_package.assigned_contribution_model == pp.contribution_model }
+    pp.assigned_contribution_model = pp.contribution_model if pp.assigned_contribution_model.nil?
+    pp.contribution_models = [pp.contribution_model] if pp.contribution_models.blank?
+    pp.save!
   end
 end
 

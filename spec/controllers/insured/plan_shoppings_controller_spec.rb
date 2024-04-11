@@ -211,6 +211,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                         :with_silver_health_product,
                         :individual_unassisted,
                         effective_on: start_of_year,
+                        aasm_state: "shopping",
                         family: family10,
                         household: family10.active_household,
                         coverage_kind: "health",
@@ -326,6 +327,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                         :individual_unassisted,
                         effective_on: start_of_year.next_month,
                         family: family10,
+                        aasm_state: "shopping",
                         product_id: hbx_enrollment10.product_id,
                         household: family10.active_household,
                         coverage_kind: "health",
@@ -435,6 +437,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let(:product_delegator) { double }
 
     before do
+      hbx_enrollment.update_attributes(aasm_state: "shopping")
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(hbx_enrollment)
       allow(BenefitMarkets::Products::Product).to receive(:find).with("plan_id").and_return(product)
@@ -583,6 +586,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                           product: product,
                           household: family.active_household,
                           coverage_kind: "health",
+                          aasm_state: "shopping",
                           kind: 'individual',
                           hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_1],
                           aasm_state: 'coverage_selected')
@@ -592,6 +596,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                           family: family,
                           product: product,
                           kind: 'individual',
+                          aasm_state: "shopping",
                           household: family.active_household,
                           coverage_kind: "health",
                           hbx_enrollment_members: [hbx_enrollment_member_1],
@@ -711,6 +716,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                         family: family,
                         household: family.latest_household,
                         coverage_kind: 'health',
+                        aasm_state: "shopping",
                         effective_on: effective_on,
                         enrollment_kind: 'open_enrollment',
                         kind: 'individual',
@@ -722,6 +728,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
                                                         family: household.family,
                                                         household: household,
+                                                        aasm_state: 'shopping',
                                                         hbx_enrollment_members: [hbx_enrollment_member],
                                                         coverage_kind: "health",
                                                         external_enrollment: false,
@@ -1410,6 +1417,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     shared_examples_for "logged in user has no authorization roles" do |action|
       before do
         allow(HbxEnrollment).to receive(:find).with("id").and_return(hbx_enrollment)
+        hbx_enrollment.update_attributes(aasm_state: 'shopping') if action == :thankyou
       end
 
       it "redirects to root with flash message" do

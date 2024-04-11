@@ -42,7 +42,11 @@ module FinancialAssistance
           end
 
           def find_families(params)
-            Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
+            if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+              Family.with_active_coverage_and_aptc_csr_grants_for_year(params[:assistance_year], params[:csr_list])
+            else
+              Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
+            end
           end
 
           def fetch_application(family, assistance_year)

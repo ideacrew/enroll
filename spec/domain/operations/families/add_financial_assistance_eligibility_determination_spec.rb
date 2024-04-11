@@ -191,7 +191,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
         expect(override.created_at.present?).to be_truthy
         expect(override.updated_at.present?).to be_truthy
         expect(override.override_rule.present?).to be_truthy
-        expect(override.override_applied.is_a?(Boolean)).to be_truthy
+        expect(override.override_applied.is_a?(Mongoid::Boolean)).to be_truthy
       end
     end
 
