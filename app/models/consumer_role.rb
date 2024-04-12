@@ -776,7 +776,7 @@ class ConsumerRole
   def update_by_person(*args)
     update_attributes(is_applying_coverage: args[0]["is_applying_coverage"])
     args[0].delete("is_applying_coverage")
-    person.update_attributes({"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true}.merge(args[0]))
+    person.update_attributes(args[0])
   end
 
   # collect all verification types user can have based on information he provided
