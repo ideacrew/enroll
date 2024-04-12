@@ -49,7 +49,7 @@
                       <% end %>
                     </td>
                     <td>
-                      <%= link_to(show_commission_statement_profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank", rel: 'noopener noreferrer') do %>
+                      <%= sanitize_html link_to(show_commission_statement_profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank", rel: 'noopener noreferrer') do %>
                         <i class='far fa-file-pdf' aria-hidden='true' data-toggle='tooltip'></i>
                       <% end %>
                     </td>
