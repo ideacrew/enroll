@@ -105,6 +105,31 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(mock_resident_candidate).to receive(:valid?).and_return(false)
     end
 
+    context 'sensitive params are filtered in logs' do
+      let(:validation_result) { true }
+      let(:found_person) { [] }
+
+      let(:person_parameters) do
+        {
+          'dob' => '1990-01-01',
+          'first_name' => 'dummy',
+          'gender' => 'male',
+          'last_name' => 'testing',
+          'middle_name' => 'enroll',
+          'name_sfx' => '',
+          'ssn' => '111111111'
+        }
+      end
+
+      let(:filtered_person_parameters) { person_parameters.merge('ssn' => '[FILTERED]') }
+
+      it 'confirms the ssn param is filtered' do
+        post :match, params: { person: person_parameters }
+        expect(response).to have_http_status(:success)
+        expect(File.read('log/test.log')).to include(filtered_person_parameters.to_s)
+      end
+    end
+
     context "given invalid parameters", dbclean: :after_each do
       let(:validation_result) { false }
       let(:found_person) { [] }
