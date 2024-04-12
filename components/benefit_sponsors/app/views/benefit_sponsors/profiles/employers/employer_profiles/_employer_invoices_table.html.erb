@@ -28,6 +28,7 @@
                     :invoice_id => invoice.id
                   ),
                   :target => "_blank" ,
+                  rel: 'noopener noreferrer',
                   :type => "pdf",
                   :disposition =>  "inline") do %>
               <%= invoice_formated_date(invoice.date) %> <i class='fa fa-cloud-download' aria-hidden='true' title='Download' data-toggle='tooltip'></i>
