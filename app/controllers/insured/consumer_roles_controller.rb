@@ -242,24 +242,9 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        redirect_path = if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
-                          upload_ridp_document_insured_consumer_role_index_path
-                        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
-                          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+        redirect_path = redirect_path_for_update
 
-                          consumer_redirection_path = if EnrollRegistry.feature_enabled?(:financial_assistance)
-                                                        help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: @shop_coverage_result)
-                                                      else
-                                                        insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-                                                      end
-                          redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
-                          URI.parse(redirect_path).to_s
-
-                        else
-                          ridp_agreement_insured_consumer_role_index_path
-                        end
-
-        fire_consumer_roles_update_for_vlp_docs(@consumer_role, @consumer_role.is_applying_coverage) if @consumer_role
+        fire_consumer_roles_update_for_vlp_docs(@consumer_role, @consumer_role.is_applying_coverage)
         redirect_to redirect_path
       end
     else
@@ -353,6 +338,32 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def redirect_path_for_update
+    if staff_and_paper_or_in_person_application?
+      upload_ridp_document_insured_consumer_role_index_path
+    elsif new_paper_or_cruam_or_mobile_application?
+      @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+      admin_bookmark_url_or_help_paying_coverage_path
+    else
+      ridp_agreement_insured_consumer_role_index_path
+    end
+  end
+
+  def staff_and_paper_or_in_person_application?
+    current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
+  end
+
+  def new_paper_or_cruam_or_mobile_application?
+    is_new_paper_application?(current_user, session[:original_application_type]) ||     @person.primary_family.has_curam_or_mobile_application_type?
+  end
+
+  def admin_bookmark_url_or_help_paying_coverage_path
+    return URI.parse(@consumer_role.admin_bookmark_url).to_s if @consumer_role.admin_bookmark_url.present?
+    return help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: @shop_coverage_result) if EnrollRegistry.feature_enabled?(:financial_assistance)
+
+    insured_family_members_path(consumer_role_id: @person.consumer_role.id)
+  end
 
   def validate_person_match
     first_name = params[:person][:first_name]
