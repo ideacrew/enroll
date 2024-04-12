@@ -1784,7 +1784,13 @@ describe Person, :dbclean => :after_each do
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
       let(:params) do
         {"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true,
-         "addresses_attributes" => {"0" => {"kind" => "home", "address_1" => "123", "address_2" => "", "city" => "was", "state" => "ME", "zip" => "04001", "county" => "York", "id" => person.home_address.id.to_s, "_destroy" => "false"}}, "phones_attributes" => {"0" => {"kind" => "home", "full_phone_number" => "", "_destroy" => "false"}, "1" => {"kind" => "mobile", "full_phone_number" => "", "_destroy" => "false"}}, "emails_attributes" => {"0" => {"kind" => "home", "address" => "", "_destroy" => "false"}, "1" => {"kind" => "work", "address" => "", "_destroy" => "false"}}, "consumer_role_attributes" => {"contact_method" => "Only Paper communication", "language_preference" => "English"}, "first_name" => "ivl576", "last_name" => "576", "middle_name" => "", "name_sfx" => "", "no_ssn" => "0", "gender" => "male", "is_incarcerated" => "false", "is_consumer_role" => "true", "ethnicity" => ["", "", "", "", "", "", ""], "us_citizen" => "true", "naturalized_citizen" => "false", "eligible_immigration_status" => "false", "indian_tribe_member" => "false", "tribal_state" => "", "tribal_name" => "", "tribe_codes" => [""], "is_homeless" => "0", "dob_check" => "false"}
+         "addresses_attributes" => {"0" => {"kind" => "home", "address_1" => "123", "address_2" => "", "city" => "was", "state" => "ME", "zip" => "04001", "county" => "York", "id" => person.home_address.id.to_s, "_destroy" => "false"}},
+         "phones_attributes" => {"0" => {"kind" => "home", "full_phone_number" => "", "_destroy" => "false"}, "1" => {"kind" => "mobile", "full_phone_number" => "", "_destroy" => "false"}},
+         "emails_attributes" => {"0" => {"kind" => "home", "address" => "", "_destroy" => "false"}, "1" => {"kind" => "work", "address" => "", "_destroy" => "false"}},
+         "consumer_role_attributes" => {"contact_method" => "Only Paper communication", "language_preference" => "English"},
+         "first_name" => "ivl576", "last_name" => "576", "middle_name" => "", "name_sfx" => "", "no_ssn" => "0", "gender" => "male", "is_incarcerated" => "false", "is_consumer_role" => "true",
+         "ethnicity" => ["", "", "", "", "", "", ""], "us_citizen" => "true", "naturalized_citizen" => "false", "eligible_immigration_status" => "false", "indian_tribe_member" => "false",
+         "tribal_state" => "", "tribal_name" => "", "tribe_codes" => [""], "is_homeless" => "0", "dob_check" => "false"}
       end
 
       it "should assign skip_lawful_presence_determination_callbacks value" do
