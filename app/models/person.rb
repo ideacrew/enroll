@@ -1196,7 +1196,7 @@ class Person
   end
 
   def skip_lawful_presence_determination_callbacks=(val)
-    @skip_lawful_presence_determination_callbacks = true if (val.to_s == "true")
+    @skip_lawful_presence_determination_callbacks = true if val.to_s == "true"
   end
 
   def naturalized_citizen=(val)

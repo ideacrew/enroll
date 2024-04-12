@@ -355,7 +355,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def new_paper_or_cruam_or_mobile_application?
-    is_new_paper_application?(current_user, session[:original_application_type]) ||     @person.primary_family.has_curam_or_mobile_application_type?
+    is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
   end
 
   def admin_bookmark_url_or_help_paying_coverage_path
