@@ -242,22 +242,25 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
-          redirect_to upload_ridp_document_insured_consumer_role_index_path
-        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
-          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-          # rubocop:disable Metrics/BlockNesting
-          consumer_redirection_path = if EnrollRegistry.feature_enabled?(:financial_assistance)
-                                        help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: @shop_coverage_result)
-                                      else
-                                        insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-                                      end
-          redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
-          redirect_to URI.parse(redirect_path).to_s
-          # rubocop:enable Metrics/BlockNesting
-        else
-          redirect_to ridp_agreement_insured_consumer_role_index_path
-        end
+        redirect_path = if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
+                          upload_ridp_document_insured_consumer_role_index_path
+                        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
+                          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+
+                          consumer_redirection_path = if EnrollRegistry.feature_enabled?(:financial_assistance)
+                                                        help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: @shop_coverage_result)
+                                                      else
+                                                        insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+                                                      end
+                          redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+                          URI.parse(redirect_path).to_s
+
+                        else
+                          ridp_agreement_insured_consumer_role_index_path
+                        end
+
+        fire_consumer_roles_update_for_vlp_docs(@consumer_role, @consumer_role.is_applying_coverage) if @consumer_role
+        redirect_to redirect_path
       end
     else
       if save_and_exit
