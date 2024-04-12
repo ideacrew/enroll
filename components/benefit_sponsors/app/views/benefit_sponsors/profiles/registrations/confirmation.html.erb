@@ -15,7 +15,7 @@
         <p><strong>Secure Carrier Appointments:</strong><br/>
           To become a <%= site_short_name %> Registered Broker, you must obtain appointments with each carrier's licensed
           entities in <%= site_state_long_title %>. for the market in which you intend to sell. This resolution was made by the <%= site_exchange_name %> Authority's Producer Advisory Committee. The
-          <%= sanitize_html link_to "Producer Advisory Committee's resolution", EnrollRegistry[:broker_agency].settings(:producer_advisory_committee).item, target:"_blank", rel:'noopener noreferrer' %> provides additional context on the requirements.
+          <%= h(link_to "Producer Advisory Committee's resolution", EnrollRegistry[:broker_agency].settings(:producer_advisory_committee).item, target:"_blank", rel:'noopener noreferrer') %> provides additional context on the requirements.
         </p>
         <br/>
         <a role="button" data-toggle="collapse" href="#collapseAppointments" aria-expanded="false" aria-controls="collapseAppointments" id="sm-p1" onclick="seeMore(this)"><i class="fa fa-chevron-down" aria-hidden="true"></i>
@@ -83,7 +83,7 @@
           <p>To verify your carrier appointments:</p>
           <ul>
             <li>Go to the National Association of Insurance Commissioners
-              <%= sanitize_html link_to "License Lookup Directory",  EnrollRegistry[:broker_agency].settings(:broker_license_lookup).item, target:"_blank", rel:'noopener noreferrer' %></li>
+              <%= h(link_to ("License Lookup Directory"),  EnrollRegistry[:broker_agency].settings(:broker_license_lookup).item, target:"_blank", rel:'noopener noreferrer') %></li>
             <li>Enter your first and last name</li>
             <li>Select Submit</li>
             <li>Select your name in the search results</li>
@@ -107,7 +107,7 @@
         <p><strong>Complete the <%= site_short_name %> Broker Policy Training Course:</strong><br/>
         <ul>
           <li>Go to the
-            <%= sanitize_html link_to "#{site_short_name} training", EnrollRegistry[:broker_agency].settings(:healthlink_training).item, target:"_blank", rel:'noopener noreferrer' %> administered by NAHU
+            <%= h(link_to ("#{site_short_name} training"), EnrollRegistry[:broker_agency].settings(:healthlink_training).item, target:"_blank", rel:'noopener noreferrer') %> administered by NAHU
           </li>
           <li>Create a login</li>
           <li>Complete the six hour training course, policy and web components</li>
@@ -152,7 +152,7 @@
         </div>
         <div class="col-sm-10">
           <p>Links to appointments and <%= site_short_name %> training can be found in our
-            <%= sanitize_html link_to "Broker Registration Guide", EnrollRegistry[:broker_agency].settings(:broker_registration_guide_pdf_link).item, target:"_blank", rel:'noopener noreferrer' %></p>
+            <%= h(link_to ("Broker Registration Guide"), EnrollRegistry[:broker_agency].settings(:broker_registration_guide_pdf_link).item, target:"_blank", rel:'noopener noreferrer') %></p>
           <%= link_to "Download", EnrollRegistry[:broker_agency].settings(:broker_registration_guide_pdf).item, download: 'Broker Registration Form', class: 'btn btn-primary' %>
         </div>
       </div>

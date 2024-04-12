@@ -88,9 +88,9 @@
                           <div class="v-doc col-md-11">
                             <% if vlp_doc.identifier.present? %>
                               <% key = vlp_doc.identifier.split('#').last %>
-                              <%= sanitize_html link_to("/insured/verification_documents/download/#{key}", :target => '_blank', rel: "noopener noreferrer", title: "Download", data: {"toggle": "tooltip"}) do %>
-                                <%= vlp_doc.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>"
-                              <% end %>
+                              <%= h(content_tag(:a, href: "/insured/verification_documents/download/#{key}", target: "_blank", rel: "noopener noreferrer", title: "Download", data: {toggle: "tooltip"}) do %>
+                                <%= vlp_doc.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
+                              <% end) %>
                             <% end %>
                           </div>
                           <div class="v-doc col-md-1">
