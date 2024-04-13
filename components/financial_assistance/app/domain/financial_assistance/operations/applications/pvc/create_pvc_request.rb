@@ -43,8 +43,8 @@ module FinancialAssistance
             if application.present?
               Success(application)
             else
-              pvc_logger.error("No applicationfound with hbx_id #{params[:application_hbx_id]}")
-              Failure("No applicationfound with hbx_id #{params[:application_hbx_id]}")
+              pvc_logger.error("No application found with hbx_id #{params[:application_hbx_id]}")
+              Failure("No application found with hbx_id #{params[:application_hbx_id]}")
             end
           end
 

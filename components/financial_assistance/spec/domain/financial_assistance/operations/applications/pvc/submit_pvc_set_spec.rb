@@ -15,6 +15,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
                       family_id: family.id,
                       aasm_state: 'determined',
                       hbx_id: "830293",
+                      predecessor_id: BSON::ObjectId.new,
                       assistance_year: TimeKeeper.date_of_record.year,
                       effective_date: TimeKeeper.date_of_record.beginning_of_year,
                       created_at: Date.new(2021, 10, 1))
@@ -57,67 +58,40 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
   end
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, csr_percent_as_integer: 73) }
-
-  let(:premiums_hash) do
-    {
-      [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}},
-      [person2.hbx_id] => {:health_only => {person2.hbx_id => [{:cost => 200.0, :member_identifier => person2.hbx_id, :monthly_premium => 200.0}]}},
-      [person3.hbx_id] => {:health_only => {person3.hbx_id => [{:cost => 200.0, :member_identifier => person3.hbx_id, :monthly_premium => 200.0}]}}
-    }
-  end
-
-  let(:slcsp_info) do
-    {
-      person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}},
-      person2.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person2.hbx_id, :monthly_premium => 200.0}},
-      person3.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person3.hbx_id, :monthly_premium => 200.0}}
-    }
-  end
-
-  let(:lcsp_info) do
-    {
-      person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}},
-      person2.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person2.hbx_id, :monthly_premium => 100.0}},
-      person3.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person3.hbx_id, :monthly_premium => 100.0}}
-    }
-  end
-
-  let(:premiums_double) { double(:success => premiums_hash) }
-  let(:slcsp_double) { double(:success => slcsp_info) }
-  let(:lcsp_double) { double(:success => lcsp_info) }
-
-  let(:fetch_double) { double(:new => double(call: premiums_double))}
-  let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
-  let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
-  let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
-  let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
-  let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-
-  let(:event) { Success(double) }
-  let(:obj)  { FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSet.new }
+  let(:assistance_year) { TimeKeeper.date_of_record.year }
 
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
-    allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-    allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
-    allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-    stub_const('::Operations::Products::Fetch', fetch_double)
-    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
-    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
-    allow(FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSet).to receive(:new).and_return(obj)
-    allow(obj).to receive(:build_event).and_return(event)
-    allow(event.success).to receive(:publish).and_return(true)
-    allow(premiums_double).to receive(:failure?).and_return(false)
-    allow(slcsp_double).to receive(:failure?).and_return(false)
-    allow(lcsp_double).to receive(:failure?).and_return(false)
+
+    allow(Family).to receive(:with_active_coverage_and_aptc_csr_grants_for_year).and_return([family.id])
   end
 
   context 'success' do
     it 'should return success' do
-      result = subject.call(assistance_year: TimeKeeper.date_of_record.year)
+      result = subject.call(assistance_year: assistance_year)
       expect(result).to be_success
+    end
+  end
+
+  context 'failure' do
+    before do
+      application.destroy
+    end
+
+    # NOTE: while checking a logger file usually isn't the best test case,
+    # we still want a test case to cover the sad path that will note a change in behavior vs. the happy path
+    it 'should but success but log error' do
+      result = subject.call(assistance_year: assistance_year)
+      expect(result).to be_success
+
+      date = TimeKeeper.date_of_record.strftime('%Y_%m_%d')
+      filename = "#{Rails.root}/log/pvc_non_esi_logger_#{date}.log"
+      error_log = File.readlines(filename)
+
+      error_message = "No Determined application found for family with primary person hbx_id #{person.hbx_id}"
+      expect(error_log.last).to include(error_message)
     end
   end
 end
