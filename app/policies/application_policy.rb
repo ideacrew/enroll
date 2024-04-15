@@ -118,6 +118,8 @@ class ApplicationPolicy
     return false if broker_staffs.blank?
 
     broker_agency_account = family.active_broker_agency_account
+    puts "family.active_broker_agency_account = #{family.active_broker_agency_account}"
+    puts "family = #{family.inspect}"
     return false if broker_agency_account.blank?
 
     broker_agency = broker_agency_account.broker_agency_profile

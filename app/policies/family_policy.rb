@@ -4,6 +4,7 @@ class FamilyPolicy < ApplicationPolicy
   def initialize(user, record)
     super
     @family = record
+    puts "FamilyPolicy record = #{record.inspect}"
   end
 
   # Returns the primary person of the family record.
@@ -47,6 +48,7 @@ class FamilyPolicy < ApplicationPolicy
   def show?
     return true if individual_market_primary_family_member?
     return true if individual_market_admin?
+    puts "active_associated_individual_market_family_broker_staff? #{active_associated_individual_market_family_broker_staff?}"
     return true if active_associated_individual_market_family_broker_staff?
     return true if active_associated_individual_market_family_broker?
 

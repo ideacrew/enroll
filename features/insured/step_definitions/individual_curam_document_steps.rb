@@ -4,7 +4,7 @@ When(/^the user navigates to the DOCUMENTS tab$/) do
 end
 
 When(/^MEDICAID & TAX CREDITS button is visible to the user$/) do
-  find(IvlDocumentsPage.medicare_and_tax_credit_btn, wait: 10).visible?
+  find(IvlDocumentsPage.medicare_and_tax_credit_btn, wait: 5).visible?
 end
 
 Then(/^there will be text to the left of the MEDICAID & TAX CREDITS button$/) do
@@ -21,7 +21,10 @@ When(/^selects a Person account and navigates to Verification page$/) do
 end
 
 When(/^the broker visits verification page$/) do
+  # sleep 100
   visit verification_insured_families_path
+  # visit verification_insured_families_path(tab: 'verification')
+  # find(".interaction-click-control-documents", wait: 5).click
 end
 
 When(/^the user visits messages page$/) do
