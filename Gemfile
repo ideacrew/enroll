@@ -54,7 +54,7 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 gem 'aasm',                     '~> 4.8'
 gem 'recurring_select'
 
-gem 'aws-sdk',                  '~> 2.2.4'
+gem 'aws-sdk',                  '~> 3.2'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
 gem 'browser',                  '2.7.0'
@@ -180,5 +180,5 @@ end
 group :production do
   gem 'newrelic_rpm', '~> 9.6'
   gem 'unicorn',      '~> 4.8'
-  gem 'puma',         '~> 3.12.4'
+  gem 'puma',         '~> 5.6', '>= 5.6.8'
 end
