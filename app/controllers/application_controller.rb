@@ -34,6 +34,13 @@ class ApplicationController < ActionController::Base
   # for current_user
   before_action :set_current_user
 
+  # Handles ActionController::UnknownFormat exception by calling the +render_unsupported_format+ method.
+  #
+  # @see #render_unsupported_format
+  #
+  # @example
+  #   rescue_from ActionController::UnknownFormat, with: :render_unsupported_format
+  #
   rescue_from ActionController::UnknownFormat, with: :render_unsupported_format
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
@@ -109,6 +116,13 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # Renders an 'Unsupported format' message with a status of :not_acceptable for various formats.
+  # This method is used to handle requests in unsupported formats.
+  #
+  # @example
+  #   render_unsupported_format
+  #
+  # @return [ActionController::Response] A response with a plain text body and a status of :not_acceptable.
   def render_unsupported_format
     respond_to do |format|
       format.html { render plain: 'Unsupported format', status: :not_acceptable }
