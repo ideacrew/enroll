@@ -26,7 +26,8 @@ module Operations
             return Success({}) unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item
             person = find_person(params[:person_hbx_id], nil)
             subject = person.value!&.to_global_id&.uri if person.success?
-            result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: params[:metadata][:headers]["job_id"],
+            job_id = params[:metadata]&.to_h&.dig(:headers, "job_id")
+            result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: job_id,
                                                                                   key: :ssa_verification_response,
                                                                                   payload: params[:response],
                                                                                   correlation_id: params[:person_hbx_id],
