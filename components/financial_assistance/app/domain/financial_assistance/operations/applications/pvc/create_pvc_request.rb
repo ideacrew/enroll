@@ -23,7 +23,6 @@ module FinancialAssistance
             cv3_application = yield transform_and_validate_application(application)
             event = yield build_event(cv3_application)
             publish(event)
-            create_success_history(application)
 
             Success("Successfully published the pvc payload for family with hbx_id #{params[:family_hbx_id]}")
           end
@@ -35,7 +34,7 @@ module FinancialAssistance
             errors << 'application hbx_id is missing' unless params[:application_hbx_id]
             errors << 'family_hbx_id is missing' unless params[:family_hbx_id]
 
-            errors.empty? ? Success(params) : Failure(errors)
+            errors.empty? ? Success(params) : log_error_and_return_failure(errors)
           end
 
           def fetch_application(params)
@@ -54,6 +53,7 @@ module FinancialAssistance
 
               applicant.create_evidence(:non_esi_mec, "Non ESI MEC")
             end
+            create_evidence_history(application, 'PVC_Submitted', 'PVC - Renewal verifications submitted', 'system')
 
             Success(true)
           rescue StandardError => e
@@ -63,11 +63,15 @@ module FinancialAssistance
 
           def transform_and_validate_application(application)
             payload_entity = ::Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
-            record_application_failure(application, payload_entity.failure.messages) if payload_entity.failure?
+
+            if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors) && payload_entity.failure?
+              record_application_failure(application, payload_entity.failure.messages)
+              log_error_and_return_failure(payload_entity.failure.messages)
+            end
 
             if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors) && payload_entity.success?
-              all_applicants_valid = validate_applicants(payload_entity, application)
-              return all_applicants_valid.all?(true) ? payload_entity : Failure("Failed to transform application with hbx_id #{application.hbx_id} due to all applicants being invalid")
+              valid_applicants = validate_applicants(payload_entity, application)
+              return valid_applicants.any?(true) ? payload_entity : log_error_and_return_failure("Failed to transform application with hbx_id #{application.hbx_id} due to all applicants being invalid")
             end
 
             payload_entity
@@ -135,13 +139,13 @@ module FinancialAssistance
             Success("Successfully published the pvc payload")
           end
 
-          def create_success_history(application)
-            create_evidence_history(application, 'PVC_Submitted', 'PVC - Renewal verifications submitted', 'system')
-            application.save
-          end
-
           def pvc_logger
             @pvc_logger ||= Logger.new("#{Rails.root}/log/pvc_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          end
+
+          def log_error_and_return_failure(error)
+            pvc_logger.error(error)
+            Failure(error)
           end
         end
       end
