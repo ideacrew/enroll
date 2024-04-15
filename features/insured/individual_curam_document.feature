@@ -49,6 +49,7 @@ Feature: Customers go to Curam to view notices and verifications
     And broker lands on broker agency home page
     And the broker clicks on Families tab
     And broker clicks on the name of the person in family index
+    And the broker sees the documents tab
     When the broker visits verification page
     Then MEDICAID & TAX CREDITS button is visible to the user
     And there will be text to the left of the MEDICAID & TAX CREDITS button
