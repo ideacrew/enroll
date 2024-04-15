@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe Insured::ConsumerRolesController do
@@ -49,7 +51,7 @@ RSpec.describe Insured::ConsumerRolesController do
       sign_in(user)
       allow(ConsumerRole).to receive(:find).with(consumer_role_id).and_return(consumer_role)
       allow(consumer_role).to receive(:skip_consumer_role_callbacks=).and_return(true)
-      allow(consumer_role).to receive(:update_by_person).with( {"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true}.merge(person_controller_parameters)).and_return(true)
+      allow(consumer_role).to receive(:update_by_person).with({"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true}.merge(person_controller_parameters)).and_return(true)
       allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(false)
       allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(false)
       allow(person).to receive(:mec_check_eligible?).and_return(false)
