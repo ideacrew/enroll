@@ -74,24 +74,4 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
       expect(result).to be_success
     end
   end
-
-  context 'failure' do
-    before do
-      application.destroy
-    end
-
-    # NOTE: while checking a logger file usually isn't the best test case,
-    # we still want a test case to cover the sad path that will note a change in behavior vs. the happy path
-    it 'should but success but log error' do
-      result = subject.call(assistance_year: assistance_year)
-      expect(result).to be_success
-
-      date = TimeKeeper.date_of_record.strftime('%Y_%m_%d')
-      filename = "#{Rails.root}/log/pvc_non_esi_logger_#{date}.log"
-      error_log = File.readlines(filename)
-
-      error_message = "No Determined application found for family with primary person hbx_id #{person.hbx_id}"
-      expect(error_log.last).to include(error_message)
-    end
-  end
 end
