@@ -1,38 +1,59 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
   before_action :set_user, except: [:confirm_lock, :unsupported_browser]
 
   def confirm_lock
     authorize HbxProfile, :confirm_lock?
     @user_id  = params[:user_action_id]
+
+    respond_to do |format|
+      format.js { render 'confirm_lock' }
+    end
   end
 
   def lockable
     authorize HbxProfile, :lockable?
     @user.lock!
     flash[:notice] = "User #{user.email} is successfully #{user.lockable_notice}."
-    render file: 'users/lockable.js.erb'
+
+    respond_to do |format|
+      format.js { render 'lockable' }
+    end
   end
 
   def reset_password
     authorize HbxProfile, :reset_password?
-    render file: 'users/reset_password.js.erb'
+
+    respond_to do |format|
+      format.js { render 'reset_password' }
+    end
   end
 
   def confirm_reset_password
     authorize HbxProfile, :confirm_reset_password?
     @error = nil
     validate_email if params[:user].present?
-    if @error.nil?
-      User.send_reset_password_instructions(email: @user.email)
-      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Reset password instruction sent to user email."
-    else
-      render file: 'users/reset_password.js.erb'
+
+    respond_to do |format|
+      format.js do
+        if @error.nil?
+          User.send_reset_password_instructions(email: @user.email)
+          redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Reset password instruction sent to user email."
+        else
+          render 'reset_password'
+        end
+      end
     end
   end
 
   def change_username_and_email
     authorize HbxProfile, :change_username_and_email?
     @user_id = params[:user_id]
+
+    respond_to do |format|
+      format.js { render 'change_username_and_email' }
+    end
   end
 
   def confirm_change_username_and_email
@@ -61,10 +82,18 @@ class UsersController < ApplicationController
   def login_history
     authorize HbxProfile, :login_history?
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
+
+    respond_to do |format|
+      format.js { render 'login_history' }
+    end
   end
 
   # Auth not required
-  def unsupported_browser; end
+  def unsupported_browser
+    respond_to do |format|
+      format.html { render 'unsupported_browser' }
+    end
+  end
 
   private
 

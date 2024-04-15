@@ -34,6 +34,8 @@ class ApplicationController < ActionController::Base
   # for current_user
   before_action :set_current_user
 
+  rescue_from ActionController::UnknownFormat, with: :render_unsupported_format
+
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   rescue_from ActionController::InvalidCrossOriginRequest do |exception|
@@ -106,6 +108,20 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def render_unsupported_format
+    respond_to do |format|
+      format.html { render plain: 'Unsupported format', status: :not_acceptable }
+      format.json { render json: { error: 'Unsupported format' }, status: :not_acceptable }
+      format.xml  { render xml: '<error>Unsupported format</error>', status: :not_acceptable }
+      format.csv  { render plain: 'Unsupported format', status: :not_acceptable }
+      format.text { render plain: 'Unsupported format', status: :not_acceptable }
+      format.js   { render plain: 'Unsupported format', status: :not_acceptable }
+
+      # Default handler for any other format
+      format.any  { render plain: 'Unsupported format', status: :not_acceptable }
+    end
+  end
 
   def redirect_if_prod
     redirect_to root_path, :flash => { :error => "Unable to run seeds on prod environment." } unless ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?
