@@ -774,7 +774,7 @@ class ConsumerRole
   end
 
   def update_by_person(*args)
-    person.consumer_role.update_attributes(is_applying_coverage: args[0]["is_applying_coverage"])
+    update_attributes(is_applying_coverage: args[0]["is_applying_coverage"])
     args[0].delete("is_applying_coverage")
     person.update_attributes(args[0])
   end

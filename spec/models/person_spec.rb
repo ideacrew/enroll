@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -268,17 +270,7 @@ describe Person, :dbclean => :after_each do
           expect(@person.is_active?).to eq false
         end
 
-=begin
-        context "dob more than 110 years ago" do
-          let(:dob){ 200.years.ago }
 
-          it "should have a validation error" do
-            expect(@person.valid?).to be_falsey
-            expect(@person.errors.full_messages).to include("Dob date cannot be more than 110 years ago")
-          end
-
-        end
-=end
       end
 
       context "with invalid date values" do
@@ -671,19 +663,6 @@ describe Person, :dbclean => :after_each do
       expect(person.addresses.first.city).to eq "Washington"
     end
   end
-
-=begin
-  describe '#find_all_staff_roles_by_employer_profile' do
-    employer_profile = FactoryBot.build(:employer_profile)
-    person = FactoryBot.build(:person)
-    FactoryBot.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
-    it "should have the same search criteria" do
-      allow(Person).to receive(:where).and_return([person])
-      expect(Person.find_all_staff_roles_by_employer_profile(employer_profile)).to eq [person]
-    end
-
-  end
-=end
 
   describe "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
     include_context "BradyBunchAfterAll"
@@ -1797,6 +1776,37 @@ describe Person, :dbclean => :after_each do
     it 'should not trigger unless crm_notifiction_needed' do
       person.set(crm_notifiction_needed: false)
       expect(person.reload.send(:trigger_async_publish)).to eq nil
+    end
+  end
+
+  describe 'assign_citizen_status' do
+    context '#skip_lawful_presence_determination_callbacks' do
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:params) do
+        {"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true,
+         "addresses_attributes" => {"0" => {"kind" => "home", "address_1" => "123", "address_2" => "", "city" => "was", "state" => "ME", "zip" => "04001", "county" => "York", "id" => person.home_address.id.to_s, "_destroy" => "false"}},
+         "phones_attributes" => {"0" => {"kind" => "home", "full_phone_number" => "", "_destroy" => "false"}, "1" => {"kind" => "mobile", "full_phone_number" => "", "_destroy" => "false"}},
+         "emails_attributes" => {"0" => {"kind" => "home", "address" => "", "_destroy" => "false"}, "1" => {"kind" => "work", "address" => "", "_destroy" => "false"}},
+         "consumer_role_attributes" => {"contact_method" => "Only Paper communication", "language_preference" => "English"},
+         "first_name" => "ivl576", "last_name" => "576", "middle_name" => "", "name_sfx" => "", "no_ssn" => "0", "gender" => "male", "is_incarcerated" => "false", "is_consumer_role" => "true",
+         "ethnicity" => ["", "", "", "", "", "", ""], "us_citizen" => "true", "naturalized_citizen" => "false", "eligible_immigration_status" => "false", "indian_tribe_member" => "false",
+         "tribal_state" => "", "tribal_name" => "", "tribe_codes" => [""], "is_homeless" => "0", "dob_check" => "false"}
+      end
+
+      it "should assign skip_lawful_presence_determination_callbacks value" do
+        person.update_attributes(params)
+        expect(person.consumer_role.lawful_presence_determination.skip_lawful_presence_determination_callbacks).to eq true
+      end
+
+      it "should not assign skip_lawful_presence_determination_callbacks value" do
+        person.update_attributes(params.except("skip_lawful_presence_determination_callbacks"))
+        expect(person.consumer_role.lawful_presence_determination.skip_lawful_presence_determination_callbacks).to eq nil
+      end
+
+      it "should not assign skip_lawful_presence_determination_callbacks value for false" do
+        person.update_attributes(params.merge("skip_lawful_presence_determination_callbacks" => false))
+        expect(person.consumer_role.lawful_presence_determination.skip_lawful_presence_determination_callbacks).to eq nil
+      end
     end
   end
 end
