@@ -66,7 +66,7 @@ module FinancialAssistance
 
             if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors) && payload_entity.failure?
               record_application_failure(application, payload_entity.failure.messages)
-              log_error_and_return_failure(payload_entity.failure.messages)
+              return log_error_and_return_failure(payload_entity.failure.messages)
             end
 
             if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors) && payload_entity.success?

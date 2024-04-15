@@ -137,6 +137,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
 
   context 'when an application fails to be transformed into an entity' do
     before do
+      # validate_and_record_publish_application_errors needs to be true in order to check applicants' evidences at an individual level
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+
       application.update(aasm_state: :draft)
     end
 
@@ -146,6 +150,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
       evidence = applicant.non_esi_evidence
 
       expect(result).to be_failure
+      expect(evidence.verification_histories.last.update_reason).to eq("PVC - Periodic verifications submission failed due to transformation failure")
       expect(evidence.aasm_state).to eq('attested')
     end
   end
