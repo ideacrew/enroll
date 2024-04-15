@@ -104,9 +104,12 @@ Given(/^an individual market broker exists$/) do
   broker :with_family, :broker_with_person, organization: @broker_agency_profile.organization
 end
 
-And(/^a consumer role family exists with broker$/) do
+And(/^a consumer role family exists$/) do
   @person = FactoryBot.create(:person, :with_family, :with_consumer_role)
   @person.consumer_role.move_identity_documents_to_verified
+end
+
+And(/^a consumer role family exists with a broker$/) do
   @person.primary_family.broker_agency_accounts.create!(
     start_on: TimeKeeper.date_of_record,
     benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id,
@@ -121,7 +124,7 @@ end
 
 And(/^broker clicks on the name of the person in family index$/) do
   person_name = @person&.first_name || 'John'
-  find('a', :text => person_name, :wait => 10).click
+  find('a', :text => person_name).click
 end
 
 Given(/^there is a Broker Agency exists for (.*?)$/) do |broker_agency_name|

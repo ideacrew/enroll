@@ -42,10 +42,10 @@ Feature: Customers go to Curam to view notices and verifications
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
     Then Hbx Admin logs out
   
-  @flaky
   Scenario: Broker can see the Navigation Button
     Given an individual market broker exists
-    And a consumer role family exists with broker
+    And a consumer role family exists
+    And a consumer role family exists with a broker
     And the broker is signed in
     And broker lands on broker agency home page
     And the broker clicks on Families tab
