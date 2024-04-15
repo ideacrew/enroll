@@ -177,6 +177,54 @@ module Operations
         expect(transaction.json_payload).not_to eq nil
       end
     end
+
+    context "with no metadata payload" do
+      let(:response_payload) do
+        {
+          :SSACompositeIndividualResponses => [
+            {
+              :ResponseMetadata => {
+                :ResponseCode => "HS000000",
+                :ResponseDescriptionText => "ResponseDescriptionText0",
+                :TDSResponseDescriptionText => nil
+              },
+              :PersonSSNIdentification => "100101000",
+              :SSAResponse => nil
+            }
+          ],
+          :ResponseMetadata => {
+            :ResponseCode => "HS000000",
+            :ResponseDescriptionText => "ResponseDescriptionText0",
+            :TDSResponseDescriptionText => nil
+          }
+        }
+      end
+
+      let(:response) do
+        AcaEntities::Fdsh::Ssa::H3::SSACompositeResponse.new(response_payload)
+      end
+
+      before do
+        allow(EnrollRegistry[:ssa_h3].setting(:use_transmittable)).to receive(:item).and_return(true)
+        person.consumer_role.update!(aasm_state: "ssa_pending")
+        person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => 'identifier', :verification_type => 'Immigration type')
+        @result = described_class.new.call({person_hbx_id: person.hbx_id, metadata: {headers: {}}, response: response.to_h})
+      end
+
+      it "should pass" do
+        expect(@result).to be_success
+      end
+
+      it "consumer role should be valid" do
+        expect(person.reload.consumer_role.vlp_authority).to eq 'ssa'
+        expect(person.consumer_role.valid?).to be_truthy
+      end
+
+      it 'should have transmittable object for response' do
+        job = ::Transmittable::Job.where(key: :ssa_verification_response).first
+        expect(job.process_status.latest_state).to eq :succeeded
+      end
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength
