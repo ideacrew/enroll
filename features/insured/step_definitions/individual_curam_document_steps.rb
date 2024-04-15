@@ -24,7 +24,6 @@ And(/^the broker sees the documents tab$/) do
   find('.interaction-click-control-documents').visible?
 end
 
-
 When(/^the broker visits verification page$/) do
   visit verification_insured_families_path
 end
