@@ -1195,6 +1195,10 @@ class Person
     @naturalized_citizen = false if val.to_s == "false"
   end
 
+  def skip_lawful_presence_determination_callbacks=(val)
+    @skip_lawful_presence_determination_callbacks = true if val.to_s == "true"
+  end
+
   def naturalized_citizen=(val)
     @naturalized_citizen = (val.to_s == "true")
   end
@@ -1276,7 +1280,9 @@ class Person
     elsif
       self.errors.add(:base, "Citizenship status can't be nil.")
     end
-    self.consumer_role.lawful_presence_determination.assign_citizen_status(new_status) if new_status
+    lawful_presence_determination = self.consumer_role.lawful_presence_determination
+    lawful_presence_determination.skip_lawful_presence_determination_callbacks = @skip_lawful_presence_determination_callbacks if @skip_lawful_presence_determination_callbacks == true
+    lawful_presence_determination.assign_citizen_status(new_status) if new_status
   end
 
   def agent?
