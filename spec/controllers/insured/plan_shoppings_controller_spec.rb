@@ -1114,6 +1114,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     context "normal" do
       before :each do
+        hbx_enrollment.update_attributes(aasm_state: "shopping")
         allow(cost_calculator).to receive(:groups_for_products).with(products).and_return(product_groups)
         allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
@@ -1135,6 +1136,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     context "when sponsored_benefit package products are available" do
       before do
+        hbx_enrollment.update_attributes(aasm_state: 'shopping')
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
         sponsored_benefit_product_packages_product = hbx_enrollment.sponsored_benefit.products(hbx_enrollment.sponsored_benefit.rate_schedule_date).first
         sponsored_benefit_product_packages_product.update_attributes(hsa_eligibility: false)
@@ -1186,6 +1188,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         let(:user)  { FactoryBot.create(:user, person: person) }
 
         before do
+          hbx_enrollment.update_attributes(aasm_state: 'shopping')
           allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
           allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
           allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
@@ -1220,6 +1223,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
         context "without tax_household" do
           before :each do
+            hbx_enrollment.update_attributes(aasm_state: 'shopping')
             allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
             allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
             allow(person).to receive(:active_employee_roles).and_return []
@@ -1238,6 +1242,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
         context "without tax_household when has aptc session" do
           before :each do
+            hbx_enrollment.update_attributes(aasm_state: 'shopping')
             allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
             allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
             allow(person).to receive(:active_employee_roles).and_return []
@@ -1258,6 +1263,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
         context "with tax_household and plan shopping in shop market" do
           before :each do
+            hbx_enrollment.update_attributes(aasm_state: 'shopping')
             allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
             allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
             allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
@@ -1290,6 +1296,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family1, household: family1.active_household, consumer_role_id: person1.consumer_role.id, kind: 'individual', product_id: product.id)}
 
       before :each do
+        hbx_enrollment.update_attributes(aasm_state: 'shopping')
         allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
         allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
         ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
@@ -1366,6 +1373,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it 'should update the member coverage start on' do
+      hbx_enrollment.update_attributes(aasm_state: 'shopping')
       person.consumer_role.move_identity_documents_to_verified
       sign_in(user)
       allow_any_instance_of(HbxEnrollment).to receive(:decorated_elected_plans).and_return([])
@@ -1417,7 +1425,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     shared_examples_for "logged in user has no authorization roles" do |action|
       before do
         allow(HbxEnrollment).to receive(:find).with("id").and_return(hbx_enrollment)
-        hbx_enrollment.update_attributes(aasm_state: 'shopping') if action == :thankyou
+        hbx_enrollment.update_attributes(aasm_state: 'shopping') if [:thankyou, :show].include?(action)
       end
 
       it "redirects to root with flash message" do
