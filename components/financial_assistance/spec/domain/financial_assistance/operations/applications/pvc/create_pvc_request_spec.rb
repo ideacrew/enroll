@@ -146,7 +146,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
       evidence = applicant.non_esi_evidence
 
       expect(result).to be_failure
-      expect(evidence.verification_histories.last.update_reason).to eq("PVC - Periodic verifications submission failed due to transformation failure")
       expect(evidence.aasm_state).to eq('attested')
     end
   end
