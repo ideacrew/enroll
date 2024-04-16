@@ -137,6 +137,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
 
   context 'when an application fails to be transformed into an entity' do
     before do
+      # validate_and_record_publish_application_errors needs to be true in order to check applicants' evidences at an individual level
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+
       application.update(aasm_state: :draft)
     end
 
