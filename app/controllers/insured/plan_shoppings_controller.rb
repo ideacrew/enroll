@@ -14,8 +14,8 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
   before_action :validate_rating_address, only: [:show]
-  before_action :check_enrollment_state, only: [:thankyou]
-  before_action :set_cache_headers, only: [:thankyou]
+  before_action :check_enrollment_state, only: [:show, :thankyou]
+  before_action :set_cache_headers, only: [:show, :thankyou]
 
   def checkout
     (redirect_back(fallback_location: root_path) and return) unless agreed_to_thankyou_ivl_page_terms
@@ -328,7 +328,7 @@ class Insured::PlanShoppingsController < ApplicationController
     return if @hbx_enrollment.shopping?
 
     flash[:notice] = l10n("insured.active_enrollment_warning")
-    redirect_to family_account_path
+    redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
   end
 
   def show_ivl(hbx_enrollment_id)
