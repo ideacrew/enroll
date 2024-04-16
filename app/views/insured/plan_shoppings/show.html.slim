@@ -96,10 +96,11 @@ javascript:
   // Needs to be defined outside of conditional for marketKind
   // because will try to render on plan_filters.html.slim even on individual market
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
+
   function resetAllFilters() {
-    resetAptc()
-    clearAll()
-    clearSelections()
+    resetAptc();
+    clearAll(); // Defined in plan_filters.js
+    resetPlanTileSelection();
   }
 
   function resetAptc() {
@@ -111,12 +112,12 @@ javascript:
     }
   }
 
-  function clearSelections() {
+  function resetPlanTileSelection() {
     Array.from(selectedPlans).forEach(function (plan) {
       if (plan) {
-        plan.remove()
+        plan.remove();
       }
-    })
+    });
     if ($('#plans').length > 0) {
       $('#plans').each( function () {
         $(this).removeClass('hidden');
