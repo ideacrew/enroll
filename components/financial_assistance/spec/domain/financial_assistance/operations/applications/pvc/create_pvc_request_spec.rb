@@ -164,14 +164,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
 
       allow(::Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules).to receive(:new).and_return(service_object)
-      allow(service_object).to receive(:call).and_return(Dry::Monads::Result::Failure.new("transformation failure"))
+      allow(service_object).to receive(:call).and_return(Dry::Monads::Result::Failure.new("invalid ssn"))
     end
 
     it 'will return a failure' do
       result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
       applicant.reload
       evidence = applicant.non_esi_evidence
-      error_message = "PVC - Periodic verifications submission failed due to Failed to transform application with hbx_id #{application.hbx_id} due to all applicants being invalid"
+      error_message = "PVC - Periodic verifications submission failed due to invalid ssn"
 
       expect(result).to be_failure
       expect(evidence.verification_histories.last.update_reason).to eq(error_message)
