@@ -199,5 +199,63 @@ FactoryBot.define do
       can_edit_osse_eligibility {true}
       can_edit_broker_agency_profile {true}
     end
+
+    trait :full_access_super_admin do
+      name { 'super_admin' }
+      modify_family { true }
+      modify_employer { true }
+      revert_application { true }
+      list_enrollments { true }
+      send_broker_agency_message { true }
+      approve_broker { true }
+      approve_ga { true }
+      modify_admin_tabs { true }
+      view_admin_tabs { true }
+      can_update_ssn { true }
+      can_complete_resident_application { true }
+      can_add_sep { true }
+      can_add_pdc { true }
+      can_lock_unlock { true }
+      can_view_username_and_email { true }
+      can_transition_family_members { true }
+      can_access_user_account_tab { true }
+      view_login_history { true }
+      can_change_username_and_email { true }
+      can_reset_password { true }
+      can_extend_open_enrollment { true }
+      can_modify_plan_year { true }
+      can_create_benefit_application { true }
+      can_change_fein { true }
+      can_force_publish { true }
+      view_the_configuration_tab { true }
+      can_submit_time_travel_request { true }
+      can_view_application_types { true }
+      view_personal_info_page { true }
+      can_access_new_consumer_application_sub_tab { true }
+      can_access_outstanding_verification_sub_tab { true }
+      can_access_identity_verification_sub_tab { true }
+      can_access_accept_reject_identity_documents { true }
+      can_access_accept_reject_paper_application_documents { true }
+      can_delete_identity_application_documents { true }
+      can_access_pay_now { true }
+      view_agency_staff { true }
+      manage_agency_staff { true }
+      can_access_age_off_excluded { true }
+      can_send_secure_message { true }
+      can_manage_qles { true }
+      can_edit_aptc { true }
+      can_view_sep_history { true }
+      can_reinstate_enrollment { true }
+      can_cancel_enrollment { true }
+      can_terminate_enrollment { true }
+      change_enrollment_end_date { true }
+      can_drop_enrollment_members { true }
+      can_call_hub { true }
+      can_edit_osse_eligibility { true }
+      can_edit_broker_agency_profile { true }
+      can_view_notice_templates { true }
+      can_edit_notice_templates { true }
+      can_view_audit_log { true }
+    end
   end
 end
