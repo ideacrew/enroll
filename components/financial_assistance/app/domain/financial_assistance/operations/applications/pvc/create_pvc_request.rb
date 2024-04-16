@@ -71,13 +71,13 @@ module FinancialAssistance
 
             if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors) && payload_entity.success?
               valid_applicants = validate_applicants(payload_entity, application)
-              return valid_applicants.any?(true) ? payload_entity : log_error_and_return_failure("Failed to transform application with hbx_id #{application.hbx_id} due to all applicants being invalid")
+              return complete_create_pvc_request(valid_applicants, application, payload_entity)
             end
 
             payload_entity
           rescue StandardError => e
             pvc_logger.error("Failed to transform application with hbx_id #{application.hbx_id} due to #{e.inspect}")
-            record_application_failure(application, "transformation failure") if payload_entity.failure?
+            record_application_failure(application, "transformation failure") if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
             Failure("Failed to transform application with hbx_id #{application.hbx_id}")
           end
 
@@ -100,9 +100,13 @@ module FinancialAssistance
             results_array
           end
 
-          def record_applicant_failure(evidence, error_messages)
-            add_verification_history(evidence, 'PVC_Submission_Failed', "PVC - Periodic verifications submission failed due to #{error_messages}", 'system')
-            update_evidence_to_default_state(evidence)
+          def complete_create_pvc_request(valid_applicants, application, payload_entity)
+            if valid_applicants.any?(true)
+              payload_entity
+            else
+              error_message = "Failed to transform application with hbx_id #{application.hbx_id} due to all applicants being invalid"
+              log_error_and_return_failure(error_message)
+            end
           end
 
           def record_application_failure(application, error_messages)
@@ -112,6 +116,11 @@ module FinancialAssistance
 
               record_applicant_failure(evidence, error_messages)
             end
+          end
+
+          def record_applicant_failure(evidence, error_messages)
+            add_verification_history(evidence, 'PVC_Submission_Failed', "PVC - Periodic verifications submission failed due to #{error_messages}", 'system')
+            update_evidence_to_default_state(evidence)
           end
 
           def add_verification_history(evidence, action, update_reason, update_by)

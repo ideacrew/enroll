@@ -155,7 +155,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
     end
   end
 
-  context 'when an applicant is invalid' do
+  context 'when all applicants are invalid' do
     let(:service_object) { double("CheckApplicantEligibilityRules") }
 
     before do
@@ -171,9 +171,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
       result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
       applicant.reload
       evidence = applicant.non_esi_evidence
+      error_message = "PVC - Periodic verifications submission failed due to Failed to transform application with hbx_id #{application.hbx_id} due to all applicants being invalid"
 
       expect(result).to be_failure
-      expect(evidence.verification_histories.last.update_reason).to eq("PVC - Periodic verifications submission failed due to transformation failure")
+      expect(evidence.verification_histories.last.update_reason).to eq(error_message)
       expect(evidence.aasm_state).to eq('attested')
     end
   end
