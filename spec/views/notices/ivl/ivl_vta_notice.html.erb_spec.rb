@@ -32,7 +32,7 @@ RSpec.describe 'notices/ivl/ivl_vta_notice.html.erb' do
   before :each do
     catastrophic_plan_notice.append_hbe
     catastrophic_plan_notice.build
-    render file: 'notices/ivl/ivl_vta_notice', locals: {notice: notice}
+    render template: 'notices/ivl/ivl_vta_notice', locals: {notice: notice}
   end
 
   context "for template's text" do
