@@ -5,7 +5,7 @@
       <% qhps.each do |qhp|%>
         <th colspan="2">
           <% if qhp.plan.nationwide %>
-            <%= link_to "DOCTOR DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
+            <%= h(link_to "DOCTOR DIRECTORY", qhp.plan.provider_directory_url, target: "_blank", rel: "noopener noreferrer") %>
           <% end %>
         </th>
       <% end %>
@@ -16,7 +16,7 @@
     <th></th>
     <% qhps.each do |qhp|%>
       <th colspan="2">
-        <%= link_to "DOCTOR DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
+        <%= h(link_to "DOCTOR DIRECTORY", qhp.plan.provider_directory_url, target: "_blank", rel: "noopener noreferrer") %>
       </th>
     <% end %>
   </tr>
