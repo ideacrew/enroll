@@ -329,7 +329,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
             end
 
             expect(session[:invalid_match_attempts]).to eq(max_attempts_to_try)
-            expect(assigns(:employee_candidate).errors.first[1]).to include("Maximum number of attempts")
+            expect(assigns(:employee_candidate).errors.first.message).to include("Maximum number of attempts")
             expect(user.reload.locked_at).to_not eq(nil)
           end
 
@@ -340,7 +340,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
             end
 
             expect(session[:invalid_match_attempts]).to eq(2)
-            expect(assigns(:employee_candidate).errors.first[1]).to eq(I18n.t("insured.employee_roles.unsuccessful_match_attempts"))
+            expect(assigns(:employee_candidate).errors.first.message).to eq(I18n.t("insured.employee_roles.unsuccessful_match_attempts"))
             expect(response).to render_template("no_match")
             expect(user.reload.locked_at).to eq(nil)
           end
