@@ -105,6 +105,7 @@ PATH
     benefit_markets (0.0.1)
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
+      bson (~> 4.3)
       config (~> 2.0)
       dry-monads
       dry-struct
