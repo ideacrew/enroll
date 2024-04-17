@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', '~> 6.1.7.6'
 
   s.add_dependency 'mongoid', '~> 7.5.4'
+  s.add_dependency 'bson', '~> 4.3'
 
   s.add_dependency "aasm",                      "~> 4.8"
   s.add_dependency 'active_model_serializers',  '~> 0.10'
