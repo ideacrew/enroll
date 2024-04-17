@@ -89,6 +89,7 @@ PATH
     benefit_markets (0.0.1)
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
+      bson (~> 4.3)
       config (~> 2.0)
       dry-monads
       dry-struct
@@ -143,7 +144,7 @@ PATH
       kaminari (~> 0.17.0)
       mongoid (~> 7.5.4)
       pundit (~> 2.0)
-      rails (= 6.1.7.6)
+      rails (~> 6.1.7.6)
       roo (~> 2.7.0)
       sass (~> 3.7.3)
       slim (~> 3.0.8)
@@ -264,7 +265,7 @@ GEM
     bootsnap (1.18.3)
       msgpack (~> 1.2)
     browser (2.7.0)
-    bson (5.0.0)
+    bson (4.15.0)
     builder (3.2.4)
     bunny (2.22.0)
       amq-protocol (~> 2.3, >= 2.3.1)
