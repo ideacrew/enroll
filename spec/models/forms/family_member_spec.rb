@@ -235,10 +235,10 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
           it "call new when current address blank" do
             allow(person).to receive(:home_address).and_return nil
 
-            _addresses = double(new: {})
-            allow(person).to receive(:addresses).and_return _addresses
+            addresses1 = double(new: {})
+            allow(person).to receive(:addresses).and_return addresses1
 
-            expect(_addresses).to receive(:create).and_return true
+            expect(addresses1).to receive(:create).and_return true
             employee_dependent.assign_person_address(person)
           end
         end
@@ -636,7 +636,7 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
       end
 
       it "should create a coverage household member record for the existing inactive family member" do
-        chm = new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }
+        chm = new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |coverage_member| coverage_member.family_member_id == new_family_member.id }
         expect(chm.size).to eq 1
       end
 
