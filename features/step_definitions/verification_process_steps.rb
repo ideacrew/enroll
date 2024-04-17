@@ -24,7 +24,10 @@ Given(/^I should see page for documents verification$/) do
   expect(page).to have_content('Social Security Number')
   find('.btn', text: 'Documents We Accept').click
   expect(page).to have_content('DC Residency')
-  find_link('https://dmv.dc.gov/page/proof-dc-residency-certifications').visible?
+  link = find_link('https://dmv.dc.gov/page/proof-dc-residency-certifications')
+  link.visible?
+  expect(link[:target]).to eq('_blank')
+  expect(link[:rel]).to eq('noopener noreferrer')
   new_window = window_opened_by { click_link 'https://dmv.dc.gov/page/proof-dc-residency-certifications' }
   switch_to_window new_window
 end

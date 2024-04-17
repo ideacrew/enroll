@@ -53,7 +53,7 @@
     <br/>
     <ul style="list-style-type:circle">
       <li>By calling <%= contact_center_phone_number %>. TTY: <%=contact_center_tty_number%></li>
-      <li>By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}", target: "_blank"%></li>
+      <li>By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}", target: "_blank", rel: 'noopener noreferrer' %></li>
     </ul>
     <br/>
     You can also find more information on our website at <%= site_website_address %>
