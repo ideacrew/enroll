@@ -12,8 +12,6 @@ module Operations
       class Cv3Person
         include Rails.application.routes.url_helpers
         include Dry::Monads[:result, :do]
-        include Acapi::Notifiers
-        require 'securerandom'
 
         def call(person)
           request_payload = yield construct_payload(person)
