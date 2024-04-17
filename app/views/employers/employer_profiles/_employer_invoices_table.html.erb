@@ -17,9 +17,9 @@
       <tr>
         <% @invoices.each do |invoice|%>
         <td>
-          <%= link_to(download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline") do %>
+          <%= h(link_to(download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank",  rel: "noopener noreferrer", :type => "pdf", :disposition =>  "inline") do %>
             <%= invoice_formated_date(invoice.date) %> <i class='fa fa-cloud-download' aria-hidden='true' title='Download' data-toggle='tooltip'></i>
-          <% end %>
+          <% end) %>
         </td>
         <td><%=invoice_coverage_date(invoice.date)%></td>
       <tr/>

@@ -56,17 +56,17 @@
           br
         - if individual_market_is_enabled?
           .icon-left-download
-            = link_to "https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf", target: '_blank' do
+            = link_to "https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf", target: '_blank', rel: 'noopener noreferrer' do
               i.fa.fa-download
               |  Download Step-by-Step Instructions for New Employers
         - else
           .icon-left-download
-            = link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank' do
+            = link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank', rel: 'noopener noreferrer' do
               i.fa.fa-download
               |  Download Step-by-Step Instructions for New Employers
       - if individual_market_is_enabled?
         .col-xs-2.pdf-image.full-width
-          = link_to 'https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf', target: '_blank' do
+          = link_to 'https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf', target: '_blank', rel: 'noopener noreferrer' do
           = image_tag('images/guidanceforsmallbusinessowners_214.jpg', class: 'pull-right')
 
 javascript:

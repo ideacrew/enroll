@@ -87,10 +87,10 @@
               = render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan }
             .col-xs-4
               - if @plan.kind == :health && @plan.rx_formulary_url.present?
-                = link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank"
+                = link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank", rel: 'noopener noreferrer'
             .col-xs-4
               - if offers_nationwide_plans? && show_provider_directory_url?(@plan) && @plan.provider_directory_url.present?
-                = link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank"
+                = link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank", rel: 'noopener noreferrer'
   - if display_enr_summary_is_enabled(@hbx_enrollment)
     .row.plan
       .col-xs-12

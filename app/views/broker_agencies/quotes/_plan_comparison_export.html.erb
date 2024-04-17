@@ -39,7 +39,7 @@
             <% qhps.each do |qhp|%>
               <th colspan="2">
                 <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
-                  <%= link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank" %>
+                  <%= h(link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank", rel: 'noopener noreferrer') %>
                 <% end %>
               </th>
             <% end %>

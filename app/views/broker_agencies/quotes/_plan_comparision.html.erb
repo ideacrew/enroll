@@ -50,7 +50,7 @@
             <% qhps.each do |qhp|%>
               <th colspan="2">
                 <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
-                  <%= link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank" %>
+                  <%= h(link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank", rel: 'noopener noreferrer') %>
                 <% end %>
               </th>
             <% end %>
@@ -77,6 +77,6 @@
     </table>
   </div>
   <br>
-    <%= link_to "#{l10n('broker_agencies.quotes.export_to_pdf')}", download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id), class: "btn btn-info", target: "_blank" %>
+    <%= h(link_to "#{l10n('broker_agencies.quotes.export_to_pdf')}", download_pdf_broker_agencies_broker_role_quotes_path(@broker,:plans => params[:plans], quote_id: @quote.id), class: "btn btn-info", target: "_blank", rel: 'noopener noreferrer') %>
   <br><br>
 </div>
