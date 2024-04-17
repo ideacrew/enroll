@@ -171,13 +171,16 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     original_applying_for_coverage = consumer_role.present? ? consumer_role.is_applying_coverage : nil
-    if @address_errors.blank? && @dependent.update_attributes(dependent_person_params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    valid_params = {"skip_consumer_role_callbacks" => true, "skip_person_updated_event_callback" => true}.merge(dependent_person_params[:dependent])
+
+    if @address_errors.blank? && @dependent.update_attributes(valid_params) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       active_family_members_count = @family.active_family_members.count
       household = @family.active_household
       immediate_household_members_count = household&.immediate_family_coverage_household&.coverage_household_members&.count
       extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
       Rails.logger.info("In FamilyMembersController Update action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+      consumer_role.skip_consumer_role_callbacks = true
       if consumer_role.present? && !params[:dependent][:is_applying_coverage].nil?
         consumer_role.update_attribute(:is_applying_coverage, params[:dependent][:is_applying_coverage])
       end
