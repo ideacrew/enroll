@@ -141,7 +141,7 @@ module BenefitSponsors
           member.validate
           expect(member).to be_invalid
 
-          expect(member.errors[:dob].first).to match(/future date: #{future_dob.to_s} is not valid for date of birth/)
+          expect(member.errors[:dob].first).to match(/future date: #{future_dob} is not valid for date of birth/)
         end
       end
 

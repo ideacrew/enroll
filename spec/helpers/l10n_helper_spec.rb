@@ -18,7 +18,7 @@ RSpec.describe L10nHelper, :type => :helper do
   end
 
   it "should handle non string results gracefully" do
-    allow(helper).to receive(:t).with({:formats => {:default => "%m/%d/%Y"}}, default: "Formatsdefaultmd Y").and_return(
+    allow(I18n).to receive(:t).with({:formats => {:default => "%m/%d/%Y"}}, default: "Formatsdefaultmd Y").and_return(
       {:formats => {:default => "%m/%d/%Y"}}
     )
     expect(helper.l10n({:formats => {:default => "%m/%d/%Y"}})).to eq("{:formats=>{:default=>\"%m/%d/%Y\"}}")
