@@ -51,7 +51,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
                                   is_claimed_as_tax_dependent: false,
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
-                                  is_post_partum_period: false)
+                                  is_post_partum_period: false,
+                                  encrypted_ssn: "wFDFw1whehQ1Udku1/79DA==\n")
     applicant
   end
 
@@ -132,5 +133,49 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
     result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
     expect(result).to be_success
     expect(applicant.reload.non_esi_evidence.present?).to be_falsey
+  end
+
+  context 'when an application fails to be transformed into an entity' do
+    before do
+      # validate_and_record_publish_application_errors needs to be true in order to check applicants' evidences at an individual level
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+
+      application.update(aasm_state: :draft)
+    end
+
+    it 'will return a failure' do
+      result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
+      applicant.reload
+      evidence = applicant.non_esi_evidence
+
+      expect(result).to be_failure
+      expect(evidence.verification_histories.last.update_reason).to eq("PVC - Periodic verifications submission failed due to transformation failure")
+      expect(evidence.aasm_state).to eq('attested')
+    end
+  end
+
+  context 'when all applicants are invalid' do
+    let(:service_object) { double("CheckApplicantEligibilityRules") }
+
+    before do
+      # validate_and_record_publish_application_errors needs to be true in order to check applicants' evidences at an individual level
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+
+      allow(::Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules).to receive(:new).and_return(service_object)
+      allow(service_object).to receive(:call).and_return(Dry::Monads::Result::Failure.new("invalid ssn"))
+    end
+
+    it 'will return a failure' do
+      result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
+      applicant.reload
+      evidence = applicant.non_esi_evidence
+      error_message = "PVC - Periodic verifications submission failed due to invalid ssn"
+
+      expect(result).to be_failure
+      expect(evidence.verification_histories.last.update_reason).to eq(error_message)
+      expect(evidence.aasm_state).to eq('attested')
+    end
   end
 end

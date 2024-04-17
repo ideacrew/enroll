@@ -28,12 +28,15 @@ module FinancialAssistance
             private
 
             def initialize_application_entity(params)
-              ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(params)
+              application_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(params)
+              return log_and_return_failure("Failed to initialize application with hbx_id: #{params[:hbx_id]}") if application_entity.failure?
+
+              application_entity
             end
 
             def find_application(application_entity)
               application = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id).first
-              application.present? ? Success(application) : Failure({:errors => ["Could not find application with given hbx_id: #{application_entity.hbx_id}"]})
+              application.present? ? Success(application) : log_and_return_failure("Could not find application with given hbx_id: #{application_entity.hbx_id}")
             end
 
             def update_applicant(response_app_entity, application, applicant_identifier)
@@ -41,11 +44,13 @@ module FinancialAssistance
               response_applicant = response_app_entity.applicants.detect {|applicant| applicant.person_hbx_id == applicant_identifier}
               applicant = application.applicants.where(person_hbx_id: applicant_identifier).first
 
-              return Failure("applicant not found with #{applicant_identifier} for pvc Medicare") unless applicant
-              return Failure("applicant not found in response with #{applicant_identifier} for pvc Medicare") unless response_applicant
+              return log_and_return_failure("applicant not found with #{applicant_identifier} for pvc Medicare") unless applicant
+              return log_and_return_failure("applicant not found in response with #{applicant_identifier} for pvc Medicare") unless response_applicant
 
               update_applicant_verifications(applicant, response_applicant, enrollments)
               Success('Successfully updated Applicant with evidences and verifications')
+            rescue StandardError => e
+              log_and_return_failure("Failed to update_applicant with hbx_id #{applicant&.person_hbx_id} due to #{e.inspect}")
             end
 
             def update_applicant_verifications(applicant, response_applicant_entity, enrollments)
@@ -90,6 +95,15 @@ module FinancialAssistance
 
               family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
               family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
+            end
+
+            def log_and_return_failure(message)
+              pvc_logger.error(message)
+              Failure(message)
+            end
+
+            def pvc_logger
+              @pvc_logger ||= Logger.new("#{Rails.root}/log/pvc_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
             end
           end
         end

@@ -114,4 +114,81 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::Medicare::A
       end
     end
   end
+
+  context 'failure' do
+    include_context 'FDSH PVC Medicare sample response'
+
+    let(:identifier) { '1629165429385938' }
+
+    context 'the application cannot be found' do
+      before do
+        application.destroy
+      end
+
+      it 'returns an error' do
+        result = subject.call({payload: response_payload, applicant_identifier: identifier})
+
+        expect(result).to be_failure
+        expect(result.failure).to eq("Could not find application with given hbx_id: #{response_payload[:hbx_id]}")
+      end
+    end
+
+    context 'an error occurs when trying to initialize an application entity' do
+      before do
+        response_payload[:hbx_id] = nil
+      end
+
+      it 'returns an error' do
+        result = subject.call({payload: response_payload, applicant_identifier: identifier})
+
+        expect(result).to be_failure
+        expect(result.failure).to eq("Failed to initialize application with hbx_id: ")
+      end
+    end
+
+    context 'the application applicant cannot be found' do
+      before do
+        application.applicants.first.destroy
+      end
+
+      it 'returns an error' do
+        result = subject.call({payload: response_payload, applicant_identifier: identifier})
+
+        expect(result).to be_failure
+        expect(result.failure).to eq("applicant not found with #{identifier} for pvc Medicare")
+      end
+    end
+
+    context 'the applicant in the response payload cannot be found' do
+      before do
+        response_payload[:applicants].first[:person_hbx_id] = '12345'
+      end
+
+      it 'returns an error' do
+        result = subject.call({payload: response_payload, applicant_identifier: identifier})
+
+        expect(result).to be_failure
+        expect(result.failure).to eq("applicant not found in response with #{identifier} for pvc Medicare")
+      end
+    end
+
+    context 'an error occurs when trying to update the applicant' do
+      let(:non_esi_evidence) do
+        instance_double("Eligibilities::Evidence", key: :non_esi_evidence, title: "NON ESI MEC", due_on: "error I am not a date")
+      end
+
+      before do
+        applicant = application.applicants.first
+        allow(applicant).to receive(:non_esi_evidence).and_return(non_esi_evidence)
+        allow(::FinancialAssistance::Application).to receive(:by_hbx_id).and_return([application])
+      end
+
+      it 'returns an error' do
+        result = subject.call({payload: response_payload, applicant_identifier: identifier})
+
+        expect(result).to be_failure
+        expect(result.failure).to include("Failed to update_applicant")
+      end
+    end
+  end
 end
