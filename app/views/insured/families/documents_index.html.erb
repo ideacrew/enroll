@@ -11,7 +11,7 @@
       </h4>
     </div>
     <div class="col-xs-4">
-      <%= link_to l10n("download_tax_documents"), EnrollRegistry[:enroll_app].setting(:prod_tax_info).item, class: "btn btn-primary  pull-right", target: '_blank' if @person.try(:consumer_role).present? %>
+      <%= h(link_to l10n("download_tax_documents"), EnrollRegistry[:enroll_app].setting(:prod_tax_info).item, class: "btn btn-primary  pull-right", target: '_blank', rel: "noopener noreferrer") if @person.try(:consumer_role).present? %>
       <%= link_to l10n("upload_document"), document_upload_insured_families_path, class: "btn btn-primary  pull-right" if @person.try(:consumer_role).present? %>
     </div>
   </div>

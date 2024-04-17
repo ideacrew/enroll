@@ -56,6 +56,7 @@
                 <%= link_to(
                       "/financial_assistance/applications/#{application.id}/applicants/#{applicant.id}/verification_documents/download?key=#{key}&evidence_kind=#{evidence_kind}",
                       :target => '_blank',
+                      rel: 'noopener noreferrer',
                       title: "Download",
                       data: {"toggle": "tooltip"}) do %>
                   <%= document.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>

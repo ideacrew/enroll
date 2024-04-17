@@ -21,7 +21,7 @@
           <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "n-radio zip-check"%>
           <span class="n-radio"></span>
           <span>
-            <%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= link_to("(Use the calculator to see if you qualify)", 'http://www.healthcare.gov/lower-costs', target: :_blank) if individual_market_is_enabled? %>
+            <%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= h(link_to("(Use the calculator to see if you qualify)", 'http://www.healthcare.gov/lower-costs', target: :_blank, rel: "noopener noreferrer")) if individual_market_is_enabled? %>
           </span>
         </label>
       </div>
