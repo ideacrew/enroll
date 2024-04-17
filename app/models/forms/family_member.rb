@@ -331,7 +331,8 @@ module Forms
     end
 
     def try_update_person(person)
-      person.consumer_role.update_attributes(skip_consumer_role_callbacks: @skip_consumer_role_callbacks , :is_applying_coverage => is_applying_coverage) if person.consumer_role
+      person&.consumer_role&.update_attributes(skip_consumer_role_callbacks: @skip_consumer_role_callbacks, :is_applying_coverage => is_applying_coverage)
+
       person.update_attributes(extract_person_params).tap do
         bubble_person_errors(person)
       end
