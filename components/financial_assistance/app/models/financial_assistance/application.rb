@@ -949,7 +949,6 @@ module FinancialAssistance
         false
       end
     rescue StandardError => e
-      binding.pry
       Rails.logger.error("Error while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}")
       false
     end
