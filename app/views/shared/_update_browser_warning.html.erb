@@ -8,27 +8,27 @@
     <div class="col-xs-2">
     </div>
     <div class="col-xs-8 state">
-      <%= link_to "https://www.google.com/chrome/", target: '_blank' do %>
+      <%= h(content_tag(:a, href: "https://www.google.com/chrome/", target: "_blank", rel: "noopener noreferrer") do %>
         <div class="col-xs-4 bg-grey br-default">
-            <div class="browser-icon chrome">
-            </div>
-            Chrome
+          <div class="browser-icon chrome">
+          </div>
+          Chrome
         </div>
-      <% end %>
-      <%= link_to "http://www.apple.com/safari/", target: '_blank' do %>
+      <% end) %>
+      <%= h(content_tag(:a, href: "http://www.apple.com/safari/", target: "_blank", rel: "noopener noreferrer") do %>
         <div class="col-xs-4 bg-grey br-default">
-            <div class="browser-icon safari">
-            </div>
-            Safari
+          <div class="browser-icon safari">
+          </div>
+          Safari
         </div>
-      <% end %>
-      <%= link_to "https://www.mozilla.org/en-US/firefox/new/", target: '_blank' do %>
+      <% end) %>
+      <%= h(content_tag(:a, href: "https://www.mozilla.org/en-US/firefox/new/", target: "_blank", rel: "noopener noreferrer") do %>
         <div class="col-xs-4 bg-grey br-default">
-            <div class="browser-icon firefox">
-            </div>
-            Firefox
+          <div class="browser-icon firefox">
+          </div>
+          Firefox
         </div>
-      <% end %>
+      <% end) %>
     </div>
   </div>
 </div>

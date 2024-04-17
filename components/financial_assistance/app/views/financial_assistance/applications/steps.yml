@@ -141,7 +141,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-botom'
-                    text: "If you are not registered to vote where you live now and would like to apply to register to vote, visit: <a href='https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa' target='_blank'>https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa</a>."
+                    text: "If you are not registered to vote where you live now and would like to apply to register to vote, visit: <a href='https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa' target='_blank' rel='noopener noreferrer'>https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa</a>."
 
 
 - step:

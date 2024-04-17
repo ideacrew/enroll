@@ -26,7 +26,7 @@ nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color"
         li.list-group-item.user-actions.pt-0.pb-0 class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
           = render partial: "shared/my_portal_links"
           .mt-3
-          a.header-text href="https://dchealthlink.com/help" target="_blank" Help |
+          a.header-text href="#{site_help_url}" target="_blank" rel="noopener noreferrer"  Help |
           = link_to "Logout", main_app.destroy_user_session_path, method: "delete", class: "header-text"
         li.list-group-item.user-actions.pt-0.pb-0 class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
           strong class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")

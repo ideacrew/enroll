@@ -110,12 +110,12 @@
           </div>
           <div class="col-xs-4">
             <% if @plan.coverage_kind == "health" && @plan.rx_formulary_url.present? %>
-            <%= link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank" %>
+            <%= h(link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank", rel: "noopener noreferrer") %>
             <% end %>
           </div>
           <div class="col-xs-4">
             <% if offers_nationwide_plans? && show_provider_directory_url?(@plan) && @plan.provider_directory_url.present? %>
-              <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
+              <%= h(link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank", rel: "noopener noreferrer") %>
             <% end %>
           </div>
         </div>

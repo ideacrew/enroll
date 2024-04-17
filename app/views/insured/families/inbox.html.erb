@@ -5,8 +5,8 @@
   <div class="vertically-aligned-row">
     <h1 class="darkblue no-buffer"><%= l10n("messages") %></h1>
     <span class='text-right'>
-      <%= link_to l10n("upload_notices"), upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank' if current_user.has_hbx_staff_role? && EnrollRegistry.feature_enabled?(:show_upload_notices)  %>
-      <%= link_to l10n(".download_tax_documents"), tax_info_url, class: "btn btn-primary", target: '_blank' if show_download_tax_documents_button? %>
+      <%= h(link_to l10n("upload_notices"), upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank', rel: "noopener noreferrer") if current_user.has_hbx_staff_role? && EnrollRegistry.feature_enabled?(:show_upload_notices)  %>
+      <%= h(link_to l10n(".download_tax_documents"), tax_info_url, class: "btn btn-primary", target: '_blank', rel: "noopener noreferrer") if show_download_tax_documents_button? %>
     </span>
   </div>
   <%= render 'inbox', provider: @person %>

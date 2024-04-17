@@ -56,7 +56,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
-            = link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary  mtz", target: '_blank'
+            = link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary  mtz", target: '_blank', rel: 'noopener noreferrer'
 
   #plan_match_doctor_shop.modal.fade role="document" tabindex="-1"
     .modal-dialog
@@ -71,7 +71,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button" Cancel
-            = link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank'
+            = link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank', rel: 'noopener noreferrer'
   #plan_match_shop.modal.fade role="document" tabindex="-1"
     .modal-dialog
       .modal-content

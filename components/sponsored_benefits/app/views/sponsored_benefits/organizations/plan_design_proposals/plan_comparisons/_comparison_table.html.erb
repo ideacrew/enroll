@@ -51,7 +51,7 @@
             <% qhps.each do |qhp|%>
               <th colspan="2">
                 <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
-                  <%= link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank" %>
+                  <%= h(link_to "RX FORMULARY URL", qhp.plan.rx_formulary_url, target: "_blank",  rel: "noopener noreferrer") %>
                 <% end %>
               </th>
             <% end %>
@@ -80,8 +80,8 @@
   <br>
   <% unless single_plan_displayed %>
     <div class="col-md-offset-5">
-      <%= link_to "Export to PDF", sponsored_benefits.export_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans] ) , class: "btn btn-default", target: "_blank" %>
-      <%= link_to "Export to CSV",  sponsored_benefits.csv_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans]), class: 'btn btn-default', target: "_blank" %>
+      <%= h(link_to "Export to PDF", sponsored_benefits.export_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans] ) , class: "btn btn-default", target: "_blank", rel: "noopener noreferrer") %>
+      <%= h(link_to "Export to CSV",  sponsored_benefits.csv_organizations_plan_design_proposal_plan_comparisons_path(plan_design_proposal, plans: params[:plans]), class: 'btn btn-default', target: "_blank", rel: "noopener noreferrer") %>
       <button class="btn btn-default" id="hide-detail-comparisons">Hide Details</button>
     </div>
   <% end %>

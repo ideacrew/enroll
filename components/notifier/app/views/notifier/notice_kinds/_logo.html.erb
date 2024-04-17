@@ -7,9 +7,9 @@
             Washington DC 20005<br>
         </td>
       <td colspan="2" align="right">
-        <%= link_to site_home_url, target: :_blank do %>
-          <%= image_tag "#{Rails.root}/app/assets/images/#{EnrollRegistry[:enroll_app].setting(:mailer_logo_file_name).item}", style: "height: auto; vertical-align: right;", width: "150"  %>
-        <% end %>
+        <%= h(content_tag(:a, href: site_home_url, target: "_blank", rel: "noopener noreferrer") do %>
+          <%= h(content_tag(:img, nil, src: "#{Rails.root}/app/assets/images/#{EnrollRegistry[:enroll_app].setting(:mailer_logo_file_name).item}", style: "height: auto; vertical-align: right;", width: "150")) %>
+        <% end) %>
         </td>
     </tr>
   </tbody>

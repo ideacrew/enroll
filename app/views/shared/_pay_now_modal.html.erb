@@ -37,7 +37,7 @@
       <%= hidden_field_tag 'source', source %>
       <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><%= l10n("go_back")%></button>
-        <form action=<%= url %> method="<%= first_payment || plan_shopping ? 'post' : 'get' %>" target="_blank" id="pay_now_form_<%= hbx_enrollment.hbx_id %>">
+        <form action=<%= url %> method="<%= first_payment || plan_shopping ? 'post' : 'get' %>" target="_blank" rel="noopener noreferrer" id="pay_now_form_<%= hbx_enrollment.hbx_id %>">
           <% if first_payment || plan_shopping %>
             <input type="hidden" name="SAMLResponse" value="response" id="sp-<%= hbx_enrollment.hbx_id %>"/>
             <input type="hidden" name="RelayState" value=<%= pay_now_relay_state(carrier) %>/>
