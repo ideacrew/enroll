@@ -42,15 +42,16 @@
                               :statement_id => statement.id
                             ),
                             :target => "_blank" ,
+                            rel: 'noopener noreferrer',
                             :type => "pdf",
                             :disposition =>  "inline") do %>
                         <i class='fas fa-cloud-download-alt' aria-hidden='false' title='Download' data-toggle='tooltip'></i>
                       <% end %>
                     </td>
                     <td>
-                      <%= link_to(show_commission_statement_profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank") do %>
+                      <%= h(content_tag(:a, href: show_commission_statement_profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile, statement_id: statement.id), target: "_blank", rel: "noopener noreferrer") do %>
                         <i class='far fa-file-pdf' aria-hidden='true' data-toggle='tooltip'></i>
-                      <% end %>
+                      <% end) %>
                     </td>
                   </tr>
                 <% end %>
