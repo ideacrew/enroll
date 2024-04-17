@@ -90,27 +90,25 @@
         </span>
         <% if individual_market_is_enabled? %>
           <div class="icon-left-download">
-            <%= link_to "https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf", target: '_blank' do %>
+            <%= h(content_tag(:a, href: h("https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf"), target: '_blank', rel: 'noopener noreferrer') do %>
               <i class="fa fa-download">
-              </i>
               Download Step-by-Step Instructions for New Employers
-            <% end %>
+            <% end) %>
           </div>
         <%else%>
           <div class="icon-left-download">
-            <%= link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank' do %>
+            <%= h(content_tag(:a, href: h("https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage"), target: '_blank', rel: 'noopener noreferrer') do %>
               <i class="fa fa-download">
-              </i>
               Download Step-by-Step Instructions for New Employers
-            <% end %>
+            <% end) %>
           </div>
         <% end %>
       </div>
       <%if individual_market_is_enabled? %>
         <div class="col-xs-2 pdf-image full-width">
-          <%= link_to 'https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf', target: '_blank' do %>
-          <%= image_tag('images/guidanceforsmallbusinessowners_214.jpg', class: 'pull-right') %>
-          <% end %>
+          <%= h(content_tag(:a, href: 'https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf', target: '_blank', rel: 'noopener noreferrer') do %>
+            <%= h(content_tag(:img, nil, src: 'images/guidanceforsmallbusinessowners_214.jpg', class: 'pull-right')) %>
+          <% end) %>
         </div>
       <%end%>
     </div>

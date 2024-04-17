@@ -5,7 +5,7 @@
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
       <%= l10n("insured.employee_roles.privacy.privacy_info_html", site_short_name: site_short_name) %>
-      <%= link_to l10n(".view_privacy_act_statement"), site_privacy_policy, target: "_blank" %>
+      <%= h(link_to l10n(".view_privacy_act_statement"), site_privacy_policy, target: "_blank", rel: "noopener noreferrer") %>
 
     </div>
   </div>
