@@ -11,22 +11,14 @@ module L10nHelper
   #   Using `I18n.t` instead of `t` can lead to issues related to short naming of the translation key like l10n('.welcome_to_site_sub_header').
   #   Therefore, we are using `t` method with `raise: true` option to avoid the caching issue and returning the titleized translation key if the translation is missing.
   def l10n(translation_key, interpolated_keys = {})
-    log_error_for_non_string_key(translation_key)
-
-    result = fetch_translation(translation_key, interpolated_keys)
+    result = fetch_translation(translation_key.to_s, interpolated_keys)
 
     sanitize_result(result)
-  rescue I18n::MissingTranslationData => e
+  rescue I18n::MissingTranslationData, RuntimeError => e
     handle_missing_translation(translation_key, e)
   end
 
   private
-
-  def log_error_for_non_string_key(translation_key)
-    return if translation_key.is_a?(String)
-
-    Rails.logger.error {"#L10nHelper passed non string key: #{translation_key.inspect}"}
-  end
 
   def fetch_translation(translation_key, interpolated_keys)
     options = interpolated_keys.present? ? interpolated_keys.merge(default: default_translation(translation_key)) : {}
@@ -47,6 +39,6 @@ module L10nHelper
   end
 
   def default_translation(translation_key)
-    translation_key.gsub(/\W+/, '').titleize
+    translation_key.to_s&.gsub(/\W+/, '')&.titleize
   end
 end
