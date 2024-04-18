@@ -269,5 +269,6 @@ COPY --chown=nonroot:nonroot ./.docker/config/devise.rb $HOME/config/initializer
 COPY --chown=nonroot:nonroot ./.docker/config/redis.rb $HOME/config/initializers
 COPY --chown=nonroot:nonroot ./.docker/config/sidekiq.rb $HOME/config/initializers
 
-USER nonroot
+RUN echo '[ ! -z "$TERM" -a -r /etc/scripts/motd/motd ] && cat /etc/scripts/motd/motd' >> /etc/bash.bashrc
 
+USER nonroot
