@@ -261,5 +261,84 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
       end
     end
   end
+
+  describe "#get_broker_profile_path" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:person) { FactoryBot.create(:person, user: user) }
+    let(:broker_role) { FactoryBot.create(:broker_role, person: person) }
+    let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+      allow(person).to receive(:broker_role).and_return(broker_role)
+      allow(person).to receive(:active_broker_staff_roles).and_return([])
+    end
+
+    context "when user has an associated broker role with a valid broker agency profile" do
+      before do
+        broker_role.broker_agency_profile = broker_agency_profile
+        allow(broker_agency_profile).to receive(:is_a?).with(BenefitSponsors::Organizations::BrokerAgencyProfile).and_return(true)
+      end
+
+      it "returns the correct path for the broker agency profile" do
+        expected_path = "/path_to_broker_agency_profile/#{broker_role.benefit_sponsors_broker_agency_profile_id}"
+        allow(helper).to receive(:benefit_sponsors).and_return(double(profiles_broker_agencies_broker_agency_profile_path: expected_path))
+        expect(helper.get_broker_profile_path).to eq(expected_path)
+      end
+    end
+
+    context "when user's broker role does not have an associated broker agency profile" do
+      before do
+        broker_role.broker_agency_profile = nil
+      end
+
+      it "returns nil" do
+        expect(helper.get_broker_profile_path).to be_nil
+      end
+    end
+
+    context "when user does not have a broker role" do
+      before do
+        allow(person).to receive(:broker_role).and_return(nil)
+      end
+
+      it "returns nil" do
+        expect(helper.get_broker_profile_path).to be_nil
+      end
+    end
+
+    context "when user has an active broker agency staff role" do
+      let(:site) do
+        FactoryBot.create(
+          :benefit_sponsors_site,
+          :with_benefit_market,
+          :as_hbx_profile,
+          site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+        )
+      end
+
+      let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
+      let(:broker_agency_id) { broker_agency_profile.id }
+      let(:broker_staff_role) do
+        person.create_broker_agency_staff_role(
+          benefit_sponsors_broker_agency_profile_id: broker_agency_id
+        )
+      end
+
+      before do
+        allow(person).to receive(:broker_role).and_return(nil)
+        allow(person).to receive(:active_broker_staff_roles).and_return([broker_staff_role])
+        broker_staff_role.broker_agency_profile = broker_agency_profile
+        allow(broker_agency_profile).to receive(:is_a?).with(BenefitSponsors::Organizations::BrokerAgencyProfile).and_return(true)
+      end
+
+      it "returns the correct path for the first active broker staff role's broker agency profile" do
+        expected_path = "/path_to_broker_agency_profile/#{broker_staff_role.benefit_sponsors_broker_agency_profile_id}"
+        allow(helper).to receive(:benefit_sponsors).and_return(double(profiles_broker_agencies_broker_agency_profile_path: expected_path))
+        expect(helper.get_broker_profile_path).to eq(expected_path)
+      end
+    end
+  end
 end
 # rubocop:enable Style/StringConcatenation
