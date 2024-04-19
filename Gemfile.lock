@@ -2662,7 +2662,6 @@ DEPENDENCIES
   prawn!
   puma (~> 5.6, >= 5.6.8)
   pundit (~> 2.0)
-  rack (~> 2.2, = 2.2.8.1)
   rack-cors
   railroady (~> 1.5.3)
   rails (~> 6.0.6.1)
