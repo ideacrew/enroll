@@ -80,6 +80,8 @@ WORKDIR $HOME
 ARG SECRET_KEY_BASE_DEFAULT=c8d2b9b204fbac78081a88a2c29b28cfeb82e6ccd3664b3948b813463b5917b315dbbd3040e8dffcb5b68df427099db0ce03e59e2432dfe5d272923b00755b82
 ENV SECRET_KEY_BASE=$SECRET_KEY_BASE_DEFAULT
 
+RUN mkdir /etc/infra
+
 ENV RAILS_ENV=production
 ENV NODE_ENV=production
 
@@ -269,5 +271,6 @@ COPY --chown=nonroot:nonroot ./.docker/config/devise.rb $HOME/config/initializer
 COPY --chown=nonroot:nonroot ./.docker/config/redis.rb $HOME/config/initializers
 COPY --chown=nonroot:nonroot ./.docker/config/sidekiq.rb $HOME/config/initializers
 
-USER nonroot
+RUN echo '[ ! -z "$TERM" -a -r /etc/infra/motd ] && cat /etc/infra/motd' >> /etc/bash.bashrc
 
+USER nonroot
