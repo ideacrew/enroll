@@ -60,10 +60,6 @@
       <% end %>
     </main>
 
-    <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
-      <%= render "shared/customer_support/live_chat_widget" %>
-    <% end %>
-
     <%= render partial: './ui-components/bs4/v1/footers/footer' %>
     <% if EnrollRegistry.feature_enabled?(:jquery_migrate) %>
       <% if EnrollRegistry[:jquery_migrate].setting(:show_warnings).item == true %>
