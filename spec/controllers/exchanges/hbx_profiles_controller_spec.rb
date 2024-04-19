@@ -891,6 +891,16 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
     end
 
+    context 'when resource is not person or profile' do
+      it 'should set resource to nil' do
+        invalid_params = {resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: "kernal" }
+        get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+        expect(assigns(:resource)).to eq nil
+        expect(assigns(:subject)).to eq invalid_params[:subject]
+        expect(assigns(:body)).to eq invalid_params[:body]
+      end
+    end
   end
 
   describe "POST update_dob_ssn", :dbclean => :after_each do
