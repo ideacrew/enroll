@@ -514,8 +514,7 @@ class ApplicationController < ActionController::Base
     browser.ie? && !support_for_ie_browser?
   end
 
-  def parse_date(string)
-    date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
-    Date.strptime(string, date_format)
+  def set_bs4_layout
+    @bs4 = true
   end
 end
