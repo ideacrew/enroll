@@ -3,6 +3,7 @@
                     $active: var(--button-primary-active-color)) {
   background-color: $button-color;
   font-weight: 600;
+  line-height: 20px;
   padding: 8px 12px;
   text-decoration: none;
   cursor: pointer;
