@@ -147,10 +147,11 @@ module PortalHeaderHelper
 
   # rubocop:disable Naming/AccessorMethodName
   def get_broker_profile_path
-    @broker_role ||= current_user.person.broker_role || current_user.person.active_broker_staff_roles.first
+    @broker_role ||= current_user.person.broker_role || current_user.person.active_broker_staff_roles&.first
     broker_agency_profile = @broker_role&.broker_agency_profile
 
-    benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: @broker_role.benefit_sponsors_broker_agency_profile_id) if broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+    return unless broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+    benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: @broker_role.benefit_sponsors_broker_agency_profile_id)
   end
   # rubocop:enable Naming/AccessorMethodName
 
