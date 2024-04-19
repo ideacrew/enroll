@@ -26,7 +26,7 @@ class V2GroupXmlGenerator
   # 3 plan_year[:end_date] e.g. 20160831
   def initialize(feins, plan_year_start, plan_year_end)
     @feins = feins
-    Dir.mkdir("employer_xmls.v2") unless File.exists?("employer_xmls.v2") #Output directory
+    Dir.mkdir("employer_xmls.v2") unless File.exist?("employer_xmls.v2") #Output directory
     @plan_year = {"start_date": plan_year_start, "end_date": plan_year_end}
   end
 

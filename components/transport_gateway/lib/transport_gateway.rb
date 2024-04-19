@@ -17,6 +17,7 @@ module URI
     end
   end
 
+  @@schemes ||= scheme_list
   @@schemes['S3'] = S3
 end
 

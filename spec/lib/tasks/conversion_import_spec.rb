@@ -28,7 +28,7 @@ describe 'import conversion employer/employee details ', :dbclean => :after_each
 
     it 'should generate a csv when feins_list is nil' do
       Rake::Task["conversion_import:employers"].invoke("")
-      expect(File.exists?("#{Rails.root}/public/employers_export_conversion.csv")).to be true
+      expect(File.exist?("#{Rails.root}/public/employers_export_conversion.csv")).to be true
     end
   end
 
@@ -55,7 +55,7 @@ describe 'import conversion employer/employee details ', :dbclean => :after_each
 
     it 'should generate a csv when feins_list is nil' do
       Rake::Task["conversion_import:employees"].invoke("")
-      expect(File.exists?("#{Rails.root}/public/employees_export_conversion.csv")).to be true
+      expect(File.exist?("#{Rails.root}/public/employees_export_conversion.csv")).to be true
     end
   end
 end

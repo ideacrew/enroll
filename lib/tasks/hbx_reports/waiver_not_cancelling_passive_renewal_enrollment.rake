@@ -26,7 +26,7 @@ namespace :reports do
                         Enrollment_Waived_Time_Stamp
                         )
 
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+      Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
       file_name = "#{Rails.root}/hbx_report/waiver_not_cancelling_passive_renewal_enrollment.csv"
 
       CSV.open(file_name, "w") do |csv|

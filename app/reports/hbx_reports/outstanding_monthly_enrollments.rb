@@ -24,7 +24,7 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
   def migrate
     effective_on = Date.strptime(ENV['start_date'],'%m/%d/%Y') 
     file_name = "#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv"
-    Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+    Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
 
     def quiet_period_range(benefit_application,effective_on)
       start_on = benefit_application.open_enrollment_period.max.to_date
@@ -36,7 +36,7 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
       (start_on..end_on)
     end
 
-    glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip) if File.exists?("all_glue_policies.txt")
+    glue_list = File.read("all_glue_policies.txt").split("\n").map(&:strip) if File.exist?("all_glue_policies.txt")
     field_names = [ "Employer ID",
                     "Employer FEIN", 
                     "Employer Name",
@@ -118,7 +118,7 @@ class OutstandingMonthlyEnrollments < MongoidMigrationTask
         pubber.publish URI.join("file://", file_name)
       end
 
-      if File.exists?(file_name)
+      if File.exist?(file_name)
         puts 'Report has been successfully generated in the hbx_report directory!' unless Rails.env.test?
       end 
     end

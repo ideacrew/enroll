@@ -6,7 +6,7 @@ initial_feins = ["451431314", "274551672", "273208144", "200457331", "811095280"
 def write_to_csv(type, feins)
   dir = "ga_files"
 
-  Dir.mkdir(dir) unless File.exists?(dir)
+  Dir.mkdir(dir) unless File.exist?(dir)
 
   csv_hash = {}
 

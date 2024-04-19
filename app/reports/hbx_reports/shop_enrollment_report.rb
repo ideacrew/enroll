@@ -11,7 +11,7 @@ class ShopEnrollmentReport < MongoidMigrationTask
       purchase_date_start = Time.strptime(ENV['purchase_date_start'],'%m/%d/%Y').beginning_of_day
       purchase_date_end = Time.strptime(ENV['purchase_date_end'],'%m/%d/%Y').end_of_day
     end
-    Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+    Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
 
     qs = Queries::PolicyAggregationPipeline.new
     qs.filter_to_shopping_completed

@@ -12,7 +12,7 @@ namespace :reports do
       carriers
     end
 
-    Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+    Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
 
     field_names  = ['Employer Name', 'Employer FEIN', 'Initial/Renewing', 'Enrollment Group ID', 'Carrier', 'Enrollment Status', 'Submitted On']
     CSV.open("#{Rails.root}/hbx_report/shop_monthly_enrollments_#{effective_on.strftime('%m_%d_%Y')}.csv", "w") do |csv|

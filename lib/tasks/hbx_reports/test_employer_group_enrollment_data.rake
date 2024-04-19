@@ -22,7 +22,7 @@ namespace :reports do
       employer_count = 0
       employee_count = 0
       employees_with_no_enrollments_count = 0
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+      Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
       filename = "hbx_report/#{ENV['filename']}_results_#{Time.now.strftime('%Y%m%d%H%M')}.csv"
       CSV.open(filename,"w") do |csv|
         csv << ["Group", "FEIN", "Name","Person HBX ID","Enrollment HBX ID", "Subscriber/Dependent","Enrollment Status","Broker Name","Broker NPN","Broker FEIN"]

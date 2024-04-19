@@ -14,7 +14,7 @@ namespace :report do
                                                 non_native_not_lawfully_present_in_us)+[nil]})
     puts lawful_aliens.size
     field_names = ["Person HBX ID", "First Name", "Last Name", "DOB", "SSN", "Citizen Status", "Document(s)","Last Updated Date"]
-    Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+    Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
     file_name = "#{Rails.root}/hbx_report/lawful_alien_documents_#{Time.now.strftime('%Y%m%d%H%M')}.csv"
     count = 0 
     CSV.open(file_name,"w") do |csv|

@@ -60,7 +60,7 @@ describe OutstandingMonthlyEnrollments, dbclean: :around_each do
     it 'should generate user csv report in hbx_report' do
       ClimateControl.modify start_date:start_date do 
         subject.migrate
-        expect(File.exists?( "#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv")).to be true
+        expect(File.exist?( "#{Rails.root}/hbx_report/#{effective_on.strftime('%Y%m%d')}_employer_enrollments_#{Time.now.strftime('%Y%m%d%H%M')}.csv")).to be true
       end
     end
   end

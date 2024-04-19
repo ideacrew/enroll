@@ -4,7 +4,7 @@ namespace :update_enroll do
     total_count = 0
     census_employees=CensusEmployee.waived.linked.all
 
-    Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+    Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
     file_name = "#{Rails.root}/hbx_report/EE_autorenew_data_clearnup_list.csv"
     field_names  = %w(
           hbx_id

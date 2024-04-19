@@ -48,7 +48,7 @@ module TransportGateway
 
     def ensure_directory_for(path)
       dir = File.dirname(path)
-      return nil if File.exists?(dir)
+      return nil if File.exist?(dir)
       FileUtils.mkdir_p(dir)
     end
 

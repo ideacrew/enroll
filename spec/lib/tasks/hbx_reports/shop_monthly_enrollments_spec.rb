@@ -29,7 +29,7 @@ describe 'Shop monthly enrollments report', :dbclean => :after_each do
 
     it 'should generate user csv report in hbx_report' do
       Rake::Task["reports:shop_monthly_enrollments"].invoke
-      expect(File.exists?("#{Rails.root}/hbx_report/shop_monthly_enrollments_#{effective_on.strftime('%m_%d_%Y')}.csv")).to be true
+      expect(File.exist?("#{Rails.root}/hbx_report/shop_monthly_enrollments_#{effective_on.strftime('%m_%d_%Y')}.csv")).to be true
     end
   end
 end

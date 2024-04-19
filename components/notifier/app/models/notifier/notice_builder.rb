@@ -202,7 +202,7 @@ module Notifier
     end
 
     def join_pdfs(pdfs, path = nil)
-      pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+      pdf = File.exist?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
       pdf << CombinePDF.load(pdfs[1])
       path_to_save = path.nil? ? notice_path : path
       pdf.save path_to_save

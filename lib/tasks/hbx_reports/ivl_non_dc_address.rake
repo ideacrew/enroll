@@ -25,7 +25,7 @@ namespace :reports do
         Employee_role
       )
       processed_count = 0
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+      Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
       file_path = "#{Rails.root}/hbx_report/ivl_non_dc_address.csv"
       CSV.open(file_path, "w", force_quotes: true) do |csv|
         csv << field_names

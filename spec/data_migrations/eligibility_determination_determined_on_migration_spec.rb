@@ -35,7 +35,7 @@ describe EligibilityDeterminationDeterminedOnMigration, dbclean: :after_each do
       subject.migrate
       eligibility_determination.reload
       filename = "#{Rails.root}//eligibility_determination_migration_report.csv"
-      expect(File.exists?(filename)).to eq(true)
+      expect(File.exist?(filename)).to eq(true)
       csv = CSV.read(filename)
       expect(csv[1][0]).to eq(family.person.hbx_id.to_s)
       expect(csv[1][1]).to eq(eligibility_determination._id.to_s)

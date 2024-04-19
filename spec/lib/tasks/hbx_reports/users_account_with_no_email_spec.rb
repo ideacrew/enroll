@@ -26,7 +26,7 @@ describe 'user account with no email address', :dbclean => :after_each do
       end_date = Date.today.strftime('%d/%m/%Y')
       Rake::Task["report:user_account:with_no_email_address"].invoke(start_date,end_date)
       expect(File.directory?("#{Rails.root}/hbx_report")).to be true
-      expect(File.exists?("#{Rails.root}/hbx_report/users_account_with_no_email.csv")).to be true
+      expect(File.exist?("#{Rails.root}/hbx_report/users_account_with_no_email.csv")).to be true
     end
 
     after :all do

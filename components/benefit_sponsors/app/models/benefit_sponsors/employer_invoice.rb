@@ -35,7 +35,7 @@ module BenefitSponsors
     end
 
     def join_pdfs(pdfs)
-      pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+      pdf = File.exist?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
       pdf << CombinePDF.load(pdfs[1])
       pdf.save invoice_absolute_file_path
     end

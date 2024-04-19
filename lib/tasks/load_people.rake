@@ -1,5 +1,5 @@
 def load_irs_families_seed
-    if File.exists?("db/seedfiles/irs_groups.csv")
+    if File.exist?("db/seedfiles/irs_groups.csv")
       member_ids = {}
       family_mappings = {}
       CSV.foreach("db/seedfiles/irs_groups.csv", :headers => true) do |row|
@@ -90,7 +90,7 @@ namespace :seed do
   desc "Load the family data"
   task :families => :environment do
     Family.delete_all
-    if File.exists?("db/seedfiles/heads_of_families.json")
+    if File.exist?("db/seedfiles/heads_of_families.json")
       puts "Loading families"
       file = File.open("db/seedfiles/heads_of_families.json")
       heads_of_family = JSON.load(file.read)

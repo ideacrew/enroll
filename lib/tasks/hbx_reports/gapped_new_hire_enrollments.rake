@@ -56,7 +56,7 @@ namespace :reports do
       false
     end
 
-    Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
+    Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
     @logger = Logger.new("#{Rails.root}/log/gapped_new_hire_enrollments_report.log")
 
     CSV.open("#{Rails.root}/hbx_report/gapped_new_hire_enrollments_#{start_date.strftime('%m_%d_%Y')}_#{end_date.strftime('%m_%d_%Y')}.csv", "w", force_quotes: true) do |csv|
