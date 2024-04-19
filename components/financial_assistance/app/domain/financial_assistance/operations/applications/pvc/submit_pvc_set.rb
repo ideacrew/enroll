@@ -38,7 +38,7 @@ module FinancialAssistance
             errors = []
             errors << 'assistance_year ref missing' unless params[:assistance_year]
             params[:csr_list] = PVC_CSR_LIST if params[:csr_list].blank?
-            errors.empty? ? Success(params) : Failure(errors)
+            errors.empty? ? Success(params) : log_error_and_return_failure(errors)
           end
 
           def find_families(params)
@@ -61,9 +61,7 @@ module FinancialAssistance
 
           def submit(params, family_ids)
             families = Family.where(:_id.in => family_ids)
-
             count = 0
-            pvc_logger = Logger.new("#{Rails.root}/log/pvc_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
             families.no_timeout.each do |family|
               determined_application = fetch_application(family, params[:assistance_year])
@@ -89,6 +87,15 @@ module FinancialAssistance
             event.success.publish
 
             Success("Successfully published the pvc payload")
+          end
+
+          def pvc_logger
+            @pvc_logger ||= Logger.new("#{Rails.root}/log/pvc_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          end
+
+          def log_error_and_return_failure(error)
+            pvc_logger.error(error)
+            Failure(error)
           end
         end
       end

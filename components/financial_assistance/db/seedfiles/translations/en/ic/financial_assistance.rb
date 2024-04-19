@@ -73,7 +73,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.private_health_insurance" => "Private Health Insurance",
   "en.faa.private_health_insurance_text" => "These people qualify to enroll in a private health insurance plan.",
   "en.faa.qualified_to_enroll" => "These people are not eligible for lower monthly premiums. They <span> qualify to enroll </span> in a private health insurance plan.",
-  "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. <a href= %{appeal_link} target='_blank'>Find out more about the appeal process</a> or <a href= %{find_expert_link}  target='_blank'>get help</a> by contacting us directly.",
+  "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. <a href= %{appeal_link} target='_blank' rel='noopener noreferrer'>Find out more about the appeal process</a> or <a href= %{find_expert_link}  target='_blank' rel='noopener noreferrer'>get help</a> by contacting us directly.",
   "en.faa.your_application_reference" => "Your application reference number is ",
   "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
   "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
@@ -167,7 +167,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.see_if_you_qualify_2" => " %{short_name} health insurance or free Medicaid coverage.",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2022-coverage?utm_source=2022EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2022'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' rel='noopener noreferrer' href='https://www.dchealthlink.com/contact-us-for-2022-coverage?utm_source=2022EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2022'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' rel='noopener noreferrer' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",

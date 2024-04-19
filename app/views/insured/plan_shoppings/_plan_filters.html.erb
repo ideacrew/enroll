@@ -78,7 +78,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%= sanitize link_to l10n("proceed") , l10n("checkbook_health_url"), class: "btn btn-primary  mtz", target: '_blank'  %>
+              <%= sanitize link_to l10n("proceed") , l10n("checkbook_health_url"), class: "btn btn-primary  mtz", target: '_blank', rel: 'noopener noreferrer' %>
             </div>
           </center>
          </div>
@@ -121,7 +121,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%= sanitize link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank'%>
+              <%= sanitize link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank', rel: 'noopener noreferrer'%>
             </div>
           </center>
          </div>

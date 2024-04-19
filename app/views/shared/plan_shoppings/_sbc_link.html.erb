@@ -12,7 +12,7 @@
   <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
   <% plan_name = plan.try(:title) || plan.try(:name) %>
   <% id = (defined? hbx_id) ? "plan_doc_#{hbx_id}" : "summary_benefits" %>
-  <a href="<%= main_app.document_product_sbc_download_path(plan.sbc_document.id) + "?product_id=#{plan.id}&content_type=application/pdf&filename=#{plan_name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" %>" class="sbc_link <%= text_class %> vertically-aligned-row" target="_blank" id="<%= id %>">
+  <a href="<%= main_app.document_product_sbc_download_path(plan.sbc_document.id) + "?product_id=#{plan.id}&content_type=application/pdf&filename=#{plan_name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" %>" class="sbc_link <%= text_class %> vertically-aligned-row" target="_blank" rel="noopener noreferrer" id="<%= id %>">
     <% if custom_css.present? %>
       <i class="fa fa-file-pdf-o fa-2x pull-left" ></i>
       <div class="fa-icon-label <%= text_class %> col-xs-11 enrollment-tile-summary" style="display: inline; font-size: 10px;"><%= link_text %></div>
