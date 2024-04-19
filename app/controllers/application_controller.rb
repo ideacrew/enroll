@@ -478,10 +478,6 @@ class ApplicationController < ActionController::Base
       session["stashed_password"]
     end
 
-    def authorize_for
-      authorize(controller_name.classify.constantize, "#{action_name}?".to_sym)
-    end
-
     def set_flash_by_announcement
       return if current_user.blank?
       if flash.blank? || flash[:warning].blank?
