@@ -309,13 +309,13 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
     context "when user has an active broker agency staff role" do
       let(:site) do
-            FactoryBot.create(
-              :benefit_sponsors_site,
-              :with_benefit_market,
-              :as_hbx_profile,
-              site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
-            )
-          end
+        FactoryBot.create(
+          :benefit_sponsors_site,
+          :with_benefit_market,
+          :as_hbx_profile,
+          site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+        )
+      end
 
       let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
       let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
