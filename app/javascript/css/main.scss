@@ -41,14 +41,15 @@ footer {
   color: var(--grey-000);
   background-color: var(--theme-primary-blue, #007bc4);
   width: 100%;
-  a,
-  a:hover {
+
+  a, a:hover {
     color: var(--grey-000);
     text-decoration: none;
   }
 }
 
-footer.page-footer{
+footer.page-footer {
+  font-size: 16px;
   background-color: var(--grey-040);
   color: var(--grey-150);
 
@@ -56,10 +57,25 @@ footer.page-footer{
     :first-child{
       font-weight: bold;
     }
+  }
 
-    a, a:hover {
-      color: var(--grey-150);
-      text-decoration: underline;
+  .get-help-container {
+    gap: 8px;
+
+    @include media-breakpoint-up(sm) {
+      background-color: var(--grey-030);
+      border-radius: 999px;
+    }
+
+    .btn-group{
+      gap: 8px;
+
+      a.button {
+        color: var(--grey-000);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
     }
   }
 }
