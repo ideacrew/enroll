@@ -21,6 +21,7 @@ require "rails/test_unit/railtie"
 # Configure fallbacks for mongoid errors:
 require "i18n/backend/fallbacks"
 require_relative '../app/models/hbx_id_generator'
+require_relative '../app/models/identity_verification/interactive_verification_service'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
