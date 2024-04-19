@@ -53,7 +53,7 @@ ActionController::Base.allow_rescue = false
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
 begin
   load "#{Rails.root}/db/seedfiles/english_translations_seed.rb"
-  DatabaseCleaner.strategy = :deletion, {:except => %w[translations]}
+  DatabaseCleaner.strategy = DatabaseCleaner::Mongoid::Deletion.new(except: %w[translations])
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end
@@ -65,11 +65,11 @@ end
 #     # { :except => [:widgets] } may not do what you expect here
 #     # as Cucumber::Rails::Database.javascript_strategy overrides
 #     # this setting.
-#     DatabaseCleaner.strategy = :truncation
+#     DatabaseCleaner.strategy = DatabaseCleaner::Mongoid::Deletion.new(except: %w[translations])
 #   end
 #
 #   Before('~@no-txn', '~@selenium', '~@culerity', '~@celerity', '~@javascript') do
-#     DatabaseCleaner.strategy = :transaction
+#     DatabaseCleaner.strategy = DatabaseCleaner::Mongoid::Deletion.new(except: %w[translations])
 #   end
 #
 

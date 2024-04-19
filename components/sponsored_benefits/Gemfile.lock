@@ -52,6 +52,7 @@ PATH
     benefit_markets (0.0.1)
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
+      bson (~> 4.3)
       config (~> 2.0)
       dry-monads
       dry-struct
@@ -208,7 +209,7 @@ GEM
     bootsnap (1.18.3)
       msgpack (~> 1.2)
     browser (2.7.0)
-    bson (5.0.0)
+    bson (4.15.0)
     builder (3.2.4)
     capybara (3.39.2)
       addressable

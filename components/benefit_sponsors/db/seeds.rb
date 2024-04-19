@@ -20,10 +20,6 @@ DB_COLLECTION_NAMES = %w(
 
 DB_COLLECTION_PRESERVE_NAMES = []
 
-## Add following to rspec/rails_helper.rb
-## DatabaseCleaner.strategy = :truncation, {:except => DB_COLLECTION_PRESERVE_NAMES}
-
-
 puts "Dropping engine-specific collections"
 Mongoid.default_client.collections.each do |collection|
   if DB_COLLECTION_NAMES.include?(collection.name)

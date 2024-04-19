@@ -31,9 +31,6 @@ DB_COLLECTION_PRESERVE_NAMES = []
 #     benefit_markets_locations_county_zips
 #   )
 
-## Add following to rspec/rails_helper.rb
-## DatabaseCleaner.strategy = :truncation, {:except => DB_COLLECTION_PRESERVE_NAMES}
-
 
 puts "Dropping engine-specific collections"
 Mongoid.default_client.collections.each do |collection|
