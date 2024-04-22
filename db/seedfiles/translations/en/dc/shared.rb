@@ -75,6 +75,7 @@ SHARED_TRANSLATIONS = {
     "en.previous_step" => "PREVIOUS",
     "en.save_and_exit" => "SAVE & EXIT",
     "en.help_sign_up" => "Help Me Sign Up",
+    "en.get_help_sign_up" => "Get Help Signing Up",
     "en.event_log.eligibility" => "Eligibility",
     "en.event_log.outcome" => "Outcome",
     "en.event_log.performed_by" => "Performed By",
