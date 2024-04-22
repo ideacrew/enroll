@@ -30,6 +30,11 @@ FinancialAssistance::Engine.routes.draw do
     resources :relationships, only: [:index, :create]
 
     resources :applicants do
+
+      namespace :locations do
+        resources :addresses, only: [:destroy]
+      end
+
       get 'verification_documents/upload', to: 'verification_documents#upload'
       post 'verification_documents/upload', to: 'verification_documents#upload'
       get 'verification_documents/download', to: 'verification_documents#download'
