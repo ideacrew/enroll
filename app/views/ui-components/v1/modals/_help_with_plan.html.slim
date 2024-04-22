@@ -21,18 +21,19 @@
                 a = l10n("insured.plan_shoppings.help_from_a_certified_applicant_counselor")
         #help_search.help_reset
           h4 = l10n("search_by_name")
-          = l10n('first_name')
+          label for="help_first_name" = l10n('first_name')
           | :
           br
           input#help_first_name type="text"
           br
-          = l10n('last_name')
+          label for="help_last_name" = l10n('last_name')
           | :
           br
           input#help_last_name type="text"
           button.btn.btn-primary#search_for_plan_shopping_help = l10n("search_for_help")
           br
-          h4#help_status
+          unless @bs4
+            h4#help_status
           .hide#help_requestor = @person.try(:id)
           .hide#help_requestor_email = current_user.oim_id
           .hide#help_type
