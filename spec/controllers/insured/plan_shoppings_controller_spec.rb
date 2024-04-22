@@ -1298,7 +1298,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
   end
 
-  context 'GET show for IVL  - reset coverage dates', :dbclean => :around_each do
+  context 'IVL market' do
     let(:person) {FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)}
     let(:family) {FactoryBot.create(:family, :with_primary_family_member, :person => person)}
     let(:household) {FactoryBot.create(:household, family: family)}
@@ -1344,28 +1344,56 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                         rating_area_id: rating_area.id)
     end
 
-    let!(:hbx_enrollment) do
-      FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
-                        enrollment_members: newly_covered_individuals,
-                        family: family,
-                        household: family.latest_household,
-                        coverage_kind: 'health',
-                        effective_on: effective_on,
-                        enrollment_kind: 'open_enrollment',
-                        kind: 'individual',
-                        consumer_role: person.consumer_role,
-                        product: product,
-                        rating_area_id: rating_area.id)
+    context 'GET show for IVL  - reset coverage dates', :dbclean => :around_each do
+      let!(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                          enrollment_members: newly_covered_individuals,
+                          family: family,
+                          household: family.latest_household,
+                          coverage_kind: 'health',
+                          effective_on: effective_on,
+                          enrollment_kind: 'open_enrollment',
+                          kind: 'individual',
+                          consumer_role: person.consumer_role,
+                          product: product,
+                          rating_area_id: rating_area.id)
+      end
+
+      it 'should update the member coverage start on' do
+        hbx_enrollment.update_attributes(aasm_state: 'shopping')
+        person.consumer_role.move_identity_documents_to_verified
+        sign_in(user)
+        allow_any_instance_of(HbxEnrollment).to receive(:decorated_elected_plans).and_return([])
+        hbx_enrollment.hbx_enrollment_members.update_all(coverage_start_on: previous_coverage.effective_on)
+        get :show, params: {id: hbx_enrollment.id, market_kind: "individual"}
+        hbx_enrollment.reload
+        expect(hbx_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq hbx_enrollment.effective_on
+      end
     end
 
-    it 'should update the member coverage start on' do
-      person.consumer_role.move_identity_documents_to_verified
-      sign_in(user)
-      allow_any_instance_of(HbxEnrollment).to receive(:decorated_elected_plans).and_return([])
-      hbx_enrollment.hbx_enrollment_members.update_all(coverage_start_on: previous_coverage.effective_on)
-      get :show, params: {id: hbx_enrollment.id, market_kind: "individual"}
-      hbx_enrollment.reload
-      expect(hbx_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq hbx_enrollment.effective_on
+    context "Post set_elected_aptc", :dbclean => :around_each do
+      before :each do
+        @hbx_enrollment = previous_coverage
+        user.person.consumer_role.identity_validation = 'valid'
+      end
+
+      it "should return a success" do
+        sign_in user
+        post :set_elected_aptc, params: {elected_aptc: "100", id: @hbx_enrollment.id}, format: :json
+        expect(response.status).to eq 200
+      end
+
+      it "should not return a success" do
+        sign_in user
+        post :set_elected_aptc, params: {elected_aptc: "100", id: @hbx_enrollment.id}
+        expect(response.status).not_to eq 200
+      end
+
+      it "should not return a success" do
+        sign_in user
+        post :set_elected_aptc, params: {elected_aptc: "100", id: @hbx_enrollment.id}, format: :xml
+        expect(response.status).not_to eq 200
+      end
     end
   end
 
