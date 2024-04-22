@@ -5,6 +5,8 @@ module BenefitSponsors
       include Pundit
       include HtmlScrubberUtil
 
+      before_action :check_request_format, only: [:new, :edit, :submit_application, :force_submit_application, :revert]
+
       def new
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.permit(:benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
@@ -40,7 +42,10 @@ module BenefitSponsors
           end
         else
           flash[:error] = error_messages(@benefit_application_form)
-          render :edit
+
+          respond_to do |format|
+            format.js { render :edit }
+          end
         end
       end
 
@@ -89,7 +94,10 @@ module BenefitSponsors
         date = params[:start_on_date].present? ? Date.strptime(params[:start_on_date], "%m/%d/%Y") : nil
         product_form = BenefitMarkets::Forms::ProductForm.for_new(date)
         product_form = product_form.fetch_results
-        render json: product_form.is_late_rate
+
+        respond_to do |format|
+          format.json { render json: product_form.is_late_rate }
+        end
       end
 
       private
@@ -103,6 +111,10 @@ module BenefitSponsors
           :start_on, :end_on, :fte_count, :pte_count, :msp_count,
           :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id
         )
+      end
+
+      def check_request_format
+        raise ActionController::UnknownFormat unless request.format.js?
       end
     end
   end
