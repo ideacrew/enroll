@@ -485,7 +485,7 @@ GEM
     msgpack (1.4.2)
     multi_json (1.15.0)
     multipart-post (2.1.1)
-    mustermann (1.1.1)
+    mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
     net-imap (0.3.7)
       date
@@ -519,7 +519,7 @@ GEM
     raabro (1.4.0)
     racc (1.7.3)
     rack (2.2.8)
-    rack-protection (2.1.0)
+    rack-protection (2.2.3)
       rack
     rack-proxy (0.6.5)
       rack
@@ -666,10 +666,10 @@ GEM
       simplecov (~> 0.19)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    sinatra (2.1.0)
-      mustermann (~> 1.0)
+    sinatra (2.2.3)
+      mustermann (~> 2.0)
       rack (~> 2.2)
-      rack-protection (= 2.1.0)
+      rack-protection (= 2.2.3)
       tilt (~> 2.0)
     slim (3.0.9)
       temple (>= 0.7.6, < 0.9)
