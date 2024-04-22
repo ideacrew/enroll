@@ -52,7 +52,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   s.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
-  s.add_development_dependency 'test-prof',                 '~> 0.5.0'
+  s.add_development_dependency 'test-prof',                 '~> 1.3'
 
 end
 
