@@ -1445,13 +1445,13 @@ module BenefitSponsors
       it_behaves_like "for off-cycle employer", "canceled", nil, "draft", false
       it_behaves_like "for off-cycle employer", "enrollment_ineligible", nil, "draft", true
       it_behaves_like "for off-cycle employer", "enrollment_ineligible", nil, "enrollment_open", true
-      it_behaves_like "for off-cycle employer", "enrollment_ineligible", nil, "active", true
+      it_behaves_like "for off-cycle employer", "enrollment_ineligible", nil, "active", false
       it_behaves_like "for off-cycle employer", "terminated", nil, "draft", true
       it_behaves_like "for off-cycle employer", "terminated", nil, "enrollment_open", true
-      it_behaves_like "for off-cycle employer", "terminated", nil, "active", true
+      it_behaves_like "for off-cycle employer", "terminated", nil, "active", false
       it_behaves_like "for off-cycle employer", "termination_pending", nil, "draft", true
       it_behaves_like "for off-cycle employer", "termination_pending", nil, "enrollment_open", true
-      it_behaves_like "for off-cycle employer", "termination_pending", nil, "active", true
+      it_behaves_like "for off-cycle employer", "termination_pending", nil, "active", false
       it_behaves_like "for off-cycle employer", "active", nil, "", false
       it_behaves_like "for off-cycle employer", "active", "enrollment_ineligible", "draft", true
       it_behaves_like "for off-cycle employer", "active", "enrollment_open", nil, false
