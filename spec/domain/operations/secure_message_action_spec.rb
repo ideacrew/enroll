@@ -36,7 +36,7 @@ module Operations
       let(:employer_profile) {organization.employer_profile}
 
       let(:params) { { subject: 'Hello world', body: 'Hello world', actions_id: '1234', resource_id: organization.id.to_s, resource_name: organization.class.to_s }}
-      let(:error_message) {{:message => ['Resource not found']}}
+      let(:error_message) {{:message => [l10n('insured.resource_not_found')]}}
 
       it "fails" do
         expect(subject).not_to be_success

@@ -6,6 +6,7 @@ require 'dry/monads/do'
 module Operations
   class SecureMessageAction
     send(:include, Dry::Monads[:result, :do, :try])
+    include L10nHelper
 
     def call(params:, user: nil)
       validate_params = yield validate_params(params)
@@ -33,7 +34,7 @@ module Operations
                    ::BenefitSponsors::Operations::Profiles::FindProfile.new.call(profile_id: validate_params[:resource_id])
                  end
 
-      result.present? ? result : Failure({ message: ['Resource not found'] })
+      result.present? ? result : Failure({ message: [l10n('insured.resource_not_found')] })
     end
 
     def upload_document(resource, params, user)
