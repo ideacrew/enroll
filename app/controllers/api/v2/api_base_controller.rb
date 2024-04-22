@@ -2,8 +2,7 @@ module Api
   module V2
     class ApiBaseController < ActionController::Base
       include Pundit
-
-      protect_from_forgery with: :null_session, prepend: true
+      protect_from_forgery with: :exception, prepend: true
 
       before_action :require_login
 

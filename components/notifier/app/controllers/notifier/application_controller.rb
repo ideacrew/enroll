@@ -4,6 +4,7 @@ module Notifier
     include ::L10nHelper
     include ::FileUploadHelper
     layout "notifier/single_column"
+    protect_from_forgery with: :exception, prepend: true
 
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
