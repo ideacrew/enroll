@@ -42,7 +42,7 @@ module FinancialAssistance
 
       # Fetches the address to be destroyed.
       #
-      # @return [FinancialAssistance::Locations::Address, nil] The address to be destroyed, or nil if not found.
+      # @return [FinancialAssistance::Locations::Address, ActionDispatch::Response] The address to be destroyed, or redirects back to the previous page if not found.
       def fetch_address
         application = ::FinancialAssistance::Application.where(id: destroy_params[:application_id]).first
         unless application
@@ -57,10 +57,11 @@ module FinancialAssistance
         end
 
         @address = applicant.addresses.where(id: destroy_params[:id]).first
-        unless @address
-          flash[:error] = 'Address not found with the given parameters.'
-          return redirect_back(fallback_location: main_app.root_path)
-        end
+
+        return if @address
+
+        flash[:error] = 'Address not found with the given parameters.'
+        redirect_back(fallback_location: main_app.root_path)
       end
     end
   end
