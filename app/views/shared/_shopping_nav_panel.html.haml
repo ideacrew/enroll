@@ -23,7 +23,7 @@
     - if show_help_button && back_to_account_flag
       %li
         %a{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", style: link_style, id: "help_me_sign_up", tabindex: "0", onkeydown: "handleButtonKeyDown(event, 'help_me_sign_up')"}
-          = l10n("help_sign_up")
+          = @bs4 ? l10n("get_help_sign_up") : l10n("help_sign_up")
     - if show_exit_button
       %li
         %a{href: destroy_user_session_path, style: link_style}
@@ -36,5 +36,5 @@
             = "If you select #{t('save_and_exit')}, you can save your work and continue where you left off the next time you login."
   - if show_help_button && !back_to_account_flag
     .btn.btn-default{"data-target" => "#help_with_plan_shopping", "id" => "help_with_plan_shopping_btn", "data-toggle" => "modal", "style" => "width: 100%;", "tabindex" => "0", "onkeydown"=> "handleButtonKeyDown(event, 'help_with_plan_shopping_btn')"}
-      = l10n("help_sign_up")
+      = @bs4 ? l10n("get_help_sign_up") : l10n("help_sign_up")
 = render partial: 'ui-components/v1/modals/help_with_plan' if show_help_button
