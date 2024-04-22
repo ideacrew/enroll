@@ -235,7 +235,9 @@ class Insured::PlanShoppingsController < ApplicationController
     plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
     plan_comparision_obj.elected_aptc = session[:elected_aptc]
     checkbook_url = plan_comparision_obj.generate_url
-    render json: {message: 'ok',checkbook_url: checkbook_url }
+    respond_to do |format|
+      format.json { render json: {message: 'ok',checkbook_url: checkbook_url } }
+    end
   end
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
