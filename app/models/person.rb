@@ -174,6 +174,11 @@ class Person
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
+  # @!attribute [rw] demographics_group
+  #   @return [DemographicsGroup] The demographics information for the person.
+  #   This is a polymorphic association that can be associated with any model that can have demographics information.
+  embeds_one :demographics_group, as: :demographicable, class_name: 'DemographicsGroup'
+
   attr_accessor :effective_date, :skip_person_updated_event_callback, :is_consumer_role, :is_resident_role
 
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
@@ -1195,6 +1200,10 @@ class Person
     @naturalized_citizen = false if val.to_s == "false"
   end
 
+  def skip_lawful_presence_determination_callbacks=(val)
+    @skip_lawful_presence_determination_callbacks = true if val.to_s == "true"
+  end
+
   def naturalized_citizen=(val)
     @naturalized_citizen = (val.to_s == "true")
   end
@@ -1276,7 +1285,9 @@ class Person
     elsif
       self.errors.add(:base, "Citizenship status can't be nil.")
     end
-    self.consumer_role.lawful_presence_determination.assign_citizen_status(new_status) if new_status
+    lawful_presence_determination = self.consumer_role.lawful_presence_determination
+    lawful_presence_determination.skip_lawful_presence_determination_callbacks = @skip_lawful_presence_determination_callbacks if @skip_lawful_presence_determination_callbacks == true
+    lawful_presence_determination.assign_citizen_status(new_status) if new_status
   end
 
   def agent?

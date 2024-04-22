@@ -11,7 +11,7 @@
 
         </p>
         <p class="text-right">
-          <button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span><%= link_to 'Download', employers_employer_attestation_authorized_download_path(@document.id) + "?id=#{@employer_profile.id}&content_type=#{@document.format}&filename=#{@document.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline", target: '_blank' %></button>
+          <button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span><%= h(link_to 'Download', employers_employer_attestation_authorized_download_path(@document.id) + "?id=#{@employer_profile.id}&content_type=#{@document.format}&filename=#{@document.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline", target: '_blank', rel: "noopener noreferrer") %></button>
           <button class="btn btn-default" onclick='window.print();return false;'>Print</button>
         </p>
       </div>

@@ -1,25 +1,22 @@
 FactoryBot.define do
   factory :person do
-    # name_pfx 'Mr'
     first_name { 'John' }
-    # middle_name 'X'
     sequence(:last_name) {|n| "Smith#{n}" }
-    # name_sfx 'Jr'
     dob { "1972-04-04".to_date }
     is_incarcerated { false }
     is_active { true }
 
     gender { "male" }
-    # us_citizen "true"
-    # indian_tribe_member "false"
-    # naturalized_citizen "false"
-    # association :employee_role, strategy: :build
 
     after(:create) do |p, evaluator|
       create_list(:address, 2, person: p)
       create_list(:phone, 2, person: p)
       create_list(:email, 2, person: p)
       create_list(:employee_role, 1, person: p) unless p.employee_roles
+    end
+
+    trait :with_demographics_group do
+      demographics_group { FactoryBot.build(:demographics_group) }
     end
 
     trait :with_mailing_address do

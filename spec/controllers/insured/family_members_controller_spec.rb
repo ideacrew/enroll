@@ -489,11 +489,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     let(:update_result) { false }
     # let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
-    before(:each) do
-      sign_in(user)
-    end
 
     describe "with an invalid dependent" do
+      before(:each) do
+        sign_in(user)
+      end
+
       it "should render the edit template" do
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: invalid_dependent_properties}
         expect(response).to have_http_status(:success)
@@ -507,9 +508,25 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     describe "with a valid dependent" do
-      let(:update_result) { true }
+      let(:primary_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:primary_user) { FactoryBot.create(:user, person: primary_person) }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_user.person) }
+      let(:person2) do
+        per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 15.years, "first_name" => "dep2", "middle_name" => "", "last_name" => "584", "ssn" => "367-58-7261", "no_ssn" => "0", "gender" => "male")
+        primary_person.ensure_relationship_with(per, 'spouse')
+        primary_person.save!
+        per
+      end
+      let(:family_member_2) { FactoryBot.create(:family_member, person: person2, family: family)}
+      let!(:dependent) { family_member_2 }
+      let(:test_family) { family }
+
+      before(:each) do
+        test_family.primary_person.consumer_role.move_identity_documents_to_verified
+        sign_in(test_family.primary_person.user)
+      end
+
       it "should render the show template" do
-        allow(controller).to receive(:update_vlp_documents).and_return(true)
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
@@ -525,6 +542,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     describe "with a valid dependent but invalid addresses" do
       before :each do
+        sign_in(user)
         allow(controller).to receive(:update_vlp_documents).and_return false
       end
 
@@ -707,7 +725,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
            "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
         end
-        let(:dependent) { double(addresses: [valid_addresses_attributes], family_member: true, same_with_primary: true, family_id: test_family.id).as_null_object }
+
         let(:dependent_properties) do
           {
             addresses: valid_addresses_attributes,
@@ -715,11 +733,23 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             same_with_primary: true
           }
         end
-        let(:dependent_id) { "234dlfjadsklfj" }
+        let(:dependent_id) { dependent.id }
+        let(:primary_person) { FactoryBot.create(:person, :with_consumer_role) }
+        let(:primary_user) { FactoryBot.create(:user, person: primary_person) }
+        let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_user.person) }
+        let(:person2) do
+          per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 15.years, "first_name" => "dep2", "middle_name" => "", "last_name" => "584", "ssn" => "367-58-7261", "no_ssn" => "0", "gender" => "male")
+          primary_person.ensure_relationship_with(per, 'spouse')
+          primary_person.save!
+          per
+        end
+        let(:family_member_2) { FactoryBot.create(:family_member, person: person2, family: family)}
+        let!(:dependent) { family_member_2 }
+        let(:test_family) { family }
 
         before do
-          allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
-          allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
+          test_family.primary_person.consumer_role.move_identity_documents_to_verified
+          test_family.family_members[1].person.consumer_role.move_identity_documents_to_verified
           allow(dependent).to receive(:destroy!)
         end
 
@@ -727,7 +757,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           let!(:permission) { FactoryBot.create(:permission, :super_admin) }
 
           it "can update family members for a user" do
-            put :update, params: { id: dependent_id, dependent: dependent_properties }
+            put :update, params: { id: dependent.id, dependent: dependent_properties }
 
             expect(response).to have_http_status(:success)
             expect(response).to render_template("show")
@@ -748,7 +778,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           end
 
           it "family_member :show template will render" do
-            get :show, params: { id: test_family.id }
+            get :show, params: { id: dependent_id }
 
             expect(response).to have_http_status(:success)
             expect(response).to render_template("show")
@@ -789,7 +819,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           end
 
           it "family_member :show template will not render" do
-            get :show, params: { id: test_family.id }
+            get :show, params: { id: dependent_id}
 
             expect(response).to have_http_status(:redirect)
             expect(response).to_not render_template("show")
@@ -876,7 +906,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
            "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
         end
-        let(:dependent) { double(addresses: [valid_addresses_attributes], family_member: true, same_with_primary: true, family_id: test_family.id).as_null_object }
+
         let(:dependent_properties) do
           {
             addresses: valid_addresses_attributes,
@@ -884,11 +914,24 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             same_with_primary: true
           }
         end
-        let(:dependent_id) { "234dlfjadsklfj" }
+
+        let(:dependent_id) { dependent.id }
+        let(:primary_person) { FactoryBot.create(:person, :with_consumer_role) }
+        let(:primary_user) { FactoryBot.create(:user, person: primary_person) }
+        let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_user.person) }
+        let(:person2) do
+          per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 15.years, "first_name" => "dep2", "middle_name" => "", "last_name" => "584", "ssn" => "367-58-7261", "no_ssn" => "0", "gender" => "male")
+          primary_person.ensure_relationship_with(per, 'spouse')
+          primary_person.save!
+          per
+        end
+        let(:family_member_2) { FactoryBot.create(:family_member, person: person2, family: family)}
+        let!(:dependent) { family_member_2 }
+        let(:test_family) { family }
 
         before do
-          allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
-          allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
+          test_family.primary_person.consumer_role.move_identity_documents_to_verified
+          test_family.family_members[1].person.consumer_role.move_identity_documents_to_verified
           allow(dependent).to receive(:destroy!)
         end
 
@@ -922,7 +965,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           end
 
           it "family_member :show template will render" do
-            get :show, params: { id: test_family.id }
+            get :show, params: { id: dependent.id }
 
             expect(response).to have_http_status(:success)
             expect(response).to render_template("show")
@@ -961,7 +1004,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           end
 
           it "family_member :show template will not render" do
-            get :show, params: { id: test_family.id }
+            get :show, params: { id: dependent.id }
 
             expect(response).to have_http_status(:redirect)
             expect(response).to_not render_template("show")

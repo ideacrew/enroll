@@ -29,7 +29,7 @@ describe UsersController, dbclean: :after_each do
         sign_in(admin)
       end
       it "renders the change username form" do
-        get :change_username_and_email, params: { id: user_id }, format: :js
+        get :change_username_and_email, params: { id: user_id, format: :js }
         expect(response).to render_template('change_username_and_email')
       end
     end
@@ -40,7 +40,7 @@ describe UsersController, dbclean: :after_each do
         sign_in(admin)
       end
       it "doesn't render the change username form" do
-        get :change_username_and_email, params: { id: user_id }, format: :js
+        get :change_username_and_email, params: { id: user_id, format: :js }
         expect(flash[:error]).to be_present
         expect(flash[:error]).to include('Access not allowed for hbx_profile_policy.change_username_and_email?, (Pundit policy)')
       end
@@ -128,10 +128,11 @@ describe UsersController, dbclean: :after_each do
 
       it "toggles the user lock" do
         expect(user).to receive(:lock!)
-        get :lockable, params: {id: user_id}
+        get :lockable, params: { id: user_id, format: :js }
       end
+
       it do
-        get :lockable, params: {id: user_id}
+        get :lockable, params: { id: user_id, format: :js }
         expect(flash[:notice]).to be_present
       end
     end
@@ -145,7 +146,7 @@ describe UsersController, dbclean: :after_each do
 
       it "toggles the user lock" do
         expect(user).to receive(:lock!)
-        get :lockable, params: {id: user_id}
+        get :lockable, params: { id: user_id, format: :js }
       end
     end
   end
@@ -223,7 +224,8 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         put :confirm_reset_password, params: {id: user_id, user: { email: '' }, format: :js}
-        expect(response).to render_template('users/reset_password.js.erb')
+        expect(response.content_type).to eq('text/javascript')
+        expect(response).to render_template('users/reset_password')
       end
     end
 
@@ -258,7 +260,8 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         put :confirm_reset_password, params:  {id: user_id, user: { email: user_email }, format: :js}
-        expect(response).to render_template('users/reset_password.js.erb')
+        expect(response.content_type).to eq('text/javascript')
+        expect(response).to render_template('users/reset_password')
       end
     end
 
@@ -276,9 +279,9 @@ describe UsersController, dbclean: :after_each do
 
       it do
         put :confirm_reset_password, params: {id: user_id, format: :js}
-        expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url)
+        expect(response.status).to eq(302)
+        expect(response.location).to eq(user_account_index_exchanges_hbx_profiles_url)
       end
     end
   end
-
 end

@@ -54,7 +54,7 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 gem 'aasm',                     '~> 4.8'
 gem 'recurring_select'
 
-gem 'aws-sdk',                  '~> 2.2.4'
+gem 'aws-sdk',                  '~> 3.2'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
 gem 'browser',                  '2.7.0'
@@ -107,7 +107,7 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
-gem 'loofah', '~> 2.3.1'
+gem 'loofah', '~> 2.19.1'
 gem 'stimulus_reflex', '3.4.1'
 gem 'rack-cors'
 gem 'holidays', '~> 8.6'
@@ -180,5 +180,5 @@ end
 group :production do
   gem 'newrelic_rpm', '~> 9.6'
   gem 'unicorn',      '~> 4.8'
-  gem 'puma',         '~> 3.12.4'
+  gem 'puma',         '~> 5.6', '>= 5.6.8'
 end
