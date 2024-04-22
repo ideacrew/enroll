@@ -257,6 +257,10 @@ ul.progress-wrapper li:last-child .vertical-line-progress {
   }
 }
 
+ul.list-right-section li:not(:last-of-type) {
+  margin-bottom: $spacer;
+}
+
 @media screen and (max-width: 767px) {
   .sm-space, .col-sm {
     margin-bottom: $spacer;
