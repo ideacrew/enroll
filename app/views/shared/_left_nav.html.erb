@@ -7,12 +7,11 @@
         <span class="circle-progress"></span>
         <div class="vertical-line-progress"></div>
         <a><%= l10n('personal_information') %></a>
-
       </li>
       <li class="<%= 'complete' if tell_us_about_yourself_active? %> <%= 'active' if tell_us_about_yourself_current_step? %>">
         <span class="circle-progress"></span>
         <div class="vertical-line-progress"></div>
-        <a class="<%= 'cna disabled' unless tell_us_about_yourself_active? or tell_us_about_yourself_current_step? %>">Tell Us About Yourself</a>
+        <a class="<%= 'cna disabled' unless tell_us_about_yourself_active? or tell_us_about_yourself_current_step? %>"><%= l10n('tell_us_about_yourself') %></a>
       </li>
       <li class="<%= 'complete' if family_members_index_active? %> <%= 'active' if family_members_index_current_step? %>">
         <span class="circle-progress"></span>
@@ -23,7 +22,7 @@
   </nav>
   <%= render partial: 'shared/shopping_nav_panel',
   locals: { show_exit_button: !@no_save_button && step < 6,
-            show_previous_button: !@no_previous_button && ![1,6].include?(step),
+            show_previous_button: false,
             show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
             is_complete: step == 6,
             show_help_button: step != 1 && step < 6 } %>
