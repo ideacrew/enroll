@@ -11,7 +11,7 @@ Please check if your PR fulfills the following requirements
 - [ ] There is no hard coded text added/updated in helpers/views/Javascript. New/updated translation strings do not include markup/styles, unless there is supporting documentation
 - [ ] Code does not use .html_safe
 - [ ] All images added/updated have alt text
-- [ ] Doesn’t add any new rubocop ignore
+- [ ] Doesn’t bypass rubocop rules in any way
 
 # PR Type
 What kind of change does this PR introduce?
