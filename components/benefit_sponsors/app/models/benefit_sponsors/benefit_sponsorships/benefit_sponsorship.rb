@@ -559,8 +559,12 @@ module BenefitSponsors
       return nil unless termed_or_ineligible_app
 
       compare_date = termed_or_ineligible_app.enrollment_ineligible? ? termed_or_ineligible_app.start_on : termed_or_ineligible_app.end_on
-      application =  recent_bas.select { |recent_ba| recent_ba.start_on > compare_date && recent_ba.aasm_state != :canceled && exclude_renewal_and_renewal(recent_ba) }.first
+      application =  recent_bas.select { |recent_ba| recent_ba.start_on > compare_date && exclude_renewal_active_and_expired(recent_ba) }.first
       benefit_applications.map(&:reinstated_id).include?(application&.id) ? nil : application
+    end
+
+    def exclude_renewal_active_and_expired(recent_ba)
+      recent_ba.reinstated_id.blank? && recent_ba.predecessor_id.blank? && !(recent_ba.active? || recent_ba.expired?)
     end
 
     def exclude_renewal_and_renewal(recent_ba)
