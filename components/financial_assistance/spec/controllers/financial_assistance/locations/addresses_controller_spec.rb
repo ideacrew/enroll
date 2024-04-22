@@ -84,7 +84,7 @@ RSpec.describe FinancialAssistance::Locations::AddressesController, type: :contr
       end
 
       it 'redirects back with an flash error' do
-        expect(flash[:error]).to eq('Address not found with the given parameters.')
+        expect(flash[:error]).to eq('Application not found with the given parameters.')
         expect(response).to redirect_to(Rails.application.class.routes.url_helpers.root_path)
       end
     end
@@ -100,7 +100,7 @@ RSpec.describe FinancialAssistance::Locations::AddressesController, type: :contr
       end
 
       it 'redirects back with an flash error' do
-        expect(flash[:error]).to eq('Address not found with the given parameters.')
+        expect(flash[:error]).to eq('Applicant not found with the given parameters.')
         expect(response).to redirect_to(Rails.application.class.routes.url_helpers.root_path)
       end
     end

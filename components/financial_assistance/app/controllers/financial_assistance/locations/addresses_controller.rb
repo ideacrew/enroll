@@ -44,15 +44,23 @@ module FinancialAssistance
       #
       # @return [FinancialAssistance::Locations::Address, nil] The address to be destroyed, or nil if not found.
       def fetch_address
-        @address = ::FinancialAssistance::Application.find(
-          destroy_params[:application_id]
-        ).applicants.find(destroy_params[:applicant_id]).addresses.find(destroy_params[:id])
-      rescue Mongoid::Errors::DocumentNotFound => e
-        Rails.logger.error "Error finding the FinancialAssistance::Locations::Address with params: #{
-          destroy_params.to_h} with error message: #{e.message}"
+        application = ::FinancialAssistance::Application.where(id: destroy_params[:application_id]).first
+        unless application
+          flash[:error] = 'Application not found with the given parameters.'
+          return redirect_back(fallback_location: main_app.root_path)
+        end
 
-        flash[:error] = 'Address not found with the given parameters.'
-        redirect_back(fallback_location: main_app.root_path) and return
+        applicant = application.applicants.where(id: destroy_params[:applicant_id]).first
+        unless applicant
+          flash[:error] = 'Applicant not found with the given parameters.'
+          return redirect_back(fallback_location: main_app.root_path)
+        end
+
+        @address = applicant.addresses.where(id: destroy_params[:id]).first
+        unless @address
+          flash[:error] = 'Address not found with the given parameters.'
+          return redirect_back(fallback_location: main_app.root_path)
+        end
       end
     end
   end
