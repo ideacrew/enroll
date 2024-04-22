@@ -9,7 +9,7 @@
   cursor: pointer;
   color: $color;
   border-radius: 4px;
-  border: 0;
+  border: 2px solid $button-color;
   &:visited {
     color: $color;
   }
@@ -33,6 +33,40 @@
   }
 }
 
+@mixin ghost-button($button-color: var(--button-primary-color), $hover: var(--button-primary-hover-color),
+                    $active: var(--button-primary-active-color)) {
+  background-color: transparent;
+  font-weight: 600;
+  padding: 8px 12px;
+  text-decoration: none;
+  cursor: pointer;
+  color: $button-color;
+  border-radius: 4px;
+  border: 2px solid $button-color;
+  &:visited {
+    color: $button-color;
+    border-color: $button-color;
+  }
+  &:hover {
+    color: $hover;
+    border-color: $hover;
+  }
+  &:active {
+    color: var(--button-default-active-color);
+    border-color: var(--button-default-active-color);
+  }
+  &:focus {
+    border-color: $hover;
+    outline: 2px solid var(--grey-190);
+    outline-offset: 2px;
+    color: $hover;
+  }
+  &:disabled {
+    border-color: var(--grey-090);
+    color: var(--grey-090);
+  }
+}
+
 .button, button, .button-primary, .btn, .btn-primary {
   @include solid-button;
 }
@@ -47,6 +81,10 @@ button.tertiary, .button.tertiary, .btn.tertiary, .btn-tertiary {
 
 button.error, .button.error, .btn.error, .btn-error {
   @include solid-button(var(--button-error-color), var(--grey-000), var(--button-error-hover-color), var(--button-error-active-color));
+}
+
+.button.outline, button.outline, .button-primary.outline, .btn.outline, .btn-primary.outline {
+  @include ghost-button;
 }
 
 a.button:hover {
