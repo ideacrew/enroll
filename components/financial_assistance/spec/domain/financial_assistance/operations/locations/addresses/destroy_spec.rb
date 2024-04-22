@@ -16,6 +16,8 @@ RSpec.describe FinancialAssistance::Operations::Locations::Addresses::Destroy, d
     FactoryBot.create(
       :financial_assistance_applicant,
       :with_home_address,
+      first_name: primary.first_name,
+      last_name: primary.last_name,
       application: application,
       is_primary_applicant: true,
       family_member_id: primary_member.id,
@@ -115,16 +117,19 @@ RSpec.describe FinancialAssistance::Operations::Locations::Addresses::Destroy, d
       let(:input_object) { address }
       let(:address_kind) { 'mailing' }
 
+      let(:error_message) { 'Mocking error to test failure scenario' }
+
       before do
         allow(address).to receive(:destroy!).and_raise(
-          RuntimeError.new('Mocking error to test failure scenario.')
+          RuntimeError.new(error_message)
         )
       end
 
       it 'does not destroy the address and returns a failure' do
         expect(subject).to be_a(Dry::Monads::Result::Failure)
         expect(subject.failure).to eq(
-          "Unable to destroy mailing address of the applicant with full_name: #{applicant.full_name} and person_hbx_id: #{applicant.person_hbx_id}."
+          "Unable to destroy mailing address of the applicant with full_name: #{
+            applicant.full_name} and person_hbx_id: #{applicant.person_hbx_id} with error: #{error_message}."
         )
       end
     end
