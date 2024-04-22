@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+#generation of saml response for payment transactions
 class PaymentTransactionsController < ApplicationController
   skip_before_action :verify_authenticity_token
 
@@ -13,12 +16,18 @@ class PaymentTransactionsController < ApplicationController
     status = carrier_connect_test(issuer) if Rails.env.production? #checks to see if EA can connect to carrier payment portal.
     result = Operations::GenerateSamlResponse.new.call({enrollment_id: params[:enrollment_id], source: params[:source]})
     if result.success?
-      render json: {"SAMLResponse": result.value![:SAMLResponse], status: status, error: nil}
+      respond_to do |format|
+        format.json { render json: {"SAMLResponse": result.value![:SAMLResponse], status: status, error: nil} }
+      end
     else
-      render json: {error: result.failure}
+      respond_to do |format|
+        format.json { render json: {error: result.failure} }
+      end
     end
   rescue StandardError => e
-    render json: {error: e}
+    respond_to do |format|
+      format.json { render json: {error: e} }
+    end
   end
 
   private
