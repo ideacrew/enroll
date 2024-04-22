@@ -2495,7 +2495,7 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     stimulus_reflex (3.4.2)
-      cable_ready (>= 4.5)
+      cable_ready (~> 4.5)
       nokogiri
       rack
       rails (>= 5.2)
