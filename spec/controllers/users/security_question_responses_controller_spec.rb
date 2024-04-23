@@ -41,10 +41,31 @@ RSpec.describe Users::SecurityQuestionResponsesController, dbclean: :after_each 
       end
       it 'ss' do
         request.headers.merge!('HTTP_REFERER' => 'http://example.com')
-        expect(request.referer).to eq('http://example.com') 
+        expect(request.referer).to eq('http://example.com')
       end
       it { expect(response).to have_http_status(:success) }
       it { expect(response).to render_template('users/security_question_responses/error_response') }
+    end
+
+    # this controller only responds to JS requests
+    context "with an invalid MIME type" do
+      before do
+        allow(user).to receive(:save!).and_return(true)
+      end
+
+      it "returns an error" do
+        post :create, params: { user_id: user.id, security_question_responses: security_question_responses }
+        expect(response).to_not have_http_status(:success)
+      end
+
+      it "returns an error" do
+        post :create, params: { user_id: user.id, security_question_responses: security_question_responses }, format: :xml
+        expect(response).to_not have_http_status(:success)
+      end
+      it "returns an error" do
+        post :create, params: { user_id: user.id, security_question_responses: security_question_responses }, format: :json
+        expect(response).to_not have_http_status(:success)
+      end
     end
   end
 
@@ -54,29 +75,57 @@ RSpec.describe Users::SecurityQuestionResponsesController, dbclean: :after_each 
     before do
       allow(User).to receive(:find_by).with(email: user.email).and_return(user)
       allow(User).to receive(:find_by).with(email: 'invalid@example.com').and_return(nil)
-      post :challenge, params: { user: { email: email } }, xhr: true
     end
 
-    context "for a valid email with no question responses" do
-      let(:security_question_responses) { [] }
+    context 'with a valid MIME type' do
+      before do
+        post :challenge, params: { user: { email: email } }, xhr: true
+      end
 
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(response).to have_http_status(:success) }
-      it { expect(response).to render_template('users/security_question_responses/error_response') }
+      context "for a valid email with no question responses" do
+        let(:security_question_responses) { [] }
+
+        it { expect(assigns(:user)).to eq(user) }
+        it { expect(response).to have_http_status(:success) }
+        it { expect(response).to render_template('users/security_question_responses/error_response') }
+      end
+
+      context "for a valid email" do
+        it { expect(assigns(:user)).to eq(user) }
+        it { expect(response).to have_http_status(:success) }
+        it { expect(response).to render_template('users/security_question_responses/challenge') }
+      end
+
+      context "for an invalid email" do
+        let(:email) { 'invalid@example.com' }
+
+        it { expect(assigns(:user)).to be_nil }
+        it { expect(response).to have_http_status(:success) }
+        it { expect(response).to render_template('users/security_question_responses/error_response') }
+      end
     end
 
-    context "for a valid email" do
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(response).to have_http_status(:success) }
-      it { expect(response).to render_template('users/security_question_responses/challenge') }
-    end
+    context 'with an invalid MIME type' do
+      it 'returns an error with html' do
+        post :challenge, params: { user: { email: email } }
+        expect(response).to_not have_http_status(:success)
+        expect(response).to_not render_template('users/security_question_responses/challenge')
+        expect(response).to_not render_template('users/security_question_responses/error_response')
+      end
 
-    context "for an invalid email" do
-      let(:email) { 'invalid@example.com' }
+      it 'returns an error with json' do
+        post :challenge, params: { user: { email: email } }, format: :json
+        expect(response).to_not have_http_status(:success)
+        expect(response).to_not render_template('users/security_question_responses/challenge')
+        expect(response).to_not render_template('users/security_question_responses/error_response')
+      end
 
-      it { expect(assigns(:user)).to be_nil }
-      it { expect(response).to have_http_status(:success) }
-      it { expect(response).to render_template('users/security_question_responses/error_response') }
+      it 'returns an error with xml' do
+        post :challenge, params: { user: { email: email } }, format: :xml
+        expect(response).to_not have_http_status(:success)
+        expect(response).to_not render_template('users/security_question_responses/challenge')
+        expect(response).to_not render_template('users/security_question_responses/error_response')
+      end
     end
   end
 
@@ -94,25 +143,51 @@ RSpec.describe Users::SecurityQuestionResponsesController, dbclean: :after_each 
 
       allow(user).to receive(:identity_confirmed_token=).with('SUCCESS')
       allow(user).to receive(:save!).and_return(true)
-
-      post :authenticate, params: { user_id: user.id, security_question_response: successful_response }, xhr: true
     end
 
-    context "a matching response" do
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(assigns(:success_token)).to eq("SUCCESS") }
-      it { expect(response).to have_http_status(:success) }
-      it { expect(response).to render_template('users/security_question_responses/authenticate') }
+    context 'with a valid MIME type' do
+      before do
+        post :authenticate, params: { user_id: user.id, security_question_response: successful_response }, xhr: true
+      end
+
+      context "a matching response" do
+        it { expect(assigns(:user)).to eq(user) }
+        it { expect(assigns(:success_token)).to eq("SUCCESS") }
+        it { expect(response).to have_http_status(:success) }
+        it { expect(response).to render_template('users/security_question_responses/authenticate') }
+      end
+
+      context "an invalid response" do
+        let(:matching) { false }
+
+        it { expect(assigns(:user)).to eq(user) }
+        it { expect(assigns(:success_token)).to be_nil }
+        it { expect(response).to have_http_status(:success) }
+        it { expect(response).to render_template('users/security_question_responses/error_response') }
+      end
     end
 
-    context "an invalid response" do
-      let(:matching) { false }
+    context 'with an invalid MIME type' do
+      it 'returns an error with html' do
+        post :authenticate, params: { user_id: user.id, security_question_response: successful_response }
+        expect(response).to_not have_http_status(:success)
+        expect(response).to_not render_template('users/security_question_responses/authenticate')
+        expect(response).to_not render_template('users/security_question_responses/error_response')
+      end
 
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(assigns(:success_token)).to be_nil }
-      it { expect(response).to have_http_status(:success) }
-      it { expect(response).to render_template('users/security_question_responses/error_response') }
+      it 'returns an error with json' do
+        post :authenticate, params: { user_id: user.id, security_question_response: successful_response }, format: :json
+        expect(response).to_not have_http_status(:success)
+        expect(response).to_not render_template('users/security_question_responses/authenticate')
+        expect(response).to_not render_template('users/security_question_responses/error_response')
+      end
+
+      it 'returns an error with xml' do
+        post :authenticate, params: { user_id: user.id, security_question_response: successful_response }, format: :xml
+        expect(response).to_not have_http_status(:success)
+        expect(response).to_not render_template('users/security_question_responses/authenticate')
+        expect(response).to_not render_template('users/security_question_responses/error_response')
+      end
     end
   end
-
 end
