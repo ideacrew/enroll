@@ -70,7 +70,7 @@ module VerificationHelper
     when 'in review'
       l10n("ridp_status.in_review")
     when 'valid'
-      l10n("ridp_status.verified")
+      l10n("ridp_status.valid")
     when 'rejected'
       l10n('verification_type.validation_status')
     else
@@ -87,7 +87,7 @@ module VerificationHelper
     when 'outstanding', 'rejected'
       'danger'
     when 'curam', 'attested', 'expired', 'unverified'
-      @bs4 ? 'absent' : 'default'
+      'default'
     when 'pending'
       'info'
     end
