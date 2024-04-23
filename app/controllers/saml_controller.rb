@@ -7,7 +7,6 @@ class SamlController < ApplicationController
   #   redirect_to(request.create(saml_settings))
   # end
 
-
   def account_expired
     flash[:error] = l10n('devise.failure.expired')
   end
