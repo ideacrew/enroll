@@ -1,6 +1,7 @@
 :root {
   // Generic greys
   --grey-000: hsl(0, 0%, 100%);
+  --grey-005: hsl(0, 0%, 98%);
   --grey-010: hsl(30, 20%, 98%);
   --grey-020: hsl(30, 8%, 95%);
   --grey-030: hsl(30, 10%, 92%);
@@ -14,7 +15,6 @@
   --grey-150: hsl(40, 3%, 23%);
   --grey-160: hsl(30, 2%, 19%);
   --grey-190: hsl(30, 3%, 12%);
-
 
   // Generic colors
   --info-color: hsl(202, 100%, 27%);
@@ -31,16 +31,39 @@
   --bright-green: hsl(65, 100%, 42%);
   --orange: hsl(359, 80%, 54%);
 
-
-  // Base layout colors
-  --body-color: hsl(0, 0%, 98%);
-  --text-primary: var(--grey-160);
-
-  --tertiary-color: hsl(80, 40%, 35%);
 }
 
 [data-theme="me"] {
     --default-font-color: #323130;
+
+    //palette
+    --primary-color: #3D5D6F;
+    --primary-color-dark: #314A59;
+    --primary-color-darker: #253843;
+
+    --secondary-color: #3B6B90;
+    --secondary-color-dark: #2E5470;
+    --secondary-color-darker: #213C50;
+
+    --tertiary-color: #5A7334;
+    --tertiary-color-dark: #465929;
+    --tertiary-color-darker: #32401D;
+
+    //fundamentals
+    --primary-hover-color: var(--primary-color-dark);
+    --primary-active-color: var(--primary-color-darker);
+    --primary-focus-color: var(--primary-color-dark);
+
+    --secondary-hover-color: var(--secondary-color-dark);
+    --secondary-active-color: var(--secondary-color-darker);
+    --secondary-focus-color: var(--secondary-color-dark);
+
+    --tertiary-hover-color: var(--tertiary-color-dark);
+    --tertiary-active-color: var(--tertiary-color-darker);
+    --tertiary-focus-color: var(--tertiary-color-dark);
+
+    //semantic
+    --body-color: var(--grey-005);
     --placeholder-color: #676767;
     --placeholder-font-weight: 400;
     --floatlabel-color: #767676;
@@ -48,9 +71,9 @@
     --input-text-color: #454545;
     --form-element-text-color: #454545;
 
-    --button-default-color: #4A7EA6;
-    --button-default-hover-color: #345F80;
-    --button-default-active-color: #274760;
+    --button-default-color: var(--primary-color);
+    --button-default-hover-color: var(--primary-hover-color);
+    --button-default-active-color: var(--primary-color-darker);
 
     --enrollment-status-red: #A21E1F;
     --enrollment-status-green: #027314;
@@ -61,6 +84,8 @@
 
 [data-theme="dc"] {
   --default-font-color: #323130;
+
+  --body-color: #FAFAFA;
 
   --placeholder-color: #676767;
   --placeholder-font-weight: 400;

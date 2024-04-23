@@ -514,7 +514,4 @@ class ApplicationController < ActionController::Base
     browser.ie? && !support_for_ie_browser?
   end
 
-  def set_bs4_layout
-    @bs4 = true
-  end
 end
