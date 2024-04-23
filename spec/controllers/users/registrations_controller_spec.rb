@@ -99,6 +99,8 @@ RSpec.describe Users::RegistrationsController, type: :controller, dbclean: :afte
         post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }
 
         expect(response).not_to redirect_to(root_path)
+        expect(response).to be_successful
+        expect(response).to render_template("new")
       end
     end
 
@@ -124,11 +126,13 @@ RSpec.describe Users::RegistrationsController, type: :controller, dbclean: :afte
       it "should not be successful" do
         post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }, format: :json
         expect(response).to_not be_successful
+        expect(response).not_to redirect_to(root_path)
       end
 
       it "should not be successful" do
         post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }, format: :xml
         expect(response).to_not be_successful
+        expect(response).not_to redirect_to(root_path)
       end
     end
   end

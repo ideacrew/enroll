@@ -6,6 +6,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
   layout 'bootstrap_4'
   before_action :configure_sign_up_params, only: [:create]
   before_action :set_ie_flash_by_announcement, only: [:new]
+
+  # used with respond_with in the create action
+  respond_to :html
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
@@ -52,15 +55,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
         sign_up(resource_name, resource)
         location = after_sign_in_path_for(resource)
         flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
-        respond_to do |format|
-          format.html { respond_with resource, location: location }
-        end
+        respond_with resource, location: location
       else
         set_flash_message :notice, :"signed_up_but_#{resource.inactive_message}" if is_flashing_format?
         expire_data_after_sign_in!
-        respond_to do |format|
-          format.html { respond_with resource, location: after_inactive_sign_up_path_for(resource) }
-        end
+        respond_with resource, location: after_inactive_sign_up_path_for(resource)
       end
     else
       clean_up_passwords resource
