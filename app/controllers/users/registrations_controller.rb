@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# controller for user account creation
 class Users::RegistrationsController < Devise::RegistrationsController
   include RecaptchaConcern
   layout 'bootstrap_4'
@@ -13,22 +16,26 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # POST /resource
   def create
     build_resource(sign_up_params)
+
 #   Check for curam user email, if present then restrict the user.
     if CuramUser.match_unique_login(resource.oim_id).first.present?
       flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      render :new and return
+      respond_to do |format|
+        format.html { render :new }
+      end
+      return
     end
 
     if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
       flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      render :new and return
+      respond_to do |format|
+        format.html { render :new }
+      end
+      return
     end
 
     headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
-
-    if headless.present? && !headless.person.present?
-      headless.destroy
-    end
+    headless.destroy if headless.present? && !headless.person.present?
 
     resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
     resource.handle_headless_records
@@ -45,19 +52,23 @@ class Users::RegistrationsController < Devise::RegistrationsController
         sign_up(resource_name, resource)
         location = after_sign_in_path_for(resource)
         flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
-        respond_with resource, location: location
+        respond_to do |format|
+          format.html { respond_with resource, location: location }
+        end
       else
         set_flash_message :notice, :"signed_up_but_#{resource.inactive_message}" if is_flashing_format?
         expire_data_after_sign_in!
-        respond_with resource, location: after_inactive_sign_up_path_for(resource)
+        respond_to do |format|
+          format.html { respond_with resource, location: after_inactive_sign_up_path_for(resource) }
+        end
       end
     else
       clean_up_passwords resource
       @validatable = devise_mapping.validatable?
-      if @validatable
-        @minimum_password_length = resource_class.password_length.min
+      @minimum_password_length = resource_class.password_length.min if @validatable
+      respond_to do |format|
+        format.html { render :new }
       end
-      render :new
     end
   end
 
