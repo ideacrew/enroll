@@ -914,7 +914,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def get_resource(params)
     return nil if params[:resource_id].blank?
 
-    if params[:resource_name].classify.constantize == Person
+    if params[:resource_name].to_s == "Person"
       Person.find(params[:resource_id])
     else
       BenefitSponsors::Organizations::Profile.find(params[:resource_id])

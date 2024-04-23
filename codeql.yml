@@ -1,0 +1,11 @@
+paths:
+  - app
+  - config
+  - lib
+  - components
+paths-ignore:
+  - hugo
+  - node_modules
+  - "**/*.yml"
+  - "**/*.yaml"
+  - codeql
