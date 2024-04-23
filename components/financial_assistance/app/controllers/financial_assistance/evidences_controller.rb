@@ -72,7 +72,16 @@ module FinancialAssistance
       authorize @applicant, :edit?
       fetch_applicant
       find_docs_owner
-      @evidence = @docs_owner.send(params[:evidence_kind]) if @docs_owner.respond_to?(params[:evidence_kind])
+      # Here 'evidence kind' needs to be a singular association on
+      # FinancialAssistance::Applicant which corresponds to something is, or
+      # is a subclass of, FinancialAssistance::Evidence.
+      # The options for what this can be are limited.
+      # We should find a better way to do this, and probably limit the values
+      # based on the model structure.
+      return if params[:evidence_kind].blank?
+      evidence_kind = params[:evidence_kind].to_s
+      return unless ["income_evidence", "esi_evidence", "non_esi_evidence", "local_mec_evidence"].include?(evidence_kind)
+      @evidence = @docs_owner.send(evidence_kind) if @docs_owner.respond_to?(evidence_kind)
     end
 
     def fetch_applicant_succeeded?

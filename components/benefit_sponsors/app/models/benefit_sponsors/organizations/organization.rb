@@ -451,10 +451,15 @@ module BenefitSponsors
 
           query_params << { :"profiles.languages_spoken" => { "$in" => search_params[:languages]} } unless search_params[:languages].blank?
 
-          query_params << { :"profiles.working_hours" => send(search_params[:working_hours])} unless search_params[:working_hours].blank?
+          query_params << { :"profiles.working_hours" => cast_working_hours_param(search_params[:working_hours])} unless search_params[:working_hours].blank?
 
           query_params
         end
+      end
+
+      def self.cast_working_hours_param(value)
+        return false if value.blank?
+        value.to_s.downcase == "true"
       end
 
       def self.valid_issuer_names_filters
