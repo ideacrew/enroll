@@ -38,7 +38,7 @@ RSpec.describe SamlController do
           before do
             admin_user.update_attributes!(last_activity_at: 61.days.ago)
           end
-        
+
           it "redirects to account expired path" do
             post :login, params: {SAMLResponse: sample_xml}
             expect(response).to redirect_to(account_expired_saml_index_path)
@@ -46,7 +46,7 @@ RSpec.describe SamlController do
         end
 
         context "with last activity at less than 60 days" do
-        
+
           it "redirects to last portal visited" do
             post :login, params: {SAMLResponse: sample_xml}
             expect(response).to redirect_to(admin_user.last_portal_visited)
