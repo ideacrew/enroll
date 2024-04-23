@@ -140,7 +140,7 @@ module BenefitSponsors
 
       def sign_in_and_do_new(user)
         sign_in user
-        get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }
+        get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :js, xhr: true
       end
     end
 
@@ -442,7 +442,7 @@ module BenefitSponsors
 
       def sign_in_and_revert(user)
         sign_in user
-        post :revert, params: { :benefit_application_id => benefit_application.id.to_s, benefit_sponsorship_id: benefit_sponsorship_id }
+        post :revert, params: { :benefit_application_id => benefit_application.id.to_s, benefit_sponsorship_id: benefit_sponsorship_id }, format: :js, xhr: true
       end
 
       context "when there is no eligible application to revert" do

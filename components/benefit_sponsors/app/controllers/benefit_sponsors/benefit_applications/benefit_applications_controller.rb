@@ -5,7 +5,7 @@ module BenefitSponsors
       include Pundit
       include HtmlScrubberUtil
 
-      before_action :check_request_format, only: [:new, :edit, :submit_application, :force_submit_application, :revert]
+      before_action :check_request_format, only: [:new, :edit, :submit_application, :revert]
 
       def new
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.permit(:benefit_sponsorship_id))
