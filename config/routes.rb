@@ -71,6 +71,7 @@ Rails.application.routes.draw do
       post :redirection_test
       get :logout
       get :navigate_to_assistance
+      get :account_expired
     end
   end
 

@@ -7,6 +7,10 @@ class SamlController < ApplicationController
   #   redirect_to(request.create(saml_settings))
   # end
 
+  def account_expired
+    flash[:error] = l10n('devise.failure.expired')
+  end
+
   def login
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
@@ -19,7 +23,7 @@ class SamlController < ApplicationController
 
       if oim_user.present?
         if oim_user.expired?
-          redirect_to main_app.root_path, flash: { error: l10n('devise.failure.expired') }
+          redirect_to account_expired_saml_index_path
           return
         end
 

@@ -18,7 +18,6 @@ RSpec.describe SamlController do
       let(:attributes_double) { { 'mail' => admin_user.email} }
 
       before :each do
-        admin_person.user.update_attributes!(last_activity_at: Time.now - 61.days)
         allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return(valid_saml_response)
       end
 
@@ -35,14 +34,23 @@ RSpec.describe SamlController do
           hbx_staff_role
         end
 
-        it "redirects to root path" do
-          post :login, params: {SAMLResponse: sample_xml}
-          expect(response).to redirect_to(root_path)
+        context "with last activity at greater than 60 days" do
+          before do
+            admin_user.update_attributes!(last_activity_at: 61.days.ago)
+          end
+
+          it "redirects to account expired path" do
+            post :login, params: {SAMLResponse: sample_xml}
+            expect(response).to redirect_to(account_expired_saml_index_path)
+          end
         end
 
-        it "shows error message" do
-          post :login, params: {SAMLResponse: sample_xml}
-          expect(flash[:error]).to eq l10n('devise.failure.expired')
+        context "with last activity at less than 60 days" do
+
+          it "redirects to last portal visited" do
+            post :login, params: {SAMLResponse: sample_xml}
+            expect(response).to redirect_to(admin_user.last_portal_visited)
+          end
         end
       end
 
@@ -211,6 +219,13 @@ RSpec.describe SamlController do
           expect(response).to have_http_status(403)
         end
       end
+    end
+  end
+
+  describe "GET account_expired", db_clean: :after_each do
+    it "shows error message" do
+      get :account_expired
+      expect(flash[:error]).to eq l10n('devise.failure.expired')
     end
   end
 
