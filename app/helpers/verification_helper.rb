@@ -78,6 +78,19 @@ module VerificationHelper
     end
   end
 
+  def ridp_status_translated(type, person)
+    case ridp_type_status(type, person)
+    when 'in review'
+      l10n("ridp_status.in_review")
+    when 'valid'
+      l10n("ridp_status.valid")
+    when 'rejected'
+      l10n('verification_type.validation_status')
+    else
+      l10n("ridp_status.outstanding")
+    end
+  end
+
   def verification_type_class(status)
     case status
     when 'verified', 'valid'
