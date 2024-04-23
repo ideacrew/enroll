@@ -75,6 +75,11 @@ footer.page-footer {
         display: flex;
         align-items: center;
         gap: 8px;
+
+        &:hover {
+          text-decoration: none;
+          background-color: var(--primary-hover-color);
+        }
       }
     }
   }
@@ -176,7 +181,7 @@ dt {
   padding: 15px 10px;
   margin-bottom: $spacer;
   a {
-    color: var(--text-primary);
+    color: var(--default-font-color);
     text-decoration: none;
   }
 }
