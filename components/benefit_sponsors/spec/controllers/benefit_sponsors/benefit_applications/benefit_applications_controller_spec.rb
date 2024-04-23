@@ -141,7 +141,7 @@ module BenefitSponsors
       context "when request format is html" do
         it "should not render new template" do
           sign_in user
-          get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }
+          get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :js
           expect(response.status).to eq 406
           expect(response.body).to eq "Unsupported format"
           expect(response.media_type).to eq "text/plain"
@@ -180,7 +180,7 @@ module BenefitSponsors
 
       def sign_in_and_do_new(user)
         sign_in user
-        get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :js, xhr: true
+        get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :html
       end
     end
 
@@ -286,7 +286,7 @@ module BenefitSponsors
       context "when request format is html" do
         it "should not render edit template" do
           sign_in user
-          get :edit, params: {benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params}
+          get :edit, params: {benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params}, format: :js
           expect(response.status).to eq 406
           expect(response.body).to eq "Unsupported format"
           expect(response.media_type).to eq "text/plain"
@@ -432,7 +432,7 @@ module BenefitSponsors
         context "when request format is html" do
           it "should not render submit_application template" do
             sign_in user_with_broker_role
-            post :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s, benefit_application_id: benefit_application_id }
+            post :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s, benefit_application_id: benefit_application_id }, format: :html
             expect(response.status).to eq 406
             expect(response.body).to eq "Unsupported format"
             expect(response.media_type).to eq "text/plain"

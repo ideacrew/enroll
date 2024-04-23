@@ -1,15 +1,18 @@
 module BenefitSponsors
   module BenefitApplications
-    class BenefitApplicationsController < ApplicationController
+    # This controller is used to create and update benefit applications
+    class BenefitApplicationsController < ::BenefitSponsors::ApplicationController
       layout "two_column"
       include Pundit
       include HtmlScrubberUtil
 
-      before_action :check_request_format, only: [:new, :edit, :submit_application, :revert]
-
       def new
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.permit(:benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
+
+        respond_to do |format|
+          format.html
+        end
       end
 
       def create
@@ -26,6 +29,10 @@ module BenefitSponsors
       def edit
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_edit(params.permit(:id, :benefit_sponsorship_id))
         authorize @benefit_application_form, :updateable?
+
+        respond_to do |format|
+          format.html
+        end
       end
 
       def update
@@ -55,7 +62,9 @@ module BenefitSponsors
         if @benefit_application_form.submit_application
           flash[:notice] = "Plan Year successfully published."
           flash[:error] = error_messages(@benefit_application_form)
-          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
+          respond_to do |format|
+            format.js { render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}" }
+          end
         elsif @benefit_application_form.is_ineligible_to_submit?
           respond_to do |format|
             format.js
@@ -63,7 +72,9 @@ module BenefitSponsors
         else
           error_message_html = sanitize_html(@benefit_application_form.errors.messages.values.flatten.inject("") { |memo, error| "#{memo}<li>#{error}</li>" })
           flash[:error] = "Plan Year failed to publish. #{error_message_html}"
-          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
+          respond_to do |format|
+            format.js { render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}" }
+          end
         end
       end
 
@@ -87,7 +98,10 @@ module BenefitSponsors
         else
           flash[:error] = sanitize_html("Plan Year could not be reverted to draft state. #{error_messages(@benefit_application_form)}")
         end
-        render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
+
+        respond_to do |format|
+          format.js { render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}" }
+        end
       end
 
       def late_rates_check
@@ -111,10 +125,6 @@ module BenefitSponsors
           :start_on, :end_on, :fte_count, :pte_count, :msp_count,
           :open_enrollment_start_on, :open_enrollment_end_on, :benefit_sponsorship_id
         )
-      end
-
-      def check_request_format
-        raise ActionController::UnknownFormat unless request.format.js?
       end
     end
   end
