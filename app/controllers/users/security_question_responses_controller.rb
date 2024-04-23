@@ -39,7 +39,6 @@ class Users::SecurityQuestionResponsesController < ApplicationController
       @form_name = "form#new_user"
       user.identity_confirmed_token = @success_token
       user.save!
-      respond_to :js
     else
       flash[:error] = "That doesn't seem to be the correct response"
       render :error_response
