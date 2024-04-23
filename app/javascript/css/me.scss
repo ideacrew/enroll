@@ -1,5 +1,5 @@
 // all contents of this file must be nested within the data-theme="me" selector to make sure they don't leak to other clients.
 
 [data-theme="me"] {
-
+  --font: Barlow, sans-serif;
 }
