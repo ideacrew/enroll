@@ -286,7 +286,7 @@ module BenefitSponsors
       context "when request format is html" do
         it "should not render edit template" do
           sign_in user
-          get :edit, params: {benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params}, format: :js
+          get :edit, params: {benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params}, format: :faketype
           expect(response.status).to eq 406
           expect(response.body).to eq "Unsupported format"
           expect(response.media_type).to eq "text/plain"
