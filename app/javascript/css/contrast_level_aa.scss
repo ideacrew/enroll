@@ -1,6 +1,8 @@
 // all contents of this file must be nested within the data-contrast="true" selector to make sure they don't leak to other themes.
 // These will only be applied if the contrast level is set to true in the layout.
 [data-contrast="true"] {
+  --font: Barlow, sans-serif;
+
   .warning-notice {
     padding: 8px 14px 8px 14px;
     border-radius: 18px;
