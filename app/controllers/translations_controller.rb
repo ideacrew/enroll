@@ -3,18 +3,24 @@
 # Controller with user facing interface for creating, editing, and destroying translations
 # Currently can only be visited by super admin users
 
+# Controller containing all CRUD actions for translations
 class TranslationsController < ApplicationController
   before_action :translations_authorized?
   before_action :set_translation, only: [:show, :edit, :update, :destroy]
 
+  respond_to :html, only: [:index, :new, :show, :edit]
+
   def index
     @translations = Translation.order('key ASC').all
+    respond_with(@translations)
   end
 
-  def show; end
+  def show
+    find_and_render_translation
+  end
 
   def new
-    @translation = Translation.new
+    find_and_render_translation
   end
 
   def create
@@ -32,7 +38,9 @@ class TranslationsController < ApplicationController
     # redirect_to translations_path, :notice => "Added translations"
   end
 
-  def edit; end
+  def edit
+    find_and_render_translation
+  end
 
   def update
     respond_to do |format|
@@ -55,6 +63,11 @@ class TranslationsController < ApplicationController
   end
 
   private
+
+  def find_and_render_translation
+    @translation = params[:id] ? Translation.find(params[:id]) : Translation.new
+    respond_with(@translation)
+  end
 
   # Best to keep the scope of this controller down to super admins
   def translations_authorized?
