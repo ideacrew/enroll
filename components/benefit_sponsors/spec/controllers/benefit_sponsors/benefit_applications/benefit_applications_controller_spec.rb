@@ -138,9 +138,49 @@ module BenefitSponsors
         end
       end
 
+      context "when request format is html" do
+        it "should not render new template" do
+          sign_in user
+          get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :js
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+          expect(response.media_type).to eq "text/plain"
+        end
+      end
+
+      context "when request format is BAC" do
+        it "should not render new template" do
+          sign_in user
+          get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :bac
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+          expect(response.media_type).to eq "text/plain"
+        end
+      end
+
+      context "when request format is JSON" do
+        it "should not render new template" do
+          sign_in user
+          get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :json
+          expect(response.status).to eq 406
+          expect(response.body).to eq "{\"error\":\"Unsupported format\"}"
+          expect(response.media_type).to eq "application/json"
+        end
+      end
+
+      context "when request format is xml" do
+        it "should not render new template" do
+          sign_in user
+          get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :xml
+          expect(response.status).to eq 406
+          expect(response.body).to eq "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <error>Unsupported format</error>\n</hash>\n"
+          expect(response.media_type).to eq "application/xml"
+        end
+      end
+
       def sign_in_and_do_new(user)
         sign_in user
-        get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }
+        get :new, params: { benefit_sponsorship_id: benefit_sponsorship_id }, format: :html
       end
     end
 
@@ -242,6 +282,16 @@ module BenefitSponsors
           expect(form_class).to respond_to(:for_edit)
         end
       end
+
+      context "when request format is html" do
+        it "should not render edit template" do
+          sign_in user
+          get :edit, params: {benefit_sponsorship_id: benefit_sponsorship_id, id: ben_app.id.to_s, benefit_application: benefit_application_params}, format: :faketype
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+          expect(response.media_type).to eq "text/plain"
+        end
+      end
     end
 
     describe "POST update", :dbclean => :around_each do
@@ -292,6 +342,16 @@ module BenefitSponsors
           [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in_and_do_update(login_user)
             expect(flash[:error]).to match(/Open enrollment end on can't be blank/)
+          end
+        end
+
+        context "when request format is html" do
+          it "should not render edit template" do
+            sign_in user
+            put :update, params: {:id => ben_app.id.to_s, :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application => benefit_application_params}
+            expect(response.status).to eq 406
+            expect(response.body).to eq "Unsupported format"
+            expect(response.media_type).to eq "text/plain"
           end
         end
       end
@@ -368,6 +428,16 @@ module BenefitSponsors
             expect(flash[:error]).to eq "<li>Warning: You have 0 non-owner employees on your roster. In order to be able to enroll under employer-sponsored coverage, you must have at least one non-owner enrolled. Do you want to go back to add non-owner employees to your roster?</li>"
           end
         end
+
+        context "when request format is html" do
+          it "should not render submit_application template" do
+            sign_in user_with_broker_role
+            post :submit_application, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s, benefit_application_id: benefit_application_id }, format: :html
+            expect(response.status).to eq 406
+            expect(response.body).to eq "Unsupported format"
+            expect(response.media_type).to eq "text/plain"
+          end
+        end
       end
 
       context "benefit application is not submitted due to warnings" do
@@ -442,7 +512,7 @@ module BenefitSponsors
 
       def sign_in_and_revert(user)
         sign_in user
-        post :revert, params: { :benefit_application_id => benefit_application.id.to_s, benefit_sponsorship_id: benefit_sponsorship_id }
+        post :revert, params: { :benefit_application_id => benefit_application.id.to_s, benefit_sponsorship_id: benefit_sponsorship_id }, format: :js, xhr: true
       end
 
       context "when there is no eligible application to revert" do

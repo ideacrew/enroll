@@ -13,6 +13,7 @@ module BenefitSponsors
 
     rescue_from Pundit::NotAuthorizedError, Pundit::NotDefinedError, with: :user_not_authorized
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
+    rescue_from ActionController::UnknownFormat, with: :respond_to_unsupported_format
 
     # for current_user
     before_action :set_current_user
@@ -163,6 +164,18 @@ module BenefitSponsors
         format.html { redirect_to main_app.root_path }
         format.js   { render plain: "window.location.assign('#{root_path}');" }
         format.json { redirect_to main_app.root_path }
+      end
+    end
+
+    def respond_to_unsupported_format
+      message = 'Unsupported format'
+      status = :not_acceptable
+      content_type = 'text/plain'
+
+      respond_to do |format|
+        format.json { render json: { error: message }, status: status }
+        format.xml  { render xml: { error: message }.to_xml, status: status }
+        format.all { render body: message, status: status, content_type: content_type }
       end
     end
   end
