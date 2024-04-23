@@ -334,6 +334,13 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:upload_ridp_document)
     end
+
+    it "should not render new template" do
+      sign_in user
+      get :upload_ridp_document, format: :js
+      expect(response).not_to have_http_status(:success)
+      expect(response).not_to render_template(:upload_ridp_document)
+    end
   end
 
   context "PUT update" do
@@ -720,6 +727,13 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:immigration_document_options)
     end
+
+    it "not render javascript template" do
+      allow(Person).to receive(:find).and_return person
+      get :immigration_document_options, params: params, format: :html, xhr: true
+      expect(response).not_to have_http_status(:success)
+      expect(response).not_to render_template(:immigration_document_options)
+    end
   end
 
   context "GET ridp_agreement", dbclean: :after_each do
@@ -758,11 +772,16 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(person100.consumer_role).to receive(:identity_verified?).and_return(false)
         allow(person100.consumer_role).to receive(:application_verified?).and_return(false)
         allow(person100.primary_family).to receive(:has_curam_or_mobile_application_type?).and_return(false)
-        get "ridp_agreement"
       end
 
       it "should render the agreement page" do
+        get "ridp_agreement"
         expect(response).to render_template("ridp_agreement")
+      end
+
+      it "should not render the agreement page" do
+        get "ridp_agreement", format: :js
+        expect(response).not_to render_template("ridp_agreement")
       end
     end
   end
