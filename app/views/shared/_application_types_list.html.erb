@@ -3,7 +3,7 @@
     <div class="row row-form-wrapper no-buffer">
       <div class="col-lg-4 col-md-4 form-group form-group-lg no-pd top-buffer" >
         <div class="row_align_application_type">
-          <span> <b> Application Type :</b></span>
+          <label for="application_type_id"><%= l10n("application_type") %>:</label>
         </div>
       </div>
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
@@ -12,7 +12,7 @@
         <% end %>
       </div>
       <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd top-buffer">
-        <%= f.submit 'Confirm', class: 'btn btn-primary', style: "margin-top: -7px" %>
+        <%= f.submit l10n('confirm_selection'), class: 'btn btn-primary' %>
       </div>
     </div>
   <% end %>
