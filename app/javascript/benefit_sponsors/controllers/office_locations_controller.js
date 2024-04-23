@@ -62,7 +62,11 @@ export default class extends Controller {
         input.value = ''
       })
 
-      newLocation.querySelector('input[placeholder="ZIP"]').setAttribute('data-action', "")
+      newLocation.querySelector('input[placeholder="ZIP"]').setAttribute('data-action', "");
+
+      newLocation.querySelector(".phone_number7").addEventListener('input', (event) => {
+        event.target.value = this.phoneMask(event.target.value);
+      });
 
       newLocation.querySelectorAll('select').forEach(function(input) {
         var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
@@ -78,7 +82,7 @@ export default class extends Controller {
 
       })
 
-      this.officeLocationsTarget.appendChild(newLocation)
+      this.officeLocationsTarget.appendChild(newLocation);
     }
   }
 
@@ -91,5 +95,11 @@ export default class extends Controller {
       })
       $(event.target).closest('.js-office-location').hide();
     }
+  }
+
+  phoneMask(phone) {
+    return phone.replace(/\D/g, '')
+      .replace(/(\d{3})(\d{1,4})/, '$1-$2')
+      .replace(/(-\d{4})\d+?$/, '$1');
   }
 }
