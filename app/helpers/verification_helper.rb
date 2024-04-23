@@ -37,6 +37,7 @@ module VerificationHelper
     end
   end
 
+<<<<<<< HEAD
   def display_verification_type_name(v_type)
     case v_type
     when 'ME Residency'
@@ -63,6 +64,8 @@ module VerificationHelper
     false
   end
 
+=======
+>>>>>>> a43d1f4a89 (fix fonts, more ridp work started)
   def ridp_status_translated(type, person)
     case ridp_type_status(type, person)
     when 'in review'
