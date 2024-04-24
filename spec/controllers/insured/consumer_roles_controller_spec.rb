@@ -807,7 +807,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   end
 
-  describe "Post match resident role" do
+  describe "resident role" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:resident_parameters) { { :first_name => "John", :last_name => "Smith1", :dob => "4/4/1972" }}
     let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => "true", ssn: "333224444", dob: Date.new(1968, 2, 3), :first_name => "fname", :last_name => "lname") }
@@ -829,41 +829,53 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
       allow(person).to receive(:is_resident_role_active?).and_return(false)
-
-
     end
 
-    context "with pre-existing consumer_role", dbclean: :after_each do
-      it "should not have a resident role created for it" do
-        post :match, params: {person: resident_parameters }
-        expect(user.person.resident_role).to be_nil
-        #expect(response).to redirect_to(family_account_path)
+    context "Post match" do
+      context "with pre-existing consumer_role", dbclean: :after_each do
+        it "should not have a resident role created for it" do
+          post :match, params: {person: resident_parameters }
+          expect(user.person.resident_role).to be_nil
+          #expect(response).to redirect_to(family_account_path)
+          expect(response).to render_template("match")
+        end
+      end
+
+      context "with pre-existing resident_role", dbclean: :after_each do
+        it "should navigate to family account page" do
+          allow(person).to receive(:resident_role).and_return(resident_role)
+          allow(person).to receive(:is_resident_role_active?).and_return(true)
+
+          post :match, params: { person: resident_parameters }
+          expect(user.person.resident_role).not_to be_nil
+          expect(response).to redirect_to(family_account_path)
+        end
+      end
+
+      context "with both resident and consumer roles", dbclean: :after_each do
+        it "should navigate to family account page" do
+          allow(person).to receive(:consumer_role).and_return(consumer_role)
+          allow(person).to receive(:resident_role).and_return(resident_role)
+          allow(person).to receive(:is_resident_role_active?).and_return(true)
+          allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
+          post :match, params: { person: resident_parameters }
+          expect(user.person.consumer_role).not_to be_nil
+          expect(user.person.resident_role).not_to be_nil
+          expect(response).to redirect_to(family_account_path)
+        end
+      end
+    end
+
+    context "Post build" do
+      it "should render match" do
+        post :build, params: {person: resident_parameters }
         expect(response).to render_template("match")
       end
-    end
 
-    context "with pre-existing resident_role", dbclean: :after_each do
-      it "should navigate to family account page" do
-        allow(person).to receive(:resident_role).and_return(resident_role)
-        allow(person).to receive(:is_resident_role_active?).and_return(true)
-
-        post :match, params: { person: resident_parameters }
-        expect(user.person.resident_role).not_to be_nil
-        expect(response).to redirect_to(family_account_path)
-      end
-    end
-
-    context "with both resident and consumer roles", dbclean: :after_each do
-      it "should navigate to family account page" do
-        allow(person).to receive(:consumer_role).and_return(consumer_role)
-        allow(person).to receive(:resident_role).and_return(resident_role)
-        allow(person).to receive(:is_resident_role_active?).and_return(true)
-        allow(person).to receive(:is_consumer_role_active?).and_return(true)
-
-        post :match, params: { person: resident_parameters }
-        expect(user.person.consumer_role).not_to be_nil
-        expect(user.person.resident_role).not_to be_nil
-        expect(response).to redirect_to(family_account_path)
+      it "should not render match" do
+        post :build, params: {person: resident_parameters }, format: :js
+        expect(response).not_to render_template("match")
       end
     end
   end
