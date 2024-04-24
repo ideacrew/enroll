@@ -2,6 +2,7 @@
 
 module BenefitSponsors
   module BenefitPackages
+    # This controller is used to create and update benefit packages
     class BenefitPackagesController < ::BenefitSponsors::ApplicationController
 
       before_action :check_for_late_rates, only: [:new]
