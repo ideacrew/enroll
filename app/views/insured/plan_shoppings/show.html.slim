@@ -154,7 +154,7 @@ javascript:
 
     function filterBy(element) {
       filterType = element.dataset.sortBy;
-      clearSelections()
+      resetPlanTileSelection();
       clearAll()
       applyFilter()
       filteredPlans(filterType)
@@ -441,7 +441,7 @@ javascript:
       }
       // Shows results in the view
       $("#plans-count").text(filteredArray.length);
-      clearSelections();
+      resetPlanTileSelection();
       applyFilter();
       resetComparePlan();
       showFilteredResults()
