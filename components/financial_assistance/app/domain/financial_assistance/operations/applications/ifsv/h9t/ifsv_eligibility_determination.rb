@@ -72,7 +72,13 @@ module FinancialAssistance
                 applicant.set_income_evidence_verified
               when "outstanding"
                 if income_evidence.enrolled_in_any_aptc_csr_enrollments?(enrollments)
-                  applicant.set_evidence_outstanding(income_evidence)
+                  if income_evidence.is_previous_state?('review')
+                    income_evidence.move_to_review
+                  elsif income_evidence.is_previous_state?('rejected')
+                    applicant.set_evidence_rejected(income_evidence)
+                  else
+                    applicant.set_evidence_outstanding(income_evidence)
+                  end
                 else
                   applicant.set_evidence_to_negative_response(income_evidence)
                 end
@@ -92,6 +98,7 @@ module FinancialAssistance
               end
               applicant.save!
             end
+
           end
         end
       end

@@ -391,6 +391,10 @@ module Eligibilities
       !type_verified?
     end
 
+    def is_previous_state?(state)
+      workflow_state_transitions.order_by(:transition_at.desc)&.first&.from_state == state
+    end
+
     def type_verified?
       ["verified", "attested"].include? aasm_state
     end

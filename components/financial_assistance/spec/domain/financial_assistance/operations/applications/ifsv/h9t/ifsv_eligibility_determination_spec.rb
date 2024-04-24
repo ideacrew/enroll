@@ -122,6 +122,38 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             expect(@result).to be_success
           end
 
+          context 'and income_evidence in state review' do
+            context 'with aptc used' do
+              let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_aptc_enrollment_members, :with_health_product, family: family, enrollment_members: family.family_members) }
+
+              it 'returns review' do
+                income_evidence = @applicant.income_evidence
+                income_evidence.move_to_review
+                subject.call(payload: response_payload)
+                enrollment_member = enrollment.hbx_enrollment_members.first
+                enrollment_member.person.update(hbx_id: '1629165429385938')
+                income_evidence = @applicant.income_evidence
+                expect(income_evidence.review?).to be_truthy
+              end
+            end
+          end
+
+          context 'and income_evidence in state rejected' do
+            context 'with aptc used' do
+              let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_aptc_enrollment_members, :with_health_product, family: family, enrollment_members: family.family_members) }
+
+              it 'returns rejected' do
+                income_evidence = @applicant.income_evidence
+                @applicant.set_evidence_rejected(income_evidence)
+                subject.call(payload: response_payload)
+                enrollment_member = enrollment.hbx_enrollment_members.first
+                enrollment_member.person.update(hbx_id: '1629165429385938')
+                income_evidence = @applicant.income_evidence
+                expect(income_evidence.rejected?).to be_truthy
+              end
+            end
+          end
+
           context 'with aptc used' do
 
             let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_aptc_enrollment_members, :with_health_product, family: family, enrollment_members: family.family_members) }
