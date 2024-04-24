@@ -16,11 +16,12 @@ class TranslationsController < ApplicationController
   end
 
   def show
-    find_and_render_translation
+    respond_with(@translation)
   end
 
   def new
-    find_and_render_translation
+    @translation = Translation.new
+    respond_with(@translation)
   end
 
   def create
@@ -39,7 +40,7 @@ class TranslationsController < ApplicationController
   end
 
   def edit
-    find_and_render_translation
+    respond_with(@translation)
   end
 
   def update
@@ -63,11 +64,6 @@ class TranslationsController < ApplicationController
   end
 
   private
-
-  def find_and_render_translation
-    @translation = params[:id] ? Translation.find(params[:id]) : Translation.new
-    respond_with(@translation)
-  end
 
   # Best to keep the scope of this controller down to super admins
   def translations_authorized?
