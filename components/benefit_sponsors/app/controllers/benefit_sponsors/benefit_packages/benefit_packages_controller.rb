@@ -2,7 +2,7 @@
 
 module BenefitSponsors
   module BenefitPackages
-    class BenefitPackagesController < ApplicationController
+    class BenefitPackagesController < ::BenefitSponsors::ApplicationController
 
       before_action :check_for_late_rates, only: [:new]
 

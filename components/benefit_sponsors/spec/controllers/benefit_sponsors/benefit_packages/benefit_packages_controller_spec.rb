@@ -236,7 +236,7 @@ module BenefitSponsors
 
       def sign_in_and_get_ref_prod
         sign_in user
-        get :reference_product_summary, params: { :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id }
+        get :reference_product_summary, params: { :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id }, format: :json
       end
 
       before do
