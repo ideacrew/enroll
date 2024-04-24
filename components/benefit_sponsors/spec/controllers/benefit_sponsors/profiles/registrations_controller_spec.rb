@@ -374,19 +374,17 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
             it "should not render the confirmation template" do
               post :create, params: {:agency => self.send("broker_agency_params")}, format: :js
-              expect(response).not_to render_template('confirmation')
+              expect(response).to have_http_status(:not_acceptable)
             end
 
             it "should not return a success" do
-              expect do
-                post :create, params: {:agency => self.send("broker_agency_params")}, format: :json
-              end.to raise_error(ActionView::MissingTemplate)
+              post :create, params: {:agency => self.send("broker_agency_params")}, format: :json
+              expect(response).to have_http_status(:not_acceptable)
             end
 
             it "should not return a success" do
-              expect do
-                post :create, params: {:agency => self.send("broker_agency_params")}, format: :xml
-              end.to raise_error(ActionView::MissingTemplate)
+              post :create, params: {:agency => self.send("broker_agency_params")}, format: :xml
+              expect(response).to have_http_status(:not_acceptable)
             end
           end
         end
@@ -502,25 +500,25 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           @id = self.send('broker_agency').profiles.first.id.to_s
         end
 
-        it "should return a success" do
+        it "html should return a success" do
           get :edit, params: {id: @id}
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:success)
           expect(response).to render_template('edit')
         end
 
-        it "should raise an error" do
+        it "js should raise an error" do
           get :edit, params: {id: @id}, format: :js
-          expect(response).to_not have_http_status(:success)
+          expect(response).to have_http_status(:not_acceptable)
         end
 
-        it "should raise an error" do
+        it "json should raise an error" do
           get :edit, params: {id: @id}, format: :json
-          expect(response).to_not have_http_status(:success)
+          expect(response).to have_http_status(:not_acceptable)
         end
 
-        it "should raise an error" do
+        it "xml should raise an error" do
           get :edit, params: {id: @id}, format: :xml
-          expect(response).to_not have_http_status(:success)
+          expect(response).to have_http_status(:not_acceptable)
         end
       end
     end
@@ -651,27 +649,24 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           sign_in edit_user
         end
 
-        it "should return a success" do
+        it "html should return a success" do
+          get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}
+          expect(response).to have_http_status(:success)
+        end
+
+        it "json should return a success" do
           get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :json
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:success)
         end
 
-        it "should raise an error" do
-          expect do
-            get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}
-          end.to raise_error(ActionController::UnknownFormat)
+        it "js should return an error" do
+          get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :js
+          expect(response).to have_http_status(:not_acceptable)
         end
 
-        it "should raise an error" do
-          expect do
-            get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :js
-          end.to raise_error(ActionController::UnknownFormat)
-        end
-
-        it "should raise an error" do
-          expect do
-            get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :xml
-          end.to raise_error(ActionController::UnknownFormat)
+        it "xml should return an error" do
+          get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
         end
       end
     end

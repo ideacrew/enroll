@@ -59,7 +59,9 @@ module BenefitSponsors
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
-        render 'new', :flash => { :error => @agency.errors.full_messages }
+        respond_to do |format|
+          format.html { render 'new', :flash => { :error => @agency.errors.full_messages } }
+        end
       end
 
       def edit
