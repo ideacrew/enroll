@@ -10,6 +10,8 @@ module FinancialAssistance
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
+    respond_to :html
+
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
