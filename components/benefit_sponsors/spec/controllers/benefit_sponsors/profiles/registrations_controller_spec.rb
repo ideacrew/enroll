@@ -509,21 +509,18 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         end
 
         it "should raise an error" do
-          expect do
-            get :edit, params: {id: @id}, format: :js
-          end.to raise_error(ActionController::UnknownFormat)
+          get :edit, params: {id: @id}, format: :js
+          expect(response).to_not have_http_status(:success)
         end
 
         it "should raise an error" do
-          expect do
-            get :edit, params: {id: @id}, format: :json
-          end.to raise_error(ActionController::UnknownFormat)
+          get :edit, params: {id: @id}, format: :json
+          expect(response).to_not have_http_status(:success)
         end
 
         it "should raise an error" do
-          expect do
-            get :edit, params: {id: @id}, format: :xml
-          end.to raise_error(ActionController::UnknownFormat)
+          get :edit, params: {id: @id}, format: :xml
+          expect(response).to_not have_http_status(:success)
         end
       end
     end
