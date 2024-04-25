@@ -10,8 +10,6 @@ module FinancialAssistance
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
-    respond_to :html
-
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
@@ -63,13 +61,17 @@ module FinancialAssistance
       authorize @application, :edit?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-
-
       load_support_texts
+
+      respond_to do |format|
+        format.html
+      end
     end
 
     # rubocop:disable Metrics/AbcSize
     def step
+      raise ActionController::UnknownFormat unless request.format.html?
+
       authorize @application, :step?
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
@@ -155,7 +157,10 @@ module FinancialAssistance
       authorize @application, :application_year_selection?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance'
+
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance' }
+      end
     end
 
     def application_checklist
