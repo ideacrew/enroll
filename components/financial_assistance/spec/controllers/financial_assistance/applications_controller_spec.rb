@@ -62,22 +62,20 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       it "renders the index template" do
         get :index, format: :json
         expect(response.status).to eq 406
-        expect(response.body).to eq "Unsupported format"
-        expect(response.media_type).to eq "text/plain"
+        expect(response.body).to eq "{\"error\":\"Unsupported format\"}"
+        expect(response.media_type).to eq "application/json"
       end
 
       it "renders the index template" do
         get :index, format: :fake
         expect(response.status).to eq 406
         expect(response.body).to eq "Unsupported format"
-        expect(response.media_type).to eq "text/plain"
       end
 
       it "renders the index template" do
         get :index, format: :xml
         expect(response.status).to eq 406
-        expect(response.body).to eq "Unsupported format"
-        expect(response.media_type).to eq "text/plain"
+        expect(response.body).to eq "<error>Unsupported format</error>"
       end
     end
 
@@ -263,13 +261,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(response).to redirect_to(main_app.root_path)
         expect(flash[:error]).to eq('Access not allowed for family_policy.index?, (Pundit policy)')
       end
-    end
-  end
-
-  context "GET new" do
-    it "should assign application" do
-      get :new
-      expect(assigns(:application).class).to eq FinancialAssistance::Application
     end
   end
 

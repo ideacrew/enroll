@@ -15,14 +15,6 @@ module FinancialAssistance
       @family ||= record.family
     end
 
-    # Determines if the current user has permission to create a new application.
-    # The user can create a new application if they have permission to edit it.
-    #
-    # @return [Boolean] Returns true if the user has permission to create a new application, false otherwise.
-    def new?
-      edit?
-    end
-
     # Determines if the current user has permission to create an application.
     # The user can create an application if they have permission to edit it.
     #

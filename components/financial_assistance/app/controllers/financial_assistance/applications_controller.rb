@@ -59,12 +59,6 @@ module FinancialAssistance
       end
     end
 
-    def new
-      authorize @family, :new?
-
-      @application = FinancialAssistance::Application.new
-    end
-
     def edit
       authorize @application, :edit?
       save_faa_bookmark(request.original_url)

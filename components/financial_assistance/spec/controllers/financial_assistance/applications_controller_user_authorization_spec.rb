@@ -103,7 +103,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
       context "GET checklist_pdf" do
         it 'returns success' do
-          get :checklist_pdf, params: { id: application.id }
+          get :checklist_pdf, params: { id: application.id }, format: :pdf
           expect(response).to be_successful
         end
       end
