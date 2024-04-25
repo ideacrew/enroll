@@ -307,7 +307,7 @@ module FinancialAssistance
     end
 
     def checklist_pdf
-      raise ActionController::UnknownFormat unless request.format.pdf?
+      raise ActionController::UnknownFormat unless request.format.html?
 
       authorize @application, :checklist_pdf?
       send_file(
