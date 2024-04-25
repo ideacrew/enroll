@@ -1433,6 +1433,10 @@ module FinancialAssistance
       !is_primary_applicant?
     end
 
+    def mailing_address
+      addresses.mailing.first
+    end
+
     private
 
     def fetch_evidence_params(evidence)

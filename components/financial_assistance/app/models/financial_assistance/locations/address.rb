@@ -54,6 +54,9 @@ module FinancialAssistance
                 }
       validate :county_check
 
+      # Scopes
+      scope :mailing, -> { where(kind: 'mailing') }
+
       def county_check
         return unless EnrollRegistry.feature_enabled?(:display_county)
         return if self.county.present?

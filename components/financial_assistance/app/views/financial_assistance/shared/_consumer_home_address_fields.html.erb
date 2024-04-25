@@ -132,8 +132,23 @@
 
 </div>
 
-<% if f.object.addresses[1].present? %>
-<span tabindex="0" onkeydown="handleButtonKeyDown(event, 'remove_mailing_address')" id="remove_mailing_address" class="form-action btn btn-default <%= pundit_class Family, :updateable?%>">Remove Mailing Address</span>
-<% else %>
-<span tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_mailing_address')" id="add_mailing_address" class="form-action btn btn-default <%= pundit_class Family, :updateable?%>">Add Mailing Address</span>
-<% end %>
+<% remove_address_display_class = f.object.mailing_address.present? ? '' : 'dn' %>
+<% add_address_display_class = f.object.mailing_address.present? ? 'dn' : '' %>
+
+<div
+  tabindex='0'
+  id='remove_applicant_mailing_address'
+  class="form-action btn btn-default applicant-mailing-address <%= pundit_class Family, :updateable?%> <%= remove_address_display_class %>"
+  data-url="<%= application_applicant_locations_address_path(f.object.application.id, f.object.id, f.object.mailing_address.id) %>"
+  >
+  Remove Mailing Address
+</div>
+
+<div
+  tabindex="0"
+  id="add_applicant_mailing_address"
+  class="form-action btn btn-default applicant-mailing-address <%= pundit_class Family, :updateable?%> <%= add_address_display_class %>"
+  >
+  Add Mailing Address
+</div>
+</br>

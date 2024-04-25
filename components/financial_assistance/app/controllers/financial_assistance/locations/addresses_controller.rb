@@ -25,8 +25,6 @@ module FinancialAssistance
         else
           flash[:error] = "Failed to destroy address: #{result.failure}"
         end
-
-        redirect_back(fallback_location: main_app.root_path)
       end
 
       private
@@ -44,19 +42,19 @@ module FinancialAssistance
       #
       # @return [FinancialAssistance::Locations::Address, ActionDispatch::Response] The address to be destroyed, or redirects back to the previous page if not found.
       def fetch_address
-        application = ::FinancialAssistance::Application.where(id: destroy_params[:application_id]).first
-        unless application
+        @application = ::FinancialAssistance::Application.where(id: destroy_params[:application_id]).first
+        unless @application
           flash[:error] = 'Application not found with the given parameters.'
           return redirect_back(fallback_location: main_app.root_path)
         end
 
-        applicant = application.applicants.where(id: destroy_params[:applicant_id]).first
-        unless applicant
+        @applicant = @application.applicants.where(id: destroy_params[:applicant_id]).first
+        unless @applicant
           flash[:error] = 'Applicant not found with the given parameters.'
           return redirect_back(fallback_location: main_app.root_path)
         end
 
-        @address = applicant.addresses.where(id: destroy_params[:id]).first
+        @address = @applicant.addresses.where(id: destroy_params[:id]).first
 
         return if @address
 
