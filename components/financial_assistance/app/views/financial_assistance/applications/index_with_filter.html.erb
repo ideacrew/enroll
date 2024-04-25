@@ -60,7 +60,7 @@
                   ] %>
                 <% if current_user.has_hbx_staff_role? %>
                   <% dropdown << ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled'] %>
-                  <% dropdown << ['Transfer History', transfer_history_application_path(application), 'static' ] if FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page) %>
+                  <% dropdown << ['Transfer History', transfer_history_application_path(application), 'static' ] if true %>
                 <% end %>
                 <td>
                   <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>

@@ -29,6 +29,8 @@ module FinancialAssistance
       authorize @family, :index?
 
       @applications = FinancialAssistance::Application.where("family_id" => @family.id)
+
+      respond_to :html
     end
 
     def index_with_filter
@@ -46,8 +48,14 @@ module FinancialAssistance
 
         @filtered_applications = value[:filtered_applications]
         @recent_determined_hbx_id = value[:recent_determined_hbx_id]
+
+        respond_to do |format|
+          format.html
+        end
       else
-        render json: result.failure.to_h, status: 422
+        respond_to do |format|
+          format.json { render json: result.failure.to_h, status: 422 }
+        end
       end
     end
 
@@ -63,9 +71,7 @@ module FinancialAssistance
       set_admin_bookmark_url
       load_support_texts
 
-      respond_to do |format|
-        format.html
-      end
+      respond_to :html
     end
 
     # rubocop:disable Metrics/AbcSize
@@ -149,10 +155,6 @@ module FinancialAssistance
       end
     end
 
-    def help_paying_coverage
-      authorize @application, :help_paying_coverage?
-    end
-
     def application_year_selection
       authorize @application, :application_year_selection?
       save_faa_bookmark(request.original_url)
@@ -168,9 +170,7 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      respond_to do |format|
-        format.html
-      end
+      respond_to :html
     end
 
     def review_and_submit
@@ -190,6 +190,8 @@ module FinancialAssistance
         flash[:error] = l10n("faa.errors.inconsistent_relationships_error")
       end
       redirect_to applications_path if @application.blank?
+
+      respond_to :html
     end
 
     def review
@@ -200,6 +202,8 @@ module FinancialAssistance
       authorize @application, :review?
       @applicants = @application.active_applicants
       build_applicants_name_by_hbx_id_hash
+
+      respond_to :html
     end
 
     def raw_application
@@ -234,9 +238,7 @@ module FinancialAssistance
         end
       end
 
-      respond_to do |format|
-        format.html
-      end
+      respond_to :html
     end
 
     def transfer_history
@@ -260,12 +262,15 @@ module FinancialAssistance
       end
 
       redirect_to applications_path if @application.nil?
+
+      respond_to :html
     end
 
     def wait_for_eligibility_response
       authorize @application, :wait_for_eligibility_response?
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
+
       respond_to do |format|
         format.html { render layout: 'financial_assistance' }
       end
@@ -284,6 +289,8 @@ module FinancialAssistance
       authorize @application, :application_publish_error?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
+
+      respond_to :html
     end
 
     def eligibility_response_error
@@ -293,14 +300,21 @@ module FinancialAssistance
       redirect_to eligibility_results_application_path(@application.id, cur: 1) if eligibility_results_received?(@application)
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
+
+      respond_to :html
     end
 
     def check_eligibility_results_received
       authorize @application, :check_eligibility_results_received?
-      render :plain => determination_token_present?(@application)
+
+      respond_to do |format|
+        format.html { render :plain => determination_token_present?(@application) }
+      end
     end
 
     def checklist_pdf
+      raise ActionController::UnknownFormat unless request.format.pdf?
+
       authorize @application, :checklist_pdf?
       send_file(
         FinancialAssistance::Engine.root.join(

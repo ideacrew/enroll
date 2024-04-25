@@ -69,14 +69,6 @@ module FinancialAssistance
       edit?
     end
 
-    # Determines if the current user has permission to view the help paying coverage page of the application.
-    # The user can view the page if they have permission to edit the application.
-    #
-    # @return [Boolean] Returns true if the user has permission to view the help paying coverage page of the application, false otherwise.
-    def help_paying_coverage?
-      edit?
-    end
-
     # Determines if the current user has permission to select the application year.
     # The user can select the year if they have permission to edit the application.
     #
