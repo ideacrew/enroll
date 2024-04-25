@@ -4,3 +4,4 @@
 
 Gemfile* @ideacrew/merge-shepherds
 appscan_codesweep/CODESWEEP_FALSE_POSITIVES.MD @desireB
+config/brakeman.ignore @ideacrew/merge-shepherds
