@@ -13,6 +13,7 @@ function hideOrShowApplicantMailingAddress() {
       var destroyElement1 = document.querySelector("#applicant_addresses_attributes_1__destroy");
 
       if (mailingDivElement.textContent.trim() === "Add Mailing Address") {
+      // if (mailingDivElement.isSameNode(document.querySelector('#add_applicant_mailing_address'))) {
         mailingDivElement.textContent = 'Remove Mailing Address';
         mailingDivs.forEach(function(div) {
           div.style.display = 'block';
@@ -21,6 +22,7 @@ function hideOrShowApplicantMailingAddress() {
           input.required = true;
         });
       } else if (mailingDivElement.textContent.trim() === "Remove Mailing Address") {
+      // } else if (mailingDivElement.isSameNode(document.querySelector('#remove_applicant_mailing_address'))) {
         mailingDivElement.textContent = 'Add Mailing Address';
         document.querySelectorAll('.mailing-div').forEach(function(div) {
           div.style.display = 'none';

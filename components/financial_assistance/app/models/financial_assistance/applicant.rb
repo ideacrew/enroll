@@ -1433,6 +1433,9 @@ module FinancialAssistance
       !is_primary_applicant?
     end
 
+    # Returns the first mailing address of the applicant.
+    #
+    # @return [Address, nil] the first mailing address if one exists, otherwise nil
     def mailing_address
       addresses.mailing.first
     end

@@ -7,6 +7,8 @@ module FinancialAssistance
       include Mongoid::Timestamps
       include HtmlScrubberUtil
 
+      MAILING_KIND = 'mailing'.freeze
+
       embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 
       KINDS = %w[home work mailing].freeze
