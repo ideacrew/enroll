@@ -1,8 +1,14 @@
+# frozen_string_literal: true
+
+# controller for user account creation
 class Users::RegistrationsController < Devise::RegistrationsController
   include RecaptchaConcern
   layout 'bootstrap_4'
   before_action :configure_sign_up_params, only: [:create]
   before_action :set_ie_flash_by_announcement, only: [:new]
+
+  # used with respond_with in the create action
+  respond_to :html
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
@@ -13,22 +19,26 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # POST /resource
   def create
     build_resource(sign_up_params)
+
 #   Check for curam user email, if present then restrict the user.
     if CuramUser.match_unique_login(resource.oim_id).first.present?
       flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      render :new and return
+      respond_to do |format|
+        format.html { render :new }
+      end
+      return
     end
 
     if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
       flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      render :new and return
+      respond_to do |format|
+        format.html { render :new }
+      end
+      return
     end
 
     headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
-
-    if headless.present? && !headless.person.present?
-      headless.destroy
-    end
+    headless.destroy if headless.present? && !headless.person.present?
 
     resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
     resource.handle_headless_records
@@ -54,10 +64,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
     else
       clean_up_passwords resource
       @validatable = devise_mapping.validatable?
-      if @validatable
-        @minimum_password_length = resource_class.password_length.min
+      @minimum_password_length = resource_class.password_length.min if @validatable
+      respond_to do |format|
+        format.html { render :new }
       end
-      render :new
     end
   end
 

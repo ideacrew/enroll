@@ -1,5 +1,6 @@
 class Users::SecurityQuestionResponsesController < ApplicationController
   include Config::ContactCenterConcern
+  respond_to :js, only: [:create, :authenticate, :challenge]
 
   def create
     responses = params[:security_question_responses]
