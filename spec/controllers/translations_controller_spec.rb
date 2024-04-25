@@ -21,26 +21,45 @@ RSpec.describe TranslationsController, :type => :controller do
 
   context "Permissions" do
     context "#new" do
-      context "super admin" do
-        it "should be authorized" do
-          get :new
-          expect(response.status).to be(200)
+      context 'with a valid MIME type' do
+        context "as a super admin" do
+          it "should be authorized" do
+            get :new
+            expect(response.status).to be(200)
+          end
+        end
+
+        context "as a non super admin user" do
+          before do
+            super_admin_permission.update_attributes!(name: "non_super_admin")
+          end
+          it "should not be authorized" do
+            get :new
+            expect(response).to_not eq(200)
+          end
         end
       end
 
-      context "non super admin user" do
-        before do
-          super_admin_permission.update_attributes!(name: "non_super_admin")
+      context 'with an invalid MIME type' do
+        it "js should not be authorized" do
+          get :new, format: :js
+          expect(response).to have_http_status(:not_acceptable)
         end
-        it "should not be authorized" do
-          get :new
-          expect(response).to_not eq(200)
+
+        it "json should not be authorized" do
+          get :new, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should not be authorized" do
+          get :new, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
         end
       end
     end
 
     context "#create" do
-      context "super admin" do
+      context "as a super admin" do
         # Passes locally but not on GH for some rason
         xit "should be authorized" do
           post :create, params: {translation: {key: "en.translation", value: "This is the translation."}}
@@ -48,7 +67,7 @@ RSpec.describe TranslationsController, :type => :controller do
         end
       end
 
-      context "non super admin user" do
+      context "as a non super admin user" do
         before do
           super_admin_permission.update_attributes!(name: "non_super_admin")
         end
@@ -60,33 +79,52 @@ RSpec.describe TranslationsController, :type => :controller do
     end
 
     context "#edit" do
-      context "super admin" do
-        it "should be authorized" do
-          get :edit, params: {id: test_translation.id}
-          expect(response.status).to be(200)
+      context 'with a valid MIME type' do
+        context "as a super admin" do
+          it "should be authorized" do
+            get :edit, params: {id: test_translation.id}
+            expect(response.status).to be(200)
+          end
+        end
+
+        context "as a non super admin user" do
+          before do
+            super_admin_permission.update_attributes!(name: "non_super_admin")
+          end
+          it "should not be authorized" do
+            get :edit, params: {id: test_translation.id}
+            expect(response).to_not eq(200)
+          end
         end
       end
 
-      context "non super admin user" do
-        before do
-          super_admin_permission.update_attributes!(name: "non_super_admin")
+      context 'with an invalid MIME type' do
+        it "js should not be authorized" do
+          get :edit, params: {id: test_translation.id}, format: :js
+          expect(response).to have_http_status(:not_acceptable)
         end
-        it "should not be authorized" do
-          get :edit, params: {id: test_translation.id}
-          expect(response).to_not eq(200)
+
+        it "json should not be authorized" do
+          get :edit, params: {id: test_translation.id}, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should not be authorized" do
+          get :edit, params: {id: test_translation.id}, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
         end
       end
     end
 
     context "#update" do
-      context "super admin" do
+      context "as a super admin" do
         xit "should be authorized" do
           put :update, params: {id: test_translation.id, translation: {key: "en.translation", value: "This is the translation."}}
           expect(response.status).to be(200)
         end
       end
 
-      context "non super admin user" do
+      context "as a non super admin user" do
         before do
           super_admin_permission.update_attributes!(name: "non_super_admin")
         end
@@ -98,39 +136,77 @@ RSpec.describe TranslationsController, :type => :controller do
     end
 
     context "#show" do
-      context "super admin" do
-        it "should be authorized" do
-          get :show, params: {id: test_translation.id}
-          expect(response.status).to be(200)
+      context 'with a valid MIME type' do
+        context "as a super admin" do
+          it "should be authorized" do
+            get :show, params: {id: test_translation.id}
+            expect(response.status).to be(200)
+          end
+        end
+
+        context "as a non super admin user" do
+          before do
+            super_admin_permission.update_attributes!(name: "non_super_admin")
+          end
+          it "should not be authorized" do
+            get :show, params: {id: test_translation.id}
+            expect(response).to_not eq(200)
+          end
         end
       end
 
-      context "non super admin user" do
-        before do
-          super_admin_permission.update_attributes!(name: "non_super_admin")
+      context 'with an invalid MIME type' do
+        it "js should not be authorized" do
+          get :show, params: {id: test_translation.id}, format: :js
+          expect(response).to have_http_status(:not_acceptable)
         end
-        it "should not be authorized" do
-          get :show, params: {id: test_translation.id}
-          expect(response).to_not eq(200)
+
+        it "json should not be authorized" do
+          get :show, params: {id: test_translation.id}, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should not be authorized" do
+          get :show, params: {id: test_translation.id}, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
         end
       end
     end
 
     context "#index" do
-      context "super admin" do
-        it "should be authorized" do
-          get :index
-          expect(response.status).to be(200)
+      context 'with a valid MIME type' do
+        context "as a super admin" do
+          it "should be authorized" do
+            get :index
+            expect(response.status).to be(200)
+          end
+        end
+
+        context "as a non super admin user" do
+          before do
+            super_admin_permission.update_attributes!(name: "non_super_admin")
+          end
+          it "should not be authorized" do
+            get :index
+            expect(response).to_not eq(200)
+          end
         end
       end
 
-      context "non super admin user" do
-        before do
-          super_admin_permission.update_attributes!(name: "non_super_admin")
+      context 'with an invalid MIME type' do
+        it "js should not be authorized" do
+          get :index, format: :js
+          expect(response).to have_http_status(:not_acceptable)
         end
-        it "should not be authorized" do
-          get :index
-          expect(response).to_not eq(200)
+
+        it "json should not be authorized" do
+          get :index, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should not be authorized" do
+          get :index, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
         end
       end
     end
