@@ -167,6 +167,10 @@ module FinancialAssistance
       authorize @application, :application_checklist?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
+
+      respond_to do |format|
+        format.html
+      end
     end
 
     def review_and_submit
@@ -229,6 +233,10 @@ module FinancialAssistance
           @income_coverage_hash[applicant.id] = application_hash[1]["financial_assistance_info"]
         end
       end
+
+      respond_to do |format|
+        format.html
+      end
     end
 
     def transfer_history
@@ -258,14 +266,18 @@ module FinancialAssistance
       authorize @application, :wait_for_eligibility_response?
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
-      render layout: 'financial_assistance'
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance' }
+      end
     end
 
     def eligibility_results
       authorize @application, :eligibility_results?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
+      respond_to do |format|
+        format.html { render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance') }
+      end
     end
 
     def application_publish_error
