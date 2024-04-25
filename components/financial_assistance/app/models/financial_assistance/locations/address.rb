@@ -7,7 +7,7 @@ module FinancialAssistance
       include Mongoid::Timestamps
       include HtmlScrubberUtil
 
-      MAILING_KIND = 'mailing'.freeze
+      MAILING_KIND = 'mailing'
 
       embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 

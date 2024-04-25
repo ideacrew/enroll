@@ -141,7 +141,7 @@ module Operations
         if any_addresses_destroyed?(person)
           addresses_with_params = @member_params[:person_addresses]
           destroy_address_ids = person.addresses.inject([]) do |bson_ids, address|
-            bson_ids << address.id if addresses_with_params.map { |address| address[:kind] }.exclude?(address.kind)
+            bson_ids << address.id if addresses_with_params.map { |addr| addr[:kind] }.exclude?(address.kind)
             bson_ids
           end
 
@@ -185,7 +185,7 @@ module Operations
         addresses_with_params = @member_params[:person_addresses]
 
         person.addresses.any? do |address|
-          addresses_with_params.map { |address| address[:kind] }.exclude?(address.kind)
+          addresses_with_params.map { |addr| addr[:kind] }.exclude?(address.kind)
         end
       end
 
