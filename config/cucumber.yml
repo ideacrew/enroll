@@ -1,6 +1,6 @@
-default: --format pretty --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled and not @accessibility' -r features --profile semaphoreci
+default: --format pretty --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features --profile semaphoreci
 everything: --format pretty --strict -r features
-nightly: --format pretty --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled and @accessibility' -r features --profile semaphoreci
+nightly: --format pretty --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features --profile semaphoreci
 semaphoreci: -q
 gh-report: --format json --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features
 local-report: --format json --out ci/cucumber/local-cucumber-report.json --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only and not @aca_shop_market_disabled' -r features
