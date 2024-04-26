@@ -8,6 +8,8 @@ Feature: Employee while terminating active enrollment should able to see and pic
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
     Given Covid QLE present with top ordinal position
+    Given EnrollRegistry enrollment_plan_tile_update feature is disabled
+    Given plan shopping return to account button is enabled
     And there is an employer Acme Inc.
     And initial employer Acme Inc. has active benefit application
     And there is a census employee record for Patrick Doe for employer Acme Inc.

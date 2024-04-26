@@ -5,10 +5,10 @@ $('.init_effective_date input').datepicker({changeMonth: true, changeYear: true}
 $('.kind input').val("<%= @eff_kind %>")
 "<%= @date_options %>" == "true" ? $('.optional_date').show() : $('.optional_date').hide();
 if ("<%= prior_py_sep?(@family, @effective_on, @market_kind) %>" == "true") {
-  $("#coverage_renewal_flag").attr('disabled',false);
+  $("#coverage_renewal_flag").prop('disabled',false);
   $('.coverage-renewal-flag').show()
 } else {
-  $("#coverage_renewal_flag").attr('disabled',true);
+  $("#coverage_renewal_flag").prop('disabled',true);
   $('.coverage-renewal-flag').hide();
 }
 "<%= prior_py_sep?(@family, @effective_on, @market_kind) %>" == "true"  ? $('.coverage-renewal-flag').show() : $('.coverage-renewal-flag').hide();

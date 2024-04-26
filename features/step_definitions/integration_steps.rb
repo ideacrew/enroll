@@ -880,7 +880,7 @@ Then(/^.+ should see plans sorted by Plan Name/) do
 end
 
 When(/^.+ filters plans by Carrier/) do
-  find('.interaction-choice-control-carrier').click
+  find_all('.interaction-choice-control-carrier').first.click
   carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click

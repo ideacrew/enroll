@@ -899,4 +899,9 @@ registry:
       - key: :auto_assign_expert
         item: :auto_assign_expert
         is_enabled: <%= ENV['AUTO_ASSIGN_EXPERT_IS_ENABLED'] || false %>
+      - key: :jquery_migrate
+        is_enabled: <%= ENV['JQUERY_MIGRATE_IS_ENABLED'] || true %>
+        settings:
+          - key: :show_warnings
+            item: <%= ENV['SHOW_JQUERY_MIGRATE_WARNINGS'] || true %>
 

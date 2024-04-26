@@ -2,6 +2,7 @@ import Rails from 'rails-ujs';
 import Turbolinks from 'turbolinks';
 import { Application } from "stimulus";
 import { definitionsFromContext } from "stimulus/webpack-helpers";
+import jquery from 'jquery';
 import 'popper.js';
 import 'jquery-ui';
 import 'bootstrap';
@@ -27,5 +28,9 @@ const importAll = (r) => r.keys().map(r)
 importAll(require.context('../images', false, /\.(png|jpe?g|svg|ico)$/));
 
 const application = Application.start()
+
+window.jQuery = jquery;
+
+window.$ = jquery;
 
 import "controllers"

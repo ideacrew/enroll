@@ -9,6 +9,7 @@ export default class extends Controller {
   }
 
   zipChange(event) {
+   if (this.countySelectTarget) {
     axios({
       method: 'POST',
       url: '/benefit_sponsors/profiles/registrations/counties_for_zip_code',
@@ -49,5 +50,5 @@ export default class extends Controller {
         }
       }
     })
-  }
+  }}
 }

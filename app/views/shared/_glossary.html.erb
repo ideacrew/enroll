@@ -12,15 +12,16 @@
       data-boundary="window"
       data-fallbackPlacement="flip"
       data-html="true"
-      data-content="<%= t("glossary.#{key}") %>"
-      data-title="<%= term_display %>"
+      data-content="<%= t('glossary.' + key) %>"
+      data-title="<%= term_display %>">
   <button data-dismiss='modal'
-          type='button'
-          class='close'
-          aria-label='Close'
-          onclick='$('.glossary').popover('hide');'>
+    type='button'
+    class='close'
+    aria-label='Close'
+    onclick="$('.glossary').popover('hide');">
   </button>
-<%= term_display %></span>
+  <%= term_display %>
+</span>
 
 <script>
 $(document).click(function(e){

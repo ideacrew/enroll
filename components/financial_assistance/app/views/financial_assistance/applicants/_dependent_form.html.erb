@@ -236,6 +236,8 @@
 
   <script>
       $(document).ready(function() {
+          $.inputMasks();
+
           $('.field_with_errors > *').unwrap();
           Freebies.floatlabels();
           if($("input#dependent_same_with_primary").is(":checked")){

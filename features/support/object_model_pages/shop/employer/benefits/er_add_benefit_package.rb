@@ -4,7 +4,7 @@
 class EmployerAddBenefitPackage
 
   def self.select_start_on_dropdown
-    'div[class="selectric-wrapper selectric-floatlabel selectric-benefit-application-start-date"]'
+    'div[class^="selectric-wrapper"]'
   end
 
   def self.end_on

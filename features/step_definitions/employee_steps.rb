@@ -131,6 +131,7 @@ Then(/^\w+ should see the "(.*?)" at the (.*) of the (.*?) qle list$/) do |qle_e
   end
 end
 
+
 And(/Employee should see today date and clicks continue/) do
   # screenshot("current_qle_date")
   expect(find('#qle_date').value).to eq TimeKeeper.date_of_record.strftime("%m/%d/%Y")
@@ -144,6 +145,7 @@ end
 
 And(/Employee select "(.*?)" for "(.*?)" sep effective on kind and clicks continue/) do |effective_on_kind, qle_reason|
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
+
   if qle_reason == 'covid-19'
     qle_on = TimeKeeper.date_of_record
 
@@ -153,10 +155,13 @@ And(/Employee select "(.*?)" for "(.*?)" sep effective on kind and clicks contin
                              when 'first_of_this_month'
                                qle_on.beginning_of_month.to_s
                              end
-
-    select effective_on_kind_date, from: 'effective_on_kind'
+    find('.effective_on_kinds .selectric span.label').click
+    find('.selectric-scroll li', text: effective_on_kind_date).click
   else
-    select effective_on_kind.humanize, from: 'effective_on_kind'
+    find('.effective_on_kinds .selectric span.label').click
+    find('.selectric-scroll li', text: effective_on_kind_date).click
+
+    select effective_on_kind.humanize, from: 'effective_on_kinds'
   end
   click_button "Continue"
 end
@@ -183,11 +188,12 @@ Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) d
                  end
 
   find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"), wait: 5)
-
   if screen == "coverage summary"
     find('.interaction-click-control-confirm').click
-  else
+  elsif EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == "DC"
     find('.interaction-click-control-go-to-my-account').click
+  else
+    find('.interaction-click-control-continue-to-my-account').click
   end
 end
 
@@ -314,4 +320,8 @@ end
 And(/on census employee profile through roster will display one active reinstated enrollment on it$/) do
   expect(page).to have_content "Reinstated Enrollment"
   expect(page).to have_content "Coverage Enrolled"
+end
+
+Given(/plan shopping return to account button is enabled/) do
+  enable_feature :back_to_account_all_shop, {registry_name: EnrollRegistry}
 end

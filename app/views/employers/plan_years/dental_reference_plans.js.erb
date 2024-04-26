@@ -27,7 +27,7 @@ $('#<%= @location_id %> .dental-reference-plans').before("<div class='col-xs-12 
   $('#<%= @location_id %> .elected-plans-tab .reference-plan .col-xs-2').on('click', function() {
 
     if ($(this).find('input[type=checkbox]').is(':checked')) {
-      $(this).find('input[type=checkbox]').removeProp('checked');
+      $(this).find('input[type=checkbox]').removeAttr('checked');
     } else {
       $(this).find('input[type=checkbox]').prop('checked', true );
     }

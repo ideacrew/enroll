@@ -166,7 +166,7 @@
     });
 
     function confirmChange(event){
-      $(".btn-confirmation").attr('disabled', 'disabled');
+      $(".btn-confirmation").prop('disabled', true);
       $('.modal-backdrop').removeClass('modal-backdrop');
       $('.modal-open').removeClass('modal-open');
 

@@ -22,7 +22,7 @@
                                              :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yy', disabled: 'disabled'} %>
           </div>
           <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :ssn, class: "person_ssn number floatlabel form-control", placeholder: "SOCIAL SECURITY", id: "", title: "8 digits", disabled: 'disabled' %>
+            <%=f.text_field :ssn, class: "person_ssn number mask-ssn floatlabel form-control", placeholder: "SOCIAL SECURITY", id: "", title: "8 digits", disabled: 'disabled' %>
           </div>
           <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
             <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio skinned-form-controls skinned-form-controls-mac">
@@ -132,3 +132,9 @@
 <% end %>
 <br>
 <%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
+
+<script>
+  $(document).ready(function() {
+    $.inputMasks();
+  });
+</script>

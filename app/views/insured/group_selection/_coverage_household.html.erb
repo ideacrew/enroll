@@ -24,14 +24,14 @@
           <tr class='<%= @adapter.class_for_ineligible_row(family_member, is_ivl_coverage, (@effective_on_date || @new_effective_on), @qle) %>'>
             <td style="padding: 0">
                 <% if EnrollRegistry.feature_enabled?(:choose_coverage_medicaid_warning) %>
-                  <!-- Once the :choose_coverage_medicaid_warning feature has passed UAT for DC, 
+                  <!-- Once the :choose_coverage_medicaid_warning feature has passed UAT for DC,
                   the 'if/else' block can be removed and the content of the 'else' can be entirely deleted.
                   The content of the 'if' is refactored and updated design of the 'else'.-->
                   <div class="coverage-selection-block row-form-wrapper coverage-container">
                     <div class="coverage-chbx">
                       <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked && !family_member_eligible_for_medicaid(family_member, @family, @new_effective_on&.year), disabled: !is_checked ) %>
                     </div>
-                    <div class="coverage-name-and-errors"> 
+                    <div class="coverage-name-and-errors">
                       <span class="coverage-message-row"><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name.upcase} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></span>
                       <% @person.active_employee_roles.each do |employee_role| %>
                         <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, employee_role, (@effective_on_date || @new_effective_on), @qle) %>

@@ -21,7 +21,7 @@
               = f.hidden_field :is_broker_registration_page, value: true
               = f.text_field :agency_search, placeholder: "#{l10n('broker_agencies.broker_roles.agency_name_placeholder')}", class: 'form-control'
               .input-group-btn
-                a.btn.btn-select.search[href="#" onclick="brokerSearch(); return false" data-loading-text="Loading..."]
+                button.btn.btn-select.search[href="#" onclick="brokerSearch(); return false" data-loading-text="Loading..."]
                   i.fa.fa-search
                   = l10n("search").to_s.downcase
         .result

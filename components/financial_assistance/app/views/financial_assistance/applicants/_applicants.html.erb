@@ -66,7 +66,7 @@
     <% end %>
     <div class="help-to-decide">
       <% if @application.present? %>
-        <a href="help_me_decide" data-toggle="modal" data-target="#help_me_decide" id="help_me_decide_not_sure" class="interaction-click-control-not-sure?"> Who else should I include in my household? </a>
+        <a data-toggle="modal" data-target="#help_me_decide" id="help_me_decide_not_sure" class="interaction-click-control-not-sure?"> Who else should I include in my household? </a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "help_me_decide"} %>
       <% end %>
     </div>
