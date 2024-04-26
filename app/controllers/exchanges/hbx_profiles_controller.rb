@@ -19,6 +19,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
 
+  # SHOP Feature
   def oe_extendable_applications
     authorize HbxProfile, :oe_extendable_applications?
 
@@ -26,6 +27,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  # SHOP Feature
   def oe_extended_applications
     authorize HbxProfile, :oe_extended_applications?
 
@@ -33,12 +35,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  # SHOP Feature
   def edit_open_enrollment
     authorize HbxProfile, :edit_open_enrollment?
 
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
   end
 
+  # SHOP Feature
   def extend_open_enrollment
     authorize HbxProfile, :extend_open_enrollment?
 
@@ -48,6 +52,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully extended employer(s) open enrollment." }
   end
 
+  # SHOP Feature
   def close_extended_open_enrollment
     authorize HbxProfile, :close_extended_open_enrollment?
 
@@ -56,6 +61,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
 
+  # SHOP Feature
   def new_benefit_application
     authorize HbxProfile, :new_benefit_application?
 
@@ -63,6 +69,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  # SHOP Feature
   def create_benefit_application
     authorize HbxProfile, :create_benefit_application?
 
@@ -72,6 +79,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  # SHOP Feature
   def edit_fein
     authorize HbxProfile, :edit_fein?
 
@@ -83,6 +91,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def update_fein
     authorize HbxProfile, :update_fein?
 
@@ -99,6 +108,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def binder_paid
     authorize HbxProfile, :binder_paid?
 
@@ -147,6 +157,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def disable_ssn_requirement
     authorize HbxProfile, :disable_ssn_requirement?
 
@@ -171,6 +182,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "SSN/TIN requirement has been successfully updated for the roster of selected employer" }
   end
 
+  # SHOP Feature
   def generate_invoice
     authorize HbxProfile, :generate_invoice?
 
@@ -189,6 +201,7 @@ class Exchanges::HbxProfilesController < ApplicationController
      end
   end
 
+  # SHOP Feature
   def edit_force_publish
     authorize HbxProfile, :edit_force_publish?
 
@@ -200,6 +213,7 @@ class Exchanges::HbxProfilesController < ApplicationController
    end
   end
 
+  # SHOP Feature
   def force_publish
     authorize HbxProfile, :force_publish?
 
@@ -218,6 +232,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def employer_invoice
     authorize HbxProfile, :employer_invoice?
 
@@ -233,6 +248,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def employer_datatable
     authorize HbxProfile, :employer_datatable?
 
