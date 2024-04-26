@@ -114,7 +114,7 @@
         $bulkActions.removeAttr('disabled')
         $table.data('bulk-actions-restore-selected-values', [])
       else
-        $bulkActions.attr('disabled', 'disabled')
+        $bulkActions.prop('disabled', 'disabled')
 
     drawAggregates = ($table, aggregates) ->
       $tfoot = $table.find('tfoot').first()
