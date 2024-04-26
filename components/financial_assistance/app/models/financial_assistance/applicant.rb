@@ -627,7 +627,7 @@ module FinancialAssistance
       true
     end
 
-    def valid_sibling_relationship?(relative=self)
+    def valid_sibling_relationship?
       sibling_relationships = self.relationships.where(kind: 'sibling')
       return true unless sibling_relationships.present?
       sibling_relationships.each do |sibling_relationship|
