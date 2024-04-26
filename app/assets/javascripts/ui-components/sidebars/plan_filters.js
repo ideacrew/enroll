@@ -41,7 +41,7 @@ function filterOSSEEligibility(element) {
   filterParams.selectedOSSE = element.value
 }
 
-function premuimFromAmount(element) {
+function premiumFromAmount(element) {
   filterParams.premiumFromAmountValue = element.value
 }
 
@@ -91,9 +91,6 @@ function processValues(element) {
 function clearAll() {
   // Clears all checkboxes within #filter-sidebar only
   var inputs = document.querySelectorAll("#filter-sidebar .filter-input-block input");
-  // Clears slections from view
-  // clearSelections()
-  
   for(var i = 0; i < inputs.length; i++) {
       inputs[i].checked = false;
       inputs[i].value = "";
@@ -105,8 +102,7 @@ function clearAll() {
     $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
     $("#filter-sidebar select.plan-osse-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
   }
-  
-  
+
   // Clear stored values
   filterParams.selectedMetalLevels = [];
   filterParams.selectedPlanTypes = [];

@@ -96,13 +96,11 @@ javascript:
   // Needs to be defined outside of conditional for marketKind
   // because will try to render on plan_filters.html.slim even on individual market
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
+
   function resetAllFilters() {
-    resetAptc()
-    clearAll()
-    clearSelections()
-    resetComparePlan()
-    total_plans = $('#plans .plan-row').length
-    $("#plans-count").text(total_plans);
+    resetAptc();
+    clearAll(); // Defined in plan_filters.js
+    resetPlanTileSelection();
   }
 
   function resetAptc() {
@@ -114,14 +112,16 @@ javascript:
     }
   }
 
-  function clearSelections() {
+  function resetPlanTileSelection() {
     Array.from(selectedPlans).forEach(function (plan) {
       if (plan) {
-        plan.remove()
+        plan.remove();
       }
-    })
-    if (document.getElementById('plans').length) {
-      document.getElementById('plans').classList.remove('hidden');
+    });
+    if ($('#plans').length > 0) {
+      $('#plans').each( function () {
+        $(this).removeClass('hidden');
+      });
     }
   }
 
@@ -154,7 +154,7 @@ javascript:
 
     function filterBy(element) {
       filterType = element.dataset.sortBy;
-      clearSelections()
+      resetPlanTileSelection();
       clearAll()
       applyFilter()
       filteredPlans(filterType)
@@ -441,7 +441,7 @@ javascript:
       }
       // Shows results in the view
       $("#plans-count").text(filteredArray.length);
-      clearSelections();
+      resetPlanTileSelection();
       applyFilter();
       resetComparePlan();
       showFilteredResults()
