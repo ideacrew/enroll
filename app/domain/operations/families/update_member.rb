@@ -137,7 +137,7 @@ module Operations
       def save_person(person)
         changes = person.changes
 
-        # Destroy the addresses which are not present in the params
+        # Destroys the addresses which are not present in the params
         if any_addresses_destroyed?(person)
           addresses_with_params = @member_params[:person_addresses]
           destroy_address_ids = person.addresses.inject([]) do |bson_ids, address|
@@ -145,7 +145,7 @@ module Operations
             bson_ids
           end
 
-          person.addresses.where(:id.in => destroy_address_ids).each { |address| person.addresses.delete_one(address) }
+          person.addresses.where(:id.in => destroy_address_ids).destroy_all
         end
 
         person.save!

@@ -100,23 +100,21 @@
 </div>
 
 <% remove_address_display_class = f.object.mailing_address.present? ? '' : 'dn' %>
-<% add_address_display_class = f.object.mailing_address.present? ? 'dn' : '' %>
+<div
+  tabindex='0'
+  id='remove_applicant_mailing_address'
+  class="form-action btn btn-default applicant-mailing-address <%= pundit_class Family, :updateable?%> <%= remove_address_display_class %>"
+  >
+  Remove Mailing Address
+</div>
 
+<% add_address_display_class = f.object.mailing_address.present? ? 'dn' : '' %>
 <div
   tabindex="0"
   id="add_applicant_mailing_address"
   class="form-action btn btn-default applicant-mailing-address <%= pundit_class Family, :updateable?%> <%= add_address_display_class %>"
   >
   Add Mailing Address
-</div>
-
-<div
-  tabindex='0'
-  id='remove_applicant_mailing_address'
-  class="form-action btn btn-default applicant-mailing-address <%= pundit_class Family, :updateable?%> <%= remove_address_display_class %>"
-  data-url="<%= application_applicant_locations_address_path(f.object.application.id, f.object.id, f.object.mailing_address.id) %>"
-  >
-  Remove Mailing Address
 </div>
 
 </br>

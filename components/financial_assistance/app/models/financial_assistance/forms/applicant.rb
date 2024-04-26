@@ -109,6 +109,16 @@ module FinancialAssistance
         @applicant = application.applicants.find(applicant_id) if applicant_id.present?
       end
 
+      # Checks if the given address should be destroyed.
+      #
+      # This method checks if the address is of kind 'mailing', if it is marked for destruction, and if it has an id.
+      #
+      # @param address [Hash] the address to check
+      # @option address [String] :kind the kind of the address
+      # @option address [String] :_destroy whether the address is marked for destruction ('true' or 'false')
+      # @option address [String, nil] :id the id of the address, or nil if it doesn't have one
+      #
+      # @return [Boolean] true if the address should be destroyed, false otherwise
       def destroy_mailing_address?(address)
         address[:kind] == FinancialAssistance::Locations::Address::MAILING_KIND && address[:_destroy] == 'true' && address[:id].present?
       end
