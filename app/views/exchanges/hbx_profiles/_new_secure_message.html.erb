@@ -76,7 +76,7 @@
   });
 
   function confirmSecureMsg(event){
-    $(".btn-confirmation").attr('disabled', 'disabled');
+    $(".btn-confirmation").prop('disabled', true);
 
     event.preventDefault();
     event.stopImmediatePropagation();
