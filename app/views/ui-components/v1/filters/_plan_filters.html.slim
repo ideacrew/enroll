@@ -264,14 +264,14 @@
         br
         span.hide = l10n("open")
     .filter-input-block
-      input.plan-metal-premium-from-selection-filter.form-control  type="text" placeholder="$0" value='0' onblur="premuimFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
+      input.plan-metal-premium-from-selection-filter.form-control  type="text" placeholder="$0" value="0" onblur="premiumFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
       small To
       input.plan-metal-premium-to-selection-filter.form-control.fr type="text" placeholder="$#{@max_total_employee_cost || 2000}" value="#{@max_total_employee_cost || 2000}" onblur="premiumToAmount(this)" maxlength="10" oninput="toCurrency(this)"
       = hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000)
     h5
       strong = l10n("deductible_amount")
     .filter-input-block
-      input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value='0' onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
+      input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value="0" onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
       small To
       input.plan-metal-deductible-to-selection-filter.form-control type="text" placeholder="$#{@max_deductible || 5000}" onblur="deductibleToAmount(this)" maxlength="10" oninput="toCurrency(this)" value='#{@max_deductible || 5000}'
   .checkbox-filter-wrapper
