@@ -917,7 +917,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     case params[:resource_name]
     when 'Person'
       Person.find(params[:resource_id])
-    when 'BenefitSponsors::Organizations::AcaShopDcEmployerProfile'
+    else
       BenefitSponsors::Organizations::Profile.find(params[:resource_id])
     end
   end
