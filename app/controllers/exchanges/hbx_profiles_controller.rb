@@ -422,6 +422,10 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def show_sep_history
@@ -429,8 +433,13 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
+
+    respond_to do |format|
+      format.js
+    end
   end
 
+  # SHOP and IVL Feature
   def get_user_info
     authorize HbxProfile, :get_user_info?
 
@@ -446,6 +455,10 @@ class Exchanges::HbxProfilesController < ApplicationController
       else
         BenefitSponsors::Organizations::Organization.find(@element_to_replace_id.split("_").last)
       end
+    end
+
+    respond_to do |format|
+      format.js
     end
   end
 
@@ -509,7 +522,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
     end
-
   end
 
   def update_terminate_enrollment
@@ -756,6 +768,10 @@ class Exchanges::HbxProfilesController < ApplicationController
       @element_to_replace_id = params[:person][:family_actions_id]
       family = Person.find(params[:person][:person_id]).primary_family
       family.active_household.create_new_tax_household(params[:person])
+    end
+
+    respond_to do |format|
+      format.js
     end
   end
 
