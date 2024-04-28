@@ -8,6 +8,7 @@ class Insured::InboxesController < InboxesController # rubocop:disable Style/Cla
     @inbox_to_name = params['to']
     @inbox_provider_name = 'HBX ADMIN'
     super
+    respond_to :js
   end
 
   def find_inbox_provider
@@ -16,6 +17,11 @@ class Insured::InboxesController < InboxesController # rubocop:disable Style/Cla
 
   def successful_save_path
     exchanges_hbx_profiles_root_path
+  end
+
+  def destroy
+    super
+    respond_to :js
   end
 
   private
