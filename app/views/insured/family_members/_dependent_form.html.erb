@@ -116,7 +116,7 @@
             </div>
 
             <div class="col-md-3 col-sm-3 no-pd">
-              <div class="col-xs-12">
+               <div class="col-xs-12">
                 <div class="">
                   <div class="form-group form-group-lg top-buffer">
                     <%= f.check_box :no_ssn %>
@@ -258,6 +258,8 @@
 
   <script>
     $(document).ready(function() {
+      $.inputMasks();
+
       $('.field_with_errors > *').unwrap();
       Freebies.floatlabels();
       if($("input#dependent_same_with_primary").is(":checked")){
@@ -286,7 +288,7 @@
     });
 
     function confirmChange(event){
-      $(".btn-confirmation").attr('disabled', 'disabled');
+      $(".btn-confirmation").prop('disabled', true);
       $('.modal-backdrop').removeClass('modal-backdrop');
       $('.modal-open').removeClass('modal-open');
 

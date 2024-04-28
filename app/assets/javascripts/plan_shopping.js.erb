@@ -6,7 +6,6 @@ function hidePlanTabs() {
 }
 
 function combineAllPlanSelectors(planSelectors) {
-  var selectors = [];
   var baseSelector = $(".plan-row");
   var combinedSelectors = baseSelector;
   combinedSelectors.hide();
@@ -35,22 +34,25 @@ function filterPlanBySelect(type, combinedSelectors) {
 
 function filterPlanByRange(type, combinedSelectors) {
   var from = parseFloat($("input.plan-metal-"+type+"-from-selection-filter").val().replace(/[^\d\.]/g,''));
-  var to= parseFloat($("input.plan-metal-"+type+"-to-selection-filter").val().replace(/[^\d\.]/g,''));
-  if (isNaN(from) || isNaN(to)){
-    return combinedSelectors;
-  } else {
-    var selectors = combinedSelectors.filter(function(){
-      var premium = parseFloat($(this).data("plan-metal-"+type).toString().replace(/[^\d\.]/g,''));
-      return (premium >= from && premium <= to);
-    });
-    return selectors;
-  }
+  var from = from || 0; //default to 0 if NaN
+
+  var to = parseFloat($("input.plan-metal-"+type+"-to-selection-filter").val().replace(/[^\d\.]/g,''));
+  var maxTo = Math.max.apply(null, combinedSelectors.map(function(){ //find max 'type' value in all plans
+    return parseFloat($(this).data("plan-metal-"+type).toString().replace(/[^\d\.]/g,''));
+  }));
+  var to = to || maxTo; //default to max value if NaN
+
+  var filteredPlanSelectors = combinedSelectors.filter(function(){
+    var premium = parseFloat($(this).data("plan-metal-"+type).toString().replace(/[^\d\.]/g,''));
+    return (premium >= from && premium <= to);
+  });
+  return filteredPlanSelectors;
 }
 
 function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
   var selectedPlanTypes = [];
   var spCheckboxes = $('input.' + cbKlass + ':checked');
-  if (spCheckboxes.size() > 0) {
+  if (spCheckboxes.length > 0) {
     spCheckboxes.each(function(idx, ele) {
       var ptName = $(ele).attr(cbFilterKlass);
       var qstring = "[" + planValueTag  + "='" + ptName + "']";
@@ -239,7 +241,7 @@ $(function() {
           'coverage_kind': coverage_kind
         },
         success: function(data){
-          response = jQuery.parseJSON(JSON.stringify(data))
+          response = JSON.parse(JSON.stringify(data));
           $("#plan_match_redirection .modal-footer a").attr("href",response.checkbook_url);
         },
       });
@@ -248,14 +250,7 @@ $(function() {
 
   $(document).on('click', '.all-filters-row .reset-btn', function(){
     resetAptc();
-    $("#filter-sidebar input[type='checkbox']").attr("checked", false);
-    $("#filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
-    $("#filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
-    $("#filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");
-    $("#filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
-    $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
-    $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
-    $("#filter-sidebar select.plan-osse-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    resetFilters();
     applyPlanFilters();
   });
 
@@ -266,6 +261,17 @@ $(function() {
       element.value = original_aptc;
       element.dispatchEvent(new Event('change', { bubbles: true }));
     }
+  }
+
+  function resetFilters(){
+    $("#filter-sidebar input[type='checkbox']").prop("checked", false);
+    $("#filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("");
+    $("#filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
+    $("#filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("");
+    $("#filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
+    $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    $("#filter-sidebar select.plan-osse-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
   }
 
   $(document).on('click', '#sort_by a', function(){
