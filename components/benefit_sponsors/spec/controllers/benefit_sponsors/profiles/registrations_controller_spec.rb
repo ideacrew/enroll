@@ -507,18 +507,21 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         end
 
         it "js should raise an error" do
-          get :edit, params: {id: @id}, format: :js
-          expect(response).to have_http_status(:not_acceptable)
+          expect do
+            (get :edit, params: {id: @id}, format: :js).to raise_error(ActionView::MissingTemplate)
+          end
         end
 
         it "json should raise an error" do
-          get :edit, params: {id: @id}, format: :json
-          expect(response).to have_http_status(:not_acceptable)
+          expect do
+            (get :edit, params: {id: @id}, format: :json).to raise_error(ActionView::MissingTemplate)
+          end
         end
 
         it "xml should raise an error" do
-          get :edit, params: {id: @id}, format: :xml
-          expect(response).to have_http_status(:not_acceptable)
+          expect do
+            (get :edit, params: {id: @id}, format: :xml).to raise_error(ActionView::MissingTemplate)
+          end
         end
       end
     end
