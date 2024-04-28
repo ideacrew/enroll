@@ -68,9 +68,7 @@ module BenefitSponsors
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit(profile_id: params[:id])
         authorize @agency
 
-        respond_to do |format|
-          format.html { render layout: 'single_column' if @agency.organization.is_broker_profile? || @agency.organization.is_general_agency_profile? }
-        end
+        render layout: 'single_column' if @agency.organization.is_broker_profile? || @agency.organization.is_general_agency_profile?
       end
 
       def update
