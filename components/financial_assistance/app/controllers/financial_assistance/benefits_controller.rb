@@ -9,6 +9,8 @@ module FinancialAssistance
     before_action :load_support_texts, only: [:index, :create, :update]
     before_action :set_cache_headers, only: [:index]
 
+    respond_to :js, only: [:index, :create, :update]
+
     def index
       # Authorizing on applicant since no benefit records may exist on index page
       # TODO: Use policy context to pass applicant to BenefitPolicy
