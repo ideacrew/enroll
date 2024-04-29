@@ -1218,6 +1218,79 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
       end
     end
+
+    describe "sibling relationships" do
+
+      let!(:applicant4) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:applicant5) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context "valid sibling relationships" do
+        let(:set_up_relationships) do
+          application.ensure_relationship_with_primary(applicant2, 'spouse')
+          application.ensure_relationship_with_primary(applicant3, 'child')
+          application.ensure_relationship_with_primary(applicant4, 'child')
+          application.ensure_relationship_with_primary(applicant5, 'child')
+          application.add_or_update_relationships(applicant2, applicant3, 'child')
+          application.add_or_update_relationships(applicant2, applicant4, 'child')
+          application.add_or_update_relationships(applicant2, applicant5, 'child')
+          application.add_or_update_relationships(applicant3, applicant4, 'sibling')
+          application.add_or_update_relationships(applicant3, applicant5, 'sibling')
+          application.add_or_update_relationships(applicant4, applicant5, 'sibling')
+
+          application.build_relationship_matrix
+          application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+
+        it "returns true" do
+          application.applicants.each do |applicant|
+            expect(applicant.valid_family_relationships?).to eql(true)
+          end
+        end
+      end
+
+      context "invalid sibling relationships" do
+        let(:set_up_relationships) do
+          application.ensure_relationship_with_primary(applicant2, 'spouse')
+          application.ensure_relationship_with_primary(applicant3, 'child')
+          application.ensure_relationship_with_primary(applicant4, 'child')
+          application.ensure_relationship_with_primary(applicant5, 'child')
+          application.add_or_update_relationships(applicant2, applicant3, 'child')
+          application.add_or_update_relationships(applicant2, applicant4, 'child')
+          application.add_or_update_relationships(applicant2, applicant5, 'child')
+          application.add_or_update_relationships(applicant3, applicant4, 'sibling')
+          application.add_or_update_relationships(applicant3, applicant5, 'sibling')
+          application.add_or_update_relationships(applicant4, applicant5, 'parent')
+
+          application.build_relationship_matrix
+          application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+
+        it "returns false" do
+          expect(applicant4.valid_family_relationships?).to eql(false)
+        end
+      end
+    end
   end
 
   describe '#is_spouse_of_primary' do
