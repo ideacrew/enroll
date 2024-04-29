@@ -1,31 +1,21 @@
 <% if @bs4 %>
   <% step = (defined? step) ? step.to_i : 1 %>
+  <% title = (defined? title) ? title : "" %>
+  <% nav_options = (defined? nav_options) ? nav_options : [] %>
   <nav class="progress-nav">
-    <h3><%= l10n('account_setup') %></h3>
+    <h3><%= title %></h3>
     <ul class="progress-wrapper">
-      <li class="<%= 'complete' if !account_registration_active? %> <%= 'active' if account_registration_active? %>">
-        <span class="circle-progress"></span>
-        <div class="vertical-line-progress"></div>
-        <a><%= l10n('personal_information') %></a>
-      </li>
-      <li class="<%= 'complete' if tell_us_about_yourself_active? %> <%= 'active' if tell_us_about_yourself_current_step? %>">
-        <span class="circle-progress"></span>
-        <div class="vertical-line-progress"></div>
-        <a class="<%= 'cna disabled' unless tell_us_about_yourself_active? or tell_us_about_yourself_current_step? %>"><%= l10n('tell_us_about_yourself') %></a>
-      </li>
-      <li class="<%= 'complete' if family_members_index_active? %> <%= 'active' if family_members_index_current_step? %>">
-        <span class="circle-progress"></span>
-        <div class="vertical-line-progress"></div>
-        <a class="<%= 'cna disabled' unless family_members_index_active? or family_members_index_current_step? %>"><%= l10n('family_info') %></a>
-      </li>
+      <% if nav_options.any? %>
+        <% nav_options.each do |nav_option| %>
+          <li class="<%= 'complete' if step > nav_option[:step] %> <%= 'active' if step == nav_option[:step] %>">
+            <span class="circle-progress"></span>
+            <div class="vertical-line-progress"></div>
+            <a class="<%= 'cna disabled' unless step > nav_option[:step] or step == nav_option[:step] %>"><%= nav_option[:label] %></a>
+          </li>
+        <% end %>
+      <% end %>
     </ul>
   </nav>
-  <%= render partial: 'shared/shopping_nav_panel',
-  locals: { show_exit_button: !@no_save_button && step < 6,
-            show_previous_button: false,
-            show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
-            is_complete: step == 6,
-            show_help_button: step != 1 && step < 6 } %>
 <% else %>
   <nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
     <ul class="nav nav-stacked" id="left-navigation">

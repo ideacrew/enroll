@@ -55,6 +55,13 @@
       </div>
       <div class="mr-auto col-sm col-md-6 p-0 sm-hide"></div>
     </div>
+    <fieldset class="d-flex row col-sm">
+      <legend class="required">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage?</legend>
+      <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
+      <div class="d-flex align-items-center mt-2">
+        <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+      </div>
+    </fieldset>
   </div>
   <%= render 'shared/ssn_coverage_msg' %>
 <% else %>
