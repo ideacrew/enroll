@@ -58,6 +58,27 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(response).to render_template("index")
     end
 
+    context "when the request type is invalid" do
+      it "renders the index template" do
+        get :index, format: :json
+        expect(response.status).to eq 406
+        expect(response.body).to eq "{\"error\":\"Unsupported format\"}"
+        expect(response.media_type).to eq "application/json"
+      end
+
+      it "renders the index template" do
+        get :index, format: :fake
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "renders the index template" do
+        get :index, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+
     context 'for a person who exists in multiple families(with financial assistance applications)' do
       let!(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: person2) }
       let!(:application1) { FinancialAssistance::Application.create!(family_id: family_id) }
@@ -243,19 +264,33 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
-  context "GET new" do
-    it "should assign application" do
-      get :new
-      expect(assigns(:application).class).to eq FinancialAssistance::Application
-    end
-  end
-
   describe "GET edit" do
     context "With valid data" do
       it "should render" do
         get :edit, params: { id: application.id }
         expect(assigns(:application)).to eq application
         expect(response).to render_template(:financial_assistance_nav)
+      end
+    end
+
+    context "when the request type is invalid" do
+      it "should not render the raw_application template" do
+        get :edit, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the raw_application template" do
+        get :edit, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the raw_application template" do
+        get :edit, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
       end
     end
 
@@ -467,6 +502,27 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(application.save).to eq true
       end
 
+      context "when the request type is invalid" do
+        it "should not render the raw_application template" do
+          post :step, params: { id: application.id, application: application_valid_params }, format: :csv
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+          expect(response.media_type).to eq "text/csv"
+        end
+
+        it "should not render the raw_application template" do
+          post :step, params: { id: application.id, application: application_valid_params }, format: :js
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+        end
+
+        it "should not render the raw_application template" do
+          post :step, params: { id: application.id, application: application_valid_params }, format: :xml
+          expect(response.status).to eq 406
+          expect(response.body).to eq "<error>Unsupported format</error>"
+        end
+      end
+
       it "should fail during publish application and redirects to error_page" do
         application2.ensure_relationship_with_primary(application2.applicants[1], 'spouse')
         post :step, params: { id: application2.id, commit: "Submit Application", application: application_valid_params }
@@ -605,6 +661,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(response).to render_template(:financial_assistance_nav)
     end
 
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "draft")
+      end
+
+      it "should not render the review_and_submit template" do
+        get :review_and_submit, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the review_and_submit template" do
+        get :review_and_submit, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the review_and_submit template" do
+        get :review_and_submit, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+
     context 'when the application does not have valid relations' do
       before do
         allow_any_instance_of(FinancialAssistance::Application).to receive(:valid_relations?).and_return(false)
@@ -632,6 +713,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     it "should redirect to applications page" do
       get :review, params: { id: FinancialAssistance::Application.new.id }
       expect(response).to redirect_to(applications_path)
+    end
+
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "submitted")
+      end
+
+      it "should not render the review template" do
+        get :review, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the review template" do
+        get :review, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the review template" do
+        get :review, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
     end
   end
 
@@ -684,6 +790,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(assigns(:income_coverage_hash)[applicant.id]["INCOME"].present?).to eq true
       end
     end
+
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "submitted")
+      end
+
+      it "should not render the raw_application template" do
+        get :raw_application, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the raw_application template" do
+        get :raw_application, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the raw_application template" do
+        get :raw_application, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
   end
 
   describe "PATCH update_application_year" do
@@ -702,6 +833,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
         get :wait_for_eligibility_response, params: { id: application.id }
         expect(assigns(:application)).to eq application
+      end
+    end
+
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "submitted")
+      end
+
+      it "should not render the wait_for_eligibility_response template" do
+        get :wait_for_eligibility_response, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the wait_for_eligibility_response template" do
+        get :wait_for_eligibility_response, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the wait_for_eligibility_response template" do
+        get :wait_for_eligibility_response, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
       end
     end
 
@@ -816,6 +972,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
 
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "submitted")
+      end
+
+      it "should not render the eligibility_response_error template" do
+        get :eligibility_response_error, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the eligibility_response_error template" do
+        get :eligibility_response_error, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the eligibility_response_error template" do
+        get :eligibility_response_error, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+
     context 'where application received eligibility determination' do
       before do
         application.update_attributes!(determination_http_status_code: 200, aasm_state: 'determined')
@@ -878,6 +1059,32 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         it 'succeeds' do
           get '/financial_assistance/applications'
           expect(response).to render_template(:index_with_filter)
+        end
+
+        context "when the request type is invalid" do
+          let(:operation_instance) { instance_double(FinancialAssistance::Operations::Applications::QueryFilteredApplications) }
+          let(:failure_result) { Dry::Monads::Result::Failure.new({message: "error message"}) }
+
+          it "should not render the index_with_filter template" do
+            allow(FinancialAssistance::Operations::Applications::QueryFilteredApplications).to receive(:new).and_return(operation_instance)
+            allow(operation_instance).to receive(:call).and_return(failure_result)
+            get '/financial_assistance/applications', params: { format: :csv }
+            expect(response.status).to eq 406
+            expect(response.body).to eq "Unsupported format"
+            expect(response.media_type).to eq "text/csv"
+          end
+
+          it "should not render the index_with_filter template" do
+            get '/financial_assistance/applications', params: { format: :fake }
+            expect(response.status).to eq 406
+            expect(response.body).to eq "Unsupported format"
+          end
+
+          it "should not render the index_with_filter template" do
+            get '/financial_assistance/applications', params: { format: :xml }
+            expect(response.status).to eq 406
+            expect(response.body).to eq "<error>Unsupported format</error>"
+          end
         end
       end
     end

@@ -27,8 +27,18 @@ RSpec.describe PaymentTransactionsController, :type => :controller, :dbclean => 
       allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:encode_saml_response).and_return encode_saml_response
     end
 
-    it 'should generate saml response' do
+    it 'should not generate saml response for html' do
+      get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }, format: :html
+      expect(response).not_to have_http_status(:success)
+    end
+
+    it 'should not generate saml response for no format' do
       get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
+      expect(response).not_to have_http_status(:success)
+    end
+
+    it 'should generate saml response' do
+      get :generate_saml_response, params: { :enrollment_id => hbx_enrollment.hbx_id, :source => source }, format: :json
       expect(response).to have_http_status(:success)
     end
 
