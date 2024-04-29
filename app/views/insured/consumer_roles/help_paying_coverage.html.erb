@@ -1,6 +1,6 @@
 <%= form_tag(help_paying_coverage_response_insured_consumer_role_index_path, method: :get) do %>
   <% if @bs4 %>
-    <%= render partial: 'shared/progress_side_nav', locals: {nav: sign_up_nav_options(1, show_help_button: true)} %>
+    <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
     <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
     <% if @person.mec_check_response == "Success" %>
       <div id="mec-check-response">
@@ -29,7 +29,7 @@
     <h1><%= l10n("insured.consumer_role.help_paying_coverage.header") %></h1>
     <p><%= l10n("insured.consumer_role.help_paying_coverage.details1")%> <%= render partial:"shared/glossary", locals: {key: "Premium", title: "Premium", term: "premium" } %> <%= l10n("insured.consumer_role.help_paying_coverage.details2")%>
       <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: " out-of-pocket costs" } %> <%= l10n("insured.consumer_role.help_paying_coverage.details3")%>
-      <%= render partial:"shared/glossary", locals: {key: "medicaid", term: " Medicaid" } %>.</p>
+      <%= render partial:"shared/glossary", locals: {key: "medicaid", term: " Medicaid" } %></p>
     <fieldset id="help_paying_coverage" class="focus_effect module">
       <legend class="weight-n required">
         <%= l10n('faa.premium_reductions') %>
@@ -40,12 +40,12 @@
           ?
         <% end %>
       </legend>
-      <div class="focus d-flex align-items-center mt-2 mb-2">
-        <label class="radio-label radio" for="radio1">
+      <div class="d-flex align-items-center mt-2 mb-2">
+        <label class="radio-label" for="radio1" tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio1')">
           <input class=" " id="radio1" type="radio" value="true" name="is_applying_for_assistance" <%='checked' if @person&.is_applying_for_assistance %>>
           <span><%= l10n("Yes") %></span>
         </label>
-        <label class="radio-label radio" for="radio2">
+        <label class="radio-label" for="radio2" tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio2')">
           <input class=" " id="radio2" type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person&.is_applying_for_assistance == false%>>
           <span><%= l10n("No") %></span>
         </label>
@@ -56,7 +56,7 @@
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
     <% end %>
     <div class="mt-4">
-      <%= render partial: "shared/progress_navigation_buttons", locals: {button_type: "submit"} %>
+      <%= render  partial: 'shared/individual_progress', locals: {step: 'help_paying_coverage'} %>
     </div>
   <% else %>
     <div class="container">
