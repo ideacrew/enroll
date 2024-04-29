@@ -28,4 +28,12 @@ module NavigationHelper
     return true if controller_name == "family_relationships" && action_name == "index"
     return true if controller_name == "family_members" && action_name == "index"
   end
+
+  def sign_up_nav_options
+    [
+      {step: 1, label: l10n('personal_information')},
+      {step: 2, label: l10n('tell_us_about_yourself')},
+      {step: 3, label: l10n('family_info')},
+    ]
+  end
 end
