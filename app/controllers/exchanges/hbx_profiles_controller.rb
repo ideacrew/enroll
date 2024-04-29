@@ -309,6 +309,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     else
       @staff = @staff.where(last_name: @q)
     end
+
+    respond_to :js
   end
 
   def request_help
@@ -352,7 +354,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     @person = Person.find(params[:person])
     broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
-    render :plain => {broker: broker_view, status: status_text}.to_json, layout: false
+
+    respond_to do |format|
+      format.html { render :plain => {broker: broker_view, status: status_text}.to_json, layout: false }
+    end
   end
 
   def family_index
@@ -417,6 +422,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :hide_form?
 
     @element_to_replace_id = params[:family_actions_id]
+
+    respond_to :js
   end
 
   def add_sep_form
@@ -565,6 +572,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     @enrollments = @person.primary_family.terminated_and_expired_enrollments
     @coverage_ended_enrollments = @person.primary_family.hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending", "coverage_expired"])
     @dup_enr_ids = fetch_duplicate_enrollment_ids(@coverage_ended_enrollments).map(&:to_s)
+
+    respond_to :js
   end
 
   def update_enrollment_terminated_on_date
@@ -629,6 +638,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_and_expired_enrollments
+
+    respond_to :js
   end
 
   def reinstate_enrollment
