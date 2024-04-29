@@ -4,26 +4,18 @@
   <% end %>
 <% end %>
 <% if @bs4 %>
-  <div class="container mt-4">
-    <div id="new_person_wrapper">
-      <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
-        <div class="row">
-          <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0">
-            <%= render partial: 'shared/left_nav.html.erb', locals: {step: '1'} %>
-          </div>
-          <div class="col-sm-12 col-md-12 col-lg-9">
-            <h1>
-              <%= l10n("personal_information") %>
-            </h1>
-            <p>
-              <%= l10n("insured.consumer_roles.search.enter_personal_info_msg") %>
-            </p>
-            <%= render 'insured/consumer_roles/remote_search_form', f: f %>
-            <%= render partial: 'shared/individual_progress', locals: {step: '1'} %>
-          </div>
-        </div>
-      <% end %>
-    </div>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+  <div id="new_person_wrapper">
+    <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
+      <h1>
+        <%= l10n("personal_information") %>
+      </h1>
+      <p>
+        <%= l10n("insured.consumer_roles.search.enter_personal_info_msg") %>
+      </p>
+      <%= render 'insured/consumer_roles/remote_search_form', f: f %>
+      <%= render partial: 'shared/individual_progress', locals: {step: '1'} %>
+    <% end %>
   </div>
 <% else %>
   <div class="container pd-container">
