@@ -1,5 +1,8 @@
 module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
+    layout 'bootstrap_4' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
+    before_action :set_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     before_action :set_current_person
     before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
 
@@ -125,6 +128,12 @@ module Insured
 
     def render_verification_override(transaction_id)
       render_to_string "events/identity_verification/interactive_verification_override", :formats => [:xml], :locals => { :transaction_id => transaction_id }
+    end
+
+    private
+
+    def set_bs4_layout
+      @bs4 = true
     end
   end
 end
