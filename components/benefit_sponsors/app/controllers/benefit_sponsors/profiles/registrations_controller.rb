@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 require_dependency "benefit_sponsors/application_controller"
 
 module BenefitSponsors
   module Profiles
+    # This controller is responsible for creating/updating new broker agencies
     class RegistrationsController < ::BenefitSponsors::ApplicationController
       include BenefitSponsors::Concerns::ProfileRegistration
       include Pundit
@@ -25,13 +28,12 @@ module BenefitSponsors
         end
       end
 
-      def create
+      def create #rubocop:disable Metrics/CyclomaticComplexity
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create(registration_params)
         authorize @agency
         begin
           saved, result_url = verify_recaptcha_if_needed && @agency.save
           if saved && is_employer_profile?
-              person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
               end
           elsif saved && is_general_agency_profile?
@@ -44,18 +46,22 @@ module BenefitSponsors
                               end
           if is_broker_profile? && saved
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
-            render template_filename, :layout => 'single_column'
+            respond_to do |format|
+              format.html { render template_filename, :layout => 'single_column' }
+            end
             return
           elsif saved
             result_url = self.send(result_url)
             redirect_to result_url
             return
           end
-        rescue Exception => e
+        rescue StandardError => e
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
-        render 'new', :flash => { :error => @agency.errors.full_messages }
+        respond_to do |format|
+          format.html { render 'new', :flash => { :error => @agency.errors.full_messages } }
+        end
       end
 
       def edit
@@ -85,7 +91,9 @@ module BenefitSponsors
       def counties_for_zip_code
         @counties = BenefitMarkets::Locations::CountyZip.where(zip: params[:zip_code]).pluck(:county_name).uniq
 
-        render json: @counties
+        respond_to do |format|
+          format.json { render json: @counties }
+        end
       end
 
       def resource_not_found

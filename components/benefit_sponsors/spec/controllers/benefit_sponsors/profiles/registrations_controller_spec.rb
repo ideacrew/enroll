@@ -2,7 +2,8 @@
 
 require 'rails_helper'
 
-module BenefitSponsors
+# Specs for testing BenefitSponsors::Profiles::RegistrationsController
+module BenefitSponsors # rubocop:disable Metrics/ModuleLength
   RSpec.describe Profiles::RegistrationsController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
@@ -300,11 +301,9 @@ module BenefitSponsors
           }
         end
 
-        shared_examples_for "store profile for create" do |profile_type|
-
+        context 'with valid params' do
           before :each do
             allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true) if profile_type == 'general_agency'
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
@@ -312,49 +311,83 @@ module BenefitSponsors
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_approval_period).and_return(true)
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false) if profile_type == 'broker_agency'
-            BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop if profile_type == 'broker_agency'
-            BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS << :shop if profile_type == 'general_agency'
             site.benefit_markets.first.save!
             # Stubbing the controller method (which has two conditions, one of which is a Resource Registry check) is easier
-            allow(controller).to receive(:redirect_to_requirements_after_confirmation?).and_return(true) if profile_type == 'broker_agency'
-            allow(controller).to receive(:is_broker_profile?).and_return(true) if profile_type == 'broker_agency'
             allow(controller).to receive(:verify_recaptcha_if_needed).and_return(true)
-            user = self.send("#{profile_type}_user")
-            sign_in user if user
-            post :create, params: {:agency => self.send("#{profile_type}_params")}
           end
 
-          it "should redirect for benefit_sponsor and general agency" do
-            expect(response).to have_http_status(:redirect) if profile_type != 'broker_agency'
+          shared_examples_for "store profile for create" do |profile_type|
+            before :each do
+              allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true) if profile_type == 'general_agency'
+              BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop if profile_type == 'broker_agency'
+              BenefitSponsors::Organizations::GeneralAgencyProfile::MARKET_KINDS << :shop if profile_type == 'general_agency'
+              allow(controller).to receive(:is_broker_profile?).and_return(true) if profile_type == 'broker_agency'
+              allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false) if profile_type == 'broker_agency'
+              allow(controller).to receive(:redirect_to_requirements_after_confirmation?).and_return(true) if profile_type == 'broker_agency'
+
+              user = self.send("#{profile_type}_user")
+              sign_in user if user
+              post :create, params: {:agency => self.send("#{profile_type}_params")}
+            end
+
+            it "should redirect for benefit_sponsor and general agency" do
+              expect(response).to have_http_status(:redirect) if profile_type != 'broker_agency'
+            end
+
+            it "should render confirmation template for broker agency" do
+              expect(response).to render_template('confirmation') if profile_type == 'broker_agency'
+            end
+
+            it "should redirect to home page of benefit_sponsor" do
+              expect(response.location.include?("tab=home")).to eq true if profile_type == "benefit_sponsor"
+            end
+
+            it "should redirect to new for general agency" do
+              expect(response.location.include?("new?profile_type=general_agency")).to eq true if profile_type == "general_agency"
+            end
           end
 
-          it "should render confirmation template for broker agency" do
-            expect(response).to render_template('confirmation') if profile_type == 'broker_agency'
-          end
+          it_behaves_like "store profile for create", "benefit_sponsor"
+          it_behaves_like "store profile for create", "broker_agency"
+          it_behaves_like "store profile for create", "general_agency"
 
-          it "should redirect to home page of benefit_sponsor" do
-            expect(response.location.include?("tab=home")).to eq true if profile_type == "benefit_sponsor"
-          end
+          it_behaves_like "initialize registration form", :create, {}, "benefit_sponsor"
+          it_behaves_like "initialize registration form", :create, {}, "broker_agency"
+          it_behaves_like "initialize registration form", :create, {}, "general_agency"
 
-          it "should redirect to new for general agency" do
-            expect(response.location.include?("new?profile_type=general_agency")).to eq true if profile_type == "general_agency"
+          context 'requests with correct params but valid/invalid format' do
+            before :each do
+              BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop
+              allow(controller).to receive(:is_broker_profile?).and_return(true)
+              allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false)
+              allow(controller).to receive(:redirect_to_requirements_after_confirmation?).and_return(true)
+
+              user = self.send("broker_agency_user")
+              sign_in user if user
+            end
+
+            it "should return a success" do
+              post :create, params: {:agency => self.send("broker_agency_params")}
+              expect(response.status).to eq(200)
+              expect(response).to render_template('confirmation')
+            end
+
+            it "should not render the confirmation template" do
+              post :create, params: {:agency => self.send("broker_agency_params")}, format: :js
+              expect(response).to have_http_status(:not_acceptable)
+            end
+
+            it "should not return a success" do
+              post :create, params: {:agency => self.send("broker_agency_params")}, format: :json
+              expect(response).to have_http_status(:not_acceptable)
+            end
+
+            it "should not return a success" do
+              post :create, params: {:agency => self.send("broker_agency_params")}, format: :xml
+              expect(response).to have_http_status(:not_acceptable)
+            end
           end
         end
-
-        it_behaves_like "store profile for create", "benefit_sponsor"
-        it_behaves_like "store profile for create", "broker_agency"
-        it_behaves_like "store profile for create", "general_agency"
-        # it_behaves_like "store profile for create", "issuer"
-        # it_behaves_like "store profile for create", "contact_center"
-        # it_behaves_like "store profile for create", "fedhb"
-
-        it_behaves_like "initialize registration form", :create, {}, "benefit_sponsor"
-        it_behaves_like "initialize registration form", :create, {}, "broker_agency"
-        it_behaves_like "initialize registration form", :create, {}, "general_agency"
-        # it_behaves_like "initialize registration form", :create, { profile_type: "issuer" }
-        # it_behaves_like "initialize registration form", :create, { profile_type: "contact_center" }
-        # it_behaves_like "initialize registration form", :create, { profile_type: "fedhb" }
 
         shared_examples_for "fail store profile for create if params invalid" do |profile_type|
 
@@ -384,9 +417,6 @@ module BenefitSponsors
         it_behaves_like "fail store profile for create if params invalid", "benefit_sponsor"
         it_behaves_like "fail store profile for create if params invalid", "broker_agency"
         it_behaves_like "fail store profile for create if params invalid", "general_agency"
-        # it_behaves_like "fail store profile for create if params invalid", "issuer"
-        # it_behaves_like "fail store profile for create if params invalid", "contact_center"
-        # it_behaves_like "fail store profile for create if params invalid", "fedhb"
       end
 
       context "with invalid captcha" do
@@ -459,16 +489,41 @@ module BenefitSponsors
       it_behaves_like "initialize profile for edit", "benefit_sponsor"
       it_behaves_like "initialize profile for edit", "broker_agency"
       it_behaves_like "initialize profile for edit", "general_agency"
-      # it_behaves_like "initialize profile for edit", "issuer"
-      # it_behaves_like "initialize profile for edit", "contact_center"
-      # it_behaves_like "initialize profile for edit", "fedhb"
 
       it_behaves_like "initialize registration form", :edit, { id: "id"}, "benefit_sponsor"
       it_behaves_like "initialize registration form", :edit, { id: "id" }, "broker_agency"
       it_behaves_like "initialize registration form", :edit, { id: "id" }, "general_agency"
-      # it_behaves_like "initialize registration form", :edit, { profile_type: "issuer" }
-      # it_behaves_like "initialize registration form", :edit, { profile_type: "contact_center" }
-      # it_behaves_like "initialize registration form", :edit, { profile_type: "fedhb" }
+
+      context 'with valid params but valid/invalid format' do
+        before do
+          sign_in edit_user
+          @id = self.send('broker_agency').profiles.first.id.to_s
+        end
+
+        it "html should return a success" do
+          get :edit, params: {id: @id}
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template('edit')
+        end
+
+        it "js should raise an error" do
+          expect do
+            (get :edit, params: {id: @id}, format: :js).to raise_error(ActionView::MissingTemplate)
+          end
+        end
+
+        it "json should raise an error" do
+          expect do
+            (get :edit, params: {id: @id}, format: :json).to raise_error(ActionView::MissingTemplate)
+          end
+        end
+
+        it "xml should raise an error" do
+          expect do
+            (get :edit, params: {id: @id}, format: :xml).to raise_error(ActionView::MissingTemplate)
+          end
+        end
+      end
     end
 
     describe "PUT update", dbclean: :after_each do
@@ -588,6 +643,34 @@ module BenefitSponsors
         # it_behaves_like "fail store profile for update if params invalid", "issuer"
         # it_behaves_like "fail store profile for update if params invalid", "contact_center"
         # it_behaves_like "fail store profile for update if params invalid", "fedhb"
+      end
+    end
+
+    describe "GET counties_for_zip_code" do
+      context 'valid params with valid/invalid formats' do
+        before do
+          sign_in edit_user
+        end
+
+        it "html should return a success" do
+          get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "json should return a success" do
+          get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :json
+          expect(response).to have_http_status(:success)
+        end
+
+        it "js should return an error" do
+          get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :js
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should return an error" do
+          get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
+        end
       end
     end
   end
