@@ -1,33 +1,23 @@
 <% if @bs4 %>
-  <div class="mt-4 mb-4">
-    <div class="container mt-4">
-      <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0">
-          <%= render partial: 'shared/left_nav.html.erb', locals: {step: '2', ridp: true} %>
-        </div>
-        <div class="col-sm-12 col-md-12 col-lg-9 pl-4">
-          <h1><%= l10n("insured.consumer_roles.upload_ridp_documents.header") %></h1>
-          <% if EnrollRegistry.feature_enabled?(:ridp_h139) %>
-            <p><%= l10n("insured.consumer_roles.upload_ridp_documents.ridp_h139_info") %></p>
-            <%= render partial: 'insured/fdsh_ridp_verifications/options_to_verify_identity' %>
-            <%= render partial: 'shared/application_types_list' %>
-            <div class="outstanding-ridp-documents">
-              <%= render partial: 'insured/fdsh_ridp_verifications/outstanding_ridp_documents' %>
-            </div>
-          <% else %>
-            <p><%= l10n("insured.consumer_roles.upload_ridp_documents.non_ridp_h139_info") %></p>
-            <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
-            <%= render partial: 'shared/application_types_list' %>
-            <br>
-            <div class="outstanding-ridp-documents">
-              <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
-            </div>
-          <% end %>
-          <%= render partial: 'shared/individual_progress', locals: {step: '2', next_link: ridp_redirection_link(@person), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?, previous_style: 'solid'} %>
-        </div>
-      </div>
+  <%= render partial: 'shared/consumer_signup', locals: {step: 1} %>
+  <h1><%= l10n("insured.consumer_roles.upload_ridp_documents.header") %></h1>
+  <% if EnrollRegistry.feature_enabled?(:ridp_h139) %>
+    <p><%= l10n("insured.consumer_roles.upload_ridp_documents.ridp_h139_info") %></p>
+    <%= render partial: 'insured/fdsh_ridp_verifications/options_to_verify_identity' %>
+    <%= render partial: 'shared/application_types_list' %>
+    <div class="outstanding-ridp-documents">
+      <%= render partial: 'insured/fdsh_ridp_verifications/outstanding_ridp_documents' %>
     </div>
-  </div>
+  <% else %>
+    <p><%= l10n("insured.consumer_roles.upload_ridp_documents.non_ridp_h139_info") %></p>
+    <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+    <%= render partial: 'shared/application_types_list' %>
+    <br>
+    <div class="outstanding-ridp-documents">
+      <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
+    </div>
+  <% end %>
+  <%= render partial: 'shared/individual_progress', locals: {step: '2', next_link: ridp_redirection_link(@person), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?, previous_style: 'solid'} %>
 <% else %>
   <div class="content">
     <div class="container">
