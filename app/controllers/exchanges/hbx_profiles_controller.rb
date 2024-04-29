@@ -130,6 +130,8 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @resource = get_resource_for_secure_form(params)
     @element_to_replace_id = params[:employer_actions_id] || params[:family_actions_id]
+
+    respond_to :js
   end
 
   def create_send_secure_message
@@ -589,10 +591,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :broker_agency_index?
 
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new
-
-    #@q = params.permit(:q)[:q]
-    #@broker_agency_profiles = HbxProfile.search_random(@q)
-
 
     respond_to do |format|
       format.html { render 'exchanges/hbx_profiles/broker_agency_index_datatable.html.slim' }
