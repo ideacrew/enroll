@@ -805,6 +805,26 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         expect(eligibility_determination.effective_date).to eq TimeKeeper.date_of_record
         expect(grants.size).to eq 2
       end
+
+      context "when request format type is invalid" do
+        before do
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
+          sign_in(user)
+        end
+
+        it "should not render create_eligibility" do
+          post :create_eligibility, params: params, xhr: true, format: :fake
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+        end
+
+
+        it "should not render create_eligibility" do
+          post :create_eligibility, params: params, xhr: true, format: :xml
+          expect(response.status).to eq 406
+          expect(response.body).to eq "<error>Unsupported format</error>"
+        end
+      end
     end
   end
 
@@ -1715,6 +1735,21 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
       it "should populate the row id to instance variable" do
         expect(assigns(:element_to_replace_id)).to eq family_id.to_s
+      end
+    end
+
+    context "when request format type is invalid" do
+      it "should not render create_eligibility" do
+        get :get_user_info, params: {family_actions_id: family_id, person_id: person.id}, format: :fake
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+
+      it "should not render create_eligibility" do
+        get :get_user_info, params: {family_actions_id: family_id, person_id: person.id}, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
       end
     end
 

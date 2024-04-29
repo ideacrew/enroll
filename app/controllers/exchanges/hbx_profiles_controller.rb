@@ -423,9 +423,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
 
-    respond_to do |format|
-      format.js
-    end
+    respond_to :js
   end
 
   def show_sep_history
@@ -434,9 +432,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
 
-    respond_to do |format|
-      format.js
-    end
+    respond_to :js
   end
 
   # SHOP and IVL Feature
@@ -457,9 +453,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       end
     end
 
-    respond_to do |format|
-      format.js
-    end
+    respond_to :js
   end
 
   def update_effective_date
@@ -476,9 +470,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :calculate_sep_dates?
 
     calculateDates
-    respond_to do |format|
-      format.js {}
-    end
+    respond_to :js
   end
 
   def add_new_sep
@@ -770,9 +762,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       family.active_household.create_new_tax_household(params[:person])
     end
 
-    respond_to do |format|
-      format.js
-    end
+    respond_to :js
   end
 
   # GET /exchanges/hbx_profiles/1
