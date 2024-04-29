@@ -3,7 +3,7 @@
 module Insured
   # controller for fdsh ridp H139 feature
   class FdshRidpVerificationsController < ApplicationController
-    layout 'bootstrap_4' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    layout 'progress' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     before_action :set_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     before_action :set_current_person

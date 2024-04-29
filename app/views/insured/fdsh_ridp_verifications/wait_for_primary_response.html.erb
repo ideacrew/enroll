@@ -1,20 +1,13 @@
 <% if @bs4 %>
-  <div class="container mt-4 <%=pundit_class Family, :updateable?%>">
-    <div class="row">
-      <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0">
-        <%= render partial: 'shared/left_nav.html.erb', locals: {step: '2'} %>
-      </div>
-      <div class="col-sm-12 col-md-12 col-lg-9 pl-4">
-        <div class="d-flex full-height justify-content-center align-items-center">
-          <div>
-            <h1><%= l10n("getting_response") %></h1>
-            <div class="d-flex justify-content-center align-items-center mt-4 mb-4">
-              <i class="fa fa-circle-notch fa-4x fa-spin" aria-hidden="true"></i>
-            </div>
-            <p><%= l10n("page_refresh") %></p>
-          </div>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 2} %>
+  <div class="<%=pundit_class Family, :updateable?%>">
+    <div class="d-flex full-height justify-content-center align-items-center">
+      <div>
+        <h1><%= l10n("getting_response") %></h1>
+        <div class="d-flex justify-content-center align-items-center mt-4 mb-4">
+          <i class="fa fa-circle-notch fa-4x fa-spin" aria-hidden="true"></i>
         </div>
-      </div>
+        <p><%= l10n("page_refresh") %></p>
       </div>
     </div>
   </div>
