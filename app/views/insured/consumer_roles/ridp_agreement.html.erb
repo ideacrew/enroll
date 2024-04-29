@@ -1,60 +1,50 @@
 <% if @bs4 %>
-  <div class="mt-4 mb-4">
-    <div class="container mt-4">
-      <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0">
-          <%= render partial: 'shared/left_nav.html.erb', locals: {step: '2', ridp: true} %>
-        </div>
-        <div class="col-sm-12 col-md-12 col-lg-9 pl-4">
-          <h1><%= l10n("insured.consumer_roles.ridp_agreement.heading") %></h1>
-          <p><%= l10n("insured.consumer_roles.ridp_agreement.instruction1") %></p>
-          <p><%= l10n("insured.consumer_roles.ridp_agreement.instruction2") %></p>
-          <ul>
-            <li class="mb-2"><%= l10n("insured.consumer_roles.ridp_agreement.bullet1") %></li>
-            <li class="mb-2"><%= l10n("insured.consumer_roles.ridp_agreement.bullet2") %></li>
-            <li><%= l10n("insured.consumer_roles.ridp_agreement.bullet3") %></li>
-          </ul>
-          <fieldset class="mt-4 mb-4">
-            <legend>
-              <%= l10n("insured.consumer_roles.ridp_agreement.ridp_agreement_label") %>
-            </legend>
-            <div class="disagree_placeholder_text">
-              <!-- when should this appear? does it ever -->
-              <%= l10n("insured.consumer_roles.ridp_agreement.disagree_placeholder_text", contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number) %>
-            </div>
-            <div class="d-flex align-items-center">
-              <label for="agreement_agree" tabindex="0" class="radio" data-radio-event="agreement_disagree">
-                <%= radio_button_tag :agreement, "agree", class: "required", id: 'agreement_agree' %>
-                <%= l10n('faa.i_agree') %>
-              </label>
-              <%= javascript_tag do %>
-                window.addEventListener('DOMContentLoaded', (event) => {
-                  const agreementDisagree = document.querySelector("[for='agreement_disagree']");
-                  agreementDisagree.addEventListener("keydown", (event) => {
-                    handleRadioKeyDown(event, 'agreement_disagree');
-                  });
-                });
-              <% end %>
+  <%= render partial: 'shared/consumer_signup', locals: {step: 2} %>
+  <h1><%= l10n("insured.consumer_roles.ridp_agreement.heading") %></h1>
+  <p><%= l10n("insured.consumer_roles.ridp_agreement.instruction1") %></p>
+  <p><%= l10n("insured.consumer_roles.ridp_agreement.instruction2") %></p>
+  <ul>
+    <li class="mb-2"><%= l10n("insured.consumer_roles.ridp_agreement.bullet1") %></li>
+    <li class="mb-2"><%= l10n("insured.consumer_roles.ridp_agreement.bullet2") %></li>
+    <li><%= l10n("insured.consumer_roles.ridp_agreement.bullet3") %></li>
+  </ul>
+  <fieldset class="mt-4 mb-4">
+    <legend>
+      <%= l10n("insured.consumer_roles.ridp_agreement.ridp_agreement_label") %>
+    </legend>
+    <div class="disagree_placeholder_text">
+      <!-- when should this appear? does it ever -->
+      <%= l10n("insured.consumer_roles.ridp_agreement.disagree_placeholder_text", contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number) %>
+    </div>
+    <div class="d-flex align-items-center">
+      <label for="agreement_agree" tabindex="0" class="radio" data-radio-event="agreement_disagree">
+        <%= radio_button_tag :agreement, "agree", class: "required", id: 'agreement_agree' %>
+        <%= l10n('faa.i_agree') %>
+      </label>
+      <%= javascript_tag do %>
+        window.addEventListener('DOMContentLoaded', (event) => {
+          const agreementDisagree = document.querySelector("[for='agreement_disagree']");
+          agreementDisagree.addEventListener("keydown", (event) => {
+            handleRadioKeyDown(event, 'agreement_disagree');
+          });
+        });
+      <% end %>
 
-              <label for="agreement_disagree" tabindex="0" class="radio" data-radio-event="agreement_disagree">
-                <%= radio_button_tag :agreement, "disagree", class: "required", id: 'agreement_disagree' %>
-                <%= l10n('faa.i_disagree') %>
-              </label>
-            </div>
-          </fieldset>
-          <div class="hide row-form-wrapper">
-            <div class="mt-4 mb-4 aut_cons_text">
-              <p>
-                <!-- We need to do some feature flagging in regards to the below, not sure that is an O&M task? -->
-                <b><%= l10n("insured.consumer_roles.ridp_agreement.requirement1") %></b> <%= l10n("insured.consumer_roles.ridp_agreement.requirement2") %> <%= link_to l10n("insured.consumer_roles.ridp_agreement.link_text"), "https://www.coverme.gov/forms", target: "_blank", rel: "noopener noreferrer" %>.
-              </p>
-            </div>
-          </div>
-          <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
-        </div>
-      </div>
+      <label for="agreement_disagree" tabindex="0" class="radio" data-radio-event="agreement_disagree">
+        <%= radio_button_tag :agreement, "disagree", class: "required", id: 'agreement_disagree' %>
+        <%= l10n('faa.i_disagree') %>
+      </label>
+    </div>
+  </fieldset>
+  <div class="hide row-form-wrapper">
+    <div class="mt-4 mb-4 aut_cons_text">
+      <p>
+        <!-- We need to do some feature flagging in regards to the below, not sure that is an O&M task? -->
+        <b><%= l10n("insured.consumer_roles.ridp_agreement.requirement1") %></b> <%= l10n("insured.consumer_roles.ridp_agreement.requirement2") %> <%= link_to l10n("insured.consumer_roles.ridp_agreement.link_text"), "https://www.coverme.gov/forms", target: "_blank", rel: "noopener noreferrer" %>.
+      </p>
     </div>
   </div>
+  <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
 <% else %>
   <% content_for :horizontal_status do %>
     <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
@@ -107,7 +97,6 @@
       const path = fdshEnabled ? "/insured/fdsh_ridp_verifications/new" : "/insured/interactive_identity_verifications/new"
       const agree = document.querySelector("[for='agreement_agree']");
       const disagree = document.querySelector("[for='agreement_disagree']");
-      console.log(disagree);
       agree.addEventListener("click", function(){
         $(".interaction-click-control-continue").attr("href", path);
         $('.aut_cons_text').parents('.row-form-wrapper').addClass('hide');
