@@ -1,37 +1,27 @@
 <% if @bs4 %>
-  <div class="mt-4 mb-4">
-    <div class="container mt-4">
-      <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0">
-          <% redirect_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: @person.consumer_role.id) %>
-          <%= render partial: 'shared/left_nav.html.erb', locals: {ridp:true, step: '2', next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : redirect_path, identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?} %>
-        </div>
-        <div class="col-sm-12 col-md-12 col-lg-9 pl-4">
-          <h1><%= l10n("verify_identity") %></h1>
-          <% if @step == 'start' %>
-            <h4>
-              <%= l10n("insured.interactive_identity_verifications.failed_validation.start") %>
-            </h4>
-            <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
-          <% else %>
-            <%= render partial: 'notices/shared/unordered_list', locals: { previous: l10n('insured.interactive_identity_verifications.failed_validation.else'), listings: [l10n('insured.interactive_identity_verifications.failed_validation.step_1'), l10n('insured.interactive_identity_verifications.failed_validation.step_2', transaction_id: @verification_transaction_id), l10n('insured.interactive_identity_verifications.failed_validation.step_3')] } %>
-            <% unless @verification_transaction_id.blank? %>
-              <p><%= l10n("insured.interactive_identity_verifications.failed_validation.if_continue") %></p>
-              <p class="mb-4"><%= link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer' %> <%= link_to(l10n('insured.interactive_identity_verifications.failed_validation.continue_button'), insured_interactive_identity_verification_path(:id => @verification_transaction_id), :method => :put, :class => "btn-secondary interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?)) %></p>
-            <% end %>
-            <div class="mt-4 mb-4">
-              <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
-            </div>
-          <% end %>
-          <%= render partial: 'shared/application_types_list' %>
-          <div class="outstanding-ridp-documents mt-4">
-            <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents', locals: {show_faq_button: @verification_transaction_id.blank?} %>
-          </div>
-          <%= render partial: 'shared/individual_progress', locals: {ridp:true, step: '2', next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : redirect_path, identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?} %>
-        </div>
-      </div>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+  <h1><%= l10n("verify_identity") %></h1>
+  <% if @step == 'start' %>
+    <h4>
+      <%= l10n("insured.interactive_identity_verifications.failed_validation.start") %>
+    </h4>
+    <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+  <% else %>
+    <%= render partial: 'notices/shared/unordered_list', locals: { previous: l10n('insured.interactive_identity_verifications.failed_validation.else'), listings: [l10n('insured.interactive_identity_verifications.failed_validation.step_1'), l10n('insured.interactive_identity_verifications.failed_validation.step_2', transaction_id: @verification_transaction_id), l10n('insured.interactive_identity_verifications.failed_validation.step_3')] } %>
+    <% unless @verification_transaction_id.blank? %>
+      <p><%= l10n("insured.interactive_identity_verifications.failed_validation.if_continue") %></p>
+      <p class="mb-4"><%= link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer' %> <%= link_to(l10n('insured.interactive_identity_verifications.failed_validation.continue_button'), insured_interactive_identity_verification_path(:id => @verification_transaction_id), :method => :put, :class => "btn-secondary interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?)) %></p>
+    <% end %>
+    <div class="mt-4 mb-4">
+      <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
     </div>
+  <% end %>
+  <%= render partial: 'shared/application_types_list' %>
+  <div class="outstanding-ridp-documents mt-4">
+    <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents', locals: {show_faq_button: @verification_transaction_id.blank?} %>
   </div>
+  <% redirect_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: @person.consumer_role.id) %>
+  <%= render partial: 'shared/individual_progress', locals: {ridp:true, step: '2', next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : redirect_path, identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?} %>
 <% else %>
   <div class="content">
     <div class="container">
