@@ -10,27 +10,22 @@
               <div class="text-center">
                 <span class="btn btn-default btn-file" id="select_upload_identity">
                   <i class="fa fa-upload" aria-hidden="true"></i>
-                  Select File to Upload
+                  <label for="file_"><%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %></label>
                   <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
                 </span>
               </div>
-              <div style='font-size: 100%;'>
+              <fieldset>
+                <legend for="ridp_subject"><%= l10n("insured.consumer_roles.upload_ridp_documents.id_type") %></legend>
                 <span>
-                  <%= radio_button_tag 'ridp_subject', "Driver's  License issued by state or territory", true %> Driver's  License issued by state or territory
-                  <br>
-                  <%= radio_button_tag 'ridp_subject', 'School identification card', false %> School identification card
-                  <br>
-                  <%= radio_button_tag 'ridp_subject', 'U.S. military card or draft record', false%> U.S. military card or draft record
-                  <br>
-                  <%= radio_button_tag 'ridp_subject', 'Identification card issued by the federal, state or local government, including a U.S. Passport', false %> Identification card issued by the federal, state or local government, including a U.S. Passport
-                  <br>
-                  <%= radio_button_tag 'ridp_subject', "Military dependent's identification card", false %> Military dependent's identification card
-                  <br>
-                  <%= radio_button_tag 'ridp_subject', 'Native American tribal document', false %> Native American tribal document
-                  <br>
-                  <%= radio_button_tag 'ridp_subject', 'U.S. Coast Guard Merchant Mariner card', false %> U.S. Coast Guard Merchant Mariner card
+                  <label class="mb-4" for="ridp_subject_Driver_s_License_issued_by_state_or_territory"><%= radio_button_tag 'ridp_subject', "Driver's License issued by state or territory", true %><%= l10n("insured.consumer_roles.upload_ridp_documents.driver_license") %></label>
+                  <label class="mb-4" for="ridp_subject_School_identification_card"><%= radio_button_tag 'ridp_subject', 'School identification card', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.school_id") %></label>
+                  <label class="mb-4" for="ridp_subject_U.S._military_card_or_draft_record"><%= radio_button_tag 'ridp_subject', 'U.S. military card or draft record', false%><%= l10n("insured.consumer_roles.upload_ridp_documents.military_id") %></label>
+                  <label class="mb-4" for="ridp_subject_Identification_card_issued_by_the_federal__state_or_local_government__including_a_U.S._Passport"><%= radio_button_tag 'ridp_subject', 'Identification card issued by the federal, state or local government, including a U.S. Passport', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.passport") %></label>
+                  <label class="mb-4" for="ridp_subject_Military_dependent_s_identification_card"><%= radio_button_tag 'ridp_subject', "Military dependent's identification card", false %><%= l10n("insured.consumer_roles.upload_ridp_documents.military_dependent") %></label>
+                  <label class="mb-4" for="ridp_subject_Native_American_tribal_document"><%= radio_button_tag 'ridp_subject', 'Native American tribal document', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.native_american") %></label>
+                  <label class="mb-4" for="ridp_subject_U.S._Coast_Guard_Merchant_Mariner_card"><%= radio_button_tag 'ridp_subject', 'U.S. Coast Guard Merchant Mariner card', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.coast_guard") %></label>
                 </span>
-              </div>
+              </fieldset>
                 <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
             <% end %>
         </div>
