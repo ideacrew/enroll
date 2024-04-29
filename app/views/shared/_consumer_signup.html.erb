@@ -1,0 +1,12 @@
+<% step = (defined? step) ? step.to_i : 1 %>
+<% content_for(:step) { step } %>
+<% content_for(:title) { l10n('account_setup') } %>
+<% content_for(:nav_options) do %>
+  <% sign_up_nav_options.each do |nav_option| %>
+    <li class="<%= 'complete' if step > nav_option[:step] %> <%= 'active' if step == nav_option[:step] %>">
+      <span class="circle-progress"></span>
+      <div class="vertical-line-progress"></div>
+      <a class="<%= 'cna disabled' unless step > nav_option[:step] or step == nav_option[:step] %>"><%= nav_option[:label] %></a>
+    </li>
+  <% end %>
+<% end %>
