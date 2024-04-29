@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(Rails.root, "components/benefit_sponsors/spec/support/benefit_sponsors_product_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -832,7 +834,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:person) { FactoryBot.create(:person, :with_family) }
     let(:permission) { double('Permission', can_send_secure_message: true)}
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
-    let(:params) {{"firstname"=>"test_first", "lastname"=>"test_last", "type"=>"CSR", "person"=> person.id, "email"=>"admin@dc.gov"}}
+    let(:params) {{"firstname" => "test_first", "lastname" => "test_last", "type" => "CSR", "person" => person.id, "email" => "admin@dc.gov"}}
 
     before do
       allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
@@ -860,7 +862,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:person) { FactoryBot.create(:person, :with_family) }
     let(:permission) { double('Permission', can_send_secure_message: true)}
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
-    let(:profile_valid_params) {{"family_actions_id"=>"family_actions_65faef2c62f4893277702cb7", "person_id"=> person.id}}
+    let(:profile_valid_params) {{"family_actions_id" => "family_actions_65faef2c62f4893277702cb7", "person_id" => person.id}}
 
     before do
       allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
