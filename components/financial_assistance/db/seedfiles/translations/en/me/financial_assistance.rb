@@ -260,6 +260,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.medicaid_eligible_step1" => "pick a plan, or",
   "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
   "en.faa.verification.documents" => "Financial Assistance Documents",
-  "en.faa.view_complete_checklist" => "View the Complete Application Checklist"
+  "en.faa.view_complete_checklist" => "View the Complete Application Checklist",
+  'en.faa.add_mailing_address' => 'Add Mailing Address',
+  'en.faa.remove_mailing_address' => 'Remove Mailing Address'
 }.freeze
 # rubocop:enable Layout/LineLength
