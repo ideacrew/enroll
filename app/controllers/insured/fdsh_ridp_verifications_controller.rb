@@ -3,6 +3,9 @@
 module Insured
   # controller for fdsh ridp H139 feature
   class FdshRidpVerificationsController < ApplicationController
+    layout 'bootstrap_4' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
+    before_action :set_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     before_action :set_current_person
     before_action :set_cache_headers, only: [:failed_validation]
     before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
@@ -168,6 +171,12 @@ module Insured
       consumer_redirection_path = insured_family_members_path(:consumer_role_id => consumer_role.id)
       consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
       redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : consumer_redirection_path
+    end
+
+    private
+
+    def set_bs4_layout
+      @bs4 = true
     end
   end
 end
