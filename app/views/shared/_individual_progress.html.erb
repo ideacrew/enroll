@@ -82,8 +82,8 @@
   <% elsif step == 5 %>
     <%= link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-lg btn-primary btn-block disabled", id: 'btn-continue', method: :post, disabled: !@enrollable %>
   <% elsif step != 6 %>
-    <button class="btn btn-lg btn-primary btn-block" id="btn-continue" type="submit">
-      <%= l10n("continue") %>
+    <button class="button" id="btn-continue" type="submit">
+      <%= l10n("continue_next") %>
     </button>
   <% end %>
 <% else %>
