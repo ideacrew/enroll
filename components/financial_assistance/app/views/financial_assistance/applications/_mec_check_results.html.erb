@@ -1,9 +1,19 @@
-<% 
+<%
   medicaid_short_url = l10n("faa.mc_success_link")
   medicaid_agency_url = EnrollRegistry[:enroll_app].setting(:medicaid_agency_url).item
   medicaid_agency_phone = EnrollRegistry[:enroll_app].setting(:medicaid_agency_phone).item
   medicaid_agency_phone_ttd = EnrollRegistry[:enroll_app].setting(:medicaid_agency_phone_ttd).item
 %>
+<% if @bs4 %>
+  <p>
+    <b><%= l10n("faa.mc_success_existing", medicaid_agency_phone: link_to(medicaid_agency_phone, "tel:#{medicaid_agency_phone}", target: '_blank')) %></b>
+    <%= l10n("faa.mc_success_enroll", medicaid_agency_url: link_to(medicaid_short_url, medicaid_agency_url, target: '_blank'), medicaid_agency_phone: medicaid_agency_phone, medicaid_agency_phone_ttd: medicaid_agency_phone_ttd) %>
+  </p>
+  <p>
+    <b><%= l10n("faa.mc_continue_bold") %></b>
+    <%= l10n("faa.mc_continue_application") %>
+  </p>
+<% else %>
 <div class="er-medicaid mt-2">
   <div class="border-bottom-1px"></div>
     <div class="er-success bg-success">
@@ -19,3 +29,4 @@
         </div>
     </div>
 </div>
+<% end %>
