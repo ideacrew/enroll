@@ -1,0 +1,89 @@
+<% if @bs4 %>
+  <div class="mt-4 mb-4">
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0">
+          <%= render partial: 'shared/left_nav.html.erb', locals: {step: '2'} %>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-9 pl-4">
+          <h1><%= l10n("verify_identity") %></h1>
+          <p><%= l10n(".answer_the_following_questions_when_you_finish") %></p>
+          <%= form_for(@interactive_verification, as: :interactive_verification, url: insured_interactive_identity_verifications_path, method: :post) do |f| %>
+            <%= f.hidden_field :session_id %>
+            <%= f.hidden_field :transaction_id %>
+            <%= f.fields_for :questions do |qf| %>
+              <%= qf.hidden_field :question_id %>
+              <%= qf.hidden_field :question_text %>
+              <%= qf.fields_for :responses do |qr| %>
+                <%= qr.hidden_field :response_id %>
+                <%= qr.hidden_field :response_text %>
+              <% end %>
+              <fieldset class="mt-4 mb-4 d-block">
+                <legend class="weight-n required"><%= qf.object.question_text %></legend>
+                <% qf.object.responses.each do |r| %>
+                  <div class="radio" tabindex="0" onkeydown="handleRadioKeyDown(event, 'interactive_verification_questions_attributes_#{qf.index}_response_id_#{r.response_id.downcase}')">
+                    <%= qf.label "response_id_#{r.response_id.downcase}", class: "mb-4 weight-n" do %>
+                      <%= qf.radio_button :response_id, r.response_id, class: 'required' %>
+                      <span></span>
+                      <%= r.response_text %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </fieldset>
+            <% end %>
+            <%= f.submit l10n("submit"), class: 'btn' + pundit_class(Family, :updateable?) %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <%= content_for :horizontal_status do %>
+    <%= render partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
+  <% end %>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+        <%= render partial: 'shared/left_nav' %>
+      </div>
+      <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+          <h2><%= l10n("verify_identity") %></h2>
+          <h4><%= l10n(".answer_the_following_questions_when_you_finish") %></h4>
+          <%= form_for(@interactive_verification, as: :interactive_verification, url: insured_interactive_identity_verifications_path, method: :post) do |f| %>
+            <%= f.hidden_field :session_id %>
+            <%= f.hidden_field :transaction_id %>
+            <%= f.fields_for :questions do |qf| %>
+              <%= qf.hidden_field :question_id %>
+              <%= qf.hidden_field :question_text %>
+              <%= qf.fields_for :responses do |qr| %>
+                <%= qr.hidden_field :response_id %>
+                <%= qr.hidden_field :response_text %>
+              <% end %>
+              <div class="form-group">
+                <p><%= qf.object.question_text %></p>
+                <% qf.object.responses.each do |r| %>
+                  <div class="row row-form-wrapper no-buffer">
+                    <div class="radio skinned-form-controls skinned-form-controls-mac" style="height: auto;" tabindex="0" onkeydown="handleRadioKeyDown(event, 'interactive_verification_questions_attributes_#{qf.index}_response_id_#{r.response_id.downcase}')">
+                      <%= qf.radio_button :response_id, r.response_id, class: 'required floatlabel' %>
+                      <%= qf.label "response_id_#{r.response_id.downcase}" do %>
+                        <span></span>
+                        <%= r.response_text %>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+                <br>
+              </div>
+            <% end %>
+            <br>
+            <%= f.submit l10n("submit"), class: 'btn btn-lg btn-primary ' + pundit_class(Family, :updateable?) %>
+          <% end %>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+          <%= render partial: 'shared/individual_progress', locals: {step: '2'} %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
