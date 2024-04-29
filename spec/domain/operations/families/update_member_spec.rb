@@ -56,8 +56,7 @@ RSpec.describe Operations::Families::UpdateMember, type: :model, dbclean: :after
         person_emails: person.emails.map(&:attributes),
         skip_person_updated_event_callback: true,
         consumer_role: {
-          skip_consumer_role_callbacks: true,
-          immigration_documents_attributes: [],
+          skip_consumer_role_callbacks: true, immigration_documents_attributes: []
         }.merge(consumer_role.attributes.slice('is_applying_coverage', 'is_applicant', 'citizen_status'))
       }
     end
