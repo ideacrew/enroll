@@ -1,13 +1,13 @@
-<p>You have three options to complete your application if you cannot or do not want to verify your identity online using Experian:</p>
+<p><%= l10n("insured.interactive_identity_verifications.failed_validation.options_header") %></p>
 <ul>
   <li>
-    <b>Upload document(s) proving your identity:</b> <%= site_key.upcase %> Health Benefit Exchange Authority staff will need to review and approve what you upload before you can continue. This can take 3-5 business days.
+    <b><%= l10n("insured.interactive_identity_verifications.failed_validation.upload_docs") %>:</b> <%= l10n("insured.interactive_identity_verifications.failed_validation.upload_doc_details", site_key: site_key.upcase) %>
   </li>
   <li>
-    <b>Apply in person:</b> You can set up an appointment to complete an application in person at the <%= site_key.upcase %> Health Benefit Exchange Authority. Call <%= health_benefit_exchange_authority_phone_number %> to set up an appointment.
+    <b><%= l10n("insured.consumer_roles.upload_ridp_documents.in_person") %>:</b> <%= l10n("insured.consumer_roles.upload_ridp_documents.in_person_details", site_key: site_key.upcase, phone: health_benefit_exchange_authority_phone_number) %>
   </li>
   <li>
-    <b>Upload a paper application:</b> Complete a paper application and upload it. <%= site_key.upcase %> Health Benefit Exchange Authority staff will need to review your application. You will not be able to access your information online, unless you also provide documents proving your identity.
+    <b><%= l10n("insured.consumer_roles.upload_ridp_documents.paper_application") %>:</b> <%= l10n("insured.consumer_roles.upload_ridp_documents.paper_application_details", site_key: site_key.upcase) %>
   </li>
 </ul>
 <p>
