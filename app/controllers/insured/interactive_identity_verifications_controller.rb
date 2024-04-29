@@ -1,10 +1,8 @@
-# frozen_string_literal: true
-
 module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
-    layout 'progress' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    layout 'bootstrap_4' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-    before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :set_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     before_action :set_current_person
     before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
 
@@ -16,13 +14,15 @@ module Insured
         format.html do
           if service_response.blank?
             redirect_to :action => "service_unavailable"
-          elsif service_response.failed?
-            @step = 'start'
-            @verification_response = service_response
-            redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => @verification_response.transaction_id
           else
-            @interactive_verification = service_response.to_model
-            render :new
+            if service_response.failed?
+              @step = 'start'
+              @verification_response= service_response
+              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => @verification_response.transaction_id
+            else
+              @interactive_verification = service_response.to_model
+              render :new
+            end
           end
         end
       end
@@ -56,12 +56,14 @@ module Insured
             service_response = service.respond_to_questions(render_question_responses(@interactive_verification))
             if service_response.blank?
               redirect_to :action => "service_unavailable"
-            elsif service_response.successful?
-              process_successful_interactive_verification(service_response)
             else
-              @step = 'questions'
-              @verification_response = service_response
-              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => @verification_response.transaction_id
+              if service_response.successful?
+                process_successful_interactive_verification(service_response)
+              else
+                @step = 'questions'
+                @verification_response= service_response
+                redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => @verification_response.transaction_id
+              end
             end
           else
             render "new"
@@ -76,16 +78,18 @@ module Insured
 
       respond_to do |format|
         format.html do
-          service = ::IdentityVerification::InteractiveVerificationService.new
-          service_response = service.check_override(render_verification_override(@transaction_id))
-          if service_response.blank?
-            redirect_to :action => "service_unavailable"
-          elsif service_response.successful?
-            process_successful_interactive_verification(service_response)
-          else
-            @verification_response = service_response
-            redirect_to :action => "failed_validation", :verification_transaction_id => @verification_response.transaction_id
-          end
+            service = ::IdentityVerification::InteractiveVerificationService.new
+            service_response = service.check_override(render_verification_override(@transaction_id))
+            if service_response.blank?
+              redirect_to :action => "service_unavailable"
+            else
+              if service_response.successful?
+                process_successful_interactive_verification(service_response)
+              else
+                @verification_response = service_response
+                redirect_to :action =>  "failed_validation", :verification_transaction_id => @verification_response.transaction_id
+              end
+            end
         end
       end
     end
@@ -95,7 +99,7 @@ module Insured
     def process_successful_interactive_verification(service_response)
       consumer_role = @person.consumer_role
       consumer_user = @person.user
-      #TODO: TREY KEVIN JIM There is no user when CSR creates enroooment
+      #TODO TREY KEVIN JIM There is no user when CSR creates enroooment
       if consumer_user
         consumer_user.identity_final_decision_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
         consumer_user.identity_response_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
@@ -126,7 +130,9 @@ module Insured
       render_to_string "events/identity_verification/interactive_verification_override", :formats => [:xml], :locals => { :transaction_id => transaction_id }
     end
 
-    def enable_bs4_layout
+    private
+
+    def set_bs4_layout
       @bs4 = true
     end
   end

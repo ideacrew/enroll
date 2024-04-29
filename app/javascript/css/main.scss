@@ -269,6 +269,36 @@ ul.list-right-section li:not(:last-of-type) {
   margin-bottom: $spacer;
 }
 
+.card {
+  border: 1px solid var(--grey-060);
+  border-radius: 5px;
+  margin-bottom: $spacer;
+  padding: 13px 12px;
+  background: var(--grey-000);
+  hr {
+    margin: 0;
+    width: 100%;
+  }
+}
+
+.badge-lg {
+  font-size: 1em;
+}
+
+.float-end {
+  float: inline-end;
+}
+
+.vertically-centered-row {
+  line-height: 40px;
+  flex-direction:row;
+}
+
+.vertically-centered-row .badge  {
+  padding: 0 10px;
+  line-height: 40px;
+}
+
 @media screen and (max-width: 767px) {
   .sm-space, .col-sm {
     margin-bottom: $spacer;
@@ -281,12 +311,19 @@ ul.list-right-section li:not(:last-of-type) {
   .sm-hide {
     display: none;
   }
+
+  .vertically-centered-row {
+    flex-direction:column;
+  }
+
+  .vertically-centered-row > * {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: $spacer;
+    width: 100%;
+  }
 }
 
-.card {
-  border: 1px solid var(--grey-060);
-  border-radius: 5px;
-  margin-bottom: $spacer;
-  padding: 13px 12px;
-  background: var(--grey-000);
+.full-height {
+  height: 70vh;
 }
