@@ -12,7 +12,6 @@ FinancialAssistance::Engine.routes.draw do
     put ':step/:step', on: :member, action: 'step'
     post :step, on: :collection
     get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
-    get 'help_paying_coverage', on: :collection, action: 'help_paying_coverage', as: 'help_paying_coverage'
     get 'application_year_selection', on: :member, action: 'application_year_selection', as: 'application_year_selection'
     get 'application_checklist', on: :member, action: 'application_checklist', as: 'application_checklist'
     get :review_and_submit, on: :member
