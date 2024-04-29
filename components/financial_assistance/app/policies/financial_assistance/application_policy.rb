@@ -15,14 +15,6 @@ module FinancialAssistance
       @family ||= record.family
     end
 
-    # Determines if the current user has permission to create a new application.
-    # The user can create a new application if they have permission to edit it.
-    #
-    # @return [Boolean] Returns true if the user has permission to create a new application, false otherwise.
-    def new?
-      edit?
-    end
-
     # Determines if the current user has permission to create an application.
     # The user can create an application if they have permission to edit it.
     #
@@ -66,14 +58,6 @@ module FinancialAssistance
     #
     # @return [Boolean] Returns true if the user has permission to copy the application, false otherwise.
     def copy?
-      edit?
-    end
-
-    # Determines if the current user has permission to view the help paying coverage page of the application.
-    # The user can view the page if they have permission to edit the application.
-    #
-    # @return [Boolean] Returns true if the user has permission to view the help paying coverage page of the application, false otherwise.
-    def help_paying_coverage?
       edit?
     end
 
