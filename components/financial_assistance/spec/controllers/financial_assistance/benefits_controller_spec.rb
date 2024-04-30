@@ -54,6 +54,27 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
       get :index, params: { application_id: application.id, applicant_id: applicant.id }
       expect(response).to render_template(:financial_assistance_nav)
     end
+
+    context "when the request type is invalid" do
+      it "should not render the raw_application template" do
+        get :index, params: { application_id: application.id, applicant_id: applicant.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the raw_application template" do
+        get :index, params: { application_id: application.id, applicant_id: applicant.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the raw_application template" do
+        get :index, params: { application_id: application.id, applicant_id: applicant.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
   end
 
   context 'POST new' do
@@ -180,6 +201,27 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
       }
       post :create, params: create_params, format: :js
       expect(applicant.benefits.count).to eq 1
+    end
+
+    context "when the request type is invalid" do
+      let(:create_params) { {
+        application_id: application.id,
+        applicant_id: applicant.id,
+        benefit: {start_on: "09/04/2017", end_on: " "}
+      } }
+
+      it "should not render the raw_application template" do
+        post :create, params: create_params, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the raw_application template" do
+        post :create, params: create_params, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
     end
   end
 
