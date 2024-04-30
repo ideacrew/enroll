@@ -32,8 +32,13 @@ fieldset
 
     .col-md-4.mb-2
         label for="inputNPN"  NPN *
-
-        = f.text_field :npn, placeholder:'NPN', required: !EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn), id:'inputNPN', class:'form-control', maxlength:'10', onkeypress: EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn) ? 'return isAlphaNumeric(event);' : 'return isNumberKey(event);'
+        = f.text_field :npn,
+          placeholder: 'NPN',
+          required: controller.action_name == 'new' ? 'true' : !EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn),
+          id: 'inputNPN',
+          class: 'form-control',
+          maxlength: '10',
+          onkeypress: EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn) ? 'return isAlphaNumeric(event);' : 'return isNumberKey(event);'
         .invalid-feedback
           |
             Please provide a NPN.
@@ -44,7 +49,7 @@ javascript:
 	    date: true,
 	    datePattern: ['m', 'd', 'Y']
 	});
-	
+
 	function validDob(element) {
 		if (element.value && element.value.length < 10) {
 			swal({
