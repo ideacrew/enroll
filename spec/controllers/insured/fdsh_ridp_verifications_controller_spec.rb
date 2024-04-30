@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 describe Insured::FdshRidpVerificationsController do
+  include Dry::Monads[:result, :do]
 
   describe 'find response' do
     let(:person) { FactoryBot.create(:person, :with_family) }
@@ -91,6 +92,223 @@ describe Insured::FdshRidpVerificationsController do
       it "should fail pundit policy" do
         get :failed_validation, params: { person_id: duplicate_person.id }
         expect(response.status).to eq 302
+      end
+    end
+  end
+
+  describe 'invalid MIME types' do
+    let(:user) { FactoryBot.create(:user, :consumer, person: person) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+    before(:each) do
+      sign_in user
+      allow(user).to receive(:person).and_return(person)
+      allow(controller).to receive(:authorize).and_return true
+    end
+
+    context 'GET new' do
+      let(:request_double) { double }
+
+      before do
+        allow(Operations::Fdsh::Ridp::RequestPrimaryDetermination).to receive(:new).and_return(request_double)
+        allow(request_double).to receive(:call).and_return(Failure('error'))
+      end
+
+      it 'returns success for html' do
+        get :new
+        expect(response).to redirect_to('/insured/fdsh_ridp_verifications/service_unavailable')
+      end
+
+      it 'returns failure for js' do
+        get :new, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for json' do
+        get :new, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :new, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'GET primary_response' do
+      before do
+        allow(controller).to receive(:find_response).with('primary').and_return([])
+      end
+
+      it 'returns success for html' do
+        get :primary_response
+        expect(response).to redirect_to('/insured/fdsh_ridp_verifications/service_unavailable')
+      end
+
+      it 'returns failure for js' do
+        get :primary_response, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for json' do
+        get :primary_response, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :primary_response, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'GET secondary_response' do
+      before do
+        allow(controller).to receive(:find_response).with('secondary').and_return([])
+      end
+
+      it 'returns success for html' do
+        get :secondary_response
+        expect(response).to redirect_to('/insured/fdsh_ridp_verifications/service_unavailable')
+      end
+
+      it 'returns failure for js' do
+        get :secondary_response, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for json' do
+        get :secondary_response, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :secondary_response, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'POST create' do
+      let(:request_double) { double }
+
+      before do
+        allow(::IdentityVerification::InteractiveVerification).to receive(:new).and_return(request_double)
+        allow(request_double).to receive(:valid?).and_return(false)
+      end
+
+      it 'returns success for html' do
+        post :create, params: { interactive_verification: { session_id: '12345', transaction_id: '12345' } }
+        expect(response).to render_template(:new)
+      end
+
+      it 'returns failure for js' do
+        get :create, params: { interactive_verification: { session_id: '12345', transaction_id: '12345' } }, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for json' do
+        get :create, params: { interactive_verification: { session_id: '12345', transaction_id: '12345' } }, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :create, params: { interactive_verification: { session_id: '12345', transaction_id: '12345' } }, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'GET check_primary_response_received' do
+      before do
+        allow(controller).to receive(:received_response).with('primary').and_return(Success('success'))
+      end
+
+      it 'returns failure for html' do
+        post :check_primary_response_received
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns success for js' do
+        get :check_primary_response_received, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'returns failure for json' do
+        get :check_primary_response_received, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :check_primary_response_received, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'GET check_secondary_response_received' do
+      before do
+        allow(controller).to receive(:received_response).with('secondary').and_return(Success('success'))
+      end
+
+      it 'returns failure for html' do
+        post :check_secondary_response_received
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns success for js' do
+        get :check_secondary_response_received, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'returns failure for json' do
+        get :check_secondary_response_received, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :check_secondary_response_received, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'GET wait_for_primary_response' do
+      it 'returns success for html' do
+        post :wait_for_primary_response
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'returns failure for js' do
+        get :wait_for_primary_response, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for json' do
+        get :wait_for_primary_response, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :wait_for_primary_response, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'GET wait_for_secondary_response' do
+      it 'returns success for html' do
+        post :wait_for_secondary_response
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'returns failure for js' do
+        get :wait_for_secondary_response, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for json' do
+        get :wait_for_secondary_response, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :wait_for_secondary_response, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
       end
     end
   end

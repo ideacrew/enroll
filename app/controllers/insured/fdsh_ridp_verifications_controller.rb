@@ -14,26 +14,30 @@ module Insured
       if result.success?
         redirect_to wait_for_primary_response_insured_fdsh_ridp_verifications_path
       else
-        redirect_to :action => "service_unavailable"
+        respond_to do |format|
+          format.html { redirect_to :action => "service_unavailable" }
+        end
       end
     end
 
     def wait_for_primary_response
       authorize @person, :complete_ridp?
+      respond_to :html
     end
 
     def wait_for_secondary_response
       authorize @person, :complete_ridp?
+      respond_to :html
     end
 
     def primary_response
       authorize @person, :complete_ridp?
       response = find_response('primary')
-      if response.present?
-        payload = response.serializable_hash.deep_symbolize_keys[:ridp_eligibility][:event]
-        result = Operations::Fdsh::Ridp::PrimaryResponseToInteractiveVerification.new.call(payload)
-        respond_to do |format|
-          format.html do
+      respond_to do |format|
+        format.html do
+          if response.present?
+            payload = response.serializable_hash.deep_symbolize_keys[:ridp_eligibility][:event]
+            result = Operations::Fdsh::Ridp::PrimaryResponseToInteractiveVerification.new.call(payload)
             if result.success?
               @interactive_verification = result.value!
               render :primary_response
@@ -41,22 +45,22 @@ module Insured
               @step = ["RF1", "RF2"].include?(final_secision_code(payload)) ? 'questions' : 'start'
               redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload, 'primary_response') || session_identification_id(payload)
             end
+          else
+            redirect_to :action => "service_unavailable"
           end
         end
-      else
-        redirect_to :action => "service_unavailable"
       end
     end
 
     def secondary_response
       authorize @person, :complete_ridp?
       response = find_response('secondary')
-      if response.present?
-        response_hash = response.serializable_hash.deep_symbolize_keys
-        status = response_hash.dig(:ridp_eligibility, :event, :attestations, :ridp_attestation, :status)
-        payload = response_hash.dig(:ridp_eligibility, :event)
-        respond_to do |format|
-          format.html do
+      respond_to do |format|
+        format.html do
+          if response.present?
+            response_hash = response.serializable_hash.deep_symbolize_keys
+            status = response_hash.dig(:ridp_eligibility, :event, :attestations, :ridp_attestation, :status)
+            payload = response_hash.dig(:ridp_eligibility, :event)
             if status == 'success'
               response_metadata = payload.dig(:attestations, :ridp_attestation, :evidences, 0, :secondary_response, :Response)
               process_successful_interactive_verification(response_metadata)
@@ -64,10 +68,10 @@ module Insured
               @step = 'questions'
               redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload, 'secondary_response') || session_identification_id(payload)
             end
+          else
+            redirect_to :action => "service_unavailable"
           end
         end
-      else
-        redirect_to :action => "service_unavailable"
       end
     end
 
@@ -97,13 +101,17 @@ module Insured
     def check_primary_response_received
       authorize @person, :complete_ridp?
       result = received_response('primary')
-      render :plain => result.success?
+      respond_to do |format|
+        format.js { render :plain => result.success? }
+      end
     end
 
     def check_secondary_response_received
       authorize @person, :complete_ridp?
       result = received_response('secondary')
-      render :plain => result.success?
+      respond_to do |format|
+        format.js { render :plain => result.success? }
+      end
     end
 
     def service_unavailable
