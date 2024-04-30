@@ -227,9 +227,9 @@ var duplicate_household = function() {
 
 var save_benefit_group_button = function() {
   if($(this).val().length !=0)
-    $('#save_benefit_group_submit').attr('disabled', false);
+    $('#save_benefit_group_submit').prop('disabled', false);
   else
-    $('#save_benefit_group_submit').attr('disabled',true);
+    $('#save_benefit_group_submit').prop('disabled',true);
 
 };
 
