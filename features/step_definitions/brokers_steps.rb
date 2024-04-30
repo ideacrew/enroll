@@ -26,6 +26,13 @@ When(/^.+ enters personal information$/) do
   fill_in 'agency[staff_roles_attributes][0][npn]', with: '109109109'
 end
 
+When(/^.+ enters personal information without npn$/) do
+  fill_in 'agency[staff_roles_attributes][0][first_name]', with: 'Ricky'
+  fill_in 'agency[staff_roles_attributes][0][last_name]', with: 'Martin'
+  fill_in 'inputDOB', with: '10/10/1984'
+  fill_in 'inputEmail', with: 'ricky.martin@example.com'
+end
+
 
 And(/^.+ enters broker agency information for individual markets$/) do
   fill_in 'organization[legal_name]', with: "Logistics Inc"
@@ -112,6 +119,10 @@ end
 Then(/^.+ should see broker registration successful message$/) do
   expect(page).to have_content("Complete the following requirements to become a #{EnrollRegistry[:enroll_app].setting(:short_name).item} Registered Broker") if broker_approval_period_enabled?
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
+end
+
+Then(/^.+ should see broker npn validation error message$/) do
+  expect(page).to have_content('Please provide a NPN.')
 end
 
 def broker_approval_period_enabled?

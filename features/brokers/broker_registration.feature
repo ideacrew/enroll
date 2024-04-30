@@ -29,7 +29,7 @@ Feature: Broker Agency Registration
     Then Primary Broker should see the create account page
     When Primary Broker registers with valid information
     Then they should see a welcome message
-    
+
 
   @broken
   Scenario: When the broker is hired as a census employee and registration is complete through employee role
@@ -68,3 +68,16 @@ Feature: Broker Agency Registration
     Then Employee should not see phone main field in the personal information fields
     And Employee Ricky Martin should only have phone with work kind
 
+  Scenario: Broker registration without NPN
+    Given the shop market configuration is enabled
+    And EnrollRegistry broker_attestation_fields feature is disabled
+    And EnrollRegistry broker_approval_period feature is enabled
+    And EnrollRegistry broker_invitation feature is enabled
+    Given a CCA site exists with a benefit market
+    When Primary Broker visits the HBX Broker Registration form
+    Given Primary Broker has not signed up as an HBX user
+    Then Primary Broker should see the New Broker Agency form
+    When Primary Broker enters personal information without npn
+    And And Primary Broker enters broker agency information for SHOP markets
+    And Primary Broker enters office location for default_office_location
+    Then Primary Broker should see broker npn validation error message
