@@ -118,6 +118,8 @@ module Insured
       authorize @person, :complete_ridp?
       @person.consumer_role.move_identity_documents_to_outstanding
       render "service_unavailable"
+
+      respond_to :html
     end
 
     def failed_validation
@@ -128,6 +130,8 @@ module Insured
       @verification_transaction_id = params[:verification_transaction_id]
       @person.consumer_role.move_identity_documents_to_outstanding
       render "failed_validation"
+
+      respond_to :html
     end
 
     private
