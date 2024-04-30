@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  # Applicant controller for Financial Assistance
   class ApplicantsController < FinancialAssistance::ApplicationController
     include ::UIHelpers::WorkflowController
 
@@ -70,7 +71,10 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @applicant = @application.active_applicants.find(params[:id])
-      render layout: 'financial_assistance_nav'
+
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance_nav' }
+      end
     end
 
     def save_questions
@@ -87,7 +91,10 @@ module FinancialAssistance
       end
     end
 
+    #rubocop:disable Metrics/AbcSize
     def step
+      raise ActionController::UnknownFormat unless request.format.html?
+
       authorize @applicant, :step?
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
@@ -120,10 +127,14 @@ module FinancialAssistance
         render 'workflow/step', layout: 'financial_assistance_nav'
       end
     end
+    #rubocop:enable Metrics/AbcSize
 
     def age_of_applicant
       authorize @applicant, :age_of_applicant?
-      render :plain => @applicant.age_of_the_applicant.to_s
+
+      respond_to do |format|
+        format.js { render :plain => @applicant.age_of_the_applicant.to_s }
+      end
     end
 
     def applicant_is_eligible_for_joint_filing
@@ -136,6 +147,8 @@ module FinancialAssistance
       return primary_applicant_has_spouse if applicant.is_primary_applicant
       # applicant is spouse of primary?
       applicant_is_spouse_of_primary(applicant)
+
+      respond_to :js
     end
 
     def immigration_document_options
@@ -151,6 +164,7 @@ module FinancialAssistance
       @vlp_doc_target = params[:vlp_doc_target]
       # vlp_doc_subject = params[:vlp_doc_subject]
       # @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
+      respond_to :js
     end
 
     def destroy

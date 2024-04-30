@@ -11,7 +11,10 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, id: family_id, person: person) }
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period) }
   let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
-  let!(:applicant) { FactoryBot.create(:applicant, application: application, dob: TimeKeeper.date_of_record - 40.years, is_primary_applicant: true, is_claimed_as_tax_dependent: false, is_self_attested_blind: false, has_daily_living_help: false,need_help_paying_bills: false, family_member_id: family_member_id) }
+  let!(:applicant) do
+    FactoryBot.create(:applicant, application: application, dob: TimeKeeper.date_of_record - 40.years, is_primary_applicant: true, is_claimed_as_tax_dependent: false, is_self_attested_blind: false, has_daily_living_help: false,
+                                  need_help_paying_bills: false, family_member_id: family_member_id)
+  end
   let(:financial_assistance_applicant_valid) do
     {
       "is_ssn_applied" => "false",
@@ -69,6 +72,11 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       get :other_questions, params: { application_id: application.id, id: applicant.id }
       expect(assigns(:applicant).id).to eq applicant.id
       expect(response).to render_template(:financial_assistance_nav)
+    end
+
+    it "should not assign applications", dbclean: :after_each do
+      get :other_questions, params: { application_id: application.id, id: applicant.id }, format: :js
+      expect(response).not_to render_template(:financial_assistance_nav)
     end
   end
 
@@ -588,6 +596,11 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       expect(response).to render_template 'workflow/step'
     end
 
+    it "should not render step if request is not html" do
+      post :step, params: { application_id: application.id, id: applicant.id }, format: :js
+      expect(response).not_to render_template 'workflow/step'
+    end
+
     context "when params has application key" do
       it "When model is saved" do
         post :step, params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_valid }
@@ -674,8 +687,31 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
 
   context "GET age of applicant" do
     it "should return age of applicant", dbclean: :after_each do
-      get :age_of_applicant, params: { application_id: application.id, applicant_id: applicant.id }
+      get :age_of_applicant, params: { application_id: application.id, applicant_id: applicant.id }, format: :js
       expect(response.body).to eq person.age_on(TimeKeeper.date_of_record).to_s
+    end
+
+    it "should not return age of applicant if the format is not js", dbclean: :after_each do
+      get :age_of_applicant, params: { application_id: application.id, applicant_id: applicant.id }, format: :json
+      expect(response.body).not_to eq person.age_on(TimeKeeper.date_of_record).to_s
+    end
+  end
+
+  context "GET immigration_document_options" do
+    it "should return age of applicant", dbclean: :after_each do
+      get :immigration_document_options, params: { application_id: application.id,
+                                                   target_type: "FinancialAssistance::Applicant",
+                                                   applicant_id: applicant.id,
+                                                   vlp_doc_target: "test"}, format: :js
+      expect(response.status).to eq 200
+    end
+
+    it "should not return age of applicant if the format is not js", dbclean: :after_each do
+      get :immigration_document_options, params: { application_id: application.id,
+                                                   target_type: "FinancialAssistance::Applicant",
+                                                   applicant_id: applicant.id,
+                                                   vlp_doc_target: "test"}
+      expect(response.status).not_to eq 200
     end
   end
 end
