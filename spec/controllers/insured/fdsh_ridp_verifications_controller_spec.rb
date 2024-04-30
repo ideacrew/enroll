@@ -136,13 +136,20 @@ describe Insured::FdshRidpVerificationsController do
     end
 
     context 'GET primary_response' do
+      let(:response_double) { double }
+      let(:payload) { double(::Fdsh::Ridp::EligibilityResponseModel) }
+      let(:serialized_payload) { { ridp_eligibility: {  event: 'event' } } }
+
       before do
-        allow(controller).to receive(:find_response).with('primary').and_return([])
+        allow(controller).to receive(:find_response).with('primary').and_return(payload)
+        allow(payload).to receive(:serializable_hash).and_return(serialized_payload)
+        allow(Operations::Fdsh::Ridp::PrimaryResponseToInteractiveVerification).to receive(:new).and_return(response_double)
+        allow(response_double).to receive(:call).and_return(Success('¡Éxito!'))
       end
 
       it 'returns success for html' do
         get :primary_response
-        expect(response).to redirect_to('/insured/fdsh_ridp_verifications/service_unavailable')
+        expect(response).to render_template('primary_response')
       end
 
       it 'returns failure for js' do
@@ -162,28 +169,43 @@ describe Insured::FdshRidpVerificationsController do
     end
 
     context 'GET secondary_response' do
+      let(:payload) { double(::Fdsh::Ridp::EligibilityResponseModel) }
+      let(:serialized_payload) do
+        {
+          ridp_eligibility: {
+            event: {
+              attestations: {
+                ridp_attestation: {
+                  status: 'success',
+                  evidences: [
+                    {
+                      secondary_response: {
+                        Response: {
+                          ResponseMetadata: {
+                            TDSResponseDescriptionText: 'Good Job!'
+                          },
+                          VerificationResponse: {
+                            DSHReferenceNumber: '12345'
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      end
+
       before do
-        allow(controller).to receive(:find_response).with('secondary').and_return([])
+        allow(controller).to receive(:find_response).with('secondary').and_return(payload)
+        allow(payload).to receive(:serializable_hash).and_return(serialized_payload)
       end
 
       it 'returns success for html' do
         get :secondary_response
-        expect(response).to redirect_to('/insured/fdsh_ridp_verifications/service_unavailable')
-      end
-
-      it 'returns failure for js' do
-        get :secondary_response, format: :js
-        expect(response).to have_http_status(:not_acceptable)
-      end
-
-      it 'returns failure for json' do
-        get :secondary_response, format: :json
-        expect(response).to have_http_status(:not_acceptable)
-      end
-
-      it 'returns failure for xml' do
-        get :secondary_response, format: :xml
-        expect(response).to have_http_status(:not_acceptable)
+        expect(response).to redirect_to(:help_paying_coverage_insured_consumer_role_index)
       end
     end
 
@@ -222,12 +244,12 @@ describe Insured::FdshRidpVerificationsController do
       end
 
       it 'returns failure for html' do
-        post :check_primary_response_received
+        get :check_primary_response_received
         expect(response).to have_http_status(:not_acceptable)
       end
 
       it 'returns success for js' do
-        get :check_primary_response_received, format: :js
+        get :check_primary_response_received, xhr: true
         expect(response).to have_http_status(:success)
       end
 
@@ -248,12 +270,12 @@ describe Insured::FdshRidpVerificationsController do
       end
 
       it 'returns failure for html' do
-        post :check_secondary_response_received
+        get :check_secondary_response_received
         expect(response).to have_http_status(:not_acceptable)
       end
 
       it 'returns success for js' do
-        get :check_secondary_response_received, format: :js
+        get :check_secondary_response_received, xhr: true
         expect(response).to have_http_status(:success)
       end
 
@@ -270,7 +292,7 @@ describe Insured::FdshRidpVerificationsController do
 
     context 'GET wait_for_primary_response' do
       it 'returns success for html' do
-        post :wait_for_primary_response
+        get :wait_for_primary_response
         expect(response).to have_http_status(:success)
       end
 
@@ -292,7 +314,7 @@ describe Insured::FdshRidpVerificationsController do
 
     context 'GET wait_for_secondary_response' do
       it 'returns success for html' do
-        post :wait_for_secondary_response
+        get :wait_for_secondary_response
         expect(response).to have_http_status(:success)
       end
 
@@ -308,6 +330,50 @@ describe Insured::FdshRidpVerificationsController do
 
       it 'returns failure for xml' do
         get :wait_for_secondary_response, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'GET service_unavailable' do
+      it 'returns success for html' do
+        get :service_unavailable
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'returns failure for js' do
+        get :service_unavailable, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for json' do
+        get :service_unavailable, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :service_unavailable, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+
+    context 'GET failed_validation' do
+      it 'returns success for html' do
+        get :failed_validation
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'returns failure for js' do
+        get :failed_validation, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for json' do
+        get :failed_validation, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it 'returns failure for xml' do
+        get :failed_validation, format: :xml
         expect(response).to have_http_status(:not_acceptable)
       end
     end
