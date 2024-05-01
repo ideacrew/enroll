@@ -1,0 +1,18 @@
+name: CodeQL Security Checks
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-s-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codeql-scan:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: github/codeql-action/init@v3
+          with:
+            config-file: ./codeql.yml
+            packs: codeql/ruby-queries:queries/security/cwe-094/CodeInjection.ql
