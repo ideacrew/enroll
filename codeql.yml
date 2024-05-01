@@ -9,6 +9,7 @@ paths-ignore:
   - "**/*.yml"
   - "**/*.yaml"
   - codeql
+languages: ruby
 disable-default-queries: true
 packs:
   ruby:
