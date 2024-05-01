@@ -220,6 +220,16 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # Left Navigation
   "en.faa.left_nav.completed" => "completed",
   "en.faa.left_nav.family_info" => "family_info",
+  "en.faa.left_nav.family_relationships" => "Family Relationships",
+  "en.faa.left_nav.health_coverage" => "Health Coverage",
+  "en.faa.left_nav.other_questions" => "Other Questions",
+  "en.faa.left_nav.income_adjustments" => "Income Adjustments",
+  "en.faa.left_nav.other_income" => "Other Income",
+  "en.faa.left_nav.my_household" => "My Household",
+  "en.faa.left_nav.tax_info" => "Tax Info",
+  "en.faa.left_nav.job_income" => "Job Income",
+  "en.faa.left_nav.view_my_applications" => "View My Applications",
+  "en.faa.left_nav.review_and_submit" => "Review & Submit",
   # Flash error display
   "en.faa.errors.should_be_answered" => "should be answered",
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
