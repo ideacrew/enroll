@@ -1,3 +1,3 @@
 #!/bin/bash
 
-codeql database create --language ruby,javascript --db-cluster --codescanning-config=codeql.yml -- enroll
+codeql database create --language ruby --db-cluster --codescanning-config=codeql.yml -- enroll
