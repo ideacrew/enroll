@@ -34,7 +34,7 @@ fieldset
         label for="inputNPN"  NPN *
         = f.text_field :npn,
           placeholder: 'NPN',
-          required: controller.action_name == 'new' ? 'true' : !EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn),
+          required: %w[new create].include?(controller.action_name) ? 'true' : !EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn),
           id: 'inputNPN',
           class: 'form-control',
           maxlength: '10',

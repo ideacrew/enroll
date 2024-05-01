@@ -26,6 +26,14 @@ When(/^.+ enters personal information$/) do
   fill_in 'agency[staff_roles_attributes][0][npn]', with: '109109109'
 end
 
+When(/^.+ enters personal information with specific NPN$/) do
+  fill_in 'agency[staff_roles_attributes][0][first_name]', with: 'Ricky'
+  fill_in 'agency[staff_roles_attributes][0][last_name]', with: 'Martin'
+  fill_in 'inputDOB', with: '10/10/1984'
+  fill_in 'inputEmail', with: 'ricky.martin@example.com'
+  fill_in 'agency[staff_roles_attributes][0][npn]', with: BrokerRegistration.alphabetic_npn
+end
+
 When(/^.+ enters personal information without npn$/) do
   fill_in 'agency[staff_roles_attributes][0][first_name]', with: 'Ricky'
   fill_in 'agency[staff_roles_attributes][0][last_name]', with: 'Martin'
