@@ -218,8 +218,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.transfer_history_desc" => "Application transfers sent to or from %{site_short_name} related to this application are listed below.",
   "en.faa.no_history_available" => "No history available.",
   # Left Navigation
-  "en.faa.left_nav.completed" => "completed",
-  "en.faa.left_nav.family_info" => "family_info",
   "en.faa.left_nav.family_relationships" => "Family Relationships",
   "en.faa.left_nav.health_coverage" => "Health Coverage",
   "en.faa.left_nav.other_questions" => "Other Questions",
