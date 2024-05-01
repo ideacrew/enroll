@@ -127,10 +127,20 @@ module FinancialAssistance
       # embed documents.  The options for what this can be are limited.
       # We should find a better way to do this, and probably limit the values
       # based on the model structure.
+      return if @docs_owner.blank?
       return if params[:evidence_kind].blank?
       evidence_kind = params[:evidence_kind].to_s
-      return unless ["income_evidence", "esi_evidence", "non_esi_evidence", "local_mec_evidence"].include?(evidence_kind)
-      @evidence = @docs_owner.send(evidence_kind) if @docs_owner.respond_to?(evidence_kind)
+      return unless ['income_evidence', 'esi_evidence', 'non_esi_evidence', 'local_mec_evidence'].include?(evidence_kind)
+      @evidence = case evidence_kind
+                  when 'income_evidence'
+                    @docs_owner.income_evidence
+                  when 'esi_evidence'
+                    @docs_owner.esi_evidence
+                  when 'non_esi_evidence'
+                    @docs_owner.non_esi_evidence
+                  when 'local_mec_evidence'
+                    @docs_owner.local_mec_evidence
+                  end
     end
 
     def file_path(file)
