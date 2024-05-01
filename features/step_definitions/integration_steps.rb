@@ -410,7 +410,7 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   find('#broker-btn').click
 end
 
-When(/(^.+) delete NPN and submit form$/) do
+When(/^.+ delete NPN and submit form$/) do
   fill_in 'agency[staff_roles_attributes][0][npn]', with: ''
   find('#broker-btn').click
 end

@@ -82,7 +82,6 @@ Feature: Broker Agency Registration
     And Primary Broker enters office location for default_office_location
     Then Primary Broker should see broker npn validation error message
 
-
   Scenario: Broker registration with already used NPN and then pass empty NPN
     Given the shop market configuration is enabled
     And EnrollRegistry broker_attestation_fields feature is disabled
