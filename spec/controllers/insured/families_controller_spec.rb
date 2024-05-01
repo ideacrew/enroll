@@ -12,6 +12,7 @@ class Announcement
     []
   end
 end
+
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryBot.create(:user, person: person) }
@@ -1037,17 +1038,17 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       context 'with the incorrect mime type' do
         it "html should return an error" do
-          get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :html
+          get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :html
           expect(response).to have_http_status(:not_acceptable)
         end
 
         it "json should return an error" do
-          get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :json
+          get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :json
           expect(response).to have_http_status(:not_acceptable)
         end
 
         it "xml should return an error" do
-          get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :xml
+          get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :xml
           expect(response).to have_http_status(:not_acceptable)
         end
       end
@@ -1524,6 +1525,108 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "xml should return an error" do
         get :brokers, params: { tab: 'home' }, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET check_move_reason" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return an error" do
+        get :check_move_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "js should return success" do
+        get :check_move_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "json should return an error" do
+        get :check_move_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :check_move_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET check_insurance_reason" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return an error" do
+        get :check_insurance_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "js should return success" do
+        get :check_insurance_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "json should return an error" do
+        get :check_insurance_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :check_insurance_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET check_marriage_reason" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return an error" do
+        get :check_marriage_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "js should return success" do
+        get :check_marriage_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "json should return an error" do
+        get :check_marriage_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :check_marriage_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :xml
         expect(response).to have_http_status(:not_acceptable)
       end
     end

@@ -231,6 +231,7 @@ class Insured::FamiliesController < FamiliesController
     authorize @family, :verification?
 
     @family_members = @person.primary_family.has_active_consumer_family_members
+    respond_to :html
   end
 
   def upload_application
@@ -325,14 +326,17 @@ class Insured::FamiliesController < FamiliesController
 
   def check_move_reason
     authorize @family, :check_qle_reason?
+    respond_to :js
   end
 
   def check_insurance_reason
     authorize @family, :check_qle_reason?
+    respond_to :js
   end
 
   def check_marriage_reason
     authorize @family, :check_qle_reason?
+    respond_to :js
   end
 
   def purchase
