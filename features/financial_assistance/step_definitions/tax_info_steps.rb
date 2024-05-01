@@ -34,7 +34,7 @@ When(/^the user clicks the ADD Info Button for a given household member$/) do
 end
 
 Given(/^the user is editing an application for financial assistance$/) do
-  click_link 'My Household'
+  click_link(l10n('faa.left_nav.my_household'))
 end
 
 When(/^the user navigates to the Tax Info page for a given applicant$/) do
@@ -101,7 +101,7 @@ When(/^the user clicks on the CONTINUE button$/) do
 end
 
 Then(/^the user will navigate to the Job Income page for the same applicant\.$/) do
-  click_link 'Job Income'
+  click_link(l10n('faa.left_nav.job_income'))
 end
 
 And(/^the user navigates to the Back to All Household Members page$/) do

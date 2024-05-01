@@ -98,7 +98,7 @@ end
 
 Then(/^Family Relationships left section WILL display$/) do
   sleep 2
-  expect(page).to have_content('Family Relationships')
+  expect(page).to have_content(l10n('faa.left_nav.family_relationships'))
 end
 
 When(/^all applicants are in Info Completed state$/) do
