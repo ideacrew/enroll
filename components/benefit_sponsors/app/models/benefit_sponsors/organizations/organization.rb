@@ -458,7 +458,6 @@ module BenefitSponsors
       end
 
       def self.cast_working_hours_param(value)
-        return false if value.blank?
         value.to_s.downcase == "true"
       end
 
