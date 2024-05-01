@@ -230,6 +230,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.left_nav.job_income" => "Job Income",
   "en.faa.left_nav.view_my_applications" => "View My Applications",
   "en.faa.left_nav.review_and_submit" => "Review & Submit",
+  "en.faa.left_nav.income_and_coverage_info" => "Income and Coverage Info",
   # Flash error display
   "en.faa.errors.should_be_answered" => "should be answered",
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
