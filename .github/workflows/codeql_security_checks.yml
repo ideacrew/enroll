@@ -21,7 +21,6 @@ jobs:
           uses: github/codeql-action/analyze@v3
         - name: Analyze Reports - Pass or Fail Build
           run: |
-            ls -lah ${{ steps.codeql-analysis-step.outputs.sarif-output }}/
             cd codeql/sarif_reporter/
             npm install
             npm run compile
