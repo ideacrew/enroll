@@ -15,4 +15,3 @@ jobs:
         - uses: github/codeql-action/init@v3
           with:
             config-file: ./codeql.yml
-            packs: codeql/ruby-queries:queries/security/cwe-094/CodeInjection.ql
