@@ -22,4 +22,4 @@ jobs:
             cd codeql/sarif_reporter/
             npm install
             npm run compile
-            cat ../../results/ruby.sarif | npm run-script run
+            cat ../../../results/ruby.sarif | npm run-script run
