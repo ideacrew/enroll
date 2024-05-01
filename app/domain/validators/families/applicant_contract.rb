@@ -10,7 +10,7 @@ module Validators
         optional(:middle_name).maybe(:string)
         required(:last_name).maybe(:string)
         optional(:name_sfx).maybe(:string)
-        required(:ssn).maybe(:string)
+        optional(:ssn).maybe(:string)
         required(:gender).maybe(:string)
         required(:dob).filled(:date)
 
@@ -93,10 +93,6 @@ module Validators
             key.failure(text: "invalid addresses. Expected a hash.")
           end
         end
-      end
-
-      rule(:ssn, :no_ssn) do
-        base.failure("SSN is missing") if values[:ssn].blank? && values[:no_ssn] == '0' && values[:is_applying_coverage]
       end
 
       rule(:is_primary_applicant) do
