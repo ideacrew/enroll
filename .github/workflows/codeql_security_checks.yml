@@ -15,4 +15,5 @@ jobs:
         - uses: github/codeql-action/init@v3
           with:
             config-file: ./codeql.yml
+            languages: ruby
         - uses: github/codeql-action/analyze@v3
