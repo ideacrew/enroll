@@ -68,9 +68,9 @@
           <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
             <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
               <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
-              <%= link_to_with_noopener_noreferrer(l10n("faa.left_nav.health_coverage"), financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "") %>
+              <%= link_to_with_noopener_noreferrer(l10n("health_coverage"), financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "") %>
             <% else %>
-              <%= link_to_with_noopener_noreferrer(l10n("faa.left_nav.health_coverage"), financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check") %>
+              <%= link_to_with_noopener_noreferrer(l10n("health_coverage"), financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check") %>
             <% end %>
           </li>
         <% end %>

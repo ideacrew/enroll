@@ -216,7 +216,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.no_history_available" => "No history available.",
   # Left Navigation
   "en.faa.left_nav.family_relationships" => "Family Relationships",
-  "en.faa.left_nav.health_coverage" => "Health Coverage",
   "en.faa.left_nav.other_questions" => "Other Questions",
   "en.faa.left_nav.income_adjustments" => "Income Adjustments",
   "en.faa.left_nav.other_income" => "Other Income",
