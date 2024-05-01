@@ -178,7 +178,7 @@ class CoverageHousehold
   def valid_coverage_household_members
     family_member_ids = family.family_members.select(&:persisted?).map {|fm| fm.id.to_s }
     coverage_household_members.select do |chm|
-      chm.family_member_id.present? && chm.family_member.is_active && family_member_ids.include?(chm.family_member_id.to_s)
+      chm.family_member.present? && chm.family_member.is_active && family_member_ids.include?(chm.family_member_id.to_s)
     end
   end
 
