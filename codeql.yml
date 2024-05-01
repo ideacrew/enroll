@@ -10,8 +10,6 @@ paths-ignore:
   - "**/*.yaml"
   - codeql
 disable-default-queries: true
-queries:
-  - uses: codeql/ruby-queries:queries/security/cwe-094/CodeInjection.ql
 packs:
   ruby:
     codeql/ruby-queries:queries/security/cwe-094/CodeInjection.ql
