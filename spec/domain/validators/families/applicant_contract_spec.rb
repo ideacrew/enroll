@@ -6,7 +6,7 @@ RSpec.describe Validators::Families::ApplicantContract,  dbclean: :after_each do
 
   let(:required_params) do
     {
-      first_name: "James", last_name: "Bond", gender: "male", dob: Date.new(1993, 3, 8), citizen_status: "US citizen", is_consumer_role: true,
+      first_name: "James", last_name: "Bond", gender: "male", ssn: '101010101', dob: Date.new(1993, 3, 8), citizen_status: "US citizen", is_consumer_role: true,
       is_applying_coverage: true, eligibility_determination_id: BSON::ObjectId.new, magi_medicaid_category: 'test',
       magi_as_percentage_of_fpl: 23.3, magi_medicaid_monthly_income_limit: {}, magi_medicaid_monthly_household_income: {},
       is_without_assistance: true, is_ia_eligible: false, is_medicaid_chip_eligible: false, is_non_magi_medicaid_eligible: false,
