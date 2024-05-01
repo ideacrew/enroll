@@ -16,5 +16,3 @@ jobs:
           with:
             config-file: ./codeql.yml
         - uses: github/codeql-action/analyze@v3
-          with:
-            config-file: ./codeql.yml
