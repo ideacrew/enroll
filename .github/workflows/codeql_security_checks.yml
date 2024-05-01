@@ -17,3 +17,9 @@ jobs:
             config-file: ./codeql.yml
             languages: ruby
         - uses: github/codeql-action/analyze@v3
+        - name: Analyze Reports - Pass or Fail Build
+          run: |
+            cd codeql/sarif_reporter/
+            npm install
+            npm run compile
+            cat ../../results/ruby.sarif | npm run-script run
