@@ -92,7 +92,10 @@ module BenefitSponsors
         @counties = BenefitMarkets::Locations::CountyZip.where(zip: params[:zip_code]).pluck(:county_name).uniq
 
         respond_to do |format|
+          # this first format is for requests originating from broker_agency_profiles_registrations
           format.json { render json: @counties }
+          # this second format is for requests originating from users_registrations
+          format.html { render json: @counties }
         end
       end
 

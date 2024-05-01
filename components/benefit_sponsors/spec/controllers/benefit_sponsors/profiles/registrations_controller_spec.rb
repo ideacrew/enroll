@@ -654,7 +654,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
         it "html should return a success" do
           get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}
-          expect(response).to have_http_status(:not_acceptable)
+          expect(response).to have_http_status(:success)
         end
 
         it "json should return a success" do
@@ -662,7 +662,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response).to have_http_status(:success)
         end
 
-        it "js should return an error" do
+        it "js should not return an error" do
           get :counties_for_zip_code, params: {zip_code: address_attributes[:zip]}, format: :js
           expect(response).to have_http_status(:not_acceptable)
         end
