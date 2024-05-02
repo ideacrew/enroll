@@ -21,6 +21,7 @@ module Operations
         member_params, family_id, person_hbx_id = yield validate(params)
         person = yield find_person(person_hbx_id)
         member_params = yield sanitize_person_params(member_params, person)
+        @member_params = member_params
         person = yield assign_member_values(person, member_params)
         active_vlp_document = yield find_active_vlp_document(person, member_params)
         family = yield find_family(family_id)
@@ -135,6 +136,18 @@ module Operations
 
       def save_person(person)
         changes = person.changes
+
+        # Destroys the addresses which are not present in the params
+        if any_addresses_destroyed?(person)
+          addresses_with_params = @member_params[:person_addresses]
+          destroy_address_ids = person.addresses.inject([]) do |bson_ids, address|
+            bson_ids << address.id if addresses_with_params.map { |addr| addr[:kind] }.exclude?(address.kind)
+            bson_ids
+          end
+
+          person.addresses.where(:id.in => destroy_address_ids).destroy_all
+        end
+
         person.save!
         changes
       end
@@ -167,8 +180,17 @@ module Operations
         event('events.individual.consumer_roles.updated', attributes: { gid: consumer_role.to_global_id.uri, previous: {is_applying_coverage: consumer_role.is_applying_coverage} })
       end
 
+      # Checks if any applicant addresses are destroyed for the person.
+      def any_addresses_destroyed?(person)
+        addresses_with_params = @member_params[:person_addresses]
+
+        person.addresses.any? do |address|
+          addresses_with_params.map { |addr| addr[:kind] }.exclude?(address.kind)
+        end
+      end
+
       def person_changed?(person)
-        (person.changed? && person.changes.present?) || person.addresses.any?(&:changed?) || person.emails.any?(&:changed?) || person.phones.any?(&:changed?)
+        (person.changed? && person.changes.present?) || person.addresses.any?(&:changed?) || person.emails.any?(&:changed?) || person.phones.any?(&:changed?) || any_addresses_destroyed?(person)
       end
 
       def consumer_role_changed?(consumer_role)

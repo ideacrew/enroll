@@ -9,10 +9,12 @@ RSpec.describe Operations::Families::UpdateMember, type: :model, dbclean: :after
     FactoryBot.create(:person,
                       :with_consumer_role,
                       :with_active_consumer_role,
+                      :with_ssn,
                       hbx_id: '20944967',
                       last_name: 'primary_first',
+                      ethnicity: ['White'],
+                      tribe_codes: [],
                       first_name: 'primary_last',
-                      ssn: '243108282',
                       dob: Date.new(1984, 3, 8))
   end
 
@@ -26,6 +28,63 @@ RSpec.describe Operations::Families::UpdateMember, type: :model, dbclean: :after
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
+  end
+
+  describe '#call' do
+    let(:consumer_role) { person.consumer_role }
+    let(:primary_attributes_hash) do
+      {
+        hbx_id: person.hbx_id,
+        first_name: person.first_name,
+        last_name: person.last_name,
+        encrypted_ssn: person.encrypted_ssn,
+        gender: person.gender,
+        dob: person.dob,
+        is_incarcerated: person.is_incarcerated,
+        ethnicity: person.ethnicity,
+        tribal_id: person.tribal_id,
+        tribal_state: person.tribal_state,
+        tribal_name: person.tribal_name,
+        tribe_codes: person.tribe_codes,
+        no_dc_address: person.no_dc_address,
+        is_homeless: person.is_homeless,
+        is_temporarily_out_of_state: person.is_temporarily_out_of_state,
+        no_ssn: person.no_ssn,
+        relationship: nil,
+        person_addresses: person.addresses.map(&:attributes),
+        person_phones: person.phones.map(&:attributes),
+        person_emails: person.emails.map(&:attributes),
+        skip_person_updated_event_callback: true,
+        consumer_role: {
+          skip_consumer_role_callbacks: true, immigration_documents_attributes: []
+        }.merge(consumer_role.attributes.slice('is_applying_coverage', 'is_applicant', 'citizen_status'))
+      }
+    end
+    let(:params) { { member_params: primary_attributes_hash, family_id: family.id, person_hbx_id: person.hbx_id } }
+
+    let(:mailing_address) do
+      FactoryBot.create(
+        :address,
+        kind: 'mailing',
+        address_1: '123 Test St',
+        address_2: 'whatever',
+        city: 'Test City',
+        state: 'ME',
+        zip: '04001',
+        county: 'York',
+        person: person
+      )
+    end
+
+    context 'when mailing address is not included' do
+      it 'destroys mailing address' do
+        primary_attributes_hash
+        mailing_address
+        expect(person.reload.addresses.where(kind: 'mailing').first).to be_a(Address)
+        expect(subject.call(params).success?).to be_truthy
+        expect(person.reload.addresses.where(kind: 'mailing').first).to be_nil
+      end
+    end
   end
 
   context '#update member' do
