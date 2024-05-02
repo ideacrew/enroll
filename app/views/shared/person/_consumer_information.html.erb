@@ -5,29 +5,29 @@
     <%= f.hidden_field :dob_check  %>
     <div class="d-flex mb-md-4 row col-sm">
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-        <%= f.label :first_name, l10n("First Name"), class: "required" %>
-        <%= f.text_field :first_name, class: "required", required: true, placeholder: l10n("First Name"), autocomplete: :off %>
+        <%= f.label :first_name, l10n("first_name"), class: "required" %>
+        <%= f.text_field :first_name, class: "required", required: true, placeholder: l10n("first_name"), autocomplete: :off %>
       </div>
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-        <%= f.label :middle_name, l10n("Middle Name") %>
-        <%= f.text_field :middle_name, class: "required", required: false, placeholder: l10n("Middle Name"), autocomplete: :off %>
+        <%= f.label :middle_name, l10n("middle_name") %>
+        <%= f.text_field :middle_name, class: "required", required: false, placeholder: l10n("middle_name"), autocomplete: :off %>
       </div>
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-        <%= f.label :last_name, l10n("Last Name"), class: "required" %>
-        <%= f.text_field :last_name, class: "required", required: true, placeholder: l10n("Last Name"), autocomplete: :off %>
+        <%= f.label :last_name, l10n("last_name"), class: "required" %>
+        <%= f.text_field :last_name, class: "required", required: true, placeholder: l10n("last_name"), autocomplete: :off %>
       </div>
       <div class="col-sm col-md-6 col-lg-3 p-0">
-        <%= f.label :name_sfx, l10n("Suffix") %>
-        <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => l10n("None"), autocomplete: :off %>
+        <%= f.label :name_sfx, l10n("suffix") %>
+        <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => l10n("none"), autocomplete: :off %>
       </div>
     </div>
     <div class="d-flex mb-md-4 row col-sm">
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-        <%= f.label :dob, "Date of Birth", class: "required" %>
+        <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
         <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
       </div>
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-        <%= f.label :gender, l10n("Sex"), class: 'required'  %>
+        <%= f.label :gender, l10n("gender"), class: 'required'  %>
         <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], autocomplete: :off, required: true %>
         <a href="#sex_gender" data-toggle="modal" data-target="#sex_gender" class="d-block"><%= l10n("not_sure") %></a>
         <%= render partial: 'shared/modal_support_text_household', locals: {key: "sex_gender"} %>
@@ -56,7 +56,7 @@
       <div class="mr-auto col-sm col-md-6 p-0 sm-hide"></div>
     </div>
     <fieldset class="d-flex row col-sm">
-      <legend class="required">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage?</legend>
+      <legend class="required"><%= l10n("does_person_need_coverage", person: @person.first_name.present? ? @person.first_name : "this person") %></legend>
       <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
       <div class="d-flex align-items-center mt-2">
         <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
