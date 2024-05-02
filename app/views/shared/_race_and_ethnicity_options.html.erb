@@ -1,6 +1,7 @@
  <% if @bs4 %>
   <fieldset class="mb-4 d-block" >
-    <legend>What is your race/ethnicity? (OPTIONAL - check all that apply)</legend>
+    <legend class="required"><%= l10n("insured.shared.race_ethicity_label") %></legend>
+    <small class="text-muted"><%= l10n("insured.shared.check_all_paranthetical") %></small>
     <div class="row col-sm ethnicity-container">
     <% ethnicity_collection.each do |ethnicity_set| %>
       <div class="mr-auto col-sm-12 col-md-6 col-lg-3 p-0">
@@ -18,7 +19,8 @@
   </fieldset>
   <fieldset class="mb check_box_collection">
     <div>
-      <legend>If Hispanic/Latino/a, ethnicity (OPTIONAL - check all that apply.)</legend>
+      <legend><%= l10n("insured.shared.hispanic_label") %></legend>
+      <small class="text-muted"><%= l10n("insured.shared.check_all_paranthetical") %></small>
       <div class="row col-sm ethnicity-container">
       <% latino_collection.each do |ethnicity_set| %>
       <div class="mr-auto col-sm-12 col-md-6 col-lg-3 p-0">
