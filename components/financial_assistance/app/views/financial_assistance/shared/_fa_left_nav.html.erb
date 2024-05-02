@@ -115,14 +115,14 @@
       <% else %>
         <% if @application && @application.applicants.count > 1 && @application.is_draft? %>
           <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable global-nav'>
-            <%= link_to l10n("faa.left_nav.family_relationships"), financial_assistance.application_relationships_path(@application) %>
+            <%= sanitize link_to l10n("faa.left_nav.family_relationships"), financial_assistance.application_relationships_path(@application) %>
           </li>
         <% end %>
       <% end %>
 
       <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> global-nav indent-w no-hover-disable">
         <% if @application.present? && @application.ready_for_attestation? && @application.is_draft? %>
-          <%= link_to l10n("faa.left_nav.review_and_submit"), financial_assistance.review_and_submit_application_path(@application) %>
+          <%= sanitize link_to l10n("faa.left_nav.review_and_submit"), financial_assistance.review_and_submit_application_path(@application) %>
         <% else %>
           <a href="javascript:void(0);" class="cna"><%= l10n("faa.left_nav.review_and_submit") %></a>
         <% end %>
