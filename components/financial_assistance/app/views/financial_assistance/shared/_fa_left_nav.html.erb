@@ -14,7 +14,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %> applicant-nav">
           <% if @applicant.tax_info_complete?%>
-            <span class="fa fa-check applicant-check"><span class="hide"><%= l10n("completed") %></span></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.go_to_step_application_applicant_path(@application, @applicant, 1), class: "" do %>
               <%= l10n("faa.left_nav.tax_info") %>
             <% end %>
@@ -67,7 +67,7 @@
         <% if @applicant.is_applying_coverage %>
           <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
             <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
-              <span class="fa fa-check applicant-check"><span class="hide"><%= l10n("completed") %></span></span>
+              <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
               <%= link_to_with_noopener_noreferrer(l10n("health_coverage"), financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "") %>
             <% else %>
               <%= link_to_with_noopener_noreferrer(l10n("health_coverage"), financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check") %>
