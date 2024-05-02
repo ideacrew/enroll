@@ -95,7 +95,7 @@ Given(/^NO other household members exist$/) do
 end
 
 Then(/^Family Relationships left section will NOT display$/) do
-  expect(page).to have_no_content('Family Relationships')
+  expect(page).to have_no_content(l10n("faa.left_nav.family_relationships"))
 end
 
 Given(/^at least one other household members exist$/) do
