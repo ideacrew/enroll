@@ -4,7 +4,8 @@
       <li class="activer list-box step-tabs no-hover global-nav">
         <a href="<%= edit_application_path(@application) %>">
           <i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i>
-          My Household</a>
+          <%= l10n("faa.left_nav.my_household") %>
+        </a>
       </li>
       <li class="activer list-box step-tabs income-style no-hover">
         <%= content_tag("a", "Income and Coverage Info", :class => 'cna')  %>
