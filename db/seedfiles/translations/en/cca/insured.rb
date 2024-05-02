@@ -110,7 +110,6 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.count' => "Count",
   :'en.active' => "Active",
   :'en.enrollments' => "Enrollment(s)",
-  :'en.edit' => "Edit",
   :'en.open' => "Open",
   :'en.info_complete' => "Info Complete",
   :'en.info_needed' => "Info Needed",
