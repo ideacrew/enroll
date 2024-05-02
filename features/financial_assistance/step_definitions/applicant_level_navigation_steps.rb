@@ -13,7 +13,7 @@ Given(/^that the user is on the Tax Info page for a given applicant$/) do
 end
 
 When(/^the user clicks My Household section on the left navigation$/) do
-  click_link 'My Household'
+  click_link(l10n('faa.left_nav.my_household'))
 end
 
 Then(/^the user will navigate to the FAA Household Info page for the corresponding application\.$/) do
@@ -21,7 +21,7 @@ Then(/^the user will navigate to the FAA Household Info page for the correspondi
 end
 
 When(/^the user clicks Income & Coverage section on the left navigation$/) do
-  expect(page).to have_content('Income and Coverage Info')
+  expect(page).to have_content(l10n('faa.left_nav.income_and_coverage_info'))
 end
 
 Then(/^the cursor will display disabled\.$/) do
@@ -29,11 +29,11 @@ Then(/^the cursor will display disabled\.$/) do
 end
 
 When(/^the user clicks Tax Info section on the left navigation$/) do
-  click_link 'Tax Info'
+  click_link(l10n('faa.left_nav.tax_info'))
 end
 
 When(/^the user clicks Job Income section on the left navigation$/) do
-  click_link 'Job Income'
+  click_link(l10n('faa.left_nav.job_income'))
 end
 
 Then(/^the user will navigate to the Job Income page for the corresponding applicant$/) do
@@ -41,7 +41,7 @@ Then(/^the user will navigate to the Job Income page for the corresponding appli
 end
 
 When(/^the user clicks Other Income section on the left navigation$/) do
-  click_link 'Other Income'
+  click_link(l10n('faa.left_nav.other_income'))
 end
 
 Then(/^the user will navigate to the Other Income page for the corresponding applicant\.$/) do
@@ -49,7 +49,7 @@ Then(/^the user will navigate to the Other Income page for the corresponding app
 end
 
 When(/^the user clicks Income Adjustments section on the left navigation$/) do
-  click_link 'Income Adjustments'
+  click_link(l10n('faa.left_nav.income_adjustments'))
 end
 
 Then(/^the user will navigate to the Income Adjustments page for the corresponding applicant$/) do
@@ -57,7 +57,7 @@ Then(/^the user will navigate to the Income Adjustments page for the correspondi
 end
 
 When(/^the user clicks Health Coverage section on the left navigation$/) do
-  click_link 'Health Coverage'
+  click_link(l10n('health_coverage'))
 end
 
 Then(/^the user will navigate to the Health Coverage page for the corresponding applicant$/) do
@@ -65,7 +65,7 @@ Then(/^the user will navigate to the Health Coverage page for the corresponding 
 end
 
 When(/^the user clicks Other Questions section on the left navigation$/) do
-  click_link 'Other Questions'
+  click_link(l10n('faa.left_nav.other_questions'))
 end
 
 Then(/^the user will navigate to the Other Questions page for the corresponding applicant$/) do

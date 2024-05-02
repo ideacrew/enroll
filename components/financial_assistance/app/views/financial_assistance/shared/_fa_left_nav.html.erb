@@ -4,10 +4,11 @@
       <li class="activer list-box step-tabs no-hover global-nav">
         <a href="<%= edit_application_path(@application) %>">
           <i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i>
-          My Household</a>
+          <%=l10n("faa.left_nav.my_household")%>
+        </a>
       </li>
       <li class="activer list-box step-tabs income-style no-hover">
-        <%= content_tag("a", "Income and Coverage Info", :class => 'cna')  %>
+        <%= content_tag("a", l10n("faa.left_nav.income_and_coverage_info"), :class => 'cna') %>
       </li>
       <ul class="nav nav-stacked mr-top">
 
@@ -15,11 +16,11 @@
           <% if @applicant.tax_info_complete?%>
             <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.go_to_step_application_applicant_path(@application, @applicant, 1), class: "" do %>
-              Tax Info
+              <%=l10n("faa.left_nav.tax_info")%>
             <% end %>
           <% else %>
             <%= link_to financial_assistance.go_to_step_application_applicant_path(@application, @applicant, 1), class: "no-check" do %>
-              Tax Info
+              <%=l10n("faa.left_nav.tax_info")%>
             <% end %>
           <% end %>
         </li>
@@ -28,11 +29,11 @@
           <% if @applicant.embedded_document_section_entry_complete?(:income)%>
             <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.application_applicant_incomes_path(@application, @applicant), class: "" do %>
-              Job Income
+              <%=l10n("faa.left_nav.job_income")%>
             <% end %>
           <% else %>
             <%= link_to financial_assistance.application_applicant_incomes_path(@application, @applicant), class: "no-check" do %>
-              Job Income
+              <%=l10n("faa.left_nav.job_income")%>
             <% end %>
           <% end %>
         </li>
@@ -41,11 +42,11 @@
           <% if @applicant.embedded_document_section_entry_complete?(:other_income)%>
             <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.other_application_applicant_incomes_path(@application, @applicant), class: "" do %>
-              Other Income
+              <%=l10n("faa.left_nav.other_income")%>
             <% end %>
           <% else %>
             <%= link_to financial_assistance.other_application_applicant_incomes_path(@application, @applicant), class: "no-check" do %>
-              Other Income
+              <%=l10n("faa.left_nav.other_income")%>
             <% end %>
           <% end %>
         </li>
@@ -54,11 +55,11 @@
           <% if @applicant.embedded_document_section_entry_complete?(:income_adjustment)%>
             <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.application_applicant_deductions_path(@application, @applicant), class: "" do %>
-              Income Adjustments
+              <%=l10n("faa.left_nav.income_adjustments")%>
             <% end %>
           <% else %>
             <%= link_to financial_assistance.application_applicant_deductions_path(@application, @applicant), class: "no-check" do %>
-              Income Adjustments
+              <%=l10n("faa.left_nav.income_adjustments")%>
             <% end %>
           <% end %>
         </li>
@@ -67,9 +68,9 @@
           <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
             <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
               <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
-              <%= link_to_with_noopener_noreferrer('Health Coverage', financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "") %>
+              <%= link_to_with_noopener_noreferrer(l10n("health_coverage"), financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "") %>
             <% else %>
-              <%= link_to_with_noopener_noreferrer('Health Coverage', financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check") %>
+              <%= link_to_with_noopener_noreferrer(l10n("health_coverage"), financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check") %>
             <% end %>
           </li>
         <% end %>
@@ -78,11 +79,11 @@
           <% if @applicant.other_questions_complete?%>
             <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.other_questions_application_applicant_path(@application, @applicant), class: "" do %>
-              Other Questions
+              <%=l10n("faa.left_nav.other_questions")%>
             <% end %>
           <% else %>
             <%= link_to financial_assistance.other_questions_application_applicant_path(@application, @applicant), class: "no-check" do %>
-              Other Questions
+              <%=l10n("faa.left_nav.other_questions")%>
             <% end %>
           <% end %>
         </li>
@@ -91,37 +92,37 @@
       <li class="activer list-box step-tabs no-hover global-nav">
         <a href="<%= financial_assistance.applications_path %>">
           <i class="fa fa-arrow-circle-left white-font previous-icon" aria-hidden="true"></i>
-          <span class="view-nav-app float-left"> View My Applications </span>
+          <span class="view-nav-app float-left"> <%=l10n("faa.left_nav.view_my_applications")%> </span>
         </a>
       </li>
 
       <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> global-nav indent-w no-hover-disable">
-        <% if @application.present? && @application.is_draft?  %>
-          <a href="<%= financial_assistance.edit_application_path(@application) %>"><%= l10n('family_info') %></a>
+        <% if @application.present? && @application.is_draft? %>
+          <a href="<%= financial_assistance.edit_application_path(@application) %>"><%= l10n("family_info") %></a>
         <% else %>
-          <a href="javascript:void(0);" class="not-allowed"><%= l10n('family_info') %></a>
+          <a href="javascript:void(0);" class="not-allowed"><%= l10n("family_info") %></a>
         <% end %>
       </li>
 
       <% if @application && @application.incomplete_applicants? %>
         <% if @application.applicants.count > 1 %>
           <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable'>
-            <a class="not-allowed">Family Relationships</a>
+            <a class="not-allowed"><%=l10n("faa.left_nav.family_relationships")%></a>
           </li>
         <% end %>
       <% else %>
         <% if @application && @application.applicants.count > 1 && @application.is_draft? %>
           <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable global-nav'>
-            <%= link_to 'Family Relationships', financial_assistance.application_relationships_path(@application) %>
+            <%= link_to l10n("faa.left_nav.family_relationships"), financial_assistance.application_relationships_path(@application) %>
           </li>
         <% end %>
       <% end %>
 
       <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> global-nav indent-w no-hover-disable">
         <% if @application.present? && @application.ready_for_attestation? && @application.is_draft? %>
-          <%= link_to "Review & Submit", financial_assistance.review_and_submit_application_path(@application) %>
+          <%= link_to l10n("faa.left_nav.review_and_submit"), financial_assistance.review_and_submit_application_path(@application) %>
         <% else %>
-          <a href="javascript:void(0);" class="cna">Review & Submit</a>
+          <a href="javascript:void(0);" class="cna"><%=l10n("faa.left_nav.review_and_submit")%></a>
         <% end %>
       </li>
     <% end %>
