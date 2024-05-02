@@ -99,6 +99,36 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
     end
   end
 
+  describe '#call' do
+    context "update person's address" do
+      let(:person) { FactoryBot.create(:person, :with_mailing_address) }
+
+      let(:person_params) do
+        {
+          first_name: person.first_name,
+          last_name: person.last_name,
+          dob: person.dob,
+          no_ssn: '1',
+          gender: 'female',
+          is_incarcerated: false,
+          person_hbx_id: person.hbx_id,
+          same_with_primary: true,
+          indian_tribe_member: true,
+          citizen_status: 'true',
+          addresses: person.addresses.where(:kind.ne => 'mailing').map(&:serializable_hash).map(&:deep_symbolize_keys),
+          phones: person.serializable_hash.deep_symbolize_keys[:phones],
+          emails: person.serializable_hash.deep_symbolize_keys[:emails]
+        }
+      end
+
+      it 'destroys the mailing address' do
+        expect(person.addresses.where(kind: 'mailing').first).to be_a(Address)
+        subject.call(params: person_params)
+        expect(person.reload.addresses.where(kind: 'mailing').first).to be_nil
+      end
+    end
+  end
+
   context 'update person' do
     let!(:person) {FactoryBot.create(:person)}
     let!(:person_params) do
