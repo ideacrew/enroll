@@ -51,7 +51,7 @@ label.required:after, legend.required:after {
   margin-left: 0.25ch;
 }
 
-input,
+input:not([type="submit"]),
 select,
 .input {
   box-sizing: border-box;
@@ -125,6 +125,10 @@ fieldset {
 
 fieldset label:not(:last-child) {
   margin-right: $spacer;
+}
+
+label.radio {
+  font-weight: 400;
 }
 
 input[type='file'] {
