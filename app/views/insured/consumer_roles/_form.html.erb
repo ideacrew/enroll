@@ -4,32 +4,31 @@
     <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
     <% if current_user.has_hbx_staff_role? %>
       <div class="row_align_application_type mb-3">
-        <label for="application_type_id" class="required">Application Type</label>
+        <label for="application_type_id" class="required"><%= l10n("application_type") %></label>
         <%= f.fields_for :family do |f| %>
           <%= f.select(:application_type, options_for_select(*consumer_role_application_type_options(@person)), {include_blank: @person.primary_family.e_case_id.present? ? nil : "choose *"}, required: !@person.primary_family.e_case_id.present?, id:'application_type_id' ) %>
         <% end %>
       </div>
     <% end %>
     <% if FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) %>
-      <!-- need to redo the below partial -->
       <%= render :partial => 'shared/optional_field_warning' %>
     <% end %>
-    <h1>Personal Information</h1>
-    <p>Enter your personal information and answer the following questions. When you're finished, select CONTINUE.</p>
+    <h1><%= l10n("personal_information") %></h1>
+    <p><%= l10n("insured.consumer_roles.help_question_info") %></p>
     <%= render "shared/error_messages", object: f.object %>
     <%= render 'shared/person/consumer_information', f: f %>
-    <h2>Demographic Information for <%= @person.full_name %></h2>
+    <h2><%= l10n("insured.consumer_roles.demo_info_for") %> <%= @person.full_name %></h2>
     <div id="consumer_fields_sets">
       <%= render 'shared/consumer_fields', f: f %>
     </div>
-    <h3 class="beta mt-4">Contact Information for <%= @person.full_name %></h3>
+    <h3 class="beta mt-4"><%= l10n("insured.consumer_roles.contact_info_for") %> <%= @person.full_name %></h3>
     <section class="mb-4">
-      <h4 class="gamma">Home Address</h4>
+      <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
       <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
     </section>
     <section class="mb-4">
-      <h4 class="gamma mb-0">Phone and Email</h4>
-      <p>Please provide as much information as possible</p>
+      <h4 class="gamma mb-0"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
+      <p><%= l10n("insured.consumer_roles.please_provide") %></p>
       <%= render partial: 'shared/phone_fields', locals: {f: f, bs4: true} %>
       <div id="email_info" class="">
         <div class="email d-flex mb-md-4 row col-sm">
