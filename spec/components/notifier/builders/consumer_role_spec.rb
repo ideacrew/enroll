@@ -10,7 +10,6 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_test_data.csv")
       csv = CSV.open(file, "r", :headers => true)
       data = csv.to_a
-      
 
       {"consumer_role_id" => "5c61bf485f326d4e4f00000c",
        "event_object_kind" => "ConsumerRole",
