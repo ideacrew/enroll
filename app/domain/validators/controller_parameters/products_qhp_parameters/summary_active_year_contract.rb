@@ -6,7 +6,7 @@ module Validators
       # Strict checking for the active_year parameter under the 'summary' action.
       class SummaryActiveYearContract < Dry::Validation::Contract
         params do
-          required(:active_year).value(:filled?, format?: /\A[0-9][0-9][0-9][0-9]\z/)
+          required(:active_year).value(:filled?, format?: /\A\s*[0-9][0-9][0-9][0-9]\s*\z/)
         end
       end
     end
