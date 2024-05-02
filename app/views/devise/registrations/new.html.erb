@@ -1,91 +1,180 @@
 <%= render partial: 'devise/shared/captcha' if aca_recaptcha_enabled %>
-<div id="signup" class="container mt-5">
-  <div class="row justify-content-md-center">
-    <div id="registration-form-container" class="col-md-6 col-sm-8 col-xs-12">
-      <h2 class="text-center heading-text">Create Account</h2>
-      <div id="pwError" class="d-none">
-        <div class="alert alert-danger">
-          <span id="pwErrorMatch" class="d-none"><%= l10n("devise.errors.password_match") %></span>
-          <span id="pwErrorStrength" class="d-none"><%= l10n("devise.errors.password_strength") %></span>
+<% if @bs4 %>
+  <div id="signup" class="container mt-5">
+    <div class="card w-75 mx-auto">
+      <div class="mt-3 text-center">
+        <%= image_pack_tag "logo_#{ENV['CLIENT'] || 'ic'}.svg", alt: "#{site_state_long_title}", class: "w-25" %>
+        <h1 class="beta"><%= l10n("devise.registrations.new.heading") %></h1>
+        <div class="d-flex text-left row col-sm">
+          <div class="col-xs-12 col-sm-12 col-md-6 mr-auto">
+            <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup', action: "keyup->signup#validateInput keydown->signup#preventEnterSubmission"}, novalidate: true, rel: 'noopener noreferrer' }) do |f| %>
+              <%= devise_error_messages! %>
+              <div class="row error-block d-none">
+                <div class="col-xs-12">
+                  <div class="alert alert-danger text-center"></div>
+                </div>
+              </div>
+              <%= f.hidden_field :referer, value: request.env["HTTP_REFERER"] %>
+              <div class="form-group">
+                <%= f.label :email_or_username, for: 'email_or_username', class:'required' %>
+                <small class="text-muted"><%= l10n("devise.registrations.new.email_username") %></small>
+                <%= f.text_field :oim_id, class: "form-control", id: 'email_or_username', required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip focusout->signup#validateEmail", toggle: "tooltip", placement: "right", trigger: 'click', title: l10n("devise.registrations.new.email_username"), target: 'signup.usernameField' } %>
+              </div>
+              <div class="form-group">
+                <div class="row pl-3 pr-3">
+                  <div class="col-8 p-0">
+                    <%= f.label :password, class: 'required' %>
+                  </div>
+                </div>
+                <%= f.password_field :password, autocomplete: "off", class: "form-control", minlength:"#{User.configured_password_length.min}", maxlength:"20", required: true %>
+                <div class="invalid-feedback">
+                  <%= l10n('devise.errors.password_length_username', length: User.configured_password_length.min) %>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="row pl-3 pr-3">
+                  <div class="col-8 p-0">
+                    <%= f.label :password_confirmation, l10n(".password_confirmation"), class: 'required' %>
+                  </div>
+                  <div class="col-4 p-0">
+                    <div class="float-right">
+                      <span id="pass_match"></span>
+                      <span id="match_icon"></span>
+                    </div>
+                  </div>
+                </div>
+                <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"#{User.configured_password_length.min}", required: true %>
+                <div class="invalid-feedback">
+                  <%= l10n('devise.errors.password_length_username', length: User.configured_password_length.min) %>
+                </div>
+              </div>
+              <div class="form-group d-none" id="optionalEmail">
+                <%= f.label :email %>
+                <%= f.text_field :email, class: "form-control", data: {action: "focus->signup#hideTooltips click->signup#hideTooltips blur->signup#validateEmailFormat", trigger: 'click', target: 'signup.optionalEmail'} %>
+                <%= f.hidden_field :invitation_id %>
+              </div>
+              <% if registration_recaptcha_enabled?("user_account") %>
+                <%= recaptcha_tags %>
+              <% end %>
+              <div class="recaptcha-error alert-error"></div>
+              <div class="recaptcha" id="captcha-widget"></div>
+              <br>
+              <div class="mb-4">
+                <% if site_uses_default_devise_path? %>
+                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.registrations.new.sign_in')}</a>" %>
+                <% else %>
+                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.registrations.new.sign_in')}</a>" unless Rails.env.production? %>
+                <% end %>
+                <%= f.submit l10n('devise.registrations.new.submit'), id: 'submit-button', class: 'button' %>
+              </div>
+            <% end %>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-6">
+            <h2 class="delta"><%= l10n("devise.registrations.new.requirements") %></h2>
+            <ul>
+              <li><%= l10n("devise.registrations.new.requirement_bullet1") %></li>
+              <li><%= l10n("devise.registrations.new.requirement_bullet2") %></li>
+              <li><%= l10n("devise.registrations.new.requirement_bullet3") %></li>
+              <li><%= l10n("devise.registrations.new.requirement_bullet4") %></li>
+              <li><%= l10n("devise.registrations.new.requirement_bullet5") %></li>
+              <li><%= l10n("devise.registrations.new.requirement_bullet6") %></li>
+              <li><%= l10n("devise.registrations.new.requirement_bullet7") %></li>
+              <li><%= l10n("devise.registrations.new.requirement_bullet8") %></li>
+            </ul>
+          </div>
         </div>
       </div>
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup', action: "keyup->signup#validateInput keydown->signup#preventEnterSubmission"}, novalidate: true, rel: 'noopener noreferrer' }) do |f| %>
-        <%= devise_error_messages! %>
-        <div class="row error-block d-none">
-          <div class="col-xs-12">
-            <div class="alert alert-danger text-center"></div>
-          </div>
-        </div>
-        <%= f.hidden_field :referer, value: request.env["HTTP_REFERER"] %>
-        <div class="form-group">
-          <%= f.label :email_or_username %>
-          <%= f.text_field :oim_id, class: "form-control", required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip focusout->signup#validateEmail", toggle: "tooltip", placement: "right", trigger: 'click', title: "You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.", target: 'signup.usernameField' } %>
-          <div class="invalid-feedback">
-            You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="row pl-3 pr-3">
-            <div class="col-8 p-0">
-              <%= f.label :password %>
-              <small class="pl-2 text-muted">
-                <%= "#{User.configured_password_length.min} #{l10n('devise.registrations.characters_minimum')}" %>
-              </small>
-            </div>
-            <div class="col-4 p-0">
-              <div class="float-right">
-                <span id="pass_strength"></span>
-                <span id="complexity"></span>
-              </div>
-            </div>
-          </div>
-          <%= f.password_field :password, autocomplete: "off", class: "form-control", minlength:"#{User.configured_password_length.min}", maxlength:"20", required: true, data: { action: "focus->signup#passwordTooltip", toggle: "tooltip", placement: "right", trigger: 'click', html: true, target: 'signup.passwordField' } %>
-          <div class="invalid-feedback">
-            <%= l10n('devise.errors.password_length_username', length: User.configured_password_length.min) %>
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="row pl-3 pr-3">
-            <div class="col-8 p-0">
-              <%= f.label :password_confirmation, l10n(".password_confirmation") %>
-            </div>
-            <div class="col-4 p-0">
-              <div class="float-right">
-                <span id="pass_match"></span>
-                <span id="match_icon"></span>
-              </div>
-            </div>
-          </div>
-          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"#{User.configured_password_length.min}", required: true, data: {action: "focus->signup#hideTooltips click->signup#hideTooltips keyup->signup#checkMatch blur->signup#validatePassword", target: 'signup.passwordConfirmationField'} %>
-          <div class="invalid-feedback">
-            <%= l10n('devise.errors.password_length_username', length: User.configured_password_length.min) %>
-          </div>
-        </div>
-        <div class="form-group d-none" id="optionalEmail">
-          <%= f.label :email %>
-          <small class="pl-2 text-muted">
-            <%= l10n(".optional") %>
-          </small>
-          <%= f.text_field :email, class: "form-control", data: {action: "focus->signup#hideTooltips click->signup#hideTooltips blur->signup#validateEmailFormat", trigger: 'click', target: 'signup.optionalEmail'} %>
-          <%= f.hidden_field :invitation_id %>
-        </div>
-        <% if registration_recaptcha_enabled?("user_account") %>
-          <%= recaptcha_tags %>
-        <% end %>
-        <div class="recaptcha-error alert-error"></div>
-        <div class="recaptcha" id="captcha-widget"></div>
-        <br>
-        <div class="row justify-content-md-center">
-          <%= f.submit 'Create Account', id: 'submit-button', class: 'btn btn-primary create-account-btn' %>
-        </div>
-        <div class="row justify-content-md-center pt-3">
-          <% if site_uses_default_devise_path? %>
-            <%= sanitize "<a class='btn' href='#{new_user_session_path}'>Sign In</a>" %>
-          <% else %>
-            <%= sanitize "<a class='btn' href='#{new_user_session_path}'>Sign In</a>" unless Rails.env.production? %>
-          <% end %>
-        </div>
-      <% end %>
     </div>
   </div>
-</div>
+<% else %>
+  <div id="signup" class="container mt-5">
+    <div class="row justify-content-md-center">
+      <div id="registration-form-container" class="col-md-6 col-sm-8 col-xs-12">
+        <h2 class="text-center heading-text">Create Account</h2>
+        <div id="pwError" class="d-none">
+          <div class="alert alert-danger">
+            <span id="pwErrorMatch" class="d-none"><%= l10n("devise.errors.password_match") %></span>
+            <span id="pwErrorStrength" class="d-none"><%= l10n("devise.errors.password_strength") %></span>
+          </div>
+        </div>
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup', action: "keyup->signup#validateInput keydown->signup#preventEnterSubmission"}, novalidate: true, rel: 'noopener noreferrer' }) do |f| %>
+          <%= devise_error_messages! %>
+          <div class="row error-block d-none">
+            <div class="col-xs-12">
+              <div class="alert alert-danger text-center"></div>
+            </div>
+          </div>
+          <%= f.hidden_field :referer, value: request.env["HTTP_REFERER"] %>
+          <div class="form-group">
+            <%= f.label :email_or_username %>
+            <%= f.text_field :oim_id, class: "form-control", required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip focusout->signup#validateEmail", toggle: "tooltip", placement: "right", trigger: 'click', title: "You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.", target: 'signup.usernameField' } %>
+            <div class="invalid-feedback">
+              You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row pl-3 pr-3">
+              <div class="col-8 p-0">
+                <%= f.label :password %>
+                <small class="pl-2 text-muted">
+                  <%= "#{User.configured_password_length.min} #{l10n('devise.registrations.characters_minimum')}" %>
+                </small>
+              </div>
+              <div class="col-4 p-0">
+                <div class="float-right">
+                  <span id="pass_strength"></span>
+                  <span id="complexity"></span>
+                </div>
+              </div>
+            </div>
+            <%= f.password_field :password, autocomplete: "off", class: "form-control", minlength:"#{User.configured_password_length.min}", maxlength:"20", required: true, data: { action: "focus->signup#passwordTooltip", toggle: "tooltip", placement: "right", trigger: 'click', html: true, target: 'signup.passwordField' } %>
+            <div class="invalid-feedback">
+              <%= l10n('devise.errors.password_length_username', length: User.configured_password_length.min) %>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row pl-3 pr-3">
+              <div class="col-8 p-0">
+                <%= f.label :password_confirmation, l10n(".password_confirmation") %>
+              </div>
+              <div class="col-4 p-0">
+                <div class="float-right">
+                  <span id="pass_match"></span>
+                  <span id="match_icon"></span>
+                </div>
+              </div>
+            </div>
+            <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"#{User.configured_password_length.min}", required: true, data: {action: "focus->signup#hideTooltips click->signup#hideTooltips keyup->signup#checkMatch blur->signup#validatePassword", target: 'signup.passwordConfirmationField'} %>
+            <div class="invalid-feedback">
+              <%= l10n('devise.errors.password_length_username', length: User.configured_password_length.min) %>
+            </div>
+          </div>
+          <div class="form-group d-none" id="optionalEmail">
+            <%= f.label :email %>
+            <small class="pl-2 text-muted">
+              <%= l10n(".optional") %>
+            </small>
+            <%= f.text_field :email, class: "form-control", data: {action: "focus->signup#hideTooltips click->signup#hideTooltips blur->signup#validateEmailFormat", trigger: 'click', target: 'signup.optionalEmail'} %>
+            <%= f.hidden_field :invitation_id %>
+          </div>
+          <% if registration_recaptcha_enabled?("user_account") %>
+            <%= recaptcha_tags %>
+          <% end %>
+          <div class="recaptcha-error alert-error"></div>
+          <div class="recaptcha" id="captcha-widget"></div>
+          <br>
+          <div class="row justify-content-md-center">
+            <%= f.submit 'Create Account', id: 'submit-button', class: 'btn btn-primary create-account-btn' %>
+          </div>
+          <div class="row justify-content-md-center pt-3">
+            <% if site_uses_default_devise_path? %>
+              <%= sanitize "<a class='btn' href='#{new_user_session_path}'>Sign In</a>" %>
+            <% else %>
+              <%= sanitize "<a class='btn' href='#{new_user_session_path}'>Sign In</a>" unless Rails.env.production? %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
