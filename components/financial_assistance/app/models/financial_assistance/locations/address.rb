@@ -7,6 +7,8 @@ module FinancialAssistance
       include Mongoid::Timestamps
       include HtmlScrubberUtil
 
+      MAILING_KIND = 'mailing'
+
       embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 
       KINDS = %w[home work mailing].freeze
@@ -53,6 +55,9 @@ module FinancialAssistance
                   :message => 'should be in the form: 12345 or 12345-1234'
                 }
       validate :county_check
+
+      # Scopes
+      scope :mailing, -> { where(kind: 'mailing') }
 
       def county_check
         return unless EnrollRegistry.feature_enabled?(:display_county)

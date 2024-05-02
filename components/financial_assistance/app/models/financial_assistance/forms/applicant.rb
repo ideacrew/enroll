@@ -109,6 +109,20 @@ module FinancialAssistance
         @applicant = application.applicants.find(applicant_id) if applicant_id.present?
       end
 
+      # Checks if the given address should be destroyed.
+      #
+      # This method checks if the address is of kind 'mailing', if it is marked for destruction, and if it has an id.
+      #
+      # @param address [Hash] the address to check
+      # @option address [String] :kind the kind of the address
+      # @option address [String] :_destroy whether the address is marked for destruction ('true' or 'false')
+      # @option address [String, nil] :id the id of the address, or nil if it doesn't have one
+      #
+      # @return [Boolean] true if the address should be destroyed, false otherwise
+      def destroy_mailing_address?(address)
+        address[:kind] == FinancialAssistance::Locations::Address::MAILING_KIND && address[:_destroy] == 'true' && address[:id].present?
+      end
+
       def save
         return false unless valid?
         is_living_in_state = has_in_state_home_addresses?(addresses_attributes)
@@ -119,6 +133,10 @@ module FinancialAssistance
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
           if applicant.present? && applicant.persisted?
             applicant.home_address&.destroy if applicant.is_dependent? && same_with_primary == "true"
+
+            # Destroys mailing address if it is marked for destroy.
+            applicant.mailing_address.destroy! if applicant.mailing_address.present? && addresses_attributes.values.any? { |address| destroy_mailing_address?(address) }
+
             applicant.update(values)
           else
             applicant = application.applicants.build(values)
@@ -197,6 +215,10 @@ module FinancialAssistance
 
       def nested_parameters
         address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
+
+        # Removes mailing address if it is marked for destroy from the params
+        address_params = address_params.reject { |_key, address| destroy_mailing_address?(address) }
+
         address_params = primary_applicant_address_attributes if is_dependent == "true" && same_with_primary == "true"
 
         params = {addresses_attributes: address_params}
