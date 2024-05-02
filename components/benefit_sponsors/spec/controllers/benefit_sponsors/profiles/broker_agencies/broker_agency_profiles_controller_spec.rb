@@ -121,6 +121,27 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response).to redirect_to(profiles_broker_agencies_broker_agency_profile_path(:id => bap_id))
         end
       end
+
+      context 'with the incorrect MIME type' do
+        before do
+          initialize_and_login_admin[super_permission]
+        end
+
+        it "js should return http success" do
+          get :index, format: :js
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "json should return http success" do
+          get :index, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should return http success" do
+          get :index, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
+        end
+      end
     end
 
     describe "#show" do

@@ -31,6 +31,7 @@ module BenefitSponsors
           # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
           authorize BenefitSponsors::Organizations::BrokerAgencyProfile
           @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
+          respond_to :html
         end
 
         def show
@@ -39,6 +40,7 @@ module BenefitSponsors
           set_flash_by_announcement
           @provider = current_user.person
           @id = params[:id]
+          # here
         end
 
         def staff_index
@@ -60,6 +62,7 @@ module BenefitSponsors
                      unsorted_search = find_by_agency_name + find_by_last_name + find_by_first_name
                      unsorted_search.sort_by(&:last_name).uniq
                    end
+          # here html
         end
 
         # TODO: need to refactor for cases around SHOP broker agencies
