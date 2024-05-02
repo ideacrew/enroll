@@ -13,31 +13,31 @@
 
 
 <% if show_component(request.path) %>
-  <h3><%= "#{percent_complete}% Complete" %></h3>
+  <h3><%= "#{percent_complete}% " + l10n("complete") %></h3>
   <ul class="list-unstyled progress-wrapper hidden-xs">
     <li class="<%= add_progress_class(1, step) %>">
       <span class="circle-progress"></span>
-      <div class="vertical-line-progress">Personal Info</div>
+      <div class="vertical-line-progress"><%= l10n("personal_info")%></div>
     </li>
     <li class="<%= add_progress_class(2, step) %>">
       <span class="circle-progress"></span>
-      <div class="vertical-line-progress">Verify Identity</div>
+      <div class="vertical-line-progress"><%= l10n("insured.consumer_roles.upload_ridp_documents.header") %></div>
     </li>
     <li class="<%= add_progress_class(3, step) %>">
       <span class="circle-progress"></span>
-      <div class="vertical-line-progress">Household Info</div>
+      <div class="vertical-line-progress"><%= l10n("household_info") %></div>
     </li>
     <li class="<%= add_progress_class(4, step) %>">
       <span class="circle-progress"></span>
-      <div class="vertical-line-progress">Choose Plan</div>
+      <div class="vertical-line-progress"><%= l10n("choose_plan") %></div>
     </li>
     <li class="<%= add_progress_class(5, step) %>">
       <span class="circle-progress"></span>
-      <div class="vertical-line-progress">Confirm</div>
+      <div class="vertical-line-progress"><%= l10n("confirm_selection")%></div>
     </li>
     <li class="<%= add_progress_class(6, step) %>">
       <span class="circle-progress"></span>
-      <div class="vertical-line-progress">Complete</div>
+      <div class="vertical-line-progress">l10n("complete")</div>
     </li>
   </ul>
 <% end %>
