@@ -65,6 +65,12 @@ module Operations
         records = applicant_params[assoc.to_sym]
         return if records.empty?
 
+        if assoc == :addresses
+          person.addresses.each do |address|
+            address.destroy! if records.map { |record| record[:kind] }.exclude?(address.kind)
+          end
+        end
+
         records.each do |attrs|
           address_matched = person.send(assoc).detect {|adr| adr.kind == attrs[:kind]}
           if address_matched

@@ -145,7 +145,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def build
     set_current_person(required: false)
     build_person_params
-    render 'match'
+    respond_to do |format|
+      format.html { render 'match' }
+    end
   end
 
   def create
@@ -213,6 +215,7 @@ class Insured::ConsumerRolesController < ApplicationController
     @vlp_doc_target = params[:vlp_doc_target]
     vlp_doc_subject = params[:vlp_doc_subject]
     @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
+    respond_to :js
   end
 
   def edit
@@ -231,8 +234,10 @@ class Insured::ConsumerRolesController < ApplicationController
     save_and_exit = params['exit_after_method'] == 'true'
     mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
     @shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
+    @consumer_role.skip_consumer_role_callbacks = true
+    valid_params = {"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true}.merge(params.require(:person).permit(*person_parameters_list))
 
-    if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+    if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(valid_params)
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
       @person.active_employee_roles.each { |role| role.update_attributes(contact_method: params[:person][:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
       @person.primary_family.update_attributes(application_type: params["person"]["family"]["application_type"]) if current_user.has_hbx_staff_role?
@@ -241,22 +246,10 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
-          redirect_to upload_ridp_document_insured_consumer_role_index_path
-        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
-          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-          # rubocop:disable Metrics/BlockNesting
-          consumer_redirection_path = if EnrollRegistry.feature_enabled?(:financial_assistance)
-                                        help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: @shop_coverage_result)
-                                      else
-                                        insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-                                      end
-          redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
-          redirect_to URI.parse(redirect_path).to_s
-          # rubocop:enable Metrics/BlockNesting
-        else
-          redirect_to ridp_agreement_insured_consumer_role_index_path
-        end
+        redirect_path = redirect_path_for_update
+
+        fire_consumer_roles_update_for_vlp_docs(@consumer_role, @consumer_role.is_applying_coverage)
+        redirect_to redirect_path
       end
     else
       if save_and_exit
@@ -284,12 +277,14 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       set_consumer_bookmark_url
     end
+    respond_to :html
   end
 
   def upload_ridp_document
     set_consumer_bookmark_url
     set_current_person
     @person.consumer_role.move_identity_documents_to_outstanding
+    respond_to :html
   end
 
   def update_application_type
@@ -349,6 +344,32 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def redirect_path_for_update
+    if staff_and_paper_or_in_person_application?
+      upload_ridp_document_insured_consumer_role_index_path
+    elsif new_paper_or_cruam_or_mobile_application?
+      @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+      admin_bookmark_url_or_help_paying_coverage_path
+    else
+      ridp_agreement_insured_consumer_role_index_path
+    end
+  end
+
+  def staff_and_paper_or_in_person_application?
+    current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
+  end
+
+  def new_paper_or_cruam_or_mobile_application?
+    is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
+  end
+
+  def admin_bookmark_url_or_help_paying_coverage_path
+    return URI.parse(@consumer_role.admin_bookmark_url).to_s if @consumer_role.admin_bookmark_url.present?
+    return help_paying_coverage_insured_consumer_role_index_path(shop_coverage_result: @shop_coverage_result) if EnrollRegistry.feature_enabled?(:financial_assistance)
+
+    insured_family_members_path(consumer_role_id: @person.consumer_role.id)
+  end
 
   def validate_person_match
     first_name = params[:person][:first_name]
