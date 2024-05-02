@@ -304,8 +304,8 @@ ul.list-right-section li:not(:last-of-type) {
     margin-bottom: $spacer;
   }
 
-  .ethnicity-container label {
-    width: 100%;
+  .ethnicity-container label, .w-75, .w-25 {
+    width: 100% !important;
   }
 
   .sm-hide {
