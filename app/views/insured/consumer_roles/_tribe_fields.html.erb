@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <div class="mb-4 <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>
-<%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
+    <%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
     <input type="hidden" id="is_indian_alaskan_tribe_details_enabled" value="<%= EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>">
     <fieldset id="tribal_container">
       <legend id="indian_tribe_member_value">
@@ -13,11 +13,11 @@
       <div class="d-flex align-items-center">
         <label for="indian_tribe_member_yes" tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_yes')" class="radio">
           <%= f.radio_button :indian_tribe_member, true, class: "required", id: 'indian_tribe_member_yes' %>
-          <span class="yes_no_pair">Yes</span>
+          <span class="yes_no_pair"><%= l10n("yes") %></span>
         </label>
         <label for="indian_tribe_member_no" tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_no')" class="radio">
           <%= f.radio_button :indian_tribe_member, false, class: "required", id: 'indian_tribe_member_no' %>
-          <span class="yes_no_pair">No</span>
+          <span class="yes_no_pair"><%= l10n("no") %></span>
         </label>
       </div>
     </fieldset>
@@ -31,7 +31,7 @@
 
       <div class="mb-4" id="tribal-state-container">
         <label for="tribal_state"><%= l10n("insured.tribal_state") %></label>
-        <div id="tribal-state-alert">
+        <div id="tribal-state-alert" class="hide">
           <div class="alert alert-warning d-flex" role="alert">
             <div>
               <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
@@ -41,7 +41,7 @@
             </div>
           </div>
         </div>
-        <%= f.select(:tribal_state, options_for_select(State::NAME_IDS, selected: f.object.tribal_state), {include_blank: "SELECT STATE"}, id: "tribal-state")  %>
+        <%= f.select(:tribal_state, options_for_select(State::NAME_IDS, selected: f.object.tribal_state), {include_blank: l10n("insured.consumer_roles.select_state")}, id: "tribal-state")  %>
       </div>
 
       <div class="mb-4 featured-tribe-container hide">
@@ -63,7 +63,7 @@
             </div>
           </div>
         </div>
-        <%= f.text_field :tribal_name, class: "required", id: "tribal-name", placeholder: 'TRIBE NAME' %>
+        <%= f.text_field :tribal_name, class: "required", id: "tribal-name", placeholder: l10n("insured.consumer_roles.tribe_name") %>
       </div>
     <% else %>
       <div class="mb-4">
@@ -78,7 +78,7 @@
             </div>
           </div>
         </div>
-        <%= f.text_field :tribal_id, class: "required", id: "tribal-id", placeholder: 'TRIBAL ID' %>
+        <%= f.text_field :tribal_id, class: "required", id: "tribal-id", placeholder: l10n("insured.consumer_roles.tribal_id") %>
       </div>
     <% end %>
   </div>
