@@ -66,8 +66,10 @@ Layout/SpaceInsideBlockBraces:
 Layout/TrailingEmptyLines:
   Enabled: false
 
+# Specify indentation style
 Layout/IndentationWidth:
   Enabled: true
+  Width: 2
 
 Layout/LineLength:
   Max: 250
@@ -75,6 +77,7 @@ Layout/LineLength:
 Layout/IndentationStyle:
   Enabled: true
 
+# Disallow trailing white spaces
 Layout/TrailingWhitespace:
   Enabled: true
 

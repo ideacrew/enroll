@@ -26,6 +26,51 @@ Given(/^that the user is on FAA Household Info: Family Members page$/) do
   click_link 'Continue'
 end
 
+Given(/^the applicant only has one home address and one mailing address$/) do
+  application = FinancialAssistance::Application.where(family_id: consumer.person.primary_family.id).first
+  applicant = application.primary_applicant
+  home_address = applicant.addresses.where(kind: 'home').first
+  other_address = applicant.addresses.where(:id.ne => home_address.id).first
+  other_address.update_attributes(
+    {
+      kind: 'mailing',
+      address_1: '123 Main St',
+      address_2: 'Apt 1',
+      city: 'Anytown',
+      state: 'DC',
+      zip: '20001'
+    }
+  )
+end
+
+And(/^the user clicks edit applicant$/) do
+  find('.edit-applicant').click
+end
+
+And(/^the user sees Remove Mailing Address button$/) do
+  expect(page).to have_css('#remove_applicant_mailing_address:not(.dn)')
+end
+
+And(/^the user clicks Remove Mailing Address button$/) do
+  find('#remove_applicant_mailing_address').click
+end
+
+And(/^user clicks confirm member button$/) do
+  find('#confirm_member').click
+end
+
+Then(/^user should not see the deleted mailing address$/) do
+  expect(page).not_to have_content('123 Main St')
+  expect(page).not_to have_content('Apt 1')
+  expect(page).not_to have_content('Anytown')
+  expect(page).not_to have_content('20001')
+end
+
+And(/^the user sees Add Mailing Address button$/) do
+  expect(page).to have_css('#add_applicant_mailing_address:not(.dn)')
+  expect(page).not_to have_css('#remove_applicant_mailing_address:not(.dn)')
+end
+
 When(/^at least one applicant is in the Info Needed state$/) do
   sleep 5
   expect(application.incomplete_applicants?).to be true
