@@ -27,11 +27,11 @@ module FinancialAssistance
           end
 
           def publish(event)
-            @logger.info "Started publishing the payload to medicaid_gateway to be transferred out to ACES"
             event.publish
 
             Success("Successfully published the payload to medicaid_gateway to be transferred out to ACES")
-            @logger.info "Successfully published the payload to medicaid_gateway to be transferred out to ACES"
+
+            Rails.logger.info("Successfully published the payload to medicaid_gateway to be transferred out to ACES: #{event.name} ")
           end
         end
       end
