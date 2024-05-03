@@ -5,7 +5,7 @@ module Insured
   class FdshRidpVerificationsController < ApplicationController
     layout 'progress' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-    before_action :set_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     before_action :set_current_person
     before_action :set_cache_headers, only: [:failed_validation]
     before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
@@ -173,9 +173,7 @@ module Insured
       redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : consumer_redirection_path
     end
 
-    private
-
-    def set_bs4_layout
+    def enable_bs4_layout
       @bs4 = true
     end
   end
