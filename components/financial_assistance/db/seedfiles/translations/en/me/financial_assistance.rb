@@ -180,7 +180,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.required_indicator" => "* = required field",
   "en.faa.question.not_sure" => "Not sure?",
   "en.faa.question.eligible_immigration_status" => "Does this person have an eligible immigration status?",
-  "en.faa.question.immigration_continue_note_1" => "Note: You can continue the application without answering this question, but if you don't answer it, this person won't be eligible for full Medicaid or Marketplace coverage. ",
+  "en.faa.question.immigration_continue_note_1" => "<br><br>Note: You can continue the application without answering this question, but if you don't answer it, this person won't be eligible for full Medicaid or Marketplace coverage. ",
   "en.faa.question.immigration_continue_note_2" => "They'll only be considered for coverage of emergency services, including labor and delivery services.",
   # Submit Your Application Page
   "en.faa.submit_your_application" => "Submit Your Application",
