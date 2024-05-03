@@ -1,0 +1,48 @@
+<% step = (defined? step) ? step.to_i : 1 %>
+<% ridp = (defined? ridp) ? ridp : false %>
+<% continue_disabled = (defined? continue_disabled) ? continue_disabled : false %>
+
+<% step = (defined? step) ? step.to_i : 1 %>
+<% content_for(:step) { step } %>
+<% content_for(:title) { l10n('insured.enroll_in_coverage') } %>
+<% content_for(:nav_options) do %>
+  <% plan_shopping_nav_options.each do |nav_option| %>
+    <li class="<%= 'complete' if step > nav_option[:step] %> <%= 'active' if step == nav_option[:step] %>">
+      <span class="circle-progress"></span>
+      <div class="vertical-line-progress"></div>
+      <a class="<%= 'cna disabled' unless step > nav_option[:step] or step == nav_option[:step] %>"><%= nav_option[:label] %></a>
+    </li>
+  <% end %>
+<% end %>
+
+<!--
+<% if step == 1 %>
+  <%= button_tag 'CONTINUE', class: 'btn btn-lg btn-primary btn-block interaction-click-control-continue', type: 'submit' %>
+<% elsif ridp == true && step == 2 %>
+  <% if EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>
+    <%= link_to 'Continue', new_insured_fdsh_ridp_verification_path, class: 'button btn btn-lg btn-primary btn-block interaction-click-control-continue', id: 'btn-continue', disabled: true %>
+  <% else %>
+    <%= link_to 'Continue', new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary btn-block interaction-click-control-continue', id: 'btn-continue', disabled: true %>
+  <% end %>
+<% elsif defined? url %>
+  <%= link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue' %>
+<% elsif step == 4 %>
+  <% if button_continue == true %>
+    <%= button_tag 'CONTINUE', class: 'btn btn-lg btn-primary btn-block interaction-click-control-continue', type: 'submit' %>
+  <% else %>
+    <%= link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary btn-block no-sep-continue', disabled: continue_disabled, id: 'btn-continue' %>
+  <% end %>
+<% elsif step == 5 %>
+  <%= button_tag 'CONTINUE', class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue' %>
+<% elsif step == 6 %>
+  <%= link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: 'btn btn-lg btn-primary btn-block disabled', id: 'btn-continue', method: :post, disabled: !@enrollable %>
+<% elsif step != 7 %>
+  <%= button_tag 'CONTINUE', class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue', type: 'submit' %>
+<% end %> -->
+
+<%#= render partial: 'shared/shopping_nav_panel',
+  locals: { show_exit_button: step < 7,
+            show_previous_button: ![1, 7].include?(step),
+            show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+            show_help_button: step < 7,
+            is_complete: step == 7 } %>
