@@ -16,7 +16,7 @@ module Validators
             rescue BSON::ObjectId::Invalid
               :invalid_objectid
             end
-            key.failure("must be an ObjectId") if cast_result == :invalid_object_id
+            key.failure("must be an ObjectId") if cast_result == :invalid_objectid
           end
         end
       end
