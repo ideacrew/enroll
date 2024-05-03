@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- extract to helper rather than use the ENV directly -->
-<html lang="en" data-theme="<%= ENV['CLIENT'] %>" data-contrast="<%= EnrollRegistry.feature_enabled?(:contrast_level_aa) %>">
+<html lang="en" data-theme="<%= ENV['CLIENT'] %>" data-contrast="<%= EnrollRegistry.feature_enabled?(:contrast_level_aa) %>" data-bs4="<%= @bs4 %>">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
