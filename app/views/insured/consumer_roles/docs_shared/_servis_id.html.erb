@@ -1,7 +1,18 @@
-<div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-  <%= v.text_field :sevis_id, :placeholder => l10n("insured.consumer_roles.docs_shared.sevis_id"),
-                   :pattern => "\\d{10}",
-                   :class => "doc_fields",
-                   :title => l10n("insured.consumer_roles.docs_shared.sevis_id_req").gsub("-li-", "") %>
-  <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.sevis_id_req")} %>
-</div>
+<% if @bs4 %>
+  <div class="mt-4 mb-4">
+    <%= label_tag :sevis_id, l10n("insured.consumer_roles.docs_shared.sevis_id") %>
+    <%= v.text_field :sevis_id, :placeholder => l10n("insured.consumer_roles.docs_shared.sevis_id"),
+                    :pattern => "\\d{10}",
+                    :class => "doc_fields",
+                    :title => l10n("insured.consumer_roles.docs_shared.sevis_id_req").gsub("-li-", "") %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.sevis_id_req")} %>
+  </div>
+<% else %>
+  <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+    <%= v.text_field :sevis_id, :placeholder => l10n("insured.consumer_roles.docs_shared.sevis_id"),
+                    :pattern => "\\d{10}",
+                    :class => "doc_fields",
+                    :title => l10n("insured.consumer_roles.docs_shared.sevis_id_req").gsub("-li-", "") %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.sevis_id_req")} %>
+  </div>
+<% end %>
