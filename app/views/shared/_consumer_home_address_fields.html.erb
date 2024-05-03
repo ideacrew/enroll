@@ -93,9 +93,9 @@
               </div>
             <% end %>
             <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-              <div class="address_checkbox">
-                <%= f.check_box :is_homeless %>
-                <label for="checkbox"><span><strong><%= l10n('insured.dc_homeless') %></strong></span><span><%= l10n('insured.dc_homeless_extension') %></span></label>
+              <label for="is_homeless">
+                <%= f.check_box :is_homeless, id: "is_homeless" %>
+                <span><strong><%= l10n('insured.dc_homeless') %></strong></span> <span><%= l10n('insured.dc_homeless_extension') %></span>
               </div>
             </div>
           </div>

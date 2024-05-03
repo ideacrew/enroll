@@ -1,11 +1,10 @@
 <% if @bs4 %>
   <div class="mt-4 mb-4">
-    <%= v.label :naturalization_number, l10n("insured.consumer_roles.docs_shared.naturalization_number"), class: "weight-n" %>
+    <%= label_tag :naturalization_number, l10n("insured.consumer_roles.docs_shared.naturalization_number") %>
     <%= v.text_field :naturalization_number, :placeholder => l10n("insured.consumer_roles.docs_shared.naturalization_number"),
                     :pattern => "[a-zA-Z0-9]{6,12}",
                     :class => "doc_fields",
-                    :title => l10n("insured.consumer_roles.docs_shared.naturalization_number_req").gsub("-li-", ""),
-                    :id => "naturalization_number" %>
+                    :title => l10n("insured.consumer_roles.docs_shared.naturalization_number_req").gsub("-li-", "") %>
     <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.naturalization_number_req")} %>
   </div>
 <% else %>
