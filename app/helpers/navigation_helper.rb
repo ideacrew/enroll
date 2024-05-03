@@ -117,4 +117,15 @@ module NavigationHelper
       {step: 3, page_key: :complete, display_label: l10n('complete')}
     ]
   end
+
+  def plan_shopping_nav_options
+    [
+      {step: 1, label: l10n('personal_information')},
+      {step: 2, label: l10n('verify_identity')},
+      {step: 3, label: l10n('household_info')},
+      {step: 4, label: l10n('choose_plan')},
+      {step: 5, label: l10n('review_submit')},
+      {step: 6, label: l10n('complete')}
+    ]
+  end
 end
