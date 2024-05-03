@@ -5,7 +5,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   include RecaptchaConcern
   layout 'bootstrap_4'
 
-  before_action :set_bs4_layout, only: [:create, :new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:create, :new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :configure_sign_up_params, only: [:create]
   before_action :set_ie_flash_by_announcement, only: [:new]
 
@@ -124,7 +124,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super(resource)
   # end
 
-  def set_bs4_layout
+  def enable_bs4_layout
     @bs4 = true
   end
 
