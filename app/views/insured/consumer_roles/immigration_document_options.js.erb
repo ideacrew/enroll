@@ -35,7 +35,6 @@
 
 <% if @target.present? %>
   <% url = @target.is_a?(Person) ? {} : employee_dependent_submission_options_for(@target) %>
-
   '<%= form_for @target, url do |f| %>'
     '<%= f.fields_for find_consumer_role_for_fields(f.object) do |c| %>'
       $(".vlp_doc_area").html("<%= escape_javascript(render partial: partial_target, locals: {c: c}) %>")
