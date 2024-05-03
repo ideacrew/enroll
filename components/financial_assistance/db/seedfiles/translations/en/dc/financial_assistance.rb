@@ -178,7 +178,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
-  "en.faa.application_for_premium_reductions" => "Your Application for Premium Reductions",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
   # Mec check
