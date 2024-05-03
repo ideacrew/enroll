@@ -2496,8 +2496,8 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    stimulus_reflex (3.4.1)
-      cable_ready (>= 4.5)
+    stimulus_reflex (3.4.2)
+      cable_ready (~> 4.5)
       nokogiri
       rack
       rails (>= 5.2)
@@ -2700,7 +2700,7 @@ DEPENDENCIES
   sponsored_benefits!
   spring
   spring-watcher-listen
-  stimulus_reflex (= 3.4.1)
+  stimulus_reflex (= 3.4.2)
   stimulus_reflex_testing (~> 0.3.0)
   symmetric-encryption (= 3.9.1)
   test-prof
