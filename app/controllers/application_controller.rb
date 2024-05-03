@@ -513,5 +513,4 @@ class ApplicationController < ActionController::Base
   def check_browser_compatibility
     browser.ie? && !support_for_ie_browser?
   end
-
 end
