@@ -247,6 +247,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
       let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month) }
+      let(:household) { FactoryBot.create(:household, family: family) }
       let(:application) do
         FactoryBot.create(
           :financial_assistance_application,
@@ -255,10 +256,8 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
           effective_date: DateTime.now.beginning_of_month
         )
       end
-
-      before do
+      let(:hbx_enrollment) {
         FactoryBot.create(:hbx_enrollment,
-
                           hbx_enrollment_members: [hbx_enrollment_member],
                           family: family,
                           product: product1,
@@ -270,24 +269,33 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
                           kind: "individual",
                           submitted_at: TimeKeeper.date_of_record,
                           aasm_state: 'coverage_selected')
+      }
+
+      before do
         consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
         consumer_person.consumer_role.vlp_documents = []
         consumer_person.save!
         @immigration_type = consumer_person.verification_types.where(type_name: 'Immigration status').first
 
-        @immigration_type.update_attributes!(inactive: false, validation_status: 'Outstanding')
-        EnrollRegistry[:'gid://enroll_app/Family'].feature.stub(:is_enabled).and_return(true)
+        @immigration_type.update_attributes!(inactive: false, validation_status: 'outstanding')
+        [
+          :financial_assistance,
+          :'gid://enroll_app/Family',
+          :aptc_csr_credit,
+          :aca_individual_market_eligibility,
+          :health_product_enrollment_status,
+          :dental_product_enrollment_status
+        ].each do |feature_key|
+          EnrollRegistry[feature_key].feature.stub(:is_enabled).and_return(true)
+        end
       end
 
       it 'change due date on family level' do
         post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id }
-
         consumer_person.reload
-
-        family_due_date = consumer_person.primary_family.eligibility_determination&.outstanding_verification_earliest_due_date
+        family_due_date = family.eligibility_determination&.outstanding_verification_earliest_due_date
         puts "eligibility_determination #{consumer_person.primary_family.eligibility_determination.inspect}"
-        # expect(family_due_date.strftime("%Y-%m-%d")).to match(TimeKeeper.date_of_record.strftime("%Y-%m-%d"))
-
+        expect(family_due_date&.strftime("%Y-%m-%d")).to match(TimeKeeper.date_of_record.strftime("%Y-%m-%d"))
       end
     end
 

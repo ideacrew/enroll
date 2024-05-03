@@ -22,8 +22,6 @@ module Operations
 
       def validate(params)
         contract_result = AcaEntities::Eligibilities::Contracts::DeterminationContract.new.call(params)
-        puts "::Operations::Determinations::Create params #{params}"
-        puts "::Operations::Determinations::Create success #{contract_result.success?}"
         contract_result.success? ? Success(contract_result.to_h) : Failure(contract_result.errors)
       end
 

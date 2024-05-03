@@ -69,6 +69,7 @@ module Operations
               eligibility_states:
                 build_eligibility_states(subject, eligibility_items, values)
             }
+            puts "subject_params #{subject_params}"
             Hash[
               subject.uri,
               subject_params
@@ -149,6 +150,7 @@ module Operations
 
       def outstanding_verification_due_on_for_determination(determination)
         subjects = determination[:subjects].values
+        puts "subjects = #{subjects}"
         subjects.reject! do |subject|
           subject[:outstanding_verification_status] == 'not_enrolled'
         end
