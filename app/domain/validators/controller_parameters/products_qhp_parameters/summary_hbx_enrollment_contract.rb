@@ -13,7 +13,7 @@ module Validators
           if value.present?
             cast_result = begin
               BSON::ObjectId(value)
-            rescue BSON::Error::InvalidObjectId
+            rescue BSON::ObjectId::Invalid
               :invalid_objectid
             end
             key.failure("must be an ObjectId") if cast_result == :invalid_object_id
