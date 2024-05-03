@@ -12,7 +12,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
   #associated consumer role
-  let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,) }
   let(:consumer_user) { FactoryBot.create(:user, person: consumer_person) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
   let!(:consumer_role) do
@@ -193,26 +193,90 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     end
 
     context 'enrolled' do
+      let(:application) do
+        FactoryBot.create(
+          :financial_assistance_application,
+          family_id: family.id,
+          aasm_state: 'determined',
+          effective_date: DateTime.now.beginning_of_month
+        )
+      end
+
+      let!(:applicant1) do
+        FactoryBot.build(
+          :financial_assistance_applicant,
+          :with_work_phone,
+          :with_work_email,
+          :with_home_address,
+          :with_income_evidence,
+          :with_esi_evidence,
+          :with_non_esi_evidence,
+          :with_local_mec_evidence,
+          family_member_id: family.primary_applicant.id,
+          application: application,
+          gender: consumer_person.gender,
+          is_incarcerated: consumer_person.is_incarcerated,
+          ssn: consumer_person.ssn,
+          dob: consumer_person.dob,
+          first_name: consumer_person.first_name,
+          last_name: consumer_person.last_name,
+          is_primary_applicant: true,
+          person_hbx_id: consumer_person.hbx_id,
+          is_applying_coverage: true,
+          citizen_status: 'alien_lawfully_present',
+          indian_tribe_member: false
+        )
+      end
+
+      let(:household) { FactoryBot.create(:household, family: family) }
+
+      let!(:organization) do
+        FactoryBot.create(:organization, legal_name: 'CareFirst', dba: 'care')
+      end
+      let!(:carrier_profile1) do
+        FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
+      end
+      let!(:product1) do
+        FactoryBot.create(
+          :benefit_markets_products_health_products_health_product,
+          benefit_market_kind: :aca_individual,
+          kind: :health,
+          csr_variant_id: '01'
+        )
+      end
+
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
       let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month) }
+      let(:application) do
+        FactoryBot.create(
+          :financial_assistance_application,
+          family_id: family.id,
+          aasm_state: 'determined',
+          effective_date: DateTime.now.beginning_of_month
+        )
+      end
 
       before do
         FactoryBot.create(:hbx_enrollment,
-                          product: product,
+
                           hbx_enrollment_members: [hbx_enrollment_member],
                           family: family,
+                          product: product1,
                           is_any_enrollment_member_outstanding: true,
                           household: family.active_household,
                           coverage_kind: "health",
-                          effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                          effective_on: TimeKeeper.date_of_record.next_month.beginning_of_year,
                           enrollment_kind: "open_enrollment",
                           kind: "individual",
                           submitted_at: TimeKeeper.date_of_record,
                           aasm_state: 'coverage_selected')
         consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
+        consumer_person.consumer_role.vlp_documents = []
         consumer_person.save!
         @immigration_type = consumer_person.verification_types.where(type_name: 'Immigration status').first
-        @immigration_type.update_attributes!(inactive: false)
+
+        @immigration_type.update_attributes!(inactive: false, validation_status: 'Outstanding')
+        EnrollRegistry[:'gid://enroll_app/Family'].feature.stub(:is_enabled).and_return(true)
       end
 
       it 'change due date on family level' do

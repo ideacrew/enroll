@@ -151,7 +151,7 @@ class DocumentsController < ApplicationController
     # puts "fed_hub_request +++"
     if result.failure?
       # puts "fed_hub_request failure?"
-      puts "fed_hub_request failure family #{@person.primary_family.inspect}"
+      puts "fed_hub_request failure eligibility_determination #{@person.primary_family.eligibility_determination.inspect}"
       ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: @person.primary_family, effective_date: TimeKeeper.date_of_record)
       puts "fed_hub_request eligibility_determination #{@person.primary_family.eligibility_determination.inspect}"
       @verification_type.fail_type

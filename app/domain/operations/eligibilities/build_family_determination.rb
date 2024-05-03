@@ -44,7 +44,9 @@ module Operations
         primary_person = family&.primary_applicant&.person
         is_any_member_applying_for_coverage = family.family_members.any?(&:is_applying_coverage)
         if (is_any_member_applying_for_coverage && primary_person.consumer_role.present?) || values[:is_migrating]
-          BuildDetermination.new.call(subjects: subjects, effective_date: values[:effective_date], family: family)
+          determination = BuildDetermination.new.call(subjects: subjects, effective_date: values[:effective_date], family: family)
+          puts "BuildFamilyDetermination build_determination #{determination}"
+          determination
         else
           puts "BuildFamilyDetermination build_determination failure"
           Failure("Person don't have consumer role or is not applying for coverage")
