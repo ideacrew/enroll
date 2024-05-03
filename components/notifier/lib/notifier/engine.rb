@@ -6,7 +6,6 @@ require "aasm"
 require "wkhtmltopdf-binary-edge"
 require "wicked_pdf"
 require 'ckeditor'
-require "redcarpet"
 require "config"
 require "money-rails"
 require 'pundit'
