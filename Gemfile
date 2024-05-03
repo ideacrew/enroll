@@ -68,7 +68,7 @@ gem 'devise-jwt',               '0.9.0'
 gem 'warden-jwt_auth',          '0.6.0'
 gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
-gem 'httparty',                 '~> 0.16'
+gem 'httparty',                 '~> 0.21'
 gem 'i18n',                     '~> 1.5'
 gem 'i18n-tasks', '~> 0.9.33'
 gem 'interactor',               '~> 3.0'
