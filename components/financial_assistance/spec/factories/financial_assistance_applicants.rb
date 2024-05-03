@@ -9,6 +9,26 @@ FactoryBot.define do
       student_school_kind { 'Graduate School' }
       student_status_end_on { TimeKeeper.date_of_record.end_of_month.to_s }
     end
+
+    trait :with_basic_info do
+      first_name { 'John' }
+      last_name { 'Doe' }
+      gender { 'M' }
+      dob { TimeKeeper.date_of_record - 30.years }
+    end
+
+    trait :with_ssn do
+      sequence(:ssn) do |n|
+        ssn = ''
+        loop do
+          ssn_number = SecureRandom.random_number(1_000_000_000)
+          ssn = "7#{ssn_number.to_s[2..3]}#{ssn_number.to_s[4]}#{n + 1}#{ssn_number.to_s[5..7]}#{n + 1}"
+          break if ssn.match?(/^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
+        end
+
+        ssn
+      end
+    end
   end
 
   factory :financial_assistance_applicant, class: "FinancialAssistance::Applicant" do

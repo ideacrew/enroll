@@ -919,7 +919,7 @@ GEM
       net-ssh (>= 2.8.0)
     ssrf_filter (1.0.7)
     state_machines (0.5.0)
-    stimulus_reflex (3.4.1)
+    stimulus_reflex (3.4.2)
       cable_ready (>= 4.5)
       nokogiri
       rack

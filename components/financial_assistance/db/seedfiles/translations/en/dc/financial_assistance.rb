@@ -214,6 +214,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.transfer_history" => "Transfer History",
   "en.faa.transfer_history_desc" => "Application transfers sent to or from %{site_short_name} related to this application are listed below.",
   "en.faa.no_history_available" => "No history available.",
+  # Left Nav Pane
+  "en.faa.left_nav.my_household" => "My Household",
   # Flash error display
   "en.faa.errors.should_be_answered" => "should be answered",
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
@@ -257,6 +259,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.medicaid_eligible_step1" => "pick a plan, or",
   "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
   "en.faa.verification.documents" => "Cost Savings Documents",
-  "en.faa.view_complete_checklist" => "View the Complete Application Checklist"
+  "en.faa.view_complete_checklist" => "View the Complete Application Checklist",
+  'en.faa.add_mailing_address' => 'Add Mailing Address',
+  'en.faa.remove_mailing_address' => 'Remove Mailing Address'
 }.freeze
 # rubocop:enable Layout/LineLength

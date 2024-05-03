@@ -13,7 +13,7 @@ Given(/^that the user is on the Tax Info page for a given applicant$/) do
 end
 
 When(/^the user clicks My Household section on the left navigation$/) do
-  click_link 'My Household'
+  click_link(l10n('faa.left_nav.my_household'))
 end
 
 Then(/^the user will navigate to the FAA Household Info page for the corresponding application\.$/) do
