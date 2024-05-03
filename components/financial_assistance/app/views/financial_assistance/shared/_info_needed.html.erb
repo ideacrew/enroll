@@ -1,33 +1,17 @@
-<% if bs4 %>
-  <% if applicant.applicant_validation_complete? %>
-    <div class="notice notice-success" role="alert"><%=l10n("info_complete")%></div>
-  <% else %>
-    <div class="notice notice-warning d-flex" role="alert">
-      <div>
-        <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
-      </div>
-      <div class="mt-1">
-        <%=l10n("info_needed")%>
-      </div>
-    </div>
-  <% end %>
+<% if applicant.applicant_validation_complete? %>
+  <span class="success-notice"><span class="glyphicon glyphicon-ok complete-icon success-status-hide"></span>&nbsp;<span class="complete-icon-text"><%=l10n("info_complete")%></span></span>
 <% else %>
-  <% if applicant.applicant_validation_complete? %>
-    <span class="success-notice"><span class="glyphicon glyphicon-ok complete-icon success-status-hide"></span>&nbsp;<span class="complete-icon-text"><%=l10n("info_complete")%></span></span>
-  <% else %>
-    <span class="warning-notice"><span class="glyphicon glyphicon-refresh in-progress-icon warning-status-hide" alt="warning"></span>&nbsp;<span class="in-progress"><%=l10n("info_needed")%></span></span>
-    <ul>
-      <% if applicant.is_applying_coverage && !applicant.ssn_present? %>
-        <li>
-          <%= l10n("ssn_not_present") %>
-        </li>
-      <% end %>
-      <% unless applicant.covering_applicant_exists? %>
-        <li>
-          <% l10n("tax_covering_applicant_not_present") %>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
+  <span class="warning-notice"><span class="glyphicon glyphicon-refresh in-progress-icon warning-status-hide" alt="warning"></span>&nbsp;<span class="in-progress"><%=l10n("info_needed")%></span></span>
+  <ul>
+    <% if applicant.is_applying_coverage && !applicant.ssn_present? %>
+      <li>
+        <%= l10n("ssn_not_present") %>
+      </li>
+    <% end %>
+    <% unless applicant.covering_applicant_exists? %>
+      <li>
+        <% l10n("tax_covering_applicant_not_present") %>
+      </li>
+    <% end %>
+  </ul>
 <% end %>
-
