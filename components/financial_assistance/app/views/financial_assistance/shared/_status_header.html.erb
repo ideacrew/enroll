@@ -1,17 +1,13 @@
-<% if bs4 %>
-  <b><%= assistance_year.blank? ? DateTime.now.year : assistance_year %> <%= l10n('faa.application_for_coverage') %></b>
-<% else %>
-  <div class="row app-year-header">
-    <div class="col-xs-4 app-year-column">
-      <div class="row text-center">
-        <%= assistance_year[0..1] %>
-      </div>
-      <div class="row text-center">
-        <b><%= assistance_year[2..3] %></b>
-      </div>
+<div class="row app-year-header">
+  <div class="col-xs-4 app-year-column">
+    <div class="row text-center">
+      <%= assistance_year[0..1] %>
     </div>
-    <div class="col-xs-8 app-year-title">
-      <b><%= l10n('faa.application_for_coverage') %></b>
+    <div class="row text-center">
+      <b><%= assistance_year[2..3] %></b>
     </div>
   </div>
-<% end %>
+  <div class="col-xs-8 app-year-title">
+    <b><%= l10n('faa.application_for_coverage') %></b>
+  </div>
+</div>
