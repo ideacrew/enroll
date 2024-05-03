@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency 'rails', '~> 6.0.6.1'
+  s.add_dependency 'rails', '~> 6.1.7.6'
   s.add_dependency "slim", "~> 3.0.8"
   s.add_dependency 'mongoid', '~> 7.5.4'
   s.add_dependency "aasm", "~> 4.8.0"
@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'roo', '~> 2.7.0'
   s.add_dependency 'pundit',                    '~> 2.0'
   s.add_dependency 'ffi', '~> 1.9'
-  s.add_dependency 'kaminari', '~> 0.17.0'
+  s.add_dependency 'kaminari', '~> 1.2'
   s.add_dependency 'sass', '~> 3.7.3'
   s.add_dependency 'webpacker',                 '~> 4.0.2'
   s.add_dependency 'dry-types'
@@ -50,7 +50,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'capybara',                  '~> 3.12'
   s.add_development_dependency 'factory_bot_rails',         '~> 4'
   s.add_development_dependency 'forgery',                   '~> 0.7.0'
-  s.add_development_dependency 'test-prof',                 '~> 0.5.0'
+  s.add_development_dependency 'test-prof',                 '~> 1.3'
   s.add_development_dependency "mongoid-rspec",             '~> 4'
   s.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'
   s.add_development_dependency "rspec-benchmark"
