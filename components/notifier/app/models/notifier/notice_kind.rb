@@ -163,19 +163,6 @@ module Notifier
       market_kind.blank? || market_kind == :aca_shop
     end
 
-    # def self.markdown
-    #   Redcarpet::Markdown.new(ReplaceTokenRenderer,
-    #       no_links: true,
-    #       hard_wrap: true,
-    #       disable_indented_code_blocks: true,
-    #       fenced_code_blocks: false,
-    #     )
-    # end
-
-    # # Markdown API: http://www.rubydoc.info/gems/redcarpet/3.3.4
-    # def to_html
-    #   self.markdown.render(template.body)
-    # end
     private
 
     def default_market_kind

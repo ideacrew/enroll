@@ -152,7 +152,6 @@ PATH
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
       rails (~> 5.2.4.3)
-      redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
@@ -756,7 +755,6 @@ GEM
       jquery-rails (>= 3.0)
       rails (>= 5.2)
       sass-rails (>= 4.0)
-    redcarpet (3.4.0)
     redis (4.2.5)
     redis-actionpack (5.2.0)
       actionpack (>= 5, < 7)
@@ -1085,7 +1083,6 @@ DEPENDENCIES
   rails-controller-testing
   recaptcha (~> 4.13)
   recurring_select
-  redcarpet (~> 3.4)
   redis (~> 4.0)
   redis-rails (~> 5.0.2)
   resource_registry!
