@@ -10,14 +10,14 @@ module Validators
         end
 
         rule(:hbx_enrollment_id) do
-          # rubocop:disable Style/RescueModifier
-          # rubocop:disable Lint/EmptyRescueClause
           if value.present?
-            cast_result = BSON::ObjectId(value) rescue nil
-            key.failure("must be an ObjectId") if cast_result.nil?
+            cast_result = begin
+              BSON::ObjectId(value)
+            rescue BSON::Error::InvalidObjectId
+              :invalid_objectid
+            end
+            key.failure("must be an ObjectId") if cast_result == :invalid_object_id
           end
-          # rubocop:enable Style/RescueModifier
-          # rubocop:enable Lint/EmptyRescueClause
         end
       end
     end
