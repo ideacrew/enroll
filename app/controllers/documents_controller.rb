@@ -145,11 +145,12 @@ class DocumentsController < ApplicationController
   def fed_hub_request
     authorize HbxProfile, :can_call_hub?
 
-    request_hash = {person_id: @person.id, verification_type: @verification_type.type_name}
+    request_hash = { person_id: @person.id, verification_type: @verification_type.type_name }
     result = ::Operations::CallFedHub.new.call(request_hash)
     key, message = result.failure? ? result.failure : result.success
 
     if result.failure?
+      ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: @person.primary_family, effective_date: TimeKeeper.date_of_record)
       @verification_type.fail_type
       @verification_type.add_type_history_element(action: "Hub Request Failed",
                                                   modifier: "System",
