@@ -109,7 +109,7 @@ gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.19.1'
-gem 'stimulus_reflex', '3.4.1'
+gem 'stimulus_reflex', '3.4.2'
 gem 'rack-cors'
 gem 'holidays', '~> 8.6'
 
