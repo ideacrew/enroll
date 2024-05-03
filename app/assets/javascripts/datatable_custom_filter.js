@@ -69,7 +69,7 @@ DT = (function() {
   }
   var filter_params = function(keys, level) {
     var selector = $('.custom_level_' + level + ' .active')
-    if (typeof(selector) != 'undefined' && selector.size() > 0) {
+    if (typeof(selector) != 'undefined' && selector.length > 0) {
       keys[selector.parent().attr('data-scope')] =  selector.attr('data-key')
       filter_params(keys, level+1)
     }

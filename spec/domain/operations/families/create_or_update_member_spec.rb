@@ -38,6 +38,11 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
         expect(@result).to be_a(Dry::Monads::Result::Success)
       end
 
+      it 'returns a success result with family_member_id' do
+        expect(@result.success).to be_a(Hash)
+        expect(@result.success[:family_member_id]).to be_truthy
+      end
+
       it 'persists the person' do
         expect(@person.persisted?).to be_truthy
       end

@@ -145,7 +145,9 @@ class Insured::ConsumerRolesController < ApplicationController
   def build
     set_current_person(required: false)
     build_person_params
-    render 'match'
+    respond_to do |format|
+      format.html { render 'match' }
+    end
   end
 
   def create
@@ -213,6 +215,7 @@ class Insured::ConsumerRolesController < ApplicationController
     @vlp_doc_target = params[:vlp_doc_target]
     vlp_doc_subject = params[:vlp_doc_subject]
     @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
+    respond_to :js
   end
 
   def edit
@@ -274,12 +277,14 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       set_consumer_bookmark_url
     end
+    respond_to :html
   end
 
   def upload_ridp_document
     set_consumer_bookmark_url
     set_current_person
     @person.consumer_role.move_identity_documents_to_outstanding
+    respond_to :html
   end
 
   def update_application_type

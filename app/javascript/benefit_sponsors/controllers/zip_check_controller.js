@@ -9,9 +9,10 @@ export default class extends Controller {
   }
 
   zipChange(event) {
+   if (this.countySelectTarget) {
     axios({
       method: 'POST',
-      url: '/benefit_sponsors/profiles/registrations/counties_for_zip_code',
+      url: '/benefit_sponsors/profiles/registrations/counties_for_zip_code.json',
       data: { zip_code: event.currentTarget.value },
       headers: {
         'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
@@ -49,5 +50,5 @@ export default class extends Controller {
         }
       }
     })
-  }
+  }}
 }

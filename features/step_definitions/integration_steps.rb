@@ -410,6 +410,11 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   find('#broker-btn').click
 end
 
+When(/^.+ delete NPN and submit form$/) do
+  fill_in 'agency[staff_roles_attributes][0][npn]', with: ''
+  find('#broker-btn').click
+end
+
 When(/^.+ updates office location from (.+) to (.+)$/) do |old_add, new_add|
   old_add = eval(old_add) if old_add.class == String
   new_add = eval(new_add) if new_add.class == String
@@ -880,7 +885,7 @@ Then(/^.+ should see plans sorted by Plan Name/) do
 end
 
 When(/^.+ filters plans by Carrier/) do
-  find('.interaction-choice-control-carrier').click
+  find_all('.interaction-choice-control-carrier').first.click
   carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click

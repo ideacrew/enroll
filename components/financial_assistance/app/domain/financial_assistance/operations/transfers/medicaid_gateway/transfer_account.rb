@@ -13,6 +13,7 @@ module FinancialAssistance
           include EventSource::Command
 
           def call(payload)
+            @payload = payload
             event = yield build_event(payload)
             result = yield publish(event)
 
@@ -27,6 +28,7 @@ module FinancialAssistance
           end
 
           def publish(event)
+            Rails.logger.info("publishing the payload to medicaid_gateway to be transferred out for application: #{@payload[:family][:hbx_id]}")
             event.publish
 
             Success("Successfully published the payload to medicaid_gateway to be transferred out to ACES")
