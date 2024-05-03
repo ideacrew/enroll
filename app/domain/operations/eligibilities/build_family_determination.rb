@@ -33,7 +33,7 @@ module Operations
         errors = []
         errors << 'family missing' unless params[:family]
         errors << 'effective date missing' unless params[:effective_date]
-
+        puts "BuildFamilyDetermination validate #{errors.empty?}"
         errors.empty? ? Success(params) : Failure(errors)
       end
 
@@ -46,6 +46,7 @@ module Operations
         if (is_any_member_applying_for_coverage && primary_person.consumer_role.present?) || values[:is_migrating]
           BuildDetermination.new.call(subjects: subjects, effective_date: values[:effective_date], family: family)
         else
+          puts "BuildFamilyDetermination build_determination failure"
           Failure("Person don't have consumer role or is not applying for coverage")
         end
       end
@@ -53,10 +54,13 @@ module Operations
       def persist(values, determination_entity)
         family = values[:family]
         attributes = determination_entity.sanitize_attributes
+        puts "BuildFamilyDetermination persist attributes#{attributes}"
         model_attributes = transform(attributes)
         determination = ::Eligibilities::Determination.new(model_attributes)
         family.eligibility_determination = determination
         family.save
+        puts "BuildFamilyDetermination family #{family.inspect}"
+        puts "BuildFamilyDetermination determination #{determination.inspect}"
 
         Success(determination)
       end

@@ -36,7 +36,8 @@ module Operations
         errors << 'subject ref missing' unless params[:subjects]
         errors << 'effective_date ref missing' unless params[:effective_date]
         errors << 'family ref missing' unless params[:family]
-
+        puts "BuildDetermination validate effective_date #{params[:effective_date]}"
+        puts "BuildDetermination validate family #{params[:family]}"
         errors.empty? ? Success(params) : Failure(errors)
       end
 

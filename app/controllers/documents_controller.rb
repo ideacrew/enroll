@@ -148,9 +148,12 @@ class DocumentsController < ApplicationController
     request_hash = { person_id: @person.id, verification_type: @verification_type.type_name }
     result = ::Operations::CallFedHub.new.call(request_hash)
     key, message = result.failure? ? result.failure : result.success
-
+    # puts "fed_hub_request +++"
     if result.failure?
+      # puts "fed_hub_request failure?"
+      puts "fed_hub_request failure family #{@person.primary_family.inspect}"
       ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: @person.primary_family, effective_date: TimeKeeper.date_of_record)
+      puts "fed_hub_request eligibility_determination #{@person.primary_family.eligibility_determination.inspect}"
       @verification_type.fail_type
       @verification_type.add_type_history_element(action: "Hub Request Failed",
                                                   modifier: "System",

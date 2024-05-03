@@ -184,8 +184,46 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
           @immigration_type.reload
           expect(@immigration_type.validation_status).to eq 'negative_response_received'
           error_message = @immigration_type.type_history_elements.last.update_reason
+          family_due_date = consumer_person.primary_family.eligibility_determination&.outstanding_verification_earliest_due_date
+          puts "eligibility_determination #{consumer_person.primary_family.eligibility_determination.inspect}"
+          # expect(family_due_date.strftime("%Y-%m-%d")).to match(TimeKeeper.date_of_record.strftime("%Y-%m-%d"))
           expect(error_message).to match(/Failed due to VLP Document not found/)
         end
+      end
+    end
+
+    context 'enrolled' do
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
+      let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month) }
+
+      before do
+        FactoryBot.create(:hbx_enrollment,
+                          product: product,
+                          hbx_enrollment_members: [hbx_enrollment_member],
+                          family: family,
+                          is_any_enrollment_member_outstanding: true,
+                          household: family.active_household,
+                          coverage_kind: "health",
+                          effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                          enrollment_kind: "open_enrollment",
+                          kind: "individual",
+                          submitted_at: TimeKeeper.date_of_record,
+                          aasm_state: 'coverage_selected')
+        consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
+        consumer_person.save!
+        @immigration_type = consumer_person.verification_types.where(type_name: 'Immigration status').first
+        @immigration_type.update_attributes!(inactive: false)
+      end
+
+      it 'change due date on family level' do
+        post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id }
+
+        consumer_person.reload
+
+        family_due_date = consumer_person.primary_family.eligibility_determination&.outstanding_verification_earliest_due_date
+        puts "eligibility_determination #{consumer_person.primary_family.eligibility_determination.inspect}"
+        # expect(family_due_date.strftime("%Y-%m-%d")).to match(TimeKeeper.date_of_record.strftime("%Y-%m-%d"))
+
       end
     end
 
