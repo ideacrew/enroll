@@ -226,6 +226,7 @@ function showOnly(selected) {
   $('.vlp_doc_area').html('<span>waiting...</span>');
   var target_id = $('input#vlp_doc_target_id').val();
   var target_type = $('input#vlp_doc_target_type').val();
+  var bs4 = document.documentElement.dataset.bs4;
   $.ajax({
     type: 'get',
     url: '/insured/consumer_role/immigration_document_options',
@@ -235,6 +236,7 @@ function showOnly(selected) {
       target_type: target_type,
       vlp_doc_target: vlp_doc_target,
       vlp_doc_subject: selected,
+      bs4: bs4,
     },
   });
 }
