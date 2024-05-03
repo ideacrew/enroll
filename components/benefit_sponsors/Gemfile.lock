@@ -118,7 +118,6 @@ PATH
       non-stupid-digest-assets
       pundit (~> 2.0)
       rails (~> 6.0.6.1)
-      redcarpet (~> 3.4.0)
       roo (~> 2.7.0)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
@@ -564,7 +563,6 @@ GEM
       ffi (~> 1.0)
     rbnacl (7.1.1)
       ffi
-    redcarpet (3.4.0)
     redis (4.4.0)
     redis-namespace (1.8.1)
       redis (>= 3.0.4)
