@@ -45,7 +45,6 @@ module FinancialAssistance
     ]
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
-    layout "bs4_financial_assistance_nav", only: %i[application_checklist edit]
 
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
