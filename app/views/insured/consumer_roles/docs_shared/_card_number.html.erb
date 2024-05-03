@@ -1,3 +1,15 @@
+<% if @bs4 %>
+  <div class="mt-4 mb-4">
+    <% description = name == 'I-766' ? l10n("insured.consumer_roles.docs_shared.i_766_card_number_req") : l10n("insured.consumer_roles.docs_shared.card_number_req") %>
+    <%= label_tag :card_number, l10n("insured.consumer_roles.docs_shared.card_number"), class: "#{!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "required" : ""}doc_fields" %>
+    <%= v.text_field :card_number, :placeholder => l10n("insured.consumer_roles.docs_shared.card_number"),
+                   :pattern => "[a-zA-Z0-9]{13}",
+                   :class => "#{FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required" } doc_fields",
+                   :title => description.gsub("-li-", "") %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: description} %>
+  </div>
+<% else %>
+
 <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
 
   <% description = name == 'I-766' ? l10n("insured.consumer_roles.docs_shared.i_766_card_number_req") : l10n("insured.consumer_roles.docs_shared.card_number_req") %>
@@ -7,3 +19,4 @@
                    :title => description.gsub("-li-", "") %>
   <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: description} %>
 </div>
+<% end %>
