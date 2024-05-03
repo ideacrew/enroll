@@ -2,8 +2,16 @@
 
 require 'rails_helper'
 
-RSpec.describe BenefitSponsors::Inboxes::MessagesController, type: :controller, dbclean: :after_each do
-  routes {BenefitSponsors::Engine.routes}
+RSpec.describe BenefitSponsors::Inboxes::MessagesController, type: :controller do
+  routes { BenefitSponsors::Engine.routes }
+
+  before :all do
+    DatabaseCleaner.clean
+  end
+
+  after :all do
+    DatabaseCleaner.clean
+  end
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -85,20 +93,16 @@ RSpec.describe BenefitSponsors::Inboxes::MessagesController, type: :controller, 
     broker_staff
   end
 
-  describe "DELETE #destroy" do
-    before do
-      sign_in logged_in_user
-      delete :destroy, params: { id: broker_role.person.id, message_id: message.id, format: :js }
-    end
-
+  describe "GET #show" do
     context 'broker logged in' do
       let(:logged_in_user) { broker_user }
 
       it 'succesfully deletes the message' do
-        expect(message.reload.folder).to eq(Message::FOLDER_TYPES[:deleted])
+        sign_in logged_in_user
+        get :show, params: { id: broker_role.person.id, message_id: message.id }
+        expect(message.reload.folder).to eq(Message::FOLDER_TYPES[:inbox])
         expect(response).to have_http_status(:success)
-        expect(response).to render_template(:destroy)
-        expect(flash[:notice]).to eq('Successfully deleted inbox message.')
+        expect(response).to render_template(:show)
       end
     end
 
@@ -106,10 +110,11 @@ RSpec.describe BenefitSponsors::Inboxes::MessagesController, type: :controller, 
       let(:logged_in_user) { broker_staff_user }
 
       it 'succesfully deletes the message' do
-        expect(message.reload.folder).to eq(Message::FOLDER_TYPES[:deleted])
+        sign_in logged_in_user
+        get :show, params: { id: broker_role.person.id, message_id: message.id }
+        expect(message.reload.folder).to eq(Message::FOLDER_TYPES[:inbox])
         expect(response).to have_http_status(:success)
-        expect(response).to render_template(:destroy)
-        expect(flash[:notice]).to eq('Successfully deleted inbox message.')
+        expect(response).to render_template(:show)
       end
     end
 
@@ -118,8 +123,10 @@ RSpec.describe BenefitSponsors::Inboxes::MessagesController, type: :controller, 
       let(:logged_in_user) { broker_staff_user }
 
       it 'denies access to inactive broker staff' do
+        sign_in logged_in_user
+        get :show, params: { id: broker_role.person.id, message_id: message.id, format: :js }
         expect(response.status).to eq(403)
-        expect(flash[:error]).to eq('Access not allowed for destroy_inbox_message?, (Pundit policy)')
+        expect(flash[:error]).to eq('Access not allowed for show_inbox_message?, (Pundit policy)')
       end
     end
 
@@ -127,10 +134,11 @@ RSpec.describe BenefitSponsors::Inboxes::MessagesController, type: :controller, 
       let(:logged_in_user) { hbx_admin_user }
 
       it 'succesfully deletes the message' do
-        expect(message.reload.folder).to eq(Message::FOLDER_TYPES[:deleted])
+        sign_in logged_in_user
+        get :show, params: { id: broker_role.person.id, message_id: message.id }
+        expect(message.reload.folder).to eq(Message::FOLDER_TYPES[:inbox])
         expect(response).to have_http_status(:success)
-        expect(response).to render_template(:destroy)
-        expect(flash[:notice]).to eq('Successfully deleted inbox message.')
+        expect(response).to render_template(:show)
       end
     end
 
@@ -139,8 +147,10 @@ RSpec.describe BenefitSponsors::Inboxes::MessagesController, type: :controller, 
       let(:logged_in_user) { hbx_admin_user }
 
       it 'denies access to inactive broker staff' do
+        sign_in logged_in_user
+        get :show, params: { id: broker_role.person.id, message_id: message.id, format: :js }
         expect(response.status).to eq(403)
-        expect(flash[:error]).to eq('Access not allowed for destroy_inbox_message?, (Pundit policy)')
+        expect(flash[:error]).to eq('Access not allowed for show_inbox_message?, (Pundit policy)')
       end
     end
   end
