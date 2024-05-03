@@ -1,4 +1,6 @@
 class Api::V1::ApiBaseController < ActionController::Base
+  protect_from_forgery with: :exception, prepend: true
+
   respond_to :json
 
   include Pundit

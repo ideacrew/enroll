@@ -428,4 +428,4 @@ DEPENDENCIES
   simplecov-cobertura (~> 2.1.0)
 
 BUNDLED WITH
-   2.3.24
+   2.4.22
