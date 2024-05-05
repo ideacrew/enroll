@@ -43,6 +43,7 @@ module Operations
       end
 
       def evidence_states_for(values)
+
         evidence_items_for(values)
           .collect do |evidence_item|
             attrs = values.slice(:subject, :effective_date, :eligibility_item).merge(evidence_item: evidence_item)

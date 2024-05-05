@@ -36,7 +36,6 @@ module Operations
         errors << 'subject ref missing' unless params[:subjects]
         errors << 'effective_date ref missing' unless params[:effective_date]
         errors << 'family ref missing' unless params[:family]
-        puts "BuildDetermination validate errors.empty? #{errors.empty?}"
         errors.empty? ? Success(params) : Failure(errors)
       end
 
@@ -69,7 +68,6 @@ module Operations
               eligibility_states:
                 build_eligibility_states(subject, eligibility_items, values)
             }
-            puts "subject_params #{subject_params}"
             Hash[
               subject.uri,
               subject_params
@@ -91,8 +89,6 @@ module Operations
           subjects: subjects,
           grants: grants
         }
-
-        puts "BuildDetermination build_determination #{determination}"
 
         Success(
           determination.merge(
@@ -186,25 +182,14 @@ module Operations
       end
 
       def build_eligibility_states(subject, eligibility_items, values)
-        eligibility_items
-          .collect do |eligibility_item|
-            unless values[:eligibility_items_requested].blank? ||
-                   values[:eligibility_items_requested]&.key?(
-                     eligibility_item.key.to_sym
-                   )
+        eligibility_items.collect do |eligibility_item|
+            unless values[:eligibility_items_requested].blank? || values[:eligibility_items_requested]&.key?(eligibility_item.key.to_sym)
               next
             end
 
             evidence_item_keys = []
-            if values[:eligibility_items_requested]&.key?(
-              eligibility_item.key.to_sym
-            )
-              evidence_item_keys =
-                values[:eligibility_items_requested][
-                  eligibility_item.key.to_sym
-                ][
-                  :evidence_items
-                ]
+            if values[:eligibility_items_requested]&.key?(eligibility_item.key.to_sym)
+              evidence_item_keys = values[:eligibility_items_requested][eligibility_item.key.to_sym][:evidence_items]
             end
 
             eligibility_state =

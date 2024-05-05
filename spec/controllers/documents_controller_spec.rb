@@ -230,37 +230,14 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
       let(:household) { FactoryBot.create(:household, family: family) }
 
-      let!(:organization) do
-        FactoryBot.create(:organization, legal_name: 'CareFirst', dba: 'care')
-      end
-      let!(:carrier_profile1) do
-        FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
-      end
-      let!(:product1) do
-        FactoryBot.create(
-          :benefit_markets_products_health_products_health_product,
-          benefit_market_kind: :aca_individual,
-          kind: :health,
-          csr_variant_id: '01'
-        )
-      end
-
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
       let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month) }
       let(:household) { FactoryBot.create(:household, family: family) }
-      let(:application) do
-        FactoryBot.create(
-          :financial_assistance_application,
-          family_id: family.id,
-          aasm_state: 'determined',
-          effective_date: DateTime.now.beginning_of_month
-        )
-      end
       let(:hbx_enrollment) {
         FactoryBot.create(:hbx_enrollment,
                           hbx_enrollment_members: [hbx_enrollment_member],
                           family: family,
-                          product: product1,
+                          product: product,
                           is_any_enrollment_member_outstanding: true,
                           household: family.active_household,
                           coverage_kind: "health",
@@ -276,8 +253,8 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         consumer_person.consumer_role.vlp_documents = []
         consumer_person.save!
         @immigration_type = consumer_person.verification_types.where(type_name: 'Immigration status').first
-
-        @immigration_type.update_attributes!(inactive: false, validation_status: 'outstanding')
+        @immigration_type.pending_type
+        @immigration_type.update_attributes!(inactive: false)
         [
           :financial_assistance,
           :'gid://enroll_app/Family',
@@ -294,7 +271,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id }
         consumer_person.reload
         family_due_date = family.eligibility_determination&.outstanding_verification_earliest_due_date
-        puts "eligibility_determination #{consumer_person.primary_family.eligibility_determination.inspect}"
+        # puts "eligibility_determination #{consumer_person.primary_family.eligibility_determination.inspect}"
         expect(family_due_date&.strftime("%Y-%m-%d")).to match(TimeKeeper.date_of_record.strftime("%Y-%m-%d"))
       end
     end

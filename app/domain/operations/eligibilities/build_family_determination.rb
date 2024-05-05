@@ -38,7 +38,6 @@ module Operations
 
       def build_determination(values)
         subjects = values[:family].family_members.map(&:to_global_id)
-
         family = values[:family]
         primary_person = family&.primary_applicant&.person
         is_any_member_applying_for_coverage = family.family_members.any?(&:is_applying_coverage)
