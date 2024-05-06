@@ -6,7 +6,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:person) {FactoryBot.create(:person)}
+  let(:person) { family.primary_applicant.person}
   let(:user) { FactoryBot.create(:user, person: person) }
   let(:family){ FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
   let(:household){ family.active_household }
@@ -186,7 +186,7 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
     it "should fail when bad data" do
       sign_in(user)
       get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: '999', active_year: "2015", market_kind: "shop", coverage_kind: "health"}
-      expect(response).to have_http_status(500)
+      expect(response).to have_http_status(422)
     end
   end
 
