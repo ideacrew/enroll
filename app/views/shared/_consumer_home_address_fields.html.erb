@@ -8,13 +8,13 @@
       <% div_class = kind+"-div" %>
       <% if kind != 'home' && address.object.new_record? %>
         <% if f.object.addresses[1].present? %>
-          <% style="display:block;" %>
+          <% display_class="d-block" %>
         <% else %>
-          <% style="display:none;" %>
+          <% display_class="d-none" %>
         <% end %>
       <% end %>
       <% required = kind =='home' ? "address_required" : '' %>
-      <div style="<%= style %>" class="address-row <%= div_class %>">
+      <div class="address-row <%= div_class %> <%= display_class %>">
         <% if kind == 'home' %>
           <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_home_address_info")%>
         <% elsif kind == 'mailing' %>
@@ -22,25 +22,25 @@
           <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_mailing_address_info")%>
         <% end %>
       </div>
-      <div style="<%= style %>" class="address-row <%= div_class %>">
+      <div class="address-row <%= div_class %> <%= display_class %>">
         <div class="d-flex mb-md-4 row col-sm">
           <div class="col-sm col-md-6 p-0">
             <div class="col-md-12 pl-0">
               <span><%= address.hidden_field :kind, value: address.object.kind %>
               <%= address.hidden_field :_destroy %></span>
 
-              <%= address.label :address_1 %>
-              <%= address.text_field :address_1, placeholder: "#{kind.titlecase} ADDRESS LINE 1 (NUMBER, STREET, QUADRANT) #{'*' if required.present?}", class: "#{required} full-width", required: required.present? %>
+              <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}" %>
+              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} full-width", required: required.present? %>
             </div>
           </div>
           <div class="mr col-sm col-md-6 p-0">
             <div class="col-md-12 pr-0">
-              <%= address.label :address_2 %>
-              <%= address.text_field :address_2, placeholder: "#{kind.upcase} ADDRESS LINE 2 (APT, UNIT, ETC.)", class: "full-width" %>
+              <%= address.label :address_2, "#{l10n("address_2")} #{l10n("address_2_desc")}" %>
+              <%= address.text_field :address_2, placeholder: l10n("address_2"), class: "full-width" %>
             </div>
           </div>
         </div>
-        <div style="<%= style %>" class="address-row <%= div_class %>" data-controller="zip-check">
+        <div class="address-row <%= div_class %> <%= display_class %>" data-controller="zip-check">
           <div class="d-flex mb-md-4 row col-sm">
             <div class="d-flex col-sm col-md-6 pl-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
@@ -54,8 +54,8 @@
             </div>
             <div class="d-flex col-sm col-md-6 pr-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
-                <%= address.label :zip %>
-                <%= address.text_field :zip, class: "full-width", required: true, placeholder: 'ZIP', data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
+                <%= address.label :zip, l10n("zip_code") %>
+                <%= address.text_field :zip, class: "full-width", required: true, placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
               </div>
               <% if EnrollRegistry.feature_enabled?(:display_county) %>
                 <div id="county-select-<%= f.index %>" class="col-sm col-md-6 pr-0">
@@ -73,9 +73,9 @@
         </div>
         <% if kind == 'home' %>
           <% if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
-            <% style="display:none;" %>
+            <% display_class="d-none" %>
           <% end %>
-          <div style="<%= style %>" class="address-row show no-dc-address-reasons">
+          <div class="address-row show no-dc-address-reasons <%= display_class %>">
             <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
               <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
                 <div class="address_checkbox">
