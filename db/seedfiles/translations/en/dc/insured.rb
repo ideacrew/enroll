@@ -449,6 +449,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.dependent_lives_with_primary_subscriber' => "This person <strong>lives with primary subscriber</strong>",
   :'en.confirm_member' => "Confirm Member",
   :'en.household_info' => "Household Info",
+  :'en.plan_selection' => "Plan Selection",
+  :'en.review' => "Review",
   :'en.family_info' => "Family Info",
   :'en.account_setup' => "Account Setup",
   :'en.family_information' => "Family Information",

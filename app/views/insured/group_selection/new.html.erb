@@ -1,29 +1,20 @@
 <% if @bs4 %>
   <%# Left Nav %>
-  <%= render partial: 'shared/sep_progress', locals: {step: 3} %>
-
-  <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0 hidden">
-    <% if @change_plan.blank? && @market_kind == "individual" %>
-      <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
-        <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
-      <% else %>
-        <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
-      <% end %>
-    <% elsif @change_plan.blank? && can_shop_resident?(@person) %>
-      <%= render partial: 'shared/coverall_progress', locals: {step: '4'} %>
-    <% elsif @change_plan.blank? %>
-      <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
-    <% elsif @change_plan == "change_by_qle" %>
-      <%= render partial: 'shared/qle_progress', locals: {step: '1', show_button:false} %>
-    <% elsif @change_plan == "change_plan" %>
-      <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
-        <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
-      <% else %>
-        <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>
-      <% end %>
+  <% if @change_plan.blank? && @market_kind == "individual" %>
+    <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
+      <%= render partial: 'shared/plan_shopping_progress', locals: {step: '3', option_hash: individual_shop_nav_options } %>
+    <% else %>
+      <%= render partial: 'shared/plan_shopping_progress', locals: {step: '4', option_hash: sep_nav_options } %>
     <% end %>
-  </div>
-
+  <% elsif @change_plan == "change_by_qle" %>
+    <%= render partial: 'shared/plan_shopping_progress', locals: {step: '1', option_hash: qle_nav_options } %>
+  <% elsif @change_plan == "change_plan" %>
+    <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
+      <%= render partial: 'shared/plan_shopping_progress', locals: {step: '2', option_hash: shop_for_plans_nav_options } %>
+    <% else %>
+      <%= render partial: 'shared/plan_shopping_progress', locals: {step: '1', option_hash: sep_shop_for_plans_nav_options } %>
+    <% end %>
+  <% end %>
 
   <%# Main Content (right) %>
   <% effective_date_for_display = @effective_on_date || @new_effective_on %>
@@ -332,9 +323,6 @@
                 <%= link_to l10n('select_plan_to_terminate'), terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: ('btn btn-primary btn-lg' + pundit_class(Family, :updateable?)) %>
               <% end %>
             <% end %>
-          <% else %>
-            <!--<h3>Select a plan</h3>-->
-            <!--<p class="text-justify"><%#= t('welcome.employee.select_plan') %></p>-->
           <% end %>
           <br/>
           <br/>
@@ -345,19 +333,19 @@
         <div class="col-xs-3 right-section pull-right">
           <% if @change_plan.blank? && @market_kind == "individual" %>
             <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
-              <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
+              <%= render partial: 'shared/individual_progress', locals: {step: '3'} %>
             <% else %>
-              <%= render  partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
+              <%= render partial: 'shared/sep_progress', locals: {step: '4', continue_disabled: false, button_continue: true } %>
             <% end %>
           <% elsif @change_plan.blank? && can_shop_resident?(@person) %>
             <%= render partial: 'shared/coverall_progress', locals: {step: '4'} %>
           <% elsif @change_plan.blank? %>
-            <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
+            <%= render partial: 'shared/signup_progress', locals: {step: '4'} %>
           <% elsif @change_plan == "change_by_qle" %>
             <%= render partial: 'shared/qle_progress', locals: {step: '1',show_button:false} %>
           <% elsif @change_plan == "change_plan" %>
             <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
-              <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
+              <%= render partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>
             <% else %>
               <%= render partial: 'shared/shop_for_plans_progress', locals: {step: '1', show_waive: true} %>
             <% end %>
