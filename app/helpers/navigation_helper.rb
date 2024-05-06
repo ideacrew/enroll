@@ -118,7 +118,18 @@ module NavigationHelper
     ]
   end
 
-  def plan_shopping_nav_options
+  def individual_shop_nav_options
+    [
+      {step: 1, label: l10n('personal_info')},
+      {step: 2, label: l10n('insured.consumer_roles.upload_ridp_documents.header')},
+      {step: 3, label: l10n('household_info')},
+      {step: 4, label: l10n('choose_plan')},
+      {step: 5, label: l10n('confirm_selection')},
+      {step: 6, label: l10n('complete')}
+    ]
+  end
+
+  def sep_nav_options
     [
       {step: 1, label: l10n('personal_information')},
       {step: 2, label: l10n('verify_identity')},
@@ -128,4 +139,31 @@ module NavigationHelper
       {step: 6, label: l10n('complete')}
     ]
   end
+
+  def qle_nav_options
+    [
+      {step: 1, label: l10n('household_info')},
+      {step: 2, label: l10n('plan_selection')},
+      {step: 3, label: l10n('review')},
+      {step: 4, label: l10n('complete')}
+    ]
+  end
+
+  def shop_for_plans_nav_options
+    [
+      {step: 1, label: l10n('plan_selection')},
+      {step: 2, label: l10n('review')},
+      {step: 3, label: l10n('complete')}
+    ]
+  end
+
+  def sep_shop_for_plans_nav_options
+    [
+      {step: 1, label: l10n('insured.families.special_enrollment_period')},
+      {step: 2, label: l10n('plan_selection')},
+      {step: 3, label: l10n('review')},
+      {step: 4, label: l10n('complete')}
+    ]
+  end
+
 end
