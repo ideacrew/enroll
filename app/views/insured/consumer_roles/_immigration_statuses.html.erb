@@ -1,12 +1,12 @@
 <% if @bs4 %>
-  <fieldset id="immigration_doc_statuses" class="mt-4 mb-4">
+  <fieldset id="immigration_doc_statuses" class="mt-4">
     <legend><%= l10n("insured.consumer_roles.docs_shared.other_status_question") %></legend>
     <div>
-      <% ::ConsumerRole::IMMIGRATION_DOCUMENT_STATUSES.each do |status| %>
+      <% ::ConsumerRole::IMMIGRATION_DOCUMENT_STATUSES.each_with_index do |status, index| %>
         <label for="<%= status.gsub(/[^\w\s_-]+/, '').gsub(/\s+/, '_') %>" class="mb-3">
           <%= c.check_box :immigration_doc_statuses, { multiple: true, id: status.gsub(/[^\w\s_-]+/, '').gsub(/\s+/, '_') }, status, false %>
           <span class="weight-n"><%= status %></span>
-          <% if status == 'None of these' %><small class="muted-text"><%= l10n("insured.consumer_roles.docs_shared.none_of_above_note") %></small><% end %>
+          <% if index == ::ConsumerRole::IMMIGRATION_DOCUMENT_STATUSES.length - 1 %><small class="muted-text"><%= l10n("insured.consumer_roles.docs_shared.none_of_above_note") %></small><% end %>
         </label>
       <% end %>
     </div>
