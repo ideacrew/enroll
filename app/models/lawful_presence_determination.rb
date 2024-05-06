@@ -83,8 +83,8 @@ class LawfulPresenceDetermination
       ssa_verification_type = ivl_role.verification_types.ssn_type.first
 
       if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
-        ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.ivl_role.person.primary_family, effective_date: TimeKeeper.date_of_record)
         process_ssa_request_failure(result, ssa_verification_type)
+        ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.ivl_role.person.primary_family, effective_date: TimeKeeper.date_of_record)
       else
         ssa_verification_type&.pending_type
       end

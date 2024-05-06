@@ -12,7 +12,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
   #associated consumer role
-  let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,) }
+  let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let(:consumer_user) { FactoryBot.create(:user, person: consumer_person) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
   let!(:consumer_role) do
@@ -184,9 +184,6 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
           @immigration_type.reload
           expect(@immigration_type.validation_status).to eq 'negative_response_received'
           error_message = @immigration_type.type_history_elements.last.update_reason
-          family_due_date = consumer_person.primary_family.eligibility_determination&.outstanding_verification_earliest_due_date
-          puts "eligibility_determination #{consumer_person.primary_family.eligibility_determination.inspect}"
-          # expect(family_due_date.strftime("%Y-%m-%d")).to match(TimeKeeper.date_of_record.strftime("%Y-%m-%d"))
           expect(error_message).to match(/Failed due to VLP Document not found/)
         end
       end
@@ -233,7 +230,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
       let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month) }
       let(:household) { FactoryBot.create(:household, family: family) }
-      let(:hbx_enrollment) {
+      let(:hbx_enrollment) do
         FactoryBot.create(:hbx_enrollment,
                           hbx_enrollment_members: [hbx_enrollment_member],
                           family: family,
@@ -246,9 +243,22 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
                           kind: "individual",
                           submitted_at: TimeKeeper.date_of_record,
                           aasm_state: 'coverage_selected')
-      }
+      end
 
       before do
+        hbx_enrollment
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:set_due_date_upon_response_from_hub).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:notify_address_changed).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
         consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
         consumer_person.consumer_role.vlp_documents = []
         consumer_person.save!
@@ -270,9 +280,10 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       it 'change due date on family level' do
         post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id }
         consumer_person.reload
+        @immigration_type.reload
+        family.reload
         family_due_date = family.eligibility_determination&.outstanding_verification_earliest_due_date
-        # puts "eligibility_determination #{consumer_person.primary_family.eligibility_determination.inspect}"
-        expect(family_due_date&.strftime("%Y-%m-%d")).to match(TimeKeeper.date_of_record.strftime("%Y-%m-%d"))
+        expect(family_due_date).to match(@immigration_type.due_date)
       end
     end
 
