@@ -10,6 +10,7 @@ class InboxesController < ApplicationController
   def new
     @new_message = @inbox_provider.inbox.messages.build
     @element_to_replace_id = params[:family_actions_id]
+    respond_to :html, :js
   end
 
   def create
@@ -43,6 +44,8 @@ class InboxesController < ApplicationController
     @message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])
     flash[:notice] = "Successfully deleted inbox message."
     @inbox_url = params[:url] if params[:url].present?
+
+    respond_to :js
   end
 
   private

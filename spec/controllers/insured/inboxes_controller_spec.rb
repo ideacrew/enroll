@@ -75,9 +75,9 @@ RSpec.describe Insured::InboxesController, :type => :controller do
       end
 
       context 'GET new' do
-        it 'html request will not render :new' do
+        it 'html will render :new' do
           get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }
-          expect(response).to have_http_status(:not_acceptable)
+          expect(response).to have_http_status(:success)
         end
 
         it 'json request will not render :new' do
