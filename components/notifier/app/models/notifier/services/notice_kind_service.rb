@@ -14,7 +14,9 @@ class Notifier::Services::NoticeKindService
   end
 
   def builder=(builder_str)
-    @model_builder = builder_str.constantize.new
+    builder_str_value = builder_str.to_s
+    raise Notifier::MergeDataModels::InvalidBuilderError, builder_str unless Notifier::MergeDataModels::BUILDER_STRING_KINDS.include?(builder_str_value)
+    @model_builder = Notifier::MergeDataModels::BUILDER_STRING_MAPPING[builder_str_value].new
   end
 
   def service
