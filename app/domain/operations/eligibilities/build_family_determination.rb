@@ -33,11 +33,13 @@ module Operations
         errors = []
         errors << 'family missing' unless params[:family]
         errors << 'effective date missing' unless params[:effective_date]
+
         errors.empty? ? Success(params) : Failure(errors)
       end
 
       def build_determination(values)
         subjects = values[:family].family_members.map(&:to_global_id)
+
         family = values[:family]
         primary_person = family&.primary_applicant&.person
         is_any_member_applying_for_coverage = family.family_members.any?(&:is_applying_coverage)
@@ -55,6 +57,7 @@ module Operations
         determination = ::Eligibilities::Determination.new(model_attributes)
         family.eligibility_determination = determination
         family.save
+
         Success(determination)
       end
 
