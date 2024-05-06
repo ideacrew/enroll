@@ -69,7 +69,11 @@ module BenefitSponsors
       end
 
       def sponsor_catalog_decorator_class
-        "BenefitSponsors::BenefitApplications::BenefitSponsorHealthCatalogDecorator".gsub("Health", kind.humanize).constantize
+        if kind.humanize == 'Dental'
+          BenefitSponsors::BenefitApplications::BenefitSponsorDentalCatalogDecorator
+        else
+          BenefitSponsors::BenefitApplications::BenefitSponsorHealthCatalogDecorator
+        end
       end
 
       def find_sponsored_benefit(sponsored_benefit_id)
