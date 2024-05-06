@@ -5,6 +5,7 @@ Please check if your PR fulfills the following requirements
 - [ ] Tests for the changes have been added (for bugfixes/features), they use let helpers and before blocks
 - [ ] For all UI changes, there is cucumber coverage
 - [ ] Any endpoint touched in the PR has an appropriate Pundit policy. For open endpoints, reasoning is documented in PR and code
+- [ ] Any endpoint modified in the PR only responds to the expected MIME types.
 - [ ] For all scripts or rake tasks, how to run it is documented on both the PR and in the code
 - [ ] There are no inline styles added
 - [ ] There are no inline javascript added
