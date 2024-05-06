@@ -183,11 +183,11 @@ module Operations
 
       def build_eligibility_states(subject, eligibility_items, values)
         eligibility_items
-         .collect do |eligibility_item|
+          .collect do |eligibility_item|
             unless values[:eligibility_items_requested].blank? ||
-                  values[:eligibility_items_requested]&.key?(
-                    eligibility_item.key.to_sym
-                 )
+                    values[:eligibility_items_requested]&.key?(
+                      eligibility_item.key.to_sym
+                  )
               next
             end
 
