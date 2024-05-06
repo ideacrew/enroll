@@ -9,6 +9,13 @@ module BenefitSponsors
       false
     end
 
+    # Determines whether the inbox message should be shown.
+    #
+    # @return [Boolean] `true` if the inbox message should be shown, `false` otherwise.
+    def show_inbox_message?
+      destroy_inbox_message?
+    end
+
     # Determines if the current user has permission to destroy an inbox message.
     # The user can destroy an inbox message if they are the person associated with the record,
     # an admin in the shop market, or a broker agency staff member associated with the broker agency of the record.

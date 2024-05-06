@@ -14,34 +14,37 @@ module Insured
       if result.success?
         redirect_to wait_for_primary_response_insured_fdsh_ridp_verifications_path
       else
-        redirect_to :action => "service_unavailable"
+        respond_to do |format|
+          format.html { redirect_to :action => "service_unavailable" }
+        end
       end
     end
 
     def wait_for_primary_response
       authorize @person, :complete_ridp?
+      respond_to :html
     end
 
     def wait_for_secondary_response
       authorize @person, :complete_ridp?
+      respond_to :html
     end
 
     def primary_response
       authorize @person, :complete_ridp?
       response = find_response('primary')
+
       if response.present?
         payload = response.serializable_hash.deep_symbolize_keys[:ridp_eligibility][:event]
         result = Operations::Fdsh::Ridp::PrimaryResponseToInteractiveVerification.new.call(payload)
-        respond_to do |format|
-          format.html do
-            if result.success?
-              @interactive_verification = result.value!
-              render :primary_response
-            else
-              @step = ["RF1", "RF2"].include?(final_secision_code(payload)) ? 'questions' : 'start'
-              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload, 'primary_response') || session_identification_id(payload)
-            end
+        if result.success?
+          @interactive_verification = result.value!
+          respond_to do |format|
+            format.html { render :primary_response }
           end
+        else
+          @step = ["RF1", "RF2"].include?(final_secision_code(payload)) ? 'questions' : 'start'
+          redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload, 'primary_response') || session_identification_id(payload)
         end
       else
         redirect_to :action => "service_unavailable"
@@ -55,16 +58,12 @@ module Insured
         response_hash = response.serializable_hash.deep_symbolize_keys
         status = response_hash.dig(:ridp_eligibility, :event, :attestations, :ridp_attestation, :status)
         payload = response_hash.dig(:ridp_eligibility, :event)
-        respond_to do |format|
-          format.html do
-            if status == 'success'
-              response_metadata = payload.dig(:attestations, :ridp_attestation, :evidences, 0, :secondary_response, :Response)
-              process_successful_interactive_verification(response_metadata)
-            else
-              @step = 'questions'
-              redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload, 'secondary_response') || session_identification_id(payload)
-            end
-          end
+        if status == 'success'
+          response_metadata = payload.dig(:attestations, :ridp_attestation, :evidences, 0, :secondary_response, :Response)
+          process_successful_interactive_verification(response_metadata)
+        else
+          @step = 'questions'
+          redirect_to :action => "failed_validation", :step => @step, :verification_transaction_id => transaction_id(payload, 'secondary_response') || session_identification_id(payload)
         end
       else
         redirect_to :action => "service_unavailable"
@@ -77,19 +76,17 @@ module Insured
         params.require(:interactive_verification).permit(:session_id, :transaction_id, questions_attributes: {}).to_h
       )
 
-      respond_to do |format|
-        format.html do
-          if @interactive_verification.valid?
-            result = Operations::Fdsh::Ridp::RequestSecondaryDetermination.new.call(@person.primary_family, @interactive_verification)
+      if @interactive_verification.valid?
+        result = Operations::Fdsh::Ridp::RequestSecondaryDetermination.new.call(@person.primary_family, @interactive_verification)
 
-            if result.success?
-              redirect_to wait_for_secondary_response_insured_fdsh_ridp_verifications_path
-            else
-              redirect_to :action => "service_unavailable"
-            end
-          else
-            render "new"
-          end
+        if result.success?
+          redirect_to wait_for_secondary_response_insured_fdsh_ridp_verifications_path
+        else
+          redirect_to :action => "service_unavailable"
+        end
+      else
+        respond_to do |format|
+          format.html { render "new" }
         end
       end
     end
@@ -97,19 +94,26 @@ module Insured
     def check_primary_response_received
       authorize @person, :complete_ridp?
       result = received_response('primary')
-      render :plain => result.success?
+      respond_to do |format|
+        format.js { render :plain => result.success? }
+      end
     end
 
     def check_secondary_response_received
       authorize @person, :complete_ridp?
       result = received_response('secondary')
-      render :plain => result.success?
+      respond_to do |format|
+        format.js { render :plain => result.success? }
+      end
     end
 
     def service_unavailable
       authorize @person, :complete_ridp?
       @person.consumer_role.move_identity_documents_to_outstanding
-      render "service_unavailable"
+
+      respond_to do |format|
+        format.html { render "service_unavailable" }
+      end
     end
 
     def failed_validation
@@ -119,7 +123,10 @@ module Insured
       @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
       @person.consumer_role.move_identity_documents_to_outstanding
-      render "failed_validation"
+
+      respond_to do |format|
+        format.html { render "failed_validation" }
+      end
     end
 
     private
@@ -149,7 +156,6 @@ module Insured
     def process_successful_interactive_verification(response)
       consumer_role = @person.consumer_role
       consumer_user = @person.user
-
       if consumer_user
         consumer_user.identity_final_decision_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
         consumer_user.identity_response_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
