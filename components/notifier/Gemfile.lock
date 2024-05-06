@@ -40,7 +40,6 @@ PATH
       non-stupid-digest-assets
       pundit (~> 2.0)
       rails (~> 6.1.7.6)
-      redcarpet (~> 3.4.0)
       roo (~> 2.7.0)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
@@ -319,7 +318,6 @@ GEM
       thor (~> 1.0)
     rake (13.2.1)
     rbtree (0.4.6)
-    redcarpet (3.4.0)
     regexp_parser (2.9.0)
     rexml (3.2.6)
     roo (2.7.1)

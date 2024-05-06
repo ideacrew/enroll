@@ -46,10 +46,16 @@ class Products::QhpController < ApplicationController
     end
   end
 
-
   def summary
     @standard_component_ids = [] << @new_params[:standard_component_id]
-    @active_year = params[:active_year]
+    active_year_result = Validators::ControllerParameters::ProductsQhpParameters::SummaryActiveYearContract.new.call(params.permit(:active_year).to_h)
+    if active_year_result.success?
+      @active_year = active_year_result.values[:active_year]
+    else
+      head 422
+      return
+    end
+
     @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
@@ -79,11 +85,21 @@ class Products::QhpController < ApplicationController
 
   private
 
-
   def set_kind_for_market_and_coverage
-    @new_params = params.permit(:standard_component_id, :hbx_enrollment_id)
-    hbx_enrollment_id = @new_params[:hbx_enrollment_id] || params[:id]
+    @new_params = params.permit(:standard_component_id, :hbx_enrollment_id, :active_year)
+    hbx_enrollment_id_params = {
+      hbx_enrollment_id: @new_params[:hbx_enrollment_id] || params[:id]
+    }
+    hbx_enrollment_id_result = Validators::ControllerParameters::ProductsQhpParameters::SummaryHbxEnrollmentContract.new.call(hbx_enrollment_id_params)
+    hbx_enrollment_id = nil
+    if hbx_enrollment_id_result.success?
+      hbx_enrollment_id = hbx_enrollment_id_result.values[:hbx_enrollment_id]
+    else
+      head 422
+      return
+    end
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id) unless hbx_enrollment_id.nil?
+    authorize @hbx_enrollment if @hbx_enrollment
     if @hbx_enrollment.blank?
       error_message = {
         :error => {
