@@ -39,6 +39,14 @@ class HbxEnrollmentPolicy < ApplicationPolicy
     create?
   end
 
+  def summary?
+    show?
+  end
+
+  def comparison?
+    show?
+  end
+
   # Determines if the current user has permission to set elected APTC (Advanced Premium Tax Credit).
   # The user can set elected APTC if they are a primary family member,
   # an admin, an active associated broker staff, or an active associated broker in the individual market.
