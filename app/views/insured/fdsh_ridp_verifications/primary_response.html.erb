@@ -30,6 +30,7 @@
 <% else %>
   <%= content_for :horizontal_status do %>
     <%= render partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
+  <% end %>
   <div class="container">
     <div class="row">
       <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
