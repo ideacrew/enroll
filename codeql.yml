@@ -3,12 +3,14 @@ paths:
   - config
   - lib
   - components
+  - project_gems
 paths-ignore:
   - hugo
   - node_modules
   - "**/*.yml"
   - "**/*.yaml"
   - codeql
+  - project_gems/mongoid_userstamp-0.4.0/Gemfile
 disable-default-queries: true
 packs:
   ruby:
