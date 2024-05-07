@@ -24,7 +24,6 @@ DEVISE_TRANSLATIONS = {
   :'en.devise.requirements' => "Account Requirements:",
   :'en.devise.sign_in' => "Sign In",
   :'en.devise.requirement_bullet1' => "Email must be in the following format example domain.com",
-  :'en.devise.requirement_bullet2' => "Passwords must match",
   :'en.devise.requirement_bullet3' => "Cannot contain the email/username",
   :'en.devise.requirement_bullet4' => "Must contain at least 8 characters",
   :'en.devise.requirement_bullet5' => "Must contain at least one uppercase letter",
