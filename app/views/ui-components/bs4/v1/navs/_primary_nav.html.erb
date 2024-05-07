@@ -4,7 +4,7 @@
       <ul id="primary-nav-bar" class="navbar-nav ho" role="tablist">
         <li class="nav-item pl-0" role="presentation">
           <a>
-            <%= link_to(main_app.exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" ) do %>
+            <%= sanitize(link_to(main_app.exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" )) do %>
               <i class="fas fa-home fa-lg" aria-hidden="true"></i>
             <% end %>
           </a>
@@ -65,7 +65,7 @@
                 <% if external_application_configured?("admin") && EnrollRegistry.feature_enabled?(:agency_staff) %>
                   <li>
                     <% url = ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff" %>
-                    <%= link_to(url, "aria-expanded" => "true", data: { turbolinks: false, jwt_token: jwt_for_external_application }, id: "agencyStaffLinkToExternal") %>
+                    <%= sanitize(link_to(url, "aria-expanded" => "true", data: { turbolinks: false, jwt_token: jwt_for_external_application }, id: "agencyStaffLinkToExternal")) %>
                   </li>
                 <% end %>
               </ul>
@@ -99,7 +99,7 @@
             </div>
             <% if EnrollRegistry.feature_enabled?(:inbox_tab) %>
               <li class="nav-item pl-1" role="presentation" class="<%= pundit_class HbxProfile, :view_admin_tabs? %>">
-                <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do %>
+                <%= sanitize(link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" )) do %>
                   | Inbox
                   <span class="badge ml-half"><%= @unread_messages %></span>
                 <% end %>
@@ -107,7 +107,7 @@
             <% end %>
             <% if EnrollRegistry.feature_enabled?(:notices_tab) %>
               <li class="nav-item pl-1" role="presentation" class="<%= pundit_class HbxProfile, :view_admin_tabs? %>">
-                <%= link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do %>
+                <%= sanitize(link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" )) do %>
                   | Notices
                 <% end %>
               </li>
