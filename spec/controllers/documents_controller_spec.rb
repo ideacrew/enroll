@@ -190,46 +190,8 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     end
 
     context 'enrolled' do
-      let(:application) do
-        FactoryBot.create(
-          :financial_assistance_application,
-          family_id: family.id,
-          aasm_state: 'determined',
-          effective_date: DateTime.now.beginning_of_month
-        )
-      end
-
-      let!(:applicant1) do
-        FactoryBot.build(
-          :financial_assistance_applicant,
-          :with_work_phone,
-          :with_work_email,
-          :with_home_address,
-          :with_income_evidence,
-          :with_esi_evidence,
-          :with_non_esi_evidence,
-          :with_local_mec_evidence,
-          family_member_id: family.primary_applicant.id,
-          application: application,
-          gender: consumer_person.gender,
-          is_incarcerated: consumer_person.is_incarcerated,
-          ssn: consumer_person.ssn,
-          dob: consumer_person.dob,
-          first_name: consumer_person.first_name,
-          last_name: consumer_person.last_name,
-          is_primary_applicant: true,
-          person_hbx_id: consumer_person.hbx_id,
-          is_applying_coverage: true,
-          citizen_status: 'alien_lawfully_present',
-          indian_tribe_member: false
-        )
-      end
-
-      let(:household) { FactoryBot.create(:household, family: family) }
-
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
       let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month) }
-      let(:household) { FactoryBot.create(:household, family: family) }
       let(:hbx_enrollment) do
         FactoryBot.create(:hbx_enrollment,
                           hbx_enrollment_members: [hbx_enrollment_member],
