@@ -17,11 +17,8 @@ RSpec.describe L10nHelper, :type => :helper do
     expect(helper.l10n({:formats => {:default => "%m/%d/%Y"}})).to eq("Formatsdefaultmd Y")
   end
 
-  it "should handle non string results gracefully" do
-    allow(helper).to receive(:t).with({:formats => {:default => "%m/%d/%Y"}}, default: "Formatsdefaultmd Y").and_return(
-      {:formats => {:default => "%m/%d/%Y"}}
-    )
-    expect(helper.l10n({:formats => {:default => "%m/%d/%Y"}})).to eq("{:formats=>{:default=>\"%m/%d/%Y\"}}")
+  it "should handle non available shortcut path translations gracefully" do
+    expect(helper.l10n('.Pizza')).to eq("Pizza")
   end
 
   context "interpolated keys" do

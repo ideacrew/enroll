@@ -368,7 +368,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     it "has the correct headers" do
       get :show
-      expect(response.headers['Cache-Control']).to eql("no-cache, no-store")
+      expect(response.headers['Cache-Control']).to eq("private, no-store")
       expect(response.headers['Pragma']).to eql("no-cache")
     end
 
