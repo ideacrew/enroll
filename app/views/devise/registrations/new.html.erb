@@ -65,7 +65,7 @@
                 <% else %>
                   <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.registrations.new.sign_in')}</a>" unless Rails.env.production? %>
                 <% end %>
-                <%= f.submit l10n('devise.registrations.new.submit'), id: 'submit-button', class: 'button' %>
+                <%= f.submit l10n('submit'), id: 'submit-button', class: 'button' %>
               </div>
             <% end %>
           </div>
