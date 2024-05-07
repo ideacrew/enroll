@@ -9,7 +9,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:local_data) { {recipient: person} }
 
     before :each do
-      render file: 'notices/shared/header_ivl', locals: local_data
+      render template: 'notices/shared/header_ivl', locals: local_data
     end
 
     context 'for matching text' do

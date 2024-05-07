@@ -8,7 +8,7 @@ describe "insured/families/check_qle_date.js.erb" do
       before :each do
         assign :qualified_date, true
         assign :qle, qle
-        render file: "insured/families/check_qle_date.js.erb"
+        render template: "insured/families/check_qle_date.js.erb"
       end
 
       it "should match effective_on_kinds" do
@@ -22,7 +22,7 @@ describe "insured/families/check_qle_date.js.erb" do
           assign :qualified_date, true
           assign :qle_date, TimeKeeper.date_of_record + 1.month
           assign :effective_on_options, [1, 2]
-          render file: "insured/families/check_qle_date.js.erb"
+          render template: "insured/families/check_qle_date.js.erb"
         end
 
         it "should have qle message" do
@@ -40,7 +40,7 @@ describe "insured/families/check_qle_date.js.erb" do
           assign :qle_date, TimeKeeper.date_of_record + 1.month
           assign :qle, qle
           assign :effective_on_options, TimeKeeper.date_of_record
-          render file: "insured/families/check_qle_date.js.erb"
+          render template: "insured/families/check_qle_date.js.erb"
         end
 
         it "should match effective_on_kinds" do
@@ -54,7 +54,7 @@ describe "insured/families/check_qle_date.js.erb" do
     before :each do
       assign :qualified_date, false
       assign :qle, qle
-      render file: "insured/families/check_qle_date.js.erb"
+      render template: "insured/families/check_qle_date.js.erb"
     end
 
     it "should match error notice" do
@@ -68,7 +68,7 @@ describe "insured/families/check_qle_date.js.erb" do
      assign :qualified_date, false
      assign :future_qualified_date, true
      assign :qle, qle
-     render file: "insured/families/check_qle_date.js.erb"
+     render template: "insured/families/check_qle_date.js.erb"
     end
 
     it "should match error notice " do

@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Exchanges::SeedsController, :type => :controller do
-  include ActionView::Helpers::TranslationHelper
   include L10nHelper
+
   let(:user) { FactoryBot.create(:user, :hbx_staff, :with_hbx_staff_role) }
   let(:hbx_staff_role) { double("hbx_staff_role", permission: hbx_permission)}
   let(:hbx_profile) { double("HbxProfile")}

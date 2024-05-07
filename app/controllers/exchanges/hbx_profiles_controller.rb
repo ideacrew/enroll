@@ -458,7 +458,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = sep_params[:family_actions_id]
     createSep
     respond_to do |format|
-      format.js { render :file => "sep/approval/add_sep_result.js.erb", name: @name }
+      format.js { render "sep/approval/add_sep_result.js.erb", name: @name }
     end
   end
 
@@ -481,7 +481,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @family_id = params_parser.family_id
     params_parser.cancel_enrollments
     respond_to do |format|
-      format.js { render :file => "datatables/cancel_enrollment_result.js.erb"}
+      format.js { render "datatables/cancel_enrollment_result.js.erb"}
     end
   end
 
@@ -505,7 +505,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @family_id = params_parser.family_id
     params_parser.terminate_enrollments
     respond_to do |format|
-      format.js { render :file => "datatables/terminate_enrollment_result.js.erb"}
+      format.js { render "datatables/terminate_enrollment_result.js.erb"}
     end
   end
 
@@ -530,7 +530,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @family_id = params_parser.family_id
     params_parser.drop_enrollment_members
     respond_to do |format|
-      format.js { render :file => "datatables/drop_enrollment_member_result.js.erb"}
+      format.js { render "datatables/drop_enrollment_member_result.js.erb"}
     end
   end
 

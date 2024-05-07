@@ -5,7 +5,7 @@
 
       This confirms that you're enrolled in the <b><%= @plan&.title %></b> plan offered by your employer.<br/><br/>
 
-      Your monthly premium contribution is <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.employee_cost_total %>.</b> Your employer contributes <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.sponsor_contribution_total %></b> towards your monthly premium.</p><br/>
+      Your monthly premium contribution is <b><%= number_to_currency(@member_group.group_enrollment.employee_cost_total) %>.</b> Your employer contributes <b><%= number_to_currency(@member_group.group_enrollment.sponsor_contribution_total) %></b> towards your monthly premium.</p><br/>
 
       Your coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></b>.<br/><br/>
 
@@ -23,7 +23,7 @@
 
       This confirms enrollment in <b><%= @plan&.title %></b> through the Individual & Family marketplace.<br/><br/>
 
-      Your monthly premium payment is <b><%= ActionView::Base.new.number_to_currency(@plan.total_premium.to_f - @enrollment.applied_aptc_amount.to_f) %></b>.</br><br/>
+      Your monthly premium payment is <b><%= number_to_currency(@plan.total_premium.to_f - @enrollment.applied_aptc_amount.to_f) %></b>.</br><br/>
 
       The coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></b>.<br/><br/>
 

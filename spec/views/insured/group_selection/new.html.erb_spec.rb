@@ -346,7 +346,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
     end
 
     # it "should display family members" do
@@ -411,7 +411,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(adapter).to receive(:can_shop_resident?).and_return(false)
       allow(adapter).to receive(:class_for_ineligible_row).and_return("ineligible_dental_row_#{employee_role.id} is_primary")
       # allow(adapter).to receive(:class_for_ineligible_row).with(new_family_member_1, nil, nil).and_return("ineligible_health_row_#{employee_role.id} ineligible_dental_row_#{employee_role.id}")
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
     end
 
     # it "should display family members" do
@@ -465,67 +465,67 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should display title" do
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to match(/What would you like to do/)
     end
 
     it "should show shop for new plan submit" do
       allow(benefit_group).to receive(:plan_option_kind).and_return("metal_level")
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Shop for new plan']")
     end
 
     it "should not show shop for new plan submit when single_plan" do
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
 
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Shop for new plan']", count: 1)
     end
 
     it "when hbx_enrollment not terminated" do
       allow(view).to receive(:show_keep_existing_plan).and_return true
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
       expect(rendered).to have_selector("a", text: "Select Plan to Terminate",  count: 1)
     end
 
     it "when hbx_enrollment not terminated and not shop_for_plans" do
       assign(:shop_for_plans, "shop_for_plans")
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
       expect(rendered).to have_selector("a", text: "Select Plan to Terminate",  count: 1)
     end
 
     it "when hbx_enrollment is terminated" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(false)
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
     end
 
     it "should have back to my account link" do
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("a[href='/families/home']", text: 'Back To My Account')
     end
 
     if dental_market_enabled?
       it "should see dental radio option" do
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#coverage_kind_dental')
       end
     end
 
     it "should see health radio option" do
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector('#coverage_kind_health')
     end
 
     it "shouldn't see marketplace options" do
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to_not have_selector('h3', text: 'Marketplace')
     end
 
     it "should display effective on date" do
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to match(/EFFECTIVE DATE/i)
     end
   end
@@ -564,7 +564,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should have the waive confirmation modal" do
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(view).to render_template(:partial => "ui-components/v1/modals/_waive_confirmation", :count => 1)
     end
   end
@@ -604,7 +604,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "when present" do
       assign :market_kind, "shop"
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[type='hidden']", visible: false)
       expect(rendered).to have_selector("input[value='shop']", visible: false)
     end
@@ -612,7 +612,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     context "when blank" do
       before :each do
         assign :market_kind, ""
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
       end
 
       # it "should have title" do
@@ -658,22 +658,22 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       end
 
       it "shouldn't see dental radio option" do
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#coverage_kind_dental')
       end
 
       it "should see health radio option" do
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#coverage_kind_health')
       end
 
       it "shouldn't see marketplace options" do
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('h3', text: 'Marketplace')
       end
 
       it "shouldn't see terminate plan" do
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to_not have_selector("a", text: "Select Plan to Terminate")
       end
     end
@@ -713,7 +713,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "shouldn't see waiver button" do
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(rendered).not_to have_text('Waiver Coverage')
     end
   end
@@ -752,7 +752,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     # Loading coverage household member records only once & displaying errors based on selection
 
     it "should render coverage_household partial to display chm's" do
-      render file: "insured/group_selection/new.html.erb"
+      render template: "insured/group_selection/new.html.erb"
       expect(response).to render_template(:partial => 'coverage_household', :locals => {:coverage_household => nil})
     end
   end
@@ -808,28 +808,28 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       it "should see dental radio option" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#coverage_kind_dental')
       end
 
       it "should see health radio option" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#coverage_kind_health')
       end
 
       it "should see employer-sponsored coverage radio option" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#market_kind_shop')
       end
 
       it "should see individual coverage radio option" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('#market_kind_individual')
       end
 
@@ -837,7 +837,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('h3', text: 'Marketplace')
       end
 
@@ -846,7 +846,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(adapter).to receive(:can_shop_shop?).with(person).and_return(false)
         allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
         allow(person).to receive(:has_employer_benefits?).and_return(false)
-        render file: "insured/group_selection/new.html.erb"
+        render template: "insured/group_selection/new.html.erb"
         expect(rendered).not_to have_selector('#market_kind_shop')
       end
 
@@ -864,13 +864,13 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         it "dental option should have a class of dn" do
           allow(adapter).to receive(:is_eligible_for_dental?).and_return(false)
           assign(:market_kind, 'shop')
-          render file: "insured/group_selection/new.html.erb"
+          render template: "insured/group_selection/new.html.erb"
           expect(rendered).to have_selector('.n-radio-row.dn')
         end
 
         it "dental option should not be visible" do
           allow(adapter).to receive(:is_eligible_for_dental?).and_return(true)
-          render file: "insured/group_selection/new.html.erb"
+          render template: "insured/group_selection/new.html.erb"
           expect(rendered).to_not have_selector('.n-radio-row.dn')
         end
       end

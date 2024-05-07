@@ -176,7 +176,5 @@ module BenefitSponsors
         errors.add(:dob, message: "date of birth cannot be more than 110 years ago")
       end
     end
-
-
   end
 end

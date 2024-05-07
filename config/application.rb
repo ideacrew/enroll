@@ -20,6 +20,8 @@ require "rails/test_unit/railtie"
 
 # Configure fallbacks for mongoid errors:
 require "i18n/backend/fallbacks"
+require_relative '../app/models/hbx_id_generator'
+require_relative '../app/models/identity_verification/interactive_verification_service'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -35,7 +37,7 @@ module Enroll
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
-    config.autoload_paths += ["#{config.root}/lib", "#{config.root}/app/notices", "#{config}/app/jobs"]
+    config.autoload_paths += ["#{config.root}/lib", "#{config.root}/app/notices", "#{config.root}/app/jobs"]
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     # config.time_zone = 'Central Time (US & Canada)'

@@ -6,8 +6,6 @@ module Exchanges
   class SeedsController < ApplicationController
     include ::DataTablesAdapter #TODO: check
     include ::Pundit
-    include ActionView::Helpers::TranslationHelper
-    include L10nHelper
 
   # layout 'single_column'
     layout 'bootstrap_4'

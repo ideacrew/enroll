@@ -100,7 +100,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
     allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', can_access_progress?: true))
     allow(view).to receive(:show_pay_now?).and_return false
-    render file: "insured/plan_shoppings/receipt.en.html.erb"
+    render template: "insured/plan_shoppings/receipt.en.html.erb"
   end
 
   it "should match the data on the confirmation receipt" do
@@ -142,12 +142,12 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       allow(view).to receive(:show_pay_now?).and_return false
     end
     it "doesn't have a Pay now button" do
-      render file: "insured/plan_shoppings/receipt.en.html.erb"
+      render template: "insured/plan_shoppings/receipt.en.html.erb"
       expect(rendered).to_not have_selector('btn-btn-default', text: /Pay Now/)
     end
 
     it "doesn't have Pay Now messaging" do
-      render file: "insured/plan_shoppings/receipt.en.html.erb"
+      render template: "insured/plan_shoppings/receipt.en.html.erb"
       expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment online/)
       expect(rendered).to_not have_content(/Select PAY NOW to make your first premium payment directly to Kaiser Permanente/)
     end
@@ -163,7 +163,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     end
 
     it "should have a Pay now button" do
-      render file: "insured/plan_shoppings/receipt.en.html.erb"
+      render template: "insured/plan_shoppings/receipt.en.html.erb"
       carrier = carrier_profile.legal_name
       if EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:plan_shopping).item
         expect(rendered).to have_selector('button', text: /Pay Now/)

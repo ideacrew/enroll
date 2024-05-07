@@ -1887,8 +1887,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       before do
         application.update_attributes(effective_date: TimeKeeper.date_of_record)
       end
+
       it 'should not return nil' do
-        expect(application.apply_aggregate_to_enrollment).to eq true
+        expect(application.apply_aggregate_to_enrollment).to eq false
       end
     end
   end

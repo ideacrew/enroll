@@ -14,7 +14,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     before :each do
       allow(notice).to receive(:hbe).and_return(hbe)
       allow(hbe).to receive(:phone).and_return(phone)
-      render file: 'notices/shared/footer_ivl', locals: local_data
+      render template: 'notices/shared/footer_ivl', locals: local_data
     end
 
     context 'for matching text' do

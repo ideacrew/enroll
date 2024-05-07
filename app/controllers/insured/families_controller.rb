@@ -447,7 +447,7 @@ class Insured::FamiliesController < FamiliesController
     trigger_cdc_to_ivl_transition_notice  if @consumer_people.present?
 
     respond_to do |format|
-      format.js { render :file => "insured/families/transition_family_members_result.js.erb"}
+      format.js { render "insured/families/transition_family_members_result.js.erb"}
     end
   end
 

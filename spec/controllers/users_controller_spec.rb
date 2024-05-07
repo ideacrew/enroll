@@ -224,7 +224,7 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         put :confirm_reset_password, params: {id: user_id, user: { email: '' }, format: :js}
-        expect(response.content_type).to eq('text/javascript')
+        expect(response.content_type).to eq('text/javascript; charset=utf-8')
         expect(response).to render_template('users/reset_password')
       end
     end
@@ -260,7 +260,7 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         put :confirm_reset_password, params:  {id: user_id, user: { email: user_email }, format: :js}
-        expect(response.content_type).to eq('text/javascript')
+        expect(response.content_type).to eq('text/javascript; charset=utf-8')
         expect(response).to render_template('users/reset_password')
       end
     end

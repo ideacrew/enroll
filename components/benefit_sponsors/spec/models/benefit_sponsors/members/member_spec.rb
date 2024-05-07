@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Members::Member, type: :model, :dbclean => :after_each do
+  RSpec.describe Members::Member, type: :model, :dbclean => :around_each do
 
     let(:employee_member) { described_class.new }
 
@@ -129,7 +129,7 @@ module BenefitSponsors
           member.validate
           expect(member).to be_invalid
 
-          expect(member.errors[:dob].first[:message]).to match(/date of birth cannot be more than 110 years ago/)
+          expect(member.errors[:dob].first).to match(/date of birth cannot be more than 110 years ago/)
         end
       end
 
@@ -141,7 +141,7 @@ module BenefitSponsors
           member.validate
           expect(member).to be_invalid
 
-          expect(member.errors[:dob].first[:message].to_s).to match(/future date: #{future_dob.to_s} is not valid for date of birth/)
+          expect(member.errors[:dob].first).to match(/future date: #{future_dob} is not valid for date of birth/)
         end
       end
 
@@ -160,10 +160,7 @@ module BenefitSponsors
             expect(member.age_on(today + 1)).to eq age_tomorrow
           end
         end
-
       end
-
     end
-
   end
 end

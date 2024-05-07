@@ -17,7 +17,7 @@ describe "insured/family_members/destroyed.js.erb" do
       assign(:dependent, Forms::FamilyMember.find(family_member.id))
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
 
-      render file: "insured/family_members/destroyed.js.erb"
+      render template: "insured/family_members/destroyed.js.erb"
     end
 
     it "should display qle_flow" do

@@ -36,7 +36,7 @@ RSpec.describe "notices/ivl/ivl_tax_notice.html.erb" do
   before :each do
     catastrophic_plan_notice.append_hbe
     catastrophic_plan_notice.build
-    render file: "notices/ivl/ivl_tax_notice", locals: {notice: notice}
+    render template: "notices/ivl/ivl_tax_notice", locals: {notice: notice}
   end
 
   context 'template text for both assisted and unassisted' do

@@ -20,7 +20,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
     allow(view).to receive(:individual_market_is_enabled?).and_return(individual_market_is_enabled)
 
-    render file: "insured/consumer_roles/edit.html.erb"
+    render template: "insured/consumer_roles/edit.html.erb"
   end
 
   it "should display the page info" do

@@ -32,7 +32,7 @@ class V2GroupXmlGenerator
 
   def generate_xmls
     views = Rails::Application::Configuration.new(Rails.root).paths["app/views"]
-    views_helper = ActionView::Base.new views
+    views_helper = ActionView::Base.new(ActionView::LookupContext.new(views), {}, nil)
     views_helper.class.send(:include, EventsHelper)
     views_helper.class.send(:include, Config::AcaHelper)
 
