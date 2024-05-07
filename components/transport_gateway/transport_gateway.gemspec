@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency 'rails', '~> 6.0.6.1'
+  s.add_dependency 'rails', '~> 6.1.7.6'
   s.add_dependency 'net-sftp', '~> 2.1', '>= 2.1.2'
   s.add_dependency 'net-ssh', '4.2.0'
   s.add_dependency 'aws-sdk', '~> 3.2'
@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'simplecov',                 '~> 0.22.0'
   s.add_development_dependency 'simplecov-cobertura',       '~> 2.1.0'
   s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
-  s.add_development_dependency 'shoulda-matchers'
+  s.add_development_dependency 'shoulda-matchers',          '~> 4.5'
   s.add_development_dependency 'webmock'
   s.add_development_dependency 'rspec'
 end

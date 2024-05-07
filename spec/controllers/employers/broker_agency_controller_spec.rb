@@ -35,7 +35,7 @@ RSpec.describe Employers::BrokerAgencyController do
     it "should render js template" do
       sign_in(@user)
       get :index, params: {employer_profile_id: @employer_profile.id, q: @org2.broker_agency_profile.legal_name}, xhr: true
-      expect(response.content_type).to eq "text/javascript"
+      expect(response.content_type).to eq "text/javascript; charset=utf-8"
     end
 
     context 'with out search string' do

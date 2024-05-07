@@ -19,7 +19,7 @@ describe "employers/plan_years/reference_plan_summary.js.erb" do
   before :each do
     assign(:employer_profile, employer_profile)
     assign(:plan, plan)
-    render file: "employers/plan_years/reference_plan_summary.js.erb"
+    render template: "employers/plan_years/reference_plan_summary.js.erb"
   end
 
   it "should display plan name and carrier in modal title" do
