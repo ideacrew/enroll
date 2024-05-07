@@ -40,7 +40,7 @@
     <div class="mt-4 mb-4 aut_cons_text">
       <p>
         <!-- We need to do some feature flagging in regards to the below, not sure that is an O&M task? -->
-        <b><%= l10n("insured.consumer_roles.ridp_agreement.requirement1") %></b> <%= l10n("insured.consumer_roles.ridp_agreement.requirement2") %> <%= link_to t("insured.consumer_roles.ridp_agreement.link_text"), "https://www.coverme.gov/forms", target: "_blank", rel: "noopener noreferrer" %>.
+        <b><%= l10n("insured.consumer_roles.ridp_agreement.requirement1") %></b> <%= l10n("insured.consumer_roles.ridp_agreement.requirement2") %> <%= sanitize(link_to t("insured.consumer_roles.ridp_agreement.link_text"), "https://www.coverme.gov/forms", target: "_blank", rel: "noopener noreferrer") %>.
       </p>
     </div>
   </div>
