@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 gem 'rails', '~> 6.0.6.1'
-gem 'sidekiq'
+gem 'sidekiq', '~> 6.5.10'
 gem 'globalid'
 #######################################################
 # FIXME

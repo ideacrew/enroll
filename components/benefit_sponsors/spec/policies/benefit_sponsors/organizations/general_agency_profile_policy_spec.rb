@@ -19,12 +19,14 @@ module BenefitSponsors
         policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user_with_hbx_staff_role, nil)
         expect(policy.can_read_inbox?).to be true
         expect(policy.show?).to be true
+        expect(policy.can_download_document?).to be true
       end
 
       it 'returns false if user has no valid role' do
         policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, nil)
         expect(policy.can_read_inbox?).to be false
         expect(policy.show?).to be false
+        expect(policy.can_download_document?).to be false
       end
     end
 
@@ -39,6 +41,7 @@ module BenefitSponsors
 
         expect(policy.can_read_inbox?).to be true
         expect(policy.show?).to be true
+        expect(policy.can_download_document?).to be true
       end
 
       it 'returns false if random record is passed' do
@@ -46,6 +49,7 @@ module BenefitSponsors
 
         expect(policy.can_read_inbox?).to be false
         expect(policy.show?).to be false
+        expect(policy.can_download_document?).to be false
       end
     end
   end
