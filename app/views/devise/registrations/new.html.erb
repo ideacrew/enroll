@@ -4,7 +4,7 @@
     <div class="card w-75 mx-auto">
       <div class="mt-3 text-center">
         <%= image_pack_tag "logo_#{ENV['CLIENT'] || 'ic'}.svg", alt: "#{site_state_long_title}", class: "w-25" %>
-        <h1 class="beta"><%= l10n("devise.registrations.new.heading") %></h1>
+        <h1 class="beta"><%= l10n("devise.create_heading") %></h1>
         <div class="d-flex text-left row col-sm">
           <div class="col-xs-12 col-sm-12 col-md-6 mr-auto">
             <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup', action: "keyup->signup#validateInput keydown->signup#preventEnterSubmission"}, novalidate: true, rel: 'noopener noreferrer' }) do |f| %>
@@ -17,7 +17,7 @@
               <%= f.hidden_field :referer, value: request.env["HTTP_REFERER"] %>
               <div class="form-group">
                 <%= f.label :email_or_username, for: 'email_or_username', class:'required' %>
-                <small class="text-muted"><%= l10n("devise.registrations.new.email_username") %></small>
+                <small class="text-muted"><%= l10n("devise.email_username") %></small>
                 <%= f.text_field :oim_id, class: "form-control", id: 'email_or_username', required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip focusout->signup#validateEmail", toggle: "tooltip", placement: "right", trigger: 'click', title: l10n("devise.registrations.new.email_username"), target: 'signup.usernameField' } %>
               </div>
               <div class="form-group">
@@ -61,25 +61,25 @@
               <br>
               <div class="mb-4">
                 <% if site_uses_default_devise_path? %>
-                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.registrations.new.sign_in')}</a>" %>
+                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.sign_in')}</a>" %>
                 <% else %>
-                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.registrations.new.sign_in')}</a>" unless Rails.env.production? %>
+                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.sign_in')}</a>" unless Rails.env.production? %>
                 <% end %>
                 <%= f.submit l10n('submit'), id: 'submit-button', class: 'button' %>
               </div>
             <% end %>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-6">
-            <h2 class="delta"><%= l10n("devise.registrations.new.requirements") %></h2>
+            <h2 class="delta"><%= l10n("devise.requirements") %></h2>
             <ul>
-              <li><%= l10n("devise.registrations.requirement_bullet1") %></li>
-              <li><%= l10n("devise.registrations.requirement_bullet2") %></li>
-              <li><%= l10n("devise.registrations.requirement_bullet3") %></li>
-              <li><%= l10n("devise.registrations.requirement_bullet4") %></li>
-              <li><%= l10n("devise.registrations.requirement_bullet5") %></li>
-              <li><%= l10n("devise.registrations.requirement_bullet6") %></li>
-              <li><%= l10n("devise.registrations.requirement_bullet7") %></li>
-              <li><%= l10n("devise.registrations.requirement_bullet8") %></li>
+              <li><%= l10n("devise.requirement_bullet2") %></li>
+              <li><%= l10n("devise.requirement_bullet2") %></li>
+              <li><%= l10n("devise.requirement_bullet3") %></li>
+              <li><%= l10n("devise.requirement_bullet4") %></li>
+              <li><%= l10n("devise.requirement_bullet5") %></li>
+              <li><%= l10n("devise.requirement_bullet6") %></li>
+              <li><%= l10n("devise.requirement_bullet7") %></li>
+              <li><%= l10n("devise.requirement_bullet8") %></li>
             </ul>
           </div>
         </div>
