@@ -1,20 +1,7 @@
 <% if @bs4 %>
   <%# Left Nav %>
-  <% if @change_plan.blank? && @market_kind == "individual" %>
-    <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
-      <%= render partial: 'shared/plan_shopping_progress', locals: {step: '3', option_hash: individual_shop_nav_options } %>
-    <% else %>
-      <%= render partial: 'shared/plan_shopping_progress', locals: {step: '4', option_hash: sep_nav_options } %>
-    <% end %>
-  <% elsif @change_plan == "change_by_qle" %>
-    <%= render partial: 'shared/plan_shopping_progress', locals: {step: '1', option_hash: qle_nav_options } %>
-  <% elsif @change_plan == "change_plan" %>
-    <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
-      <%= render partial: 'shared/plan_shopping_progress', locals: {step: '2', option_hash: shop_for_plans_nav_options } %>
-    <% else %>
-      <%= render partial: 'shared/plan_shopping_progress', locals: {step: '1', option_hash: sep_shop_for_plans_nav_options } %>
-    <% end %>
-  <% end %>
+  <% current_progress = plan_shopping_progress_hash%>
+  <%= render partial: 'shared/plan_shopping_progress', locals: current_progress %>
 
   <%# Main Content (right) %>
   <% effective_date_for_display = @effective_on_date || @new_effective_on %>
@@ -152,24 +139,12 @@
       <% end %>
     <% end %>
 
-    <div class="flow-navigation-buttons">
-      <%# Previous Step Button%>
-
-
-      <%# Next Step Button %>
-      <% if @change_plan.present? %>
-        <%= hidden_field_tag 'change_plan', @change_plan %>
-        <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%>
-
-        <%= submit_tag l10n('shop_for_new_plan'), class: 'btn btn-primary btn-lg' + pundit_class(Family, :updateable?) %>
-
-        <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>c
-          <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
-          <% if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record && (@market_kind == 'shop' || @market_kind == 'fehb') && @hbx_enrollment.is_shop? && @hbx_enrollment.may_terminate_coverage? %>
-            <%= link_to l10n('select_plan_to_terminate'), terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan), class: ('btn btn-primary btn-lg' + pundit_class(Family, :updateable?)) %>
-          <% end %>
-        <% end %>
-      <% end %>
+    <div class="plan-shopping-page-navigation-buttons">
+      <% step = current_progress.dig(:step).to_i %>
+      <%#= render partial: 'shared/plan_shopping_page_navigation',
+        locals: { step: step,
+                  show_exit_button: step < 7,
+                  show_previous_button: step > 1 } %>
     </div>
   </div>
 

@@ -1,0 +1,139 @@
+<% is_complete = false if is_complete.nil? %>
+<% show_exit_button = true if show_exit_button.nil? %>
+<% show_previous_button = true if show_previous_button.nil? %>
+<% show_next_button = true if show_next_button.nil? %>
+
+<%= step %>
+<div class="d-flex flex-row">
+  <% if show_previous_button %>
+    <button class="back" href="#">
+      <%= l10n("previous_step") %>
+    </button>
+  <% end %>
+
+  <% if show_next_button %>
+    <!--
+    <%# individual progress %>
+    <% if step == 1 && search_page == true %>
+      <%= link_to l10n("continue_next"), insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn' %>
+    <% elsif step == 1 %>
+      <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'continue_button')" id="continue_button" class="btn" onkeydown="handleButtonKeyDown(event, 'continue_button');" onclick="PersonValidations.manageRequiredValidations($(this));">
+        <%= l10n("continue_next") %>
+      </span>
+      <button class="btn interaction-click-control-continue hidden" type="submit">
+        <%= l10n("continue_next") %>
+      </button>
+    <% elsif ridp == true && step == 2 %>
+      <% if next_link.present? && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper") %>
+        <%= link_to l10n("continue_next"), next_link, method: :get, class: "button interaction-click-control-continue", id: 'btn-continue', disabled: (application_verified || identity_verified) ? false : true %>
+      <% elsif next_link.present? %>
+        <%= link_to l10n("continue_next"), next_link, method: :get, class: "button interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified %>
+      <% elsif EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>
+        <%= link_to l10n("continue_next"), new_insured_fdsh_ridp_verification_path, class: "button interaction-click-control-continue", id: 'btn-continue' %>
+      <% else %>
+        <%= link_to l10n("continue_next"), new_insured_interactive_identity_verification_path, class: "button interaction-click-control-continue", id: 'btn-continue' %>
+      <% end %>
+    <% elsif step == 2 %>
+      <% if next_link.present? && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper") %>
+        <%= link_to l10n("continue_next"), next_link, method: :get, class: "button interaction-click-control-continue", id: 'btn-continue', disabled: (application_verified || identity_verified) ? false : true %>
+      <% elsif next_link.present? && current_user.has_hbx_staff_role? && @person.primary_family.application_type == "In Person" %>
+        <%= link_to l10n("continue_next"), next_link, method: :get, class: "button interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified %>
+      <% elsif next_link.present? %>
+        <%= link_to l10n("continue_next"), next_link, method: :get, class: "button interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified %>
+      <% end %>
+    <% elsif defined? url %>
+      <%= link_to l10n("continue_next"), url, class: "button", id: 'btn-continue' %>
+    <% elsif step == 4 %>
+      <button class="options_to_verify_identity" id="btn-continue" disabled="true">
+        <%= l10n("continue_next") %>
+      </button>
+      <br>
+    <% elsif step == 5 %>
+      <%= link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-lg btn-primary btn-block disabled", id: 'btn-continue', method: :post, disabled: !@enrollable %>
+    <% elsif step != 6 %>
+      <button class="button" id="btn-continue" type="submit">
+        <%= l10n("continue_next") %>
+      </button>
+    <% end %>
+
+    <%# sep progress %>
+    <% if step == 1 %>
+      <button class="btn btn-lg btn-primary btn-block interaction-click-control-continue" type="submit">
+        <%= l10n("continue_next") %>
+      </button>
+
+    <% elsif ridp == true && step == 2 %>
+      <% if EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>
+        <%= link_to l10n("continue_next"), new_insured_fdsh_ridp_verification_path, class: 'button btn btn-lg btn-primary btn-block interaction-click-control-continue', id: 'btn-continue', disabled: true %>
+      <% else %>
+        <%= link_to l10n("continue_next"), new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary btn-block interaction-click-control-continue', id: 'btn-continue', disabled: true %>
+      <% end %>
+
+    <% elsif defined? url %>
+      <%= link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue' %>
+
+    <% elsif step == 4 %>
+      <% if show_next_button == true %>
+        <button class="btn btn-lg btn-primary btn-block interaction-click-control-continue" type="submit">
+          <%= l10n("continue_next") %>
+        </button>
+      <% else %>
+        <%= link_to l10n("continue_next"), family_account_path, class: 'btn btn-lg btn-primary btn-block no-sep-continue', disabled: continue_disabled, id: 'btn-continue' %>
+      <% end %>
+
+    <% elsif step == 5 %>
+      <button class="btn btn-lg btn-primary btn-block" id="btn-continue">
+        <%= l10n("continue_next") %>
+      </button>
+
+    <% elsif step == 6 %>
+      <%= link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: 'btn btn-lg btn-primary btn-block disabled', id: 'btn-continue', method: :post, disabled: !@enrollable %>
+
+    <% elsif step != 7 %>
+      <button class="btn btn-lg btn-primary btn-block" id="btn-continue" type="submit">
+        <%= l10n("continue_next") %>
+      </button>
+    <% end %>
+
+    <%# qle progress %>
+    <% if (@market_kind == 'shop' || @market_kind == 'fehb') && step == 2 && show_button == 'true' %>
+      <%= link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default' if @hbx_enrollment and @hbx_enrollment.employee_role.present? %>
+    <% end %>
+    <% if step == 3 && !no_purchase %>
+      <%= link_to purchase_or_confirm,
+      checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind),
+      class: "btn btn-lg btn-primary btn-block #{'disabled' if kind == 'individual'}",
+      id: 'btn-continue',
+      method: :post, disabled: disable_purchase?(!@enrollable, @enrollment, qle: (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')) %>
+    <% end %>
+
+
+    <%# shop for plans progress %>
+    <% if show_waive %>
+      <% enrollment = @hbx_enrollment || @enrollment %>
+      <%= link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default' if (enrollment && (enrollment.employee_role.present? || enrollment.benefit_group.present?)) %>
+    <% end %>
+    <% if step == 2 && !no_purchase %>
+      <% enrollment = @hbx_enrollment || @enrollment %>
+      <% disabled_in_ivl = (enrollment && enrollment.is_shop?) ? '' : 'disabled' %>
+      <%= link_to 'Confirm', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-lg btn-primary btn-block #{disabled_in_ivl}", id: 'btn-continue', method: :post, disabled: disable_purchase?(!@enrollable, @enrollment), 'data-disable-with' => l10n("please_wait") %>
+    <% end %>
+
+
+    <%# sep shop for plans progress %>
+    <% if step == 2 && (@market_kind == 'shop' || @market_kind == 'fehb') %>
+      <%= link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default' if @hbx_enrollment and @hbx_enrollment.employee_role.present? %>
+    <% end %>
+    <% if step == 3 && !no_purchase %>
+      <%= link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: "btn btn-lg btn-primary btn-block #{'disabled' if @market_kind == 'individual'}", id: 'btn-continue', method: :post %>
+
+      <% if (@market_kind == 'shop' || @market_kind == 'fehb') %>
+        <%= link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn-waive btn btn-round btn-default' if @enrollment and @enrollment.employee_role.present? %>
+      <% end %>
+    <% elsif step == 1 %>
+      <%= link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary btn-block no-sep-continue', disabled: true, id: 'btn-continue' %>
+    <% end %>
+    -->
+  <% end %>
+
+</div>

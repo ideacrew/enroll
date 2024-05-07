@@ -34,6 +34,24 @@ module NavigationHelper
     local == "true"
   end
 
+  def plan_shopping_progress_hash
+    if @change_plan.blank? && @market_kind == "individual"
+      if @enrollment_kind.blank? && is_under_open_enrollment?
+        {step: '3', flow_type: "individual_shop" , option_hash: individual_shop_nav_options}
+      else
+        {step: '4', option_hash: sep_nav_options}
+      end
+    elsif @change_plan == "change_by_qle"
+      {step: '1', option_hash: qle_nav_options}
+    elsif @change_plan == "change_plan"
+      if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep'
+        {step: '2', option_hash: shop_for_plans_nav_options}
+      else
+        {step: '1', option_hash: sep_shop_for_plans_nav_options}
+      end
+    end
+  end
+
   def sign_up_nav_options
     [
       {step: 1, label: l10n('tell_us_about_yourself')},
@@ -57,9 +75,10 @@ module NavigationHelper
       {step: 1, label: l10n('personal_information')},
       {step: 2, label: l10n('verify_identity')},
       {step: 3, label: l10n('household_info')},
-      {step: 4, label: l10n('choose_plan')},
-      {step: 5, label: l10n('review_submit')},
-      {step: 6, label: l10n('complete')}
+      {step: 4, label: l10n('insured.families.special_enrollment_period')},
+      {step: 5, label: l10n('choose_plan')},
+      {step: 6, label: l10n('confirm_selection')},
+      {step: 7, label: l10n('complete')}
     ]
   end
 
