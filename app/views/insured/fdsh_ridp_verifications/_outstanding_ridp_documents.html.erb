@@ -4,7 +4,7 @@
   <div class="mt-4 mb-4">
     <%= show_faq_button %>
   <% if show_faq_button %>
-    <%= link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer' %>
+    <%= sanitize(link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer') %>
   <% end %>
   <h2 class="mt-4"><%= l10n("insured.consumer_roles.upload_ridp_documents.outstanding_header") %></h2>
   <section class="card">
@@ -132,17 +132,9 @@
     </div>
   </div>
 
-<<<<<<< HEAD
 <div class="row">
   <div class="col-xs-12">
-    <%= h(link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank', rel: "noopener noreferrer") %>
-=======
-
-  <div class="row">
-    <div class="col-xs-12">
-      <%= link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank' %>
-    </div>
->>>>>>> e17ec9fd74 (fix fonts, more ridp work started)
+    <%= (link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank', rel: "noopener noreferrer") %>
   </div>
 
   <div class="collapse" id="docs-verification-faq">
