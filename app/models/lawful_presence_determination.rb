@@ -107,6 +107,7 @@ class LawfulPresenceDetermination
         else
           ivl_role.fail_lawful_presence(args)
         end
+        ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.ivl_role.person.primary_family, effective_date: TimeKeeper.date_of_record)
       else
         verification_type.pending_type
       end

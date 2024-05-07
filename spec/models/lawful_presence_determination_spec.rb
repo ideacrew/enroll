@@ -366,12 +366,20 @@ describe '#start_vlp_process' do
         before do
           allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
           allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:set_due_date_upon_response_from_hub).and_return(true)
         end
 
         it 'should be in outstanding' do
           consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
           vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
           expect(vlp_verification_type.validation_status).to eq('pending')
+        end
+
+        it 'should rebuild family eligibility determination' do
+          consumer_role.lawful_presence_determination.start_ssa_process
+          ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+          family.reload
+          expect(family.eligibility_determination.outstanding_verification_earliest_due_date).to eql(ssa_verification_type.due_date)
         end
       end
     end
