@@ -22,6 +22,7 @@ DEVISE_TRANSLATIONS = {
   "en.devise.sessions.signed_out_concurrent_session" => "New user login detected - you have been signed out of this session.",
   "en.devise.registrations.new.heading" => "Create New Account",
   "en.devise.registrations.new.requirements" => "Account Requirements:",
+  "en.devise.registrations.new.sign_in" => "Sign In",
   "en.devise.registrations.new.requirement_bullet1" => "Email must be in the following format ‘example@domain.com’",
   "en.devise.registrations.new.requirement_bullet2" => "Passwords must match",
   "en.devise.registrations.new.requirement_bullet3" => "Cannot contain the email/username",
