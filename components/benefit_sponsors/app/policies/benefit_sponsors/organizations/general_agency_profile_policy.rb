@@ -31,6 +31,10 @@ module BenefitSponsors
         show?
       end
 
+      def can_download_document?
+        show?
+      end
+
       def user_has_benefit_sponsors_ga_profile?
         ga_staff_roles = user.person&.general_agency_staff_roles
         ga_staff_roles&.pluck(:benefit_sponsors_general_agency_profile_id)&.include?(record.id)
