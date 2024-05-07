@@ -83,6 +83,27 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
       expect(response).to render_template(:financial_assistance_nav)
       expect(response).to render_template 'workflow/step'
     end
+
+    context "when the request type is invalid" do
+      it "should not render the raw_application template" do
+        post :new, params: { application_id: application.id, applicant_id: applicant.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the raw_application template" do
+        post :new, params: { application_id: application.id, applicant_id: applicant.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the raw_application template" do
+        post :new, params: { application_id: application.id, applicant_id: applicant.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
   end
 
   context 'POST step' do

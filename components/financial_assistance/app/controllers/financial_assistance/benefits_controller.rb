@@ -29,7 +29,10 @@ module FinancialAssistance
 
       load_steps
       current_step
-      render 'workflow/step', layout: 'financial_assistance_nav'
+
+      respond_to do |format|
+        format.html { render 'workflow/step', layout: 'financial_assistance_nav' }
+      end
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
