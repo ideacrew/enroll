@@ -20,15 +20,6 @@ DEVISE_TRANSLATIONS = {
   :'en.devise.errors.password_strength' => "Your password is not strong enough. Try again.",
   :'en.devise.errors.password_length_username' => "Must be at least %{length} characters and cannot contain username",
   :'en.devise.sessions.signed_out_concurrent_session' => "New user login detected - you have been signed out of this session.",
-  :'en.devise.heading' => "Create New Account",
-  :'en.devise.requirements' => "Account Requirements:",
-  :'en.devise.requirement_bullet1' => "Email must be in the following format 'example domain.com'",
-  :'en.devise.requirement_bullet2' => "Passwords must match",
-  :'en.devise.requirement_bullet3' => "Cannot contain the email/username",
-  :'en.devise.requirement_bullet4' => "Must contain at least 8 characters",
-  :'en.devise.requirement_bullet5' => "Must contain at least one uppercase letter",
-  :'en.devise.requirement_bullet6' => "Must contain at least one lowercase letter",
-  :'en.devise.requirement_bullet7' => "Must contain at least one number",
-  :'en.devise.requirement_bullet8' => "Must contain at least one character that isn’t a number or letter",
+  :'en.devise.create_heading' => "Create New Account",
   :'en.devise.email_username' => "You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it."
 }
