@@ -219,7 +219,7 @@ describe '#start_ssa_process' do
     end
   end
 
-  context 'when validate_and_record_publish_errors feature is enabled' do
+  context 'when validate_and_record_publish_errors feature is disabled' do
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(false)
     end
@@ -376,10 +376,12 @@ describe '#start_vlp_process' do
         end
 
         it 'should rebuild family eligibility determination' do
-          consumer_role.lawful_presence_determination.start_ssa_process
-          ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+          consumer_role.vlp_documents = []
+          consumer_role.save!
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+          vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
           family.reload
-          expect(family.eligibility_determination.outstanding_verification_earliest_due_date).to eql(ssa_verification_type.due_date)
+          expect(family.eligibility_determination.outstanding_verification_earliest_due_date).to eql(vlp_verification_type.due_date)
         end
       end
     end
