@@ -16,7 +16,7 @@ module Operations
         member_hash = yield transform(applicant_params)
         family_member_id = yield create_or_update_member(member_hash, family_id, person)
 
-        Success(family_member_id)
+        Success({ family_member_id: family_member_id })
       end
 
       private

@@ -56,7 +56,7 @@ module FinancialAssistance
                                                                     "applicants.is_ia_eligible": true)
 
 
-            applications.exists(:predecessor_id => true).max_by(&:created_at)
+            applications.max_by(&:submitted_at)
           end
 
           def submit(params, family_ids)

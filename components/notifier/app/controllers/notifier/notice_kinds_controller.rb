@@ -2,6 +2,7 @@ module Notifier
   class NoticeKindsController < Notifier::ApplicationController
     include ::Config::SiteConcern
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+    rescue_from Notifier::MergeDataModels::InvalidBuilderError, with: :invalid_builder_provided
 
     layout 'notifier/single_column'
 
@@ -156,6 +157,12 @@ module Notifier
       respond_to do |format|
         format.html
         format.json { render json: {recipients: recipients} }
+      end
+    end
+
+    def invalid_builder_provided
+      respond_to do |format|
+        format.all { render head: 422  }
       end
     end
 
