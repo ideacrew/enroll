@@ -27,8 +27,8 @@
             <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= l10n('layout.header.user_and_id', name: user_first_name_last_name_and_suffix, id: current_user.try(:person).try(:hbx_id)) %></span>
             <span class="horizontal-links">
               <%= render partial: "shared/my_portal_links" %>
-              <span><%= link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer" %></span>
-              <span><%= link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete' %></span>
+              <span><%= sanitize(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %></span>
+              <span><%= sanitize(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
             </span>
           </li>
         <% end %>
