@@ -3,7 +3,7 @@
   <% show_faq_button = (defined? show_faq_button) ? show_faq_button : true %>
   <div class="mt-4 mb-4">
   <% if ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item.present? && show_faq_button %>
-  <%= link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer' %>
+  <%= sanitize (link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer') %>
   <% end %>
   <h2 class="mt-4"><%= l10n("insured.consumer_roles.upload_ridp_documents.outstanding_header") %></h2>
   <section class="card">
