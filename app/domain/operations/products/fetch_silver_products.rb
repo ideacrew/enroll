@@ -14,7 +14,7 @@ module Operations
         service_areas     = yield find_service_areas(values[:effective_date], values[:address])
         query             = yield query_criteria(rating_area.id, service_areas.map(&:id), values[:effective_date])
         products          = yield fetch_products(query, values)
-        payload           = yield construct_payload(products, rating_area.id)
+        payload           = yield construct_payload(products, rating_area.id, rating_area.exchange_provided_code)
 
         Success(payload)
       end
@@ -67,8 +67,9 @@ module Operations
         end
       end
 
-      def construct_payload(products, rating_area_id)
-        Success({products: products, rating_area_id: rating_area_id})
+      def construct_payload(products, rating_area_id, rating_area_exchange_provided_code)
+        Success({products: products, rating_area_id: rating_area_id,
+                 rating_area_exchange_provided_code: rating_area_exchange_provided_code})
       end
     end
   end

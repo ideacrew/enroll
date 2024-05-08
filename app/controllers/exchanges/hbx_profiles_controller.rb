@@ -126,7 +126,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :create_send_secure_message?
 
     @resource = get_resource(params)
-    binding.irb
     @subject = params[:subject].presence
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
