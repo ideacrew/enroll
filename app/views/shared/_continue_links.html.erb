@@ -8,7 +8,7 @@
 <% run_person_validations = local_assigns[:run_person_validations] ? run_person_validations : false %>
 
 <% if confimation_link %>
-  <%= sanitize(link_to l10n("confirm"), checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-lg btn-primary btn-block disabled", id: 'btn-continue', method: :post, disabled: !@enrollable) %>
+  <%= h(link_to l10n("confirm"), checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-lg btn-primary btn-block disabled", id: 'btn-continue', method: :post, disabled: !@enrollable) %>
 <% elsif !dont_show_next_button %>
   <% if button_link %>
     <button id="btn-continue" <%= "disabled=#{disable_link}" if disable_link == true %> type="<%= button_type %>" method="<%= link_method %>">
