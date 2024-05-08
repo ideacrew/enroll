@@ -22,6 +22,7 @@ DEVISE_TRANSLATIONS = {
   :'en.devise.sessions.signed_out_concurrent_session' => "New user login detected - you have been signed out of this session.",
   :'en.devise.heading' => "Create New Account",
   :'en.devise.account_requirements' => "Account Requirements:",
+  :'en.devise.requirement1' => "Passwords must match",
   :'en.devise.requirement3' => "Cannot contain the email/username",
   :'en.devise.requirement4' => "Must contain at least 8 characters",
   :'en.devise.requirement5' => "Must contain at least one uppercase letter",
