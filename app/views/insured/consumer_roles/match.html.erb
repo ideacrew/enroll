@@ -12,7 +12,7 @@
       </h1>
       <%= render "no_match" %>
       <%= render 'insured/consumer_roles/remote_search_form', f: f %>
-      <%= render partial: 'shared/individual_progress', locals: {step: '1', search_page: true} %>
+      <%= render partial: "shared/continue_links", locals: {next_link: insured_consumer_role_index_path(person: @person_params), method: :post, link_params: {person: @person_params}} %>
     <% end %>
   </div>
 <% else %>
