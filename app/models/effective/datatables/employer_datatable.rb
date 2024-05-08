@@ -70,12 +70,40 @@ module Effective
         row.current_month_invoice.present? || !row.employer_profile.is_new_employer? ? 'disabled' : 'post_ajax'
       end
 
+      def cast_employer_filter_employers(params, current_scope)
+        case params[:employers].to_s
+        when 'employer_profiles_applicants'
+          current_scope.employer_profiles_applicants
+        when 'employer_profiles_enrolling'
+          current_scope.employer_profiles_enrolling
+        when 'employer_profiles_enrolled'
+          current_scope.employer_profiles_enrolled
+        when 'employer_attestations'
+          current_scope.employer_attestations
+        else
+          current_scope
+        end
+      end
+
+      def cast_employer_filter_enrolling(params, current_scope)
+        case params[:enrolling].to_s
+        when 'employer_profiles_initial_eligible'
+          current_scope.employer_profiles_initial_eligible
+        when 'employer_profiles_renewing'
+          current_scope.employer_profiles_renewing
+        when 'employer_profiles_enrolling'
+          current_scope.employer_profiles_enrolling
+        else
+          current_scope
+        end
+      end
+
        def collection
         return @employer_collection if defined? @employer_collection
         employers = Organization.all_employer_profiles
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
-          employers = employers.send(attributes[:employers]) if ['employer_profiles_applicants','employer_profiles_enrolling','employer_profiles_enrolled', 'employer_attestations'].include?(attributes[:employers])
-          employers = employers.send(attributes[:enrolling]) if attributes[:enrolling].present?
+          employers = cast_employer_filter_employers(attributes, employers)
+          employers = cast_employer_filter_enrolling(attributes, employers)
           employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
           employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
           employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
