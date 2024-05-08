@@ -126,6 +126,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :create_send_secure_message?
 
     @resource = get_resource(params)
+    binding.irb
     @subject = params[:subject].presence
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
@@ -599,6 +600,9 @@ class Exchanges::HbxProfilesController < ApplicationController
   def configuration
     authorize HbxProfile, :configuration?
 
+    family =  Person.where(hbx_id: "1000595").first.primary_family
+    result = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+    @cv3_family = result.success? ? result.success : nil
     @time_keeper = Forms::TimeKeeper.new
     respond_to do |format|
       format.html { render '/exchanges/hbx_profiles/configuration_index.html.erb' }

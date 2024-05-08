@@ -27,6 +27,7 @@ class ApplicationController < ActionController::Base
   before_action :require_login, unless: :authentication_not_required?
   before_action :authenticate_user_from_token!
   before_action :authenticate_me!
+  before_action :authenticate_rack_profiler
 
   # for i18L
   before_action :set_locale
@@ -62,6 +63,10 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
+
+  def authenticate_rack_profiler
+      Rack::MiniProfiler.authorize_request
+  end
 
   def set_cache_headers
     response.headers["Cache-Control"] = "no-cache, no-store, private"
