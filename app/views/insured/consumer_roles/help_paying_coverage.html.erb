@@ -56,7 +56,7 @@
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
     <% end %>
     <div class="mt-4">
-      <%= render  partial: 'shared/individual_progress', locals: {step: 'help_paying_coverage'} %>
+      <%= render partial: "shared/previous_link" %> <%= render partial: "shared/continue_links", locals: {button_type: "submit"} %>
     </div>
   <% else %>
     <div class="container">
