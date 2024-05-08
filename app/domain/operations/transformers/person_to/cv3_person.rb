@@ -10,10 +10,8 @@ module Operations
     module PersonTo
       # Person params to be transformed.
       class Cv3Person
-        include Dry::Monads[:result, :do]
-        include Acapi::Notifiers
         include Rails.application.routes.url_helpers
-        require 'securerandom'
+        include Dry::Monads[:result, :do]
 
         def call(person)
           request_payload = yield construct_payload(person)

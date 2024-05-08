@@ -12,7 +12,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
   #associated consumer role
-  let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let(:consumer_user) { FactoryBot.create(:user, person: consumer_person) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
   let!(:consumer_role) do
@@ -186,6 +186,66 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
           error_message = @immigration_type.type_history_elements.last.update_reason
           expect(error_message).to match(/Failed due to VLP Document not found/)
         end
+      end
+    end
+
+    context 'enrolled' do
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
+      let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month) }
+      let(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          hbx_enrollment_members: [hbx_enrollment_member],
+                          family: family,
+                          product: product,
+                          is_any_enrollment_member_outstanding: true,
+                          household: family.active_household,
+                          coverage_kind: "health",
+                          effective_on: TimeKeeper.date_of_record.next_month.beginning_of_year,
+                          enrollment_kind: "open_enrollment",
+                          kind: "individual",
+                          submitted_at: TimeKeeper.date_of_record,
+                          aasm_state: 'coverage_selected')
+      end
+
+      before do
+        hbx_enrollment
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:set_due_date_upon_response_from_hub).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:notify_address_changed).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
+        consumer_person.consumer_role.vlp_documents = []
+        consumer_person.save!
+        @immigration_type = consumer_person.verification_types.where(type_name: 'Immigration status').first
+        @immigration_type.pending_type
+        @immigration_type.update_attributes!(inactive: false)
+        [
+          :financial_assistance,
+          :'gid://enroll_app/Family',
+          :aptc_csr_credit,
+          :aca_individual_market_eligibility,
+          :health_product_enrollment_status,
+          :dental_product_enrollment_status
+        ].each do |feature_key|
+          EnrollRegistry[feature_key].feature.stub(:is_enabled).and_return(true)
+        end
+      end
+
+      it 'change due date on family level' do
+        post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id }
+        consumer_person.reload
+        @immigration_type.reload
+        family.reload
+        family_due_date = family.eligibility_determination&.outstanding_verification_earliest_due_date
+        expect(family_due_date).to match(@immigration_type.due_date)
       end
     end
 
