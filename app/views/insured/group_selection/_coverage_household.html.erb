@@ -32,7 +32,6 @@
           <% end %>
 
           <div class="ivl_errors text-dk-grey">
-            <% errors << "coverage not available" %>
             <% errors&.each do |error| %>
               <% error = error.join(' ') if error.kind_of?(Array) %>
               <div class="pb-1"><%= sanitize_html(error) %></div>
