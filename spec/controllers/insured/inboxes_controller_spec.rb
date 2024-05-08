@@ -41,6 +41,14 @@ RSpec.describe Insured::InboxesController, :type => :controller do
           expect(response).to have_http_status(:redirect)
           expect(flash[:notice]).to eq("Successfully sent message.")
         end
+
+        it 'will render new if message params invalid' do
+          valid_params['subject'] = nil
+          valid_params['body'] = nil
+          post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }, format: :js, xhr: true
+
+          expect(response).to render_template('new')
+        end
       end
 
       describe 'GET show / DELETE destroy' do
@@ -57,6 +65,58 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to have_http_status(:success)
+        end
+      end
+    end
+
+    context 'with incorrct mime types' do
+      before do
+        sign_in(user)
+      end
+
+      context 'GET new' do
+        it 'html will render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'json request will not render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it 'xml request will not render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
+        end
+      end
+
+      context 'POST create' do
+        it 'json request will not render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it 'xml request will not render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
+        end
+      end
+
+      context 'DELETE destroy' do
+        it 'html request will not delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it 'json request will not delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it 'xml request will not delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
         end
       end
     end
