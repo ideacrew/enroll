@@ -113,9 +113,9 @@ class Insured::FamiliesController < FamiliesController
     authorize @family, :brokers?
 
     @tab = params['tab']
-    if @person.active_employee_roles.present?
-      @employee_role = @person.active_employee_roles.first
-    end
+    @employee_role = @person.active_employee_roles.first if @person.active_employee_roles.present?
+
+    respond_to :html
   end
 
   def find_sep
@@ -137,7 +137,10 @@ class Insured::FamiliesController < FamiliesController
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end
-    render :layout => 'application'
+
+    respond_to do |format|
+      format.html { render :layout => 'application' }
+    end
   end
 
   def record_sep
@@ -185,12 +188,15 @@ class Insured::FamiliesController < FamiliesController
     @sent_box = false
     @provider = @person
     @family_members = @family.active_family_members
+
+    respond_to :html
   end
 
   def healthcare_for_childcare_program
     authorize @family, :healthcare_for_childcare_program?
 
     @childcare_forms = ::Forms::HealthcareForChildcareProgramForm.build_forms_for(@person.primary_family)
+    respond_to :html
   end
 
   def event_logs
@@ -198,6 +204,7 @@ class Insured::FamiliesController < FamiliesController
     @tab = params['tab']
     hbxes = @family.family_members.map {|fm| fm.person.hbx_id}&.uniq
     @event_logs = EventLogs::MonitoredEvent.where(:subject_hbx_id.in => hbxes)&.order(:event_time.desc)&.map(&:eligibility_details)
+    respond_to :html
   end
 
   def healthcare_for_childcare_program_form
@@ -205,6 +212,7 @@ class Insured::FamiliesController < FamiliesController
 
     @service = ::Services::IvlOsseEligibilityService.new(params.permit(:person_id))
     @osse_status_by_year = @service.osse_status_by_year
+    respond_to :html
   end
 
   def update_osse_eligibilities
@@ -223,12 +231,14 @@ class Insured::FamiliesController < FamiliesController
     authorize @family, :verification?
 
     @family_members = @person.primary_family.has_active_consumer_family_members
+    respond_to :html
   end
 
   def upload_application
     authorize @family, :upload_application?
 
     @family_members = @person.primary_family.has_active_resident_family_members
+    respond_to :html
   end
 
   def check_qle_date
@@ -279,6 +289,8 @@ class Insured::FamiliesController < FamiliesController
       event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
       trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
     end
+
+    respond_to :js
   end
 
   def sep_zip_compare
@@ -307,19 +319,24 @@ class Insured::FamiliesController < FamiliesController
       end
     end
 
-    render json: {is_approved: is_approved}
+    respond_to do |format|
+      format.json { render json: {is_approved: is_approved} }
+    end
   end
 
   def check_move_reason
     authorize @family, :check_qle_reason?
+    respond_to :js
   end
 
   def check_insurance_reason
     authorize @family, :check_qle_reason?
+    respond_to :js
   end
 
   def check_marriage_reason
     authorize @family, :check_qle_reason?
+    respond_to :js
   end
 
   def purchase
@@ -352,7 +369,9 @@ class Insured::FamiliesController < FamiliesController
       @terminate = params[:terminate].present? ? params[:terminate] : ''
       @terminate_date = fetch_terminate_date(params["terminate_date_#{@enrollment.hbx_id}"]) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
-      render :layout => 'application'
+      respond_to do |format|
+        format.html { render :layout => 'application' }
+      end
     else
       redirect_to :back
     end
@@ -399,6 +418,7 @@ class Insured::FamiliesController < FamiliesController
     authorize @family, :upload_notice_form?
 
     @notices = @person.documents.where(subject: 'notice')
+    respond_to :html
   end
 
   def delete_consumer_broker
