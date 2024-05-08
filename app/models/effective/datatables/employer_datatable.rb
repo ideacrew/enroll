@@ -98,16 +98,68 @@ module Effective
         end
       end
 
+      def cast_employer_filter_enrolling_initial(params, current_scope)
+        case params[:enrolling_initial].to_s
+        when 'employer_profiles_initial_application_pending'
+          current_scope.employer_profiles_initial_application_pending
+        when 'employer_profiles_initial_open_enrollment'
+          current_scope.employer_profiles_initial_open_enrollment
+        when 'employer_profiles_binder_pending'
+          current_scope.employer_profiles_binder_pending
+        when 'employer_profiles_binder_paid'
+          current_scope.employer_profiles_binder_paid
+        else
+          current_scope
+        end
+      end
+
+      def cast_employer_filter_enrolling_renewing(params, current_scope)
+        case params[:enrolling_renewing].to_s
+        when 'employer_profiles_renewing_application_pending'
+          current_scope.employer_profiles_renewing_application_pending
+        when 'employer_profiles_renewing_open_enrollment'
+          current_scope.employer_profiles_renewing_open_enrollment
+        else
+          current_scope
+        end
+      end
+
+      def cast_employer_filter_enrolled(params, current_scope)
+        case params[:enrolled].to_s
+        when 'employer_profiles_enrolled'
+          current_scope.employer_profiles_enrolled
+        when 'employer_profiles_suspended'
+          current_scope.employer_profiles_suspended
+        else
+          current_scope
+        end
+      end
+
+      def cast_employer_filter_attestations(params, current_scope)
+        case params[:attestations].to_s
+        when 'employer_attestations_submitted'
+          current_scope.employer_attestations_submitted
+        when 'employer_attestations_pending'
+          current_scope.employer_attestations_pending
+        when 'employer_attestations_approved'
+          current_scope.employer_attestations_approved
+        when 'employer_attestations_denied'
+          current_scope.employer_attestations_denied
+        else
+          current_scope
+        end
+      end
+
        def collection
         return @employer_collection if defined? @employer_collection
         employers = Organization.all_employer_profiles
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
           employers = cast_employer_filter_employers(attributes, employers)
           employers = cast_employer_filter_enrolling(attributes, employers)
-          employers = employers.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present?
-          employers = employers.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present?
-          employers = employers.send(attributes[:enrolled]) if attributes[:enrolled].present?
-          employers = employers.send(attributes[:attestations]) if attributes[:attestations].present?
+          employers = cast_employer_filter_enrolling_initial(attributes, employers)
+          employers = cast_employer_filter_enrolling_renewing(attributes, employers)
+          employers = cast_employer_filter_enrolled(attributes, employers)
+          employers = cast_employer_filter_attestations(attributes, employers)
 
           if attributes[:upcoming_dates].present?
               if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")
