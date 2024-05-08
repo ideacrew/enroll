@@ -225,11 +225,13 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
     end
 
     context "when the request type is invalid" do
-      let(:create_params) { {
-        application_id: application.id,
-        applicant_id: applicant.id,
-        benefit: {start_on: "09/04/2017", end_on: " "}
-      } }
+      let(:create_params) do
+        {
+          application_id: application.id,
+          applicant_id: applicant.id,
+          benefit: {start_on: "09/04/2017", end_on: " "}
+        }
+      end
 
       it "should not render the raw_application template" do
         post :create, params: create_params, format: :csv
