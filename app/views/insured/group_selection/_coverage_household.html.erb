@@ -41,8 +41,8 @@
       </div>
 
       <div class="need-coverage-selection">
-        <div class="d-flex flex-row-reverse justify-content-end align-items-center mt-3 mb-3">
-          <label><%= l10n("insured.group_selection.needs_coverage", name: family_member.first_name) %></label>
+        <div class="d-flex flex-row-reverse justify-content-end align-items-center my-3">
+          <label class="mb-0 ml-1 weight-n"><%= l10n("insured.group_selection.needs_coverage", name: family_member.first_name) %></label>
           <%= check_box_tag("family_member_ids[#{index}]",
             family_member.id,
             is_checked && !family_member_eligible_for_medicaid(family_member, @family, @new_effective_on&.year),
