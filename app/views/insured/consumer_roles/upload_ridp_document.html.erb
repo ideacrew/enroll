@@ -17,7 +17,7 @@
       <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
     </div>
   <% end %>
-  <%= render partial: 'shared/individual_progress', locals: {step: '2', next_link: ridp_redirection_link(@person), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?, previous_style: 'solid'} %>
+  <%= render partial: "shared/previous_link" %> <%= render partial: "shared/continue_links", locals: {next_link: ridp_redirection_link(@person), disabled: ridp_step_2_disabled(@person, @person.consumer_role.application_verified?, @person.consumer_role.identity_verified?)} %>
 <% else %>
   <div class="content">
     <div class="container">

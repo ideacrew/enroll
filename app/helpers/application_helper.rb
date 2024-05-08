@@ -1085,4 +1085,14 @@ module ApplicationHelper
   end
 
   # => END: Broker Role Consumer Role(Dual Roles) Enhancement
+
+  # @method ridp_step_2_disabled
+  # Used to determine if the continue button should be disabled on ridp pages.
+  def ridp_step_2_disabled(person, application_verified, identity_verified)
+    if current_user.has_hbx_staff_role? && (person.primary_family.application_type == "Phone" || person.primary_family.application_type == "Paper")
+      return (application_verified || identity_verified) ? false : true
+    else
+      !identity_verified
+    end
+  end
 end
