@@ -1,0 +1,18 @@
+{
+  "name": "sarif_reporter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/index.js",
+  "scripts": {
+    "compile": "tsc",
+    "run": "node bin/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/sarif": "^2.1.7",
+    "typescript": "^5.4.5"
+  }
+}

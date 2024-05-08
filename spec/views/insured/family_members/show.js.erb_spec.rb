@@ -19,7 +19,7 @@ describe "insured/family_members/show.js.erb" do
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
 
       stub_template "insured/family_members/dependent" => ''
-      render file: "insured/family_members/show.js.erb"
+      render template: "insured/family_members/show.js.erb"
     end
 
     it "should display notice" do

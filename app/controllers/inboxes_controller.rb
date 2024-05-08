@@ -10,6 +10,7 @@ class InboxesController < ApplicationController
   def new
     @new_message = @inbox_provider.inbox.messages.build
     @element_to_replace_id = params[:family_actions_id]
+    respond_to :html, :js
   end
 
   def create
@@ -21,7 +22,13 @@ class InboxesController < ApplicationController
       flash[:notice] = "Successfully sent message."
       redirect_to successful_save_path
     else
-      render "new"
+      respond_to do |format|
+        # Both js and html need to be covered here, as some of the classes
+        # that inherit from InboxesController have both html and js 'new' templates
+        # while others (namely general_agencies) do _not_ have an js equivalent
+        format.html { render "new" }
+        format.js { render "new" }
+      end
     end
   end
 
@@ -37,6 +44,8 @@ class InboxesController < ApplicationController
     @message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])
     flash[:notice] = "Successfully deleted inbox message."
     @inbox_url = params[:url] if params[:url].present?
+
+    respond_to :js
   end
 
   private

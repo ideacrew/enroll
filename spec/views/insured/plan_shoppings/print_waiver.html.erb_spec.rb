@@ -14,7 +14,7 @@ RSpec.describe "insured/plan_shoppings/print_waiver.html.erb" do
     assign :hbx_enrollment, hbx_enrollment
     allow(view).to receive(:policy_helper).and_return(double('Family', updateable?: true))
     allow(view).to receive(:policy_helper).and_return(double('Family', can_access_progress?: true))
-    render file: "insured/plan_shoppings/print_waiver.html.slim"
+    render template: "insured/plan_shoppings/print_waiver.html.slim"
   end
 
   it "should show waiver confirmation page" do

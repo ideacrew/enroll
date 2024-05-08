@@ -13,7 +13,7 @@ RSpec.describe "products/qhp/summary.js.erb" do
     allow(benefit_group).to receive(:sole_source?).and_return(true)
     allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
     stub_template "shared/_summary.html.erb" => ''
-    render file: "products/qhp/summary.js.erb"
+    render template: "products/qhp/summary.js.erb"
   end
 
   it "should call account-detail" do
