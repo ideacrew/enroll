@@ -71,7 +71,7 @@ module Operations
         rating_silver_products.each_pair do |hbx_ids, payload|
           member_premiums[hbx_ids] = {}
 
-          health_products = payload[:products].where(kind: :health)
+          health_products = payload[:products].select { |product| product.kind == :health }
           premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_products, family: family, effective_date: effective_date,
                                                                                 rating_area_exchange_provided_code: payload[:rating_area_exchange_provided_code], rating_area_id: payload[:rating_area_id] })
 

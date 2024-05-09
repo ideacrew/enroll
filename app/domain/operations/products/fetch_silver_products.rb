@@ -58,8 +58,22 @@ module Operations
                 })
       end
 
+      def construct_cache_key(query_criteria, values)
+        {
+          :metal_level_kind.in => [:silver, :dental],
+          :'rating_area_id' => query_criteria[:'premium_tables.rating_area_id'],
+          :service_area_id.in => query_criteria[:service_area_ids],
+          :active_year => values[:effective_date].year,
+          :benefit_market_kind => :aca_individual
+        }
+      end
+
       def fetch_products(query_criteria, values)
-        products = BenefitMarkets::Products::Product.where(query_criteria)
+        cache_key = construct_cache_key(query_criteria, values)
+        products = Rails.cache.fetch(cache_key.to_s, expire_in: 12.hours) do
+          BenefitMarkets::Products::Product.where(query_criteria).to_a
+        end
+
         if products.present?
           Success(products)
         else
