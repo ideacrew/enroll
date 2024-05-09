@@ -31,7 +31,7 @@ module BenefitSponsors
           # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
           authorize BenefitSponsors::Organizations::BrokerAgencyProfile
           @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
-          respond_to :html
+          respond_to :js
         end
 
         def show
@@ -40,9 +40,10 @@ module BenefitSponsors
           set_flash_by_announcement
           @provider = current_user.person
           @id = params[:id]
-          # here
+          respond_to :html
         end
 
+        # DC-specific endpoint
         def staff_index
           # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
           authorize BenefitSponsors::Organizations::BrokerAgencyProfile
@@ -62,7 +63,6 @@ module BenefitSponsors
                      unsorted_search = find_by_agency_name + find_by_last_name + find_by_first_name
                      unsorted_search.sort_by(&:last_name).uniq
                    end
-          # here html
         end
 
         # TODO: need to refactor for cases around SHOP broker agencies
@@ -141,6 +141,7 @@ module BenefitSponsors
           send_data Aws::S3Storage.find(@commission_statement.identifier), options
         end
 
+        # DC-specific endpoint
         def general_agency_index
           @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           authorize @broker_agency_profile
@@ -177,15 +178,20 @@ module BenefitSponsors
           @folder = (params[:folder] || 'Inbox').capitalize
 
           @provider = (current_user.person._id.to_s == provider_id) ? current_user.person : @broker_agency_provider
+          respond_to :js
         end
 
+        # DC-specific endpoint
         # no auth required for this action: it is used to send an email for prospective brokers, which can be non-users
         # may want to consider implementing some sort of rate limitation on this endpoint to prevent it from being abused
         def email_guide
           notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
           flash[:notice] = notice
           UserMailer.broker_registration_guide(params).deliver_now
-          render 'benefit_sponsors/profiles/registrations/confirmation', :layout => 'single_column'
+
+          respond_to do |format|
+            format.html { render 'benefit_sponsors/profiles/registrations/confirmation', :layout => 'single_column' }
+          end
         end
 
         private
