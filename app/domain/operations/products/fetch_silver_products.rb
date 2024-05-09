@@ -13,7 +13,8 @@ module Operations
         rating_area       = yield find_rating_area(values[:effective_date], values[:address])
         service_areas     = yield find_service_areas(values[:effective_date], values[:address])
         query             = yield query_criteria(rating_area.id, service_areas.map(&:id), values[:effective_date])
-        products          = yield fetch_products(query, values)
+        cache_key         = yield construct_cache_key(rating_area.id, service_areas.map(&:id), values[:effective_date])
+        products          = yield fetch_products(cache_key, query, values)
         payload           = yield construct_payload(products, rating_area.id, rating_area.exchange_provided_code)
 
         Success(payload)
@@ -58,19 +59,19 @@ module Operations
                 })
       end
 
-      def construct_cache_key(query_criteria, values)
-        {
-          :metal_level_kind.in => [:silver, :dental],
-          :'rating_area_id' => query_criteria[:'premium_tables.rating_area_id'],
-          :service_area_id.in => query_criteria[:service_area_ids],
-          :active_year => values[:effective_date].year,
+      def construct_cache_key(rating_area, service_areas, effective_date)
+        Success({
+          :metal_level_kinds => [:silver, :dental],
+          :'rating_area_id' => rating_area.to_s,
+          :service_area_ids => service_areas.map(&:to_s),
+          :active_year => effective_date.year,
           :benefit_market_kind => :aca_individual
-        }
+        })
       end
 
-      def fetch_products(query_criteria, values)
-        cache_key = construct_cache_key(query_criteria, values)
-        products = Rails.cache.fetch(cache_key.to_s, expire_in: 12.hours) do
+
+      def fetch_products(cache_key, query_criteria, values)
+        products = Rails.cache.fetch(cache_key.to_json, expire_in: 12.hours) do
           BenefitMarkets::Products::Product.where(query_criteria).to_a
         end
 
