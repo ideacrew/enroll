@@ -97,9 +97,7 @@ module BenefitSponsors
           authorize @broker_agency_profile
           @q = params.permit(:q)[:q]
 
-          respond_to do |format|
-            format.js {}
-          end
+          respond_to :js
         end
 
         def commission_statements
@@ -118,11 +116,11 @@ module BenefitSponsors
           documents = @broker_agency_profile.documents
           @statements = get_commission_statements(documents) if documents
           collect_and_sort_commission_statements
-          respond_to do |format|
-            format.js
-          end
+          respond_to :js
         end
 
+        # Possibly only an MA endpoint -- Dom 05/09/2024
+        # Revisit for MIME type validations at a later date
         def show_commission_statement
           authorize @broker_agency_profile
 
@@ -133,6 +131,8 @@ module BenefitSponsors
           send_data Aws::S3Storage.find(@commission_statement.identifier), options
         end
 
+        # Possibly only an MA endpoint -- Dom 05/09/2024
+        # Revisit for MIME type validations at a later date
         def download_commission_statement
           authorize @broker_agency_profile
 
@@ -158,9 +158,7 @@ module BenefitSponsors
           @broker_provider = @broker_agency_profile.primary_broker_role.person
           authorize @broker_agency_profile
 
-          respond_to do |format|
-            format.js {}
-          end
+          respond_to :js
         end
 
         def inbox
@@ -189,10 +187,7 @@ module BenefitSponsors
           notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
           flash[:notice] = notice
           UserMailer.broker_registration_guide(params).deliver_now
-
-          respond_to do |format|
-            format.html { render 'benefit_sponsors/profiles/registrations/confirmation', :layout => 'single_column' }
-          end
+          render 'benefit_sponsors/profiles/registrations/confirmation', :layout => 'single_column'
         end
 
         private
