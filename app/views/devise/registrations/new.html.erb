@@ -61,9 +61,9 @@
               <br>
               <div class="mb-4">
                 <% if site_uses_default_devise_path? %>
-                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('sign_in')}</a>" %>
+                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.shared.links.sign_in')}</a>" %>
                 <% else %>
-                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('sign_in')}</a>" unless Rails.env.production? %>
+                  <%= sanitize "<a class='button outline' href='#{new_user_session_path}'>#{l10n('devise.shared.links.sign_in')}</a>" unless Rails.env.production? %>
                 <% end %>
                 <%= f.submit l10n('submit'), id: 'submit-button', class: 'button' %>
               </div>
