@@ -76,7 +76,7 @@ PATH
   remote: ../ui_helpers
   specs:
     ui_helpers (0.0.1)
-      rails (~> 6.1.7.6)
+      rails (~> 6.1.7.7)
 
 PATH
   remote: .
@@ -94,7 +94,7 @@ PATH
       mongoid (~> 7.5.4)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
-      rails (~> 6.1.7.6)
+      rails (~> 6.1.7.7)
       slim (~> 3.0)
       symmetric-encryption (= 3.9.1)
 
@@ -167,7 +167,6 @@ GEM
     amq-protocol (2.3.2)
     ast (2.4.2)
     bcrypt (3.1.20)
-    bigdecimal (3.1.7)
     bootsnap (1.18.3)
       msgpack (~> 1.2)
     bson (5.0.0)
@@ -380,12 +379,12 @@ GEM
     parser (3.3.0.5)
       ast (~> 2.4.1)
       racc
-    pry (0.14.2)
+    pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    pry-byebug (3.10.1)
+    pry-byebug (3.9.0)
       byebug (~> 11.0)
-      pry (>= 0.13, < 0.15)
+      pry (~> 0.13.0)
     public_suffix (5.0.5)
     pundit (2.3.1)
       activesupport (>= 3.0.0)
@@ -447,7 +446,7 @@ GEM
       rspec-support (~> 3.13.0)
     rspec-instafail (1.0.0)
       rspec
-    rspec-mocks (3.13.0)
+    rspec-mocks (3.13.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-rails (5.0.3)
