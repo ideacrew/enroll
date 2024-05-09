@@ -2,6 +2,8 @@ class TypeHistoryElement
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  include Transmittable::Reference
+
   embedded_in :verification_type
 
   field :action, type: String   #tracked action [verify, reject, call_hub, upload_document, delete_document, hub_request, hub_response]
