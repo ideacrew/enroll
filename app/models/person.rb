@@ -1390,6 +1390,12 @@ class Person
     true
   end
 
+  def create_demographics_group
+    return unless demographics_group.blank?
+    demographics_group = DemographicsGroup.new(alive_status: AliveStatus.new)
+    update(demographics_group: demographics_group)
+  end
+
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
     welcome_body_translation_key = if broker_role || broker_agency_staff_roles.present?
