@@ -27,11 +27,11 @@ module BenefitSponsors
           "5" => "employer_profile.plan_years.start_on"
         }.freeze
 
+        # DC-specific endpoint (used only by employers)
         def index
           # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
           authorize BenefitSponsors::Organizations::BrokerAgencyProfile
           @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
-          respond_to :js
         end
 
         def show
@@ -89,6 +89,7 @@ module BenefitSponsors
           end
 
           @draw = dt_query.draw
+          respond_to :json
         end
 
         def family_index
