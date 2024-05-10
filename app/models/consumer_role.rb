@@ -236,7 +236,7 @@ class ConsumerRole
   embeds_many :local_residency_requests, class_name:"EventRequest"
 
   after_initialize :setup_lawful_determination_instance
-  after_create :create_initial_market_transition, :publish_created_event, :create_person_demographics_group
+  after_create :create_initial_market_transition, :publish_created_event
   after_update :publish_updated_event
   before_validation :ensure_verification_types
 
@@ -1011,10 +1011,6 @@ class ConsumerRole
     transition.effective_starting_on = TimeKeeper.datetime_of_record
     transition.user_id = SAVEUSER[:current_user_id]
     self.person.individual_market_transitions << transition
-  end
-
-  def create_person_demographics_group
-    person.create_demographics_group
   end
 
   def mark_residency_denied(*args)
