@@ -512,8 +512,8 @@ module FinancialAssistance
     end
 
     def strictly_boolean
-      errors.add(:base, 'is_ia_eligible should be a boolean') unless is_ia_eligible.is_a?(Boolean)
-      errors.add(:base, 'is_medicaid_chip_eligible should be a boolean') unless is_medicaid_chip_eligible.is_a? Boolean
+      errors.add(:base, 'is_ia_eligible should be a boolean') unless is_ia_eligible.is_a?(Mongoid::Boolean)
+      errors.add(:base, 'is_medicaid_chip_eligible should be a boolean') unless is_medicaid_chip_eligible.is_a?(Mongoid::Boolean)
     end
 
     def tax_filing?
@@ -612,7 +612,7 @@ module FinancialAssistance
     end
 
     def valid_family_relationships?
-      valid_spousal_relationship? && valid_child_relationship? && valid_in_law_relationship?
+      valid_spousal_relationship? && valid_child_relationship? && valid_in_law_relationship? && valid_sibling_relationship?
     end
 
     # Checks that an applicant cannot have more than one spousal relationship
@@ -624,6 +624,15 @@ module FinancialAssistance
                                                                 ]
                                                               })
       return false if partner_relationships.size > 2
+      true
+    end
+
+    def valid_sibling_relationship?
+      sibling_relationships = self.relationships.where(kind: 'sibling')
+      return true unless sibling_relationships.present?
+      sibling_relationships.each do |sibling_relationship|
+        return false unless sibling_relationship.relative.relationships.where(kind: 'sibling').count == sibling_relationships.count
+      end
       true
     end
 
@@ -1310,7 +1319,7 @@ module FinancialAssistance
       save!
     end
 
-    # rubocop:disable Metrics/Naming/AccessorMethodName
+    # rubocop:disable Naming/AccessorMethodName
     def set_evidence_verified(evidence)
       evidence.verification_outstanding = false
       evidence.is_satisfied = true
@@ -1363,7 +1372,7 @@ module FinancialAssistance
       evidence.move_to_rejected
       save!
     end
-    # rubocop:enable Metrics/Naming/AccessorMethodName
+    # rubocop:enable Naming/AccessorMethodName
 
     class << self
       def find(id)
@@ -1422,6 +1431,13 @@ module FinancialAssistance
 
     def is_dependent?
       !is_primary_applicant?
+    end
+
+    # Returns the first mailing address of the applicant.
+    #
+    # @return [Address, nil] the first mailing address if one exists, otherwise nil
+    def mailing_address
+      addresses.mailing.first
     end
 
     private
@@ -1621,7 +1637,7 @@ module FinancialAssistance
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
         create_or_update_result = if FinancialAssistanceRegistry[:avoid_dup_hub_calls_on_applicant_create_or_update].enabled?
-                                    create_or_update_member_params.merge!(is_primary_applicant: is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
+                                    create_or_update_member_params[:applicant_params].merge!(is_primary_applicant: is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
                                     ::Operations::Families::CreateOrUpdateMember.new.call(create_or_update_member_params)
                                   else
                                     ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)

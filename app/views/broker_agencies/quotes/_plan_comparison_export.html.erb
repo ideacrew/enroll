@@ -39,7 +39,7 @@
             <% qhps.each do |qhp|%>
               <th colspan="2">
                 <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
-                  <%= link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank" %>
+                  <%= h(link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank", rel: 'noopener noreferrer') %>
                 <% end %>
               </th>
             <% end %>
@@ -56,14 +56,13 @@
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
-           <% if qhp.plan.sbc_document.present? %>
+           <% if qhp.product.sbc_document.present? %>
             <th colspan="2">
               <div class="plan_comparison">
-                <% key, bucket = get_key_and_bucket(qhp.plan.sbc_document.identifier) %>
                 <% link_text = qhp.plan.coverage_kind == 'health' ? "Summary of Benefits and Coverage" : 'Plan Summary' %>
-                <%= link_to link_text, root_url + document_download_path(bucket, key) +
-                                                  "?content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.
-                                                  pdf&disposition=inline" %>
+                <%= sanitize link_to(link_text, root_url + document_product_sbc_download_path(qhp.product.sbc_document.id) +
+                                                  "?product_id=#{qhp.product.id}&content_type=application/pdf&filename=#{qhp.plan.name.gsub(/[^0-9a-z]/i,'')}.
+                                                  pdf&disposition=inline") %>
               </div>
             </th>
             <%end%>

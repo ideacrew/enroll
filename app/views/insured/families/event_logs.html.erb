@@ -1,5 +1,5 @@
 <% content_for :navigation do %>
   <%= render partial: 'ui-components/v1/navs/families_navigation' %>
 <% end %>
-<%= render partial: "event_logs/event_log_tab", :locals => {active_tab: params[:tab], hbx_id: @person.hbx_id, name: @person.first_name + ' ' + @person.last_name} %>
+<%= render partial: "event_logs/event_log_tab", :locals => {active_tab: params[:tab], hbx_id: @person.hbx_id, name: @person.first_name + ' ' + @person.last_name, type: 'consumer', members: @family.active_family_members.map{|m| m.person&.full_name }} %>
 

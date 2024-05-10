@@ -152,7 +152,6 @@ PATH
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
       rails (~> 5.2.4.3)
-      redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
@@ -662,7 +661,7 @@ GEM
     multi_json (1.15.0)
     multi_test (0.1.2)
     multi_xml (0.6.0)
-    mustermann (1.1.1)
+    mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
     net-scp (3.0.0)
       net-ssh (>= 2.6.5, < 7.0.0)
@@ -703,7 +702,7 @@ GEM
     pundit (2.1.0)
       activesupport (>= 3.0.0)
     rack (2.2.3)
-    rack-protection (2.1.0)
+    rack-protection (2.2.3)
       rack
     rack-proxy (0.6.5)
       rack
@@ -756,7 +755,6 @@ GEM
       jquery-rails (>= 3.0)
       rails (>= 5.2)
       sass-rails (>= 4.0)
-    redcarpet (3.4.0)
     redis (4.2.5)
     redis-actionpack (5.2.0)
       actionpack (>= 5, < 7)
@@ -886,10 +884,10 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.2)
-    sinatra (2.1.0)
-      mustermann (~> 1.0)
+    sinatra (2.2.3)
+      mustermann (~> 2.0)
       rack (~> 2.2)
-      rack-protection (= 2.1.0)
+      rack-protection (= 2.2.3)
       tilt (~> 2.0)
     slim (3.0.9)
       temple (>= 0.7.6, < 0.9)
@@ -919,7 +917,7 @@ GEM
       net-ssh (>= 2.8.0)
     ssrf_filter (1.0.7)
     state_machines (0.5.0)
-    stimulus_reflex (3.4.1)
+    stimulus_reflex (3.4.2)
       cable_ready (>= 4.5)
       nokogiri
       rack
@@ -1085,7 +1083,6 @@ DEPENDENCIES
   rails-controller-testing
   recaptcha (~> 4.13)
   recurring_select
-  redcarpet (~> 3.4)
   redis (~> 4.0)
   redis-rails (~> 5.0.2)
   resource_registry!

@@ -36,14 +36,14 @@
       <% else %>
       <%- if er.active_broker_agency_account.present? %>
         <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
-        <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
+        <td><%#= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
       <%- else %>
         <td>None selected</td>
       <% end %>
       <% end %>
       <td><%= er.active_general_agency_legal_name %></td>
       <% if @profile %>
-        <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default " + (pundit_class HbxProfile, :modify_admin_tabs?), remote: true %></td>
+        <td><%= link_to 'Send Secure Message', new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default " + (pundit_class HbxProfile, :modify_admin_tabs?), remote: true %></td>
       <% end %>
     </tr>
   <% end %>

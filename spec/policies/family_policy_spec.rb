@@ -11,7 +11,7 @@ describe FamilyPolicy, "given a user who has no properties" do
   subject { FamilyPolicy.new(user, family) }
 
   it "can't show" do
-    expect(subject.show?).to be_falsey
+    expect(subject.legacy_show?).to be_falsey
   end
 end
 
@@ -25,7 +25,7 @@ describe FamilyPolicy, "given a user who is the primary member" do
   subject { FamilyPolicy.new(user, family) }
 
   it "can show" do
-    expect(subject.show?).to be_truthy
+    expect(subject.legacy_show?).to be_truthy
   end
 end
 
@@ -51,7 +51,7 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
     let(:user) { FactoryBot.create(:user, :person => person)}
 
     it "can show" do
-      expect(subject.show?).to be_truthy
+      expect(subject.legacy_show?).to be_truthy
     end
   end
 
@@ -63,7 +63,7 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
     let(:user) { FactoryBot.create(:user, :person => broker_person)}
 
     it "can't show" do
-      expect(subject.show?).to be_falsey
+      expect(subject.legacy_show?).to be_falsey
     end
   end
 end
@@ -93,7 +93,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
     let(:user) { FactoryBot.create(:user, :person => person)}
 
     it "can show" do
-      expect(subject.show?).to be_truthy
+      expect(subject.legacy_show?).to be_truthy
     end
   end
 
@@ -103,7 +103,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
     let(:user) { FactoryBot.create(:user, :person => employee_person)}
 
     it "can't show" do
-      expect(subject.show?).to be_falsey
+      expect(subject.legacy_show?).to be_falsey
     end
   end
 end
@@ -129,7 +129,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
     let(:general_agency_account_profile_id) { general_agency_profile_id }
 
     it "can show" do
-      expect(subject.show?).to be_truthy
+      expect(subject.legacy_show?).to be_truthy
     end
   end
 
@@ -137,7 +137,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
     let(:general_agency_account_profile_id) { double }
 
     it "can't show" do
-      expect(subject.show?).to be_falsey
+      expect(subject.legacy_show?).to be_falsey
     end
   end
 end
@@ -155,7 +155,7 @@ describe FamilyPolicy, "given a user who has the modify family permission" do
   subject { FamilyPolicy.new(user, family) }
 
   it "can show" do
-    expect(subject.show?).to be_truthy
+    expect(subject.legacy_show?).to be_truthy
   end
 
   it "can can_view_entire_family_enrollment_history" do
@@ -188,7 +188,7 @@ describe FamilyPolicy, 'given a family with an active broker with only broker ro
 
     it 'can show' do
       allow(broker_person).to receive(:active_broker_staff_roles).and_return []
-      expect(subject.show?).to be_truthy
+      expect(subject.legacy_show?).to be_truthy
     end
   end
 end
@@ -329,6 +329,221 @@ describe 'user permission' do
       let(:permissioned_person) { instance_double(Person, :id => double, :hbx_staff_role => nil, csr_role: nil) }
       it 'should return false' do
         expect(subject.can_view_username_and_email?).to be_falsey
+      end
+    end
+  end
+end
+
+describe FamilyPolicy, "#hire_broker_agency?" do
+  RSpec.shared_examples_for "a FamilyPolicy given a user with a needed permission" do |check|
+    before :each do
+      perm_list = [
+        :individual_market_primary_family_member?,
+        :individual_market_non_ridp_primary_family_member?,
+        :individual_market_admin?,
+        :shop_market_primary_family_member?,
+        :shop_market_admin?,
+        :fehb_market_primary_family_member?,
+        :fehb_market_admin?,
+        :coverall_market_primary_family_member?,
+        :coverall_market_admin?
+      ]
+      allow(subject).to receive(check.to_sym).and_return(true)
+      (perm_list - [check].compact).each do |perm|
+        allow(subject).to receive(perm.to_sym).and_return(false)
+      end
+    end
+
+    it "has the ability to #{check} and can hire_broker_agency" do
+      expect(subject.hire_broker_agency?).to be_truthy
+    end
+  end
+
+  let(:user) { instance_double(User, person: nil) }
+  let(:family) { instance_double(Family, primary_person: nil) }
+
+  subject { described_class.new(user, family) }
+
+  it "can't hire_broker_agency without permissions" do
+    expect(subject.hire_broker_agency?).to be_falsey
+  end
+
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_non_ridp_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :shop_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :shop_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_admin?
+end
+
+describe FamilyPolicy, "#request_help?" do
+  RSpec.shared_examples_for "a FamilyPolicy given a user with a needed permission" do |check|
+    before :each do
+      perm_list = [
+        :individual_market_primary_family_member?,
+        :individual_market_non_ridp_primary_family_member?,
+        :individual_market_admin?,
+        :shop_market_primary_family_member?,
+        :shop_market_admin?,
+        :fehb_market_primary_family_member?,
+        :fehb_market_admin?,
+        :coverall_market_primary_family_member?,
+        :coverall_market_admin?,
+        :active_associated_shop_market_family_broker?,
+        :active_associated_shop_market_general_agency?,
+        :active_associated_fehb_market_family_broker?,
+        :active_associated_fehb_market_general_agency?,
+        :active_associated_coverall_market_family_broker?
+      ]
+      allow(subject).to receive(check.to_sym).and_return(true)
+      (perm_list - [check].compact).each do |perm|
+        allow(subject).to receive(perm.to_sym).and_return(false)
+      end
+    end
+
+    it "has the ability to #{check} and can request_help" do
+      expect(subject.request_help?).to be_truthy
+    end
+  end
+
+  let(:user) { instance_double(User, person: nil) }
+  let(:family) { instance_double(Family, primary_person: nil) }
+
+  subject { described_class.new(user, family) }
+
+  it "can't request_help without permissions" do
+    expect(subject.request_help?).to be_falsey
+  end
+
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_non_ridp_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :shop_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :shop_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_shop_market_family_broker?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_shop_market_general_agency?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_fehb_market_family_broker?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_fehb_market_general_agency?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_coverall_market_family_broker?
+end
+
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+  RSpec.describe FamilyPolicy, dbclean: :after_each, type: :model do
+    subject { described_class }
+
+    let(:person) { FactoryBot.create(:person, :with_resident_role, :with_active_resident_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+    permissions :upload_paper_application? do
+      context 'when the user is a hbx staff' do
+        let(:hbx_profile) do
+          FactoryBot.create(
+            :hbx_profile,
+            :normal_ivl_open_enrollment,
+            us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+            cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+          )
+        end
+        let(:hbx_staff_person) { FactoryBot.create(:person) }
+        let(:hbx_staff_role) do
+          hbx_staff_person.create_hbx_staff_role(
+            permission_id: permission.id,
+            subrole: permission.name,
+            hbx_profile: hbx_profile
+          )
+        end
+        let(:hbx_admin_user) do
+          FactoryBot.create(:user, person: hbx_staff_person)
+          hbx_staff_role.person.user
+        end
+
+        let(:logged_in_user) { hbx_admin_user }
+
+        context 'when the hbx staff has the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it 'grants access' do
+            expect(subject).to permit(logged_in_user, family)
+          end
+        end
+
+        context 'when the hbx staff does not have the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it 'denies access' do
+            expect(subject).not_to permit(logged_in_user, family)
+          end
+        end
+      end
+
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, family)
+        end
+      end
+    end
+
+    permissions :download_paper_application? do
+      context 'when the user is a hbx staff' do
+        let(:hbx_profile) do
+          FactoryBot.create(
+            :hbx_profile,
+            :normal_ivl_open_enrollment,
+            us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+            cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+          )
+        end
+        let(:hbx_staff_person) { FactoryBot.create(:person) }
+        let(:hbx_staff_role) do
+          hbx_staff_person.create_hbx_staff_role(
+            permission_id: permission.id,
+            subrole: permission.name,
+            hbx_profile: hbx_profile
+          )
+        end
+        let(:hbx_admin_user) do
+          FactoryBot.create(:user, person: hbx_staff_person)
+          hbx_staff_role.person.user
+        end
+
+        let(:logged_in_user) { hbx_admin_user }
+
+        context 'when the hbx staff has the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it 'grants access' do
+            expect(subject).to permit(logged_in_user, family)
+          end
+        end
+
+        context 'when the hbx staff does not have the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it 'denies access' do
+            expect(subject).not_to permit(logged_in_user, family)
+          end
+        end
+      end
+
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, family)
+        end
       end
     end
   end

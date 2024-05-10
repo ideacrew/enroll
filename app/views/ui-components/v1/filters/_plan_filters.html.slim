@@ -56,7 +56,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
-            = link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary  mtz", target: '_blank'
+            = link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary  mtz", target: '_blank', rel: 'noopener noreferrer'
 
   #plan_match_doctor_shop.modal.fade role="document" tabindex="-1"
     .modal-dialog
@@ -71,7 +71,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button" Cancel
-            = link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank'
+            = link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank', rel: 'noopener noreferrer'
   #plan_match_shop.modal.fade role="document" tabindex="-1"
     .modal-dialog
       .modal-content
@@ -128,6 +128,8 @@
       - tooltip_text = is_ivl_osse_filter_eligible ? "#{l10n('your_tax_credit_for_hc4cc')}" : "#{l10n('your_tax_credit')}"
       a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title=tooltip_text
         i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+        br
+        span.hide = l10n("open")
     .aptc.panel.panel-default
       .panel-body style="padding:10px;"
         .row style="margin:0;"
@@ -161,6 +163,8 @@
         strong HC4CC Eligible
         a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.hc4cc_eligible_title_info")}"
           i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+          br
+          span.hide = l10n("open")
       ul.list-unstyled
         li
           .filter-input-block
@@ -171,6 +175,8 @@
         strong Metal Level
         a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Plans use metal levels as an easy way to help indicate how generous they are in paying expenses. Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan."
           i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+          br
+          span.hide = l10n("open")
       ul.list-unstyled
         - for level in @metal_levels do
           li
@@ -186,6 +192,8 @@
       strong = l10n(".plan_type")
       a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.plan_type_title_info")}"
         i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+        br
+        span.hide = l10n("open")
     ul.list-unstyled
       - @plan_types.each_with_index do |type, i|
         li
@@ -202,6 +210,8 @@
         strong = l10n("network")
         a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.network_title_info")}"
           i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+          br
+          span.hide = l10n("open")
       ul.list-unstyled
         - if @market_kind == 'shop' || @market_kind == 'fehb'
           - @networks.each_with_index do |network, i|
@@ -228,6 +238,8 @@
       strong = l10n("carrier")
       a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("filter_by_the_carrier")}"
         i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+        br
+        span.hide = l10n("open")
     ul.list-unstyled
       li
         .filter-input-block
@@ -238,6 +250,8 @@
       strong = l10n('hsa_eligible')
       a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.hsa_eligible_title_info")}"
         i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+        br
+        span.hide = l10n("open")
     ul.list-unstyled
       li
         .filter-input-block
@@ -247,15 +261,17 @@
       strong = l10n("premium_amount")
       a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.premium_amount_title_info")}"
         i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+        br
+        span.hide = l10n("open")
     .filter-input-block
-      input.plan-metal-premium-from-selection-filter.form-control  type="text" placeholder="$0" value='0' onblur="premuimFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
+      input.plan-metal-premium-from-selection-filter.form-control  type="text" placeholder="$0" value="0" onblur="premiumFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
       small To
       input.plan-metal-premium-to-selection-filter.form-control.fr type="text" placeholder="$#{@max_total_employee_cost || 2000}" value="#{@max_total_employee_cost || 2000}" onblur="premiumToAmount(this)" maxlength="10" oninput="toCurrency(this)"
       = hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000)
     h5
       strong = l10n("deductible_amount")
     .filter-input-block
-      input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value='0' onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
+      input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value="0" onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
       small To
       input.plan-metal-deductible-to-selection-filter.form-control type="text" placeholder="$#{@max_deductible || 5000}" onblur="deductibleToAmount(this)" maxlength="10" oninput="toCurrency(this)" value='#{@max_deductible || 5000}'
   .checkbox-filter-wrapper

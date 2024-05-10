@@ -23,7 +23,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                       is_primary_applicant: true,
                       first_name: 'Gerald',
                       last_name: 'Rivers',
-                      dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                      dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                       application: application)
   end
 
@@ -116,7 +116,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                             is_primary_applicant: true,
                             first_name: 'Gerald',
                             last_name: 'Rivers',
-                            dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                            dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                             application: application)
           dup_response_payload = response_payload.dup
           dup_response_payload[:tax_households].first[:tax_household_members].first[:product_eligibility_determination][:is_ia_eligible] = nil

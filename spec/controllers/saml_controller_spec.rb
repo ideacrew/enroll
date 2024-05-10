@@ -8,11 +8,63 @@ RSpec.describe SamlController do
 
     invalid_xml = File.read("spec/saml/invalid_saml_response.xml")
 
-    context "with devise session active" do
-      it "should sign out current user" do
-        sign_in user
-        expect(subject).to receive(:sign_out).with(user)
-        post :login, params: {SAMLResponse: invalid_xml}
+    context "user with admin role" do
+      let(:admin_user) { FactoryBot.create(:user, last_portal_visited: family_account_path, roles: ["hbx_staff"])}
+      let(:admin_person) { FactoryBot.create(:person, :user => admin_user)}
+      let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: admin_person) }
+      sample_xml = File.read("spec/saml/invalid_saml_response.xml")
+      let(:name_id) { admin_user.oim_id }
+      let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id)}
+      let(:attributes_double) { { 'mail' => admin_user.email} }
+
+      before :each do
+        allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return(valid_saml_response)
+      end
+
+      context "with admin account autolock feature enabled", dbclean: :after_each do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_account_autolock).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:notify_address_changed).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+          hbx_staff_role
+        end
+
+        context "with last activity at greater than 60 days" do
+          before do
+            admin_user.update_attributes!(last_activity_at: 61.days.ago)
+          end
+
+          it "redirects to account expired path" do
+            post :login, params: {SAMLResponse: sample_xml}
+            expect(response).to redirect_to(account_expired_saml_index_path)
+          end
+        end
+
+        context "with last activity at less than 60 days" do
+
+          it "redirects to last portal visited" do
+            post :login, params: {SAMLResponse: sample_xml}
+            expect(response).to redirect_to(admin_user.last_portal_visited)
+          end
+        end
+      end
+
+      context "with admin account autolock feature disabled", dbclean: :after_each do
+
+        it "redirects to last portal visited" do
+          post :login, params: {SAMLResponse: sample_xml}
+          expect(response).to redirect_to(admin_user.last_portal_visited)
+        end
+
+        it "shows success message" do
+          post :login, params: {SAMLResponse: sample_xml}
+          expect(flash[:notice]).to eq "Signed in Successfully."
+        end
       end
     end
 
@@ -25,7 +77,6 @@ RSpec.describe SamlController do
         end
 
         post :login, params: {SAMLResponse: invalid_xml}
-        expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
         expect(response).to have_http_status(403)
       end
     end
@@ -165,10 +216,16 @@ RSpec.describe SamlController do
           end
 
           post :login, params: {SAMLResponse: sample_xml}
-          expect(response).to render_template(:file => "#{Rails.root}/public/403.html")
           expect(response).to have_http_status(403)
         end
       end
+    end
+  end
+
+  describe "GET account_expired", db_clean: :after_each do
+    it "shows error message" do
+      get :account_expired
+      expect(flash[:error]).to eq l10n('devise.failure.expired')
     end
   end
 

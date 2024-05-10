@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Exchanges::SeedsController, :type => :controller do
-  include ActionView::Helpers::TranslationHelper
   include L10nHelper
+
   let(:user) { FactoryBot.create(:user, :hbx_staff, :with_hbx_staff_role) }
   let(:hbx_staff_role) { double("hbx_staff_role", permission: hbx_permission)}
   let(:hbx_profile) { double("HbxProfile")}
@@ -98,6 +98,12 @@ RSpec.describe Exchanges::SeedsController, :type => :controller do
         post :create, params: wrong_row_csv_params, as: :json
         expect(flash[:error]).to include("CSV does not match individual_market_seed template. Must use headers (in any order) ")
       end
+    end
+    it "does not allow docx files to be uploaded" do
+      create_params[:file] = fixture_file_upload("#{Rails.root}/test/sample.docx")
+      post :create, params: create_params, as: :json
+
+      expect(flash[:error]).to include("Unable to use CSV template")
     end
   end
   describe "#edit" do

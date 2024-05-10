@@ -4,7 +4,7 @@ class InvitationsController < ApplicationController
   def claim
     @invitation = Invitation.find(params[:id])
 
-    if @invitation.may_claim?
+    if @invitation.may_claim? && @invitation.may_be_claimed_by?(current_user)
       @invitation.claim_invitation!(current_user, self)
     else
       flash[:error] = "Invalid invitation."

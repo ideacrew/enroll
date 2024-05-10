@@ -180,6 +180,17 @@ namespace :dc_permissions do
   DcDefinePermissions.define_task :hbx_admin_can_change_username_and_email => :environment
 end
 
+namespace :dc_permissions do
+  desc 'hbx admin can edit osse eligibility'
+  DcDefinePermissions.define_task :hbx_admin_can_edit_osse_eligibility => :environment
+end
+
+namespace :dc_permissions do
+  desc 'hbx admin can view audit log'
+  DcDefinePermissions.define_task :hbx_admin_can_view_audit_log => :environment
+end
+
+
 #rake dc_permissions:hbx_admin_can_reset_password
 
 #rake dc_permissions:hbx_admin_access_new_consumer_application_sub_tab
@@ -203,6 +214,9 @@ end
 #RAILS_ENV=production bundle exec rake dc_permissions:hbx_admin_can_access_user_account_tab
 #RAILS_ENV=production bundle exec rake dc_permissions:hbx_admin_can_transition_family_members
 #RAILS_ENV=production bundle exec rake dc_permissions:hbx_admin_can_access_age_off_excluded
+#RAILS_ENV=production bundle exec rake dc_permissions:hbx_admin_can_edit_osse_eligibility
+#RAILS_ENV=production bundle exec rake dc_permissions:hbx_admin_can_view_audit_log
+
 #rake dc_permissions:hbx_admin_can_add_pdc
 
 #rake dc_permissions:initial_hbx

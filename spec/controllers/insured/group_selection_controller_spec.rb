@@ -6,11 +6,10 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers"
 
 RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each do
-    #include_context "setup benefit market with market catalogs and product packages"
-
   before :each do
     allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
+    allow(controller).to receive(:ridp_verified?).with(any_args).and_return(true)
   end
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
@@ -985,6 +984,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       member.consumer_role.update_attributes(aasm_state: 'fully_verified')
       member
     end
+    let(:user_14) { FactoryBot.create(:user, person: person_14) }
     let!(:family_member2) {FactoryBot.create(:family_member, family: family_14, person: person2)}
     let!(:tax_household) {FactoryBot.create(:tax_household, household: family_14.active_household, effective_ending_on: nil, effective_starting_on: effective_on)}
     let!(:tax_household_member1) {FactoryBot.create(:tax_household_member, applicant_id: family_14.family_members[0].id, tax_household: tax_household)}
@@ -1040,7 +1040,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         end
       end
       BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-      sign_in user
+      sign_in user_14
       family_member2.person.update_attributes(is_incarcerated: false)
       post :edit_aptc, params: params
     end
@@ -1089,7 +1089,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     context 'Overlapping plan year enrollments' do
       before do
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 17))
-        sign_in user
+        sign_in user_14
         post :edit_aptc, params: params
       end
 
@@ -1492,6 +1492,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:tobacco_cost).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
         sign_in user
       end
 

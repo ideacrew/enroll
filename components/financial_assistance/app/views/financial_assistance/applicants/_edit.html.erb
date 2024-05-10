@@ -17,7 +17,9 @@
               <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
               <div class="text-right">
                 <% unless @applicant.is_primary_applicant? %>
-                  <%= button_tag ('<i class="fa fa-times"><span class="hide">Delete</span></i>'.html_safe), id: "delete_applicant_button", class: "close" %>
+                  <%= button_tag(id: "delete_applicant_button", class: "close") do %>
+                    <i class="fa fa-times"><span class="hide">Delete</span></i>
+                  <% end %>
                 <% end %>
               </div>
           </div>
@@ -182,7 +184,6 @@
       <div class="no-buffer no-border-top">
         <div class="form-group form-group-lg">
           <% if aca_security_questions %>
-            <p class="sixteen"><a class="change-password-link" id='change_password_link' href="#passwordChangeModal" data-toggle="modal" data-target="#passwordChangeModal">Change my password</a></p>
             <p class="sixteen"><a class="update-security-responses-link" id='update_security_responses_link' href="#securityQuestionModal" data-toggle="modal" data-target="#securityQuestionModal">Update my security challenge responses</a>
             </p>
           <% end %>
@@ -200,10 +201,10 @@
   </div>
 <% end %>
 <br>
-<%= render 'devise/passwords/edit' %>
 <%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
 <script>
   Freebies.floatlabels();
+  $.inputMasks();
 
   $('#applicant_same_with_primary').click(function(){
     if($(this).is(':checked')){
@@ -224,7 +225,7 @@
   });
 
   function confirmDestoyApplicant(event, url){
-    $(".btn-confirmation").attr('disabled', 'disabled');
+    $(".btn-confirmation").prop('disabled', true);
     event.preventDefault();
     event.stopImmediatePropagation();
     //

@@ -13,13 +13,12 @@ module BenefitSponsors
 
     let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:benefit_sponsor)       { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let(:employer_profile)      { benefit_sponsor.employer_profile }
+    let(:employer_profile)       { benefit_sponsor.employer_profile }
     let!(:rating_area)           { FactoryBot.create_default :benefit_markets_locations_rating_area }
     let!(:service_area)          { FactoryBot.create_default :benefit_markets_locations_service_area }
     let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
     before do
-      controller.prepend_view_path("../../app/views")
       person.employer_staff_roles.create! benefit_sponsor_employer_profile_id: employer_profile.id
     end
 
@@ -65,16 +64,37 @@ module BenefitSponsors
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
-          get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'accounts'}
-          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
         end
 
-        it "should render show template" do
-          expect(response).to render_template("show")
+        context 'with no page_num params' do
+          before do
+            get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'accounts'}
+            allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+          end
+
+          it "should render show template" do
+            expect(response).to render_template("show")
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
         end
 
-        it "should return http success" do
-          expect(response).to have_http_status(:success)
+        context 'with page_num params' do
+
+          before do
+            get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'accounts', page_num: 3}
+            allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+          end
+
+          it "should render show template" do
+            expect(response).to render_template("show")
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
         end
       end
     end
@@ -111,10 +131,19 @@ module BenefitSponsors
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
-          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
         end
 
         it 'should throw error' do
+          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+
+          expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
+        end
+
+        it "does not allow docx files to be uploaded" do
+          file = fixture_file_upload("#{Rails.root}/test/sample.docx")
+          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+
+          expect(flash[:error]).to include("Unable to upload file.")
           expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
         end
       end
@@ -160,6 +189,79 @@ module BenefitSponsors
         expect(response.header['Content-Type']).to include 'text/csv'
         expect(response.body).to include('Name,SSN,DOB,Hired On,Benefit Group,Type,Name,Issuer,Covered Ct,Employer Contribution,Employee Premium,Total Premium')
       end
+    end
+
+    describe "GET wells_fargo_sso" do
+      before do
+        benefit_sponsorship.save!
+        allow(controller).to receive(:authorize).and_return(true)
+        sign_in user
+      end
+
+      context "when staff roles and email are present" do
+        before do
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(double(url: "http://example.com", token: "token"))
+          get :wells_fargo_sso, params: {id: employer_profile.id.to_s}, format: :json
+        end
+
+        it "creates a WellsFargoSSO instance and sets @wf_url" do
+          expect(assigns(:wells_fargo_sso)).to be_present
+          expect(assigns(:wf_url)).to eq("http://example.com")
+        end
+
+        it "renders the JSON response with wf_url" do
+          expect(response).to have_http_status(:success)
+          expect(JSON.parse(response.body)).to eq({ "wf_url" => "http://example.com" })
+        end
+      end
+
+      context "when staff roles or email is not present" do
+        before do
+          allow(employer_profile.staff_roles).to receive(:first).and_return(nil)
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(nil)
+        end
+
+        it "does not create a WellsFargoSSO instance" do
+          get :wells_fargo_sso, params: { id: employer_profile.id.to_s }, format: :json
+
+          expect(assigns(:wells_fargo_sso)).to be_nil
+          expect(assigns(:wf_url)).to be_nil
+        end
+
+        it "renders the JSON response with nil wf_url" do
+          get :wells_fargo_sso, params: { id: employer_profile.id.to_s }, format: :json
+
+          expect(response).to have_http_status(:success)
+          expect(JSON.parse(response.body)).to eq({ "wf_url" => nil })
+        end
+      end
+
+
+      context "when page_num value is present" do
+        before do
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(double(url: "http://example.com", token: "token"))
+          get :wells_fargo_sso, params: {id: employer_profile.id.to_s, page_num: 3}, format: :json
+        end
+
+        it "should not render the JSON response with wf_url" do
+          expect(response).to have_http_status(:success)
+          expect(response.body).to eq("")
+        end
+      end
+
+      context 'employee tab' do
+        before do
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(double(url: "http://example.com", token: "token"))
+          get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'employees'}
+          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        end
+
+        it "does not create a WellsFargoSSO instance" do
+          expect(assigns(:wells_fargo_sso)).to be_nil
+          expect(assigns(:wf_url)).to be_nil
+        end
+      end
+
     end
 
 

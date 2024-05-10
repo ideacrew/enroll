@@ -18,7 +18,7 @@ RSpec.describe "insured/families/personal.html.erb" do
 
   shared_examples_for "display_heading" do
     before :each do
-      render file: 'insured/families/personal.html.erb'
+      render template: 'insured/families/personal.html.erb'
     end
 
     it "should display the title" do
@@ -37,7 +37,7 @@ RSpec.describe "insured/families/personal.html.erb" do
       allow(view).to receive(:verification_needed?).and_return true
       allow(view).to receive(:documents_uploaded).and_return true
       allow(view).to receive(:display_documents_tab?).and_return true
-      render file: 'insured/families/personal.html.erb'
+      render template: 'insured/families/personal.html.erb'
     end
 
     let(:person) {FactoryBot.create(:person, :with_family)}
@@ -63,7 +63,7 @@ RSpec.describe "insured/families/personal.html.erb" do
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "for consumer role" do
       before :each do
-        render file: 'insured/families/personal.html.erb'
+        render template: 'insured/families/personal.html.erb'
       end
 
       let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}

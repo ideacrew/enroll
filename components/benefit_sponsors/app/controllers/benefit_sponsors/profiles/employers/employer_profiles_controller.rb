@@ -12,11 +12,10 @@ module BenefitSponsors
         before_action :find_employer, only: [
           :show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice,
           :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments,
-          :osse_eligibilities, :update_osse_eligibilities
+          :osse_eligibilities, :update_osse_eligibilities, :wells_fargo_sso
         ]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
-        before_action :wells_fargo_sso, only: [:show]
         before_action :set_flash_by_announcement, only: :show
         layout "two_column", except: [:new]
 
@@ -58,7 +57,8 @@ module BenefitSponsors
           when 'inbox'
               # do something
           when 'event_log_shop'
-            # do something
+            authorize @employer_profile, :can_view_audit_log?
+            @event_logs = EventLogs::MonitoredEvent.where(subject_hbx_id: @employer_profile.hbx_id)&.order(:event_time.desc)&.map(&:eligibility_details)
           else
             else_block
           end
@@ -158,12 +158,12 @@ module BenefitSponsors
         def bulk_upload_with_async_process(file)
           filename = file.original_filename
           # preparing the file upload to s3
-          uri = Aws::S3Storage.save(file.path, 'ce-roster-upload')
+          s3_reference_key = Aws::S3Storage.save(file.path, 'ce-roster-upload')
           @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
           begin
-            if uri.present?
+            if s3_reference_key.present?
               # making call to subscriber
-              event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
+              event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: s3_reference_key, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
               event.success.publish if event.success?
               # once we put file to s3 then redirecting user to the employees list page
               flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_success_message")
@@ -196,6 +196,12 @@ module BenefitSponsors
 
         def bulk_employee_upload
           authorize @employer_profile, :show?
+
+          if params[:file].present? && !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES + FileUploadValidator::XLS_TYPES)
+            render default_url
+            return
+          end
+
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
             if ce_roster_bulk_upload_enabled?
@@ -263,14 +269,13 @@ module BenefitSponsors
           redirect_to "#{profiles_employers_employer_profile_path(@employer_profile)}?tab=employees"
         end
 
-        private
-
         def wells_fargo_sso
+          authorize @employer_profile, :show?
           #grab url for WellsFargoSSO and store in insance variable
           email = @employer_profile.staff_roles.first&.work_email_or_best
 
           if email.present?
-            wells_fargo_sso =
+            @wells_fargo_sso =
               ::WellsFargo::BillPay::SingleSignOn.new(
                 @employer_profile.hbx_id,
                 @employer_profile.hbx_id,
@@ -278,8 +283,15 @@ module BenefitSponsors
                 email
               )
           end
-          @wf_url = wells_fargo_sso.url if wells_fargo_sso&.token.present?
+          @wf_url = @wells_fargo_sso.url if @wells_fargo_sso&.token.present?
+          return if params[:page_num].present?
+          respond_to do |format|
+            format.html
+            format.json { render json: {wf_url: @wf_url} }
+          end
         end
+
+        private
 
         def retrieve_payments_for_page(page_no)
           return unless (financial_transactions = @benefit_sponsorship.financial_transactions)

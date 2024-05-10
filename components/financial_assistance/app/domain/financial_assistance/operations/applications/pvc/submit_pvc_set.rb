@@ -26,8 +26,8 @@ module FinancialAssistance
           # @return [ Success ] Job successfully completed
           def call(params)
             values = yield validate(params)
-            families = find_families(values)
-            submit(params, families)
+            family_ids = find_families(values)
+            submit(params, family_ids)
 
             Success("Successfully Submitted PVC Set")
           end
@@ -38,11 +38,15 @@ module FinancialAssistance
             errors = []
             errors << 'assistance_year ref missing' unless params[:assistance_year]
             params[:csr_list] = PVC_CSR_LIST if params[:csr_list].blank?
-            errors.empty? ? Success(params) : Failure(errors)
+            errors.empty? ? Success(params) : log_error_and_return_failure(errors)
           end
 
           def find_families(params)
-            Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
+            if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+              Family.with_active_coverage_and_aptc_csr_grants_for_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
+            else
+              Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
+            end
           end
 
           def fetch_application(family, assistance_year)
@@ -52,14 +56,12 @@ module FinancialAssistance
                                                                     "applicants.is_ia_eligible": true)
 
 
-            applications.exists(:predecessor_id => true).max_by(&:created_at)
+            applications.max_by(&:submitted_at)
           end
 
           def submit(params, family_ids)
             families = Family.where(:_id.in => family_ids)
-
             count = 0
-            pvc_logger = Logger.new("#{Rails.root}/log/pvc_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
             families.no_timeout.each do |family|
               determined_application = fetch_application(family, params[:assistance_year])
@@ -85,6 +87,15 @@ module FinancialAssistance
             event.success.publish
 
             Success("Successfully published the pvc payload")
+          end
+
+          def pvc_logger
+            @pvc_logger ||= Logger.new("#{Rails.root}/log/pvc_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          end
+
+          def log_error_and_return_failure(error)
+            pvc_logger.error(error)
+            Failure(error)
           end
         end
       end

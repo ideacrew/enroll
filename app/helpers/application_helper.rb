@@ -3,6 +3,7 @@
 module ApplicationHelper
   include FloatHelper
   include ::FinancialAssistance::VerificationHelper
+  include HtmlScrubberUtil
 
   def add_external_links_enabled?
     EnrollRegistry.feature_enabled?(:add_external_links)
@@ -151,22 +152,26 @@ module ApplicationHelper
     end
   end
 
+  # rubocop:disable Style/IdenticalConditionalBranches
+  # rubocop:disable Style/StringConcatenation
   def generate_breadcrumbs(breadcrumbs)
-    html = "<ul class='breadcrumb'>".html_safe
+    html = "<ul class='breadcrumb'>"
     breadcrumbs.each_with_index do |breadcrumb, index|
       if breadcrumb[:path]
-        html += "<li>".html_safe + link_to(breadcrumb[:name], breadcrumb[:path], data: breadcrumb[:data])
-        html += "<span class='divider'></span>".html_safe if index < breadcrumbs.length - 1
-        html += "</li>".html_safe
+        html += "<li>" + link_to(breadcrumb[:name], breadcrumb[:path], data: breadcrumb[:data])
+        html += "<span class='divider'></span>" if index < breadcrumbs.length - 1
+        html += "</li>"
       else
-        html += "<li class='active #{breadcrumb[:class]}'>".html_safe + breadcrumb[:name]
-        html += "<span class='divider'></span>".html_safe if index < breadcrumbs.length - 1
-        html += "</li>".html_safe
+        html += "<li class='active #{breadcrumb[:class]}'>" + breadcrumb[:name]
+        html += "<span class='divider'></span>" if index < breadcrumbs.length - 1
+        html += "</li>"
       end
     end
-    html += "</ul>".html_safe
-    html
+    html += "</ul>"
+    sanitize_html(html)
   end
+  # rubocop:enable Style/IdenticalConditionalBranches
+  # rubocop:enable Style/StringConcatenation
 
   # Formats version information in HTML string for the referenced object instance
   def version_for_record(obj)
@@ -246,7 +251,11 @@ module ApplicationHelper
 
   # Uses a boolean value to return an HTML checked/unchecked glyph with hover text
   def prepend_glyph_to_text(test)
-    test.event_name ? "<i class='fa fa-link' data-toggle='tooltip' title='#{test.event_name}'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe : "<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}".html_safe
+    if test.event_name
+      sanitize_html("<i class='fa fa-link' data-toggle='tooltip' title='#{test.event_name}'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}")
+    else
+      sanitize_html("<i class='fa fa-link' data-toggle='tooltip' style='color: silver'></i>&nbsp;&nbsp;&nbsp;&nbsp;#{link_to test.notice_number, notifier.preview_notice_kind_path(test), target: '_blank'}")
+    end
   end
 
   # Formats a number into a 9-digit US Social Security Number string (nnn-nn-nnnn)
@@ -352,7 +361,7 @@ module ApplicationHelper
         rendered << get_flash(type, messages)
       end
     end
-    rendered.join.html_safe
+    sanitize_html(rendered.join)
   end
 
   def get_flash(type, msg)
@@ -431,14 +440,14 @@ module ApplicationHelper
   end
 
   def retrieve_show_path(provider, message)
-    return broker_agencies_inbox_path(provider, message_id: message.id) if provider.try(:broker_role)
+    return  benefit_sponsors.inboxes_message_path(provider, message_id: message.id) if provider.try(:broker_role)
     case provider.model_name.name
     when "Person"
       insured_inbox_path(provider, message_id: message.id)
     when "EmployerProfile"
       employers_inbox_path(provider, message_id: message.id)
     when "BrokerAgencyProfile"
-      broker_agencies_inbox_path(provider, message_id: message.id)
+      benefit_sponsors.inboxes_message_path(provider, message_id: message.id)
     when "HbxProfile"
       exchanges_inbox_path(provider, message_id: message.id)
     when "GeneralAgencyProfile"
@@ -447,15 +456,18 @@ module ApplicationHelper
   end
 
   def retrieve_inbox_path(provider, folder: 'inbox')
-    broker_agency_mailbox =  broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
-    return broker_agency_mailbox if provider.try(:broker_role)
+    if provider.try(:broker_role)
+      broker_agency_mailbox =  benefit_sponsors.inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
+      return broker_agency_mailbox
+    end
+
     case provider.model_name.name
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
       inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
-      broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+      benefit_sponsors.inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
     when "Person"
       inbox_insured_families_path(profile_id: provider.id, folder: folder)
     when "GeneralAgencyProfile"
@@ -592,8 +604,8 @@ module ApplicationHelper
         concat content_tag(:small, enrolled, class: 'progress-current', style: "left: #{progress_bar_width - 2}%;") if eligible > 1
 
         if eligible >= 2 && plan_year.employee_participation_ratio_minimum != 0
-          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe
-          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: p_min.to_s})
+          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>"
+          concat content_tag(:p, sanitize_html(eligible_text), class: 'divider-progress', data: {value: p_min.to_s})
         end
 
         concat(content_tag(:div, class: 'progress-val') do
@@ -789,12 +801,11 @@ module ApplicationHelper
       participation_rule_text = participation_rule_for_plan_year(show_plan_year)
       non_owner_participation_rule_text = non_owner_participation_rule_for_plan_year(show_plan_year)
       text = (@participation_count == 0 && @non_owner_participation_rule == true ? "Yes" : "No")
-      eligibility_text = ("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text).html_safe
+      # eligibility_text = sanitize_html("Criteria Met : #{text}" + "<br>" + participation_rule_text + "<br>" + non_owner_participation_rule_text)
       if text == "Yes"
         "Eligible"
       else
         "Ineligible"
-        #{}"<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='tooltip' title='#{eligibility_text}'></i>".html_safe
       end
     else
       "Ineligible"
@@ -1026,4 +1037,52 @@ module ApplicationHelper
   def individual_osse_eligibility_years_for_display
     ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
   end
+
+  # => START: Broker Role Consumer Role(Dual Roles) Enhancement.
+
+  # Method: eligible_to_redirect_to_home_page?
+  #
+  # This method checks if a user is eligible to be redirected to the family home page.
+  #
+  # @param [User] user The user to check for eligibility.
+  #
+  # @return [Boolean]
+  #   returns true if the user has an employee role
+  #   returns true if the 'broker_role_consumer_enhancement' feature is not enabled
+  #   returns true if the user has a consumer role and their identity is verified.
+  #   Otherwise, it returns false.
+  #
+  # @example
+  #   eligible_to_redirect_to_home_page?(user) #=> true/false
+  def eligible_to_redirect_to_home_page?(user)
+    return true if user.has_employee_role?
+    return true unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+
+    user.has_consumer_role? && user.consumer_identity_verified?
+  end
+
+  # @method insured_role_exists?(user)
+  # Checks if the user has an insured role.
+  #
+  # @param [User] user The user to check for insured roles.
+  #
+  # @return [Boolean]
+  #   returns true if the user has an employee role.
+  #   returns true if the user has a consumer role and the 'broker_role_consumer_enhancement' feature is enabled.
+  #   returns true if the user has a consumer role and their identity is verified when the 'broker_role_consumer_enhancement' feature is disabled enabled.
+  #   Otherwise, it returns false.
+  #
+  # @example Check if a user has an insured role
+  #   insured_role_exists?(user) #=> true/false
+  def insured_role_exists?(user)
+    return true if user.has_employee_role?
+
+    if EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+      user.has_consumer_role?
+    else
+      user.has_consumer_role? && user.consumer_identity_verified?
+    end
+  end
+
+  # => END: Broker Role Consumer Role(Dual Roles) Enhancement
 end

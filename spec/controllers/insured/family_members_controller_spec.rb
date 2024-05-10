@@ -3,23 +3,42 @@
 require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
-  let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
+  let(:person) {FactoryBot.create(:person)}
+  let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let(:user) { FactoryBot.create(:user, person: person) }
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind) }
-  let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
-  let(:person) { test_family.primary_family_member.person }
   let(:published_plan_year)  { FactoryBot.build(:plan_year, aasm_state: :published)}
   let(:employer_profile) { FactoryBot.create(:employer_profile) }
-  let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile, person: person) }
+  let!(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile, person: person) }
   let(:employee_role_id) { employee_role.id }
-  let(:census_employee) { FactoryBot.create(:census_employee) }
+  let(:census_employee) { FactoryBot.create(:census_employee, person: person) }
 
   before do
     employer_profile.plan_years << published_plan_year
     employer_profile.save
   end
 
-
   describe "GET index" do
+    before do
+      allow(person).to receive(:primary_family).and_return(test_family)
+    end
+
+    context 'with broker role' do
+      let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: "active") }
+      let(:consumer_role) { FactoryBot.create(:consumer_role, person: person) }
+
+      before do
+        EnrollRegistry[:auto_assign_expert].feature.stub(:is_enabled).and_return(false)
+        allow(person).to receive(:broker_role).and_return(broker_role)
+        sign_in(user)
+      end
+
+      it 'does not auto-assign expert staff' do
+        get :index, params: { consumer_role_id: consumer_role.id }
+        expect(test_family.broker_agency_accounts).to be_empty
+      end
+    end
+
     context 'normal' do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
@@ -27,7 +46,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
-        get :index, params: {employee_role_id: employee_role_id}
+        get :index, params: { employee_role_id: employee_role_id }
       end
 
       it "renders the 'index' template" do
@@ -40,7 +59,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "assigns the family" do
-        expect(assigns(:family)).to eq nil #wat?
+        expect(assigns(:family)).to eq test_family
       end
     end
 
@@ -64,7 +83,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "assigns the family" do
-        expect(assigns(:family)).to eq nil #wat?
+        expect(assigns(:family)).to eq test_family
       end
     end
 
@@ -77,9 +96,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }
 
       before :each do
-        allow(person).to receive(:broker_role).and_return(nil)
-        allow(user).to receive(:person).and_return(person)
-        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        employee_role
         sign_in(user)
         allow(controller).to receive(:validate_address_params).and_return []
         allow(controller.request).to receive(:referer).and_return(nil)
@@ -142,14 +159,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           expect(qle.market_kind).to eq "shop"
         end
       end
-
     end
 
     it "with qle_id" do
-      allow(person).to receive(:primary_family).and_return(test_family)
-      allow(person).to receive(:broker_role).and_return(nil)
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      allow(employee_role).to receive(:save!).and_return(true)
       allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
       sign_in user
       allow(controller).to receive(:validate_address_params).and_return []
@@ -161,13 +173,11 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "GET show" do
-    let(:dependent) { double("Dependent", family_id: '1') }
-    let(:family_member) {double("FamilyMember", id: double("id"))}
+    let(:dependent) { double("Dependent", family_id: test_family.id) }
+    let(:family_member) { test_family.family_members.where(:is_primary_applicant => false).first }
 
     before(:each) do
       allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
-      allow(dependent).to receive(:family_id).and_return(test_family.id)
-      allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
       sign_in(user)
       get :show, params: {id: family_member.id}
     end
@@ -179,13 +189,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "GET new" do
-    let(:family_id) { "addbedddedtotallyafamiyid" }
     let(:dependent) { double }
 
     before(:each) do
       sign_in(user)
-      allow(Forms::FamilyMember).to receive(:new).with({:family_id => family_id}).and_return(dependent)
-      get :new, params: {family_id: family_id}
+      allow(Forms::FamilyMember).to receive(:new).with({:family_id => test_family.id}).and_return(dependent)
+      get :new, params: { family_id: test_family.id }
     end
 
     it "renders the 'new' template" do
@@ -210,12 +219,10 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
     let(:dependent_properties) { {addresses: valid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
     let(:save_result) { false }
-    let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     describe "with an invalid dependent" do
       before :each do
         sign_in(user)
-        # No Resident Role
         allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
         post :create, params: {dependent: dependent_properties}, :format => "js"
       end
@@ -234,9 +241,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     describe "with a duplicate dependent" do
       let(:test_person) { FactoryBot.create(:person, :with_nuclear_family) }
       let(:duplicate_test_family) { test_person.primary_family }
-      let(:target_dependent) do
-        duplicate_test_family.dependents.detect { |dependent| dependent.relationship == 'child' }
-      end
+      let(:test_user) { FactoryBot.create(:user, person: test_person) }
+      let!(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile, person: test_person) }
+      let(:target_dependent) { duplicate_test_family.dependents.detect { |dependent| dependent.relationship == 'child' } }
       let(:duplicate_dependent_attributes) do
         {
           dependent: {
@@ -249,12 +256,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           }
         }
       end
-      before :each do
-        # To make it detect the test family as current family
-        allow(user).to receive(:person).and_return(test_person)
-        sign_in(user)
-        # No Resident Role
 
+      before :each do
+        sign_in(test_user)
         post :create, params: duplicate_dependent_attributes, :format => "js"
       end
 
@@ -270,8 +274,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       context "when readding the deleted dependent" do
         before do
           target_dependent.update_attributes(is_active: false)
-          allow(user).to receive(:person).and_return(test_person)
-          sign_in(user)
+          sign_in(test_user)
           post :create, params: duplicate_dependent_attributes, :format => "js"
         end
 
@@ -289,7 +292,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
       before :each do
         sign_in(user)
-        # No resident role
         allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
         post :create, params: {dependent: dependent_properties}, :format => "js"
       end
@@ -312,11 +314,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     describe "with a valid dependent but not applying for coverage" do
       let(:save_result) { true }
       let(:dependent_properties) { { "is_applying_coverage" => "false", "same_with_primary" => "true", "family_id" => test_family.id.to_s } }
-      let(:test_family) { FactoryBot.create(:family, :with_primary_family_member)}
 
       before :each do
         sign_in(user)
-        # No resident role
         allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
         post :create, params: {dependent: dependent_properties}, :format => "js"
       end
@@ -355,18 +355,15 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     describe "with a valid dependent but invalid addresses" do
+      let(:address_errors) {[{:zip => ["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip => ["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
+      let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
+      let(:dependent_properties) { {addresses: invalid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
+
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return false
         sign_in(user)
         post :create, params: {dependent: dependent_properties}, :format => "js"
       end
-
-      let(:address_errors) {[{:zip => ["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip => ["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
-
-      let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
-      let(:dependent_properties) { {addresses: invalid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
-      let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
-
 
       it "should assign the dependent" do
         expect(assigns(:dependent).class).to eq Forms::FamilyMember
@@ -389,15 +386,11 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "DELETE destroy" do
-    # let(:family) { double(Family, active_family_members: [])}
-
     let(:dependent) { double(family_id: test_family.id) }
     let(:dependent_id) { "234dlfjadsklfj" }
 
     before :each do
       sign_in(user)
-      allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
-      # subject.instance_variable_set(:@family, family)
     end
 
     it "should destroy the dependent" do
@@ -415,32 +408,31 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     context "Delete Duplicate FM members" do
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
-      let(:dependent1) { family.family_members.where(is_primary_applicant: false).first }
-      let(:dependent2) { family.family_members.where(is_primary_applicant: false).last }
+      let(:dependent1) { test_family.family_members.where(is_primary_applicant: false).first }
+      let(:dependent2) { test_family.family_members.where(is_primary_applicant: false).last }
       let!(:duplicate_family_member_1) do
-        family.family_members << FamilyMember.new(person_id: dependent1.person.id)
-        dup_fm = family.family_members.last
+        test_family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+        dup_fm = test_family.family_members.last
         dup_fm.save(validate: false)
         dup_fm
       end
       let!(:duplicate_family_member_2) do
-        family.family_members << FamilyMember.new(person_id: dependent1.person.id)
-        dup_fm = family.family_members.last
+        test_family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+        dup_fm = test_family.family_members.last
         dup_fm.save(validate: false)
         dup_fm
       end
 
       before do
-        allow(Family).to receive(:find).and_return(family)
+        sign_in(user)
       end
 
       it 'should destroy the duplicate dependents if exists' do
-        expect(family.family_members.active.count).to eq 5
+        expect(test_family.family_members.active.count).to eq 5
         delete :destroy, params: {id: dependent1.id}
         expect(response).to have_http_status(:success)
-        family.reload
-        expect(family.family_members.active.count).to eq 3
+        test_family.reload
+        expect(test_family.family_members.active.count).to eq 3
       end
 
     end
@@ -469,7 +461,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:family_member) { double }
+    # let(:family_member) { double }
     let(:valid_addresses_attributes) do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
        "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
@@ -495,13 +487,14 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     let(:update_result) { false }
-    let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
+    # let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
-    before(:each) do
-      sign_in(user)
-    end
 
     describe "with an invalid dependent" do
+      before(:each) do
+        sign_in(user)
+      end
+
       it "should render the edit template" do
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: invalid_dependent_properties}
         expect(response).to have_http_status(:success)
@@ -515,9 +508,25 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     describe "with a valid dependent" do
-      let(:update_result) { true }
+      let(:primary_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:primary_user) { FactoryBot.create(:user, person: primary_person) }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_user.person) }
+      let(:person2) do
+        per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 15.years, "first_name" => "dep2", "middle_name" => "", "last_name" => "584", "ssn" => "367-58-7261", "no_ssn" => "0", "gender" => "male")
+        primary_person.ensure_relationship_with(per, 'spouse')
+        primary_person.save!
+        per
+      end
+      let(:family_member_2) { FactoryBot.create(:family_member, person: person2, family: family)}
+      let!(:dependent) { family_member_2 }
+      let(:test_family) { family }
+
+      before(:each) do
+        test_family.primary_person.consumer_role.move_identity_documents_to_verified
+        sign_in(test_family.primary_person.user)
+      end
+
       it "should render the show template" do
-        allow(controller).to receive(:update_vlp_documents).and_return(true)
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
@@ -533,6 +542,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     describe "with a valid dependent but invalid addresses" do
       before :each do
+        sign_in(user)
         allow(controller).to receive(:update_vlp_documents).and_return false
       end
 
@@ -540,7 +550,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
       let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
       let(:dependent_properties) { ActionController::Parameters.new({addresses: invalid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
-
 
       it "should render the edit template" do
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
@@ -553,5 +562,479 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         expect(assigns(:address_errors)).to eq address_errors
       end
     end
+  end
+
+  context 'permissions' do
+    let(:dependent_properties) { { "is_applying_coverage" => "false", "same_with_primary" => "true", "family_id" => test_family.id.to_s } }
+
+    before :each do
+      allow(controller.request).to receive(:referer).and_return(nil)
+      allow(Family).to receive(:find).with(test_family.id).and_return(test_family)
+
+      FactoryBot.create(:consumer_role, person: test_family.primary_person)
+      test_family.primary_person.consumer_role.move_identity_documents_to_verified
+    end
+
+    context 'a user without permissions' do
+      let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:fake_user) { FactoryBot.create(:user, :person => fake_person) }
+      let(:fake_family) { FactoryBot.create(:family, :with_nuclear_family, person: fake_person) }
+      let(:fake_family_member) { fake_family.family_members.first }
+      let(:fake_employer_profile) { FactoryBot.create(:employer_profile) }
+      let(:fake_employee_role) { FactoryBot.create(:employee_role, employer_profile: fake_employer_profile, person: fake_person) }
+      let(:fake_employee_role_id) { fake_employee_role.id }
+
+      before :each do
+        sign_in(fake_user)
+      end
+
+      context 'index' do
+        before do
+          allow(fake_person).to receive(:primary_family).and_return(test_family)
+        end
+
+        it "can't view another user's family_members index page" do
+          get :index, params: { employee_role_id: employee_role_id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("index")
+        end
+      end
+
+      context 'create' do
+        it "can't create family members on behalf of another user" do
+          post :create, params: { dependent: dependent_properties }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("show")
+          expect(response).to_not render_template("new")
+          expect(assigns(:created)).to eq nil
+        end
+      end
+
+      context 'new, show, edit, update, destroy' do
+        let(:dependent) { double("Dependent", family_id: test_family.id) }
+        let(:dependent_id) { "234dlfjadsklfj" }
+
+        before do
+          allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
+          allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
+          allow(dependent).to receive(:destroy!)
+        end
+
+        it "can't update family members on behalf of another user" do
+          put :update, params: { id: dependent_id, dependent: dependent_properties }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("show")
+          expect(response).to_not render_template("edit")
+        end
+
+        it "can't delete family members on behalf of another user" do
+          delete :destroy, params: { id: dependent_id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("index")
+        end
+
+        it "family_member :new template will not render" do
+          get :new, params: { family_id: test_family.id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("new")
+        end
+
+        it "family_member :show template will not render" do
+          get :show, params: { id: test_family.id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("show")
+        end
+
+        it "family_member :edit template will not render" do
+          get :edit, params: { id: dependent_id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("edit")
+        end
+      end
+    end
+
+    context 'a super_admin' do
+      let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+      let!(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person) }
+      let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+      before :each do
+        sign_in(admin_user)
+      end
+
+      context 'index' do
+        context 'with permissions' do
+          let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it "can't view another user's family_members index page" do
+            get :index, params: { employee_role_id: employee_role_id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("index")
+          end
+        end
+
+        context 'without permissions' do
+          let!(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it "can't view another user's family_members index page" do
+            get :index, params: { employee_role_id: employee_role_id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("index")
+          end
+        end
+      end
+
+      context 'create' do
+        context 'with permissions' do
+          let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it "can create family members on behalf of another user" do
+            allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(true)
+            post :create, params: { dependent: dependent_properties }, :format => "js"
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("show")
+          end
+        end
+
+        context 'without permissions' do
+          let!(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it "can't create family members on behalf of another user" do
+            post :create, params: { dependent: dependent_properties }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("show")
+            expect(response).to_not render_template("new")
+            expect(assigns(:created)).to eq nil
+          end
+        end
+      end
+
+      context 'new, show, edit, update, destroy' do
+        let(:valid_addresses_attributes) do
+          {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
+           "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
+        end
+
+        let(:dependent_properties) do
+          {
+            addresses: valid_addresses_attributes,
+            :family_id => test_family.id,
+            same_with_primary: true
+          }
+        end
+        let(:dependent_id) { dependent.id }
+        let(:primary_person) { FactoryBot.create(:person, :with_consumer_role) }
+        let(:primary_user) { FactoryBot.create(:user, person: primary_person) }
+        let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_user.person) }
+        let(:person2) do
+          per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 15.years, "first_name" => "dep2", "middle_name" => "", "last_name" => "584", "ssn" => "367-58-7261", "no_ssn" => "0", "gender" => "male")
+          primary_person.ensure_relationship_with(per, 'spouse')
+          primary_person.save!
+          per
+        end
+        let(:family_member_2) { FactoryBot.create(:family_member, person: person2, family: family)}
+        let!(:dependent) { family_member_2 }
+        let(:test_family) { family }
+
+        before do
+          test_family.primary_person.consumer_role.move_identity_documents_to_verified
+          test_family.family_members[1].person.consumer_role.move_identity_documents_to_verified
+          allow(dependent).to receive(:destroy!)
+        end
+
+        context 'with permissions' do
+          let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it "can update family members for a user" do
+            put :update, params: { id: dependent.id, dependent: dependent_properties }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("show")
+          end
+
+          it "can delete family members for a user" do
+            delete :destroy, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("index")
+          end
+
+          it "family_member :new template will render" do
+            get :new, params: { family_id: test_family.id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("new")
+          end
+
+          it "family_member :show template will render" do
+            get :show, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("show")
+          end
+
+          it "family_member :edit template will render" do
+            get :edit, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("edit")
+          end
+        end
+
+        context 'without permissions' do
+          let!(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it "can't update family members for a user" do
+            allow(controller).to receive(:update_vlp_documents).and_return(true)
+            put :update, params: { id: dependent_id, dependent: dependent_properties }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("show")
+            expect(response).to_not render_template("edit")
+          end
+
+          it "can't delete family members for a user" do
+            delete :destroy, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("index")
+          end
+
+          it "family_member :new template will not render" do
+            get :new, params: { family_id: test_family.id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("new")
+          end
+
+          it "family_member :show template will not render" do
+            get :show, params: { id: dependent_id}
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("show")
+          end
+
+          it "family_member :edit template will not render" do
+            get :edit, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("edit")
+          end
+        end
+      end
+    end
+
+    context 'a broker' do
+      let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :individual)}
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: :active) }
+
+      before :each do
+        sign_in(broker_user)
+      end
+
+      context 'index' do
+        context 'with permissions/hired by family' do
+          before(:each) do
+            test_family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                     writing_agent_id: writing_agent.id,
+                                                                                                     start_on: Time.now,
+                                                                                                     is_active: true)
+          end
+
+          it "can't view another user's family_members index page" do
+            get :index, params: { employee_role_id: employee_role_id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("index")
+          end
+        end
+
+        context 'without permissions/not hired by family' do
+          it "can't view another user's family_members index page" do
+            get :index, params: { employee_role_id: employee_role_id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("index")
+          end
+        end
+      end
+
+      context 'create' do
+        context 'with permissions/hired by family' do
+          before(:each) do
+            test_family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                     writing_agent_id: writing_agent.id,
+                                                                                                     start_on: Time.now,
+                                                                                                     is_active: true)
+          end
+
+          it "can create family members on behalf of another user" do
+            allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(true)
+            post :create, params: { dependent: dependent_properties }, :format => "js"
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("show")
+          end
+        end
+
+        context 'without permissions/not hired by family' do
+          it "can't create family members on behalf of another user" do
+            post :create, params: { dependent: dependent_properties }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("show")
+            expect(response).to_not render_template("new")
+            expect(assigns(:created)).to eq nil
+          end
+        end
+      end
+
+      context 'new, show, edit, update, destroy' do
+        let(:valid_addresses_attributes) do
+          {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
+           "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
+        end
+
+        let(:dependent_properties) do
+          {
+            addresses: valid_addresses_attributes,
+            :family_id => test_family.id,
+            same_with_primary: true
+          }
+        end
+
+        let(:dependent_id) { dependent.id }
+        let(:primary_person) { FactoryBot.create(:person, :with_consumer_role) }
+        let(:primary_user) { FactoryBot.create(:user, person: primary_person) }
+        let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_user.person) }
+        let(:person2) do
+          per = FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 15.years, "first_name" => "dep2", "middle_name" => "", "last_name" => "584", "ssn" => "367-58-7261", "no_ssn" => "0", "gender" => "male")
+          primary_person.ensure_relationship_with(per, 'spouse')
+          primary_person.save!
+          per
+        end
+        let(:family_member_2) { FactoryBot.create(:family_member, person: person2, family: family)}
+        let!(:dependent) { family_member_2 }
+        let(:test_family) { family }
+
+        before do
+          test_family.primary_person.consumer_role.move_identity_documents_to_verified
+          test_family.family_members[1].person.consumer_role.move_identity_documents_to_verified
+          allow(dependent).to receive(:destroy!)
+        end
+
+        context 'with permissions/hired by family' do
+          before(:each) do
+            test_family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                     writing_agent_id: writing_agent.id,
+                                                                                                     start_on: Time.now,
+                                                                                                     is_active: true)
+          end
+
+          it "can update family members for a user" do
+            put :update, params: { id: dependent_id, dependent: dependent_properties }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("show")
+          end
+
+          it "can delete family members for a user" do
+            delete :destroy, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("index")
+          end
+
+          it "family_member :new template will render" do
+            get :new, params: { family_id: test_family.id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("new")
+          end
+
+          it "family_member :show template will render" do
+            get :show, params: { id: dependent.id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("show")
+          end
+
+          it "family_member :edit template will render" do
+            get :edit, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("edit")
+          end
+        end
+
+        context 'without permissions/not hired by family' do
+          it "can't update family members for a user" do
+            allow(controller).to receive(:update_vlp_documents).and_return(true)
+            put :update, params: { id: dependent_id, dependent: dependent_properties }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("show")
+            expect(response).to_not render_template("edit")
+          end
+
+          it "can't delete family members for a user" do
+            delete :destroy, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("index")
+          end
+
+          it "family_member :new template will not render" do
+            get :new, params: { family_id: test_family.id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("new")
+          end
+
+          it "family_member :show template will not render" do
+            get :show, params: { id: dependent.id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("show")
+          end
+
+          it "family_member :edit template will not render" do
+            get :edit, params: { id: dependent_id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("edit")
+          end
+        end
+      end
+    end
+  end
+
+  describe "logged in user failed authorization" do
+    shared_examples_for "logged in user has no authorization roles for family_members controller" do |action|
+      it "redirects to root with flash message" do
+        person = FactoryBot.create(:person, :with_family, :with_consumer_role)
+        unauthorized_user = FactoryBot.create(:user, :person => person)
+        sign_in(unauthorized_user)
+
+        get action, params: {consumer_role_id: person.consumer_role.id, family_id: person.primary_family.id}
+        expect(response).to redirect_to(root_path)
+        expect(flash[:error]).to eq("Access not allowed for family_policy.#{action}?, (Pundit policy)")
+      end
+    end
+
+    it_behaves_like 'logged in user has no authorization roles for family_members controller', :index
+    it_behaves_like 'logged in user has no authorization roles for family_members controller', :new
   end
 end

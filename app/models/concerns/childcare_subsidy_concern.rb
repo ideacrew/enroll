@@ -97,7 +97,9 @@ module ChildcareSubsidyConcern
           effective_date = Date.new(year, 1, 1)
           next if eligibility_on(effective_date)
 
-          ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
+          operation = ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new
+          operation.default_eligibility = true
+          operation.call(
             osse_eligibility_params(false, effective_date)
           )
         rescue StandardError => e

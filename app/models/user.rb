@@ -145,7 +145,7 @@ class User
     if has_agent_role?
       if has_role?(:assister)
         "In Person Assister (IPA)"
-      elsif person.csr_role.cac == true
+      elsif person&.csr_role&.cac == true
          "Certified Applicant Counselor (CAC)"
       else
         "Customer Service Representative (CSR)"
@@ -243,9 +243,13 @@ class User
       Thread.current[:current_user] = user
     end
 
+    def current_login_session=(resource)
+      Thread.current[:login_session_id] = resource ? SecureRandom.hex(16) : nil
+    end
+
     def current_session_values=(session = nil)
-      session_values = (session&.to_hash || {}).except("warden.user.user.key", "_csrf_token")
-      session_values.merge!({"session_id" => session.id}) if session
+      session_values = session&.to_hash&.except("warden.user.user.key", "_csrf_token") || {}
+      session_values["session_id"] = session&.id
       Thread.current[:current_session_values] = session_values
     end
 

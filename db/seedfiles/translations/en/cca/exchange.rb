@@ -17,4 +17,6 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.no_valid_pys" => "No valid plan years present for",
   "en.exchange.employer_applications.select_term_reason" => "Please select terminate reason",
   "en.exchange.error" => "Error",
+  'en.exchanges.security_questions.denied_access_message' => 'Security Questions feature is not enabled. You are not allowed to create, edit, view or delete security questions.',
+  "en.documents.need_employee_template" => "Need the new template? Download it now."
 }

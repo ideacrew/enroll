@@ -41,6 +41,15 @@ When(/(.*) click the "(.*?)" in qle carousel/) do |_name, qle_event|
   click_link qle_event.to_s
 end
 
+When(/(.*) clicks browser back button/) do |_name|
+  @browser.execute_script('window.history.back()')
+end
+
+Then(/(.*) should redirect to receipt page and should see a flash message/) do |_name|
+  expect(page).to have_content("Enrollment Submitted")
+  expect(page).to have_content(l10n("insured.active_enrollment_warning"))
+end
+
 Then(/(.*) should see family members page and clicks continue/) do |_name|
   expect(page).to have_content l10n('family_information').to_s
   find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
@@ -53,6 +62,20 @@ When(/^(.*) selects a past qle date$/) do |_name|
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
+end
+
+Given(/an individual has gender information as male/) do
+  gender = Person.first.gender
+  gender == 'male'
+end
+
+And(/the individual selects gender as female/) do
+  find(IvlPersonalInformation.female_radiobtn).click
+end
+
+Then(/the individual should show gender as female/) do
+  gender = Person.first.gender
+  gender == 'female'
 end
 
 When(/individual has a home and mailing address/) do
@@ -159,4 +182,8 @@ end
 
 Then(/^the consumer will navigate to the Enrollment History page$/) do
   expect(page).to have_selector("#enrollment-history-title")
+end
+
+And(/^the user clicks the deleted messages button$/) do
+  find(".interaction-click-control-deleted").click
 end

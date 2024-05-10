@@ -1,14 +1,19 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
+  # application controller for the benefit sponsors engine
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
     before_action :set_last_portal_visited
     include Pundit
     include ::L10nHelper
+    include ::FileUploadHelper
 
     helper BenefitSponsors::Engine.helpers
 
-    rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+    rescue_from Pundit::NotAuthorizedError, Pundit::NotDefinedError, with: :user_not_authorized
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
+    rescue_from ActionController::UnknownFormat, with: :respond_to_unsupported_format
 
     # for current_user
     before_action :set_current_user
@@ -143,9 +148,9 @@ module BenefitSponsors
     end
 
     def user_not_authorized(exception)
-      policy_name = exception.policy.class.to_s.underscore
+      error_type = exception&.class == Pundit::NotDefinedError ? exception&.class : exception&.query
 
-      flash[:error] = "Access not allowed for #{exception.query}, (Pundit policy)" unless broker_agency_or_general_agency?
+      flash[:error] = "Access not allowed for #{error_type}, (Pundit policy)" unless broker_agency_or_general_agency?
       respond_to do |format|
         format.json { render nothing: true, status: :forbidden }
         format.html { redirect_to(session[:custom_url] || request.referrer || main_app.root_path)}
@@ -159,6 +164,18 @@ module BenefitSponsors
         format.html { redirect_to main_app.root_path }
         format.js   { render plain: "window.location.assign('#{root_path}');" }
         format.json { redirect_to main_app.root_path }
+      end
+    end
+
+    def respond_to_unsupported_format
+      message = 'Unsupported format'
+      status = :not_acceptable
+      content_type = 'text/plain'
+
+      respond_to do |format|
+        format.json { render json: { error: message }, status: status }
+        format.xml  { render xml: { error: message }.to_xml, status: status }
+        format.all { render body: message, status: status, content_type: content_type }
       end
     end
   end

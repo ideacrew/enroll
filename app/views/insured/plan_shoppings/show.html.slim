@@ -38,10 +38,10 @@
                   span.mr-1
                     strong = l10n("sort_by")
                   .btn-group#sort_by role="group"
-                    a.btn.btn-default data-sort-by="plan-name" onclick="filterBy(this)" = l10n("plan_name")
-                    a.btn.btn-default data-sort-by='plan-metal-premium' onclick="filterBy(this)" = l10n("premium_amount")
-                    a.btn.btn-default data-sort-by='plan-metal-deductible' onclick="filterBy(this)" = l10n("deductible")
-                    a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
+                    a.btn.btn-default id="plan_name_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'plan_name_filter')" data-sort-by="plan-name" onclick="filterBy(this)" = l10n("plan_name")
+                    a.btn.btn-default id="premium_amount_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'premium_amount_filter')" data-sort-by='plan-metal-premium' onclick="filterBy(this)" = l10n("premium_amount")
+                    a.btn.btn-default id="deductible_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'deductible_filter')" data-sort-by='plan-metal-deductible' onclick="filterBy(this)" = l10n("deductible")
+                    a.btn.btn-default id="carrier_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'carrier_filter')" data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
                 - if @market_kind == 'individual' || @market_kind == 'coverall'
                   #ivl_plans
                     h3
@@ -96,13 +96,11 @@ javascript:
   // Needs to be defined outside of conditional for marketKind
   // because will try to render on plan_filters.html.slim even on individual market
   var selectedPlans = document.getElementsByClassName("myfilteredPlans");
+
   function resetAllFilters() {
-    resetAptc()
-    clearAll()
-    clearSelections()
-    resetComparePlan()
-    total_plans = $('#plans .plan-row').length
-    $("#plans-count").text(total_plans);
+    resetAptc();
+    clearAll(); // Defined in plan_filters.js
+    resetPlanTileSelection();
   }
 
   function resetAptc() {
@@ -114,14 +112,16 @@ javascript:
     }
   }
 
-  function clearSelections() {
+  function resetPlanTileSelection() {
     Array.from(selectedPlans).forEach(function (plan) {
       if (plan) {
-        plan.remove()
+        plan.remove();
       }
-    })
-    if (document.getElementById('plans').length) {
-      document.getElementById('plans').classList.remove('hidden');
+    });
+    if ($('#plans').length > 0) {
+      $('#plans').each( function () {
+        $(this).removeClass('hidden');
+      });
     }
   }
 
@@ -154,7 +154,7 @@ javascript:
 
     function filterBy(element) {
       filterType = element.dataset.sortBy;
-      clearSelections()
+      resetPlanTileSelection();
       clearAll()
       applyFilter()
       filteredPlans(filterType)
@@ -441,7 +441,7 @@ javascript:
       }
       // Shows results in the view
       $("#plans-count").text(filteredArray.length);
-      clearSelections();
+      resetPlanTileSelection();
       applyFilter();
       resetComparePlan();
       showFilteredResults()
@@ -546,7 +546,7 @@ javascript:
                       </div>
                     </div>
                     <div class="col-xs-4">
-                      <a class="sbc_link health vertically-aligned-row interaction-click-control-summary-of-benefits-and-coverage" target="_blank" href= '${sbc_url}'>
+                      <a class="sbc_link health vertically-aligned-row interaction-click-control-summary-of-benefits-and-coverage" target="_blank" rel="noopener noreferrer" href= '${sbc_url}'>
                         Summary of Benefits and Coverage
                       </a>
                     </div>

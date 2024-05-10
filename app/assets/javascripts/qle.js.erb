@@ -95,13 +95,13 @@ $(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
-    
+
     if($(this).data('reason') == 'covid-19'){
       $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
     } else {
       $('.qle-details-title').html($(this).data('title'));
     }
-    
+
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
@@ -114,12 +114,12 @@ $(function () {
     } else {
       if ($(this).data('qle-event-date-kind') == 'submitted_at' && $(this).data('reason') == 'covid-19') {
          $('#qle_date').val($(this).data('current-date'));
-         $('#qle_date').attr('placeholder',$(this).data('current-date'));
-         $('#qle_date').attr('readonly',true);
+         $('#qle_date').prop('placeholder',$(this).data('current-date'));
+         $('#qle_date').prop('readonly',true);
          $('#qle_date').each(function (){ this.style.pointerEvents = 'none'; });
       }
       else {
-        $('#qle_date').attr('readonly',false);
+        $('#qle_date').prop('readonly',false);
         $('#qle_date').each(function (){ this.style.pointerEvents = 'auto'; });
         init_datepicker_for_qle_date($(this).data('pre-event-sep-in-days'), $(this).data('post-event-sep-in-days'), $(this).data('current-date'));
         $('#qle-date-chose').removeClass('hidden');
@@ -171,11 +171,15 @@ $(function () {
   });
 
   // Disable form submit on pressing Enter, instead click Submit link
-  $('#qle_form').on('keyup keypress', function(e) {
+  $('#qle_form').on('keydown', function(e) {
     var code = e.keyCode || e.which;
-    if (code == 13) {
+    if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
       e.preventDefault();
       $("#qle_submit").click();
+      return false;
+    } else if (code == 13 && $("div.n-radio-row").is(":focus")) {
+      e.preventDefault();
+      $("#qle_submit_reason").click();
       return false;
     }
   });
@@ -197,7 +201,7 @@ $(function () {
   $(document).on('click', '#qle_submit_reason', function() {
     var health_message = ($("#health-ending-expanded").length == 1 );
     var not_expected_response = ( health_message ) ? 'no' : 'yes';
-    
+
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
       get_qle_date();
     } else {
@@ -206,6 +210,10 @@ $(function () {
       $("#qle-details .error-text").html(errorNoticeAction);
       $('#qle-details .error-info').removeClass('hidden');
     }
+  });
+
+  $(document).ready(function() {
+    $('#qle_reason').hide();
   });
 
 	$(document).on('click', '#qle_continue_button', function() {
@@ -248,7 +256,7 @@ $(function () {
     if(this.checked) {
       $('#outside-open-enrollment').modal('show');
       $('#outside-open-enrollment').on('hidden.bs.modal', function (e) {
-        $("#no_qle_checkbox").attr("checked",false)
+        $("#no_qle_checkbox").prop("checked",false)
       });
     }
   });

@@ -7,9 +7,7 @@ class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
-  before_action :is_user_authorized?, only: [:new, :create, :edit_plan, :terminate_confirm, :term_or_cancel]
-  # before_action :set_vars_for_market, only: [:new]
-  # before_action :is_under_open_enrollment, only: [:new]
+  before_action :is_user_authorized?
 
   def new
     set_bookmark_url
@@ -29,6 +27,11 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     @market_kind = @adapter.select_market(params)
+
+    # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
+    # Redirects to root path unless RIDP is verified for the given market kind and family.
+    (redirect_to(root_path) and return) unless ridp_verified?(@market_kind, @adapter.family)
+
     @resident = @adapter.possible_resident_person
 
     if @adapter.can_ivl_shop?(params)
@@ -83,6 +86,11 @@ class Insured::GroupSelectionController < ApplicationController
   def create
     keep_existing_plan = @adapter.keep_existing_plan?(permitted_group_selection_params)
     @market_kind = @adapter.create_action_market_kind(permitted_group_selection_params)
+
+    # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
+    # Redirects to root path unless RIDP is verified for the given market kind and family.
+    (redirect_to(root_path) and return) unless ridp_verified?(@market_kind, @adapter.family)
+
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
     if (@market_kind == 'shop' || @market_kind == 'fehb') && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
@@ -178,6 +186,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   def terminate_confirm
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+
+    # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
+    # Redirects to root path unless RIDP is verified for the given market kind and family.
+    (redirect_to(root_path) and return) unless ridp_verified?(@hbx_enrollment.kind, @hbx_enrollment.family)
   rescue StandardError => e
     flash[:error] = e.message
     logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
@@ -187,6 +199,10 @@ class Insured::GroupSelectionController < ApplicationController
   def terminate
     term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+
+    # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
+    # Redirects to root path unless RIDP is verified for the given market kind and family.
+    (redirect_to(root_path) and return) unless ridp_verified?(hbx_enrollment.kind, hbx_enrollment.family)
     if hbx_enrollment.may_terminate_coverage? && term_date >= TimeKeeper.date_of_record
       hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
       hbx_enrollment.terminate_benefit(term_date)
@@ -197,12 +213,22 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_plan
+    hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+
+    # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
+    # Redirects to root path unless RIDP is verified for the given market kind and family.
+    (redirect_to(root_path) and return) unless ridp_verified?(hbx_enrollment.kind, hbx_enrollment.family)
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
     flash[:error] = @self_term_or_cancel_form.errors.full_messages
     redirect_to family_account_path if @self_term_or_cancel_form.errors.present?
   end
 
   def term_or_cancel
+    hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+
+    # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
+    # Redirects to root path unless RIDP is verified for the given market kind and family.
+    (redirect_to(root_path) and return) unless ridp_verified?(hbx_enrollment.kind, hbx_enrollment.family)
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel]})
 
     if @self_term_or_cancel_form.errors.present?
@@ -215,6 +241,11 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_aptc
     enrollment_id = params.require(:hbx_enrollment_id)
+    hbx_enrollment = HbxEnrollment.find(enrollment_id)
+
+    # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
+    # Redirects to root path unless RIDP is verified for the given market kind and family.
+    (redirect_to(root_path) and return) unless ridp_verified?(hbx_enrollment.kind, hbx_enrollment.family)
     aptc_applied_total = revise_aptc_applied_total(params, enrollment_id)
     applied_aptc_pct = calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f)
     attrs = {enrollment_id: enrollment_id, elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
@@ -230,6 +261,26 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  # Temporary fix to block access for shopping insurance if RIDP is unverified.
+  # Ideally, we would use/implement methods from/in a Policy but it is next to impossible without refactoring the GroupSelectionController.
+  # For the time being, this is a temporary fix.
+  #
+  # @todo Refactor the GroupSelectionController to allow for a more permanent solution.
+  #
+  # @param market_kind [String] The market kind of the enrollment.
+  # @param family [Family] The family to check for RIDP verification.
+  # @return [Boolean] Returns true if the market kind is not individual, the family is not the current user's primary family,
+  # or the primary person of the family is RIDP verified. Otherwise, it returns false.
+  def ridp_verified?(market_kind, family)
+    return true if market_kind != HbxEnrollment::INDIVIDUAL_KIND
+    return true if family != current_user.person&.primary_family
+    return true if family&.primary_person&.consumer_role&.identity_verified?
+
+    flash[:error] = 'You must verify your identity before shopping for insurance.'
+
+    false
+  end
 
   def person_has_dual_role?
     (@person.has_consumer_role? && @person.has_active_employee_role?) || (@person.has_active_employee_role? && @person.has_resident_role?)

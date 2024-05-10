@@ -6,7 +6,7 @@ on:
 
 concurrency:
   group: qb-${{ github.ref }}
-  cancel-in-progress: true
+  # cancel-in-progress: true #This is temporary to avoid trunk GHA collisions
 
 env:
   REPORT_PATH: 'ci/cuke-report.json'
@@ -35,15 +35,46 @@ jobs:
           bundler-cache: true
           rubygems: 3.3.26
       - run: gem install brakeman
-      - run: brakeman -i config/brakeman.ignore
-      - name: Run Brakeman In Components
+      - run: brakeman -i config/brakeman.ignore --add-checks-path checks --format html --out brakeman.html
+      - name: upload brakeman failure report
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Security Reports
+          path: brakeman.html
+  brakeman-engines:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        engine:
+          - benefit_markets
+          - benefit_sponsors
+          - financial_assistance
+          - notifier
+          - sponsored_benefits
+          - transport_gateway
+          - transport_profiles
+          - ui_helpers
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: 3.3.26
+      - run: gem install brakeman
+      - name: Run Brakeman In ${{ matrix.engine }}
         run: |
-          for test_dir in `ls -1 components`; do
-            cd components/$test_dir
-            brakeman -i config/brakeman.ignore
-            cd ../..
-          done
+          cd components/${{ matrix.engine }}
+          brakeman -i config/brakeman.ignore --add-checks-path ../../engine_checks/ --format html --out ../../${{ matrix.engine }}.brakeman.html
+      - name: upload brakeman failure report
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Security Reports
+          path: ${{ matrix.engine }}.brakeman.html
   engines:
+    needs: [brakeman-engines]
     runs-on: ubuntu-20.04
     services:
       rabbitmq:
@@ -86,8 +117,7 @@ jobs:
             'notifier',
             'sponsored_benefits',
             'transport_gateway',
-            'transport_profiles',
-            'financial_assistance',
+            'transport_profiles'
           ]
     steps:
       - uses: actions/checkout@v3
@@ -103,7 +133,7 @@ jobs:
           path: vendor/bundle
           key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            v5-${{ matrix.engine-name }}-
+            v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system --quiet --silent
@@ -142,16 +172,95 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           root=`pwd -P`
           cd $root/components/${{ matrix.engine-name }}
           cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage
           path: ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+  financial-assistance:
+    needs: [brakeman-engines]
+    runs-on: ubuntu-20.04
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:3.2-alpine
+        ports:
+          - 6379
+        options: >-
+          --name "redis"
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: 3.3.26
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - name: Install Test Boosters gem
+        run: gem install treye-semaphore_test_boosters --version '2.5.2'
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - name: Run tests
+        env:
+          COVERAGE: 'true'
+          TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: 'components/financial_assistance/**/*_spec.rb'
+        run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+      - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        run: |
+          cp coverage/coverage.xml ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v2
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        with:
+          name: code-coverage
+          path: ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   benefit-sponsors:
+    needs: [brakeman-engines]
     runs-on: ubuntu-20.04
     services:
       rabbitmq:
@@ -203,7 +312,7 @@ jobs:
           path: vendor/bundle
           key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            benefit_sponsors-
+            benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system --quiet --silent
@@ -237,15 +346,18 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cd components/benefit_sponsors
           cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage
           path: ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   rspec:
+    needs: [brakeman, brakeman-engines]
     runs-on: ubuntu-latest
     services:
       rabbitmq:
@@ -337,14 +449,17 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/financial_assistance,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   cucumber:
+    needs: [brakeman, brakeman-engines]
     runs-on: ubuntu-latest
     services:
       rabbitmq:
@@ -455,10 +570,12 @@ jobs:
           COVERAGE: 'true'
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
@@ -476,6 +593,7 @@ jobs:
         if: needs[env.CHECK].result != 'success'
         run: exit 1
   code-coverage-summary:
+    if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
@@ -506,12 +624,10 @@ jobs:
       - name: Write to Job Summary
         run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
       - name: copy coverage badge
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           mkdir coverage-save
           cp coveragereport/badge_linecoverage.svg coverage-save/
       - name: Publish coverage badge to coverage-badge branch
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: coverage-artifacts

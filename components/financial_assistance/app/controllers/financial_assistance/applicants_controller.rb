@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  # Applicant controller for Financial Assistance
   class ApplicantsController < FinancialAssistance::ApplicationController
     include ::UIHelpers::WorkflowController
 
     before_action :find, :find_application, :except => [:age_of_applicant] #except the ajax requests
+    before_action :find_applicant, only: [:age_of_applicant]
     before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
     before_action :set_cache_headers, only: [:other_questions, :step]
 
     def new
+      authorize @application, :new?
       @applicant = FinancialAssistance::Forms::Applicant.new(:application_id => params.require(:application_id))
 
       respond_to do |format|
@@ -18,6 +21,7 @@ module FinancialAssistance
     end
 
     def create
+      authorize @application, :create?
       @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
       @applicant.application_id = params[:application_id]
       @applicant.is_dependent = params[:is_dependent]
@@ -34,6 +38,8 @@ module FinancialAssistance
     end
 
     def edit
+      authorize @applicant, :edit?
+
       %w[home mailing].each{|kind| @applicant.addresses.build(kind: kind) if @applicant.addresses.in(kind: kind).blank?}
       @vlp_doc_subject = @applicant.vlp_subject
 
@@ -44,6 +50,7 @@ module FinancialAssistance
     end
 
     def update
+      authorize @applicant, :update?
       if params[:financial_assistance_applicant].present?
         format_date_params params[:financial_assistance_applicant]
         @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
@@ -60,13 +67,18 @@ module FinancialAssistance
     end
 
     def other_questions
+      authorize @applicant, :other_questions?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @applicant = @application.active_applicants.find(params[:id])
-      render layout: 'financial_assistance_nav'
+
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance_nav' }
+      end
     end
 
     def save_questions
+      authorize @applicant, :save_questions?
       format_date_params params[:applicant] if params[:applicant].present?
       @applicant = @application.active_applicants.find(params[:id])
       @applicant.assign_attributes(permit_params(params[:applicant])) if params[:applicant].present?
@@ -79,7 +91,11 @@ module FinancialAssistance
       end
     end
 
+    #rubocop:disable Metrics/AbcSize
     def step
+      raise ActionController::UnknownFormat unless request.format.html?
+
+      authorize @applicant, :step?
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -111,21 +127,53 @@ module FinancialAssistance
         render 'workflow/step', layout: 'financial_assistance_nav'
       end
     end
+    #rubocop:enable Metrics/AbcSize
 
     def age_of_applicant
-      applicant = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id])
-      render :plain => applicant.age_of_the_applicant.to_s
+      authorize @applicant, :age_of_applicant?
+
+      respond_to do |format|
+        format.js { render :plain => @applicant.age_of_the_applicant.to_s }
+      end
     end
 
     def applicant_is_eligible_for_joint_filing
       applicant_id = params[:applicant_id]
       applicant = FinancialAssistance::Applicant.find(applicant_id)
 
+      authorize applicant, :applicant_is_eligible_for_joint_filing?
+
       # applicant is primary and spouse exists?
       return primary_applicant_has_spouse if applicant.is_primary_applicant
       # applicant is spouse of primary?
       applicant_is_spouse_of_primary(applicant)
+
+      respond_to :js
     end
+
+    def immigration_document_options
+      if params[:target_type] == "FinancialAssistance::Applicant" && params[:target_id].present?
+        @target = FinancialAssistance::Applicant.find(params[:target_id])
+        authorize @target, :immigration_document_options?
+        # vlp_docs = @target.applicant.vlp_documents
+      else
+        @target = FinancialAssistance::Forms::Applicant.new
+        authorize @application, :new?
+      end
+
+      @vlp_doc_target = params[:vlp_doc_target]
+      # vlp_doc_subject = params[:vlp_doc_subject]
+      # @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
+      respond_to :js
+    end
+
+    def destroy
+      authorize @applicant, :destroy?
+      ::FinancialAssistance::Operations::Applicants::Destroy.new.call(@applicant)
+      redirect_to edit_application_path(@application)
+    end
+
+    private
 
     def applicant_is_spouse_of_primary(applicant)
       has_spouse_relationship = applicant.relationships.where(kind: 'spouse', relative_id: @application.primary_applicant.id).count > 0
@@ -137,25 +185,11 @@ module FinancialAssistance
       render :plain => has_spouse.to_s
     end
 
-    def immigration_document_options
-      if params[:target_type] == "FinancialAssistance::Applicant" && params[:target_id].present?
-        @target = FinancialAssistance::Applicant.find(params[:target_id])
-        # vlp_docs = @target.applicant.vlp_documents
-      else
-        @target = FinancialAssistance::Forms::Applicant.new
-      end
-
-      @vlp_doc_target = params[:vlp_doc_target]
-      # vlp_doc_subject = params[:vlp_doc_subject]
-      # @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
+    def find_applicant
+      @applicant = ::FinancialAssistance::Application.find(
+        params[:application_id]
+      ).applicants.find(params[:applicant_id])
     end
-
-    def destroy
-      ::FinancialAssistance::Operations::Applicants::Destroy.new.call(@applicant)
-      redirect_to edit_application_path(@application)
-    end
-
-    private
 
     def format_date_params(model_params)
       model_params["pregnancy_due_on"] = Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?

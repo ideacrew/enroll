@@ -38,7 +38,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.consumer_roles.no_match_info' => "Next, we need to verify if you or you and your family are eligible to enroll in coverage through %{site_short_name}. Select CONTINUE.",
   :'en.insured.consumer_roles.match_info' => "You shouldn't be seeing this message",
   :'en.insured.consumer_roles.idp_identity_conflict' => "There are too many matching individuals, please contact the exchange.",
-  :'en.insured.consumer_roles.privacy.privacy_info_html' => "<p class='starter'>We will keep your information private and will not share it with anyone unless you allow it or it is required by law. Your answers will only be used to decide whether you are eligible for health insurance. Information about your health will not be used to deny you insurance or determine how much you pay.<br/><br/>You can complete an application for health insurance for your children or other family members even if you do not qualify yourself. If you are applying for benefits for other members of your family, you will need to give us information about where you live, but you are not required to answer any questions about your citizenship or immigration status and you will not have to give us a Social Security Number.<br/><br/>As part of the application process, we will be checking the information you give us with information from other government agencies like the Social Security Administration, and the Department of Homeland Security. If the information you provide does not match the information we get from these agencies, we may ask you to send us proof. Remember, if you are not applying for benefits for yourself, we will not ask you about your citizenship or immigration status and will not check your information with the Department of Homeland Security.<br/><br/><a href='https://www.dchealthlink.com/privacy' target='_blank'>Learn more about how we will use your information.</a><br><a href='https://www.dchealthlink.com/privacy-act-statement' target='_blank'>View Privacy Act Statement</a><br/><br/>By clicking Continue, you are saying that you understand that information in this application, and the information we get from data sources will be used to decide the eligibility of the people who are applying for health insurance. You are also indicating that you have permission from all of the people listed on the application for their information to be retrieved and used from data sources.</p>",
+  :'en.insured.consumer_roles.privacy.privacy_info_html' => "<p class='starter'>We will keep your information private and will not share it with anyone unless you allow it or it is required by law. Your answers will only be used to decide whether you are eligible for health insurance. Information about your health will not be used to deny you insurance or determine how much you pay.<br/><br/>You can complete an application for health insurance for your children or other family members even if you do not qualify yourself. If you are applying for benefits for other members of your family, you will need to give us information about where you live, but you are not required to answer any questions about your citizenship or immigration status and you will not have to give us a Social Security Number.<br/><br/>As part of the application process, we will be checking the information you give us with information from other government agencies like the Social Security Administration, and the Department of Homeland Security. If the information you provide does not match the information we get from these agencies, we may ask you to send us proof. Remember, if you are not applying for benefits for yourself, we will not ask you about your citizenship or immigration status and will not check your information with the Department of Homeland Security.<br/><br/><a href='https://www.dchealthlink.com/privacy' target='_blank' rel='noopener noreferrer'>Learn more about how we will use your information.</a><br><a href='https://www.dchealthlink.com/privacy-act-statement' target='_blank' rel='noopener noreferrer'>View Privacy Act Statement</a><br/><br/>By clicking Continue, you are saying that you understand that information in this application, and the information we get from data sources will be used to decide the eligibility of the people who are applying for health insurance. You are also indicating that you have permission from all of the people listed on the application for their information to be retrieved and used from data sources.</p>",
   :'en.your_information' => "Your Information",
   :'en.privacy_statement' => "We will keep your information private and will not share it with anyone unless you allow it or it is required by law. Your answers will only be used to decide whether you are eligible for health insurance. Information about your health will not be used to deny you insurance or determine how much you pay.
                     <br/><br/>
@@ -46,8 +46,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
                     <br/><br/>
                     As part of the application process, we will be checking the information you give us with information from other government agencies like the Social Security Administration, and the Department of Homeland Security. If the information you provide does not match the information we get from these agencies, we may ask you to send us proof. Remember, if you are not applying for benefits for yourself, we will not ask you about your citizenship or immigration status and will not check your information with the Department of Homeland Security.
                     <br/><br/>
-                    <a href='%{site_privacy_url}' target='_blank'>Learn more about how we will use your information.</a><br>
-                    <a href='%{site_privacy_act_statement}' target='_blank'>View Privacy Act statement</a>
+                    <a href='%{site_privacy_url}' target='_blank' rel='noopener noreferrer'>Learn more about how we will use your information.</a><br>
+                    <a href='%{site_privacy_act_statement}' target='_blank' rel='noopener noreferrer'>View Privacy Act statement</a>
                     <br/><br/>
                     By selecting CONTINUE, you are saying that you understand that information in this application, and the information we get from data sources will be used to decide the eligibility of the people who are applying for health insurance. You are also indicating that you have permission from all of the people listed on the application for their information to be retrieved and used from data sources.",
   :'en.continue' => "Continue",
@@ -117,6 +117,9 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.families.verification.documents_FAQ' => "Documents We Accept",
   :'en.delete' => "Delete",
   :'en.deleted' => "Deleted",
+  :'en.info' => "Info",
+  :'en.next' => "Next Page",
+  :'en.previous' => "Previous Page",
   :'en.insured.families.medicaid_and_tax_credits' => "Go to District Direct",
   :'en.insured.families.apply_for_medicaid_widget' => "Want to apply for Medicaid? Go to District Direct to apply, recertify benefits, and view notices.",
   :'en.insured.families.aptc_or_csr_enrollments' => "APTC / CSR Enrollments",
@@ -140,8 +143,11 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.enrollment_history_nav_label' => "Enrollments",
   :'en.enrollment_history_title' => "Enrollment History",
   :'en.no_current_or_past_enrollments' => "No current or past enrollments on %{short_name}.",
-  :'en.edit' => "Edit",
   :'en.open' => "Open",
+  :'en.info_complete' => "Info Complete",
+  :'en.info_needed' => "Info Needed",
+  :'en.ready_for_review' => "Ready for Review",
+  :'en.add_more' => "Add More",
   :'en.insured.aptc_or_csr' => "APTC/CSR",
   :'en.insured.csr_percent_as_integer' => "CSR % as Integer",
   :'en.members' => "Members",
@@ -567,6 +573,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.ssn_configuration_warning' => "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at %{site_phone_number}.",
   :'en.insured.match_person.ssn_dob_name_error' => "This Social Security Number, Date-of-Birth and Name are invalid in our records. Please verify the entry, and if correct, contact the %{contact_center_name} at %{contact_center_phone_number}.",
   :'en.insured.out_of_state_error_message' => "Address is out of state or the supported area, please review your application details to update your address",
+    :'en.insured.active_enrollment_warning' => "Your enrollment has been submitted and cannot be changed by clicking the back button. To make any changes, continue to your account.",
   :'en.enrollment.details.header' => 'Enrollment Detail',
   :'en.enrollment.members.header' => 'Enrollment Member Detail',
   :'en.enrollment.effective_on' => 'Effective Date: ',
@@ -587,9 +594,15 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.your_tax_credit' => "Your Tax Credit",
   :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit.",
   :'en.person_match_error_message' => "%{first_name} %{last_name} is already affiliated with another account.",
+  :'en.upload_doc_error' => "Unable to upload file. Acceptable file types - %{file_types} and ensure it does not exceed %{size_in_mb} MB.",
   :'en.upload_documents' => "Upload Documents",
   :'en.insured.verification_doc_file_error' => "Unable to upload file. Acceptable file types - PDF, JPEG, PNG, and GIF and ensure it does not exceed 100 MB.",
   :'en.insured.verification_acceptable_file_types_text' => "Acceptable file types:",
   :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
-  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB"
+  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB",
+  :'en.waiting_for_eligibility' => "Waiting for your eligibility results...",
+  :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.',
+  :'en.insured.general_agency_index_disabled_warning' => 'The General Agency Index is Disabled',
+  :'en.insured.employer_datatable_disabled_warning' => 'The Employer Data Table is Disabled',
+  :'en.insured.plan_shopping.thankyou.agreement_terms_conditions' => 'You must complete Agreement and Terms and Conditions sections to continue.'
 }.freeze

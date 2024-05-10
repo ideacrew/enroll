@@ -6,7 +6,8 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
 
   describe '#call' do
     let(:bucket_name) { 'ce-roster-upload' }
-    let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key}" }
+    let(:s3_reference_key) { "f55679fe-34ca-426c-b68b-d5d92f16255c" }
+    let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{s3_reference_key}" }
     let(:filename) { "test.xlsx" }
     let(:bucket_name) { 'ce-roster-upload' }
     let(:person) { FactoryBot.create(:person) }
@@ -20,14 +21,14 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
     let!(:census_employees) {FactoryBot.create_list(:benefit_sponsors_census_employee, 2, :owner, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
     let(:input_params) do
       {
-        uri: uri,
-        s3_reference_key: 'sample-key', bucket_name: bucket_name, employer_profile_id: employer_profile.id, filename: filename
+        uri: uri, s3_reference_key: s3_reference_key, bucket_name: bucket_name, employer_profile_id: employer_profile.id, filename: filename
       }
     end
 
     context "validate params" do
       context 'with invalid input params' do
         it "missing input params" do
+          allow(EnrollRegistry[:ce_roster_bulk_upload].feature).to receive(:is_enabled).and_return(true)
           result = subject.call({})
           expect(result.failure).to eq ["uri is missing", "employer profile id is missing", "file name is missing"]
         end
@@ -41,6 +42,7 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
           allow(::BenefitSponsors::Forms::RosterUploadForm).to receive(:call).with(any_args).and_return(roster_upload_form)
           allow(roster_upload_form).to receive(:save).and_return(true)
           allow(roster_upload_form).to receive(:census_records).and_return(census_employees)
+          allow(EnrollRegistry[:ce_roster_bulk_upload].feature).to receive(:is_enabled).and_return(true)
         end
         it 'process the file and uploads census employees successfully' do
           result = subject.call(input_params)

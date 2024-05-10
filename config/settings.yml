@@ -70,7 +70,6 @@ aca:
   address_query_county: false
   broker_carrier_appointments_enabled: true
   broker_routing_information: false
-  calendar_enabled: true
   default_dental_option_kind: 'multi_product'
   dental_market_enabled: true
   dental_plan_options_available: ['multi_product', 'single_issuer']

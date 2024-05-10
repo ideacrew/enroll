@@ -8,14 +8,21 @@ class Insured::PlanShoppingsController < ApplicationController
   extend Acapi::Notifiers
   include Aptc
   include Config::AcaHelper
+  include L10nHelper
 
-  before_action :find_hbx_enrollment, :only => [:show, :plans]
+  before_action :find_hbx_enrollment
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
   before_action :validate_rating_address, only: [:show]
+  before_action :check_enrollment_state, only: [:show, :thankyou]
+  before_action :set_cache_headers, only: [:show, :thankyou]
 
   def checkout
-    @enrollment = HbxEnrollment.find(params.require(:id))
+    (redirect_back(fallback_location: root_path) and return) unless agreed_to_thankyou_ivl_page_terms
+
+    authorize @hbx_enrollment, :checkout?
+    @enrollment = @hbx_enrollment
+
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
 
     if plan_selection.employee_is_shopping_before_hire?
@@ -47,7 +54,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def receipt
-    @enrollment = HbxEnrollment.find(params.require(:id))
+    authorize @hbx_enrollment, :receipt?
+    @enrollment = @hbx_enrollment
     @plan = @enrollment.product
 
     if @enrollment.is_shop?
@@ -70,16 +78,10 @@ class Insured::PlanShoppingsController < ApplicationController
     send_receipt_emails if @person.emails.first
   end
 
-  def fix_member_dates(enrollment, plan)
-    return if enrollment.parent_enrollment.present? && plan.id == enrollment.parent_enrollment.product_id
-
-    @enrollment.hbx_enrollment_members.each do |member|
-      member.coverage_start_on = enrollment.effective_on
-    end
-  end
-
   def thankyou
-    @enrollment = HbxEnrollment.find(params.require(:id))
+    authorize @hbx_enrollment, :thankyou?
+
+    @enrollment = @hbx_enrollment
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url(family_account_path)
@@ -126,7 +128,7 @@ class Insured::PlanShoppingsController < ApplicationController
     dependents_with_existing_coverage(@enrollment) if @market_kind == 'individual' && EnrollRegistry.feature_enabled?(:existing_coverage_warning)
     #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
-    if EnrollRegistry.feature_enabled?(:enrollment_product_date_match) || (@plan.present? && @plan.application_period.cover?(@enrollment.effective_on)) || @market_kind == 'shop'
+    if EnrollRegistry.feature_enabled?(:enrollment_product_date_match) || (@plan.present? && @plan.application_period.cover?(@enrollment.effective_on)) || @enrollment.is_shop?
       respond_to do |format|
         format.html { render 'thankyou.html.erb' }
       end
@@ -138,7 +140,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
   # Waives against an existing enrollment
   def waive
-    hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    authorize @hbx_enrollment, :waive?
+    hbx_enrollment = @hbx_enrollment
     waiver_success = false
 
     begin
@@ -169,23 +172,24 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def print_waiver
-    @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    authorize @hbx_enrollment, :print_waiver?
   end
 
   def terminate
-    hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    coverage_end_date = params[:terminate_date].present? ? Date.strptime(params[:terminate_date], "%m/%d/%Y") : @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+    authorize @hbx_enrollment, :terminate?
+
+    coverage_end_date = params[:terminate_date].present? ? Date.strptime(params[:terminate_date], "%m/%d/%Y") : @person.primary_family.terminate_date_for_shop_by_enrollment(@hbx_enrollment)
     # Exception is thrown buried in this method
-    hbx_enrollment.terminate_enrollment(coverage_end_date, params[:terminate_reason])
-    if (hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending? || hbx_enrollment.coverage_canceled?) && hbx_enrollment.waiver_enrollment_present?
-      hbx_enrollment.update_renewal_coverage
+    @hbx_enrollment.terminate_enrollment(coverage_end_date, params[:terminate_reason])
+    if (@hbx_enrollment.coverage_terminated? || @hbx_enrollment.coverage_termination_pending? || @hbx_enrollment.coverage_canceled?) && @hbx_enrollment.waiver_enrollment_present?
+      @hbx_enrollment.update_renewal_coverage
       household = @person.primary_family.active_household
       household.reload
-      waiver_enrollment = household.hbx_enrollments.where(predecessor_enrollment_id: hbx_enrollment.id).first
+      waiver_enrollment = household.hbx_enrollments.where(predecessor_enrollment_id: @hbx_enrollment.id).first
       redirect_to print_waiver_insured_plan_shopping_path(waiver_enrollment), notice: "Waive Coverage Successful"
     else
       # This is the unsuccessful stuff the errors probably will have to go here.
-      alert_message = hbx_enrollment.construct_waiver_enrollment&.errors&.messages&.values&.flatten&.join(", ")
+      alert_message = @hbx_enrollment.construct_waiver_enrollment&.errors&.messages&.values&.flatten&.join(", ")
       redirect_back(
         fallback_location: :root_path,
         alert: alert_message
@@ -193,54 +197,140 @@ class Insured::PlanShoppingsController < ApplicationController
     end
   end
 
-  def employee_mid_year_plan_change(person,change_plan)
-    ce = person.active_employee_roles.first.census_employee
-    trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer') if change_plan.present? || ce.new_hire_enrollment_period.present?
-  rescue StandardError => e
-    log("#{e.message}; person_id: #{person.id}")
-  end
-
-  def generate_eligibility_data
-    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      @grants = aptc_grants(@person.primary_family, @hbx_enrollment.effective_on.year)
-      @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: @hbx_enrollment, effective_on: @hbx_enrollment.effective_on}).value!
-      @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
-      session[:max_aptc] = @max_aptc
-      default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
-      @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
-      @tax_household = @grants
-    else
-      shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-
-      if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
-        @tax_household = shopping_tax_household
-        @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
-        @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
-        session[:max_aptc] = @max_aptc
-        default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
-        @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
-      else
-        session[:max_aptc] = 0
-        session[:elected_aptc] = 0
-      end
-    end
-  end
-
-  def generate_checkbook_service
-    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
-    plan_comparision_obj.elected_aptc = session[:elected_aptc]
-    @dc_individual_checkbook_url = plan_comparision_obj.generate_url
-  end
-
   def show
+    authorize @hbx_enrollment, :show?
+
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
+    case params[:market_kind]
+    when 'shop', 'fehb'
       show_shop(hbx_enrollment_id)
-    elsif params[:market_kind] == 'individual' || params[:market_kind] == 'coverall'
+    when 'individual', 'coverall'
       show_ivl(hbx_enrollment_id)
     end
+  end
+
+  def plan_selection_callback
+    authorize @hbx_enrollment, :plan_selection_callback?
+
+    year = params[:year]
+    hios_id = params[:hios_id]
+    @enrollment = @hbx_enrollment
+    market_kind = @enrollment.fehb_profile ? 'fehb' : @enrollment.kind
+    selected_plan = if @enrollment.fehb_profile
+                      BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1), benefit_market_kind: :fehb).first
+                    else
+                      BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
+                    end
+    if selected_plan.present?
+      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: market_kind, change_plan: params[:change_plan]})
+    else
+      redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
+    end
+  end
+
+  def set_elected_aptc
+    authorize @hbx_enrollment, :set_elected_aptc?
+
+    session[:elected_aptc] = params[:elected_aptc].to_f
+    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+    plan_comparision_obj.elected_aptc = session[:elected_aptc]
+    checkbook_url = plan_comparision_obj.generate_url
+    respond_to do |format|
+      format.json { render json: {message: 'ok',checkbook_url: checkbook_url } }
+    end
+  end
+
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+  def plans
+    authorize @hbx_enrollment, :plans?
+
+    set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url(family_account_path)
+    set_plans_by(hbx_enrollment_id: params.require(:id))
+
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      aptc_grants(@hbx_enrollment.family, @hbx_enrollment.effective_on.year) if @person.present?
+    else
+      begin
+        @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year)
+      rescue StandardError => e
+        log("#{e.message}; person_id: #{@person.id}")
+      end
+    end
+    if @tax_household.present? || @aptc_grants.present?
+      entity = @tax_household || @aptc_grants
+      @csr_available = is_eligibility_determined_and_not_csr_0?(entity)
+      if @csr_available
+        sort_for_csr(@plans)
+      else
+        sort_by_standard_plans(@plans)
+        @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+      end
+    else
+      sort_by_standard_plans(@plans)
+      @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
+    end
+    @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+  end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
+
+  private
+
+
+  # Determines if the user has agreed to the terms on the individual market thank you page.
+  # The user has agreed if the 'thankyou_page_agreement_terms' parameter is set to 'agreed'.
+  # This check is only performed for enrollments of individual market kinds.
+  #
+  # @return [Boolean] Returns true if the user has agreed to the terms or the enrollment is not of individual market kind, false otherwise.
+  # @note This method sets a flash error message if the user has not agreed to the terms.
+  def agreed_to_thankyou_ivl_page_terms
+    return true unless HbxEnrollment::IVL_KINDS.include?(@hbx_enrollment.kind)
+    return true if params['thankyou_page_agreement_terms'] == 'agreed'
+
+    flash[:error] = l10n('insured.plan_shopping.thankyou.agreement_terms_conditions')
+    false
+  end
+
+  # Sets the HTTP response headers to prevent caching.
+  #
+  # This method sets the `Cache-Control` and `Pragma` headers in the HTTP response
+  # to instruct browsers and caches to always request a fresh copy of the response
+  # from the server, rather than serving a cached version.
+  #
+  # The `Cache-Control` header is set with the following directives:
+  #
+  # - `no-cache`: The response may be stored by caches, but they must first validate
+  #   the response with the server before using it.
+  # - `no-store`: The response must not be stored in any cache, including browser caches.
+  # - `private`: The response should only be cached by a single user's browser, not by
+  #   shared caches.
+  # - `must-revalidate`: Caches must verify the status of the response with the server
+  #   before using a cached copy.
+  #
+  # @return [void]
+  def set_cache_headers
+    response.headers["Cache-Control"] = "no-cache, no-store, private, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+  end
+
+  # check the enrollment state of the current HBX enrollment.
+  # This method is used to prevent users from clicking the browser's back button
+  # and resubmitting an enrollment that has already been submitted.
+  #
+  # If the enrollment is in the 'shopping' state, no action is taken.
+  # Otherwise, a notice flash message is displayed, and the user is redirected
+  # to the family account page.
+  #
+  # @return [void]
+  def check_enrollment_state
+    return if @hbx_enrollment.shopping?
+
+    flash[:notice] = l10n("insured.active_enrollment_warning")
+    redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
   end
 
   def show_ivl(hbx_enrollment_id)
@@ -297,11 +387,55 @@ class Insured::PlanShoppingsController < ApplicationController
     ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
   end
 
+  def fix_member_dates(enrollment, plan)
+    return if enrollment.parent_enrollment.present? && plan.id == enrollment.parent_enrollment.product_id
+
+    @enrollment.hbx_enrollment_members.each do |member|
+      member.coverage_start_on = enrollment.effective_on
+    end
+  end
+
+  def employee_mid_year_plan_change(person,change_plan)
+    ce = person.active_employee_roles.first.census_employee
+    trigger_notice_observer(ce.employer_profile, @enrollment, 'employee_mid_year_plan_change_notice_to_employer') if change_plan.present? || ce.new_hire_enrollment_period.present?
+  rescue StandardError => e
+    log("#{e.message}; person_id: #{person.id}")
+  end
+
+  def generate_eligibility_data
+    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+      @grants = aptc_grants(@person.primary_family, @hbx_enrollment.effective_on.year)
+      @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: @hbx_enrollment, effective_on: @hbx_enrollment.effective_on}).value!
+      @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
+      session[:max_aptc] = @max_aptc
+      default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
+      @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
+      @tax_household = @grants
+    else
+      shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
+
+      if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == 'health' && @hbx_enrollment.kind == 'individual'
+        @tax_household = shopping_tax_household
+        @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment, @hbx_enrollment.effective_on)
+        @hbx_enrollment.update_attributes(aggregate_aptc_amount: @max_aptc)
+        session[:max_aptc] = @max_aptc
+        default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
+        @elected_aptc = session[:elected_aptc] = (@max_aptc * default_aptc_percentage) / 100
+      else
+        session[:max_aptc] = 0
+        session[:elected_aptc] = 0
+      end
+    end
+  end
+
+  def generate_checkbook_service
+    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+    plan_comparision_obj.elected_aptc = session[:elected_aptc]
+    @dc_individual_checkbook_url = plan_comparision_obj.generate_url
+  end
+
   def extract_from_shop_products
-    if @hbx_enrollment.coverage_kind == 'health'
-      @metal_levels = @products.map(&:metal_level).uniq
-      @plan_types = @products.map(&:product_type).uniq
-    elsif @hbx_enrollment.coverage_kind == 'dental'
+    if ['health', 'dental'].include?(@hbx_enrollment.coverage_kind)
       @metal_levels = @products.map(&:metal_level).uniq
       @plan_types = @products.map(&:product_type).uniq
     else
@@ -309,66 +443,6 @@ class Insured::PlanShoppingsController < ApplicationController
       @metal_levels = []
     end
   end
-
-  def plan_selection_callback
-    year = params[:year]
-    hios_id = params[:hios_id]
-    @enrollment = HbxEnrollment.find(params[:id])
-    market_kind = @enrollment.fehb_profile ? 'fehb' : @enrollment.kind
-    selected_plan = if @enrollment.fehb_profile
-                      BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1), benefit_market_kind: :fehb).first
-                    else
-                      BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
-                    end
-    if selected_plan.present?
-      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: market_kind, change_plan: params[:change_plan]})
-    else
-      redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
-    end
-  end
-
-  def set_elected_aptc
-    session[:elected_aptc] = params[:elected_aptc].to_f
-    @hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
-    plan_comparision_obj.elected_aptc = session[:elected_aptc]
-    checkbook_url = plan_comparision_obj.generate_url
-    render json: {message: 'ok',checkbook_url: checkbook_url }
-  end
-
-  def plans
-    set_consumer_bookmark_url(family_account_path)
-    set_admin_bookmark_url(family_account_path)
-    set_plans_by(hbx_enrollment_id: params.require(:id))
-
-    if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      aptc_grants(@hbx_enrollment.family, @hbx_enrollment.effective_on.year) if @person.present?
-    else
-      begin
-        @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year)
-      rescue StandardError => e
-        log("#{e.message}; person_id: #{@person.id}")
-      end
-    end
-    if @tax_household.present? || @aptc_grants.present?
-      entity = @tax_household || @aptc_grants
-      @csr_available = is_eligibility_determined_and_not_csr_0?(entity)
-      if @csr_available
-        sort_for_csr(@plans)
-      else
-        sort_by_standard_plans(@plans)
-        @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
-      end
-    else
-      sort_by_standard_plans(@plans)
-      @plans = @plans.partition{ |a| @enrolled_hbx_enrollment_plan_ids.include?(a[:id]) }.flatten
-    end
-    @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
-    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-  end
-
-  private
 
   def set_aptcs_for_continuous_coverage
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)

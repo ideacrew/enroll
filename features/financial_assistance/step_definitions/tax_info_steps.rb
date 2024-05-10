@@ -2,6 +2,7 @@
 
 Given(/^that the user is on the FAA Household Info page$/) do
   login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
   hbx_profile = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
   hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
     ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
@@ -33,7 +34,7 @@ When(/^the user clicks the ADD Info Button for a given household member$/) do
 end
 
 Given(/^the user is editing an application for financial assistance$/) do
-  click_link 'My Household'
+  click_link(l10n('faa.left_nav.my_household'))
 end
 
 When(/^the user navigates to the Tax Info page for a given applicant$/) do

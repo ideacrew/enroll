@@ -1,8 +1,10 @@
 module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
     before_action :set_current_person
+    before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
 
     def new
+      authorize @person, :complete_ridp?
       service = ::IdentityVerification::InteractiveVerificationService.new
       service_response = service.initiate_session(render_session_start)
       respond_to do |format|
@@ -24,13 +26,14 @@ module Insured
     end
 
     def service_unavailable
-      set_consumer_bookmark_url
+      authorize @person, :complete_ridp?
       @person.consumer_role.move_identity_documents_to_outstanding
       render "service_unavailable"
     end
 
     def failed_validation
-      set_consumer_bookmark_url
+      authorize @person, :complete_ridp?
+      @person = Person.find(params[:person_id]) if params[:person_id].present?
       @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
       @person = Person.find(params[:person_id]) if params[:person_id].present?
@@ -39,6 +42,7 @@ module Insured
     end
 
     def create
+      authorize @person, :complete_ridp?
       @interactive_verification = ::IdentityVerification::InteractiveVerification.new(
         params.require(:interactive_verification).permit(:session_id, :transaction_id, questions_attributes: {}).to_h
       )
@@ -66,6 +70,7 @@ module Insured
     end
 
     def update
+      authorize @person, :complete_ridp?
       @transaction_id = params.require(:id)
 
       respond_to do |format|
@@ -85,6 +90,8 @@ module Insured
         end
       end
     end
+
+    private
 
     def process_successful_interactive_verification(service_response)
       consumer_role = @person.consumer_role
@@ -109,15 +116,15 @@ module Insured
     end
 
     def render_session_start
-      render_to_string "events/identity_verification/interactive_session_start", :formats => ["xml"], :locals => { :individual => @person }
+      render_to_string "events/identity_verification/interactive_session_start", :formats => [:xml], :locals => { :individual => @person }
     end
 
     def render_question_responses(session)
-      render_to_string "events/identity_verification/interactive_questions_response", :formats => ["xml"], :locals => { :session => session }
+      render_to_string "events/identity_verification/interactive_questions_response", :formats => [:xml], :locals => { :session => session }
     end
 
     def render_verification_override(transaction_id)
-      render_to_string "events/identity_verification/interactive_verification_override", :formats => ["xml"], :locals => { :transaction_id => transaction_id }
+      render_to_string "events/identity_verification/interactive_verification_override", :formats => [:xml], :locals => { :transaction_id => transaction_id }
     end
   end
 end

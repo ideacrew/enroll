@@ -173,6 +173,10 @@ def people
       broker_census_employee: true,
       password: 'aA1!aA1!aA1!',
       ssn: "222335220"
+    },
+    'Dual Role' => {
+      first_name: 'Dual',
+      last_name: 'Role'
     }
   }
 end
@@ -403,6 +407,11 @@ When(/(^.+) enters? office location for (.+)$/) do |role, location|
   end
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
+  find('#broker-btn').click
+end
+
+When(/^.+ delete NPN and submit form$/) do
+  fill_in 'agency[staff_roles_attributes][0][npn]', with: ''
   find('#broker-btn').click
 end
 
@@ -876,7 +885,7 @@ Then(/^.+ should see plans sorted by Plan Name/) do
 end
 
 When(/^.+ filters plans by Carrier/) do
-  find('.selectric-interaction-choice-control-carrier').click
+  find_all('.interaction-choice-control-carrier').first.click
   carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
@@ -884,7 +893,8 @@ When(/^.+ filters plans by Carrier/) do
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do
-  find_all('.plan-row').each do |row|
+  sleep(2)
+  find_all('.plan-row', wait: 5).each do |row|
     expect(row.find('h3 small', wait: 5).text).to eq @carrier_selected
   end
 end
@@ -916,13 +926,18 @@ Then(/(.*?) should see (.*?) page with (.*?) plan year start as coverage effecti
   end
 end
 
-When(/^.+ selects? a plan on the plan shopping page$/) do
-  find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[0].click
+When(/^(.+) selects? a plan on the plan shopping page$/) do |role|
+  if role == 'consumer'
+    find_all('div.plan-row')[0].find('.plan-select').click
+  else
+    find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[0].click
+  end
 end
 
 When(/^.+ selects? a second plan on the plan shopping page$/) do
   find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[1].click
-  @current_plan_selection = BenefitMarkets::Products::HealthProducts::HealthProduct.all[1]
+  effective_year = benefit_sponsorship.benefit_applications.active.first.effective_period.min.year
+  @current_plan_selection = BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(effective_year)[1]
 end
 
 When(/^.+ selects? a last plan on the plan shopping page$/) do
@@ -934,6 +949,20 @@ end
 Then(/^.+ should see the coverage summary page$/) do
   expect(page).to have_content('Confirm Your Plan Selection')
   # screenshot("summary_page")
+end
+
+# This step completes the agreement terms and conditions sections on the thank you page for the consumer.
+# It selects the checkbox for the terms and conditions and fills in the first and last name of the primary person.
+And(/consumer completes agreement terms and conditions sections on thankyou page$/) do
+  find('#terms_check_thank_you').click
+  primary = Person.all.select { |person| person.primary_family.present? }.first
+  fill_in('First Name *', with: primary.first_name)
+  fill_in('Last Name *', with: primary.last_name)
+end
+
+# This step simulates the consumer clicking the 'Continue to My Account' button.
+Then(/the consumer clicks continue to my account button/) do
+  find('.interaction-click-control-continue-to-my-account').click
 end
 
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
@@ -1278,14 +1307,14 @@ Then(/^I should see Shop for new plan button$/) do
   expect(shop_for_new_plan_input.present?).to eq(true)
 end
 
-Then(/^they should see the live chat button$/) do
-  expect(page).to have_css(AdminHomepage.chat_button)
+And(/^.+ last signed in more than 60 days ago$/) do
+  User.first.update_attributes!(last_activity_at: Time.now - 61.days)
 end
 
-Then(/^they should see the bot button$/) do
-  expect(page).to have_css(AdminHomepage.bot_button)
+Then(/^.+ should be signed in successfully$/) do
+  expect(page).to have_content(/logout/i)
 end
 
-Then(/^they should not see the live chat button$/) do
-  expect(page).to_not have_css(AdminHomepage.chat_button)
+Then(/^.+ should not be able to log in$/) do
+  expect(page).to have_content(l10n('devise.failure.expired'))
 end

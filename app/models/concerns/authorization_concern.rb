@@ -4,9 +4,18 @@ module AuthorizationConcern
   included do
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable and :omniauthable
-    devise :database_authenticatable, :registerable, :lockable,
-           :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true},
-           jwt_revocation_strategy: self
+    if EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions)
+      devise :database_authenticatable, :registerable, :lockable,
+             :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable, :expirable,
+             :session_limitable, # Limit number of sessions
+             :authentication_keys => {email: false, login: true},
+             jwt_revocation_strategy: self
+    else
+      devise :database_authenticatable, :registerable, :lockable,
+             :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable, :expirable,
+             :authentication_keys => {email: false, login: true},
+             jwt_revocation_strategy: self
+    end
 
     ## Database authenticatable
     field :email,              type: String, default: ""
@@ -34,11 +43,19 @@ module AuthorizationConcern
     field :unlock_token,    type: String # Only if unlock strategy is :email or :both
     field :locked_at,       type: Time
 
+    ## Session Limitable
+    field :unique_session_id, type: String
+
+    ## Expirable
+
+    field :last_activity_at, type: Time
+    field :expired_at, type: Time
+
     validate :password_complexity
     validates :password, format: { without: /\s/, message: "Password must not contain spaces"}
     validates_presence_of     :password, if: :password_required?
     validates_confirmation_of :password, if: :password_required?
-    validates_length_of       :password, within: Devise.password_length, allow_blank: true
+    validates_length_of       :password, within: self.configured_password_length, allow_blank: true
     validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "is invalid"
 
     scope :locked, ->{ where(:locked_at.ne => nil) }
@@ -47,6 +64,21 @@ module AuthorizationConcern
     before_save :ensure_authentication_token
 
     has_many :whitelisted_jwts
+
+    def active_for_authentication?
+      super && !expired?
+    end
+
+    def expired?
+      return false unless EnrollRegistry.feature_enabled?(:admin_account_autolock) && self.hbx_staff_role?
+      return expired_at < Time.now.utc unless expired_at.nil?
+
+      # if it is not set, check the last activity against configured expire_after time range
+      return last_activity_at < self.class.expire_after.ago unless last_activity_at.nil?
+
+      # if last_activity_at is nil as well, the user has to be 'fresh' and is therefore not expired
+      false
+    end
 
     def generate_jwt(scope, audience)
       token, payload = Warden::JWTAuth::UserEncoder.new.call(
@@ -141,6 +173,12 @@ module AuthorizationConcern
 
   class_methods do
     MAX_SAME_CHAR_LIMIT = 4
+
+    def configured_password_length
+      default_min, default_max = EnrollRegistry[:enroll_app].setting(:default_password_length_range).item.split("..").map(&:to_i)
+      return Range.new(default_min, default_max) unless EnrollRegistry.feature_enabled?(:strong_password_length)
+      Devise.password_length
+    end
 
     def password_invalid?(password)
       ## TODO: oim_id is an explicit dependency to the User class

@@ -5,6 +5,10 @@ require 'rails_helper'
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
 
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   let(:person1) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person1) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
@@ -34,8 +38,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
-  describe "GET index" do
+  before do
+    family.primary_person.consumer_role.move_identity_documents_to_verified
+  end
 
+  describe "GET index" do
     before(:each) do
       sign_in user
     end
@@ -49,6 +56,27 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     it "renders the index template" do
       get :index
       expect(response).to render_template("index")
+    end
+
+    context "when the request type is invalid" do
+      it "renders the index template" do
+        get :index, format: :json
+        expect(response.status).to eq 406
+        expect(response.body).to eq "{\"error\":\"Unsupported format\"}"
+        expect(response.media_type).to eq "application/json"
+      end
+
+      it "renders the index template" do
+        get :index, format: :fake
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "renders the index template" do
+        get :index, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
     end
 
     context 'for a person who exists in multiple families(with financial assistance applications)' do
@@ -125,21 +153,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
   end
-
-  context 'copy with failure' do
-    before do
-      sign_in user
-      get :copy, params: { id: BSON::ObjectId.new }
-    end
-
-    it 'redirects to applications_path' do
-      expect(response).to redirect_to(applications_path)
-    end
-
-    it 'should return a flas error' do
-      expect(flash[:error]).to eq(I18n.t('faa.errors.unable_to_find_application_error'))
-    end
-  end
 end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
@@ -195,8 +208,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let!(:applicant2) { FactoryBot.create(:applicant, application: application2,  family_member_id: family_member_id) }
   let(:application_valid_params) { {"medicaid_terms" => "yes", "report_change_terms" => "yes", "medicaid_insurance_collection_terms" => "yes", "parent_living_out_of_home_terms" => "true", "attestation_terms" => "yes", "submission_terms" => "yes"} }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
-  let(:admin_person) { FactoryBot.create(:person) }
-  let(:admin_user) { FactoryBot.create(:user, :person => admin_person, oim_id: '1234567899', email: 'test@test.com') }
+  let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+  let(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person, oim_id: '1234567899', email: 'test@test.com') }
 
   #set of objects that doesnt belong to the first family/user to validate the records returned only belong to the user logged in
   let(:person10) { FactoryBot.create(:person, :with_consumer_role)}
@@ -229,26 +242,30 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   before do
     allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
+    family.primary_person.consumer_role.move_identity_documents_to_verified
   end
 
-  context "GET Index" do
-    it "should assign applications", dbclean: :after_each do
-      get :index
-      applications = FinancialAssistance::Application.where(family_id: family_id)
-      expect(assigns(:applications)).to match_array(applications.to_a)
+  describe '#index' do
+    context 'primary person is RIDP verified' do
+      it 'assigns applications' do
+        get :index
+        applications = FinancialAssistance::Application.where(family_id: family_id)
+        expect(assigns(:applications)).to match_array(applications.to_a)
+      end
     end
-  end
 
-  context "GET new" do
-    it "should assign application" do
-      get :new
-      expect(assigns(:application).class).to eq FinancialAssistance::Application
+    context 'primary person is not RIDP verified' do
+      it 'redirects to root_path with a flash message' do
+        family.primary_person.consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
+        get :index
+        expect(response).to redirect_to(main_app.root_path)
+        expect(flash[:error]).to eq('Access not allowed for family_policy.index?, (Pundit policy)')
+      end
     end
   end
 
   describe "GET edit" do
     context "With valid data" do
-
       it "should render" do
         get :edit, params: { id: application.id }
         expect(assigns(:application)).to eq application
@@ -256,20 +273,75 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
 
-    context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
+    context "when the request type is invalid" do
+      it "should not render the raw_application template" do
+        get :edit, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
       end
 
+      it "should not render the raw_application template" do
+        get :edit, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the raw_application template" do
+        get :edit, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+
+    context "With missing family id" do
       it "should find the correct application" do
-        get :edit, params: { id: application.id }
+        sign_in(admin_user)
+        get :edit, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
+    end
 
+    context 'broker logged in' do
+      let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :both) }
+      let(:writing_agent) do
+        FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
+      end
+      let(:assister)  do
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00", aasm_state: "active")
+        assister.save(validate: false)
+        assister
+      end
+      let(:user) { broker_user }
+
+      before { family.primary_person.consumer_role.move_identity_documents_to_verified }
+
+      context 'hired by family' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+
+          family.reload
+        end
+
+        it "should render" do
+          get :edit, params: { id: application.id }, session: { person_id: family.primary_person.id }
+          expect(assigns(:application)).to eq application
+          expect(response).to render_template(:financial_assistance_nav)
+        end
+      end
+
+      context 'not hired by family' do
+        it "should render" do
+          get :edit, params: { id: application.id }, session: { person_id: family.primary_person.id }
+          expect(assigns(:application)).to eq application
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq('Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)')
+        end
+      end
     end
   end
 
@@ -430,6 +502,27 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(application.save).to eq true
       end
 
+      context "when the request type is invalid" do
+        it "should not render the raw_application template" do
+          post :step, params: { id: application.id, application: application_valid_params }, format: :csv
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+          expect(response.media_type).to eq "text/csv"
+        end
+
+        it "should not render the raw_application template" do
+          post :step, params: { id: application.id, application: application_valid_params }, format: :js
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+        end
+
+        it "should not render the raw_application template" do
+          post :step, params: { id: application.id, application: application_valid_params }, format: :xml
+          expect(response.status).to eq 406
+          expect(response.body).to eq "<error>Unsupported format</error>"
+        end
+      end
+
       it "should fail during publish application and redirects to error_page" do
         application2.ensure_relationship_with_primary(application2.applicants[1], 'spouse')
         post :step, params: { id: application2.id, commit: "Submit Application", application: application_valid_params }
@@ -505,13 +598,57 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(flash[:error].to_s).to match(message)
       end
     end
-  end
 
-  context "uqhp_flow" do
-    it "should redirect to insured family members" do
-      get :uqhp_flow
-      expect(FinancialAssistance::Application.where(family_id: family_id, aasm_state: "draft").count).to eq 0
-      expect(response).to redirect_to(main_app.insured_family_members_path(consumer_role_id: person.consumer_role.id))
+    context 'broker logged in' do
+      let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :both) }
+
+      let(:writing_agent) do
+        FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
+      end
+
+      let(:assister)  do
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00", aasm_state: "active")
+        assister.save(validate: false)
+        assister
+      end
+      let(:user) { broker_user }
+      let(:current_hbx_profile) { OpenStruct.new(under_open_enrollment?: true) }
+
+      before do
+        FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
+        allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
+        family.primary_person.consumer_role.move_identity_documents_to_verified
+      end
+
+      context 'hired by family' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+        end
+
+        it "should render" do
+          skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
+
+          get :copy, params: { id: application.id }, session: { person_id: family.primary_person.id }
+          existing_app_ids = [application.id, application2.id]
+          copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
+          expect(response).to redirect_to(edit_application_path(copy_app.id))
+        end
+      end
+
+      context 'not hired by family' do
+        it "should render" do
+          skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
+
+          get :copy, params: { id: application.id }, session: { person_id: family.primary_person.id }
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq('Access not allowed for financial_assistance/application_policy.copy?, (Pundit policy)')
+        end
+      end
     end
   end
 
@@ -524,8 +661,32 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(response).to render_template(:financial_assistance_nav)
     end
 
-    context 'when the application does not have valid relations' do
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "draft")
+      end
 
+      it "should not render the review_and_submit template" do
+        get :review_and_submit, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the review_and_submit template" do
+        get :review_and_submit, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the review_and_submit template" do
+        get :review_and_submit, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+
+    context 'when the application does not have valid relations' do
       before do
         allow_any_instance_of(FinancialAssistance::Application).to receive(:valid_relations?).and_return(false)
       end
@@ -539,10 +700,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET review" do
-
     before do
       sign_in(user)
     end
+
     it "should be successful" do
       application.update_attributes(:aasm_state => "submitted")
       get :review, params: { id: application.id }
@@ -552,6 +713,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     it "should redirect to applications page" do
       get :review, params: { id: FinancialAssistance::Application.new.id }
       expect(response).to redirect_to(applications_path)
+    end
+
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "submitted")
+      end
+
+      it "should not render the review template" do
+        get :review, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the review template" do
+        get :review, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the review template" do
+        get :review, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
     end
   end
 
@@ -604,6 +790,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(assigns(:income_coverage_hash)[applicant.id]["INCOME"].present?).to eq true
       end
     end
+
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "submitted")
+      end
+
+      it "should not render the raw_application template" do
+        get :raw_application, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the raw_application template" do
+        get :raw_application, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the raw_application template" do
+        get :raw_application, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
   end
 
   describe "PATCH update_application_year" do
@@ -625,17 +836,35 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
 
-    context "With missing family id" do
+    context "when the request type is invalid" do
       before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
+        application.update_attributes(:aasm_state => "submitted")
       end
 
+      it "should not render the wait_for_eligibility_response template" do
+        get :wait_for_eligibility_response, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the wait_for_eligibility_response template" do
+        get :wait_for_eligibility_response, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the wait_for_eligibility_response template" do
+        get :wait_for_eligibility_response, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+
+    context "With missing family id" do
       it "should find application" do
-        get :wait_for_eligibility_response, params: { id: application.id }
+        sign_in(admin_user)
+        get :wait_for_eligibility_response, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
@@ -651,16 +880,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-      end
-
       it 'should find the correct application' do
-        get :eligibility_results, params: {:id => application.id, :cur => 1}
+        sign_in(admin_user)
+        get :eligibility_results, params: {:id => application.id, :cur => 1}, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
@@ -677,16 +899,15 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-      end
+      let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+      let!(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
+      let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+      let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
       it 'should find application with missing family id' do
-        get :application_publish_error, params: { id: application.id }
+        family.primary_person.consumer_role.move_identity_documents_to_verified
+        sign_in(admin_user)
+        get :application_publish_error, params: { id: application.id }, session: { person_id: family.primary_person.id }
         expect(assigns(:application)).to eq application
         expect(response).to render_template(:financial_assistance_nav)
       end
@@ -724,17 +945,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "with missing family id" do
-    before do
-      allow(admin_user).to receive(:try).with(:id).and_call_original
-      allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-      allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-      sign_in(admin_user)
-      allow(controller).to receive(:current_user).and_return(admin_user)
-
-    end
-
     it "should find the correct application" do
-      get :check_eligibility_results_received, params: { id: application.id }
+      sign_in(admin_user)
+      get :check_eligibility_results_received, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
       expect(assigns(:application)).to eq application
     end
   end
@@ -759,6 +972,31 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
 
+    context "when the request type is invalid" do
+      before do
+        application.update_attributes(:aasm_state => "submitted")
+      end
+
+      it "should not render the eligibility_response_error template" do
+        get :eligibility_response_error, params: { id: application.id }, format: :csv
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+        expect(response.media_type).to eq "text/csv"
+      end
+
+      it "should not render the eligibility_response_error template" do
+        get :eligibility_response_error, params: { id: application.id }, format: :js
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render the eligibility_response_error template" do
+        get :eligibility_response_error, params: { id: application.id }, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+
     context 'where application received eligibility determination' do
       before do
         application.update_attributes!(determination_http_status_code: 200, aasm_state: 'determined')
@@ -775,17 +1013,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "with missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-
-      end
-
       it "finds the correct application" do
-        get :eligibility_response_error, params: { id: application.id }
+        sign_in(admin_user)
+        get :eligibility_response_error, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
@@ -802,7 +1032,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "with :filtered_application_list on" do
     let(:person) { FactoryBot.create(:person, :with_consumer_role, first_name: "test1") }
     let(:user) { FactoryBot.create(:user, :person => person) }
-
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
@@ -821,13 +1050,41 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       describe "GET /applications" do
         let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
         let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family.id, aasm_state: 'determined' }
+
         before(:each) do
+          person.consumer_role.move_identity_documents_to_verified
           sign_in(user)
         end
 
         it 'succeeds' do
           get '/financial_assistance/applications'
           expect(response).to render_template(:index_with_filter)
+        end
+
+        context "when the request type is invalid" do
+          let(:operation_instance) { instance_double(FinancialAssistance::Operations::Applications::QueryFilteredApplications) }
+          let(:failure_result) { Dry::Monads::Result::Failure.new({message: "error message"}) }
+
+          it "should not render the index_with_filter template" do
+            allow(FinancialAssistance::Operations::Applications::QueryFilteredApplications).to receive(:new).and_return(operation_instance)
+            allow(operation_instance).to receive(:call).and_return(failure_result)
+            get '/financial_assistance/applications', params: { format: :csv }
+            expect(response.status).to eq 406
+            expect(response.body).to eq "Unsupported format"
+            expect(response.media_type).to eq "text/csv"
+          end
+
+          it "should not render the index_with_filter template" do
+            get '/financial_assistance/applications', params: { format: :fake }
+            expect(response.status).to eq 406
+            expect(response.body).to eq "Unsupported format"
+          end
+
+          it "should not render the index_with_filter template" do
+            get '/financial_assistance/applications', params: { format: :xml }
+            expect(response.status).to eq 406
+            expect(response.body).to eq "<error>Unsupported format</error>"
+          end
         end
       end
     end

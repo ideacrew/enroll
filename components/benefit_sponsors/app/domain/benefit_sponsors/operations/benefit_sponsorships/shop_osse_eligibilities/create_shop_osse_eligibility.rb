@@ -11,7 +11,7 @@ module BenefitSponsors
         class CreateShopOsseEligibility
           send(:include, Dry::Monads[:result, :do])
 
-          attr_accessor :subject, :default_eligibility
+          attr_accessor :subject, :default_eligibility, :prospective_eligibility
 
           # @param [Hash] opts Options to build eligibility
           # @option opts [<GlobalId>] :subject required
@@ -102,7 +102,7 @@ module BenefitSponsors
             end
 
             if subject.save
-              Success(eligibility_record)
+              Success(eligibility_record.reload)
             else
               Failure(subject.errors.full_messages)
             end
@@ -150,6 +150,7 @@ module BenefitSponsors
 
           def publish_event(eligibility)
             event_name = eligibility_event_for(eligibility.current_state)
+            return Succcess(eligibility) unless event_name
 
             ::Operations::EventLogs::TrackableEvent.new.call({
                                                                event_name: event_name,
@@ -160,6 +161,9 @@ module BenefitSponsors
           end
 
           def eligibility_event_for(current_state)
+            return false if default_eligibility
+            return 'events.benefit_sponsors.benefit_sponsorships.eligibilities.shop_osse_eligibility.eligibility_renewed' if prospective_eligibility
+
             case current_state
             when :eligible
               'events.benefit_sponsors.benefit_sponsorships.eligibilities.shop_osse_eligibility.eligibility_created'

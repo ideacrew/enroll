@@ -98,7 +98,6 @@ class Family
   index({"households.tax_households.effective_ending_on" => 1})
   index({"households.tax_households.tax_household_member.financial_statement.submitted_date" => 1})
   index({"tax_household_groups.tax_households._id" => 1})
-
   index({"households.tax_households.eligibility_determinations._id" => 1})
   index({"households.tax_households.eligibility_determinations.e_pdc_id" => 1})
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
@@ -293,7 +292,8 @@ class Family
       where({
               "$and" =>
                 [
-                  {"eligibility_determination.subjects.eligibility_states.evidence_states.status" => :outstanding},
+                  {"eligibility_determination.subjects" => {"$elemMatch": {"outstanding_verification_status": {"$ne": "not_enrolled"}}}},
+                  {"eligibility_determination.subjects.eligibility_states.evidence_states.status" => {"$in": [:outstanding, :rejected]}},
                   {"eligibility_determination.subjects.eligibility_states.eligibility_item_key" => {"$in": %w[aptc_csr_credit aca_individual_market_eligibility] }},
                   {"eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day}
                 ]
@@ -345,6 +345,24 @@ class Family
     ).distinct(:family_id)
   ) }
 
+  # Scope to find families with APTC CSRs grants for a specific year.
+  # @param assistance_year [Integer] The year of assistance.
+  # @param csr_list [Array] The list of CSR values.
+  # @return [Mongo::Collection::View] The families that match the criteria.
+  scope :with_aptc_csr_grants_for_year, lambda { |assistance_year, csr_list|
+                                          where({ "$and" => [
+                                                              {"eligibility_determination.grants" => {"$elemMatch": {"key" => "AdvancePremiumAdjustmentGrant", "assistance_year" => assistance_year, "value" => { "$gt" => "0" }}}},
+                                                              {"eligibility_determination.subjects.eligibility_states.grants" => {"$elemMatch" => {"key" => "CsrAdjustmentGrant", "assistance_year" => assistance_year,
+                                                                                                                                                   "value" => {"$in" => csr_list.map(&:to_s)}}}}
+                                                            ] })
+                                        }
+
+  # Scope to find families with active coverage and APTC CSR grants for a specific year.
+  # @param assistance_year [Integer] The year of assistance.
+  # @param csr_list [Array] The list of CSR values.
+  # @return [Mongo::Collection::View] The families that match the criteria.
+  scope :with_active_coverage_and_aptc_csr_grants_for_year, ->(assistance_year, csr_list){ all_enrolled_and_renewal_enrollments.with_aptc_csr_grants_for_year(assistance_year, csr_list) }
+
   # It fetches active or renewal application for the family based on the year passed
   def active_financial_assistance_application(year = TimeKeeper.date_of_record.year)
     ::FinancialAssistance::Application.where(family_id: self.id).by_year(year).determined.max_by(&:created_at)
@@ -392,9 +410,7 @@ class Family
   end
 
   def existing_coverage_query_expr(enrollment, include_matching_effective_date)
-    query_criteria = {
-      :_id.ne => enrollment.id, :kind => enrollment.kind
-    }
+    query_criteria = { :_id.ne => enrollment.id, :kind => enrollment.kind }
 
     if include_matching_effective_date
       query_criteria.merge!({:effective_on.lte => enrollment.effective_on})
@@ -416,11 +432,15 @@ class Family
   def current_enrolled_or_termed_coverages(enrollment, include_matching_effective_date = false)
     coverages = active_household.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind)
     query_expr = existing_coverage_query_expr(enrollment, include_matching_effective_date)
-    coverages.where(query_expr).or(
-      {:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES},
-      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => enrollment.effective_on.prev_day},
-      {:aasm_state.in => ['coverage_expired'], effective_on: { "$gte" => enrollment.effective_on.beginning_of_year, "$lte" => enrollment.effective_on.end_of_year} }
-    ).order('effective_on DESC')
+
+    coverages.where(query_expr).where(
+      "$or" => [
+        {"aasm_state" => { "$in" => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES }},
+        {"aasm_state" => { "$in" => HbxEnrollment::TERMINATED_STATUSES}, :terminated_on.gte => enrollment.effective_on.prev_day},
+        {"aasm_state" => { "$in" => ['coverage_expired'] }, effective_on: { "$gte" => enrollment.effective_on.beginning_of_year, "$lte" => enrollment.effective_on.end_of_year }}
+
+      ]
+    ).order_by(effective_on: :desc)
   end
   # rubocop:enable Style/OptionalBooleanParameter
 
@@ -439,8 +459,15 @@ class Family
     family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
   end
 
+  # Returns the primary person of the family.
+  # If the @primary_person is defined, then the method will return @primary_person.
+  # Otherwise, it will fetch the primary applicant's person and assign it to @primary_person.
+  #
+  # @return [Person, nil] The primary person of the family or nil if not defined or not present.
   def primary_person
-    primary_applicant&.person
+    return @primary_person if defined?(@primary_person)
+
+    @primary_person = primary_applicant&.person
   end
 
   def primary_family_member=(new_primary_family_member)

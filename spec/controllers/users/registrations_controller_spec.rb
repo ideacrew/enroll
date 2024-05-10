@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Users::RegistrationsController do
+RSpec.describe Users::RegistrationsController, type: :controller, dbclean: :after_each do
 
   context "create" do
     let(:curam_user){ double("CuramUser") }
@@ -18,7 +18,7 @@ RSpec.describe Users::RegistrationsController do
 
       it "should redirect to saml recovery page if user matches" do
         post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(flash[:alert]).to eq "An account with this username ( #{email} ) already exists. <a href=\"#{SamlInformation.account_recovery_url}\">Click here</a> if you've forgotten your password."
       end
     end
@@ -63,7 +63,7 @@ RSpec.describe Users::RegistrationsController do
 
       it "should re-render the page" do
         post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).not_to redirect_to(root_path)
       end
     end
@@ -81,7 +81,7 @@ RSpec.describe Users::RegistrationsController do
 
       it "should render the 'new' template" do
         post :create, params: { user: { oim_id: email, password: 'Password1$', password_confirmation: 'Password1$'} }
-        expect(response).to be_success
+        expect(response).to be_successful
         expect(response).to render_template("new")
       end
     end
@@ -98,6 +98,40 @@ RSpec.describe Users::RegistrationsController do
       it "does not redirect" do
         post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }
 
+        expect(response).not_to redirect_to(root_path)
+        expect(response).to be_successful
+        expect(response).to render_template("new")
+      end
+    end
+
+    context "with valid params and valid/invalid format" do
+      let(:email) { "devise12345@test.com" }
+      let(:password) { 'Password12345!' }
+
+      before do
+        @request.env["devise.mapping"] = Devise.mappings[:user]
+      end
+
+      it "should complete sign up and redirect" do
+        post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }
+        expect(response).to redirect_to(root_path)
+      end
+
+      it "should not be successful" do
+        post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }, format: :js
+        expect(response).to_not be_successful
+        expect(response).not_to redirect_to(root_path)
+      end
+
+      it "should not be successful" do
+        post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }, format: :json
+        expect(response).to_not be_successful
+        expect(response).not_to redirect_to(root_path)
+      end
+
+      it "should not be successful" do
+        post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }, format: :xml
+        expect(response).to_not be_successful
         expect(response).not_to redirect_to(root_path)
       end
     end

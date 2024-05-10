@@ -223,4 +223,33 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
       end
     end
   end
+
+  describe '#type_history_elements' do
+    let(:alive_status) do
+      person.add_new_verification_type(VerificationType::ALIVE_STATUS)
+      person.alive_status
+    end
+
+    let(:type_history_params) do
+      {
+        action: 'Bulk response failed',
+        modifier: 'System',
+        update_reason: 'Bulk response failed due to some reason',
+        saga_id: 'alive_status_verification',
+        job_id: 'alive_status_verification_response_202405080953',
+        transmission_id: 'alive_status_verification_transmission_response_202405080953',
+        transaction_id: 'alive_status_verification_transaction_response_202405080953'
+      }
+    end
+
+    let(:latest_type_history_element) do
+      alive_status.fail_type
+      alive_status.add_type_history_element(type_history_params)
+      alive_status.type_history_elements.order(created_at: :desc).first
+    end
+
+    it 'returns job_id for type history element' do
+      expect(latest_type_history_element.job_id).to eq(type_history_params[:job_id])
+    end
+  end
 end

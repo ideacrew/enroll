@@ -5,20 +5,22 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
-        <p>
-          <%= BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item %>’s on-line payment is powered by Wells Fargo E-Bill Express. By clicking this link, you will be subject to the terms of use found on that website.
+        <p id="payOnlineSpinner" class="text-center">
+          <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>
+        </p>
+        <p id="payOnlineSuccess">
+          <%= l10n("employers.employer_profiles.my_account.sso_token_success", site_name: BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item) %>
+        </p>
+        <p id="payOnlineFailure">
+          <%= l10n('employers.employer_profiles.my_account.sso_token_failure') %>
         </p>
       </div>
       <div class="modal-footer">
-        <%= link_to '<button class="btn btn-default pay_online_confirmation pull-right left-margin">Pay Online</button>'.html_safe, @wf_url, target: :_blank %> <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+        <a id="pay-online-confirmation-link" href="#" target="_blank" rel="noopener noreferrer">
+          <button class="btn btn-default pay_online_confirmation pull-right left-margin" id="pay-online-confirmation-final" disabled><%= l10n("pay_online")%></button>
+        </a>
+        <span class="btn btn-default btn-small" data-dismiss="modal"><%= l10n("cancel")%></span>
       </div>
     </div>
   </div>
 </div>
-
-<script type="text/javascript">
-  var conf_id = '#payOnlineConfirmation_' + '<%= @employer_profile.id %>';
-  $('.pay_online_confirmation.btn').click(function() {
-    $(conf_id).modal('hide');
-  });
-</script>

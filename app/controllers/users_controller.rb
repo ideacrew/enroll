@@ -1,75 +1,92 @@
+# frozen_string_literal: true
+
+# UsersController handles actions related to User in the context of HbxProfile.
+#
+# @see ApplicationController
 class UsersController < ApplicationController
-  before_action :confirm_existing_password, only: [:change_password]
-  before_action :set_user, except: [:confirm_lock, :unsupported_browser, :index, :show]
 
-  def index
-    redirect_to root_path
-  end
+  # Sets the user before each action, except for :confirm_lock and :unsupported_browser.
+  before_action :set_user, except: [:confirm_lock, :unsupported_browser]
 
-  def show
-    redirect_to root_path
-  end
-
+  # Confirms the lock action for a user.
+  #
+  # @return [void]
+  # @response_to JS
   def confirm_lock
-    authorize User, :lockable?
+    authorize HbxProfile, :confirm_lock?
     @user_id  = params[:user_action_id]
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
+
+    respond_to do |format|
+      format.js { render 'confirm_lock' }
+    end
   end
 
+  # Locks a user.
+  #
+  # @return [void]
+  # @response_to JS
   def lockable
-    authorize User, :lockable?
+    authorize HbxProfile, :lockable?
     @user.lock!
     flash[:notice] = "User #{user.email} is successfully #{user.lockable_notice}."
-    render file: 'users/lockable.js.erb'
-  rescue Pundit::NotAuthorizedError
-    redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
+
+    respond_to do |format|
+      format.js { render 'lockable' }
+    end
   end
 
+  # Resets a user's password.
+  #
+  # @return [void]
+  # @response_to JS
   def reset_password
-    authorize User, :reset_password?
-    render file: 'users/reset_password.js.erb'
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
+    authorize HbxProfile, :reset_password?
+
+    respond_to do |format|
+      format.js { render 'reset_password' }
+    end
   end
 
+  # Confirms the reset password action for a user.
+  #
+  # @return [void]
+  # @response_to JS
   def confirm_reset_password
-    authorize User, :reset_password?
+    authorize HbxProfile, :confirm_reset_password?
     @error = nil
     validate_email if params[:user].present?
-    if @error.nil?
-      User.send_reset_password_instructions(email: @user.email)
-      redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Reset password instruction sent to user email."
-    else
-      render file: 'users/reset_password.js.erb'
+
+    respond_to do |format|
+      format.js do
+        if @error.nil?
+          User.send_reset_password_instructions(email: @user.email)
+          redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Reset password instruction sent to user email."
+        else
+          render 'reset_password'
+        end
+      end
     end
-  rescue Pundit::NotAuthorizedError
-    redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
-  def change_password
-    @user.password = params[:user][:new_password]
-    @user.password_confirmation = params[:user][:password_confirmation]
-    if @user.save!
-      flash[:success] = "Password successfully changed"
-    else
-      flash[:error] = "We encountered a problem trying to update your password, please try again"
-    end
-    redirect_to personal_insured_families_path
-  end
-
+  # Changes a user's username and email.
+  #
+  # @return [void]
+  # @response_to JS
   def change_username_and_email
-    authorize User, :change_username_and_email?
+    authorize HbxProfile, :change_username_and_email?
     @user_id = params[:user_id]
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
+
+    respond_to do |format|
+      format.js { render 'change_username_and_email' }
+    end
   end
 
+  # Confirms the change username and email action for a user.
+  #
+  # @return [void]
+  # @response_to JS
   def confirm_change_username_and_email
-    authorize User, :change_username_and_email?
+    authorize HbxProfile, :confirm_change_username_and_email?
     @element_to_replace_id = params[:family_actions_id]
     @email_taken = User.where(:email => params[:new_email].strip, :id.ne => @user.id).first if params[:new_email]
     @username_taken = User.where(:oim_id => params[:new_oim_id].strip, :id.ne => @user.id).first if params[:new_oim_id]
@@ -91,22 +108,29 @@ class UsersController < ApplicationController
     end
   end
 
-  def edit
-  end
-
-  def update
-    @user.update_attributes(email_update_params)
-  end
-
+  # Shows a user's login history.
+  #
+  # @return [void]
+  # @response_to JS
   def login_history
-    authorize User, :view_login_history?
+    authorize HbxProfile, :login_history?
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
+
+    respond_to do |format|
+      format.js { render 'login_history' }
+    end
   end
 
-  def unsupported_browser; end
+  # Shows the unsupported browser page.
+  #
+  # @return [void]
+  # @response_to HTML
+  # @note Authentication and Authorization are not required
+  def unsupported_browser
+    respond_to do |format|
+      format.html { render 'unsupported_browser' }
+    end
+  end
 
   private
 
@@ -124,19 +148,17 @@ class UsersController < ApplicationController
               end
   end
 
+  # Returns the user.
+  #
+  # @return [User] The user.
   def user
     @user ||= User.find(params[:id])
   end
 
+  # Sets the user.
+  #
+  # @return [void]
   def set_user
     @user = User.find(params[:id])
-  end
-
-  def confirm_existing_password
-    return unless @user.valid_password? params[:user][:password]
-
-    flash[:error] = "That password does not match the one we have stored"
-    redirect_to personal_insured_families_path
-    false
   end
 end

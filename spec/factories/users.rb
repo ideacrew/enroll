@@ -81,7 +81,12 @@ FactoryBot.define do
 
     after :create do |user, evaluator|
       if user.person.present?
-        user.person.broker_agency_staff_roles.push FactoryBot.build(:broker_agency_staff_role, broker_agency_profile_id: evaluator.organization.broker_agency_profile.id)
+        staff_role = FactoryBot.build(
+          :broker_agency_staff_role,
+          broker_agency_profile_id: evaluator.organization.broker_agency_profile.id,
+          benefit_sponsors_broker_agency_profile_id: evaluator.organization.broker_agency_profile.id
+        )
+        user.person.broker_agency_staff_roles.push staff_role
         evaluator.organization.broker_agency_profile.primary_broker_role = FactoryBot.create :broker_role, person: user.person, broker_agency_profile: evaluator.organization.broker_agency_profile
         evaluator.organization.save
         user.save

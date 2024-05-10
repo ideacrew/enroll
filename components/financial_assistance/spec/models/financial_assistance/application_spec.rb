@@ -1887,8 +1887,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       before do
         application.update_attributes(effective_date: TimeKeeper.date_of_record)
       end
+
       it 'should not return nil' do
-        expect(application.apply_aggregate_to_enrollment).to eq true
+        expect(application.apply_aggregate_to_enrollment).to eq false
       end
     end
   end
@@ -2410,7 +2411,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Gerald',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2421,7 +2422,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Diana',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2514,7 +2515,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Gerald',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2525,7 +2526,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Diana',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2571,7 +2572,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Gerald',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2582,7 +2583,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Diana',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2621,7 +2622,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Gerald',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2632,7 +2633,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Diana',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2671,7 +2672,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Gerald',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 
@@ -2682,7 +2683,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
                         family_member_id: family.primary_applicant.id,
                         first_name: 'Diana',
                         last_name: 'Rivers',
-                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                         application: application)
     end
 

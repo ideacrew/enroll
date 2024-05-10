@@ -65,6 +65,40 @@ class BrokerAgencyStaffRole
     end
   end
 
+  # Scopes
+
+  # @!scope class
+  # @scope active
+  # Retrieves all Broker Agency Staff Roles that are in the 'active' state.
+  #
+  # @return [Mongoid::Criteria<BrokerAgencyStaffRole>] Returns a Mongoid::Criteria of BrokerAgencyStaffRole objects that are in the 'active' state.
+  #
+  # @example Retrieve all active Broker Agency Staff Roles
+  #   BrokerAgencyStaffRole.active #=> Mongoid::Criteria<BrokerAgencyStaffRole>
+  scope :active, -> { where(aasm_state: 'active') }
+
+  # @!scope class
+  # @scope broker_agency_pending
+  # Retrieves all Broker Agency Staff Roles that are in the 'broker_agency_pending' state.
+  #
+  # @return [Mongoid::Criteria<BrokerAgencyStaffRole>] Returns a Mongoid::Criteria of BrokerAgencyStaffRole objects that are in the 'broker_agency_pending' state.
+  #
+  # @example Retrieve all pending Broker Agency Staff Roles
+  #   BrokerAgencyStaffRole.broker_agency_pending #=> Mongoid::Criteria<BrokerAgencyStaffRole>
+  scope :broker_agency_pending, -> { where(aasm_state: 'broker_agency_pending') }
+
+  # @!scope class
+  # @scope by_profile_id
+  # Retrieves all Broker Agency Staff Roles associated with a given Broker Agency Profile BSON::ObjectId.
+  #
+  # @param [BSON::ObjectId] profile_id The ID of the Broker Agency Profile for which to retrieve the Broker Agency Staff Roles.
+  #
+  # @return [Mongoid::Criteria<BrokerAgencyStaffRole>] Returns an Mongoid::Criteria of BrokerAgencyStaffRole objects associated with the given Broker Agency Profile BSON::ObjectId.
+  #
+  # @example Retrieve all Broker Agency Staff Roles for a given Broker Agency Profile BSON::ObjectId
+  #   BrokerAgencyStaffRole.by_profile_id(profile_id) #=> Mongoid::Criteria<BrokerAgencyStaffRole>
+  scope :by_profile_id, ->(profile_id) { where(benefit_sponsors_broker_agency_profile_id: profile_id) }
+
   def send_invitation
     # TODO: broker agency staff is not actively supported right now
     # Also this method call sends an employee invitation, which is bug 8028

@@ -4,7 +4,8 @@ Feature: Start a new Financial Assistance Application
   Background:
     Given the FAA feature configuration is enabled
     Given the date is within open enrollment
-    Given a consumer, with a family, exists
+    Given a consumer exists with family
+    And the consumer is RIDP verified
     And is logged in
     And a benchmark plan exists
 
@@ -29,13 +30,3 @@ Feature: Start a new Financial Assistance Application
     And they should see each of their dependents listed
     And consumer clicks on pencil symbol next to primary person
     Then consumer should see today date and clicks continue
-
-  Scenario: contrast level aa is enabled - A consumer should see the applications assistance year when feature enabled
-    Given the contrast level aa feature is enabled
-    And IAP Assistance Year Display feature is enabled
-    When a consumer visits the Get Help Paying for coverage page
-    And selects yes they would like help paying for coverage
-    Then they should see a new finanical assistance application
-    Then They should see the application assistance year above Info Needed
-    And the browser has finished rendering the page
-    Then the page should be axe clean excluding "a[disabled]" according to: wcag2aa; checking only: color-contrast

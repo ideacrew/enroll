@@ -12,7 +12,13 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
 
   let!(:applicant) do
     FactoryBot.create(:applicant,
+                      :with_basic_info,
+                      :with_ssn,
                       application: application,
+                      is_applying_coverage: true,
+                      is_incarcerated: false,
+                      indian_tribe_member: false,
+                      us_citizen: true,
                       dob: Date.today - 40.years,
                       is_primary_applicant: true,
                       family_member_id: BSON::ObjectId.new)
@@ -423,6 +429,86 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
     it 'should return true' do
       spouse_applicant.reload
       expect(spouse_applicant.addresses.first.present?).to be_truthy
+    end
+  end
+
+  describe '#save' do
+    context '' do
+      let(:input_applicant) { applicant }
+      let(:params) do
+        {
+          first_name: input_applicant.first_name,
+          last_name: input_applicant.last_name,
+          middle_name: '',
+          name_sfx: '',
+          dob: input_applicant.dob.strftime("%Y-%m-%d"),
+          ssn: input_applicant.ssn,
+          gender: input_applicant.gender,
+          is_applying_coverage: input_applicant.is_applying_coverage,
+          us_citizen: input_applicant.us_citizen,
+          naturalized_citizen: input_applicant.naturalized_citizen,
+          indian_tribe_member: input_applicant.indian_tribe_member,
+          tribal_id: '',
+          is_incarcerated: input_applicant.is_incarcerated,
+          relationship: 'self',
+          is_consumer_role: 'true',
+          is_temporarily_out_of_state: '0',
+          is_homeless: '0',
+          no_ssn: '0',
+          addresses_attributes: addresses_information,
+          ethnicity: ['', '', '', '', '', '', '']
+        }
+      end
+
+      let(:addresses_information) do
+        addresses_params = {}
+        applicant.addresses.each_with_index do |address, index|
+          addresses_params[index.to_s] = {
+            id: address.id,
+            kind: address.kind,
+            address_1: address.address_1,
+            address_2: address.address_2,
+            city: address.city,
+            state: address.state,
+            zip: address.zip,
+            _destroy: address.mailing?.to_s
+          }
+        end
+        addresses_params
+      end
+
+      before do
+        applicant.addresses.create!(
+          {
+            kind: 'home',
+            address_1: '123 Main St Home',
+            city: 'Bar Harbor',
+            state: 'ME',
+            zip: '04401',
+            county: 'Cumberland'
+          }
+        )
+        applicant.addresses.create!(
+          {
+            kind: 'mailing',
+            address_1: '123 Main St Mailing',
+            city: 'Bar Harbor',
+            state: 'ME',
+            zip: '04401',
+            county: 'Cumberland'
+          }
+        )
+      end
+
+      it 'destroys the mailing address of the applicant' do
+        expect(applicant.addresses.where(kind: 'mailing').first).to be_a(FinancialAssistance::Locations::Address)
+        applicant_form = described_class.new(params)
+        applicant_form.application_id = application.id
+        applicant_form.applicant_id = input_applicant.id
+        applicant_form.save
+        expect(applicant_form.errors.full_messages).to be_empty
+        expect(applicant.reload.addresses.where(kind: 'mailing').first).to be_nil
+      end
     end
   end
 end

@@ -4,7 +4,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   describe Insured::InteractiveIdentityVerificationsController do
 
     describe "GET #new" do
-      let(:mock_person) { double(agent?: false) }
+      let(:mock_person) { double(agent?: false, policy_class: PersonPolicy) }
       let(:mock_family) { instance_double("Family") }
       let(:mock_transaction_id) { double }
       let(:mock_user) { double(:person => mock_person) }
@@ -12,8 +12,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let(:mock_service_result) { instance_double("::IdentityVerification::InteractiveVerificationResponse", :failed? => service_failed, :to_model => mock_session, :transaction_id => mock_transaction_id) }
       let(:mock_session) { double }
       let(:mock_template_result) { double }
+      let(:mock_policy) { instance_double(PersonPolicy, :complete_ridp? => true) }
 
       before :each do
+        allow(PersonPolicy).to receive(:new).with(mock_user, mock_person).and_return(mock_policy)
         sign_in(mock_user)
         allow(mock_person).to receive(:primary_family).and_return(mock_family)
         allow(mock_person.primary_family).to receive(:most_recent_and_draft_financial_assistance_application).and_return nil
@@ -21,7 +23,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         allow(controller).to receive(:render_to_string).with(
           "events/identity_verification/interactive_session_start",
           {
-            :formats => ["xml"],
+            :formats => [:xml],
             :locals => { :individual => mock_person }
           }
         ).and_return(mock_template_result)
@@ -53,7 +55,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(controller).to receive(:render_to_string).with(
             "events/identity_verification/interactive_session_start",
             {
-              :formats => ["xml"],
+              :formats => [:xml],
               :locals => { :individual => mock_person }
             }
           ).and_return(mock_template_result)
@@ -68,7 +70,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "POST #create" do
       let(:mock_person_user) { instance_double("User") }
       let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
-      let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user, agent?: false) }
+      let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user, agent?: false, policy_class: PersonPolicy) }
       let(:mock_family) { instance_double("Family") }
       let(:email) { double(:address => 'test@test.com') }
       let(:mock_user) { double(:person => mock_person) }
@@ -80,8 +82,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let(:mock_template_result) { double }
       let(:expected_params) { verification_params }
       let(:mock_today) { double }
+      let(:mock_policy) { instance_double(PersonPolicy, :complete_ridp? => true) }
 
       before :each do
+        allow(PersonPolicy).to receive(:new).with(mock_user, mock_person).and_return(mock_policy)
         sign_in(mock_user)
         allow(mock_person).to receive(:emails).and_return([email])
         allow(mock_person).to receive(:first_name).and_return("john")
@@ -126,7 +130,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           allow(controller).to receive(:render_to_string).with(
             "events/identity_verification/interactive_questions_response",
             {
-              :formats => ["xml"],
+              :formats => [:xml],
               :locals => { :session => mock_session }
             }
           ).and_return(mock_template_result)
@@ -173,7 +177,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "POST #update" do
       let(:mock_person_user) { instance_double("User") }
       let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
-      let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user, agent?: false) }
+      let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user, agent?: false, policy_class: PersonPolicy) }
       let(:mock_family) { instance_double("Family") }
       let(:email) { double(:address => 'test@test.com') }
       let(:mock_user) { double(:person => mock_person) }
@@ -188,7 +192,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       let(:service_succeeded) { false }
 
+      let(:mock_policy) { instance_double(PersonPolicy, :complete_ridp? => true) }
+
       before :each do
+        allow(PersonPolicy).to receive(:new).with(mock_user, mock_person).and_return(mock_policy)
         sign_in(mock_user)
         allow(mock_person).to receive(:emails).and_return([email])
         allow(mock_person).to receive(:first_name).and_return("john")
@@ -198,7 +205,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         allow(controller).to receive(:render_to_string).with(
           "events/identity_verification/interactive_verification_override",
           {
-            :formats => ["xml"],
+            :formats => [:xml],
             :locals => { :transaction_id => transaction_id }
           }
         ).and_return(mock_template_result)
@@ -281,7 +288,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "GET #service_unavailable" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
       let(:mock_user) { FactoryBot.create(:user, :person => person) }
+      let(:mock_policy) { instance_double(PersonPolicy, :complete_ridp? => true) }
       before :each do
+        allow(PersonPolicy).to receive(:new).with(mock_user, person).and_return(mock_policy)
         allow(mock_user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(mock_user)
       end
@@ -297,7 +306,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
       let(:mock_transaction_id) { double }
       let(:mock_user) { FactoryBot.create(:user, :person => person) }
+      let(:mock_policy) { instance_double(PersonPolicy, :complete_ridp? => true) }
       before :each do
+        allow(PersonPolicy).to receive(:new).with(mock_user, person).and_return(mock_policy)
         allow(mock_user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(mock_user)
       end
@@ -307,6 +318,78 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:failed_validation)
       end
+    end
+
+    describe '.failed_validation' do
+      let(:user){ FactoryBot.create(:user, :consumer, person: person) }
+      let(:person){ FactoryBot.create(:person, :with_consumer_role) }
+      let(:mock_policy) { instance_double(PersonPolicy, :complete_ridp? => true) }
+
+      context "GET failed_validation", dbclean: :after_each do
+        before(:each) do
+          allow(PersonPolicy).to receive(:new).with(user, person).and_return(mock_policy)
+          sign_in user
+          allow(user).to receive(:person).and_return(person)
+        end
+
+        it "should render template" do
+          get :failed_validation, params: {}
+
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("failed_validation")
+        end
+      end
+    end
+  end
+
+  describe Insured::InteractiveIdentityVerificationsController, "given an unauthorized user" do
+    let(:mock_user) do
+      instance_double(
+        User,
+        :has_hbx_staff_role? => false,
+        :person => mock_person
+      )
+    end
+    let(:mock_person) do
+      double(
+        policy_class: PersonPolicy
+      )
+    end
+    let(:mock_policy) do
+      instance_double(
+        PersonPolicy,
+        :complete_ridp? => false
+      )
+    end
+
+    before :each do
+      allow(PersonPolicy).to receive(:new).with(mock_user, mock_person).and_return(mock_policy)
+      sign_in(mock_user)
+    end
+
+    it "denies access to GET #new" do
+      get :new
+      expect(response.status).to eq 302
+    end
+
+    it "denies access to POST #create" do
+      post :create, params: {}
+      expect(response.status).to eq 302
+    end
+
+    it "denies access to POST #update" do
+      post :update, params: { :id => "some random ID" }
+      expect(response.status).to eq 302
+    end
+
+    it "denies access to GET #service_unavailable" do
+      get :service_unavailable
+      expect(response.status).to eq 302
+    end
+
+    it "denies access to GET #failed_validation" do
+      get :failed_validation
+      expect(response.status).to eq 302
     end
   end
 end

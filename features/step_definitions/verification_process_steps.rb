@@ -24,7 +24,10 @@ Given(/^I should see page for documents verification$/) do
   expect(page).to have_content('Social Security Number')
   find('.btn', text: 'Documents We Accept').click
   expect(page).to have_content('DC Residency')
-  find_link('https://dmv.dc.gov/page/proof-dc-residency-certifications').visible?
+  link = find_link('https://dmv.dc.gov/page/proof-dc-residency-certifications')
+  link.visible?
+  expect(link[:target]).to eq('_blank')
+  expect(link[:rel]).to eq('noopener noreferrer')
   new_window = window_opened_by { click_link 'https://dmv.dc.gov/page/proof-dc-residency-certifications' }
   switch_to_window new_window
 end
@@ -37,8 +40,12 @@ Given(/^the consumer is logged in$/) do
   login_as user
 end
 
+And(/^the user is RIDP verified$/) do
+  user.person.consumer_role.move_identity_documents_to_verified
+end
+
 Then(/^the consumer visits verification page$/) do
-  visit verification_insured_families_path
+  visit verification_insured_families_path(tab: 'verification')
   find(".interaction-click-control-documents", wait: 5).click
 end
 

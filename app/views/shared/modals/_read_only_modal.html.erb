@@ -4,7 +4,7 @@
       <div class="modal-header">
         <div class="vertically-aligned-row">
           <h3 class="modal-title">
-            <%= header_icon.html_safe %>&nbsp;<%= title %>
+            <%= sanitize_html(header_icon) %>&nbsp;<%= title %>
           </h3>
           <button aria-label="Close" class="close" data-dismiss="modal" type="button">
             <span aria-hidden="true">&times;</span>

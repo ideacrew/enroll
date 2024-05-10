@@ -1,9 +1,12 @@
 require 'rails_helper'
 
 describe UsersController, dbclean: :after_each do
-  let(:admin) { instance_double(User) }
-  let(:user_policy) { instance_double(UserPolicy) }
-  let(:user) { instance_double(User, :email => user_email) }
+  let(:admin) { instance_double(User, person: staff_person) }
+  let(:user) { instance_double(User, :email => user_email, :person => person) }
+  let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+  let(:person) { double('Person', hbx_staff_role: nil) }
+  let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+  let(:permission) { double('Permission')}
   let(:user_id) { "23432532423424" }
   let(:user_email) { "some_email@some_domain.com" }
 
@@ -11,39 +14,14 @@ describe UsersController, dbclean: :after_each do
     DatabaseCleaner.clean
   end
 
-  describe '.change_password' do
-    let(:user) { build(:user, id: '1', password: 'Complex!@#$') }
-    let(:original_password) { 'Complex!@#$' }
-    before do
-      allow(User).to receive(:find).with('1').and_return(user)
-      sign_in(user)
-      post :change_password, params: { id: '1', user: { password: original_password, new_password: 'S0methingElse!@#$', password_confirmation: 'S0methingElse!@#$'} }
-    end
-
-    context "with a matching current password" do
-      xit 'changes the password' do
-        expect(user.valid_password? 'S0methingElse!@#$').to be_truthy
-      end
-    end
-
-    context "with an invalid current password" do
-      let(:original_password) { 'Potato' }
-      xit 'does not change the password' do
-        expect(user.valid_password? 'Complex!@#$').to be_truthy
-      end
-    end
-  end
-
-
   before :each do
-    allow(UserPolicy).to receive(:new).with(admin, User).and_return(user_policy)
     allow(User).to receive(:find).with(user_id).and_return(user)
   end
 
   describe ".change_username_and_email" do
-    let(:user) { build(:user, id: '1', oim_id: user_email) }
+    let(:user) { build(:user, id: '1', oim_id: user_email, person: person) }
     before do
-      allow(user_policy).to receive(:change_username_and_email?).and_return(true)
+      allow(permission).to receive(:can_change_username_and_email).and_return(true)
     end
 
     context "An admin is allowed to access the change username action" do
@@ -51,20 +29,20 @@ describe UsersController, dbclean: :after_each do
         sign_in(admin)
       end
       it "renders the change username form" do
-        get :change_username_and_email, params: { id: user_id }, format: :js
+        get :change_username_and_email, params: { id: user_id, format: :js }
         expect(response).to render_template('change_username_and_email')
       end
     end
 
     context "An admin is not allowed to access the change username action" do
       before do
-        allow(user_policy).to receive(:change_username_and_email?).and_return(false)
+        allow(permission).to receive(:can_change_username_and_email).and_return(false)
         sign_in(admin)
       end
       it "doesn't render the change username form" do
-        get :change_username_and_email, params: { id: user_id }, format: :js
-        expect(flash[:alert]).to be_present
-        expect(flash[:alert]).to include('You are not authorized for this action.')
+        get :change_username_and_email, params: { id: user_id, format: :js }
+        expect(flash[:error]).to be_present
+        expect(flash[:error]).to include('Access not allowed for hbx_profile_policy.change_username_and_email?, (Pundit policy)')
       end
     end
   end
@@ -73,6 +51,7 @@ describe UsersController, dbclean: :after_each do
     let(:person) { FactoryBot.create(:person) }
     let(:user) { FactoryBot.create(:user, :person => person) }
     let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person)}
+    let(:permission) { double('Permission')}
     let(:hbx_profile) { FactoryBot.create(:hbx_profile)}
     let(:invalid_username) { "ggg" }
     let(:valid_username) { "gariksubaric" }
@@ -80,8 +59,8 @@ describe UsersController, dbclean: :after_each do
     let(:valid_email) { "email@email.com" }
 
     before do
-      allow(UserPolicy).to receive(:new).with(user, User).and_return(user_policy)
-      allow(user_policy).to receive(:change_username_and_email?).and_return(true)
+      allow(hbx_staff_role).to receive(:permission).and_return permission
+      allow(permission).to receive(:can_change_username_and_email).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in(user)
     end
@@ -111,7 +90,7 @@ describe UsersController, dbclean: :after_each do
 
   describe ".confirm_lock, with a user allowed to perform locking" do
     before do
-      allow(user_policy).to receive(:lockable?).and_return(true)
+      allow(permission).to receive(:can_lock_unlock).and_return(true)
       sign_in(admin)
       get :confirm_lock, params:  {id: user_id, format: :js}
     end
@@ -120,7 +99,7 @@ describe UsersController, dbclean: :after_each do
 
   describe ".lockable" do
     before do
-      allow(user_policy).to receive(:lockable?).and_return(can_lock)
+      allow(permission).to receive(:can_lock_unlock).and_return(can_lock)
       allow(user).to receive(:lockable_notice).and_return("locked/unlocked")
     end
 
@@ -136,7 +115,7 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         get :lockable, params: {id: user_id}
-        expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url)
+        expect(response).to redirect_to(root_url)
       end
     end
 
@@ -149,10 +128,11 @@ describe UsersController, dbclean: :after_each do
 
       it "toggles the user lock" do
         expect(user).to receive(:lock!)
-        get :lockable, params: {id: user_id}
+        get :lockable, params: { id: user_id, format: :js }
       end
+
       it do
-        get :lockable, params: {id: user_id}
+        get :lockable, params: { id: user_id, format: :js }
         expect(flash[:notice]).to be_present
       end
     end
@@ -166,14 +146,14 @@ describe UsersController, dbclean: :after_each do
 
       it "toggles the user lock" do
         expect(user).to receive(:lock!)
-        get :lockable, params: {id: user_id}
+        get :lockable, params: { id: user_id, format: :js }
       end
     end
   end
 
   describe '.reset_password' do
     before do
-      allow(user_policy).to receive(:reset_password?).and_return(can_reset_password)
+      allow(permission).to receive(:can_reset_password).and_return(can_reset_password)
     end
 
     context 'When admin is not authorized for reset password then' do
@@ -187,8 +167,8 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         get :reset_password, params:{id: user_id, format: :js}
-        expect(flash[:alert]).to be_present
-        expect(flash[:alert]).to include('You are not authorized for this action.')
+        expect(flash[:error]).to be_present
+        expect(flash[:error]).to include('Access not allowed for hbx_profile_policy.reset_password?, (Pundit policy)')
       end
     end
 
@@ -207,7 +187,7 @@ describe UsersController, dbclean: :after_each do
   describe '#unsupportive_browser' do
     it 'should be succesful' do
       get :unsupported_browser
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -215,7 +195,7 @@ describe UsersController, dbclean: :after_each do
     let(:can_reset_password) { false }
 
     before do
-      allow(user_policy).to receive(:reset_password?).and_return(can_reset_password)
+      allow(permission).to receive(:can_reset_password).and_return(can_reset_password)
     end
 
     context 'When admin is not authorized for reset password then' do
@@ -226,7 +206,7 @@ describe UsersController, dbclean: :after_each do
       end
       it { expect(user).not_to receive(:send_reset_password_instructions) }
       it { expect(assigns(:user)).to eq(user) }
-      it { expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url) }
+      it { expect(response).to have_http_status(:forbidden) }
     end
 
     context 'When user email not present then' do
@@ -244,20 +224,21 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         put :confirm_reset_password, params: {id: user_id, user: { email: '' }, format: :js}
-        expect(response).to render_template('users/reset_password.js.erb')
+        expect(response.content_type).to eq('text/javascript; charset=utf-8')
+        expect(response).to render_template('users/reset_password')
       end
     end
 
-  describe '.edit' do
-    let(:user) { FactoryBot.build(:user, :with_consumer_role) }
-    before do
-      sign_in(admin)
-      allow(User).to receive(:find).with(user.id).and_return(user)
-      get :edit, params: {id: user.id, format: 'js'}
+    describe '.edit' do
+      let(:user) { FactoryBot.build(:user, :with_consumer_role, person: person) }
+      before do
+        sign_in(admin)
+        allow(User).to receive(:find).with(user.id).and_return(user)
+        get :edit, params: {id: user.id, format: 'js'}
+      end
+      it { expect(assigns(:user)).to eq(user) }
+      it { expect(response).to render_template('edit') }
     end
-    it { expect(assigns(:user)).to eq(user) }
-    it { expect(response).to render_template('edit') }
-  end
 
     context 'When user information is not valid' do
       let(:can_reset_password) { true }
@@ -279,7 +260,8 @@ describe UsersController, dbclean: :after_each do
       end
       it do
         put :confirm_reset_password, params:  {id: user_id, user: { email: user_email }, format: :js}
-        expect(response).to render_template('users/reset_password.js.erb')
+        expect(response.content_type).to eq('text/javascript; charset=utf-8')
+        expect(response).to render_template('users/reset_password')
       end
     end
 
@@ -297,9 +279,9 @@ describe UsersController, dbclean: :after_each do
 
       it do
         put :confirm_reset_password, params: {id: user_id, format: :js}
-        expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url)
+        expect(response.status).to eq(302)
+        expect(response.location).to eq(user_account_index_exchanges_hbx_profiles_url)
       end
     end
   end
-
 end

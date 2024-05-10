@@ -7,18 +7,26 @@ class SamlController < ApplicationController
   #   redirect_to(request.create(saml_settings))
   # end
 
+  def account_expired
+    flash[:error] = l10n('devise.failure.expired')
+  end
+
   def login
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
     relay_state = params['RelayState'] || response.attributes['relay_state']
-    sign_out current_user if current_user.present?
 
     if response.is_valid? && response.name_id.present?
       username = response.name_id.downcase
       oim_user = User.where(oim_id: /^#{Regexp.escape(username)}$/i).first
 
       if oim_user.present?
+        if oim_user.expired?
+          redirect_to account_expired_saml_index_path
+          return
+        end
+
         oim_user.idp_verified = true
         oim_user.oim_id = response.name_id
 

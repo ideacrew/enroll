@@ -1,4 +1,4 @@
-<%= l10n(
+<%= sanitize_html(l10n(
       EnrollRegistry.feature_enabled?(:broker_approval_period) ? "user_mailer.broker_application_confirmation.full_text" : "user_mailer.broker_invitation.broker_app_submission",
       site_noreply_email_address: site_noreply_email_address,
       site_short_name: site_short_name,
@@ -10,6 +10,6 @@
       state_name: state_name,
       training_link: EnrollRegistry[:broker_training_link].item,
       contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
-).html_safe %>
+)) %>
     
     

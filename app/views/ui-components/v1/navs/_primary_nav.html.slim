@@ -55,7 +55,8 @@
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'general-agencies', link_path: main_app.general_agency_index_exchanges_hbx_profiles_path, display_name: 'General Agencies', active_tab: 'general-agencies', remote: false, pundit_object: nil, pundit_method: nil}
               - if external_application_configured?("admin") && EnrollRegistry.feature_enabled?(:agency_staff)
                 li
-                  = link_to(ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff?auth_token=" + jwt_for_external_application, "aria-expanded" => "true", data: { turbolinks: false } ) do
+                  - url = ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff"
+                  = link_to(url, "aria-expanded" => "true", data: { turbolinks: false, jwt_token: jwt_for_external_application }, id: "agencyStaffLinkToExternal") do
                     span.hidden-xs
                       | Agency Staff
                     span.glyphicon.glyphicon-th-list.hidden-md.hidden-sm.hidden-lg title="Agency Staff"
@@ -63,9 +64,6 @@
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" Admin
             i.fas.fa-caret-down
             ul.dropdown-menu aria-labelledby="dropdownMenu1"
-              - if EnrollRegistry.feature_enabled?(:calendar_tab)
-                li
-                  = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'calendar', link_path: main_app.exchanges_scheduled_events_path, display_name: 'Calendar', active_tab: 'calendar', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
               - if policy_helper(HbxProfile).view_the_configuration_tab?
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'configuration', link_path: main_app.configuration_exchanges_hbx_profiles_path, display_name: 'Config', active_tab: 'config', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
@@ -92,3 +90,16 @@
               li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
                 = link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do
                   | Notices
+
+
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+    window.localStorage.removeItem("jwt");
+    const agencyStaffLink = document.getElementById('agencyStaffLinkToExternal');
+    agencyStaffLink.addEventListener('click', function(event) {
+      event.preventDefault();
+      const jwtToken = agencyStaffLink.dataset.jwtToken;
+      window.localStorage.setItem("jwt", jwtToken);
+      window.location.href = agencyStaffLink.href;
+    });
+  });

@@ -4,6 +4,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateMinimumContributionFactorOnContributionUnit < MongoidMigrationTask
   def migrate
+    raise "Can't update benefit_market_catalog once it gets created"
     raise 'Please provide benefit market catalog application date' if ENV['benefit_market_catalog_application_date'].blank?
     raise 'Please provide minimum contribution factor' if ENV['min_contribution_factor'].blank?
     date = Date.strptime(ENV['benefit_market_catalog_application_date'], "%m/%d/%Y")

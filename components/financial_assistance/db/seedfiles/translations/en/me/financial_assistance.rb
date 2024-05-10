@@ -177,16 +177,19 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.non_oe_learn_more" => "Learn more about Special Enrollment Periods",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' rel='noopener noreferrer' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "If you've already enrolled in a CoverME.gov Individual & Family plan, you're finished! You'll see your updated plan in a minute or two. Select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
   # Mec check
-  "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
+  "en.faa.mc_success_existing" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at %{medicaid_agency_phone} to make these changes before completing a CoverME.gov application.",
+  "en.faa.mc_success_enroll" => "",
+  "en.faa.mc_success_link" => "",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a CoverME.gov application.",
-  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
+  "en.faa.mc_continue_application" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
+  "en.faa.mc_continue_bold" => "",
   # FAA display evidence type
   "en.faa.evidence_type_aces" => "Coverage from MaineCare and Cub Care",
   "en.faa.evidence_type_esi" => "Coverage from a job",
@@ -214,6 +217,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.transfer_history" => "Transfer History",
   "en.faa.transfer_history_desc" => "Application transfers sent to or from %{site_short_name} related to this application are listed below.",
   "en.faa.no_history_available" => "No history available.",
+  # Left Nav Pane
+  "en.faa.left_nav.my_household" => "My Household",
   # Flash error display
   "en.faa.errors.should_be_answered" => "should be answered",
   "en.faa.errors.inconsistent_relationships_error" => "Some of the relationships you have listed are inconsistent. Review relationships and make sure each pair is correct.",
@@ -256,6 +261,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.medicaid_eligible_next_steps" => "Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:",
   "en.faa.results.medicaid_eligible_step1" => "pick a plan, or",
   "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
-  "en.faa.verification.documents" => "Financial Assistance Documents"
+  "en.faa.verification.documents" => "Financial Assistance Documents",
+  "en.faa.view_complete_checklist" => "View the Complete Application Checklist",
+  'en.faa.add_mailing_address' => 'Add Mailing Address',
+  'en.faa.remove_mailing_address' => 'Remove Mailing Address'
 }.freeze
 # rubocop:enable Layout/LineLength

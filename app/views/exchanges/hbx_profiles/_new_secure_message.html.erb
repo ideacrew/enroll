@@ -28,7 +28,7 @@
             </tr>
             <tr>
               <th style="vertical-align: top; text-transform: capitalize;">Document: (optional)<span class="text-danger"></span></th>
-              <td><%= file_field_tag "file", type: :file, accept: 'image/png,image/jpeg,application/pdf', class: "doc-upload-file"%></td>
+              <td><%= file_field_tag "file", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file"%></td>
             </tr>
             </tbody>
           </table>
@@ -76,7 +76,7 @@
   });
 
   function confirmSecureMsg(event){
-    $(".btn-confirmation").attr('disabled', 'disabled');
+    $(".btn-confirmation").prop('disabled', true);
 
     event.preventDefault();
     event.stopImmediatePropagation();

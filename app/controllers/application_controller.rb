@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   include Config::ContactCenterConcern
   include Acapi::Notifiers
   include ::L10nHelper
+  include ::FileUploadHelper
 
   after_action :update_url, :unless => :format_js?
   helper BenefitSponsors::Engine.helpers
@@ -23,7 +24,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception, prepend: true
 
   ## Devise filters
-  before_action :check_concurrent_sessions
   before_action :require_login, unless: :authentication_not_required?
   before_action :authenticate_user_from_token!
   before_action :authenticate_me!
@@ -33,6 +33,15 @@ class ApplicationController < ActionController::Base
 
   # for current_user
   before_action :set_current_user
+
+  # Handles ActionController::UnknownFormat exception by calling the +render_unsupported_format+ method.
+  #
+  # @see #render_unsupported_format
+  #
+  # @example
+  #   rescue_from ActionController::UnknownFormat, with: :render_unsupported_format
+  #
+  rescue_from ActionController::UnknownFormat, with: :render_unsupported_format
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
@@ -80,10 +89,10 @@ class ApplicationController < ActionController::Base
     policy_name = exception.policy.class.to_s.underscore
 
     flash[:error] = "Access not allowed for #{policy_name}.#{exception.query}, (Pundit policy)"
-      respond_to do |format|
-      format.json { render nothing: true, status: :forbidden }
+    respond_to do |format|
+      format.json { head :forbidden }
       format.html { redirect_to(request.referrer || main_app.root_path)}
-      format.js   { render nothing: true, status: :forbidden }
+      format.js { head :forbidden }
     end
   end
 
@@ -107,18 +116,25 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def check_concurrent_sessions
-    return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions? && current_user.has_hbx_staff_role?
-    flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
-    sign_out current_user
-  end
+  # Renders an 'Unsupported format' message with a status of :not_acceptable for various formats.
+  # This method is used to handle requests in unsupported formats.
+  #
+  # @example
+  #   render_unsupported_format
+  #
+  # @return [ActionController::Response] A response with a plain text body and a status of :not_acceptable.
+  def render_unsupported_format
+    respond_to do |format|
+      format.html { render plain: 'Unsupported format', status: :not_acceptable }
+      format.json { render json: { error: 'Unsupported format' }, status: :not_acceptable }
+      format.xml  { render xml: '<error>Unsupported format</error>', status: :not_acceptable }
+      format.csv  { render plain: 'Unsupported format', status: :not_acceptable }
+      format.text { render plain: 'Unsupported format', status: :not_acceptable }
+      format.js   { render plain: 'Unsupported format', status: :not_acceptable }
 
-  def concurrent_sessions?
-    # If the session token differs from the token stored in the db
-    # a new login for this user is detected.
-    # Checking for User class prevents spec breaking for Doubles.
-    # Currently only enabled for admin users.
-    current_user.instance_of?(User) && (session[:login_token] != current_user&.current_login_token)
+      # Default handler for any other format
+      format.any  { render plain: 'Unsupported format', status: :not_acceptable }
+    end
   end
 
   def redirect_if_prod
@@ -262,6 +278,7 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_in_path_for(resource)
+      User.current_login_session = resource
       if request.referrer =~ /sign_in/
         redirect_path = confirm_last_portal(request, resource)
         session[:portal] || redirect_path
@@ -271,6 +288,7 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_out_path_for(resource_or_scope)
+      User.current_login_session = nil
       logout_saml_index_path
     end
 
@@ -319,6 +337,7 @@ class ApplicationController < ActionController::Base
 
     # TODO: We need to be mindful of this in situations where the person_id is being erroneously set
     # to the current hbx_admin
+    # FOLLOWUP: This method does sometimes set the admin to @person which affects the views related to /insured/family_members
     def set_current_person(required: true)
       if current_user.try(:person).try(:agent?) && session[:person_id].present?
         @person = Person.find(session[:person_id])

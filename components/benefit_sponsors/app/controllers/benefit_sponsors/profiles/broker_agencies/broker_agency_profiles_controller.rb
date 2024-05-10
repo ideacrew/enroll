@@ -5,6 +5,7 @@ require_dependency "benefit_sponsors/application_controller"
 module BenefitSponsors
   module Profiles
     module BrokerAgencies
+      # controller for broker agency profiles, frequently utilized in but not limited to the broker portal
       class BrokerAgencyProfilesController < ::BenefitSponsors::ApplicationController
         # include Acapi::Notifiers
         include DataTablesAdapter
@@ -26,34 +27,23 @@ module BenefitSponsors
           "5" => "employer_profile.plan_years.start_on"
         }.freeze
 
-        def create
-          json = request.body.read
-          body_json = JSON.parse(json)
-          result = ::BenefitSponsors::Services::BrokerRegistrationService.call(body_json["data"], current_user)
-          respond_to do |format|
-            if result.success?
-              format.json { render :status => 201, json: { :message => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed." } }
-            else
-              format.json { render :status => 422, :json => { errors: result.errors.to_h } }
-            end
-          end
-        end
-
         def index
-          authorize self
+          # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
+          authorize BenefitSponsors::Organizations::BrokerAgencyProfile
           @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
         end
 
         def show
           @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
-          authorize @broker_agency_profile, :redirect_signup?
+          authorize @broker_agency_profile
           set_flash_by_announcement
           @provider = current_user.person
           @id = params[:id]
         end
 
         def staff_index
-          authorize self
+          # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
+          authorize BenefitSponsors::Organizations::BrokerAgencyProfile
           @q = params.permit(:q)[:q]
           @staff = eligible_brokers
           @page_alphabets = page_alphabets(@staff, "last_name")
@@ -75,7 +65,7 @@ module BenefitSponsors
         # TODO: need to refactor for cases around SHOP broker agencies
         def family_datatable
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          authorize @broker_agency_profile
           @display_family_link = if ::EnrollRegistry.feature_enabled?(:disable_family_link_in_broker_agency)
                                    current_user.has_hbx_staff_role? || !::EnrollRegistry[:disable_family_link_in_broker_agency].setting(:enable_after_time_period).item.cover?(TimeKeeper.date_of_record)
                                  else
@@ -100,7 +90,7 @@ module BenefitSponsors
 
         def family_index
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          authorize @broker_agency_profile
           @q = params.permit(:q)[:q]
 
           respond_to do |format|
@@ -120,7 +110,7 @@ module BenefitSponsors
             redirect_to new_profiles_registration_path
             return
           end
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          authorize @broker_agency_profile
           documents = @broker_agency_profile.documents
           @statements = get_commission_statements(documents) if documents
           collect_and_sort_commission_statements
@@ -130,6 +120,8 @@ module BenefitSponsors
         end
 
         def show_commission_statement
+          authorize @broker_agency_profile
+
           options = {}
           options[:filename] = @commission_statement.title
           options[:type] = 'application/pdf'
@@ -138,6 +130,8 @@ module BenefitSponsors
         end
 
         def download_commission_statement
+          authorize @broker_agency_profile
+
           options = {}
           options[:content_type] = @commission_statement.type
           options[:filename] = @commission_statement.title
@@ -146,9 +140,9 @@ module BenefitSponsors
 
         def general_agency_index
           @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
+          authorize @broker_agency_profile
           @broker_role = current_user.person.broker_role || nil
           @general_agency_profiles = BenefitSponsors::Organizations::GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
         end
 
         def messages
@@ -157,14 +151,12 @@ module BenefitSponsors
           # messages are different for current_user is admin and broker account login
           @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           @broker_provider = @broker_agency_profile.primary_broker_role.person
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          authorize @broker_agency_profile
 
           respond_to do |format|
             format.js {}
           end
         end
-
-        def agency_messages; end
 
         def inbox
           @sent_box = true
@@ -172,10 +164,11 @@ module BenefitSponsors
             provider_id = params["id"]
             @broker_agency_provider = Person.find(provider_id)
             @broker_agency_profile = @broker_agency_provider.broker_role.broker_agency_profile
-            authorize @broker_agency_profile, :access_to_broker_agency_profile?
+            authorize @broker_agency_profile
           elsif params['profile_id'].present?
             provider_id = params['profile_id']
             @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(provider_id))
+            authorize @broker_agency_provider
           end
 
           @folder = (params[:folder] || 'Inbox').capitalize
@@ -183,6 +176,8 @@ module BenefitSponsors
           @provider = (current_user.person._id.to_s == provider_id) ? current_user.person : @broker_agency_provider
         end
 
+        # no auth required for this action: it is used to send an email for prospective brokers, which can be non-users
+        # may want to consider implementing some sort of rate limitation on this endpoint to prevent it from being abused
         def email_guide
           notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
           flash[:notice] = notice
@@ -201,11 +196,10 @@ module BenefitSponsors
         def find_broker_agency_profile(id = nil)
           organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id)
           @broker_agency_profile = organizations.first.broker_agency_profile if organizations.present?
-          authorize @broker_agency_profile, :access_to_broker_agency_profile? if @broker_agency_profile
         end
 
         def user_not_authorized(exception)
-          if exception.query == :redirect_signup?
+          if exception.query == :show?
             redirect_to main_app.new_user_registration_path
           elsif current_user&.has_broker_agency_staff_role?
             redirect_to profiles_broker_agencies_broker_agency_profile_path(:id => current_user.person.broker_agency_staff_roles.first.benefit_sponsors_broker_agency_profile_id)

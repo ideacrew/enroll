@@ -8,6 +8,7 @@ Feature: Hbx Admin creates a New Consumer Application for ivl users
     And a Hbx admin with <subrole> access exists
     And Hbx Admin logs on to the Hbx Portal
     And creates a consumer with SEP
+    And the consumer with SEP is RIDP verified
     When the person enrolls in a Kaiser plan
     When kaiser pay now feature is enabled
     And I click on purchase confirm button for matched person

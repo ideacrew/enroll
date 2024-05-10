@@ -10,11 +10,15 @@ module SessionConcern
     end
 
     def session
-      Thread.current[:current_session_values]
+      keys_to_extract = ["portal", "warden.user.user.session", "login_token", "session_id"]
+      session_values = Thread.current[:current_session_values]&.slice(*keys_to_extract) || {}
+      session_values[:login_session_id] = Thread.current[:login_session_id] if Thread.current[:login_session_id].present?
+      session_values
     end
 
     def system_account
-      @system_account ||= User.find_by(email: "admin@dc.gov")
+      system_email = EnrollRegistry[:aca_event_logging].setting(:system_account_email)&.item
+      @system_account ||= User.find_by(email: system_email) if system_email.present?
     end
   end
 end

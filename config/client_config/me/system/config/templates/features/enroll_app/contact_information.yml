@@ -1,0 +1,19 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+      - :contact_information
+    features:
+      - key: :po_lock_box_address
+        is_enabled: true
+        settings:
+          - key: :name
+            item: "CoverME.gov Health Benefit Exchange"
+          - key: :number
+            item: "PO Box 616"
+          - key: :city
+            item: "Augusta"
+          - key: :state
+            item: "ME"
+          - key: :zip_code
+            item: "04332-6626"

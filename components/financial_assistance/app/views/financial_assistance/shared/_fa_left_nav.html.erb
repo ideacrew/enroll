@@ -4,7 +4,8 @@
       <li class="activer list-box step-tabs no-hover global-nav">
         <a href="<%= edit_application_path(@application) %>">
           <i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i>
-          My Household</a>
+          <%= l10n("faa.left_nav.my_household") %>
+        </a>
       </li>
       <li class="activer list-box step-tabs income-style no-hover">
         <%= content_tag("a", "Income and Coverage Info", :class => 'cna')  %>
@@ -99,14 +100,14 @@
         <% if @application.present? && @application.is_draft?  %>
           <a href="<%= financial_assistance.edit_application_path(@application) %>"><%= l10n('family_info') %></a>
         <% else %>
-          <a href="javascript:void(0);" class="cna"><%= l10n('family_info') %></a>
+          <a href="javascript:void(0);" class="not-allowed"><%= l10n('family_info') %></a>
         <% end %>
       </li>
 
       <% if @application && @application.incomplete_applicants? %>
         <% if @application.applicants.count > 1 %>
           <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable'>
-            <a class="cna">Family Relationships</a>
+            <a class="not-allowed">Family Relationships</a>
           </li>
         <% end %>
       <% else %>

@@ -1,0 +1,13 @@
+
+<%= sanitize_html(l10n("user_mailer.broker_linked_notification_email.full_text",
+      first_name: person_name,
+      person_name: person_name,
+      site_short_name: site_short_name,
+      contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
+      site_home_business_url: site_home_business_url,
+      site_user_sign_in_url: EnrollRegistry[:enroll_app].setting(:user_sign_in_url).item,
+      contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,
+      site_title: EnrollRegistry[:enroll_app].setting(:site_title).item,
+      broker_agreement_url: EnrollRegistry[:broker_agreement_url].item,
+      login_url: login_url
+)) %>

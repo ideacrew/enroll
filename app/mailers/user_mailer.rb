@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class UserMailer < ApplicationMailer
-  ### add_template_helper makes the view helper methods available in the Mailer templates. It does NOT make the methods available in the Mailer itself
-  ### Thus we have to use Include in addition to add_template_helper
-  add_template_helper Config::AcaHelper
-  add_template_helper Config::SiteHelper
-  add_template_helper Config::ContactCenterHelper
-  add_template_helper ::L10nHelper
+  ### helper makes the view helper methods available in the Mailer templates. It does NOT make the methods available in the Mailer itself
+  ### Thus we have to use Include in addition to helper
+  helper Config::AcaHelper
+  helper Config::SiteHelper
+  helper Config::ContactCenterHelper
+  helper ::L10nHelper
   include Config::AcaHelper
   include Config::SiteHelper
   include Config::ContactCenterHelper
@@ -113,6 +113,26 @@ class UserMailer < ApplicationMailer
 
     mail({to: email, subject: "Set up your #{site_short_name} account"}) do |format|
       format.html { render "broker_staff_invitation_email", :locals => { :person_name => person_name, :invitation => invitation, :person_id => person_id }}
+    end
+  end
+
+  # Only when "broker_role_consumer_enhancement" (cr-95) is enabled, the below email will be sent to the broker.
+  # site_broker_linked_invitation_email_login_url only applies when "broker_role_consumer_enhancement" is enabled.
+  def broker_linked_invitation_email(email, person_name)
+    return if email.blank?
+
+    mail({to: email, subject: l10n("user_mailer.broker_linked_notification_email.subject")}) do |format|
+      format.html { render "broker_linked_notification_email", :locals => { :person_name => person_name, :login_url => site_broker_linked_invitation_email_login_url }}
+    end
+  end
+
+  # Only when "broker_role_consumer_enhancement" (cr-95) is enabled, the below email will be sent to the broker staff.
+  # site_broker_linked_invitation_email_login_url only applies when "broker_role_consumer_enhancement" is enabled.
+  def broker_staff_linked_invitation_email(email, person_name)
+    return if email.blank?
+
+    mail({to: email, subject: l10n("user_mailer.broker_staff_linked_notification_email.subject")}) do |format|
+      format.html { render "broker_staff_linked_notification_email", :locals => { :person_name => person_name, :login_url => site_broker_linked_invitation_email_login_url }}
     end
   end
 

@@ -52,7 +52,7 @@ input[type="radio"]:checked + label span {
 }
 
 .fa, .knowmore h4 {
-  color: var(--theme-primary-100, #007BC4);
+  color: var(--theme-primary-blue, #007BC4);
 }
 
 #backModal {
@@ -174,7 +174,11 @@ span.span-text {
   border-top: 3px solid #ddd;
 }
 .complete-icon{
-  color: #69A30D;
+  color: var( --status-green, #69A30D);
+  font-weight: bold;
+}
+.complete-icon-text{
+  color: var( --primary-black, #69A30D);
   font-weight: bold;
 }
 .in-progress{
@@ -182,7 +186,7 @@ span.span-text {
   font-weight: 600;
 }
 .in-progress-icon{
-  color: var(--primary-orange, #EAAA00);
+  color: var(--status-yellow, #EAAA00);
 }
 .app-status{
   padding: 10px;
@@ -307,9 +311,9 @@ div#add-more-link {
 
 /*ready for review*/
 .ready-4-review .whitebox {
-  border-color: #69A30D;
+  border-color: var( --light-gray, #69A30D);
 }
-.ready-4-review .note.purple::before { border-color:#fff #eee #69A30D #69A30D; }
+.ready-4-review .note.purple::before { border-color:var(--light-gray, #fff) var(--light-gray, #eee) var(--light-gray, #69A30D) var( --light-gray, #69A30D); }
 
 .margin-bottom-adjustment {
   margin-bottom:-25px;

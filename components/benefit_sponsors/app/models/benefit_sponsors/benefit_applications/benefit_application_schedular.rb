@@ -166,7 +166,8 @@ module BenefitSponsors
       end
 
       def business_day?(date)
-        !date.saturday? && !date.sunday? && !Holidays.on(date, :us).present?
+        state_symbol = "us_#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}".to_sym
+        !date.saturday? && !date.sunday? && !Holidays.on(date, state_symbol, :observed).present?
       end
 
       def shop_enrollment_timetable(new_effective_date)

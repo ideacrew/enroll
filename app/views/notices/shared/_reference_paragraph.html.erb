@@ -3,7 +3,7 @@
     <tbody>
     <% contents.each do |para| %>
       <tr>
-        <td style="padding-top: 2px;" ><%= para.html_safe %></td>
+        <td style="padding-top: 2px;" ><%= sanitize_html(para) %></td>
       </tr>
     <% end %>
     </tbody>

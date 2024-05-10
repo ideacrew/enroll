@@ -26,6 +26,9 @@ class Person
   # verification history tracking
   include Mongoid::History::Trackable
 
+  # transmittable subject
+  include Transmittable::Subject
+
   track_history :on => [:first_name,
                         :middle_name,
                         :last_name,
@@ -55,6 +58,7 @@ class Person
 
 
   extend Mongorder
+  include HtmlScrubberUtil
 #  validates_with Validations::DateRangeValidator
 
   GENDER_KINDS = %W(male female)
@@ -169,6 +173,11 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
+
+  # @!attribute [rw] demographics_group
+  #   @return [DemographicsGroup] The demographics information for the person.
+  #   This is a polymorphic association that can be associated with any model that can have demographics information.
+  embeds_one :demographics_group, as: :demographicable, class_name: 'DemographicsGroup'
 
   attr_accessor :effective_date, :skip_person_updated_event_callback, :is_consumer_role, :is_resident_role
 
@@ -1191,6 +1200,10 @@ class Person
     @naturalized_citizen = false if val.to_s == "false"
   end
 
+  def skip_lawful_presence_determination_callbacks=(val)
+    @skip_lawful_presence_determination_callbacks = true if val.to_s == "true"
+  end
+
   def naturalized_citizen=(val)
     @naturalized_citizen = (val.to_s == "true")
   end
@@ -1272,7 +1285,9 @@ class Person
     elsif
       self.errors.add(:base, "Citizenship status can't be nil.")
     end
-    self.consumer_role.lawful_presence_determination.assign_citizen_status(new_status) if new_status
+    lawful_presence_determination = self.consumer_role.lawful_presence_determination
+    lawful_presence_determination.skip_lawful_presence_determination_callbacks = @skip_lawful_presence_determination_callbacks if @skip_lawful_presence_determination_callbacks == true
+    lawful_presence_determination.assign_citizen_status(new_status) if new_status
   end
 
   def agent?
@@ -1316,6 +1331,48 @@ class Person
     end
   end
 
+  # Creates a new Broker Agency Staff Role with given input params.
+  #
+  # @note This method may raise an exception if the Broker Agency Staff Role is not created successfully.
+  #
+  # @param [Hash] basr_params.
+  #   The acceptable keys: :aasm_state, :benefit_sponsors_broker_agency_profile_id, :reason
+  #   Currently, we only create Broker Agency Staff Role with benefit_sponsors_broker_agency_profile_id
+  # @return [BrokerAgencyStaffRole] broker_agency_staff_role if the Broker Agency Staff Role is created successfully.
+  def create_broker_agency_staff_role(basr_params)
+    basr = broker_agency_staff_roles.build(
+      {
+        benefit_sponsors_broker_agency_profile_id: basr_params[:benefit_sponsors_broker_agency_profile_id]
+      }
+    )
+    save!
+    basr
+  end
+
+  # @method pending_basr_by_profile_id(profile_id)
+  # Retrieves the first pending Broker Agency Staff Role (BASR) for a given broker agency profile ID.
+  #
+  # @param [BSON::ObjectId] profile_id The ID of the Broker Agency Profile for which to retrieve the pending BASR.
+  #
+  # @return [BrokerAgencyStaffRole, nil] Returns the first pending broker agency staff role for the given broker agency profile ID, or nil if no such role exists.
+  #
+  # @example Retrieve the first pending BASR for a given profile ID
+  #   person.pending_basr_by_profile_id(profile_id) #=> BrokerAgencyStaffRole or nil
+  def pending_basr_by_profile_id(profile_id)
+    broker_agency_staff_roles.broker_agency_pending.by_profile_id(profile_id).first
+  end
+
+  # Returns the first verification type that matches 'VerificationType::ALIVE_STATUS'.
+  # The result is memoized, so subsequent calls will return the previously computed value
+  # without querying the database again.
+  #
+  # @return [VerificationType, nil] the first verification type that matches 'VerificationType::ALIVE_STATUS', or nil if no such verification type exists.
+  def alive_status
+    return @alive_status if defined? @alive_status
+
+    @alive_status = verification_types.where(type_name: VerificationType::ALIVE_STATUS).first
+  end
+
   private
 
   def assign(collection, association)
@@ -1340,14 +1397,14 @@ class Person
                                    else
                                      "inbox.create_inbox_normal_user_message"
                                    end
-    welcome_body = l10n(
+    welcome_body = sanitize_html(l10n(
       welcome_body_translation_key,
       site_short_name: site_short_name,
       state_name: site_state_name,
       contact_center_short_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
       contact_center_tty_number: contact_center_tty_number,
       contact_center_name: contact_center_name
-    ).html_safe
+    ))
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
   end

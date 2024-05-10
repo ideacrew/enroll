@@ -72,11 +72,11 @@
                 <%= f.text_field :last_name, value: @applicant.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *" %>
                 <div class="text-right">
                   <% if !@applicant.persisted? %>
-                      <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
+                      <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %><span class="hide"><%=l10n("delete")%></span></a>
                   <% else %>
-                      <%= link_to insured_family_member_path(@applicant), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")} do
-                        '<i class="fa fa-times"></i>'.html_safe
-                      end %>
+                    <a href="<%= insured_family_member_path(@applicant) %>" class="close close-2" data-method="delete" data-remote="true" data-confirm="<%= l10n('confirm_remove_dependent') %>" data-ok="<%= l10n('yes') %>" data-cancel="<%= l10n('no') %>">
+                      <i class="fa fa-times"><span class="hide"><%= l10n('delete') %></span></i>
+                    </a>
                   <% end %>
                 </div>
               </div>
@@ -215,7 +215,12 @@
                 <%= l10n("cancel") %>
               </a>
           <% else %>
-              <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(@applicant), :remote => true %>
+              <%= link_to(
+                    insured_family_member_path(@applicant),
+                    :remote => true
+                  ) do %>
+                <span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span><%= l10n("cancel") %>
+              <% end %>
           <% end %>
 
           <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden dependent-disable", onclick: "$('#btn-continue').removeClass('disabled');") do %>
@@ -231,6 +236,8 @@
 
   <script>
       $(document).ready(function() {
+          $.inputMasks();
+
           $('.field_with_errors > *').unwrap();
           Freebies.floatlabels();
           if($("input#dependent_same_with_primary").is(":checked")){

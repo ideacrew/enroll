@@ -7,12 +7,11 @@ BenefitSponsors::Engine.routes.draw do
     end
 
     namespace :broker_agencies do
-      resources :broker_agency_profiles, format: false, only: [:new, :create, :show, :index, :edit, :update] do
+      resources :broker_agency_profiles, format: false, only: [:new, :show, :index, :edit, :update] do
         collection do
           get :family_index
           get :messages
           get :staff_index
-          get :agency_messages
           get :commission_statements
           get :general_agency_index
           post :email_guide
@@ -28,8 +27,6 @@ BenefitSponsors::Engine.routes.draw do
         end
       end
       resources :broker_applicants
-
-      resources :broker_roles
 
       resources :broker_agency_staff_roles do
         collection do
@@ -91,6 +88,7 @@ BenefitSponsors::Engine.routes.draw do
           get :inbox
           get :show_invoice
           get :download_invoice
+          get :wells_fargo_sso
         end
 
         resources :broker_agency, only: [:index, :show, :create] do
@@ -110,17 +108,7 @@ BenefitSponsors::Engine.routes.draw do
   end
 
   namespace :inboxes do
-    resources :messages, only: [:show, :destroy] do
-      get :msg_to_portal
-    end
-  end
-
-  namespace :organizations do
-    resource :office_locations do
-      member do
-        get :new
-      end
-    end
+    resources :messages, only: [:show, :destroy]
   end
 
   resources :benefit_sponsorships do

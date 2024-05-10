@@ -1,4 +1,6 @@
 module CapybaraHelpers
+  include HtmlScrubberUtil
+
   # Perform an action then wait for the page to reload before proceeding
   def wait_for_page_reload_until(timeout, slice_size = 0.2, &blk)
     execute_script(<<-JSCODE)
@@ -109,27 +111,11 @@ module CapybaraHelpers
 
   def l10n(translation_key, interpolated_keys={})
     begin
-      I18n.t(translation_key, interpolated_keys.merge(raise: true)).html_safe
+      sanitize_html(I18n.t(translation_key, interpolated_keys.merge(raise: true)))
     rescue I18n::MissingTranslationData
       translation_key.gsub(/\W+/, '').titleize
     end
   end
-
-  # rubocop:disable Style/GlobalVars
-  def select_session(id)
-    Capybara.instance_variable_set("@session_pool", {"#{Capybara.current_driver}#{Capybara.app.object_id}" => $sessions[id]})
-  end
-
-  def in_session(id)
-    $sessions ||= {}
-    $sessions[:default] ||= Capybara.current_session
-    $sessions[id]       ||= Capybara::Session.new(Capybara.current_driver, Capybara.app)
-
-    select_session(id)
-    yield
-    select_session(:default)
-  end
-  # rubocop:enable Style/GlobalVars
 end
 
 World(CapybaraHelpers)

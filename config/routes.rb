@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   mount SponsoredBenefits::Engine,    at: "/sponsored_benefits"
   mount TransportGateway::Engine,     at: "/transport_gateway"
   mount TransportProfiles::Engine,    at: "/transport_profiles"
-  mount Notifier::Engine,             at: "/notifier"
+  mount Notifier::Engine,             at: "/notifier" if EnrollRegistry.feature_enabled?(:notices_tab)
   mount FinancialAssistance::Engine,  at: '/financial_assistance'
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
@@ -32,15 +32,6 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
-  namespace :uis do
-    resources :bootstrap3_examples do
-      collection do
-        get :index
-        get :components
-        get :getting_started
-      end
-    end
-  end
   get 'datatables/*path.:json', to: 'application#resource_not_found'
   get 'insured/consumer_role/help_paying_coverage.:inc', to: 'application#resource_not_found'
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -67,10 +58,10 @@ Rails.application.routes.draw do
     post "/security_question_responses/replace", controller: "users/security_question_responses", action: 'replace'
 
     member do
-      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
-      put :confirm_reset_password, :confirm_change_username_and_email, :update
+      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email
+      put :confirm_reset_password, :confirm_change_username_and_email
 
-      post :unlock, :change_password
+      post :unlock
     end
   end
 
@@ -80,6 +71,7 @@ Rails.application.routes.draw do
       post :redirection_test
       get :logout
       get :navigate_to_assistance
+      get :account_expired
     end
   end
 
@@ -121,14 +113,6 @@ Rails.application.routes.draw do
           post 'expire_sep_type'
           get 'clone'
         end
-      end
-    end
-
-    resources :scheduled_events do
-      collection do
-        get 'current_events'
-        get 'delete_current_event'
-        get 'list'
       end
     end
 
@@ -240,7 +224,7 @@ Rails.application.routes.draw do
     end
 
     resources :broker_applicants
-    resources :security_questions
+    resources :security_questions, only: [:index, :new, :create, :edit, :update, :destroy]
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
@@ -286,7 +270,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :fdsh_ridp_verifications, format: false, only: [:create, :new, :update] do
+    resources :fdsh_ridp_verifications, format: false, only: [:create, :new] do
       collection do
         get 'failed_validation'
         get 'service_unavailable'
@@ -501,7 +485,6 @@ Rails.application.routes.draw do
 
   match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
   # match 'general_agency_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=general_agency'), via: [:get]
-  match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do
@@ -510,50 +493,10 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
-    resources :inboxes, only: [:new, :create, :show, :destroy] do
-      get :msg_to_portal
-    end
-    resources :profiles, only: [:new, :create, :show, :index, :edit, :update] do
-      get :inbox
 
-      collection do
-        get :family_index
-        get :employers
-        get :messages
-        get :staff_index
-        get :agency_messages
-        get :assign_history
-        get :commission_statements
-      end
-      member do
-        get :general_agency_index
-        get :manage_employers
-        post :clear_assign_for_employer
-        get :assign
-        post :update_assign
-        post :employer_datatable
-        post :family_datatable
-        post :set_default_ga
-        get :download_commission_statement
-        get :show_commission_statement
-      end
-
+    resources :profiles, except: [:new, :create, :show, :index, :edit, :update, :destory] do
       resources :applicants
     end
-    resources :broker_roles, only: [:create] do
-      root 'broker_roles#new_broker'
-      collection do
-        get :new_broker
-        get :new_staff_member
-        get :new_broker_agency
-        get :search_broker_agency
-        post :email_guide
-      end
-      member do
-        get :favorite
-      end
-    end
-
 
     resources :broker_roles do
 
@@ -643,21 +586,10 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :people do #TODO: delete
-    get 'select_employer'
-    get 'my_account'
-
-    collection do
-      post 'person_confirm'
-      post 'plan_details'
-      get 'check_qle_marriage_date'
-    end
-
-    member do
-      get 'get_member'
-    end
-
-  end
+  # TO-DO: this routes were split into costumer and employer namespaces
+  # however a lot of helpers needs this magic methods, we need to do a further
+  # refactor to remove this dependencies
+  resources :people, only: [:show, :index, :update]
 
   match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"
 
@@ -686,14 +618,14 @@ Rails.application.routes.draw do
       get :claim
     end
   end
-  resources :office_locations, only: [:new]
 
-  get "document/download/:bucket/:key" => "documents#download", as: :document_download
+  get "document/employees_template_download" => "documents#employees_template_download", as: :document_employees_template_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
   get "document/cartafact_download/:model/:model_id/:relation/:relation_id" => "documents#cartafact_download", as: :cartafact_document_download
 
-  resources :documents, only: [:new, :create, :destroy, :update] do
-    get :document_reader,on: :member
+  resources :documents, only: [:destroy] do
+    get :product_sbc_download
+    get :employer_attestation_document_download
     get :autocomplete_organization_legal_name, :on => :collection
     collection do
       put :change_person_aasm_state
@@ -703,13 +635,7 @@ Rails.application.routes.draw do
       get :enrollment_verification
       put :extend_due_date
       get :fed_hub_request
-      post 'download_documents'
-      post 'delete_documents'
       post :fed_hub_request
-    end
-
-    member do
-      get :download_employer_document
     end
   end
 
@@ -771,8 +697,6 @@ Rails.application.routes.draw do
   #   end
   #
   # You can have the root of your site routed with "root"
-
-  # API check_ach_routing
 
   resources :external_applications, only: [:show]
 

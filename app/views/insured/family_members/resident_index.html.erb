@@ -57,10 +57,9 @@
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
 
             <% if @change_plan.present? %>
-              <%=
-                link_to "<i class='fa fa-user-plus'></i> #{l10n('.continue')}".html_safe, group_selection_url,
-                 class: 'btn btn-primary pull-right' + pundit_class(Family,:updateable?), id: 'btn_household_continue'
-              %>
+              <%= link_to(group_selection_url, class: 'btn btn-primary pull-right' + pundit_class(Family,:updateable?), id: 'btn_household_continue') do %>
+                <i class='fa fa-user-plus white'></i> <%= l10n('.continue') %>
+              <% end %>
             <% end %>
           </div>
         </div>

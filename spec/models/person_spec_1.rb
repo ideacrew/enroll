@@ -90,4 +90,18 @@ RSpec.describe Person, type: :model do
       end
     end
   end
+
+  describe '#add_new_verification_type' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+    before do
+      person.add_new_verification_type(VerificationType::ALIVE_STATUS)
+    end
+
+    it 'returns Alive status' do
+      expect(person.reload.alive_status).to be_a(VerificationType)
+      expect(person.alive_status.type_name).to eq(VerificationType::ALIVE_STATUS)
+      expect(person.alive_status.validation_status).to eq('unverified')
+    end
+  end
 end

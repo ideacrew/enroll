@@ -105,6 +105,31 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(mock_resident_candidate).to receive(:valid?).and_return(false)
     end
 
+    context 'sensitive params are filtered in logs' do
+      let(:validation_result) { true }
+      let(:found_person) { [] }
+
+      let(:person_parameters) do
+        {
+          'dob' => '1990-01-01',
+          'first_name' => 'dummy',
+          'gender' => 'male',
+          'last_name' => 'testing',
+          'middle_name' => 'enroll',
+          'name_sfx' => '',
+          'ssn' => '111111111'
+        }
+      end
+
+      let(:filtered_person_parameters) { person_parameters.merge('ssn' => '[FILTERED]') }
+
+      it 'confirms the ssn param is filtered' do
+        post :match, params: { person: person_parameters }
+        expect(response).to have_http_status(:success)
+        expect(File.read('log/test.log')).to include(filtered_person_parameters.to_s)
+      end
+    end
+
     context "given invalid parameters", dbclean: :after_each do
       let(:validation_result) { false }
       let(:found_person) { [] }
@@ -216,8 +241,42 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       post :create, params: { person: person_params }
       expect(response).to have_http_status(:redirect)
     end
+  end
 
+  context 'POST create', dbclean: :after_each do
+    let!(:person_params){person.attributes.slice('dob', 'first_name', 'gender', 'last_name', 'middle_name', 'name_sfx', 'user_id').merge!('ssn': '268-47-9234', 'no_ssn': '0', 'dob_check': '', 'is_applying_coverage': 'true') }
+    let!(:person_user){ FactoryBot.create(:user, person: person) }
+    let!(:person) { FactoryBot.create(:person)}
 
+    before(:each) do
+      person_user.person.update_attributes(ssn: nil)
+    end
+
+    it 'should handle StandardError and show warning' do
+      sign_in user
+      post :create, params: { person: person_params }
+      allow(person).to receive(:save).and_raise(StandardError)
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:warning]).to eq(l10n('insured.existing_person_record_warning_message'))
+    end
+  end
+
+  context 'POST create: if same user try to claim the account', dbclean: :after_each do
+    let!(:person_params){person.attributes.slice('dob', 'first_name', 'gender', 'last_name', 'middle_name', 'name_sfx', 'user_id').merge!('ssn': '268-47-9234', 'no_ssn': '0', 'dob_check': '', 'is_applying_coverage': 'true') }
+    let!(:person_user){ FactoryBot.create(:user, person: person) }
+    let!(:person) { FactoryBot.create(:person)}
+
+    before(:each) do
+      person_user.person.update_attributes(ssn: nil)
+    end
+
+    it 'should not show warning' do
+      sign_in person_user
+      post :create, params: { person: person_params }
+      allow(person).to receive(:save).and_raise(StandardError)
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:warning]).to be_nil
+    end
   end
 
   context "POST create with failed construct_employee_role", dbclean: :after_each do
@@ -274,6 +333,13 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       get :upload_ridp_document
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:upload_ridp_document)
+    end
+
+    it "should not render new template" do
+      sign_in user
+      get :upload_ridp_document, format: :js
+      expect(response).not_to have_http_status(:success)
+      expect(response).not_to render_template(:upload_ridp_document)
     end
   end
 
@@ -661,6 +727,13 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:immigration_document_options)
     end
+
+    it "not render javascript template" do
+      allow(Person).to receive(:find).and_return person
+      get :immigration_document_options, params: params, format: :html, xhr: true
+      expect(response).not_to have_http_status(:success)
+      expect(response).not_to render_template(:immigration_document_options)
+    end
   end
 
   context "GET ridp_agreement", dbclean: :after_each do
@@ -699,11 +772,16 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(person100.consumer_role).to receive(:identity_verified?).and_return(false)
         allow(person100.consumer_role).to receive(:application_verified?).and_return(false)
         allow(person100.primary_family).to receive(:has_curam_or_mobile_application_type?).and_return(false)
-        get "ridp_agreement"
       end
 
       it "should render the agreement page" do
+        get "ridp_agreement"
         expect(response).to render_template("ridp_agreement")
+      end
+
+      it "should not render the agreement page" do
+        get "ridp_agreement", format: :js
+        expect(response).not_to render_template("ridp_agreement")
       end
     end
   end
@@ -729,7 +807,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   end
 
-  describe "Post match resident role" do
+  describe "resident role" do
     let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
     let(:resident_parameters) { { :first_name => "John", :last_name => "Smith1", :dob => "4/4/1972" }}
     let(:mock_consumer_candidate) { instance_double("Forms::ConsumerCandidate", :valid? => "true", ssn: "333224444", dob: Date.new(1968, 2, 3), :first_name => "fname", :last_name => "lname") }
@@ -751,41 +829,53 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:is_consumer_role_active?).and_return(false)
       allow(person).to receive(:is_resident_role_active?).and_return(false)
-
-
     end
 
-    context "with pre-existing consumer_role", dbclean: :after_each do
-      it "should not have a resident role created for it" do
-        post :match, params: {person: resident_parameters }
-        expect(user.person.resident_role).to be_nil
-        #expect(response).to redirect_to(family_account_path)
+    context "Post match" do
+      context "with pre-existing consumer_role", dbclean: :after_each do
+        it "should not have a resident role created for it" do
+          post :match, params: {person: resident_parameters }
+          expect(user.person.resident_role).to be_nil
+          #expect(response).to redirect_to(family_account_path)
+          expect(response).to render_template("match")
+        end
+      end
+
+      context "with pre-existing resident_role", dbclean: :after_each do
+        it "should navigate to family account page" do
+          allow(person).to receive(:resident_role).and_return(resident_role)
+          allow(person).to receive(:is_resident_role_active?).and_return(true)
+
+          post :match, params: { person: resident_parameters }
+          expect(user.person.resident_role).not_to be_nil
+          expect(response).to redirect_to(family_account_path)
+        end
+      end
+
+      context "with both resident and consumer roles", dbclean: :after_each do
+        it "should navigate to family account page" do
+          allow(person).to receive(:consumer_role).and_return(consumer_role)
+          allow(person).to receive(:resident_role).and_return(resident_role)
+          allow(person).to receive(:is_resident_role_active?).and_return(true)
+          allow(person).to receive(:is_consumer_role_active?).and_return(true)
+
+          post :match, params: { person: resident_parameters }
+          expect(user.person.consumer_role).not_to be_nil
+          expect(user.person.resident_role).not_to be_nil
+          expect(response).to redirect_to(family_account_path)
+        end
+      end
+    end
+
+    context "Post build" do
+      it "should render match" do
+        post :build, params: {person: resident_parameters }
         expect(response).to render_template("match")
       end
-    end
 
-    context "with pre-existing resident_role", dbclean: :after_each do
-      it "should navigate to family account page" do
-        allow(person).to receive(:resident_role).and_return(resident_role)
-        allow(person).to receive(:is_resident_role_active?).and_return(true)
-
-        post :match, params: { person: resident_parameters }
-        expect(user.person.resident_role).not_to be_nil
-        expect(response).to redirect_to(family_account_path)
-      end
-    end
-
-    context "with both resident and consumer roles", dbclean: :after_each do
-      it "should navigate to family account page" do
-        allow(person).to receive(:consumer_role).and_return(consumer_role)
-        allow(person).to receive(:resident_role).and_return(resident_role)
-        allow(person).to receive(:is_resident_role_active?).and_return(true)
-        allow(person).to receive(:is_consumer_role_active?).and_return(true)
-
-        post :match, params: { person: resident_parameters }
-        expect(user.person.consumer_role).not_to be_nil
-        expect(user.person.resident_role).not_to be_nil
-        expect(response).to redirect_to(family_account_path)
+      it "should not render match" do
+        post :build, params: {person: resident_parameters }, format: :js
+        expect(response).not_to render_template("match")
       end
     end
   end
@@ -818,7 +908,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         sign_in user
       end
 
-      context 'user has most recent existing application in draft state' do
+      context 'unverified user has most recent existing application in draft state' do
         let!(:person){ FactoryBot.create(:person) }
         let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
         let!(:primary) { family.primary_family_member }
@@ -826,11 +916,27 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         let!(:assistance_year) { FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value! }
         let!(:application) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', assistance_year: assistance_year, family_id: family.id, applicants: [applicant])}
 
+        it 'should error out for attempting to navigate without identity verification' do
+          expect { get :help_paying_coverage }.to raise_error(Pundit::NotDefinedError)
+        end
+      end
+
+      context 'verified user has most recent existing application in draft state' do
+        before do
+          allow(person.consumer_role).to receive(:identity_verified?).and_return(true)
+        end
+
+        let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+        let!(:primary) { family.primary_family_member }
+        let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, family_member_id: primary.id, person_hbx_id: primary.hbx_id) }
+        let!(:assistance_year) { FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value! }
+        let!(:application) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', assistance_year: assistance_year, family_id: family.id, applicants: [applicant])}
+
         it 'should redirect to draft application edit page' do
-          edit_application_path = FinancialAssistance::Engine.routes.url_helpers.edit_application_path(application).split('/.').last
           get :help_paying_coverage
           expect(response).to have_http_status(:redirect)
-          expect(response).to redirect_to(edit_application_path)
+          expect(response).to redirect_to(FinancialAssistance::Engine.routes.url_helpers.edit_application_path(application).split('/.').last)
         end
       end
     end

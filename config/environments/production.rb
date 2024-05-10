@@ -39,6 +39,10 @@ Rails.application.configure do
   # Apache or NGINX already handles this.
   config.serve_static_files = false
 
+  # Disable serving static files from the `/public` folder by default since
+  # Apache or NGINX already handles this.
+  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+
   # Compress JavaScripts and CSS.
   # config.assets.js_compressor = :uglifier
   config.assets.js_compressor = Uglifier.new(harmony: true)
@@ -65,7 +69,7 @@ Rails.application.configure do
   config.log_level = :debug
 
   # Prepend all log lines with the following tags.
-  # config.log_tags = [ :subdomain, :uuid ]
+  # config.log_tags = [ :subdomain, :uuid, :request_id ]
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
@@ -93,6 +97,11 @@ Rails.application.configure do
 
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :notify
+  # Log disallowed deprecations.
+  config.active_support.disallowed_deprecation = :log
+
+  # Tell Active Support which deprecation messages to disallow.
+  config.active_support.disallowed_deprecation_warnings = []
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = Logger::SimpleJsonFormatter.new
@@ -106,6 +115,7 @@ Rails.application.configure do
 
   #Queue adapter
   config.active_job.queue_adapter = :resque
+  config.action_mailer.perform_caching = false
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR

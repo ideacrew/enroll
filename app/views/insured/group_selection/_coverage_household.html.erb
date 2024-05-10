@@ -24,14 +24,14 @@
           <tr class='<%= @adapter.class_for_ineligible_row(family_member, is_ivl_coverage, (@effective_on_date || @new_effective_on), @qle) %>'>
             <td style="padding: 0">
                 <% if EnrollRegistry.feature_enabled?(:choose_coverage_medicaid_warning) %>
-                  <!-- Once the :choose_coverage_medicaid_warning feature has passed UAT for DC, 
+                  <!-- Once the :choose_coverage_medicaid_warning feature has passed UAT for DC,
                   the 'if/else' block can be removed and the content of the 'else' can be entirely deleted.
                   The content of the 'if' is refactored and updated design of the 'else'.-->
                   <div class="coverage-selection-block row-form-wrapper coverage-container">
                     <div class="coverage-chbx">
                       <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked && !family_member_eligible_for_medicaid(family_member, @family, @new_effective_on&.year), disabled: !is_checked ) %>
                     </div>
-                    <div class="coverage-name-and-errors"> 
+                    <div class="coverage-name-and-errors">
                       <span class="coverage-message-row"><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name.upcase} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></span>
                       <% @person.active_employee_roles.each do |employee_role| %>
                         <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, employee_role, (@effective_on_date || @new_effective_on), @qle) %>
@@ -42,7 +42,7 @@
                       <div class="ivl_errors text-dk-grey">
                         <% errors&.each do |error| %>
                           <% error = error.join(' ') if error.kind_of?(Array) %>
-                          <div class="pb-1"><%= error.html_safe %></div>
+                          <div class="pb-1"><%= sanitize_html(error) %></div>
                         <% end %>
                       </div>
                     </div>
@@ -75,11 +75,11 @@
                     <label class="required no-pd"><%= l10n("insured.group_selection.is_tobacco_user") %> *</label>
                   </div>
                   <% member = @latest_enrollment.hbx_enrollment_members.where(applicant_id: family_member.id).first if @latest_enrollment %>
-                  <div class="col-xs-2 top-buffer pb-1">
+                  <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_Y_<%= index %>')" class="col-xs-2 top-buffer pb-1">
                     <input id="is_tobacco_user_Y_<%= index %>" type="radio" value="Y" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use == 'Y' %>>
-                    <label class="radio-label" for="is_tobacco_user_Y_<%= index %>"><span>Yes</span></label>
+                    <label data-cuke="is_tobacco_user_Y_<%= index %>" class="radio-label" for="is_tobacco_user_Y_<%= index %>"><span>Yes</span></label>
                   </div>
-                  <div class="col-md-2 col-xs-1 top-buffer pb-1">
+                  <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_N_<%= index %>')" class="col-md-2 col-xs-1 top-buffer pb-1">
                     <input id="is_tobacco_user_N_<%= index %>" type="radio" value="N" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use != 'Y' %>>
                     <label class="radio-label" for="is_tobacco_user_N_<%= index %>"><span>No</span></label>
                   </div>
@@ -98,11 +98,8 @@
 <script>
   $(document).on('turbolinks:load', function() {
     $(document).on("change", "input[type=checkbox]", function () {
-      if (this.checked) {
-        $(this).closest('tr').find("input[type='radio']").attr('disabled','false');
-      } else {
-        $(this).closest('tr').find("input[type='radio']").attr('disabled','true');
-      }
+      var isCheckboxChecked = this.checked;
+      $(this).closest('tr').find("input[type='radio']").prop('disabled',!isCheckboxChecked);
     });
   });
 </script>

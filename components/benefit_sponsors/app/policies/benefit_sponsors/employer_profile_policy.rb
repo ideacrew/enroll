@@ -6,6 +6,10 @@ module BenefitSponsors
       user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_broker_staff_role_for_employer?(record) || is_staff_role_for_employer?(record)
     end
 
+    def can_download_document?
+      updateable?
+    end
+
     def show_pending?
       return false unless user.present?
       true
@@ -90,6 +94,12 @@ module BenefitSponsors
 
     def can_modify_employer?
       user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.modify_employer
+    end
+
+    def can_view_audit_log?
+      return false if user.blank? || user.person.blank?
+
+      user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_view_audit_log
     end
   end
 end

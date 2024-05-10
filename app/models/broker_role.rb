@@ -12,12 +12,6 @@ class BrokerRole
 
   BROKER_ROLE_STATUS_TYPES = ['applicant', 'certified', 'pending', 'decertified', 'denied', 'extended', 'imported','all'].freeze
 
-  MARKET_KINDS_OPTIONS = {
-    "Individual & Family Marketplace ONLY" => "individual",
-    "Small Business Marketplace ONLY" => "shop",
-    "Both – Individual & Family AND Small Business Marketplaces" => "both"
-  }
-
   embedded_in :person
 
   field :aasm_state, type: String
@@ -29,7 +23,12 @@ class BrokerRole
   field :provider_kind, type: String
   field :reason, type: String
 
+  # @!attribute market_kind
+  #   @return [String] Represents the market type that the broker is associated with.
+  #   This field is not being used consistently across the application and may yield unexpected results.
+  #   It is recommended to fetch or depend on this field only after we start to persist information consistently.
   field :market_kind, type: String
+
   field :languages_spoken, type: Array, default: ["en"]
   field :working_hours, type: Boolean, default: false
   field :accept_new_clients, type: Boolean
@@ -75,6 +74,26 @@ class BrokerRole
       pr.broker_role.present? &&
         (pr.broker_role.npn == broker_npn)
     end.map(&:broker_role)
+  end
+
+  # Checks if the broker is associated with the individual market.
+  # As the field market_kind is not being used properly, we depend on Broker Agency Profile's market_kind.
+  #
+  # @return [Boolean] Returns true if the broker is associated with the individual market, false otherwise.
+  def individual_market?
+    return false unless broker_agency_profile
+
+    broker_agency_profile.individual_market?
+  end
+
+  # Checks if the broker is associated with the shop market.
+  # As the field market_kind is not being used properly, we depend on Broker Agency Profile's market_kind.
+  #
+  # @return [Boolean] Returns true if the broker is associated with the shop market, false otherwise.
+  def shop_market?
+    return false unless broker_agency_profile
+
+    broker_agency_profile.shop_market?
   end
 
   def search_favorite_general_agencies(general_agency_profile_id)
@@ -351,6 +370,32 @@ class BrokerRole
 
   def active?
     aasm_state == 'active'
+  end
+
+  # @method create_basr_for_person_with_consumer_role
+  # Creates a Broker Agency Staff Role (BASR) for a person with a consumer role.
+  #
+  # This method checks:
+  #   - if the 'broker_role_consumer_enhancement' feature is enabled
+  #   - if the person has a consumer role
+  #   - if the person has a user
+  #   - if the person already has a BASR for the current broker agency profile.
+  #   If all these conditions are met, it creates a new BASR for the person with the current broker agency profile.
+  #
+  # @return [BrokerAgencyStaffRole, nil]
+  #   Returns the newly created BrokerAgencyStaffRole if it was created, or nil if no role was created.
+  #
+  # @example Create a BASR for a person with a consumer role
+  #   create_basr_for_person_with_consumer_role
+  def create_basr_for_person_with_consumer_role
+    return unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+    return if person.consumer_role.blank?
+    return if person.user.blank?
+    return if person.pending_basr_by_profile_id(benefit_sponsors_broker_agency_profile_id)
+
+    person.create_broker_agency_staff_role(
+      benefit_sponsors_broker_agency_profile_id: benefit_sponsors_broker_agency_profile_id
+    )
   end
 
   private

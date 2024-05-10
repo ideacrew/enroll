@@ -25,7 +25,7 @@
   <ul>
   <% @notices.each do |notice|%>
       <li>
-        <%= link_to(notice.title, authorized_document_download_path('Person', @person.id, 'documents', notice.id ) + "?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank") %>
+        <%= h(link_to(notice.title, authorized_document_download_path('Person', @person.id, 'documents', notice.id ) + "?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank", rel: "noopener noreferrer")) %>
       </li>
   <% end %>
     </ul>

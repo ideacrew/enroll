@@ -22,8 +22,8 @@ attributes: !ruby/hash:BSON::Document
     applying for benefits for yourself, we will not ask you about your citizenship
     or immigration status and will not check your information with the Department
     of Homeland Security.<br/><br/><a href=''https://www.dchealthlink.com/privacy''
-    target=''_blank''>Learn more about how we will use your information.</a><br><a
-    href=''https://www.dchealthlink.com/privacy-act-statement'' target=''_blank''>View
+    target=''_blank'' rel="noopener noreferrer">Learn more about how we will use your information.</a><br><a
+    href=''https://www.dchealthlink.com/privacy-act-statement'' target=''_blank'' rel="noopener noreferrer">View
     Privacy Act Statement</a><br/><br/>By clicking Continue, you are saying that you
     understand that information in this application, and the information we get from
     data sources will be used to decide the eligibility of the people who are applying

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 require "#{FinancialAssistance::Engine.root}/lib/transfer_accounts"
 
 RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
