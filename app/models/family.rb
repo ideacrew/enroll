@@ -1182,6 +1182,7 @@ class Family
     return if person.consumer_role.present?
     person.build_consumer_role({:is_applicant => false}.merge(opts))
     person.save!
+    person.create_demographics_group
   end
 
   def check_for_consumer_role

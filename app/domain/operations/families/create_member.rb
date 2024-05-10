@@ -55,6 +55,7 @@ module Operations
         vlp_document = person.consumer_role.vlp_documents.first
         consumer_role.active_vlp_document_id = vlp_document.id if vlp_document.present?
         person.save!
+        person.create_demographics_group
 
         Success(person)
       rescue StandardError => e

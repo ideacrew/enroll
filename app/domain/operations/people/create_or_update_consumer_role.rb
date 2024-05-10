@@ -46,6 +46,7 @@ module Operations
         end
 
         person.save!
+        person.create_demographics_group
 
         Success(person.consumer_role)
       rescue StandardError => e

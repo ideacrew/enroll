@@ -2,7 +2,7 @@
 
 require 'domain/operations/financial_assistance/applicant_params_context'
 
-RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean: :after_each do
+RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean: :before_each do
   include_context 'export_applicant_attributes_context'
 
   let(:person) do

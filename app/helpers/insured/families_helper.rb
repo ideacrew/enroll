@@ -390,6 +390,8 @@ module Insured::FamiliesHelper
       person.build_consumer_role({:is_applicant => false})
       person.save!
     end
+    # All persons with a consumer role are required to have a demographics_group
+    person.create_demographics_group
   end
 
   def build_resident_role(person, family)
