@@ -1,7 +1,9 @@
+<% require_relative "../../helpers/requirable_field_form_builder" %>
 <%= javascript_pack_tag 'benefit_sponsors' %>
+
 <% if @bs4 %>
   <div id="address_info" class="">
-    <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
+    <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true, builder: RequirableFieldFormBuilder do |address| %>
       <% kind = address.object.kind %>
 
       <% style = "" %>
@@ -30,13 +32,13 @@
               <%= address.hidden_field :_destroy %></span>
 
               <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}" %>
-              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} full-width", required: required.present? %>
+              <%= address.text_field :address_1, l10n("address_1"), required: required.present?, options: {class: "#{required} full-width"} %>
             </div>
           </div>
           <div class="mr col-sm col-md-6 p-0">
             <div class="col-md-12 pr-0">
               <%= address.label :address_2, "#{l10n("address_2")} #{l10n("address_2_desc")}" %>
-              <%= address.text_field :address_2, placeholder: l10n("address_2"), class: "full-width" %>
+              <%= address.text_field :address_2, l10n("address_2"), options: {class: "full-width"} %>
             </div>
           </div>
         </div>
@@ -45,7 +47,7 @@
             <div class="d-flex col-sm col-md-6 pl-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
                 <%= address.label :city %>
-                <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "#{required} full-width", required: required.present? %>
+                <%= address.text_field :city, "CITY", required: required.present?, options: {class: "#{required} full-width"} %>
               </div>
               <div class="col-sm col-md-6 pr-0">
                 <%= address.label :state %>
@@ -55,7 +57,7 @@
             <div class="d-flex col-sm col-md-6 pr-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
                 <%= address.label :zip, l10n("zip_code") %>
-                <%= address.text_field :zip, class: "full-width", required: true, placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
+                <%= address.text_field :zip, l10n("zip_code"), required: true, options: {class: "full-width", data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" }} %>
               </div>
               <% if EnrollRegistry.feature_enabled?(:display_county) %>
                 <div id="county-select-<%= f.index %>" class="col-sm col-md-6 pr-0">
