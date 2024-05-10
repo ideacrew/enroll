@@ -212,7 +212,7 @@ PATH
       kaminari (~> 1.2.1)
       mongoid (~> 7.5.4)
       pundit (~> 2.0)
-      rails (~> 6.1.7.6)
+      rails (~> 6.1.7.7)
       roo (~> 2.7.0)
       sass (~> 3.7.3)
       slim (~> 3.0.8)
@@ -2393,7 +2393,7 @@ GEM
       rspec-support (~> 3.12.0)
     rspec-instafail (1.0.0)
       rspec
-    rspec-mocks (3.12.6)
+    rspec-mocks (3.12.7)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-rails (5.0.3)
