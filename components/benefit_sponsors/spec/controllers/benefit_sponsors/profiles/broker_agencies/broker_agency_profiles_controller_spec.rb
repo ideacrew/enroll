@@ -129,7 +129,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
         it "js should return http success" do
           get :index, format: :js
-          expect(response).to have_http_status(:not_acceptable)
+          expect(response).to have_http_status(:success)
         end
 
         it "json should return http success" do
