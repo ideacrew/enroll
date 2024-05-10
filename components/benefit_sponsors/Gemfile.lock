@@ -116,7 +116,7 @@ PATH
       mongoid (~> 7.5.4)
       non-stupid-digest-assets
       pundit (~> 2.0)
-      rails (~> 6.1.7.6)
+      rails (~> 6.1.7.7)
       roo (~> 2.7.0)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
