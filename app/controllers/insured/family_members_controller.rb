@@ -5,6 +5,9 @@ class Insured::FamilyMembersController < ApplicationController
   include ApplicationHelper
   include ::L10nHelper
 
+  layout 'progress', only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :set_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
   before_action :set_dependent_and_family, only: [:destroy, :show, :edit, :update]
@@ -372,5 +375,9 @@ class Insured::FamilyMembersController < ApplicationController
     # an admin accessing family members on an unrelated user account
 
     @person = @family.primary_person if @person != @family.primary_person
+  end
+
+  def set_bs4_layout
+    @bs4 = true
   end
 end
