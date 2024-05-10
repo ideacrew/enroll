@@ -1373,6 +1373,12 @@ class Person
     @alive_status = verification_types.where(type_name: VerificationType::ALIVE_STATUS).first
   end
 
+  def create_demographics_group
+    return unless demographics_group.blank?
+    demographics_group = DemographicsGroup.new(alive_status: AliveStatus.new)
+    update(demographics_group: demographics_group)
+  end
+
   private
 
   def assign(collection, association)
@@ -1388,12 +1394,6 @@ class Person
       self.errors.add(:base, "Resident role and Consumer role can't both be active at the same time.")
     end
     true
-  end
-
-  def create_demographics_group
-    return unless demographics_group.blank?
-    demographics_group = DemographicsGroup.new(alive_status: AliveStatus.new)
-    update(demographics_group: demographics_group)
   end
 
   def create_inbox
