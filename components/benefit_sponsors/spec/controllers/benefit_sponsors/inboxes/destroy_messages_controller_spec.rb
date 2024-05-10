@@ -88,7 +88,7 @@ RSpec.describe BenefitSponsors::Inboxes::MessagesController, type: :controller, 
   describe "DELETE #destroy" do
     before do
       sign_in logged_in_user
-      delete :destroy, params: { id: broker_role.person.id, message_id: message.id }, format: :js
+      delete :destroy, params: { id: broker_role.person.id, message_id: message.id, format: :js }
     end
 
     context 'broker logged in' do

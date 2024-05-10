@@ -3,8 +3,8 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.0.6.1'
-gem 'sidekiq'
+gem 'rails', '~> 6.1.7.6'
+gem 'sidekiq', '~> 6.5.10'
 gem 'globalid'
 #######################################################
 # FIXME
@@ -68,7 +68,7 @@ gem 'devise-jwt',               '0.9.0'
 gem 'warden-jwt_auth',          '0.6.0'
 gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
-gem 'httparty',                 '~> 0.16'
+gem 'httparty',                 '~> 0.21'
 gem 'i18n',                     '~> 1.5'
 gem 'i18n-tasks', '~> 0.9.33'
 gem 'interactor',               '~> 3.0'
@@ -89,7 +89,6 @@ gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
 gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
-gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 1.26.0'
@@ -109,7 +108,7 @@ gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.19.1'
-gem 'stimulus_reflex', '3.4.1'
+gem 'stimulus_reflex', '3.4.2'
 gem 'rack-cors'
 gem 'holidays', '~> 8.6'
 
