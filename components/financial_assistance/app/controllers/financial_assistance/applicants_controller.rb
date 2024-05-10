@@ -144,11 +144,16 @@ module FinancialAssistance
       authorize applicant, :applicant_is_eligible_for_joint_filing?
 
       # applicant is primary and spouse exists?
-      return primary_applicant_has_spouse if applicant.is_primary_applicant
-      # applicant is spouse of primary?
-      applicant_is_spouse_of_primary(applicant)
+      @result = if applicant.is_primary_applicant
+                  primary_applicant_has_spouse
+                else
+                  # applicant is spouse of primary?
+                  applicant_is_spouse_of_primary(applicant)
+                end
 
-      respond_to :js
+      respond_to do |format|
+        format.text { render plain: @result }
+      end
     end
 
     def immigration_document_options
@@ -177,12 +182,12 @@ module FinancialAssistance
 
     def applicant_is_spouse_of_primary(applicant)
       has_spouse_relationship = applicant.relationships.where(kind: 'spouse', relative_id: @application.primary_applicant.id).count > 0
-      render :plain => has_spouse_relationship.to_s
+      has_spouse_relationship.to_s
     end
 
     def primary_applicant_has_spouse
-      has_spouse =  @application.primary_applicant.relationships.where(kind: 'spouse').present? ? 'true' : 'false'
-      render :plain => has_spouse.to_s
+      @application.primary_applicant.relationships.where(kind: 'spouse').present? ? 'true' : 'false'
+      # render :plain => has_spouse.to_s
     end
 
     def find_applicant
