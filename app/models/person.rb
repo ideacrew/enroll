@@ -1373,8 +1373,8 @@ class Person
     @alive_status = verification_types.where(type_name: VerificationType::ALIVE_STATUS).first
   end
 
-  # As to avoid adding another callback
-  # Method used after consumer_role is created for person
+  # In order to avoid adding another callback,
+  # this method is used after consumer_role is created for person
   # 1.) Factories::EnrollmentFactory -> self.build_consumer_role
   #   - used for consumer sign-up
   # 2.) Family -> build_consumer_role
