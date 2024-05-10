@@ -8,35 +8,35 @@ def next_year
 end
 
 all_enrolled_people = HbxEnrollment.collection.aggregate([
-{"$match" => {
-"hbx_enrollment_members" => {"$ne" => nil},
-"external_enrollment" => {"$ne" => true},
-"coverage_kind" => "health",
-"consumer_role_id" => {"$ne" => nil},
-"product_id" => { "$ne" => nil},
-"aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-"effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)}
-}
-},
-{"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
-{"$lookup" => {
-"from" => "families",
-"localField" => "family_id",
-"foreignField" => "_id",
-"as" => "family"
-}},
-{"$unwind" => "$family"},
-{"$unwind" => "$family.family_members"},
-{"$unwind" => "$hbx_enrollment_members"},
-{"$project" => {
-"family_id" => "$family_id",
-"person_id" => "$family.family_members.person_id",
-"applicant_id" => "$hbx_enrollment_members.applicant_id",
-"person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
-}
-},
-{"$match" => {"person_and_member_match" => true}},
-{"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
+  {"$match" => {
+      "hbx_enrollment_members" => {"$ne" => nil},
+      "external_enrollment" => {"$ne" => true},
+      "coverage_kind" => "health",
+      "consumer_role_id" => {"$ne" => nil},
+      "product_id" => { "$ne" => nil},
+      "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
+      "effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)}
+  }
+  },
+  {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
+  {"$lookup" => {
+    "from" => "families",
+    "localField" => "family_id",
+    "foreignField" => "_id",
+    "as" => "family"
+  }},
+  {"$unwind" => "$family"},
+  {"$unwind" => "$family.family_members"},
+  {"$unwind" => "$hbx_enrollment_members"},
+  {"$project" => {
+      "family_id" => "$family_id",
+      "person_id" => "$family.family_members.person_id",
+      "applicant_id" => "$hbx_enrollment_members.applicant_id",
+      "person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
+    }
+  },
+  {"$match" => {"person_and_member_match" => true}},
+  {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
 ])
 
 all_people_ids = all_enrolled_people.map do |rec|
@@ -46,34 +46,34 @@ end
 all_enrolled_people_set = Set.new(all_people_ids)
 
 pre_term_renewal_candidates = HbxEnrollment.collection.aggregate([
-{"$match" => {
-"hbx_enrollment_members" => {"$ne" => nil},
-"coverage_kind" => "health",
-"consumer_role_id" => {"$ne" => nil},
-"product_id" => { "$ne" => nil},
-"aasm_state" => {"$in" =>  HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-"effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
-}
-},
-{"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
-{"$lookup" => {
-"from" => "families",
-"localField" => "family_id",
-"foreignField" => "_id",
-"as" => "family"
-}},
-{"$unwind" => "$family"},
-{"$unwind" => "$family.family_members"},
-{"$unwind" => "$hbx_enrollment_members"},
-{"$project" => {
-"family_id" => "$family_id",
-"person_id" => "$family.family_members.person_id",
-"applicant_id" => "$hbx_enrollment_members.applicant_id",
-"person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
-}
-},
-{"$match" => {"person_and_member_match" => true}},
-{"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
+  {"$match" => {
+      "hbx_enrollment_members" => {"$ne" => nil},
+      "coverage_kind" => "health",
+      "consumer_role_id" => {"$ne" => nil},
+      "product_id" => { "$ne" => nil},
+      "aasm_state" => {"$in" =>  HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
+      "effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
+  }
+  },
+  {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
+  {"$lookup" => {
+    "from" => "families",
+    "localField" => "family_id",
+    "foreignField" => "_id",
+    "as" => "family"
+  }},
+  {"$unwind" => "$family"},
+  {"$unwind" => "$family.family_members"},
+  {"$unwind" => "$hbx_enrollment_members"},
+  {"$project" => {
+      "family_id" => "$family_id",
+      "person_id" => "$family.family_members.person_id",
+      "applicant_id" => "$hbx_enrollment_members.applicant_id",
+      "person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
+    }
+  },
+  {"$match" => {"person_and_member_match" => true}},
+  {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
 ])
 
 pre_term_renewal_candidate_ids = pre_term_renewal_candidates.map do |rec|
@@ -81,34 +81,34 @@ pre_term_renewal_candidate_ids = pre_term_renewal_candidates.map do |rec|
 end
 
 post_term_renewal_candidates = HbxEnrollment.collection.aggregate([
-{"$match" => {
-"hbx_enrollment_members" => {"$ne" => nil},
-"coverage_kind" => "health",
-"consumer_role_id" => {"$ne" => nil},
-"product_id" => { "$ne" => nil},
-"aasm_state" => {"$in" =>  ["coverage_expired"]},
-"effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
-}
-},
-{"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
-{"$lookup" => {
-"from" => "families",
-"localField" => "family_id",
-"foreignField" => "_id",
-"as" => "family"
-}},
-{"$unwind" => "$family"},
-{"$unwind" => "$family.family_members"},
-{"$unwind" => "$hbx_enrollment_members"},
-{"$project" => {
-"family_id" => "$family_id",
-"person_id" => "$family.family_members.person_id",
-"applicant_id" => "$hbx_enrollment_members.applicant_id",
-"person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
-}
-},
-{"$match" => {"person_and_member_match" => true}},
-{"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
+  {"$match" => {
+      "hbx_enrollment_members" => {"$ne" => nil},
+      "coverage_kind" => "health",
+      "consumer_role_id" => {"$ne" => nil},
+      "product_id" => { "$ne" => nil},
+      "aasm_state" => {"$in" =>  ["coverage_expired"]},
+      "effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
+  }
+  },
+  {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
+  {"$lookup" => {
+    "from" => "families",
+    "localField" => "family_id",
+    "foreignField" => "_id",
+    "as" => "family"
+  }},
+  {"$unwind" => "$family"},
+  {"$unwind" => "$family.family_members"},
+  {"$unwind" => "$hbx_enrollment_members"},
+  {"$project" => {
+      "family_id" => "$family_id",
+      "person_id" => "$family.family_members.person_id",
+      "applicant_id" => "$hbx_enrollment_members.applicant_id",
+      "person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
+    }
+  },
+  {"$match" => {"person_and_member_match" => true}},
+  {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
 ])
 
 post_term_renewal_candidate_ids = post_term_renewal_candidates.map do |rec|
@@ -116,37 +116,37 @@ post_term_renewal_candidate_ids = post_term_renewal_candidates.map do |rec|
 end
 
 termed_people_between_nov_and_dec = HbxEnrollment.collection.aggregate([
-{"$match" => {
-"hbx_enrollment_members" => {"$ne" => nil},
-"external_enrollment" => {"$ne" => true},
-"coverage_kind" => "health",
-"consumer_role_id" => {"$ne" => nil},
-"product_id" => { "$ne" => nil},
-"terminated_on" => { "$gte" => Date.new(year,11,1), "$lte" => Date.new(year,12,31) },
-"aasm_state" => {"$in" => ["coverage_terminated"]},
-"effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
-}
-},
-{"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
-{"$lookup" => {
-"from" => "families",
-"localField" => "family_id",
-"foreignField" => "_id",
-"as" => "family"
-}},
-{"$unwind" => "$family"},
-{"$unwind" => "$family.family_members"},
-{"$unwind" => "$hbx_enrollment_members"},
-{"$project" => {
-"family_id" => "$family_id",
-"person_id" => "$family.family_members.person_id",
-"applicant_id" => "$hbx_enrollment_members.applicant_id",
-"person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
-}
-},
-{"$match" => {"person_and_member_match" => true}},
-{"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
-])
+   {"$match" => {
+     "hbx_enrollment_members" => {"$ne" => nil},
+     "external_enrollment" => {"$ne" => true},
+     "coverage_kind" => "health",
+     "consumer_role_id" => {"$ne" => nil},
+     "product_id" => { "$ne" => nil},
+     "terminated_on" => { "$gte" => Date.new(year,11,1), "$lte" => Date.new(year,12,31) },
+     "aasm_state" => {"$in" => ["coverage_terminated"]},
+     "effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
+   }
+   },
+   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
+   {"$lookup" => {
+     "from" => "families",
+     "localField" => "family_id",
+     "foreignField" => "_id",
+     "as" => "family"
+   }},
+   {"$unwind" => "$family"},
+   {"$unwind" => "$family.family_members"},
+   {"$unwind" => "$hbx_enrollment_members"},
+   {"$project" => {
+     "family_id" => "$family_id",
+     "person_id" => "$family.family_members.person_id",
+     "applicant_id" => "$hbx_enrollment_members.applicant_id",
+     "person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
+   }
+   },
+   {"$match" => {"person_and_member_match" => true}},
+   {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
+ ])
 
 termed_people_ids = termed_people_between_nov_and_dec.map do |rec|
   rec["_id"]
@@ -165,36 +165,36 @@ re_enrolled_member_set = all_enrolled_people_set & (renewal_candidate_set | term
 time_period = Time.zone.parse("#{year}-11-01 10:00:00").utc
 
 post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
-{"$match" => {
-"hbx_enrollment_members" => {"$ne" => nil},
-"external_enrollment" => {"$ne" => true},
-"coverage_kind" => "health",
-"consumer_role_id" => {"$ne" => nil},
-"product_id" => { "$ne" => nil},
-"created_at" => { "$gte" => time_period },
-"aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-"effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)}
-}
-},
-{"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
-{"$lookup" => {
-"from" => "families",
-"localField" => "family_id",
-"foreignField" => "_id",
-"as" => "family"
-}},
-{"$unwind" => "$family"},
-{"$unwind" => "$family.family_members"},
-{"$unwind" => "$hbx_enrollment_members"},
-{"$project" => {
-"family_id" => "$family_id",
-"person_id" => "$family.family_members.person_id",
-"applicant_id" => "$hbx_enrollment_members.applicant_id",
-"person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
-}
-},
-{"$match" => {"person_and_member_match" => true}},
-{"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
+  {"$match" => {
+      "hbx_enrollment_members" => {"$ne" => nil},
+      "external_enrollment" => {"$ne" => true},
+      "coverage_kind" => "health",
+      "consumer_role_id" => {"$ne" => nil},
+      "product_id" => { "$ne" => nil},
+      "created_at" => { "$gte" => time_period },
+      "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
+      "effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)}
+  }
+  },
+  {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
+  {"$lookup" => {
+    "from" => "families",
+    "localField" => "family_id",
+    "foreignField" => "_id",
+    "as" => "family"
+  }},
+  {"$unwind" => "$family"},
+  {"$unwind" => "$family.family_members"},
+  {"$unwind" => "$hbx_enrollment_members"},
+  {"$project" => {
+      "family_id" => "$family_id",
+      "person_id" => "$family.family_members.person_id",
+      "applicant_id" => "$hbx_enrollment_members.applicant_id",
+      "person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
+    }
+  },
+  {"$match" => {"person_and_member_match" => true}},
+  {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
 ])
 
 post_11_1_ids = post_11_1_purchases.map do |rec|
@@ -205,39 +205,39 @@ post_11_1_purchase_set = Set.new(post_11_1_ids)
 
 renewal_statuses = HbxEnrollment::RENEWAL_STATUSES.map(&:to_s)
 has_been_renewed = HbxEnrollment.collection.aggregate([
-{"$match" => {
-"hbx_enrollment_members" => {"$ne" => nil},
-"external_enrollment" => {"$ne" => true},
-"coverage_kind" => "health",
-"consumer_role_id" => {"$ne" => nil},
-"product_id" => { "$ne" => nil},
-"aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-"effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)},
-'$or' => [
-{'workflow_state_transitions.from_state': { '$in' => renewal_statuses }},
-{'workflow_state_transitions.to_state': { '$in' => renewal_statuses }}
-]
-}
-},
-{"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
-{"$lookup" => {
-"from" => "families",
-"localField" => "family_id",
-"foreignField" => "_id",
-"as" => "family"
-}},
-{"$unwind" => "$family"},
-{"$unwind" => "$family.family_members"},
-{"$unwind" => "$hbx_enrollment_members"},
-{"$project" => {
-"family_id" => "$family_id",
-"person_id" => "$family.family_members.person_id",
-"applicant_id" => "$hbx_enrollment_members.applicant_id",
-"person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
-}
-},
-{"$match" => {"person_and_member_match" => true}},
-{"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
+  {"$match" => {
+      "hbx_enrollment_members" => {"$ne" => nil},
+      "external_enrollment" => {"$ne" => true},
+      "coverage_kind" => "health",
+      "consumer_role_id" => {"$ne" => nil},
+      "product_id" => { "$ne" => nil},
+      "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
+      "effective_on" => {"$gte" => Date.new(next_year,1,1), "$lt" => Date.new(next_year+1,1,1)},
+      '$or' => [
+        {'workflow_state_transitions.from_state': { '$in' => renewal_statuses }},
+        {'workflow_state_transitions.to_state': { '$in' => renewal_statuses }}
+      ]
+  }
+  },
+  {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
+  {"$lookup" => {
+    "from" => "families",
+    "localField" => "family_id",
+    "foreignField" => "_id",
+    "as" => "family"
+  }},
+  {"$unwind" => "$family"},
+  {"$unwind" => "$family.family_members"},
+  {"$unwind" => "$hbx_enrollment_members"},
+  {"$project" => {
+      "family_id" => "$family_id",
+      "person_id" => "$family.family_members.person_id",
+      "applicant_id" => "$hbx_enrollment_members.applicant_id",
+      "person_and_member_match" => {"$eq" => ["$family.family_members._id", "$hbx_enrollment_members.applicant_id"]},
+    }
+  },
+  {"$match" => {"person_and_member_match" => true}},
+  {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
 ])
 
 has_been_renewed_ids = has_been_renewed.map do |rec|
@@ -271,13 +271,13 @@ puts "Total Auto Renewed(#{next_year}) Member: #{passive_renewals_set.size}"
 # end
 
 auto_and_active_enrolled_families = HbxEnrollment.where(coverage_kind: "health",
-:"product_id".ne => nil,
-:"hbx_enrollment_members".ne => nil,
-:"external_enrollment".ne => true,
-:"consumer_role_id".ne => nil,
-:"aasm_state".in => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
-:"effective_on".gte => Date.new(next_year,1,1),
-:"effective_on".lt => Date.new(next_year+1,1,1)).pluck(:family_id).uniq
+                                                        :"product_id".ne => nil,
+                                                        :"hbx_enrollment_members".ne => nil,
+                                                        :"external_enrollment".ne => true,
+                                                        :"consumer_role_id".ne => nil,
+                                                        :"aasm_state".in => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
+                                                        :"effective_on".gte => Date.new(next_year,1,1),
+                                                        :"effective_on".lt => Date.new(next_year+1,1,1)).pluck(:family_id).uniq
 
 families_created_after_10_31_22 = Family.where(:"created_at".gte => Date.new(year,11,1), :"created_at".lt => Date.new(next_year+1,1,1)).pluck(:_id).uniq
 families_with_2023_assistance = ::FinancialAssistance::Application.renewal_eligible.by_year(next_year).pluck(:family_id).uniq
@@ -528,13 +528,13 @@ def process_people(people, offset_count)
 end
 
 all_people_from_submitted_families = Family.collection.aggregate([
-{"$match" => {
-"_id" => { "$in" => all_submitted_families.to_a }
-}},
-{"$unwind" => "$family_members"},
-{"$match" => {"family_members.is_active" => true}},
-{"$project" => {"_id" => "$family_members.person_id"}}
-]).map { |r| r['_id'] }.uniq
+                                                                   {"$match" => {
+                                                                     "_id" => { "$in" => all_submitted_families.to_a }
+                                                                   }},
+                                                                   {"$unwind" => "$family_members"},
+                                                                   {"$match" => {"family_members.is_active" => true}},
+                                                                   {"$project" => {"_id" => "$family_members.person_id"}}
+                                                                 ]).map { |r| r['_id'] }.uniq
 
 people = Person.all.where(:"consumer_role.is_applying_coverage" => true, :"_id".in => all_people_from_submitted_families)
 total_count = people.count
@@ -895,25 +895,25 @@ end
 puts "9.1. Consumers Eligible for QHP, with Financial Assistance (gross). Total number of family members that are found eligible for APTC(insurance_assistance) are: #{@total_members_with_qhp_assistance.uniq.count}"
 
 CSV.open("#{Rails.root}/CMS_daily_report_summary.csv", "w", force_quotes: true) do |csv|
-data =[
-["","",""],
-["","CMS Reporting Summary",""],
-["","",""],
-["","Total Plan Selections (net)", all_enrolled_people_set.size],
-["","New Consumers (net)", new_member_set.size],
-["","Total Re-enrollees (net)", re_enrolled_member_set.size],
-["","Active Re-enrollees (net)", active_renewals_set.size],
-["","Automatic Re-enrollees (net)", passive_renewals_set.size],
-["","Number of Submitted Applications (gross)", total_families_count],
-["","Number of Accounts created on a single day(Accounts Created)", @total_user_counter],
-["","Number of Accounts created on a single day(No external app id)", @total_new_families_count],
-["","Applications Submitted", @total_submitted_count],
-["","Consumers on Applications Submitted (gross)", @total_member_counter_for_coverage],
-["","Consumers Determined Eligible for Medicaid/CHIP (gross)", @total_medicaid_chip_members.uniq.count],
-["","Consumers Eligible for QHP (gross)", @total_members_with_qhp.uniq.count],
-["","Consumers Eligible for QHP, with Financial Assistance (gross)", @total_members_with_qhp_assistance.uniq.count]
-]
-data.each do |da|
-  csv << da
-end
+  data =[
+      ["","",""],
+      ["","CMS Reporting Summary",""],
+      ["","",""],
+      ["","Total Plan Selections (net)", all_enrolled_people_set.size],
+      ["","New Consumers (net)", new_member_set.size],
+      ["","Total Re-enrollees (net)", re_enrolled_member_set.size],
+      ["","Active Re-enrollees (net)", active_renewals_set.size],
+      ["","Automatic Re-enrollees (net)", passive_renewals_set.size],
+      ["","Number of Submitted Applications (gross)", total_families_count],
+      ["","Number of Accounts created on a single day(Accounts Created)", @total_user_counter],
+      ["","Number of Accounts created on a single day(No external app id)", @total_new_families_count],
+      ["","Applications Submitted", @total_submitted_count],
+      ["","Consumers on Applications Submitted (gross)", @total_member_counter_for_coverage],
+      ["","Consumers Determined Eligible for Medicaid/CHIP (gross)", @total_medicaid_chip_members.uniq.count],
+      ["","Consumers Eligible for QHP (gross)", @total_members_with_qhp.uniq.count],
+      ["","Consumers Eligible for QHP, with Financial Assistance (gross)", @total_members_with_qhp_assistance.uniq.count]
+  ]
+  data.each do |da|
+    csv << da
+  end
 end
