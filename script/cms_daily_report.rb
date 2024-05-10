@@ -256,18 +256,18 @@ puts "Total Re-Enrolled(#{next_year}) Member: #{re_enrolled_member_set.size}"
 puts "Total Active Renewed(#{next_year}) Member: #{active_renewals_set.size}"
 puts "Total Auto Renewed(#{next_year}) Member: #{passive_renewals_set.size}"
 
-def total_families(families, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PrimaryFullName"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
-    csv << field_names
-    families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
-      primary = family.primary_person
-      csv << [primary.hbx_id, primary.full_name]
-      rescue StandardError => e
-      puts e.message unless Rails.env.test?
-    end
-  end
-end
+# def total_families(families, file_name, offset_count)
+#   field_names = ["PrimaryHbxID", "PrimaryFullName"]
+#   CSV.open(file_name, 'w', force_quotes: true) do |csv|
+#     csv << field_names
+#     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
+#       primary = family.primary_person
+#       csv << [primary.hbx_id, primary.full_name]
+#       rescue StandardError => e
+#       puts e.message unless Rails.env.test?
+#     end
+#   end
+# end
 
 auto_and_active_enrolled_families = HbxEnrollment.where(coverage_kind: "health",
                                                         :"product_id".ne => nil,
@@ -288,28 +288,28 @@ families_per_iteration = 10_000.0
 number_of_iterations = (total_families_count / families_per_iteration).ceil
 counter = 0
 
-while counter < number_of_iterations
-  file_name = "#{Rails.root}/number_of_submitted_applications_ie_total_families_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{counter + 1}.csv"
-  offset_count = families_per_iteration * counter
-  total_families(families, file_name, offset_count)
-  counter += 1
-end
+# while counter < number_of_iterations
+#   file_name = "#{Rails.root}/number_of_submitted_applications_ie_total_families_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{counter + 1}.csv"
+#   offset_count = families_per_iteration * counter
+#   total_families(families, file_name, offset_count)
+#   counter += 1
+# end
 puts "6. Number of Submitted Applications (gross). Total number of families in the system are: #{total_families_count}"
 
 def process_users(users, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PersonFullName", "HasStaffRole?"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
-    csv << field_names
+  # field_names = ["PrimaryHbxID", "PersonFullName", "HasStaffRole?"]
+  # CSV.open(file_name, 'w', force_quotes: true) do |csv|
+  #   csv << field_names
     users.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, user|
       person = user&.person
       if person.present? && person.hbx_staff_role.blank?
-        csv << [person.hbx_id, person.full_name, person.hbx_staff_role.present?]
+        # csv << [person.hbx_id, person.full_name, person.hbx_staff_role.present?]
         @total_user_counter += 1
       end
       rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
-  end
+  # end
 end
 
 prev_day = TimeKeeper.date_of_record.yesterday
@@ -332,19 +332,19 @@ end
 puts "6.1 Number of Accounts created on a single day(Accounts Created). Total number of Users created yesterday: #{@total_user_counter}"
 
 def process_families_with_no_external_id(families, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PersonFullName", "HasStaffRole?"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
-    csv << field_names
+  # field_names = ["PrimaryHbxID", "PersonFullName", "HasStaffRole?"]
+  # CSV.open(file_name, 'w', force_quotes: true) do |csv|
+    # csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       person = family&.primary_person
       if person.present? && person.hbx_staff_role.blank?
-        csv << [person.hbx_id, person.full_name, person.hbx_staff_role.present?]
+        # csv << [person.hbx_id, person.full_name, person.hbx_staff_role.present?]
         @total_new_families_count += 1
       end
     rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
-  end
+  # end
 end
 
 families = Family.all.where(:created_at => { "$gte" => @state_at, "$lte" => @end_at }, external_app_id: nil)
@@ -370,20 +370,20 @@ prev_day = TimeKeeper.date_of_record.yesterday
 @total_submitted_count = 0
 
 def process_families(families, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PersonFullName", "FamilyCreatedAt", "NumberOfFAApplications"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
-    csv << field_names
+  # field_names = ["PrimaryHbxID", "PersonFullName", "FamilyCreatedAt", "NumberOfFAApplications"]
+  # CSV.open(file_name, 'w', force_quotes: true) do |csv|
+  #   csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       fa_apps = ::FinancialAssistance::Application.where(family_id: family.id)
       if fa_apps.blank?
         primary = family&.primary_person
-        csv << [primary.hbx_id, primary.full_name, family.created_at.to_s, fa_apps.count]
+        # csv << [primary.hbx_id, primary.full_name, family.created_at.to_s, fa_apps.count]
         @total_submitted_count += 1
       end
       rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
-  end
+  # end
 end
 
 families = Family.all.where(:created_at => { "$gte" => @state_at, "$lte" => @end_at })
@@ -399,17 +399,17 @@ while counter < number_of_iterations
 end
 
 def process_applications(applications, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PersonFullName", "ApplicationSubmittedAt", "ApplicationHbxID", "ApplicationAasmState"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
-    csv << field_names
+  # field_names = ["PrimaryHbxID", "PersonFullName", "ApplicationSubmittedAt", "ApplicationHbxID", "ApplicationAasmState"]
+  # CSV.open(file_name, 'w', force_quotes: true) do |csv|
+  #   csv << field_names
     applications.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, application|
       primary = application.family.primary_person
-      csv << [primary.hbx_id, primary.full_name, application.submitted_at.to_s, application.hbx_id, application.aasm_state]
+      # csv << [primary.hbx_id, primary.full_name, application.submitted_at.to_s, application.hbx_id, application.aasm_state]
       @total_submitted_count += 1
       rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
-  end
+  # end
 end
 
 applications = FinancialAssistance::Application.where(:submitted_at => { "$gte" => @state_at, "$lte" => @end_at })
@@ -428,8 +428,8 @@ puts "6.2  Applications Submitted, the combined total number of families created
 
 
 def process_people(people, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PersonFullName", "ApplyingForCoverage?"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
+  # field_names = ["PrimaryHbxID", "PersonFullName", "ApplyingForCoverage?"]
+  # CSV.open(file_name, 'w', force_quotes: true) do |csv|
     csv << field_names
     people.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, person|
       csv << [person.hbx_id, person.full_name, person&.consumer_role&.is_applying_coverage]
@@ -437,7 +437,7 @@ def process_people(people, file_name, offset_count)
       rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
-  end
+  # end
 end
 
 all_people_from_submitted_families = Family.collection.aggregate([
@@ -467,9 +467,9 @@ puts "7. Consumers on Applications Submitted (gross). Count of people that are a
 
 
 def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PrimaryFullName", "MedicaidMemberFullName", "IsMedicaidChipEligible"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
-    csv << field_names
+  # field_names = ["PrimaryHbxID", "PrimaryFullName", "MedicaidMemberFullName", "IsMedicaidChipEligible"]
+  # CSV.open(file_name, 'w', force_quotes: true) do |csv|
+    # csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
 
@@ -490,7 +490,7 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
         thhm_medicaid_members.each do |medicaid_thhm|
          if medicaid_thhm&.person&.is_applying_coverage
            @total_medicaid_chip_members <<  medicaid_thhm&.person&.hbx_id
-           csv << [primary.hbx_id, primary.full_name, medicaid_thhm&.person&.full_name, medicaid_thhm&.is_medicaid_chip_eligible]
+          #  csv << [primary.hbx_id, primary.full_name, medicaid_thhm&.person&.full_name, medicaid_thhm&.is_medicaid_chip_eligible]
          end
         end
         @total_member_counter_medicaid_or_chip += thhm_medicaid_members.count
@@ -498,7 +498,7 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
       rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
-  end
+  # end
 end
 
 if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
@@ -525,9 +525,9 @@ puts "8. Consumers Determined Eligible for Medicaid/CHIP (gross). Total number o
 
 
 def process_ivl_families_with_qhp(families, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PrimaryFullName", "MemberHbxID", "MemberFullName", "MemberIncarcerated", "MemberApplyingForCoverage", "MemberHasInStateAddress", "MemberMedicaidEligible", "MemberCitzenStatus"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
-    csv << field_names
+  # field_names = ["PrimaryHbxID", "PrimaryFullName", "MemberHbxID", "MemberFullName", "MemberIncarcerated", "MemberApplyingForCoverage", "MemberHasInStateAddress", "MemberMedicaidEligible", "MemberCitzenStatus"]
+  # CSV.open(file_name, 'w', force_quotes: true) do |csv|
+    # csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
@@ -562,7 +562,7 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
 
         member_citizen_status = f_member.person&.citizen_status
         if !f_member&.is_incarcerated && f_member.is_applying_coverage && in_state_address && ["us_citizen", "alien_lawfully_present", "naturalized_citizen"].include?(member_citizen_status) && !medicaid_eligible
-          csv << [primary.hbx_id, primary.full_name, f_member.hbx_id, f_member.full_name, f_member.is_incarcerated, f_member.is_applying_coverage, in_state_address, medicaid_eligible, member_citizen_status]
+          # csv << [primary.hbx_id, primary.full_name, f_member.hbx_id, f_member.full_name, f_member.is_incarcerated, f_member.is_applying_coverage, in_state_address, medicaid_eligible, member_citizen_status]
           @total_members_with_qhp << f_member.person&.hbx_id
           @total_member_counter_with_qhp += 1
         end
@@ -570,7 +570,7 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
       rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
-  end
+  # end
 end
 
 valid_people = Person.where(:is_incarcerated.ne => true, :"consumer_role.is_applying_coverage" => true, :"addresses.state" => "ME", :"consumer_role.lawful_presence_determination.citizen_status".in => ["us_citizen", "alien_lawfully_present", "naturalized_citizen"])
@@ -594,9 +594,9 @@ puts "9. Consumers Eligible for QHP (gross). Total number of family members that
 
 
 def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
-  field_names = ["PrimaryHbxID", "PrimaryFullName", "TaxHouseholdAPTC", "AptcMemberFullName", "IsIaEligible(APTC)", "CSR"]
-  CSV.open(file_name, 'w', force_quotes: true) do |csv|
-    csv << field_names
+  # field_names = ["PrimaryHbxID", "PrimaryFullName", "TaxHouseholdAPTC", "AptcMemberFullName", "IsIaEligible(APTC)", "CSR"]
+  # CSV.open(file_name, 'w', force_quotes: true) do |csv|
+  #   csv << field_names
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
 
@@ -633,7 +633,7 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
           thhm_aptc_members.each do |aptc_thhm|
             if aptc_thhm&.person&.is_applying_coverage
               @total_members_with_qhp_assistance << aptc_thhm&.person&.hbx_id
-              csv << [primary.hbx_id, primary.full_name, thh&.latest_eligibility_determination&.max_aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
+              # csv << [primary.hbx_id, primary.full_name, thh&.latest_eligibility_determination&.max_aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
             end
           end
           @total_member_counter_qhp_assistance += thhm_aptc_members.count
@@ -642,7 +642,7 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
     rescue StandardError => e
       puts e.message unless Rails.env.test?
     end
-  end
+  # end
 end
 
 if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
