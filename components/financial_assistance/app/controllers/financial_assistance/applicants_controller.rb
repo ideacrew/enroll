@@ -187,7 +187,6 @@ module FinancialAssistance
 
     def primary_applicant_has_spouse
       @application.primary_applicant.relationships.where(kind: 'spouse').present? ? 'true' : 'false'
-      # render :plain => has_spouse.to_s
     end
 
     def find_applicant
