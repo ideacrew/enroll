@@ -1,0 +1,11 @@
+.hidden {
+  display: none;
+}
+
+.result-item-arrow {
+  float: right;
+}
+
+.numeric-totals {
+  text-align: right;
+}

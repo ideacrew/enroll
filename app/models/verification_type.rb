@@ -8,7 +8,26 @@ class VerificationType
   embedded_in :person
 
   LOCATION_RESIDENCY = EnrollRegistry[:enroll_app].setting(:state_residency).item
-  ALL_VERIFICATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
+
+  # @!macro [new] constant
+  #   @!attribute [r] $0
+  #   @return [Array<String>] an array of all verification types.
+
+  # List of all verification types
+  # @todo Remove LOCATION_RESIDENCY and add it conditionally when
+  # `EnrollRegistry.feature_enabled?(:location_residency_verification_type)` is true as
+  # it is only applicable in DC context.
+  ALL_VERIFICATION_TYPES = [
+    LOCATION_RESIDENCY,
+    "Social Security Number",
+    "American Indian Status",
+    "Citizenship",
+    "Immigration status",
+    'Alive Status'
+  ].freeze
+
+  ALIVE_STATUS = 'Alive Status'.freeze
+
   NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam rejected].freeze
   OUTSTANDING_STATES = %w[outstanding rejected].freeze
