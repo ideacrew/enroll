@@ -9,7 +9,8 @@ module Operations
 
     include Config::SiteHelper
 
-    def call(resource:)
+    def call(params)
+      resource = params[:resource]
       return Failure({:message => ['Please find valid resource to send the alert message']}) if resource.blank?
 
       @resource = resource

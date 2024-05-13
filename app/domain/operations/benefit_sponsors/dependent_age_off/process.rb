@@ -48,7 +48,7 @@ module Operations
             payload = { enrollment_hbx_id: enrollment.hbx_id.to_s, new_date: new_date }
 
             if Rails.env.test?
-              Operations::BenefitSponsors::DependentAgeOff::Terminate.new.call(payload)
+              Operations::BenefitSponsors::DependentAgeOff::Terminate.new.call(**payload)
             else
               event = event('events.benefit_sponsors.non_congressional.dependent_age_off_termination.requested', attributes: payload).value!
               event.publish
