@@ -1,4 +1,4 @@
-import { Log, Run, ToolComponent, ReportingDescriptor, Result } from 'sarif';
+import { Log, Run, ToolComponent, ReportingDescriptor, Result, Notification } from 'sarif';
 import * as data from "../data/codeql.json";
 
 export class SarifData {
@@ -7,7 +7,9 @@ export class SarifData {
   public notes = 0;
   public infos = 0;
   public results = new Array<Result>();
+  public notifications = new Array<Notification>();
   public rules = new Map<string, ReportingDescriptor>();
+  public notificationTypes = new Map<string, ReportingDescriptor>();
   private log = <Log | null>data;
 
   constructor() {
@@ -44,6 +46,14 @@ export class SarifData {
     }
   }
 
+  private categorizeNotification(n: Notification) {
+    if (n.level) {
+      if ((n.level === "error") || (n.level === "warning")) {
+        this.notifications.push(n);
+      }
+    }
+  }
+
   private processRun(run : Run) {
     if (run.tool) {
       if (run.tool.driver !== undefined) {
@@ -53,11 +63,26 @@ export class SarifData {
             this.rules.set(driver.rules[i].id, driver.rules[i]);
           }
         }
+        if (driver.notifications) {
+          for (var j = 0; j < driver.notifications.length; j++) {
+            this.notificationTypes.set(driver.notifications[j].id, driver.notifications[j]);
+          }
+        }
       }
     }
     if (run.results !== undefined) {
-      for (var i = 0; i < run.results.length; i++) {
-        this.categorizeResult(run.results[i]);
+      for (var k = 0; k < run.results.length; k++) {
+        this.categorizeResult(run.results[k]);
+      }
+    }
+    if (run.invocations) {
+      for (var h = 0; h < run.invocations.length; h++) {
+        let invocation = run.invocations[h];
+        if (invocation.toolExecutionNotifications) {
+          for (var l = 0; l < invocation.toolExecutionNotifications.length; l++) {
+            this.categorizeNotification(invocation.toolExecutionNotifications[l]);
+          }
+        }
       }
     }
   }
