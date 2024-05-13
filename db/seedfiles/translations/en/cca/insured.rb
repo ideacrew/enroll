@@ -28,7 +28,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.personal_info' => "Personal Info",
   :"en.tell_us_about_yourself" => "Tell Us About Yourself",
   :"en.insured.consumer_roles.demo_info_for" => "Demographic Information for",
-  :"en.insured.consumer_roles.contact_info_for" => "Contact Information for for",
+  :"en.insured.consumer_roles.contact_info_for" => "Contact Information for",
   :"en.insured.consumer_roles.home_address" => "Home Address",
   :"en.insured.consumer_roles.phone_and_email" => "Phone and Email",
   :"en.insured.consumer_roles.please_provide" => "Please provide as much information as possible",
