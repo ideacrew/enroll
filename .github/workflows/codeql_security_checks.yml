@@ -12,16 +12,26 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
-        - uses: github/codeql-action/init@v3
+        - name: Install CodeQL
+          run: |
+            cd ../
+            wget https://github.com/github/codeql-cli-binaries/releases/download/v2.17.2/codeql-linux64.zip
+            unzip codeql-linux64.zip
+        - name: Build Database
+          run: |
+            export PATH=$PATH:${GITHUB_WORKSPACE}/../codeql/
+            ./codeql/build_db.sh
+        - name: Create Report
+          run: |
+            export PATH=$PATH:${GITHUB_WORKSPACE}/../codeql/
+            ./codeql/create_codeql_report.sh
+        - name: Upload Report
+          uses: github/codeql-action/upload-sarif@v3
           with:
-            config-file: ./codeql.yml
-            languages: ruby
-        - name: Run CodeQL Analysis
-          id: codeql-analysis-step
-          uses: github/codeql-action/analyze@v3
+            sarif_file: "./codeql.sarif"
         - name: Analyze Reports - Pass or Fail Build
           run: |
             cd codeql/sarif_reporter/
             npm install
             npm run compile
-            cat ${{ steps.codeql-analysis-step.outputs.sarif-output }}/ruby.sarif | npm run-script run
+            cat ../../codeql.sarif | npm run-script run

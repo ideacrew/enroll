@@ -1485,7 +1485,7 @@ module BenefitSponsors
             let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: nil))}
 
             it 'should return error' do
-              result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] do
+              result = ::EnrollRegistry.lookup("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}") do
                 {
                   product_package: product_package,
                   calender_year: application.start_on.year
@@ -1506,7 +1506,7 @@ module BenefitSponsors
             let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: :list_bill_contribution_model))}
 
             it 'should return error' do
-              result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] do
+              result = ::EnrollRegistry.lookup("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}") do
                 {
                   product_package: product_package,
                   calender_year: application.start_on.year

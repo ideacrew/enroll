@@ -1,3 +1,3 @@
 #!/bin/bash
 
-codeql database analyze --format=sarif-latest --output=codeql.json --sarif-add-snippets -- enroll/ruby
+codeql database analyze --format=sarif-latest --output=codeql.sarif --sarif-add-snippets -- enroll/ruby
