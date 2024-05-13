@@ -170,7 +170,7 @@ group :test do
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.22.0',  :require => false
   gem 'simplecov-cobertura'
-  gem 'test-prof'
+  gem 'test-prof',                    '~> 1.3'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.18.0'
   gem 'webdrivers', '~> 5.3.1'

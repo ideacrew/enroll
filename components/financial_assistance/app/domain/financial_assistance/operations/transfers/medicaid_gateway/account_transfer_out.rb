@@ -16,8 +16,8 @@ module FinancialAssistance
           include Acapi::Notifiers
 
           # add comment here
-          def call(application_id:)
-            application           = yield find_application(application_id)
+          def call(params)
+            application           = yield find_application(params[:application_id])
             family                = yield find_family(application)
             payload_params        = yield construct_payload(family, application)
             payload               = yield publish(payload_params)

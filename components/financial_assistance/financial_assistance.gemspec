@@ -48,8 +48,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov-cobertura',       '~> 2.1.0'
   spec.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   spec.add_development_dependency 'shoulda-matchers',          '~> 3'
-  spec.add_development_dependency 'test-prof',                 '~> 0.5.0'
+  spec.add_development_dependency 'test-prof',                 '~> 1.3'
   spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency "yard"
-
 end
