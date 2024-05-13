@@ -38,11 +38,11 @@
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :ssn, "Social Security" %>
         <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-          <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label ssn_number",
+          <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label ssn",
             pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
             oninput: "this.setCustomValidity('')", disabled: readonly_status, readonly: f.object.is_a?(Forms::EmployeeRole) %>
         <% else %>
-          <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required ssn_number", disabled: readonly_status,
+          <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required ssn", disabled: readonly_status,
             readonly: f.object.is_a?(Forms::EmployeeRole) %>
         <% end %>
       </div>
@@ -66,7 +66,7 @@
   <%= render 'shared/ssn_coverage_msg' %>
   <script>
     jQuery.inputMasks = () => {
-      $(".ssn_number").mask("999-99-9999");
+      $(".ssn").mask("999-99-9999");
     };
     $.inputMasks();
   </script>
