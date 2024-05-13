@@ -137,7 +137,7 @@ group :development, :test do
   gem 'action-cable-testing'
   gem 'addressable',            '~> 2.3'
   gem 'axe-core-cucumber',      '~> 4.8.0'
-  gem 'brakeman'
+  gem 'brakeman',               '~> 6.1'
   gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
