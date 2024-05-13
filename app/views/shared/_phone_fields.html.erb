@@ -52,8 +52,7 @@
   </div>
 <% end %>
 <script>
-  jQuery.inputMasks = () => {
-    $(".phone_number").mask("(999) 999-9999");
-  };
-  $.inputMasks();
+  $(document).ready(function() {
+    $.inputMasks();
+  });
 </script>
