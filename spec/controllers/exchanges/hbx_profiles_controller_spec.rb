@@ -832,7 +832,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe 'GET request_help' do
     let(:person) { FactoryBot.create(:person, :with_family) }
-    let(:permission) { double('Permission', can_send_secure_message: true)}
+    let(:permission) { FactoryBot.create(:permission, :full_access_super_admin, can_send_secure_message: true) }
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
     let(:params) {{"firstname" => "test_first", "lastname" => "test_last", "type" => "CSR", "person" => person.id, "email" => "admin@dc.gov"}}
 

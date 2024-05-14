@@ -314,6 +314,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def request_help
+    raise ActionController::UnknownFormat unless request.format.html?
+
     insured = Person.where(_id: params[:person]).first
     authorize insured.primary_family, :request_help?
 
@@ -355,9 +357,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @person = Person.find(params[:person])
     broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
 
-    respond_to do |format|
-      format.html { render :plain => {broker: broker_view, status: status_text}.to_json, layout: false }
-    end
+    render :plain => {broker: broker_view, status: status_text}.to_json, layout: false
   end
 
   def family_index
