@@ -16,9 +16,5 @@ RSpec.describe AliveStatus, type: :model do
       expect(alive_status.demographics_group).to eq(demographics)
       expect(alive_status.demographics_group).to be_a(DemographicsGroup)
     end
-
-    it 'returns correct child association' do
-      expect(alive_status.alive_evidence).to be_a(Eligibilities::Evidence)
-    end
   end
 end

@@ -12,6 +12,7 @@ class Announcement
     []
   end
 end
+
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   context "set_current_user with no person" do
     let(:user) { FactoryBot.create(:user, person: person) }
@@ -510,6 +511,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       expect(assigns(:family_members)).to be_an_instance_of(Array)
       expect(assigns(:family_members)).to eq(family.family_members)
     end
+
+    context 'with invalid mime types' do
+      # these should respond with a UrlGenerationError due to the use of `format: false` in the routes file
+      it "js should return an error" do
+        expect { get :verfication, format: :js }.to raise_error(ActionController::UrlGenerationError)
+      end
+
+      it "json should return an error" do
+        expect { get :verfication, format: :json }.to raise_error(ActionController::UrlGenerationError)
+      end
+
+      it "xml should return an error" do
+        expect { get :verfication, format: :xml }.to raise_error(ActionController::UrlGenerationError)
+      end
+    end
   end
 
   describe "GET manage_family" do
@@ -642,6 +658,23 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     it "should assign variables" do
       get :inbox
       expect(assigns(:folder)).to eq("Inbox")
+    end
+
+    context 'with invalid mime types' do
+      it "js should return an error" do
+        get :inbox, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "json should return an error" do
+        get :inbox, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :inbox, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
     end
   end
 
@@ -839,25 +872,47 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET find_sep" do
     let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
 
-    before :each do
-      allow(employee_roles.first).to receive(:market_kind).and_return('shop')
-      allow(family).to receive_message_chain("special_enrollment_periods.where").and_return([special_enrollment_period])
-      sign_in user
-      get :find_sep, params: {hbx_enrollment_id: "2312121212", change_plan: "change_plan"}
-    end
-
     context "with a person with an address" do
-      it "should be a success" do
-        expect(response).to have_http_status(:success)
+      before do
+        allow(employee_roles.first).to receive(:market_kind).and_return('shop')
+        allow(family).to receive_message_chain("special_enrollment_periods.where").and_return([special_enrollment_period])
+        sign_in user
       end
 
-      it "should render my account page" do
-        expect(response).to render_template("find_sep")
+      context "with a valid mime type" do
+        before :each do
+          get :find_sep, params: {hbx_enrollment_id: "2312121212", change_plan: "change_plan"}
+        end
+
+        it "should be a success" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it "should render my account page" do
+          expect(response).to render_template("find_sep")
+        end
+
+        it "should assign variables" do
+          expect(assigns(:hbx_enrollment_id)).to eq("2312121212")
+          expect(assigns(:change_plan)).to eq('change_plan')
+        end
       end
 
-      it "should assign variables" do
-        expect(assigns(:hbx_enrollment_id)).to eq("2312121212")
-        expect(assigns(:change_plan)).to eq('change_plan')
+      context 'with an invalid mime type' do
+        it "js should return an error" do
+          get :find_sep, params: {hbx_enrollment_id: "2312121212", change_plan: "change_plan"}, format: :js
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "json should return an error" do
+          get :find_sep, params: {hbx_enrollment_id: "2312121212", change_plan: "change_plan"}, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should return an error" do
+          get :find_sep, params: {hbx_enrollment_id: "2312121212", change_plan: "change_plan"}, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
+        end
       end
     end
   end
@@ -973,10 +1028,29 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     describe "with valid params" do
-      it "returns qualified_date as true" do
-        get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
-        expect(response).to have_http_status(:success)
-        expect(assigns['qualified_date']).to eq(true)
+      context 'with the correct mime type' do
+        it "returns qualified_date as true" do
+          get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+          expect(response).to have_http_status(:success)
+          expect(assigns['qualified_date']).to eq(true)
+        end
+      end
+
+      context 'with the incorrect mime type' do
+        it "html should return an error" do
+          get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :html
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "json should return an error" do
+          get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should return an error" do
+          get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")}, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
+        end
       end
     end
 
@@ -1278,29 +1352,316 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         end
       end
     end
+  end
 
-    describe "GET upload_notice_form", dbclean: :after_each do
-      let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
-      let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
-      let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+  describe "GET upload_notice_form", dbclean: :after_each do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
 
-      before(:each) do
-        user.person.hbx_staff_role.update!(permission_id: permission.id)
-        sign_in(user)
+    before(:each) do
+      allow(EnrollRegistry[:show_upload_notices].feature).to receive(:is_enabled).and_return(true)
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    it "displays the upload_notice_form view" do
+      get :upload_notice_form
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:upload_notice_form)
+    end
+
+    it "should redirect unless enabled" do
+      allow(EnrollRegistry[:show_upload_notices].feature).to receive(:is_enabled).and_return(false)
+      get :upload_notice_form
+      expect(response).to redirect_to(root_path)
+      expect(flash[:notice]).to eq("Upload Notice Form is Disabled")
+    end
+
+    context 'invalid mime types' do
+      it "js should return an error" do
+        get :upload_notice_form, format: :js
+        expect(response).to have_http_status(:not_acceptable)
       end
 
-      it "displays the upload_notice_form view" do
-        allow(EnrollRegistry[:show_upload_notices].feature).to receive(:is_enabled).and_return(true)
-        get :upload_notice_form
+      it "json should return an error" do
+        get :upload_notice_form, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :upload_notice_form, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET upload_application" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return success" do
+        get :upload_application
         expect(response).to have_http_status(:success)
-        expect(response).to render_template(:upload_notice_form)
       end
 
-      it "should redirect unless enabled" do
-        allow(EnrollRegistry[:show_upload_notices].feature).to receive(:is_enabled).and_return(false)
-        get :upload_notice_form
-        expect(response).to redirect_to(root_path)
-        expect(flash[:notice]).to eq("Upload Notice Form is Disabled")
+      it "js should return an error" do
+        get :upload_application, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "json should return an error" do
+        get :upload_application, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :upload_application, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET healthcare_for_childcare_program" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role, :with_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+
+    before(:each) do
+      allow(controller).to receive(:ivl_osse_enabled?).and_return(true)
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return success" do
+        get :healthcare_for_childcare_program, params: { person_id: person.id }
+        expect(response).to have_http_status(:success)
+      end
+
+      it "js should return an error" do
+        get :healthcare_for_childcare_program, params: { person_id: person.id }, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "json should return an error" do
+        get :healthcare_for_childcare_program, params: { person_id: person.id }, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :healthcare_for_childcare_program, params: { person_id: person.id }, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET healthcare_for_childcare_program_form" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return success" do
+        get :healthcare_for_childcare_program_form, params: { person_id: person.id }
+        expect(response).to have_http_status(:success)
+      end
+
+      it "js should return an error" do
+        get :healthcare_for_childcare_program_form, params: { person_id: person.id }, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "json should return an error" do
+        get :healthcare_for_childcare_program_form, params: { person_id: person.id }, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :healthcare_for_childcare_program_form, params: { person_id: person.id }, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET brokers" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return success" do
+        get :brokers, params: { tab: 'home' }
+        expect(response).to have_http_status(:success)
+      end
+
+      it "js should return an error" do
+        get :brokers, params: { tab: 'home' }, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "json should return an error" do
+        get :brokers, params: { tab: 'home' }, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :brokers, params: { tab: 'home' }, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET check_move_reason" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return an error" do
+        get :check_move_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "js should return success" do
+        get :check_move_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "json should return an error" do
+        get :check_move_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :check_move_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET check_insurance_reason" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return an error" do
+        get :check_insurance_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "js should return success" do
+        get :check_insurance_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "json should return an error" do
+        get :check_insurance_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :check_insurance_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET check_marriage_reason" do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+    let(:qle) { FactoryBot.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
+
+    before(:each) do
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return an error" do
+        get :check_marriage_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "js should return success" do
+        get :check_marriage_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "json should return an error" do
+        get :check_marriage_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :check_marriage_reason, params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :qle_id => qle.id}, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
+      end
+    end
+  end
+
+  describe "GET event_logs", dbclean: :after_each do
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
+    let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+
+    before(:each) do
+      allow(controller).to receive(:authorize).and_return(true)
+      user.person.hbx_staff_role.update!(permission_id: permission.id)
+      sign_in(user)
+    end
+
+    context 'with valid/invalid mime types' do
+      it "html should return success" do
+        get :event_logs, params: { person_id: person.id }
+        expect(response).to have_http_status(:success)
+      end
+
+      it "js should return an error" do
+        get :event_logs, params: { person_id: person.id }, format: :js
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "json should return an error" do
+        get :event_logs, params: { person_id: person.id }, format: :json
+        expect(response).to have_http_status(:not_acceptable)
+      end
+
+      it "xml should return an error" do
+        get :event_logs, params: { person_id: person.id }, format: :xml
+        expect(response).to have_http_status(:not_acceptable)
       end
     end
   end
@@ -1605,24 +1966,46 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "for individual" do
-      before :each do
+      before do
         ivl_person.consumer_role.move_identity_documents_to_verified
         allow(ivl_person).to receive(:primary_family).and_return(ivl_family)
         allow(ivl_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
         sign_in(ivl_user)
-        get :purchase, params: {id: ivl_family.id, hbx_enrollment_id: ivl_enrollment.id, terminate: 'terminate'}
       end
 
-      it "should get hbx_enrollment" do
-        expect(assigns(:enrollment)).to eq ivl_enrollment
+      context 'with valid mime type' do
+        before :each do
+          get :purchase, params: {id: ivl_family.id, hbx_enrollment_id: ivl_enrollment.id, terminate: 'terminate'}
+        end
+
+        it "should get hbx_enrollment" do
+          expect(assigns(:enrollment)).to eq ivl_enrollment
+        end
+
+        it "should get terminate" do
+          expect(assigns(:terminate)).to eq 'terminate'
+        end
+
+        it "should get plan" do
+          expect(assigns(:plan)).to be_kind_of(UnassistedPlanCostDecorator)
+        end
       end
 
-      it "should get terminate" do
-        expect(assigns(:terminate)).to eq 'terminate'
-      end
+      context 'with invalid mime type' do
+        it "js should return an error" do
+          get :purchase, params: {id: ivl_family.id, hbx_enrollment_id: ivl_enrollment.id, terminate: 'terminate'}, format: :js
+          expect(response).to have_http_status(:not_acceptable)
+        end
 
-      it "should get plan" do
-        expect(assigns(:plan)).to be_kind_of(UnassistedPlanCostDecorator)
+        it "json should return an error" do
+          get :purchase, params: {id: ivl_family.id, hbx_enrollment_id: ivl_enrollment.id, terminate: 'terminate'}, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should return an error" do
+          get :purchase, params: {id: ivl_family.id, hbx_enrollment_id: ivl_enrollment.id, terminate: 'terminate'}, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
+        end
       end
     end
 

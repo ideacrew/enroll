@@ -1362,6 +1362,17 @@ class Person
     broker_agency_staff_roles.broker_agency_pending.by_profile_id(profile_id).first
   end
 
+  # Returns the first verification type that matches 'VerificationType::ALIVE_STATUS'.
+  # The result is memoized, so subsequent calls will return the previously computed value
+  # without querying the database again.
+  #
+  # @return [VerificationType, nil] the first verification type that matches 'VerificationType::ALIVE_STATUS', or nil if no such verification type exists.
+  def alive_status
+    return @alive_status if defined? @alive_status
+
+    @alive_status = verification_types.where(type_name: VerificationType::ALIVE_STATUS).first
+  end
+
   private
 
   def assign(collection, association)

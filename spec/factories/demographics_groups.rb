@@ -5,7 +5,7 @@ FactoryBot.define do
 
     trait :with_alive_status do
       after(:create) do |demographics_group, _evaluator|
-        create_list(:alive_status, 1, :with_alive_evidence, demographics_group: demographics_group)
+        create_list(:alive_status, 1, demographics_group: demographics_group)
       end
     end
   end

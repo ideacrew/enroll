@@ -1962,7 +1962,7 @@ bytes@3.1.1:
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.1.1.tgz#3f018291cb4cbad9accb6e6970bca9c8889e879a"
   integrity sha512-dWe4nWO/ruEOY7HkUJ5gFt1DCFV9zPRoJr8pV0/ASQermOZjtq8jMjOprC0Kd10GLN+l7xaUPvxzJFWtxGu8Fg==
 
-"cable_ready@>= 4.5.0":
+cable_ready@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/cable_ready/-/cable_ready-4.5.0.tgz#1207218dd16934d12addfbd34c26ead853570672"
   integrity sha512-9bom1DuYe1teBdRckgKWjg+rWRLWrkOvkhzlXkhb33X+Pfu/QK9e4vGk6hGK9PVKVr0SYZC41dByFGknW4spLg==
@@ -8143,13 +8143,13 @@ stimulus@^1.1.1:
     "@stimulus/core" "^1.1.1"
     "@stimulus/webpack-helpers" "^1.1.1"
 
-stimulus_reflex@^3.3.0:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/stimulus_reflex/-/stimulus_reflex-3.4.1.tgz#2606aee3b2911b5939d68f65a75262fe3c626204"
-  integrity sha512-YbFcuE4HndNe9RBQvF/Vu+7GDt0zLGdhQTXuGfLDVti1qggPG3kPgV1YBZ9volzBTGUmLp2PQbxG9j5AIyYp5A==
+stimulus_reflex@3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/stimulus_reflex/-/stimulus_reflex-3.4.2.tgz#a211dff390ae3db2cc7190aaaa543996a7614f71"
+  integrity sha512-7fpT3Z6xdhypJAT2RVjQ9QbgrTRUMfIWFP+46jnpNOUpyza+6Qkkb5M5IywcZe+OcSYCpXOUi5UsOCR9dJUc3g==
   dependencies:
     "@rails/actioncable" ">= 6.0"
-    cable_ready ">= 4.5.0"
+    cable_ready "^4.5.0"
 
 stream-browserify@^2.0.1:
   version "2.0.2"
