@@ -1155,9 +1155,7 @@ class ConsumerRole
   def move_types_to_pending(*args)
     types_to_reject = ['American Indian Status', 'Alive Status', LOCATION_RESIDENCY]
 
-    verification_types.reject { |type| types_to_reject.include?(type.type_name) }.each do |type|
-      type.pending_type
-    end
+    verification_types.reject { |type| types_to_reject.include?(type.type_name) }.each(&:pending_type)
   end
 
   def pass_lawful_presence(*args)
