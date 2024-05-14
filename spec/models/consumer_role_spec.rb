@@ -722,7 +722,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
               case verif.type_name
               when 'American Indian Status'
                 expect(verif.validation_status).to eq('negative_response_received')
-              when 'Citizenship'
+              when 'Citizenship', 'Alive Status'
                 # Validation Status stays same as we will not make DHS call for people who are 'us_citizen'
                 expect(verif.validation_status).to eq('unverified')
               else
@@ -1014,15 +1014,15 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       end
 
       context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Alive Status", "Citizenship"], 4, "2222222222", true, nil, 25
       end
 
       context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Alive Status", "Immigration status"], 4, "2222222222", false, nil, 20
       end
 
       context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "American Indian Status"], 4, "2222222222", true, "native", 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Alive Status", "Citizenship", "American Indian Status"], 5, "2222222222", true, "native", 20
       end
 
       context "Citizen with NO SSN" do
