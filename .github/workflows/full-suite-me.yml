@@ -1,12 +1,10 @@
-name: full check suite
+name: full check suite - ME
 on:
   push:
-  schedule:
-    - cron: '0 5 * * *'
 
 concurrency:
   group: qb-${{ github.ref }}
-  # cancel-in-progress: true #This is temporary to avoid trunk GHA collisions
+  cancel-in-progress: true #This is temporary to avoid trunk GHA collisions
 
 env:
   REPORT_PATH: 'ci/cuke-report.json'
