@@ -885,6 +885,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe 'POST create_send_secure_message, :dbclean => :after_each' do
+    render_views
+
+    let(:person) { FactoryBot.create(:person, :with_family) }
+    let(:permission) { double('Permission', can_send_secure_message: true)}
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
+    let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
+    let(:employer_profile) {organization.employer_profile}
+
+    let(:profile_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
+    let(:person_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
+
+    let(:invalid_params) {{resource_id: employer_profile.id, subject: '', body: '', actions_id: '1234', resource_name: employer_profile.class.to_s}}
+
+    before do
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
+      sign_in(user)
+    end
+
     it 'should render back to new_secure_message if there is a failure' do
       get :create_send_secure_message, xhr:  true, params:  invalid_params
 
