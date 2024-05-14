@@ -60,6 +60,7 @@ class VerificationType
   scope :by_name, ->(type_name) { where(:type_name => type_name) }
   scope :ssn_type, -> { by_name("Social Security Number").active }
   scope :citizenship_type, -> { by_name("Citizenship").active }
+  scope :deceased_type, -> { by_name("Alive Status").active }
 
   # embeds_many :external_service_responses  -> needs datamigration
   embeds_many :type_history_elements
