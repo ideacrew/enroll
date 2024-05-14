@@ -8,8 +8,8 @@ module Operations
     class Sort
       include Dry::Monads[:result, :do]
 
-      def call(params:)
-        persist_data(params)
+      def call(input_params)
+        persist_data(input_params[:params])
       end
 
       private

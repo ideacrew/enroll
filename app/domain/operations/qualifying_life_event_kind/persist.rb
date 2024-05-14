@@ -8,7 +8,9 @@ module Operations
     class Persist
       include Dry::Monads[:result, :do]
 
-      def call(params:)
+      def call(input_params)
+        params = input_params[:params]
+
         values            = yield validate(params)
         entity            = yield initialize_entity(values)
         qle               = yield persist_data(entity, params)
