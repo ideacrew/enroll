@@ -41,7 +41,7 @@
     </div>
   </div>
   <% next_link = EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') ? new_insured_fdsh_ridp_verification_path : new_insured_interactive_identity_verification_path %>
-  <%= render partial: "shared/previous_link" %> <%= render partial: "shared/continue_links", locals: {next_link: next_link} %>
+  <%= render partial: "shared/progress_navigation_buttons", locals: {next_link: next_link} %>
 <% else %>
   <% content_for :horizontal_status do %>
     <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
