@@ -4,7 +4,7 @@ require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_account/_benefits.html.erb", :type => :view, dbclean: :after_each do
+RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_account/_benefits", :type => :view, dbclean: :after_each do
 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
@@ -17,7 +17,6 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
   let(:user) { FactoryBot.create(:user) }
 
   context "Add Plan year display" do
-
     before :each do
       view.extend BenefitSponsors::Engine.routes.url_helpers
       view.extend BenefitSponsors::PermissionHelper
@@ -33,7 +32,6 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
     end
 
     context "renewals" do
-
       let(:renewal_benefit_sponsor_catalog) do
         build(
           :benefit_markets_benefit_sponsor_catalog,
@@ -50,37 +48,34 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
       end
 
       context "when an active and draft benefit applications are present" do
-
         it "should not display add plan year button" do
-          render "benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits.html.erb"
+          render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits'
           expect(rendered).not_to have_selector("a", text: "Add Plan Year")
         end
       end
 
       context "when an active and canceled benefit applications are present" do
-
         before do
           renewal_application.cancel!
           renewal_application.reload
         end
 
         it "should display add plan year button" do
-          render "benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits.html.erb"
+          render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits'
           expect(rendered).to have_selector("a", text: "Add Plan Year")
         end
       end
     end
 
     context "initials" do
-
       it "should display add plan year button when draft application is present" do
         benefit_application.update_attributes!(aasm_state: :draft)
-        render "benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits.html.erb"
+        render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits'
         expect(rendered).to have_selector("a", text: "Add Plan Year")
       end
 
       it "should display add plan year button when active application is present" do
-        render "benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits.html.erb"
+        render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits'
         expect(rendered).not_to have_selector("a", text: "Add Plan Year")
       end
     end

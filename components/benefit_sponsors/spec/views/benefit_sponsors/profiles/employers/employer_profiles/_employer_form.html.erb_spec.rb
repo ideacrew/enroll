@@ -10,7 +10,7 @@ end
 
 RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", :type => :view, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
-  include L10nHelper
+  include ::L10nHelper
 
   let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
   let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
@@ -42,7 +42,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     view.extend BenefitSponsors::Engine.routes.url_helpers
     view.extend BenefitSponsors::Employers::EmployerHelper
     view.extend BenefitSponsors::ApplicationHelper
-    view.extend BenefitSponsors::RegistrationHelper
+    view.extend ::L10nHelper
     view.extend BenefitSponsors::PermissionHelper
     assign(:agency, agency)
   end
