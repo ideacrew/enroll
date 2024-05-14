@@ -31,10 +31,12 @@ Scenario: Outstanding verification
     And the consumer is logged in
     And EnrollRegistry location_residency_verification_type feature is enabled
     And consumer has outstanding verification and unverified enrollments
+    And the consumer has an outstanding Alive Status verification type
     When the consumer visits verification page
     Then consumer should see Verification Due date label
     And consumer should see Documents We Accept link
     And the consumer should see documents verification page
+    And the consumer should see the Alive Status verification type
 
   Scenario: Consumer is fully_verified should see verification types
     Given a consumer exists
@@ -44,6 +46,7 @@ Scenario: Outstanding verification
     Then the consumer visits verification page
     And the consumer should see documents verification page
     Then verification types have to be visible
+    And the consumer should not see the Alive Status verification type
 
   Scenario: Consumer is from Curam and is fully verified and shows verification types as verified
     Given a consumer exists
@@ -92,6 +95,7 @@ Scenario: Outstanding verification
     When admin visits home page
     And Individual clicks on Documents link
     Then Individual should see cost saving documents for evidences
+    And the admin should see the Alive Status verification type
     And Individual clicks on Actions dropdown
     And Individual clicks on verify
     And Individual Selects Reason
