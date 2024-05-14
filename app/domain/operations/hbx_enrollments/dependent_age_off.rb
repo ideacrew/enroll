@@ -60,11 +60,11 @@ module Operations
       end
 
       def shop_age_off(dao_date, enrollment_query)
-        ::EnrollRegistry[:aca_shop_dependent_age_off] { { new_date: dao_date, enrollment_query: enrollment_query } }
+        ::EnrollRegistry.lookup(:aca_shop_dependent_age_off) { { new_date: dao_date, enrollment_query: enrollment_query } }
       end
 
       def fehb_age_off(dao_date, enrollment)
-        ::EnrollRegistry[:aca_fehb_dependent_age_off] { { new_date: dao_date, enrollment: enrollment } }
+        ::EnrollRegistry.lookup(:aca_fehb_dependent_age_off) { { new_date: dao_date, enrollment: enrollment } }
       end
     end
   end

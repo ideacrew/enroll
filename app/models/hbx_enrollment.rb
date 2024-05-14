@@ -667,8 +667,8 @@ class HbxEnrollment
     end
 
     def terminate_dep_age_off_enrollments
-      ::EnrollRegistry[:aca_shop_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
-      ::EnrollRegistry[:aca_fehb_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
+      ::EnrollRegistry.lookup(:aca_shop_dependent_age_off) { {new_date: TimeKeeper.date_of_record} }
+      ::EnrollRegistry.lookup(:aca_fehb_dependent_age_off) { {new_date: TimeKeeper.date_of_record} }
     end
 
     def enrollments_for_display(family_id)
@@ -910,7 +910,7 @@ class HbxEnrollment
     return if is_shop?
 
     return unless EnrollRegistry[:cancel_renewals_for_term].enabled?
-    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
+    ::EnrollRegistry.lookup(:cancel_renewals_for_term) { {hbx_enrollment: self} }
   end
 
   def propogate_terminate(*args)
@@ -933,7 +933,7 @@ class HbxEnrollment
     end
 
     return unless EnrollRegistry[:cancel_renewals_for_term].enabled?
-    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
+    ::EnrollRegistry.lookup(:cancel_renewals_for_term) { {hbx_enrollment: self} }
   end
 
   def propogate_waiver

@@ -78,7 +78,7 @@ module Analytics
       if daily_instance.save && weekly_instance.save && monthly_instance.save
         [daily_instance, weekly_instance, monthly_instance]
       else
-        raise StandardError.new("update failed, unable to save one or more time dimensions " [daily_instance, weekly_instance, monthly_instance])
+        raise StandardError.new("update failed, unable to save one or more time dimensions ", [daily_instance, weekly_instance, monthly_instance])
       end
 
     end

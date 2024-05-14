@@ -39,10 +39,19 @@ module Effective
       def collection
         return @notices_collection if defined? @notices_collection
         notices = Notifier::NoticeKind.all
-        if attributes[:market_kind].present? && !['all'].include?(attributes[:market_kind])
-          notices = notices.send(attributes[:market_kind]) if ['individual','shop'].include?(attributes[:market_kind])
-        end
+        notices = cast_notice_filter_market_kind(attributes, notices)
         @notices_collection = notices
+      end
+
+      def cast_notice_filter_market_kind(params, current_scope)
+        case params[:market_kind].to_s
+        when "individual"
+          current_scope.individual
+        when "shop"
+          current_scope.shop
+        else
+          current_scope
+        end
       end
 
       def nested_filter_definition
