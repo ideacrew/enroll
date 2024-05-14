@@ -53,6 +53,7 @@ When(/^the consumer should see documents verification page$/) do
   expect(page).to have_content('We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.')
   expect(page).to have_content "Documents We Accept"
   expect(page).to have_content('Social Security Number')
+  expect(page).to_not have_content('Deceased') #should only display to consumer if 'outstanding'
 end
 
 When(/^the consumer is completely verified$/) do

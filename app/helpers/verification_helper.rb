@@ -37,6 +37,28 @@ module VerificationHelper
     end
   end
 
+  def display_verification_type_name(v_type)
+    case v_type
+    when 'ME Residency'
+      'Income'
+    when 'Alive Status'
+      'Deceased'
+    else
+      v_type
+    end
+  end
+
+  # method added specifically to handle the displaying of 'Alive Status'
+  # this verification type should always be visible to admin
+  # but should only display for consumers/brokers/broker agency staff if the validation_status is 'outstanding'
+  def can_display_type?(verif_type)
+    return true unless verif_type.type_name == 'Alive Status'
+    return true if current_user.has_hbx_staff_role?
+    return true if verif_type.validation_status == 'outstanding'
+
+    false
+  end
+
   def verification_type_class(status)
     case status
     when 'verified', 'valid'
