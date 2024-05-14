@@ -106,7 +106,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   context 'success' do
     context 'with valid application' do
       before do
-        @result = subject.call({application_id: application.id})
+        @result = subject.call(application_id: application.id)
       end
 
       it 'should return success' do
@@ -123,7 +123,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
           applicant.update_attributes!(tribal_name: "tribe name", tribal_state: "ME")
-          @result = subject.call({application_id: application.id})
+          @result = subject.call(application_id: application.id)
         end
 
         it 'should return success' do
@@ -139,7 +139,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
           applicant.update_attributes!(tribal_id: "4848477")
-          @result = subject.call({application_id: application.id})
+          @result = subject.call(application_id: application.id)
         end
 
         it 'should return success' do
@@ -156,7 +156,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   context 'failure' do
     context 'invalid application id' do
       before do
-        @result = subject.call({application_id: 'application_id'})
+        @result = subject.call(application_id: 'application_id')
       end
 
       it 'should return a failure with error message' do
@@ -167,7 +167,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     context 'invalid application aasm_state' do
       before do
         application.update_attributes!(aasm_state: 'submitted')
-        @result = subject.call({application_id: application.id})
+        @result = subject.call(application_id: application.id)
       end
 
       it 'should return a failure with error message' do

@@ -43,14 +43,14 @@ module FinancialAssistance
           def submit_application(application)
             application.submit
             return Success(application) if application.save
-            Failure("Unable to save the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
+            Failure("Unable to save the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_hash}")
           rescue StandardError => e
             Failure("Submission failed for the application id: #{application.id} | backtrace: #{e}")
           end
 
           def validate(application)
             return Success(application) if application.may_submit?
-            Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_h}")
+            Failure("Unable to submit the application for given application hbx_id: #{application.hbx_id}, base_errors: #{application.errors.to_hash}")
           end
 
           def construct_payload(application)
