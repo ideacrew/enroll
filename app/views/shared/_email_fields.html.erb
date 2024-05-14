@@ -2,8 +2,10 @@
   <% kind = f.object.kind %>
   <div class="col-sm col-md-6 p-0">
     <div class="col-md-12 <%= f.index.even? ? 'pl-0' : 'pr-0'%>">
-      <%= f.hidden_field :kind %>
-      <%= f.hidden_field :_destroy %>
+      <span>
+        <%= f.hidden_field :kind %>
+        <%= f.hidden_field :_destroy %>
+      </span>
       <%= f.label :address, kind.upcase.eql?('HOME') ? l10n("personal_email_address") : l10n(kind + " Email Address").titleize %>
       <%= f.email_field :address, placeholder: "example@mail.com", class: "full-width" %>
     </div>
