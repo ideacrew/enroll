@@ -3,7 +3,7 @@
     <%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
     <input type="hidden" id="is_indian_alaskan_tribe_details_enabled" value="<%= EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>">
     <fieldset id="tribal_container">
-      <legend id="indian_tribe_member_value" class="unweighted">
+      <legend id="indian_tribe_member_value" class="weight-n">
         <%= l10n("insured.tribe_member_pt1") %>
         <%= render partial:"shared/glossary", locals: {key: "american_indian", term: "American Indian" } %>
         <%= l10n("or") %>
@@ -30,7 +30,7 @@
       <input type="hidden" id="enroll_state_abbr" value="<%= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>">
 
       <div class="mb-4" id="tribal-state-container">
-        <label for="tribal-state" class="unweighted"><%= l10n("insured.tribal_state") %></label>
+        <label for="tribal-state" class="weight-n"><%= l10n("insured.tribal_state") %></label>
         <div id="tribal-state-alert" class="hide">
           <div class="alert alert-warning d-flex" role="alert">
             <div>
@@ -45,14 +45,14 @@
       </div>
 
       <fieldset class="mb-4 featured-tribe-container hide">
-        <legend for="tribe_codes" class="unweighted"><%= l10n("insured.tribal_name") %> *</legend>
+        <legend for="tribe_codes" class="weight-n"><%= l10n("insured.tribal_name") %> *</legend>
         <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>
           <div> <%= tribe.label(:"data-value" => tribe.value) { tribe.check_box + tribe.text } %> </div>
         <% end %>
       </fieldset>
 
       <div class="mb-4 tribal-name-container hide">
-        <label for="tribal-name" class="unweighted"><%= l10n("insured.tribal_name") %> *</label>
+        <label for="tribal-name" class="weight-n"><%= l10n("insured.tribal_name") %> *</label>
         <div id="tribal-name-alert" class="hide">
           <div class="alert alert-warning d-flex" role="alert">
             <div>
@@ -67,7 +67,7 @@
       </div>
     <% else %>
       <div class="mb-4">
-        <label for="tribal_id" class="unweighted"><%= l10n("insured.tribal_name") %> *</label>
+        <label for="tribal_id" class="weight-n"><%= l10n("insured.tribal_name") %> *</label>
         <div id="tribal-id-alert" class="hide">
           <div class="alert alert-warning d-flex" role="alert">
             <div>
