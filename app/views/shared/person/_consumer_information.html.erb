@@ -38,11 +38,11 @@
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :ssn, "Social Security" %>
         <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-          <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
+          <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
             pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
             oninput: "this.setCustomValidity('')", disabled: readonly_status, readonly: f.object.is_a?(Forms::EmployeeRole) %>
         <% else %>
-          <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: readonly_status,
+          <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required mask-ssn", disabled: readonly_status,
             readonly: f.object.is_a?(Forms::EmployeeRole) %>
         <% end %>
       </div>
@@ -64,6 +64,11 @@
     </fieldset>
   </div>
   <%= render 'shared/ssn_coverage_msg' %>
+  <script>
+    $(document).ready(function() {
+      $.inputMasks();
+    });
+  </script>
 <% else %>
   <div id="personal_info" class="focus_effect module">
     <%= hidden_field "people","id" %>
