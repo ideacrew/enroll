@@ -379,7 +379,7 @@ module Factories
     end
 
     def self.initialize_primary_applicant(family, person)
-      family.add_family_member(person, is_primary_applicant: true) unless family.find_family_member_by_person(person)
+      family.add_family_member(person, { is_primary_applicant: true }) unless family.find_family_member_by_person(person)
     end
 
     def self.person_relationship_for(census_relationship)

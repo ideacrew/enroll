@@ -459,7 +459,7 @@ module Importers::Transcripts
             end
           end
 
-          family_member = family.add_family_member(matched_person, is_primary_applicant: false)
+          family_member = family.add_family_member(matched_person, { is_primary_applicant: false })
           hbx_enrollment.hbx_enrollment_members.build({
                                                         applicant_id: family_member.id,
                                                         is_subscriber: member.is_subscriber,

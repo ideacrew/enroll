@@ -8,7 +8,7 @@ module FinancialAssistance
     include Ssn
     include UnsetableSparseFields
     include ActionView::Helpers::TranslationHelper
-    include FinancialAssistance::L10nHelper
+    include ::L10nHelper
     include Eligibilities::Visitors::Visitable
     include GlobalID::Identification
 

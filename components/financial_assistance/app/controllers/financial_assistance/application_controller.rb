@@ -12,7 +12,9 @@ module FinancialAssistance
     layout "layouts/financial_assistance"
 
     def load_support_texts
-      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
+      file_path = lookup_context.find(
+        'financial_assistance/shared/support_text', [], false, [], formats: [:yml]
+      ).identifier
       raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
       @support_texts = support_text_placeholders raw_support_text
     end

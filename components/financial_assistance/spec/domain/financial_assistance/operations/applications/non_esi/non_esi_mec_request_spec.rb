@@ -96,7 +96,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Non
   context 'success' do
     context 'with valid application' do
       before do
-        @result = subject.call({application_id: application.id})
+        @result = subject.call(application_id: application.id)
       end
 
       it 'should return success' do
@@ -113,7 +113,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Non
   context 'failure' do
     context 'invalid application id' do
       before do
-        @result = subject.call({application_id: 'application_id'})
+        @result = subject.call(application_id: 'application_id')
       end
 
       it 'should return a failure with error message' do

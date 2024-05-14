@@ -4,7 +4,7 @@ describe IrsGroup do
   let(:person) {FactoryBot.create(:person)}
   let(:family) do
     family = Family.new
-    family.add_family_member(person, is_primary_applicant: true)
+    family.add_family_member(person, { is_primary_applicant: true })
     family.save
     family
   end

@@ -244,33 +244,6 @@ module Importers::Transcripts
       @updates[:new][:new] ||= {}
 
       @updates[:new][:new]['e_case_id'] = ["Ignored", "Ignored per Family update rule set."]
-
-      # begin
-      #   primary = @other_family.primary_applicant
-      #   primary_person = match_person_instance(primary.person)
-
-      #   if primary_person.primary_family.present?
-      #     raise StaleRecordError, "Family recrod created on #{matches.first.primary_family.created_at.strftime('%m/%d/%Y')} after transcript generated"
-      #   end
-
-      #   family = Family.new({
-      #     hbx_assigned_id: @other_family.hbx_assigned_id,
-      #     e_case_id: @other_family.e_case_id
-      #     })
-
-      #   @other_family.family_members.each do |family_member|
-      #     matched_person = match_person_instance(family_member.person)
-      #     family.add_family_member(matched_person, is_primary_applicant: family_member.is_primary_applicant)
-      #     relationship = (family_member.is_primary_applicant ? 'self' : family_member.person.person_relationships.first.try(:kind).to_s)
-      #     family.relate_new_member(matched_person, relationship)
-      #   end
-
-      #   family.save!
-      #   @updates[:new][:new]['ssn'] = ["Success", "Created new family record"]
-
-      # rescue Exception => e 
-      #   @updates[:new][:new]['e_case_id'] = ["Failed", "#{e.inspect}"]
-      # end
     end
 
     def add_family_members(attributes)
@@ -289,7 +262,7 @@ module Importers::Transcripts
       end
 
       matched_person = matched_people.first
-      @family.add_family_member(matched_person, is_primary_applicant: attributes['is_primary_applicant'])
+      @family.add_family_member(matched_person, { is_primary_applicant: attributes['is_primary_applicant'] })
       @family.relate_new_member(matched_person, attributes['relationship'])
       @family.save!
     end

@@ -37,7 +37,7 @@ describe UpdateFamilyMembersIndex do
       husband.save
 
       family.add_family_member(wife)
-      family.add_family_member(husband, is_primary_applicant: true)
+      family.add_family_member(husband, { is_primary_applicant: true })
       family.save
       family
     end

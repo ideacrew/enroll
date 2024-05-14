@@ -202,7 +202,7 @@ module TransportGateway
     let(:user_name) { "A user name" }
     let(:user_password) { "someC#*($&DERAZY pwd" }
     let(:user_credentials) { double(:user => user_name, :sftp_options => {:password => user_password}) }
-    let(:userinfo)  { "#{URI.escape(user_name)}:#{URI.escape(user_password)}" }
+    let(:userinfo)  { "#{CGI.escape(user_name)}:#{CGI.escape(user_password)}" }
     let(:source_host)   { "ftp.example.com" }
     let(:source_folder) { "/path/to/target/folder" }
     let(:source_file_name) { "some_file.pdf" }

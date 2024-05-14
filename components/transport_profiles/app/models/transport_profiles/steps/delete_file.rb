@@ -22,7 +22,7 @@ module TransportProfiles
     def execute(process_context)
       delete_paths = resolve_files(process_context)
       delete_paths.each do |f_path|
-        del_path = f_path.respond_to?(:scheme) ? URI.decode(f_path.path) : f_path
+        del_path = f_path.respond_to?(:scheme) ? CGI.unescape(f_path.path) : f_path
         FileUtils.rm_f(del_path)
       end
     end

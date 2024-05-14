@@ -30,12 +30,16 @@ module UIHelpers
     end
 
     def load_steps
-      filename = lookup_context.find_template("#{controller_path}/steps.yml").identifier
+      filename = lookup_context.find(
+        "#{controller_path}/steps", [], false, [], formats: [:yml]
+      ).identifier
       @steps = Workflow::Steps.new YAML.load_file(filename)
     end
 
     def load_support_texts
-      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
+      file_path = lookup_context.find(
+        'financial_assistance/shared/support_text', [], false, [], formats: [:yml]
+      ).identifier
       raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
       @support_texts = support_text_placeholders raw_support_text
     end
