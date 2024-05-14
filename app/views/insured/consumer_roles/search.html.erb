@@ -14,7 +14,7 @@
         <%= l10n("insured.consumer_roles.search.enter_personal_info_msg") %>
       </p>
       <%= render 'insured/consumer_roles/remote_search_form', f: f %>
-      <%= render partial: "shared/continue_links", locals: {run_person_validations: true} %>
+      <%= render partial: "shared/progress_navigation_buttons", locals: {dont_show_prev_button: true, run_person_validations: true} %>
     <% end %>
   </div>
 <% else %>
