@@ -45,14 +45,14 @@
       </div>
 
       <fieldset class="mb-4 featured-tribe-container hide">
-        <legend for="tribe_codes" class="unweighted"><%= l10n("insured.tribal_name") %></legend>
+        <legend for="tribe_codes" class="unweighted"><%= l10n("insured.tribal_name") %> *</legend>
         <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>
           <div> <%= tribe.label(:"data-value" => tribe.value) { tribe.check_box + tribe.text } %> </div>
         <% end %>
       </fieldset>
 
       <div class="mb-4 tribal-name-container hide">
-        <label for="tribal-name" class="unweighted"><%= l10n("insured.tribal_name") %></label>
+        <label for="tribal-name" class="unweighted"><%= l10n("insured.tribal_name") %> *</label>
         <div id="tribal-name-alert" class="hide">
           <div class="alert alert-warning d-flex" role="alert">
             <div>
@@ -67,7 +67,7 @@
       </div>
     <% else %>
       <div class="mb-4">
-        <label for="tribal_id" class="unweighted"><%= l10n("insured.tribal_name") %></label>
+        <label for="tribal_id" class="unweighted"><%= l10n("insured.tribal_name") %> *</label>
         <div id="tribal-id-alert" class="hide">
           <div class="alert alert-warning d-flex" role="alert">
             <div>
@@ -137,7 +137,7 @@
 
       <div class="row row-form-wrapper no-buffer featured-tribe-container hide">
         <div class="col-md-12">
-          <label><%= l10n("insured.tribal_name") %></label>
+          <label><%= l10n("insured.tribal_name") %>*</label>
         </div>
         <div class="col-md-12 form-group form-group-lg check_box_collection">
           <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>

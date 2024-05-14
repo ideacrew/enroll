@@ -623,7 +623,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.tribe_member_pt1' => "Is this person a member of an ",
   :'en.insured.tribe_member_pt2' => " Tribe?",
   :'en.insured.tribal_state' => "Where is this person's tribe located?*",
-  :'en.insured.tribal_name' => "Which federally recognized tribe does this person belong to?*",
+  :'en.insured.tribal_name' => "Which federally recognized tribe does this person belong to?",
   :'en.insured.tribal_state_alert' => 'Tribe state is required',
   :'en.insured.tribal_name_alert' => 'Federally recognized tribe name is required',
   :'en.insured.tribal_id_alert' => 'Tribal ID number is required',
