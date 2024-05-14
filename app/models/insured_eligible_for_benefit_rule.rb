@@ -149,7 +149,7 @@ class InsuredEligibleForBenefitRule
   def is_child_age_satisfied?
     unless @new_effective_on.nil?
       if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
-        dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
+        dependent_coverage_eligible = ::EnrollRegistry.lookup(:age_off_relaxed_eligibility) do
           {
             effective_on: @new_effective_on,
             family_member: @family&.find_family_member_by_person(@role.person),

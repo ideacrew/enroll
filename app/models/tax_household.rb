@@ -233,7 +233,7 @@ class TaxHousehold
                                                effective_on: effective_on,
                                                shopping_fm_ids: shopping_fm_ids,
                                                subscriber_applicant_id: hbx_enrollment&.subscriber&.applicant_id }
-                              monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] {input_params}
+                              monthly_aggregate_amount = EnrollRegistry.lookup(:calculate_monthly_aggregate) {input_params}
                               monthly_aggregate_amount.success? ? monthly_aggregate_amount.value! : 0
                             else
                               current_max_aptc.to_f

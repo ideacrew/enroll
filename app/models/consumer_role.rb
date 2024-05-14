@@ -935,7 +935,7 @@ class ConsumerRole
   end
 
   def add_type_history_element(params)
-    verification_type_history_elements<<VerificationTypeHistoryElement.new(params)
+    verification_type_history_elements << VerificationTypeHistoryElement.new(params)
   end
 
   def residency_verification_enabled?
