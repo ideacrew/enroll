@@ -11,7 +11,7 @@
             <div class="col-md-12 <%= phone.index.even? ? 'pl-0' : 'pr-0'%>">
               <% unless kind == 'FAX' && params[:action] == "personal" %>
                 <%= phone.label :full_phone_number, l10n(kind + "Phone") %>
-                <%= phone.text_field :full_phone_number, placeholder: "000-000-0000", class: "#{required} full-width #{kind.downcase}-phone-number" %>
+                <%= phone.text_field :full_phone_number, placeholder: "(000) 000-0000", class: "#{required} full-width phone_number #{kind.downcase}-phone-number" %>
               <% end %>
             </div>
           </div>
@@ -51,3 +51,8 @@
     </div>
   </div>
 <% end %>
+<script>
+  $(document).ready(function() {
+    $.inputMasks();
+  });
+</script>
