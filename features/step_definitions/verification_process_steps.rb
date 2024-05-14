@@ -44,6 +44,11 @@ And(/^the user is RIDP verified$/) do
   user.person.consumer_role.move_identity_documents_to_verified
 end
 
+And(/^the consumer has an outstanding Alive Status verification type$/) do
+  alive_status = user.person.verification_type_by_name('Alive Status')
+  alive_status.update(validation_status: 'outstanding')
+end
+
 Then(/^the consumer visits verification page$/) do
   visit verification_insured_families_path(tab: 'verification')
   find(".interaction-click-control-documents", wait: 5).click
@@ -53,7 +58,6 @@ When(/^the consumer should see documents verification page$/) do
   expect(page).to have_content('We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.')
   expect(page).to have_content "Documents We Accept"
   expect(page).to have_content('Social Security Number')
-  expect(page).to_not have_content('Deceased') #should only display to consumer if 'outstanding'
 end
 
 When(/^the consumer is completely verified$/) do
@@ -104,6 +108,14 @@ end
 
 Then(/^consumer should see Verification Due date label$/) do
   expect(page).to have_content('Due Date')
+end
+
+Then(/^the consumer should not see the Alive Status verification type$/) do
+  expect(page).to_not have_content('Deceased') #should only display to consumer if 'outstanding'
+end
+
+Then(/^.+ should see the Alive Status verification type$/) do
+  expect(page).to have_content('Deceased')
 end
 
 Then(/^consumer should see Documents We Accept link$/) do
