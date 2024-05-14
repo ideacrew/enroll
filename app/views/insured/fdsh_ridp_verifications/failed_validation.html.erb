@@ -21,7 +21,7 @@
     <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents', locals: {show_faq_button: @verification_transaction_id.blank?} %>
   </div>
   <% redirect_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: @person.consumer_role.id) %>
-  <%= render partial: "shared/previous_link" %> <%= render partial: "shared/continue_links", locals: {next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : redirect_path, disabled: ridp_step_2_disabled(@person, @person.consumer_role.application_verified?, @person.consumer_role.identity_verified?)} %>
+  <%= render partial: "shared/progress_navigation_buttons", locals: {next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : redirect_path, disable_link: ridp_step_2_disabled(@person, @person.consumer_role.application_verified?, @person.consumer_role.identity_verified?)} %>
 <% else %>
   <div class="content">
     <div class="container">
