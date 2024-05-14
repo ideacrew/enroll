@@ -80,6 +80,36 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
   end
 
+  context "GET applicant_is_eligible_for_joint_filing" do
+    let(:dependent1) { FactoryBot.create(:person) }
+    let(:family_member_dependent) { FactoryBot.build(:family_member, person: dependent1, family: family)}
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        first_name: "James", last_name: "Bond", gender: "male", dob: Date.new(1993, 3, 8),
+                        person_hbx_id: dependent1.hbx_id,
+                        application: application,
+                        family_member_id: family_member_dependent.id)
+    end
+
+
+    before do
+      applicant1 = application.applicants.first
+      applicant2 = application.applicants.last
+      application.add_or_update_relationships(applicant1, applicant2, "spouse")
+    end
+
+    it "should render plain text" do
+      get :applicant_is_eligible_for_joint_filing, params: {"application_id" => application.id, "applicant_id" => applicant2.id}, format: :text
+      expect(response.status).to be 200
+      expect(response.content_type).to eq("text/plain; charset=utf-8")
+    end
+
+    it "should render plain text" do
+      get :applicant_is_eligible_for_joint_filing, params: {"application_id" => application.id, "applicant_id" => applicant2.id}, format: :js
+      expect(response.status).to be 406
+    end
+  end
+
   context "GET save questions" do
     before do
       applicant.update_attributes(is_primary_caregiver: nil) if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)

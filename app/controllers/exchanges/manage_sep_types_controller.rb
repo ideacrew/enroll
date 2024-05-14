@@ -16,7 +16,7 @@ module Exchanges
     end
 
     def create
-      result = EnrollRegistry[:sep_types]{ {params: forms_qualifying_life_event_kind_form_params} }
+      result = EnrollRegistry.lookup(:sep_types) { {params: forms_qualifying_life_event_kind_form_params} }
       respond_to do |format|
         format.html do
           if result.failure?
@@ -36,7 +36,7 @@ module Exchanges
     end
 
     def update
-      result = EnrollRegistry[:sep_types]{ {params: forms_qualifying_life_event_kind_form_params} }
+      result = EnrollRegistry.lookup(:sep_types) { {params: forms_qualifying_life_event_kind_form_params} }
 
       respond_to do |format|
         format.html do
@@ -64,7 +64,7 @@ module Exchanges
     end
 
     def expire_sep_type
-      @result = EnrollRegistry[:expire_sep_type]{ {params: format_expire_sep_type(params)} }
+      @result = EnrollRegistry.lookup(:expire_sep_type) { {params: format_expire_sep_type(params)} }
       @row = params[:qle_action_id]
 
       if @result.failure?
@@ -92,7 +92,7 @@ module Exchanges
     end
 
     def sort
-      EnrollRegistry[:sort_sep_type]{ {params: params} }
+      EnrollRegistry.lookup(:sort_sep_type) { {params: params} }
       render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
     rescue StandardError
       render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error

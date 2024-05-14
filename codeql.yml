@@ -10,7 +10,8 @@ paths-ignore:
   - "**/*.yml"
   - "**/*.yaml"
   - codeql
-  - project_gems/mongoid_userstamp-0.4.0/Gemfile
+  - project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec
+  - components/benefit_sponsors/spec/dummy
 disable-default-queries: true
 packs:
   ruby:

@@ -91,7 +91,7 @@ module BenefitSponsors
         return true unless EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
         dep_relationship = hbx_enr_member.family_member.relationship
         return true unless  EnrollRegistry[market_key].setting(:relationship_kinds).item.include?(dep_relationship)
-        ::EnrollRegistry[:age_off_relaxed_eligibility] do
+        ::EnrollRegistry.lookup(:age_off_relaxed_eligibility) do
           {
             effective_on: effective_on,
             family_member: hbx_enr_member&.family_member,
