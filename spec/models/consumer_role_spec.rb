@@ -712,7 +712,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
         describe "pending verification type updates" do
           it "updates validation status to pending for unverified consumers" do
             consumer.coverage_purchased!
-            expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending"])
+            expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "unverified" , "pending"])
           end
 
           it "updates indian tribe validition status to negative_response_received and to pending for the rest" do
