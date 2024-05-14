@@ -27,7 +27,7 @@ RSpec.describe BenefitSponsors::Operations::EnrollmentEligibility::Create,
       }
     end
 
-    let(:result) { subject.call(params) }
+    let(:result) { subject.call(**params) }
 
     it "should be success" do
       expect(result.success?).to be_truthy

@@ -150,8 +150,7 @@ class HbxEnrollmentListSponsorCostCalculator
           eligible_child_care_subsidy: enrollment_record["hbx_enrollment"]["eligible_child_care_subsidy"].to_money
         })
       ::BenefitSponsors::Members::MemberGroup.new(
-        member_entries,
-        {group_enrollment: group_enrollment}
+        member_entries, group_enrollment: group_enrollment
       )
     end
   end
