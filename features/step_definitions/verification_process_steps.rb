@@ -44,9 +44,13 @@ And(/^the user is RIDP verified$/) do
   user.person.consumer_role.move_identity_documents_to_verified
 end
 
-And(/^the consumer has an outstanding Alive Status verification type$/) do
+And(/^the consumer's Alive Status is moved to outstanding$/) do
   alive_status = user.person.verification_type_by_name('Alive Status')
   alive_status.update(validation_status: 'outstanding')
+end
+
+And(/^the consumer's Alive Status is moved to verified$/) do
+  user.person.verification_type_by_name('Alive Status').pass_type
 end
 
 Then(/^the consumer visits verification page$/) do
@@ -110,7 +114,7 @@ Then(/^consumer should see Verification Due date label$/) do
   expect(page).to have_content('Due Date')
 end
 
-Then(/^the consumer should not see the Alive Status verification type$/) do
+Then(/^.+ should not see the Alive Status verification type$/) do
   expect(page).to_not have_content('Deceased') #should only display to consumer if 'outstanding'
 end
 

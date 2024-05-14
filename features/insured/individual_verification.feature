@@ -31,12 +31,10 @@ Scenario: Outstanding verification
     And the consumer is logged in
     And EnrollRegistry location_residency_verification_type feature is enabled
     And consumer has outstanding verification and unverified enrollments
-    And the consumer has an outstanding Alive Status verification type
     When the consumer visits verification page
     Then consumer should see Verification Due date label
     And consumer should see Documents We Accept link
     And the consumer should see documents verification page
-    And the consumer should see the Alive Status verification type
 
   Scenario: Consumer is fully_verified should see verification types
     Given a consumer exists
@@ -46,7 +44,6 @@ Scenario: Outstanding verification
     Then the consumer visits verification page
     And the consumer should see documents verification page
     Then verification types have to be visible
-    And the consumer should not see the Alive Status verification type
 
   Scenario: Consumer is from Curam and is fully verified and shows verification types as verified
     Given a consumer exists
@@ -95,10 +92,25 @@ Scenario: Outstanding verification
     When admin visits home page
     And Individual clicks on Documents link
     Then Individual should see cost saving documents for evidences
-    And the admin should see the Alive Status verification type
     And Individual clicks on Actions dropdown
     And Individual clicks on verify
     And Individual Selects Reason
     And Individual clicks on Actions dropdown
     And Individual clicks on view history
     Then Individual should see verification history timestamp
+
+  Scenario: Consumer and Admin viewing Alive Status verification type
+    Given a consumer exists
+    And the user is RIDP verified
+    And the consumer is logged in
+    And the consumer is completely verified
+    When the consumer visits verification page
+    Then the consumer should not see the Alive Status verification type
+    When the consumer's Alive Status is moved to outstanding
+    And the page is refreshed
+    Then the consumer should see the Alive Status verification type
+    When the consumer logs out
+    And the consumer's Alive Status is moved to verified
+    When an HBX admin exists
+    And clicks on the person in families tab
+    Then the admin should see the Alive Status verification type
