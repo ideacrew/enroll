@@ -34,7 +34,7 @@ module BenefitMarkets
         end
 
         def create_benefit_sponsor_catalog(bsc_params)
-          Create.new.call({sponsor_catalog_params: bsc_params})
+          ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Create.new.call(sponsor_catalog_params: bsc_params)
         end
 
         def init_benefit_sponsor_catalog(bsc_entity)
