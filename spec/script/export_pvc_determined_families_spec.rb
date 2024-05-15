@@ -115,8 +115,7 @@ describe 'export_rrv_families' do
     FactoryBot.create(
       :financial_assistance_application,
       submitted_at: yesterday,
-      family_id: family.id,
-      predecessor_id: BSON::ObjectId.new
+      family_id: family.id
     )
   end
 

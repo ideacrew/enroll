@@ -2,8 +2,8 @@
 
 # This script generates a CSV report with information about families with renewal determined applications for the assistance_year with no SSN applicants.
 
-# To run this on specific enrollments
-# bundle exec rails runner script/export_pvc_families.rb assistance_year='2023'
+# To run this for specific year
+# bundle exec rails runner script/export_pvc_families.rb assistance_year='2024'
 
 assistance_year = ENV['assistance_year'].to_i
 csr_list = [02, 04, 05, 06].freeze
@@ -39,7 +39,7 @@ CSV.open("export_pvc_determined_families_#{TimeKeeper.date_of_record.strftime('%
                                                             :aasm_state => 'determined',
                                                             :"applicants.is_ia_eligible" => true)
 
-    determined_application = applications.exists(:predecessor_id => true).max_by(&:submitted_at)
+    determined_application = applications.max_by(&:submitted_at)
     next if determined_application.blank?
 
     determined_application.active_applicants.each do |applicant|
