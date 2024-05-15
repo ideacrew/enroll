@@ -60,7 +60,7 @@ module Operations
         options[:configuration] = values[:evidence_configuration] if values[
           :evidence_configuration
         ]
-        BuildEvidence.new(options).call(
+        ::Operations::Eligible::BuildEvidence.new(**options).call(
           values.merge(evidence_record: evidence_record)
         )
       end

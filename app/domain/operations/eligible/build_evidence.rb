@@ -7,7 +7,7 @@ module Operations
   module Eligible
     # Operation to support eligibility creation
     class BuildEvidence
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:result, :do]
       include ::Operations::Eligible::EligibilityImport[
                 configuration: "evidence_defaults"
               ]
