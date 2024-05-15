@@ -6,9 +6,9 @@
 # bundle exec rails runner script/export_pvc_families.rb assistance_year='2024'
 
 assistance_year = ENV['assistance_year'].to_i
-csr_list = [100, 73, 87, 94].freeze
+csr_list = [02, 04, 05, 06].freeze
 
-family_ids = Family.with_active_coverage_and_aptc_csr_grants_for_year(assistance_year, csr_list).distinct(:_id)
+family_ids = Family.with_applied_aptc_or_csr_active_enrollments(csr_list).distinct(:_id)
 
 p "found #{family_ids.count} families"  unless Rails.env.test?
 

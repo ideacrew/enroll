@@ -52,7 +52,8 @@ describe 'export_rrv_families' do
                       enrollment_members: [primary_applicant],
                       effective_on: date.beginning_of_month,
                       family: family,
-                      aasm_state: :coverage_selected)
+                      aasm_state: :coverage_selected,
+                      applied_aptc_amount: 1000.00)
   end
   let!(:thh_start_on) { tax_household_current.effective_starting_on }
 
