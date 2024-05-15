@@ -215,6 +215,15 @@ class Family
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"_id".in => HbxEnrollment.enrolled_statuses.distinct(:family_id)) }
   scope :all_enrolled_and_renewal_enrollments, ->{  where(:"_id".in => HbxEnrollment.enrolled_and_renewal.distinct(:family_id)) }  # rubocop:disable Style/SymbolLiteral
+  scope :with_applied_aptc_or_csr_active_enrollments, lambda { |csr_list|
+    product_ids = BenefitMarkets::Products::Product.where(csr_variant_id: csr_list).pluck(:id)
+    enrollment_conditions = [
+      { :"applied_aptc_amount.cents".gt => 0 },
+      { :product_id.in => product_ids }
+    ]
+    family_ids = HbxEnrollment.enrolled_and_renewal.where('$or' => enrollment_conditions).distinct(:family_id)
+    where(:_id.in => family_ids)
+  }
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.by_writing_agent_id(broker_id).distinct(:family_id)) }
   scope :all_enrollments_by_benefit_group_ids,   ->(benefit_group_ids) { where(:"_id".in => HbxEnrollment.by_benefit_group_ids(benefit_group_ids).distinct(:family_id)) }
   scope :all_enrollments_by_benefit_sponsorship_id, ->(benefit_sponsorship_id){ where(:"_id".in => HbxEnrollment.by_benefit_sponsorship_id(benefit_sponsorship_id).distinct(:family_id))}
