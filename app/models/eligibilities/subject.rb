@@ -38,6 +38,22 @@ module Eligibilities
     def person
       ::Person.find(person_id)
     end
+
+    def subject_cv3_hash
+      eligibility_states_hash = eligibility_states.collect do |eligibility_state|
+        Hash[
+          eligibility_state.eligibility_item_key,
+          eligibility_state.eligibility_states_cv3_hash
+        ]
+      end.reduce(:merge)
+
+      subject_attributes = attributes.slice('first_name', 'last_name', 'encrypted_ssn', 'hbx_id',
+                                            'person_id', 'outstanding_verification_status', 'is_primary')
+      subject_attributes[:dob] = dob
+      subject_attributes[:eligibility_states] = eligibility_states_hash
+
+      subject_attributes
+    end
   end
 end
 
