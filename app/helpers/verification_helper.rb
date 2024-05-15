@@ -54,8 +54,10 @@ module VerificationHelper
   def can_display_type?(verif_type)
     return true unless verif_type.type_name == 'Alive Status'
     return false unless EnrollRegistry.feature_enabled?(:enable_alive_status)
-
     return true if current_user.has_hbx_staff_role?
+
+    previous_states = verif_type.type_history_elements.pluck(:from_validation_status).compact
+    return true if previous_states.include?('outstanding')
     return true if verif_type.validation_status == 'outstanding'
 
     false

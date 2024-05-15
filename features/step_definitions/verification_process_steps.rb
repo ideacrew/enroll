@@ -123,6 +123,7 @@ Then(/^.+ should not see the Alive Status verification type$/) do
 end
 
 Then(/^.+ should see the Alive Status verification type$/) do
+  binding.irb
   expect(page).to have_content('Deceased')
 end
 
