@@ -16,8 +16,7 @@ module FinancialAssistance
           include EventSource::Logging
           include FinancialAssistance::JobsHelper
 
-          # "02", "04", "05", "06" are already converted
-          PVC_CSR_LIST = [100, 73, 87, 94].freeze
+          PVC_CSR_LIST = ['02', '04', '05', '06'].freeze
 
           # @param [Int] assistance_year
           # @param [Array] csr_list
@@ -43,7 +42,7 @@ module FinancialAssistance
 
           def find_families(params)
             if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-              Family.with_active_coverage_and_aptc_csr_grants_for_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
+              Family.with_applied_aptc_or_csr_active_enrollments(params[:csr_list]).distinct(:_id)
             else
               Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
             end
