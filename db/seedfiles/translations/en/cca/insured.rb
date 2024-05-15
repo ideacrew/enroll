@@ -92,6 +92,8 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.consumer_roles.ridp_document_list.diploma' => "High school or college diploma (including high school equivalency diplomas)",
   :'en.insured.consumer_roles.ridp_document_list.deed' => "Property deed or title (including for a vehicle)",
   :'en.insured.consumer_roles.select_state' => "Select State",
+  :'en.insured.us_citizen' => "Is this person a US citizen or US national?",
+  :'en.insured.incarcerated' => "Is this person currently incarcerated?",
   :'en.insured.consumer_roles.tribe_name' => "Tribe Name",
   :'en.insured.consumer_roles.tribal_id' => "Tribal ID",
   :'en.insured.shared.race_ethicity_label' => "Race",
