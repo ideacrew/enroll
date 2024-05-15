@@ -17,7 +17,7 @@
         </li>
       </ul>
       <ul class="navbar-nav">
-        <li class="nav-item d-flex flex-column">
+        <li class="nav-item d-flex flex-column align-items-end">
           <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
           <% contact_center_short_number = EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>
           <a href="tel:<%= contact_center_short_number %>">
@@ -26,12 +26,16 @@
         </li>
         <% if signed_in? %>
           <li class="nav-item-divider"></li>
-          <li class="nav-item d-flex flex-column">
+          <li class="nav-item d-flex flex-column align-items-end">
             <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= l10n('layout.header.user_and_id', name: user_first_name_last_name_and_suffix, id: current_user.try(:person).try(:hbx_id)) %></span>
             <span class="horizontal-links">
               <%= render partial: "shared/my_portal_links" %>
-              <span><%= sanitize(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %></span>
-              <span><%= sanitize(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
+              <span>
+                <%= sanitize(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %>
+              </span>
+              <span>
+                <%= sanitize(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %>
+              </span>
             </span>
           </li>
         <% end %>
