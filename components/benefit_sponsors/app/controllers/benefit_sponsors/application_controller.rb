@@ -5,7 +5,7 @@ module BenefitSponsors
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
     before_action :set_last_portal_visited
-    include Pundit
+    include Pundit::Authorization
     include ::L10nHelper
     include ::FileUploadHelper
 

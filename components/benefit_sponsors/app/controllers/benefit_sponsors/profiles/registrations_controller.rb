@@ -7,7 +7,6 @@ module BenefitSponsors
     # This controller is responsible for creating/updating new broker agencies
     class RegistrationsController < ::BenefitSponsors::ApplicationController
       include BenefitSponsors::Concerns::ProfileRegistration
-      include Pundit
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
       # TODO: Let's just doo this for now

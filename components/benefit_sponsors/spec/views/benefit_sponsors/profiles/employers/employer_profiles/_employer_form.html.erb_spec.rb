@@ -8,7 +8,7 @@ class ApplicationHelperModStubber
   extend ::BenefitSponsors::Employers::EmployerHelper
 end
 
-RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", :type => :view, dbclean: :after_each do
+RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer_form", :type => :view, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include ::L10nHelper
 
@@ -71,7 +71,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
 
       sign_in(user_with_hbx_staff_role)
       mock_form = ActionView::Helpers::FormBuilder.new(:agency, agency, view, {})
-      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", locals: {f: mock_form }
+      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form", locals: {f: mock_form }
     end
 
     it "should view the subsidies form" do
@@ -101,7 +101,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
       allow(view).to receive(:employer_current_year_osse_status).and_return("Active for #{TimeKeeper.date_of_record}")
       sign_in(hbx_csr_tier1_user)
       mock_form = ActionView::Helpers::FormBuilder.new(:agency, agency, view, {})
-      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", locals: {f: mock_form }
+      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form", locals: {f: mock_form }
     end
 
     it "should view the subsidies form" do

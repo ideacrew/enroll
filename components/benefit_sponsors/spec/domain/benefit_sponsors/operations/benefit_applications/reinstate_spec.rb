@@ -80,7 +80,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
           initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           initial_application.terminate_enrollment!
-          @new_ba = subject.call({params: {benefit_application: initial_application}}).success
+          @new_ba = subject.call({ benefit_application: initial_application }).success
           @first_wfst = @new_ba.workflow_state_transitions.first
           @second_wfst = @new_ba.workflow_state_transitions.second
           census_employee.reload
@@ -148,7 +148,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       context 'reinstate retro active canceled benefit application' do
         before do
           initial_application.cancel!
-          @new_ba = subject.call({params: {benefit_application: initial_application}}).success
+          @new_ba = subject.call({ benefit_application: initial_application }).success
           @first_wfst = @new_ba.workflow_state_transitions.first
           @second_wfst = @new_ba.workflow_state_transitions.second
         end
@@ -189,7 +189,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           initial_application.aasm_state = :canceled
           initial_application.workflow_state_transitions.new(from_state: :active, to_state: :canceled)
           initial_application.save
-          @new_ba = subject.call({params: {benefit_application: initial_application}}).success
+          @new_ba = subject.call({ benefit_application: initial_application }).success
           @first_wfst = @new_ba.workflow_state_transitions.first
           @second_wfst = @new_ba.workflow_state_transitions.second
         end
@@ -230,7 +230,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           initial_application.schedule_enrollment_termination!
           period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
           initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
-          @new_ba = subject.call({params: {benefit_application: initial_application}}).success
+          @new_ba = subject.call({ benefit_application: initial_application }).success
         end
 
         it 'should return a success with a BenefitApplication' do
@@ -275,7 +275,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           initial_application.terminate_enrollment!
           period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
           initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
-          @result = subject.call({params: {benefit_application: initial_application}})
+          @result = subject.call({ benefit_application: initial_application })
         end
 
         it 'should return failure with a message' do
@@ -294,7 +294,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           initial_application.terminate_enrollment!
           period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
           initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
-          @result = subject.call({params: {benefit_application: initial_application}})
+          @result = subject.call({ benefit_application: initial_application })
         end
 
         it 'should return failure with a message' do
@@ -308,7 +308,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         min = TimeKeeper.date_of_record.prev_year.beginning_of_month
         initial_application.update_attributes!(aasm_state: :terminated, effective_period: min..(min.next_year.prev_day))
         initial_application.benefit_sponsor_catalog.update_attributes!(effective_period: min..(min.next_year.prev_day))
-        @result = subject.call({params: {benefit_application: initial_application}})
+        @result = subject.call({ benefit_application: initial_application })
       end
 
       it 'should return a failure with message' do
@@ -320,7 +320,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
   context 'failure' do
     context 'no params' do
       before do
-        @result = subject.call({params: {}})
+        @result = subject.call({})
       end
 
       it 'should return a failure with a message' do
@@ -330,7 +330,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
     context 'invalid params' do
       before do
-        @result = subject.call({params: {benefit_application: 'benefit_application'}})
+        @result = subject.call({ benefit_application: 'benefit_application' })
       end
 
       it 'should return a failure with a message' do
@@ -340,7 +340,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
     context "invalid benefit_application's aasm state" do
       before do
-        @result = subject.call({params: {benefit_application: initial_application}})
+        @result = subject.call({ benefit_application: initial_application })
       end
 
       it 'should return a failure with a message' do

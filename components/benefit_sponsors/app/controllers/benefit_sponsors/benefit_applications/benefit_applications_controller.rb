@@ -3,7 +3,6 @@ module BenefitSponsors
     # This controller is used to create and update benefit applications
     class BenefitApplicationsController < ::BenefitSponsors::ApplicationController
       layout "two_column"
-      include Pundit
       include HtmlScrubberUtil
 
       def new
