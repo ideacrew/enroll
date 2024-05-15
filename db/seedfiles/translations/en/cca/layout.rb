@@ -3,6 +3,13 @@ LAYOUT_TRANSLATIONS = {
   "en.layout.header.user_and_id" => "%{name} ID: %{id}",
   "en.layout.header.help" => "Help",
   "en.layout.header.logout" => "Logout",
+  "en.layout.header.role.admin" => "Admin",
+  "en.layout.header.role.broker" => "Broker",
+  "en.layout.header.role.trained_expert" => "Trained Expert",
+  "en.layout.header.role.general_agency" => "General Agency",
+  "en.layout.header.role.employer" => "Employer",
+  "en.layout.header.role.employee" => "Employee",
+  "en.layout.header.role.individual_and_family" => "Individual and Family",
   "en.layout.footer.all_rights" => "All Rights Reserved.",
   "en.layout.footer.get_help" => "Get Help",
 }
