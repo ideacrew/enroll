@@ -92,7 +92,7 @@ gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 2.6.0'
-gem 'roo',                      '~> 2.7.0'
+gem 'roo',                      '~> 2.10'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 2.0'
@@ -152,6 +152,7 @@ group :development, :test do
   gem 'stimulus_reflex_testing', '~> 0.3.0'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'pry-byebug'
 end
 
 group :test do

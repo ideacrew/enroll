@@ -7,8 +7,7 @@ module FinancialAssistance
   module Operations
     module Applicant
       class Delete
-        send(:include, Dry::Monads[:result, :do])
-        send(:include, Dry::Monads[:try])
+        include Dry::Monads[:do, :result, :try]
 
         def call(financial_applicant: , family_id: )
           values        = yield validate(financial_applicant)

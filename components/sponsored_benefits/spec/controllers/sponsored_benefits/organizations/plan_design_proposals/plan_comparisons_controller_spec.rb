@@ -29,7 +29,11 @@ module SponsoredBenefits
 
       before :each do
         sign_in user_with_broker_role
-        get :new, params: {plan_design_proposal_id: plan_design_proposal.id, sort_by: "", plans: [plans.first.id.to_s, plans.last.id.to_s], format: "js"}
+        get :new, params: {
+          plan_design_proposal_id: plan_design_proposal.id,
+          sort_by: '',
+          plans: [plans.first.id.to_s, plans.last.id.to_s]
+        }, xhr: true
       end
 
       it "should return success" do

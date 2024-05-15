@@ -1,5 +1,6 @@
 module CapybaraHelpers
   include HtmlScrubberUtil
+  include ::L10nHelper
 
   # Perform an action then wait for the page to reload before proceeding
   def wait_for_page_reload_until(timeout, slice_size = 0.2, &blk)
@@ -106,14 +107,6 @@ module CapybaraHelpers
         puts ele.obscured?.inspect
       end
       raise "Couldn't find tag.  Check output for matched elements."
-    end
-  end
-
-  def l10n(translation_key, interpolated_keys={})
-    begin
-      sanitize_html(I18n.t(translation_key, interpolated_keys.merge(raise: true)))
-    rescue I18n::MissingTranslationData
-      translation_key.gsub(/\W+/, '').titleize
     end
   end
 end
