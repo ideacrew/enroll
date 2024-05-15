@@ -16,7 +16,9 @@
               <% check_box_id = "contact_type_#{type_key}" %>
               <%= person_role.label(:contact_method, for: check_box_id) do %>
                 <div class="d-flex col-4 p-0 pr-3 align-items-center mb-2 option">
-                  <span class="mr-2 contact-method"><%= person_role.check_box(:contact_method, {checked: (contact_preferences_mapping || ConsumerRole::CONTACT_METHOD_MAPPING.invert)[person_role.object.contact_method].to_a.include?(type_string), multiple: true, id: check_box_id}, type_string, nil) %></span>
+                  <span class="mr-2 contact-method">
+                    <%= person_role.check_box(:contact_method, {checked: (contact_preferences_mapping || ConsumerRole::CONTACT_METHOD_MAPPING.invert)[person_role.object.contact_method].to_a.include?(type_string), multiple: true, id: check_box_id}, type_string, nil) %>
+                  </span>
                   <%= type_string %>
                 </div>
               <% end %>
@@ -27,7 +29,7 @@
           </div>
         </fieldset>
         <div class="col-sm-12 my-4 p-0">
-          <%= person_role.label :language_preference, l10n("Language Preference"), class:'personal_landing_page_label' %>
+          <%= person_role.label :language_preference, l10n("language_preference"), class:'personal_landing_page_label' %>
           <%= person_role.select :language_preference, options_for_select(EnrollRegistry[:state_based_language_preferences].item || ["English"], selected: person_role.object.language_preference), {prompt: 'Select communications language'}, class:"col-12 col-md-4" %>
         </div>
       </div>
