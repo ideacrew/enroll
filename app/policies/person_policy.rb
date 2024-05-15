@@ -6,7 +6,7 @@
 class PersonPolicy < ApplicationPolicy
   def initialize(user, record)
     super
-    @family = record.primary_family if record.is_a?(Person)
+    @family = (record.primary_family || record.families.first) if record.is_a?(Person)
   end
 
   # Is the given entity allowed to complete RIDP on behalf of a given
