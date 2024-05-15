@@ -64,7 +64,7 @@ module Exchanges
     end
 
     def expire_sep_type
-      @result = EnrollRegistry.lookup(:expire_sep_type) { {params: format_expire_sep_type(params)} }
+      @result = EnrollRegistry.lookup(:expire_sep_type) { format_expire_sep_type(params) }
       @row = params[:qle_action_id]
 
       if @result.failure?
@@ -80,14 +80,14 @@ module Exchanges
     def sep_types_dt
       @datatable = Effective::Datatables::SepTypeDataTable.new
       respond_to do |format|
-        format.html {  render '/exchanges/manage_sep_types/sep_type_datatable.html.erb', :layout => 'single_column'}
+        format.html { render '/exchanges/manage_sep_types/sep_type_datatable', :layout => 'single_column' }
       end
     end
 
     def sorting_sep_types
       @sortable = QualifyingLifeEventKind.all
       respond_to do |format|
-        format.html { render "/exchanges/manage_sep_types/sorting_sep_types.html.erb" }
+        format.html { render '/exchanges/manage_sep_types/sorting_sep_types' }
       end
     end
 

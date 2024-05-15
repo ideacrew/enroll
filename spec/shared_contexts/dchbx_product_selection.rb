@@ -120,31 +120,6 @@ RSpec.shared_context 'family with one member and one enrollment and one predeces
   end
 end
 
-RSpec.shared_context 'family with two members and one enrollment and one predecessor enrollment', :shared_context => :metadata do
-  include_context 'family with one member and one enrollment'
-
-  let!(:predecessor_enrollment) do
-    FactoryBot.create(:hbx_enrollment,
-                      product_id: predecessor_product.id,
-                      kind: 'individual',
-                      family: family,
-                      consumer_role_id: family.primary_person.consumer_role.id,
-                      effective_on: predecessor_bcp.start_on)
-  end
-
-  let!(:predecessor_enrollment_member) do
-    FactoryBot.create(:hbx_enrollment_member,
-                      hbx_enrollment: predecessor_enrollment,
-                      applicant_id: family_member.id)
-  end
-
-  let!(:predecessor_enrollment_member1) do
-    FactoryBot.create(:hbx_enrollment_member,
-                      hbx_enrollment: predecessor_enrollment,
-                      applicant_id: family_member1.id)
-  end
-end
-
 RSpec.shared_context 'family with two members and one enrollment and one predecessor enrollment with carrier switch', :shared_context => :metadata do
   include_context 'family with one member and one enrollment'
 

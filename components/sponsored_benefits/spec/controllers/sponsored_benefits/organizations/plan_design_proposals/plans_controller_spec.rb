@@ -25,7 +25,7 @@ module SponsoredBenefits
           selected_carrier_level: 'single_carrier',
           kind: 'health',
           carrier_id: carrier_profile_id,
-          active_year: TimeKeeper.date_of_record.year,
+          active_year: TimeKeeper.date_of_record.year
         }, xhr: true
       end
 

@@ -10,9 +10,11 @@ module Operations
       class Process
         include Config::SiteConcern
         include EventSource::Command
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:result, :do]
 
-        def call(new_date:, enrollment_query: nil)
+        def call(params)
+          new_date, enrollment_query = params.values_at(:new_date, :enrollment_query)
+
           yield can_process_event(new_date)
           shop_logger = yield initialize_logger("shop")
           query_criteria = yield shop_query_criteria(enrollment_query)

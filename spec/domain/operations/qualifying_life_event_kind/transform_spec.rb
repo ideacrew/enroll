@@ -13,7 +13,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
     context 'no end date' do
       before :each do
         qlek.update_attributes!(start_on: TimeKeeper.date_of_record - 20.days)
-        @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: ''})
+        @result = subject.call({ qle_id: qlek.id.to_s, end_on: '' })
       end
 
       it 'should return failure' do
@@ -27,7 +27,12 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
 
     context 'no start date' do
       before :each do
-        @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: (TimeKeeper.date_of_record - 20.days).strftime("%Y-%m-%d")})
+        @result = subject.call(
+          {
+            qle_id: qlek.id.to_s,
+            end_on: (TimeKeeper.date_of_record - 20.days).strftime("%Y-%m-%d")
+          }
+        )
       end
 
       it 'should return failure' do
@@ -45,7 +50,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
                                 start_on: (TimeKeeper.date_of_record - 10.days),
                                 end_on: (TimeKeeper.date_of_record - 9.days))
         @end_on = TimeKeeper.date_of_record - 20.days
-        @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: @end_on.strftime("%Y-%m-%d")})
+        @result = subject.call({ qle_id: qlek.id.to_s, end_on: @end_on.strftime("%Y-%m-%d") })
         qlek.reload
       end
 
@@ -64,7 +69,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
                                 start_on: (TimeKeeper.date_of_record - 10.days),
                                 end_on: (TimeKeeper.date_of_record - 4.days))
         @end_on = TimeKeeper.date_of_record - 3.days
-        @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: @end_on.strftime("%Y-%m-%d")})
+        @result = subject.call({ qle_id: qlek.id.to_s, end_on: @end_on.strftime("%Y-%m-%d") })
         qlek.reload
       end
 
@@ -84,7 +89,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
                                 start_on: TimeKeeper.date_of_record.beginning_of_month,
                                 end_on: TimeKeeper.date_of_record.end_of_month)
         @end_on = TimeKeeper.date_of_record.next_month.beginning_of_month
-        @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: @end_on.strftime("%Y-%m-%d")})
+        @result = subject.call({ qle_id: qlek.id.to_s, end_on: @end_on.strftime("%Y-%m-%d") })
         qlek.reload
       end
 
@@ -103,7 +108,12 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
       qlek.update_attributes!(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
-      @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: (TimeKeeper.date_of_record + 20.days).strftime("%Y-%m-%d")})
+      @result = subject.call(
+        {
+          qle_id: qlek.id.to_s,
+          end_on: (TimeKeeper.date_of_record + 20.days).strftime("%Y-%m-%d")
+        }
+      )
       qlek.reload
     end
 
@@ -125,7 +135,12 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
       qlek.update_attributes!(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
-      @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d")})
+      @result = subject.call(
+        {
+          qle_id: qlek.id.to_s,
+          end_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d")
+        }
+      )
       qlek.reload
     end
 
@@ -148,7 +163,13 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
       qlek.update_attributes!(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
-      @result = subject.call(params: {qle_id: qlek.id.to_s, updated_by: user.id, end_on: (TimeKeeper.date_of_record - 1.day).strftime("%Y-%m-%d")})
+      @result = subject.call(
+        {
+          qle_id: qlek.id.to_s,
+          updated_by: user.id,
+          end_on: (TimeKeeper.date_of_record - 1.day).strftime("%Y-%m-%d")
+        }
+      )
       qlek.reload
     end
 

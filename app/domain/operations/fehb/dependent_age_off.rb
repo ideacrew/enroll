@@ -10,7 +10,9 @@ module Operations
       include Config::SiteConcern
       send(:include, Dry::Monads[:result, :do])
 
-      def call(new_date:, enrollment: nil)
+      def call(params)
+        new_date, enrollment = params.values_at(:new_date, :enrollment)
+
         yield can_process_event(new_date)
         fehb_logger = yield initialize_logger("fehb")
         query_criteria = yield fehb_query_criteria(enrollment)

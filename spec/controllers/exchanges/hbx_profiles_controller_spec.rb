@@ -73,7 +73,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it "should render json template" do
-      get :binder_index_datatable, {format: :json}
+      get :binder_index_datatable, params: { format: :json }
       expect(response).to render_template("exchanges/hbx_profiles/binder_index_datatable")
     end
 
