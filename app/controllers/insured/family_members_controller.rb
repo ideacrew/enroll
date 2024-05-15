@@ -133,6 +133,8 @@ class Insured::FamilyMembersController < ApplicationController
     authorize @family, :show?
 
     set_view_person
+
+    @bs4 = true if params[:bs4] === "true"
     respond_to do |format|
       format.html
       format.js
@@ -145,6 +147,8 @@ class Insured::FamilyMembersController < ApplicationController
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
     set_view_person
+
+    @bs4 = true if params[:bs4] === "true"
     respond_to do |format|
       format.html
       format.js
@@ -156,6 +160,8 @@ class Insured::FamilyMembersController < ApplicationController
 
     @dependent.skip_consumer_role_callbacks = true
     @address_errors = validate_address_params(params)
+
+    @bs4 = true if params[:bs4] === "true"
 
     if @dependent.family_member.try(:person).present? && @dependent.family_member.try(:person).is_resident_role_active?
       if @address_errors.blank? && @dependent.update_attributes(params[:dependent])

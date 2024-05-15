@@ -4,7 +4,7 @@
   <%= render partial: 'shared/plan_shopping_progress', locals: current_progress %>
 
   <%# Main Content (right) %>
-  <div id="choose_coverage_page" class="container">
+  <div id="choose_coverage_page">
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <%= hidden_field_tag(:ivl_effective_on, @ivl_effective_on) %>
       <%= hidden_field_tag(:shop_effective_on, @shop_effective_on) %>
@@ -109,19 +109,8 @@
       </div>
 
       <div id="plan-shopping-page-navigation-buttons" class="d-flex flex-column flex-md-row mt-4" >
-        <%# prev button %>
-        <%= link_to l10n("previous_step"), family_account_path, class: 'button outline btn btn-default mb-2 mr-md-2' %>
-
-        <%# next button %>
-        <% if @change_plan.present? %>
-          <%= hidden_field_tag 'change_plan', @change_plan %>
-          <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%>
-
-          <%= submit_tag l10n('continue_next'), class: 'btn btn-primary mb-2' + pundit_class(Family, :updateable?) %>
-          <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
-            <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary mb-2' + pundit_class(Family, :updateable?)  %>
-          <% end %>
-        <% end %>
+        <%= render partial: "shared/progress_navigation_buttons", locals: { previous_style: "outline",
+          dont_show_next_button: !@change_plan.present?, button_type: "submit" } %>
       </div>
 
     <% end %>

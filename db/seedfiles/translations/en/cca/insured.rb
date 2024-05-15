@@ -155,6 +155,8 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.self' => "Self",
   :'en.insured.families.add_or_remove_family_html' => "You have added/removed a family member to your profile. <br>You may qualify for a special enrollment period.",
   :'en.add_member' => "Add Member",
+  :'en.person' => "Person",
+  :'en.ageoff_exclusion' => "Ageoff Exclusion",
   :'en.choose_files' => "Choose Files",
   :'en.upload' => "Upload",
   :'en.accept' => "Accept",

@@ -178,6 +178,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.families.add_or_remove_family_html' => "You have added/removed a family member to your profile. <br>You may qualify for a special enrollment period.",
   :'en.insured.employee_roles.matched_other_account' => "%{first_name} %{last_name} is already affiliated with another account",
   :'en.add_member' => "Add Member",
+  :'en.person' => "Person",
+  :'en.ageoff_exclusion' => "Ageoff Exclusion",
   :'en.choose_files' => "Choose Files",
   :'en.upload' => "Upload",
   :'en.accept' => "Accept",

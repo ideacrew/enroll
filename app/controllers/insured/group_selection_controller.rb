@@ -6,8 +6,8 @@ class Insured::GroupSelectionController < ApplicationController
 
 
   layout 'progress', only: [:new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-
   before_action :set_bs4_layout, only: [:new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
