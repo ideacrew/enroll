@@ -53,6 +53,8 @@ module VerificationHelper
   # but should only display for consumers/brokers/broker agency staff if the validation_status is 'outstanding'
   def can_display_type?(verif_type)
     return true unless verif_type.type_name == 'Alive Status'
+    return false unless EnrollRegistry.feature_enabled?(:enable_alive_status)
+
     return true if current_user.has_hbx_staff_role?
     return true if verif_type.validation_status == 'outstanding'
 
