@@ -16,7 +16,7 @@ module FinancialAssistance
           include EventSource::Logging
           include FinancialAssistance::JobsHelper
 
-          PVC_CSR_LIST = [02, 04, 05, 06].freeze
+          PVC_CSR_LIST = ['02', '04', '05', '06'].freeze
 
           # @param [Int] assistance_year
           # @param [Array] csr_list
