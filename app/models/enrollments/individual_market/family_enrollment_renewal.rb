@@ -285,7 +285,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     return true if member.family_member.age_off_excluded
 
     if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
-      dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
+      dependent_coverage_eligible = ::EnrollRegistry.lookup(:age_off_relaxed_eligibility) do
         {
           effective_on: renewal_coverage_start,
           family_member: member&.family_member,

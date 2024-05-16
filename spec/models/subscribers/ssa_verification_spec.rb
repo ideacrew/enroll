@@ -42,7 +42,7 @@ describe Subscribers::SsaVerification do
         person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.verification_types.active.map(&:type_history_elements).map(&:count)).to eq [0, 1, 1]
+        expect(person.verification_types.active.map(&:type_history_elements).map(&:count)).to eq [0, 1, 0, 1]
       end
 
       it "stores reference to EventResponse in verification history element" do
