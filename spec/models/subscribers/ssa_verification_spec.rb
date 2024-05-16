@@ -30,6 +30,10 @@ describe Subscribers::SsaVerification do
     end
 
     context "stores SSA response in verification history" do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:enable_alive_status).and_return(true)
+      end
+
       it "stores verification history element" do
         person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)

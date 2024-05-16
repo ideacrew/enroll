@@ -596,6 +596,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     shared_examples_for "admin actions dropdown list" do |type, status, state, actions|
       before do
         allow(helper).to receive(:verification_type_status).and_return status
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:enable_alive_status).and_return(true)
       end
       it "returns admin actions array" do
         person.consumer_role.update_attributes(aasm_state: "#{state}")
