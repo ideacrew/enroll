@@ -150,27 +150,110 @@ module Effective
         (1..fte_max_count).include?(benefit_application.fte_count) && benefit_application.sponsor_profile.is_primary_office_local?
       end
 
+      def cast_benefit_sponsorship_filter_employers(params, current_scope)
+        case params[:employers].to_s
+        when 'benefit_sponsorship_applicant'
+          current_scope.benefit_sponsorship_applicant
+        when 'benefit_application_enrolling'
+          current_scope.benefit_application_enrolling
+        when 'benefit_application_enrolled'
+          current_scope.benefit_application_enrolled
+        when 'employer_attestations'
+          current_scope.employer_attestations
+        else
+          current_scope
+        end
+      end
+
+      def cast_benefit_sponsorship_filter_enrolling_initial(params, current_scope)
+        case params[:enrolling_initial].to_s
+        when 'benefit_application_pending'
+          current_scope.benefit_application_pending
+        when 'benefit_application_enrolling_initial_oe'
+          current_scope.benefit_application_enrolling_initial_oe
+        when 'benefit_application_initial_binder_paid'
+          current_scope.benefit_application_initial_binder_paid
+        when 'benefit_application_initial_binder_pending'
+          current_scope.benefit_application_initial_binder_pending
+        else
+          current_scope
+        end
+      end
+
+      def cast_benefit_sponsorship_filter_enrolling_renewing(params, current_scope)
+        case params[:enrolling_renewing].to_s
+        when 'benefit_application_renewal_pending'
+          current_scope.benefit_application_renewal_pending
+        when 'benefit_application_enrolling_renewing_oe'
+          current_scope.benefit_application_enrolling_renewing_oe
+        else
+          current_scope
+        end
+      end
+
+      def cast_benefit_sponsorship_filter_enrolling(params, current_scope)
+        case params[:enrolling].to_s
+        when 'benefit_application_enrolling_initial'
+          current_scope.benefit_application_enrolling_initial
+        when 'benefit_application_enrolling_renewing'
+          current_scope.benefit_application_enrolling_renewing
+        when 'benefit_application_enrolling'
+          current_scope.benefit_application_enrolling
+        else
+          current_scope
+        end
+      end
+
+      def cast_benefit_sponsorship_filter_enrolled(params, current_scope)
+        case params[:enrolled].to_s
+        when 'benefit_application_enrolled'
+          current_scope.benefit_application_enrolled
+        when 'benefit_application_suspended'
+          current_scope.benefit_application_suspended
+        else
+          current_scope
+        end
+      end
+
+      def cast_benefit_sponsorship_filter_employer_attestations(params, current_scope)
+        case params[:employer_attestations].to_s
+        when 'submitted'
+          current_scope.submitted
+        when 'pending'
+          current_scope.pending
+        when 'approved'
+          current_scope.approved
+        when 'denied'
+          current_scope.denied
+        else
+          current_scope
+        end
+      end
+
+      def enrolling_otherwise_specified?(params)
+        params[:enrolling_initial].present? && params[:enrolling_initial] == 'all' || params[:enrolling_renewing].present? && params[:enrolling_renewing] == 'all'
+      end
+
       def collection
         return @employer_collection if defined? @employer_collection
 
         benefit_sponsorships ||= BenefitSponsors::BenefitSponsorships::BenefitSponsorship.unscoped
 
         if attributes[:employers].present? && !['all'].include?(attributes[:employers])
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:employers]) if employer_kinds.include?(attributes[:employers])
+          benefit_sponsorships = cast_benefit_sponsorship_filter_employers(attributes, benefit_sponsorships)
 
           if attributes[:enrolling].present?
+            benefit_sponsorships = cast_benefit_sponsorship_filter_enrolling(attributes, benefit_sponsorships) if enrolling_otherwise_specified?(attributes)
             if attributes[:enrolling_initial].present? || attributes[:enrolling_renewing].present?
-              benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present? && attributes[:enrolling_initial] != 'all'
-              benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present? && attributes[:enrolling_renewing] != 'all'
-              benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling]) if attributes[:enrolling_initial].present? && attributes[:enrolling_initial] == 'all' || attributes[:enrolling_renewing].present? && attributes[:enrolling_renewing] == 'all'
+              benefit_sponsorships = cast_benefit_sponsorship_filter_enrolling_initial(attributes, benefit_sponsorships)
+              benefit_sponsorships = cast_benefit_sponsorship_filter_enrolling_renewing(attributes, benefit_sponsorships)
             else
-              benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling])
+              benefit_sponsorships = cast_benefit_sponsorship_filter_enrolling(attributes, benefit_sponsorships)
             end
           end
 
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolled]) if attributes[:enrolled].present?
-          benefit_sponsorships = benefit_sponsorships.send(attributes[:employer_attestations]) if attributes[:employer_attestations].present?
-
+          benefit_sponsorships = cast_benefit_sponsorship_filter_enrolled(attributes, benefit_sponsorships)
+          benefit_sponsorships = cast_benefit_sponsorship_filter_employer_attestations(attributes, benefit_sponsorships)
 
           if attributes[:upcoming_dates].present?
             if date = Date.strptime(attributes[:upcoming_dates], "%m/%d/%Y")

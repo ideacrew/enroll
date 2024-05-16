@@ -12,20 +12,6 @@ paths-ignore:
   - codeql
   - project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec
   - components/benefit_sponsors/spec/dummy
-disable-default-queries: true
 packs:
   ruby:
     - codeql/ruby-queries
-query-filters:
-  - exclude:
-     id: rb/csrf-protection-disabled
-  - exclude:
-     id: rb/csrf-protection-not-enabled
-  - exclude:
-     id: rb/incomplete-hostname-regexp
-  - exclude:
-     id: rb/redos
-  - exclude:
-     id: rb/reflected-xss
-  - exclude:
-     id: rb/regexp-injection

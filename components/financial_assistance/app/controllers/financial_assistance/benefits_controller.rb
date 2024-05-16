@@ -16,7 +16,10 @@ module FinancialAssistance
 
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance_nav'
+
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance_nav' }
+      end
     end
 
     def new
@@ -26,10 +29,15 @@ module FinancialAssistance
 
       load_steps
       current_step
-      render 'workflow/step', layout: 'financial_assistance_nav'
+
+      respond_to do |format|
+        format.html { render 'workflow/step', layout: 'financial_assistance_nav' }
+      end
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+      raise ActionController::UnknownFormat unless request.format.js? || request.format.html?
+
       authorize @model, :step?
 
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
@@ -63,6 +71,8 @@ module FinancialAssistance
     end
 
     def create
+      raise ActionController::UnknownFormat unless request.format.js? || request.format.html?
+
       format_date(params)
       @benefit = @applicant.benefits.build permit_params(params[:benefit])
       authorize @benefit, :create?
@@ -83,9 +93,13 @@ module FinancialAssistance
       authorize @benefit, :update?
 
       if @benefit.update_attributes permit_params(params[:benefit])
-        render :update, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
+        respond_to do |format|
+          format.js { render :update, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] } }
+        end
       else
-        render head: 'ok'
+        respond_to do |format|
+          format.js { render head: 'ok' }
+        end
       end
     end
 

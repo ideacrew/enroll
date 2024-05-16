@@ -628,7 +628,7 @@ class HbxEnrollment
     # SHOP: Implement if we have requirement from buiness, event need to happen after cancel in shop.
     # IVL: cancel renewals on cancelling active coverage.
     return if is_shop?
-    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
+    ::EnrollRegistry.lookup(:cancel_renewals_for_term) { {hbx_enrollment: self} }
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)

@@ -11,7 +11,16 @@ module EnrollRegistryPolicySettings
   end
 end
 
+# Syntax compatible methods for github CodeQL.  It currently can't parse code of the form:
+# ::EnrollRegistry[:aca_fehb_dependent_age_off] { { new_date: dao_date, enrollment: enrollment } }
+module EnrollSyntaxCompatibleRegistryMethods
+  def lookup(key, &blk)
+    self.[](key, &blk)
+  end
+end
+
 EnrollRegistry.extend(EnrollRegistryPolicySettings)
+EnrollRegistry.extend(EnrollSyntaxCompatibleRegistryMethods)
 
 EnrollRegistry.configure do |config|
   config.name       = :enroll
