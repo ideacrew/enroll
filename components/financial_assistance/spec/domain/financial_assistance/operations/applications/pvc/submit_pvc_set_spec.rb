@@ -64,7 +64,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
 
-    allow(Family).to receive(:with_active_coverage_and_aptc_csr_grants_for_year).and_return([family.id])
+    allow(Family).to receive(:with_applied_aptc_or_csr_active_enrollments).and_return([family.id])
   end
 
   context 'success' do
