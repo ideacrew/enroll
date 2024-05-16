@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1, show_help_button: true} %>
   <div id="new_person_wrapper">
     <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
     <% if current_user.has_hbx_staff_role? %>

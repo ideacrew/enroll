@@ -29,6 +29,11 @@ module NavigationHelper
     return true if controller_name == "family_members" && action_name == "index"
   end
 
+  def local_assigned_boolean(local, default)
+    return default unless local
+    local == "true"
+  end
+
   def sign_up_nav_options
     [
       {step: 1, label: l10n('personal_information')},
