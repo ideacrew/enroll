@@ -163,6 +163,7 @@ group :test do
 
   ## Verify Rails 5 eliminates need for this gem with MongoDB
   gem 'database_cleaner-mongoid',     '~> 2.0', '>= 2.0.1'
+  gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
