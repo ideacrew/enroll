@@ -265,7 +265,7 @@ ul.progress-wrapper li:last-child .vertical-line-progress {
 ul.list-right-section {
   padding: 0 10px;
 }
-ul.list-right-section li:not(:last-of-type) {
+ul.list-right-section li {
   margin-bottom: $spacer;
 }
 
