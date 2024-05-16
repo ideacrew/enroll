@@ -53,7 +53,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       #              can't accept a password with a standard hash.
       session["stashed_password"] = sign_up_params["password"]
       if resource.active_for_authentication?
-        set_flash_message :notice, @bs4 ? :signed_up_bs4 : :signed_up, site_name: EnrollRegistry[:enroll_app].setting(:short_name).item if is_flashing_format?
+        set_sign_up_warning
         sign_up(resource_name, resource)
         location = after_sign_in_path_for(resource)
         flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
@@ -123,6 +123,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # def after_inactive_sign_up_path_for(resource)
   #   super(resource)
   # end
+
+  def set_sign_up_warning
+    return unless is_flashing_format?
+    set_flash_message :notice, @bs4 ? :signed_up_bs4 : :signed_up, site_name: EnrollRegistry[:enroll_app].setting(:short_name).item
+  end
 
   def enable_bs4_layout
     @bs4 = true
