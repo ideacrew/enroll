@@ -26,9 +26,9 @@
             </button>
         <% else %>
             <% if run_person_validations.present? %>
-            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'continue_button')" id="continue_button" class="btn" onkeydown="handleButtonKeyDown(event, 'continue_button');" onclick="PersonValidations.manageRequiredValidations($(this));">
+            <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'continue_button')" id="continue_button" class="btn interaction-click-control-continue" onkeydown="handleButtonKeyDown(event, 'continue_button');" onclick="PersonValidations.manageRequiredValidations($(this));">
                 <%= l10n("continue_next") %>
-            </span>
+            </button>
             <button class="btn interaction-click-control-continue hidden" type="submit">
                 <%= l10n("continue_next") %>
             </button>
