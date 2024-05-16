@@ -7,6 +7,7 @@
     <%= f.radio_button :is_applying_coverage, false, class: "required floatlabel", id: 'is_applying_coverage_false', checked: second_checked %>
     <span class="yes_no_pair"><%= l10n("no") %></span>
   </label>
+  <a href="#is_applying_coverage" data-toggle="modal" data-target="#is_applying_coverage" class="d-block"><%= l10n("not_sure") %></a>
   <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_coverage"} %>
 <% else %>
   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd">
