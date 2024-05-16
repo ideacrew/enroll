@@ -50,7 +50,7 @@ class GroupSelectionEligibilityChecker
     market_key = @sponsored_benefit.reference_product.benefit_market_kind == :aca_shop ? :aca_shop_dependent_age_off : :aca_fehb_dependent_age_off
     if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
       return false unless EnrollRegistry[market_key].setting(:relationship_kinds).item.include?(rel)
-      dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
+      dependent_coverage_eligible = ::EnrollRegistry.lookup(:age_off_relaxed_eligibility) do
         {
           effective_on: coverage_date,
           family_member: family_member,

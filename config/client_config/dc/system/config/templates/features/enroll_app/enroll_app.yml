@@ -904,4 +904,7 @@ registry:
         settings:
           - key: :show_warnings
             item: <%= ENV['SHOW_JQUERY_MIGRATE_WARNINGS'] || true %>
+      - key: :enable_alive_status
+        item: :enable_alive_status
+        is_enabled: <%= ENV['ENABLE_ALIVE_STATUS'] || false %>
 
