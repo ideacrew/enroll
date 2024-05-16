@@ -392,8 +392,8 @@ var PersonValidations = (function (window, undefined) {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
     if (!document.getElementById('dependent_ul') && immigration_field) {
-      var us_citizen = document.getElementById('person_us_citizen_false').checked || document.getElementById('us_citizen_false');
-      var naturalized_citizen = document.getElementById('person_naturalized_citizen_true').checked || document.getElementById('naturalized_citizen_true');
+      var us_citizen = document.getElementById('person_us_citizen_false') || document.getElementById('us_citizen_false');
+      var naturalized_citizen = document.getElementById('person_naturalized_citizen_true') || document.getElementById('naturalized_citizen_true');
       return ( us_citizen.checked || naturalized_citizen.checked );
     } else if (immigration_field) {
       return (
