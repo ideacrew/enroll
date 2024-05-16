@@ -623,14 +623,14 @@ var PersonValidations = (function (window, undefined) {
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email').prop('checked')) {
+      if ($('#contact_type_email').prop('checked')) {
         if (!$('#person_emails_attributes_0_address').val()) {
           alert('You must enter an email address to receive notices and updates by email.');
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
 
-      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text').prop('checked')) {
+      if ($('#contact_type_text').prop('checked')) {
         if (document.querySelector('.mobile-phone-number').value.length < 1) {
           alert('You must enter a mobile phone number to receive notices and updates by text.');
           PersonValidations.restoreRequiredAttributes(e);
