@@ -15,7 +15,6 @@
   <% unless dont_show_prev_button || @no_previous_button %>
     <a id="previous_button" class="back button mr-2 <%= previous_style %>" href="#"><%= l10n("previous_step") %></a>
   <% end %>
-
   <% unless dont_show_next_button %>
     <% if confirmation_link %>
       <%= h(link_to l10n("confirm"), checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-primary btn-block disabled", id: 'continue_button', method: :post, disabled: !@enrollable) %>
@@ -37,6 +36,3 @@
     <% end %>
   <% end %>
 </div>
-
-
-<%# <input type="submit" name="commit" value="Continue to Next Step" class="btn btn-primary mb-2"> %>
