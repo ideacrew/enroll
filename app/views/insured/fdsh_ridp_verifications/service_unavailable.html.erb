@@ -2,10 +2,10 @@
   <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 2} %>
   <h1><%= l10n('insured.interactive_identity_verifications.service_unavailable.try_again_later') %></h1>
   <div class="mt-4 mb-4">
-    <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+    <%= render partial: 'insured/fdsh_ridp_verifications/options_to_verify_identity' %>
     <%= render partial: 'shared/application_types_list' %>
     <div class="outstanding-ridp-documents">
-      <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
+      <%= render partial: 'insured/fdsh_ridp_verifications/outstanding_ridp_documents' %>
     </div>
   </div>
   <% redirect_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: @person.consumer_role.id) %>
