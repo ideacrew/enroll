@@ -59,11 +59,12 @@
                 </ul>
               </nav>
               <%= render partial: 'shared/shopping_nav_panel',
-                  locals: { show_exit_button: !@no_save_button && step < 6,
-                            show_previous_button: !@no_previous_button && ![1,6].include?(step),
-                            show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
-                            is_complete: step == 6,
-                            show_help_button: step != 1 && step < 6 } %>
+                  locals: { show_exit_button: content_for?(:show_exit_button) ? yield(:show_exit_button) : false,
+                            show_previous_button: content_for?(:show_previous_button) ? yield(:show_previous_button) : false,
+                            show_account_button: content_for?(:show_account_button) ? yield(:show_account_button) : false,
+                            is_complete: content_for?(:is_complete) ? yield(:is_complete) : false,
+                            show_help_button: content_for?(:show_help_button) ? yield(:show_help_button) : false,
+                            back_to_account_flag: content_for?(:back_to_account_flag) ? yield(:back_to_account_flag) : EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
             </div>
             <div class="col-sm-12 col-md-12 col-lg-9 pl-4">
               <% if content_for? :content %>
