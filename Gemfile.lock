@@ -2353,7 +2353,7 @@ GEM
       jquery-rails (>= 3.0)
       rails (>= 5.2)
       sass-rails (>= 4.0)
-    redis (4.5.1)
+    redis (4.8.1)
     redis-actionpack (5.4.0)
       actionpack (>= 5, < 8)
       redis-rack (>= 2.1.0, < 4)
@@ -2370,8 +2370,8 @@ GEM
       redis-actionpack (>= 5.0, < 6)
       redis-activesupport (>= 5.0, < 6)
       redis-store (>= 1.2, < 2)
-    redis-store (1.8.2)
-      redis (>= 4, < 5)
+    redis-store (1.10.0)
+      redis (>= 4, < 6)
     regexp_parser (1.8.2)
     responders (3.1.1)
       actionpack (>= 5.2)
@@ -2688,6 +2688,7 @@ DEPENDENCIES
   recurring_select
   redis (~> 4.0)
   redis-rails (~> 5.0.2)
+  redis-store (~> 1.10)
   resource_registry!
   resque (~> 2.6.0)
   roo (~> 2.10)
