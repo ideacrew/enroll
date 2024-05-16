@@ -5,7 +5,7 @@ require "rails_helper"
 module Operations
   RSpec.describe SendTaxFormNoticeAlert do
     subject do
-      described_class.new.call(params)
+      described_class.new.call(**params)
     end
 
     let(:person) { FactoryBot.create(:person) }

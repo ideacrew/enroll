@@ -7,7 +7,7 @@ module Operations
   module TaxHouseholdGroups
     # this operation is to end current taxhouseholdgroups
     class Deactivate
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
       DEACTIVATE_ACTION_TYPES = ['current_only', 'current_and_prospective'].freeze
 
       def call(params)

@@ -7,7 +7,7 @@ module Operations
   module Eligible
     # Operation to migrate benefit sponsor catalog
     class MigrateBenefitSponsorCatalog
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to migrate benefit sponsor catalog
       # @option opts [<String>]   :sponsorship_id required

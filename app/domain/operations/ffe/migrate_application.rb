@@ -14,8 +14,7 @@ module Operations
   module Ffe
     # operation to transform mcr data to enroll format
     class MigrateApplication
-      send(:include, Dry::Monads[:result, :do])
-      send(:include, Dry::Monads[:try])
+      include Dry::Monads[:do, :result, :try]
 
       # @param [ Hash] mcr_application_payload to transform
       # @return [ Hash ] family_hash

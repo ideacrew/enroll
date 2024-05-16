@@ -7,7 +7,7 @@ module Operations
   module Families
     # Operation to hire broker agency for a given family.
     class HireBrokerAgency
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(params)
         valid_params = yield validate(params)

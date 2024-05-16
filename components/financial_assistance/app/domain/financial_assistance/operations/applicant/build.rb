@@ -7,7 +7,7 @@ module FinancialAssistance
   module Operations
     module Applicant
       class Build
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ Hash ] params Applicant Attributes
         # @return [FinancialAssistance::Entities::Applicant ] applicant Applicant

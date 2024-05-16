@@ -7,7 +7,7 @@ module Operations
   module HbxEnrollments
     # FindIssuerProfile
     class FindIssuerProfile
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(query_hash)
         q_hash = yield validate(query_hash)

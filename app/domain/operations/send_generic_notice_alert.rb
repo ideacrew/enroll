@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   class SendGenericNoticeAlert
-    send(:include, Dry::Monads[:result, :do, :try])
+    include Dry::Monads[:do, :result]
 
     include Config::SiteHelper
 

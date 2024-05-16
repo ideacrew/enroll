@@ -6,10 +6,7 @@ module Eligibilities
     class Subject
       include Mongoid::Document
       include Mongoid::Timestamps
-      # include ::EventSource::Command
-      # include Dry::Monads[:result, :do, :try]
       include GlobalID::Identification
-      # include Eligibilities::Eventable
 
       embedded_in :grant, class_name: "::Eligibilities::Osse::Grant"
 

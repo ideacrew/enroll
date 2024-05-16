@@ -9,7 +9,7 @@ module SponsoredBenefits
       module BqtOsseEligibilities
         # Operation to support eligibility creation
         class CreateBqtOsseEligibility
-          send(:include, Dry::Monads[:result, :do])
+          include Dry::Monads[:do, :result]
 
           attr_reader :subject
 

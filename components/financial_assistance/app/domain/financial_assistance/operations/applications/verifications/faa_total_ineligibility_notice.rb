@@ -9,7 +9,7 @@ module FinancialAssistance
       module Verifications
           # publishing request for FAA Total Ineligibility Notice
         class FaaTotalIneligibilityNotice
-          send(:include, Dry::Monads[:result, :do, :try])
+          include Dry::Monads[:do, :result]
           include EventSource::Command
 
           def call(payload)

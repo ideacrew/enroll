@@ -8,7 +8,7 @@ module Operations
     module SugarCrm
       # Class for publishing the results of updated families to Sugar CRM, if enabled
       class PublishFamily
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
         include Dry::Monads[:result, :do]
         include EventSource::Command
         include EventSource::Logging

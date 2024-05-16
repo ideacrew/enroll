@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
     # get active enrollments based on family_ids, aasm_state, market kind && coverage kind.
   class FetchExistingCoverage
-    send(:include, Dry::Monads[:result, :do])
+    include Dry::Monads[:do, :result]
 
     def call(params)
       values               =  yield validate(params)

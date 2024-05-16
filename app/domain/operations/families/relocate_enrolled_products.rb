@@ -7,7 +7,7 @@ module Operations
   module Families
     # RelocateEnrolledProducts is a service class that will be used to relocate enrolled products for a given person, new address and existing coverage
     class RelocateEnrolledProducts
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       EVENT_OUTCOME_MAPPING = {:service_area_changed => "product_service_area_relocated",
                                :rating_area_changed => "premium_rating_area_relocated",

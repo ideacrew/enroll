@@ -9,7 +9,7 @@ module FinancialAssistance
       module MedicaidGateway
         # Publish class will build event and publish the payload for a MEC check
         class PublishMecCheck
-          send(:include, Dry::Monads[:result, :do, :try])
+          include Dry::Monads[:do, :result, :try]
           include EventSource::Command
 
           def call(payload, payload_type, transmittable_message_id = nil)

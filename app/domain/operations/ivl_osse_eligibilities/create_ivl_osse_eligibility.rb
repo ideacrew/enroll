@@ -7,7 +7,7 @@ module Operations
   module IvlOsseEligibilities
     # Operation to support IVL osse eligibility creation
     class CreateIvlOsseEligibility
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
       include EventSource::Command
       include EventSource::Logging
 

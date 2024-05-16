@@ -15,7 +15,7 @@ module Operations
   module Eligibilities
     # Build Evidence state for the evidence item passed
     class BuildEvidenceState
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to build evidence
       # @option opts [GlobalID] :subject required

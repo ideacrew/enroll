@@ -7,7 +7,7 @@ module Operations
   module HbxEnrollments
     # FindProduct
     class FindProduct
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # input: {"hios_id"=>"45142NV0010001-04", "benefit_market_kind"=>"aca_individual", "kind"=>"health"}, year: 2019/2020
       def call(query_hash, year)

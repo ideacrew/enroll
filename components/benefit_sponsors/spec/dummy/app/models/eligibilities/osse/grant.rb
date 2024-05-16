@@ -6,12 +6,6 @@ module Eligibilities
     class Grant
       include Mongoid::Document
       include Mongoid::Timestamps
-      # include ::EventSource::Command
-      # include Dry::Monads[:result, :do, :try]
-      # include GlobalID::Identification
-      # include Eligibilities::Eventable
-
-      # DUE_DATE_STATES = %w[review outstanding rejected].freeze
 
       # embedded_in :evidenceable, polymorphic: true
       embedded_in :eligibility, class_name: "::Eligibilities::Osse::Eligibility"

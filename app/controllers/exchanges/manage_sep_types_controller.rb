@@ -80,14 +80,14 @@ module Exchanges
     def sep_types_dt
       @datatable = Effective::Datatables::SepTypeDataTable.new
       respond_to do |format|
-        format.html { render '/exchanges/manage_sep_types/sep_type_datatable', :layout => 'single_column' }
+        format.html {  render '/exchanges/manage_sep_types/sep_type_datatable.html.erb', :layout => 'single_column'}
       end
     end
 
     def sorting_sep_types
       @sortable = QualifyingLifeEventKind.all
       respond_to do |format|
-        format.html { render '/exchanges/manage_sep_types/sorting_sep_types' }
+        format.html { render "/exchanges/manage_sep_types/sorting_sep_types.html.erb" }
       end
     end
 

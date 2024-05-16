@@ -7,8 +7,8 @@ module Operations
   module People
     # This class uses different criteria for person match
     class Match
-      send(:include, Dry::Monads[:result, :do])
-      send(:include, Dry::Monads[:try])
+      include Dry::Monads[:do, :result, :try]
+
       attr_reader :has_ssn, :has_dob
 
       SPECIAL_CHAR = %r([!@#$%^&*()_+{}\[\]:;'"/\\?><.,]).freeze

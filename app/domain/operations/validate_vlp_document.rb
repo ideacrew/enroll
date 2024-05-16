@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   # Validate latest VLP Document against V37 Contract for a given person
   class ValidateVlpDocument
-    send(:include, Dry::Monads[:result, :do])
+    include Dry::Monads[:do, :result]
 
     def call(person_id:)
       person = yield fetch_person(person_id)

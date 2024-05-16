@@ -7,7 +7,7 @@ module Operations
   module TaxHouseholdGroups
     # this operation is to create eligibility
     class CreateEligibility
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate(params)

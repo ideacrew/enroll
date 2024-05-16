@@ -8,7 +8,7 @@ module BenefitSponsors
     module EnrollmentEligibility
       # Determines enrollment eligibility
       class Determine
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ Date ] effective_date Effective date of the benefit application
         # @param [ BenefitSponsors::Entities::BenefitSponsorship ] benefit_sponsorship Benefit Sponsorship Entity

@@ -7,7 +7,7 @@ module Operations
   module IrsGroups
     # Publish event after find and transform family to cv3 family.
     class BuildSeedRequest
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:result, :do]
       include EventSource::Command
 
       def call(family_id)

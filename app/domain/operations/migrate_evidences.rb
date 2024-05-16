@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   # Operation to migrate ols evidences to new evidences model
   class MigrateEvidences
-    send(:include, Dry::Monads[:result, :do])
+    include Dry::Monads[:do, :result]
 
     def call(applicant:)
       valid_applicant = yield validate_applicant(applicant)

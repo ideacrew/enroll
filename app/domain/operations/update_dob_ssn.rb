@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   class UpdateDobSsn
-    send(:include, Dry::Monads[:result, :do])
+    include Dry::Monads[:do, :result]
 
     def call(person_id:, params:, current_user:, ssn_require:)
       person = yield fetch_person(person_id)

@@ -7,7 +7,7 @@ module BenefitMarkets
   module Operations
     module Products
       class Create
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ Hash ] params Product Attributes
         # @return [ BenefitMarkets::Entities::Product ] product Product

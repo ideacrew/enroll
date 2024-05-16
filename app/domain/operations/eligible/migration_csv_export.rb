@@ -13,7 +13,7 @@ module Operations
   module Eligible
     # Operation to export migrated eligibilities
     class MigrationCsvExport
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to build eligibility
       # @option opts [<String>]   :resource_name required

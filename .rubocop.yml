@@ -6,7 +6,7 @@
 # - db/seedfiles
 # - lib/tasks
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 3.0
   Exclude:
     - "./bin/**/*"
     - "./project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec"

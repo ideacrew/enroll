@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Families
     class Find
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(*args)
         obj_id = args.first[:id].present? ? args.first[:id] : args.first[:external_app_id]

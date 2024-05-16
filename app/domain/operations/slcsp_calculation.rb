@@ -8,7 +8,7 @@ module Operations
   # This class is invoked when we want to calculate a SLCSP from the api
   # this currently only supports ONE household
   class SlcspCalculation
-    send(:include, Dry::Monads[:result, :do, :try])
+    include Dry::Monads[:do, :result]
 
     include Config::SiteHelper
 

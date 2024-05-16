@@ -6,10 +6,7 @@ module Eligibilities
     class Eligibility
       include Mongoid::Document
       include Mongoid::Timestamps
-      # include ::EventSource::Command
-      # include Dry::Monads[:result, :do, :try]
       include GlobalID::Identification
-      # include Eligibilities::Eventable
 
       # DUE_DATE_STATES = %w[review outstanding rejected].freeze
 

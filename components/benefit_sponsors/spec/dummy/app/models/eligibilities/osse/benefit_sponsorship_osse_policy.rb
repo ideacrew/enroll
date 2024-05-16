@@ -6,10 +6,6 @@ module Eligibilities
     class BenefitSponsorshipOssePolicy < Eligibilities::Osse::Value
       include Mongoid::Document
       include Mongoid::Timestamps
-      # include ::EventSource::Command
-      # include Dry::Monads[:result, :do, :try]
-      # include GlobalID::Identification
-      # include Eligibilities::Eventable
 
       RELAXED_RULES = [
         :minimum_participation_rule,

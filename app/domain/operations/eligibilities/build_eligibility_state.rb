@@ -7,7 +7,7 @@ module Operations
   module Eligibilities
     # Build Eligibility state for the eligibility item passed
     class BuildEligibilityState
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to build eligibility state
       # @option opts [GlobalID] :subject required

@@ -5,7 +5,7 @@ module Operations
     module Ridp
       # Checks database for RIDP eligibility responses
       class FindEligibilityResponse
-        send(:include, Dry::Monads[:result, :do, :try])
+        include Dry::Monads[:do, :result]
 
         # @param [String] member_id
         def call(params)
