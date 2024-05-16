@@ -1379,14 +1379,12 @@ class Person
   #   - used for consumer sign-up
   # 2.) Family -> build_consumer_role
   #   - used when creating a family_member from the 'Manage Family' from a user's homepage
-  # 3.) Operations::Families::CreateMember -> persist_person
-  #   - used when an applicant is propagated to a family_member
-  # 4.) Insured::FamiliesHelper -> build_consumer_role
+  # 3.) Insured::FamiliesHelper -> build_consumer_role
   #   - used as a failsafe in case any family_members are missing a consumer role
-  # 5.) Operations::People::CreateOrUpdateConsumerRole -> create_consumer_role
+  # 4.) Operations::People::CreateOrUpdateConsumerRole -> create_consumer_role
   #   - used when the legacy ::FinancialAssistance::Operations::Families::CreateOrUpdateMember propagates an applicant to a family_member
   def create_demographics_group
-    return unless demographics_group.blank?
+    return unless demographics_group.blank? && consumer_role.present?
     demographics_group = DemographicsGroup.new(alive_status: AliveStatus.new)
     update(demographics_group: demographics_group)
   end
