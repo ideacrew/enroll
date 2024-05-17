@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'rails_helper'
 
 describe "shared/_shop_for_plans_progress.html.erb" do
@@ -18,7 +16,7 @@ describe "shared/_shop_for_plans_progress.html.erb" do
     end
 
     it "should have 33% complete" do
-      expect(rendered).to match(/33%/)
+      expect(rendered).to match /33%/
     end
   end
 
@@ -34,7 +32,7 @@ describe "shared/_shop_for_plans_progress.html.erb" do
     end
 
     it "should have 66% complete" do
-      expect(rendered).to match(/66%/)
+      expect(rendered).to match /66%/
     end
 
     it "should have li option for plan selection" do
@@ -46,7 +44,7 @@ describe "shared/_shop_for_plans_progress.html.erb" do
     end
 
     it "should have previous option" do
-      expect(rendered).to match(/PREVIOUS/i)
+      expect(rendered).to match /PREVIOUS/i
     end
   end
 
@@ -65,7 +63,7 @@ describe "shared/_shop_for_plans_progress.html.erb" do
       expect(rendered).to have_selector('#btn-continue.disabled')
     end
 
-    it "should have confirm button styling not disabled for shop " do
+     it "should have confirm button styling not disabled for shop " do
       allow(enrollment).to receive(:is_shop?).and_return(true)
       render 'shared/shop_for_plans_progress', step: '2'
       expect(rendered).not_to have_selector('#btn-continue.disabled')
