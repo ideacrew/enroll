@@ -1019,7 +1019,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       end
 
       context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Alive Status", "Citizenship"], 4, "2222222222", true, nil, 25
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "Alive Status"], 4, "2222222222", true, nil, 25
       end
 
       context "SSN + Immigrant" do
@@ -1027,7 +1027,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       end
 
       context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Alive Status", "Citizenship", "American Indian Status"], 5, "2222222222", true, "native", 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "Alive Status", "American Indian Status"], 5, "2222222222", true, "native", 20
       end
 
       context "Citizen with NO SSN" do
