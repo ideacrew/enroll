@@ -60,12 +60,12 @@
           <% end %>
         </div>
       <% else %> 
-       <%= render_flash %>
+        <%= render_flash %>
         <aside class="container">
           <%= yield :horizontal_status %>
         </aside>
         <% if content_for? :content %>
-            <%= yield :content %>
+          <%= yield :content %>
         <% else %>
           <%= yield %>
         <% end %>

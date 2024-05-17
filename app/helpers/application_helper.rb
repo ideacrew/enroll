@@ -379,6 +379,8 @@ module ApplicationHelper
       "info"
     when "message" 
       "warning"
+    when "success"
+      "success"
     else 
       "error"
     end
