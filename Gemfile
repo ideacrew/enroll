@@ -92,6 +92,7 @@ gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
 gem 'redis-store',              '~> 1.10'
+gem 'rexml',                    '>= 3.2.7'
 gem 'resque',                   '~> 2.6.0'
 gem 'roo',                      '~> 2.10'
 gem 'rubyzip', '>= 1.3.0'
@@ -147,11 +148,12 @@ group :development, :test do
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
+  gem 'rdoc',                   '~> 6.3.4'
   gem 'rspec-rails',            '~> 5.0.1'
   gem 'rspec_junit_formatter'
   gem 'sdoc',                    '~> 1.0'
   gem 'stimulus_reflex_testing', '~> 0.3.0'
-  gem 'yard',                   '~> 0.9.20',  require: false
+  gem 'yard',                    '>= 0.9.36',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
 end
 
