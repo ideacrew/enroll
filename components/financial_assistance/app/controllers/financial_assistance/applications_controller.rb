@@ -23,7 +23,7 @@ module FinancialAssistance
     before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
-    layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
+    layout :resolve_layout
 
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
@@ -383,6 +383,17 @@ module FinancialAssistance
 
     def enable_bs4_layout
       @bs4 = true
+    end
+
+    def resolve_layout
+      case action_name
+      when "edit", "step", "review_and_submit", "eligibility_response_error", "application_publish_error"
+        "financial_assistance_nav"
+      when %i[application_year_selection application_checklist]
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
+      else
+        "financial_assistance"
+      end
     end
 
     def determination_token_present?(application)
