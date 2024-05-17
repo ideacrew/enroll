@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'roo', '~> 2.7.0'
   s.add_dependency 'pundit',                    '~> 2.0'
   s.add_dependency 'ffi', '~> 1.9'
-  s.add_dependency 'kaminari', '~> 0.17.0'
+  s.add_dependency 'kaminari', '~> 1.2.1'
   s.add_dependency 'sass', '~> 3.7.3'
   s.add_dependency 'webpacker',                 '~> 4.0.2'
   s.add_dependency 'dry-types'
