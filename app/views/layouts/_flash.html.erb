@@ -1,14 +1,12 @@
 <% if @bs4 %>
-  <div class="alert alert-info d-flex" role="alert">
-    <div class="col-auto p-0">
+  <div class="alert alert-info d-flex flash" role="alert">
+    <div class="p-0">
       <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
     </div>
-    <div class="col mt-1 mb-1 p-0 align-self-center">
+    <div class="my-1 mr-auto p-0 align-self-center">
       <%= raw message %>
     </div>
-    <div class="col-auto flash">
-      <a class="close" data-dismiss="alert" href="#">×</a>
-    </div>
+    <a class="close-icon icon align-self-start" alt="info" aria-hidden="true" href="#">&nbsp;</a>
   </div>
 <% else %>
   <div class="row flash module">
