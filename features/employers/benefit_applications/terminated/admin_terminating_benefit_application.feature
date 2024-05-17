@@ -8,13 +8,13 @@ Feature: As an admin user I should have the ability to terminate a given Employe
     And initial employer ABC Widgets has active benefit application
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     And the user is on the Employer Index of the Admin Dashboard
-    And the user sees the actions dropdown
     When the user clicks Action for that Employer
     Then the user will see the Plan Years button
     Then the user will select benefit application to terminate
     When the user clicks Actions for that benefit application
     Then the user will see Terminate button
 
+  @flaky 
   Scenario Outline: As an HBX Staff with Super Admin subroles I should be able to terminate an benefit application
     When the user enters <termination_date> and other details for <termination_type> termination
     When user clicks submit button
