@@ -302,6 +302,15 @@ ul.list-right-section li {
 .verification-update-reason {display: none}
 
 @media screen and (max-width: 767px) {
+  .d-flex.sm-block {
+    display: block !important;
+  }
+
+  .progress-nav-container {
+    margin-left: $spacer;
+    margin-right: $spacer;
+  }
+
   .sm-space, .col-sm {
     margin-bottom: $spacer;
   }

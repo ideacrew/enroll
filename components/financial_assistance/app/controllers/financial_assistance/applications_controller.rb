@@ -7,6 +7,7 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
+    before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -15,6 +16,7 @@ module FinancialAssistance
     include Acapi::Notifiers
     include FinancialAssistance::L10nHelper
     include ::FileUploadHelper
+    include FinancialAssistance::NavigationHelper
     require 'securerandom'
 
     before_action :check_eligibility, only: [:copy]
@@ -155,7 +157,7 @@ module FinancialAssistance
       set_admin_bookmark_url
 
       respond_to do |format|
-        format.html { render layout: 'financial_assistance' }
+        format.html { render layout: 'financial_assistance_progress' }
       end
     end
 
@@ -163,8 +165,9 @@ module FinancialAssistance
       authorize @application, :application_checklist?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-
-      respond_to :html
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance_progress' }
+      end
     end
 
     def review_and_submit
@@ -376,6 +379,10 @@ module FinancialAssistance
 
     def set_family
       @family = @person.primary_family
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
 
     def determination_token_present?(application)

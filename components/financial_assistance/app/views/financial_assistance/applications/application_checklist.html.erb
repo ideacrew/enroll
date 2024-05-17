@@ -1,3 +1,68 @@
+<% if @bs4 %>
+  <%= render partial: 'faa_progress_options', locals: {step: 1} %>
+  <h1>Application Checklist</h1>
+  <p>Before you get started, please review the application checklist below. If you gather the information in advance, you can complete the application quickly. When you’re ready to begin, select ‘Begin Application’. This application takes about 15-20 minutes to complete, you may save your progress at any time.</p>
+  <p class="b">You will need detailed information on each person in your household (even if they don’t need coverage) to complete the application. </p>
+  <div class="d-flex sm-block my-4">
+    <div class="mr-auto col-sm col-md-6 pl-0">
+      <p class="b">For each person in your household who needs health insurance, you’ll need:</p>
+      <ul class="spaced">
+        <li class="mb-4">Full legal names, birth dates, social security numbers, and addresses</li>
+        <li class="mb-4">Tax filing plans for the year you want coverage. For example:
+          <ul>
+            <li>Who will file federal taxes?</li>
+            <li>Who will be claiming dependents on their tax return?</li>
+            <li>If anyone is married, will they file taxes jointly?</li>
+          </ul>
+        </li>
+        <li class="mb-4">Information about income (how much you get, how often you get it, etc.). It helps to have:
+          <ul>
+            <li>Your most recent tax return</li>
+            <li>Recent paystubs</li>
+            <li>Recent statements for benefits like social security or unemployment</li>
+            <li>Recent bank and brokerage statements that show interest, capital gains, dividends or retirement distributions</li>
+          </ul>
+        </li>
+        <li class="mb-4">For anyone who could get health insurance through a job, a completed Employer Coverage Tool Form</li>
+        <li>For anyone who is not a US citizen, immigration documents such as an:
+          <ul>
+            <li>I-551 (also called a green card)</li>
+            <li>I-94 (also called an arrival/departure record)</li>
+            <li>Employment authorization card</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm col-md-6 pr-0">
+      <p class="b">For anyone in your household who doesn’t need health insurance, you’ll need:</p>
+      <ul class="spaced">
+        <li class="mb-4">Full legal names, birth dates, social security numbers, and addresses</li>
+        <li class="mb-4">Tax filing plans for the year you want coverage. For example:
+          <ul>
+            <li>Who will file federal taxes?</li>
+            <li>Who will be claiming dependents on their tax return?</li>
+            <li>If anyone is married, will they file taxes jointly?</li>
+          </ul>
+        </li>
+        <li class="mb-4">Information about income (how much you get, how often you get it, etc.). It helps to have:
+          <ul>
+            <li>Your most recent tax return</li>
+            <li>Recent paystubs</li>
+            <li>Recent statements for benefits like social security or unemployment</li>
+            <li>Recent bank and brokerage statements that show interest, capital gains, dividends or retirement distributions</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <% content_for :submit_button do %>
+    <%= h(link_to_with_noopener_noreferrer("Begin Application", financial_assistance.edit_application_path(@application), class: 'button btn-continue', id: 'btn-continue')) %>
+  <% end %>
+  <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+      previous_link: application_checklist_previous_url(@application),
+      next_link: financial_assistance.edit_application_path(@application)
+    } %>
+<% else %>
 <div class="container">
   <div id="new_person_wrapper">
     <div class="row">
@@ -45,3 +110,4 @@
     </div>
   </div>
 </div>
+<% end %>
