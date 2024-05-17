@@ -563,7 +563,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def resolve_layout
-    return application unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    return "application" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     case action_name
     when "privacy"
       "bootstrap_4"
