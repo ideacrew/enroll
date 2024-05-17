@@ -12,7 +12,7 @@ describe "insured/interactive_identity_verifications/new" do
   end
 
   it "should render a form for the questions" do
-    render :template => "insured/interactive_identity_verifications/new.html.haml"
+    render :template => "insured/interactive_identity_verifications/new.html.erb"
     expect(rendered).to have_selector("form")
   end
 end
