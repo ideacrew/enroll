@@ -43,13 +43,13 @@ module Operations
             payment_transactions: transform_payment_transactions(family.payment_transactions),
             magi_medicaid_applications: @transformed_applications,
             documents: transform_documents(family.documents),
-            timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime},
-            eligibility_determination: transform_eligibility_determinination(family)
+            timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime}
             # foreign_keys TO DO ??
             # general_agency_accounts = transform_general_agency_accounts(family.general_agency_accounts), #TO DO
             # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             # updated_by: construct_updated_by(updated_by)
           }
+          payload.merge!(eligibility_determination: transform_eligibility_determinination(family)) if family.eligibility_determination.present?
           payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           payload.merge!(households: @transformed_households) if @transformed_households.present?
@@ -59,7 +59,7 @@ module Operations
         end
 
         def transform_eligibility_determinination(family)
-          return nil if family.eligibility_determination.nil?
+          return {} if family.eligibility_determination.nil?
           family.eligibility_determination.determination_cv3_hash
         end
 
