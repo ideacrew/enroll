@@ -1153,9 +1153,9 @@ class ConsumerRole
   end
 
   def move_types_to_pending(*args)
-    types_to_reject = ['American Indian Status', 'Alive Status', LOCATION_RESIDENCY]
+    types_to_reject = ['American Indian Status', LOCATION_RESIDENCY]
 
-    verification_types.reject { |type| types_to_reject.include?(type.type_name) }.each(&:pending_type)
+    filtered_verification_types.reject { |type| types_to_reject.include?(type.type_name) }.each(&:pending_type)
   end
 
   def pass_lawful_presence(*args)
@@ -1170,7 +1170,7 @@ class ConsumerRole
 
   def fail_lawful_presence(*args)
     lawful_presence_determination.deny!(*args)
-    verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type unless type.validation_status == 'review' }
+    filtered_verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type unless type.validation_status == 'review' }
   end
 
   def revert_ssn
