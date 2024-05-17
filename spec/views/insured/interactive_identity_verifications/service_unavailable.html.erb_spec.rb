@@ -17,7 +17,7 @@ describe "insured/interactive_identity_verifications/service_unavailable" do
     allow(view).to receive(:ridp_redirection_link).with(person).and_return nil
   end
   it "should show a message about the service being down and asking the user to try back later" do
-    render :template => "insured/interactive_identity_verifications/service_unavailable.html.haml"
+    render :template => "insured/interactive_identity_verifications/service_unavailable.html.erb"
     expect(rendered).to include("We’re sorry. Experian - the third-party service we use to confirm your identity - is unavailable. Please try again later.")
   end
 end
