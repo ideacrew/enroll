@@ -34,52 +34,68 @@
 }
 
 [data-theme="me"] {
-    --default-font-color: #323130;
+  --default-font-color: #323130;
 
-    //palette
-    --primary-color: #3D5D6F;
-    --primary-color-dark: #314A59;
-    --primary-color-darker: #253843;
+  //palette
+  --primary-color: #3D5D6F;
+  --primary-color-dark: #314A59;
+  --primary-color-darker: #253843;
 
-    --secondary-color: #3B6B90;
-    --secondary-color-dark: #2E5470;
-    --secondary-color-darker: #213C50;
+  --secondary-color: #3B6B90;
+  --secondary-color-dark: #2E5470;
+  --secondary-color-darker: #213C50;
 
-    --tertiary-color: #5A7334;
-    --tertiary-color-dark: #465929;
-    --tertiary-color-darker: #32401D;
+  --tertiary-color: #5A7334;
+  --tertiary-color-dark: #465929;
+  --tertiary-color-darker: #32401D;
 
-    //fundamentals
-    --primary-hover-color: var(--primary-color-dark);
-    --primary-active-color: var(--primary-color-darker);
-    --primary-focus-color: var(--primary-color-dark);
+  //fundamentals
+  --primary-hover-color: var(--primary-color-dark);
+  --primary-active-color: var(--primary-color-darker);
+  --primary-focus-color: var(--primary-color-dark);
 
-    --secondary-hover-color: var(--secondary-color-dark);
-    --secondary-active-color: var(--secondary-color-darker);
-    --secondary-focus-color: var(--secondary-color-dark);
+  --secondary-hover-color: var(--secondary-color-dark);
+  --secondary-active-color: var(--secondary-color-darker);
+  --secondary-focus-color: var(--secondary-color-dark);
 
-    --tertiary-hover-color: var(--tertiary-color-dark);
-    --tertiary-active-color: var(--tertiary-color-darker);
-    --tertiary-focus-color: var(--tertiary-color-dark);
+  --tertiary-hover-color: var(--tertiary-color-dark);
+  --tertiary-active-color: var(--tertiary-color-darker);
+  --tertiary-focus-color: var(--tertiary-color-dark);
 
-    //semantic
-    --body-color: var(--grey-005);
-    --placeholder-color: #676767;
-    --placeholder-font-weight: 400;
-    --floatlabel-color: #767676;
-    --floatlabel-onclick-color:#676767;
-    --input-text-color: #454545;
-    --form-element-text-color: #454545;
+  //semantic
+  --body-color: var(--grey-005);
+  --placeholder-color: #676767;
+  --placeholder-font-weight: 400;
+  --floatlabel-color: #767676;
+  --floatlabel-onclick-color:#676767;
+  --input-text-color: #454545;
+  --form-element-text-color: #454545;
 
-    --button-default-color: var(--primary-color);
-    --button-default-hover-color: var(--primary-hover-color);
-    --button-default-active-color: var(--primary-color-darker);
+  --button-default-color: var(--primary-color);
+  --button-default-hover-color: var(--primary-hover-color);
+  --button-default-active-color: var(--primary-color-darker);
 
-    --enrollment-status-red: #A21E1F;
-    --enrollment-status-green: #027314;
-    --enrollment-status-yellow: #E5A900;
-    --enrollment-status-blue: #003260;
-    --enrollment-status-grey: #3B3A39;
+  --enrollment-status-red: #A21E1F;
+  --enrollment-status-green: #027314;
+  --enrollment-status-yellow: #E5A900;
+  --enrollment-status-blue: #003260;
+  --enrollment-status-grey: #3B3A39;
+
+  --button-primary-color: #3D5D6F;
+  --button-primary-hover-color: #314A59;
+  --button-primary-active-color: #253843;
+
+  --button-secondary-color: #3B6B90;
+  --button-secondary-hover-color: #345F80;
+  --button-secondary-active-color: #274760;
+
+  --button-tertiary-color: #647F3A;
+  --button-tertiary-hover-color: #50662E;
+  --button-tertiary-active-color: #3C4C23;
+
+  --button-error-color: var(--status-red);
+  --button-error-hover-color: var(--status-red-hover);
+  --button-error-active-color: var(--status-red-active);
 }
 
 [data-theme="dc"] {
@@ -103,6 +119,23 @@
   --enrollment-status-yellow: #E5A900;
   --enrollment-status-blue: #003260;
   --enrollment-status-grey: #3B3A39;
+
+  //buttons
+  --button-primary-color: #007BC4;
+  --button-primary-hover-color: #00629D;
+  --button-primary-active-color: #004A76;
+
+  --button-secondary-color: #003260;
+  --button-secondary-hover-color: #00284D;
+  --button-secondary-active-color: #001E3A;
+
+  --button-tertiary-color: #9D6E00;
+  --button-tertiary-hover-color: #7E5800;
+  --button-tertiary-active-color: #5E4200;
+
+  --button-error-color: #A21E1F;
+  --button-error-hover-color: #85191A;
+  --button-error-active-color: #671314;
 }
 
 
