@@ -794,11 +794,8 @@ class ConsumerRole
     # Add 'LOCATION_RESIDENCY' if the feature is enabled
     live_types << LOCATION_RESIDENCY if EnrollRegistry.feature_enabled?(:location_residency_verification_type)
 
-    # Add 'Social Security Number' and 'Alive Status' if SSN is present
-    if ssn
-      live_types << 'Social Security Number'
-      live_types << 'Alive Status' if EnrollRegistry.feature_enabled?(:enable_alive_status)
-    end
+    # Add 'Social Security Number' if SSN is present
+    live_types << 'Social Security Number' if ssn
 
     # Add 'American Indian Status' if applicable
     live_types << 'American Indian Status' if ai_or_an?
@@ -807,10 +804,7 @@ class ConsumerRole
     live_types << (us_citizen ? 'Citizenship' : 'Immigration status') unless us_citizen.nil?
 
     # Ensure 'Alive Status' is at the end of the array if it's included
-    if live_types.include?("Alive Status")
-      live_types.delete("Alive Status")
-      live_types << "Alive Status"
-    end
+    live_types << 'Alive Status' if ssn.present? && EnrollRegistry.feature_enabled?(:enable_alive_status)
 
     live_types
   end

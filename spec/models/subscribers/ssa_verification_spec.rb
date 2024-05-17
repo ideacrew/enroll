@@ -25,15 +25,12 @@ describe Subscribers::SsaVerification do
     let(:payload) { {:individual_id => individual_id, :body => xml} }
 
     before :each do
+      allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:location_residency_verification_type].feature).to receive(:is_enabled).and_return(true)
       consumer_role.aasm_state="ssa_pending"
     end
 
     context "stores SSA response in verification history" do
-      before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:enable_alive_status).and_return(true)
-      end
-
       it "stores verification history element" do
         person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
@@ -46,7 +43,7 @@ describe Subscribers::SsaVerification do
         person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.verification_types.active.map(&:type_history_elements).map(&:count)).to eq [0, 1, 0, 1]
+        expect(person.verification_types.active.map(&:type_history_elements).map(&:count)).to eq [0, 1, 1, 0]
       end
 
       it "stores reference to EventResponse in verification history element" do

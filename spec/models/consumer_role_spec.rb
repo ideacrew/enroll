@@ -710,9 +710,13 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
         end
 
         describe "pending verification type updates" do
+          before do
+            allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+          end
+
           it "updates validation status to pending for unverified consumers" do
             consumer.coverage_purchased!
-            expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "unverified", "pending"])
+            expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending", "unverified"])
           end
 
           it "updates indian tribe validition status to negative_response_received and to pending for the rest" do
@@ -992,6 +996,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
       shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
         before do
+          allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
           allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
           person.ssn = nil unless ssn
           person.us_citizen = citizen
