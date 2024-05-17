@@ -158,7 +158,7 @@ When(/^the user clicks Action for a person on families index page$/) do
 end
 
 And(/^the user sees the actions dropdown$/) do
-  expect(page).to have_css('.dropdown.pull-right', text: 'Actions')  
+  expect(page).to have_css('.dropdown.pull-right', text: 'Actions')
 end
 
 When(/^the user clicks Action for that Employer$/) do
