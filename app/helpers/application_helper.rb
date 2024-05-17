@@ -377,12 +377,12 @@ module ApplicationHelper
     case type
     when "notice"
       "info"
-    when "message" 
+    when "warning", "message" 
       "warning"
     when "success"
       "success"
     else 
-      "error"
+      "severe"
     end
   end
 
