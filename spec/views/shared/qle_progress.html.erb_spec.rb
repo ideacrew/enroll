@@ -48,7 +48,7 @@ describe "shared/_qle_progress.html.erb" do
     end
 
     it "should have previous option" do
-      expect(rendered).to match /PREVIOUS/
+      expect(rendered).to match /PREVIOUS/i
     end
 
     it "should not have disabled link" do
@@ -79,7 +79,7 @@ describe "shared/_qle_progress.html.erb" do
     end
 
     it "should have previous option" do
-      expect(rendered).to match /PREVIOUS/
+      expect(rendered).to match /PREVIOUS/i
     end
 
     it "should have disabled link" do
