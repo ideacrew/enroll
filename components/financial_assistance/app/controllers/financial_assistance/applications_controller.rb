@@ -156,18 +156,14 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      respond_to do |format|
-        format.html { render layout: 'financial_assistance_progress' }
-      end
+      respond_to :html
     end
 
     def application_checklist
       authorize @application, :application_checklist?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      respond_to do |format|
-        format.html { render layout: 'financial_assistance_progress' }
-      end
+      respond_to :html
     end
 
     def review_and_submit
