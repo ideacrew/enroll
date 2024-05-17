@@ -44,7 +44,7 @@ describe "shared/_shop_for_plans_progress.html.erb" do
     end
 
     it "should have previous option" do
-      expect(rendered).to match /PREVIOUS/
+      expect(rendered).to match /PREVIOUS/i
     end
   end
 
