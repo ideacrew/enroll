@@ -13,7 +13,7 @@ module FinancialAssistance
           class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
             include Acapi::Notifiers
 
             FAA_MITC_RELATIONSHIP_MAP = {

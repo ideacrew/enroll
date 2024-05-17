@@ -7,7 +7,7 @@ module Operations
   module FinancialAssistance
     # This class constructs financial_assistance_applicant params_hash.
     class ParseApplicant
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ FamilyMember ] family_member
       # @return [ Ruby Hash ] Applicant

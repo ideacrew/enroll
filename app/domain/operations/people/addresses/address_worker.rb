@@ -6,7 +6,7 @@ module Operations
       # This class is responsible for building payload and publishing event
       class AddressWorker
         include EventSource::Command
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [Hash] params
         # @option params [String] :person_hbx_id

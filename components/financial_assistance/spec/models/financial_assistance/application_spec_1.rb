@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'aasm/rspec'
 
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}

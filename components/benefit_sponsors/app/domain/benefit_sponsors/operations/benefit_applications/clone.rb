@@ -12,7 +12,7 @@ module BenefitSponsors
       # of the aasm_state of the input benefit_application.
       # Also, the result benefit_application is a non-persisted object.
       class Clone
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
         # @param [ Date ] effective_period for new benefit_application

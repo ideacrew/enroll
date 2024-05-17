@@ -11,7 +11,7 @@ module BenefitMarkets
       # benefit_sponsor_catalog is a non-persisted object
       # without benefit_application.
       class Clone
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [ BenefitMarkets::BenefitSponsorCatalog ] benefit_sponsor_catalog
         # @return [ BenefitMarkets::BenefitSponsorCatalog ] benefit_sponsor_catalog

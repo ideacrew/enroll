@@ -4,7 +4,7 @@ module Operations
   module Products
     # This class is to fetch silver product premiums for given products, family, effective date, rating area id.
     class FetchSilverProductPremiums
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Date] effective_date
       # @param [RatingArea] rating_area_id

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, type: :controller do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
   routes { FinancialAssistance::Engine.routes }
 
   let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }

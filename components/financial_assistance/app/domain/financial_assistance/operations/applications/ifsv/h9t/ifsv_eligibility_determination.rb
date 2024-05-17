@@ -12,7 +12,7 @@ module FinancialAssistance
           # This Operation determines applicants ifsv eligibility
           # Operation receives the Application with ifsv determination values
           class IfsvEligibilityDetermination
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
 
             # @param [Hash] opts The options to add ifsv determination to applicants
             # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params

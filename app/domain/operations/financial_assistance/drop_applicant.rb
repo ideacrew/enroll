@@ -8,7 +8,7 @@ module Operations
     # This class constructs financial_assistance_applicant params_hash,
     # then calls FinancialAssistance::Operations::Applicant::Delete
     class DropApplicant
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ FamilyMember ] family_member
       # @return [ Dry::Monads::Result::Success ] success_message

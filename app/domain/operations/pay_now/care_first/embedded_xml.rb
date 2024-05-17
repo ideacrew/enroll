@@ -9,7 +9,7 @@ module Operations
     module CareFirst
       # Generate Pay Now custom embedded XML payload for CareFirst carrier
       class EmbeddedXml
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(enrollment)
           cv3_enrollment = yield transform_enrollment(enrollment)

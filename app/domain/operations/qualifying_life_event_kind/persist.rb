@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module QualifyingLifeEventKind
     class Persist
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(input_params)
         params = input_params[:params]

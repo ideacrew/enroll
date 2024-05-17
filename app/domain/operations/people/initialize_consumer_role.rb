@@ -7,7 +7,7 @@ module Operations
   module People
     # Class for initializing a new consumer role object
     class InitializeConsumerRole
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Initializes a new consumer role object with the given parameters.
       #

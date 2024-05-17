@@ -6,7 +6,7 @@ module Operations
       module Transmissions
         # Send transmission request to generate h41 and 1095a
         class Create
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           include EventSource::Command
 
           REPORT_TYPES = %w[all original corrected void].freeze

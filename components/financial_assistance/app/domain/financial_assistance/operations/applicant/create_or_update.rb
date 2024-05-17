@@ -7,7 +7,7 @@ module FinancialAssistance
   module Operations
     module Applicant
       class CreateOrUpdate
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         #applicant attributes as type
         def call(params:, family_id:)

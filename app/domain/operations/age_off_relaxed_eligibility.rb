@@ -7,7 +7,7 @@ module Operations
   # through out the defined eligibility period(annual/monthly) from yml based on the market settings.
   class AgeOffRelaxedEligibility
     include Config::SiteConcern
-    include Dry::Monads[:result, :do]
+    include Dry::Monads[:do, :result]
 
     # Executes the age-off eligibility check for a family member.
     # This method takes a hash of parameters, performs a series of operations

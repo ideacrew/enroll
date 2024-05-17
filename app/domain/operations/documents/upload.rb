@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Documents
     class Upload
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include Config::SiteHelper
 
       def call(resource:, file_params:, user:, subjects: nil)

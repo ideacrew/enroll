@@ -5,7 +5,7 @@ module Operations
     # This class is to find if IVL enrolled product is offered in service area or not.
     # Returns true if allowed, false if not allowed
     class ProductOfferedInServiceArea
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values               = yield validate(params)

@@ -10,7 +10,7 @@ module Operations
     # then calls FinancialAssistance::Operations::Application::Create
     # gets back FinancialAssistance::Application object_id
     class Apply
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ FamilyId ] family_id bson_id of a family
       # @return [ FinancialAssistance::Application ] application_id

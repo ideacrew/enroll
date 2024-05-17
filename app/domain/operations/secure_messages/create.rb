@@ -7,7 +7,7 @@ module Operations
   module SecureMessages
     class Create
       include Config::SiteConcern
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       #resource can be a profile or person who has inbox as embedded document
       def call(resource:, message_params:, document:)

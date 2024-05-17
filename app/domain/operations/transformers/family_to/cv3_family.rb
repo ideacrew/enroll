@@ -11,7 +11,7 @@ module Operations
       class Cv3Family
         # Constructs cv3 payload including family and FA Application
 
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
         include Acapi::Notifiers
         require 'securerandom'
 

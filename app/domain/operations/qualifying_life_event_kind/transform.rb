@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module QualifyingLifeEventKind
     class Transform
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         qlek              = yield fetch_qlek_object(params)

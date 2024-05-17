@@ -10,7 +10,7 @@ module Operations
       class Process
         include Config::SiteConcern
         include EventSource::Command
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(params)
           new_date, enrollment_query = params.values_at(:new_date, :enrollment_query)

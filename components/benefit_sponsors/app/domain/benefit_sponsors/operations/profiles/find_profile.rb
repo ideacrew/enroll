@@ -7,7 +7,7 @@ module BenefitSponsors
   module Operations
     module Profiles
       class FindProfile
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
 
         def call(params)

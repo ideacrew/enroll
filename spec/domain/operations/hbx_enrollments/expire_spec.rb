@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let(:family)      { FactoryBot.create(:family, :with_primary_family_member) }
   let!(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family) }

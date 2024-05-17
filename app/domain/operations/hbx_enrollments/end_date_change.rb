@@ -9,7 +9,7 @@ module Operations
     # If given termination date is greater than enrollment termination and is a prior year enrollment
     # - it generates a new enrollment.
     class EndDateChange
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ EnrollmentId ] enrollment_id bson_id of a enrollment
       # @param [ NewTerminationDate ] termination_date to update the enrollment

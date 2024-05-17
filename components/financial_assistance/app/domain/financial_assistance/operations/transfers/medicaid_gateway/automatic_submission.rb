@@ -9,7 +9,7 @@ module FinancialAssistance
       module MedicaidGateway
         # This class is used to automatically submit the application to Medicaid Gateway for determination.
         class AutomaticSubmission
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           def call(application)
             # Additional steps that may be needed:
             # populate default values for application

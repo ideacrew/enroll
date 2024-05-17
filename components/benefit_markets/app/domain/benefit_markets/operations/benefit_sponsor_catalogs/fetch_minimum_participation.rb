@@ -4,7 +4,7 @@ module BenefitMarkets
 
       class FetchMinimumParticipation
 
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # Fetches the minimum participation from a product package for a given calendar year.
         #

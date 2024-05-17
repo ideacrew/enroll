@@ -7,7 +7,7 @@ module Operations
   module People
     # Class for initializing a new person
     class InitializePerson
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         contract = yield validate(params)

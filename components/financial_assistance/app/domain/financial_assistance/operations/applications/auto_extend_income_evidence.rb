@@ -8,7 +8,7 @@ module FinancialAssistance
     module Applications
       # This operation processes the auto extend income evidence due date feature
       class AutoExtendIncomeEvidence
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [Hash] opts The options to update an income evidence due on date
         # @option opts [Date] :current_due_on (optional)

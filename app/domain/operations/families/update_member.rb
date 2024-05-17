@@ -8,7 +8,7 @@ module Operations
     # Class for creating and updating family members in cooperation with Financial Assistance engine
     class UpdateMember
       include EventSource::Command
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Creates or updates a family member and persists the changes to the database.
       #

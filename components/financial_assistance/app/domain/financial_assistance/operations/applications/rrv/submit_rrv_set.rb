@@ -11,7 +11,7 @@ module FinancialAssistance
         # operation to manually trigger rrv events.
         # It will take families as input and find the determined application, add evidences and publish the group of applications
         class SubmitRrvSet
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           include EventSource::Command
           include EventSource::Logging
 

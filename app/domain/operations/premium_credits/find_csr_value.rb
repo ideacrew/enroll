@@ -7,7 +7,7 @@ module Operations
   module PremiumCredits
     # This operation is to find Csr value.
     class FindCsrValue
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate(params)

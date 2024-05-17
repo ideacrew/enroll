@@ -156,7 +156,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   before :all do
     DatabaseCleaner.clean
@@ -1023,7 +1023,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   before :all do
     DatabaseCleaner.clean

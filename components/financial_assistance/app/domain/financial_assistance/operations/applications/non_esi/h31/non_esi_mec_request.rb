@@ -12,7 +12,7 @@ module FinancialAssistance
           # Requests non esi mec details from h14 hub service
           class NonEsiMecRequest
 
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
             include Acapi::Notifiers
 
             # @param [ Hash ] params Applicant Attributes

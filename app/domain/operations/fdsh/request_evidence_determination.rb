@@ -7,7 +7,7 @@ module Operations
   module Fdsh
     # This class is responsible for validating an application object and constructing a payload entity for FDSH service.
     class RequestEvidenceDetermination
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
 
       def call(evidence)

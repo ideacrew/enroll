@@ -14,7 +14,7 @@ module FinancialAssistance
         # Operation to fetch needed families to call Local Medicaid ME service
         # to update application determination eligibility
         class RunPeriodicDataMatching
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           include EventSource::Command
           include EventSource::Logging
 

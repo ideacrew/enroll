@@ -9,7 +9,7 @@ module Operations
     # and will call Operations::FinancialAssistance::CreateOrUpdateApplicant
     # to update information on FinancialAssistance::Applicant objects within FAA Engine.
     class PersonCreateOrUpdateHandler
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ Person ] person
       # @param [ String ] event_name

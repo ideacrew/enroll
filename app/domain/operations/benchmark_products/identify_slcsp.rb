@@ -4,7 +4,7 @@ module Operations
   module BenchmarkProducts
     # This Operation Calculats adjusted EHB premium values and identifies the SLCSP for the household.
     class IdentifySlcsp
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Identify all silver  plans offered within the service area
       # Calculate the EHB cost of all available silver plans based on the rating area

@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module QualifyingLifeEventKind
     class Sort
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(input_params)
         persist_data(input_params[:params])

@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   # Call Fed Hub for Verification for Consumer Document Verification
   class CallFedHub
-    include Dry::Monads[:result, :do]
+    include Dry::Monads[:do, :result]
 
     def call(person_id:, verification_type:)
       person = if verification_type == 'Immigration status'

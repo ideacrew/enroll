@@ -8,7 +8,7 @@ module BenefitMarkets
     module BenefitMarkets
       # Creates benefit sponsor catalog entity
       class CreateBenefitSponsorCatalog
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         attr_reader :enrollment_eligibility
 

@@ -8,7 +8,7 @@ module Operations
     module InsurancePolicies
       # Operation to publish an event to request refresh of insurance policies within a date range(refresh_period).
       class RequestRefresh
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
         include EventSource::Command
 
         def call(params)

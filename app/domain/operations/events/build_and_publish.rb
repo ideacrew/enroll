@@ -7,7 +7,7 @@ module Operations
   module Events
     # Operation is to build and publish an event_source event
     class BuildAndPublish
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
 
       # @param [Hash] opts The options build and publish an event_source event

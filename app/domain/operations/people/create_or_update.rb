@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module People
     class CreateOrUpdate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
 

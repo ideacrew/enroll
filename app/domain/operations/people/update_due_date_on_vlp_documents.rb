@@ -7,7 +7,7 @@ module Operations
   module People
     # Class for updating due date on VLP Documents
     class UpdateDueDateOnVlpDocuments
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
         # @param [Hash] opts Options to update due date on vlp documents
         # @option opts [date] :due_date required

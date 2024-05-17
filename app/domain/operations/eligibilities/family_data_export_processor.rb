@@ -9,7 +9,7 @@ module Operations
   module Eligibilities
     # Generate family evidence data report
     class FamilyDataExportProcessor
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       DR_NOTICES = {
         :DR0 => "Action Needed - Submit Documents",

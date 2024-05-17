@@ -3,7 +3,7 @@
 require 'aasm/rspec'
 
 RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::RequestDetermination, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }

@@ -12,7 +12,7 @@ module FinancialAssistance
         class RequestEligibilityDetermination
           # Requests eligibility determination from medicaid gateway
 
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           include Acapi::Notifiers
 
           # @param [Hash] opts The options to request eligibility determination from MedicaidGateway system

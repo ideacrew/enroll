@@ -7,7 +7,7 @@ module Operations
   module Notices
     # IVL Final Renewal Eligibility Notice
     class IvlFinalRenewalEligibilityNotice
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
       include EventSource::Logging
       include ActionView::Helpers::NumberHelper

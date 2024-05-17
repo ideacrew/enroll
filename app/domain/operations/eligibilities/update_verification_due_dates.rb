@@ -8,7 +8,7 @@ module Operations
   module Eligibilities
     # update verification due on dates
     class UpdateVerificationDueDates
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to update evidence due on dates
       # @option opts [Family] :family required

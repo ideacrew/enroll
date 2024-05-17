@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Families
     class ApplyForFinancialAssistance
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(family_id:)
         family = yield find_family(family_id)

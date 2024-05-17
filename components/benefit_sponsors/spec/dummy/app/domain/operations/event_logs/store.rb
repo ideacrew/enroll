@@ -7,7 +7,7 @@ module Operations
   module EventLogs
     # Persist Audit Log Event
     class Store
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include Config::AcaModelConcern
 
       # @param [Hash] opts Options to persist event log event

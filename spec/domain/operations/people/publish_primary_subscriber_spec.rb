@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 RSpec.describe Operations::People::SugarCrm::PublishPrimarySubscriber, type: :model, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
   let!(:person) do
     # Some of these attributes are necessary in the person entity
     FactoryBot.create(

@@ -3,7 +3,7 @@
 module Operations
   module Individual
     class CancelRenewalEnrollment
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include FloatHelper
 
       # Executes the process of cancelling renewal enrollments.

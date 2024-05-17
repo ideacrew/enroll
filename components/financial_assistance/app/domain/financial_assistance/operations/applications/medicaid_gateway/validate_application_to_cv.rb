@@ -11,7 +11,7 @@ module FinancialAssistance
         #medicaid Gateway
         class ValidateApplicationToCv
           # Validate CV3 payload for applications
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
 
           # @param [Hash] opts The options to validate applications
           # @option opts [BSON::ObjectId] :application_id id ofFinancialAssistance::Application

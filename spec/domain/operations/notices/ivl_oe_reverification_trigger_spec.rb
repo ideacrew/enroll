@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::Operations::Notices::IvlOeReverificationTrigger, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy

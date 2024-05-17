@@ -10,7 +10,7 @@ module FinancialAssistance
         # This Operation adds the MEC Check to the Person(persistence object)
         # Operation receives the MEC Check results
         class AddMecCheckPerson
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
 
           # @param [Hash] opts The options to add MEC check to Person(persistence object)
           # @return [Dry::Monads::Result]

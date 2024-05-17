@@ -14,7 +14,7 @@ module BenefitSponsors
       # from draft to reinstated before the final state(active) to indicate that
       # this very application is reinstated.
       class Reinstate
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # Reinstates a benefit application.
         #

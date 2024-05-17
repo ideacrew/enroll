@@ -6,7 +6,7 @@ module FinancialAssistance
       module Verifications
         # This class handles the validation of an applicant and updates the evidences as needed
         class ValidateApplicantAndUpdateEvidence
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
 
           EVIDENCE_ALIASES = RequestEvidenceDetermination::EVIDENCE_ALIASES
 

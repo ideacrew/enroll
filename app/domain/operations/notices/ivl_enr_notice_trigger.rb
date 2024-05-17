@@ -7,7 +7,7 @@ module Operations
   module Notices
     # IVL enrollment notice
     class IvlEnrNoticeTrigger
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
       include EventSource::Logging
       include ActionView::Helpers::NumberHelper

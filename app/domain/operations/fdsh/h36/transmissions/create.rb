@@ -6,7 +6,7 @@ module Operations
       module Transmissions
         # Send transmission request to generate h36
         class Create
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           include EventSource::Command
 
           # @param [Integer] assistance_year

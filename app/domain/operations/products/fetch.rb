@@ -5,7 +5,7 @@ module Operations
     # This class is to fetch product premiums for given family & effective date
     # This considers rating address for each person in the given family & gives lcsp details for all the family members at given address.
     class Fetch
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
 
       # @param [Date] effective_date

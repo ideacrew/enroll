@@ -9,7 +9,7 @@ module BenefitMarkets
 
       class Assign
         # include Dry::Monads::Do.for(:call)
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # Executes the assignment process for a Benefit Sponsor Catalog.
         # This method takes a hash of parameters, performs a series of operations

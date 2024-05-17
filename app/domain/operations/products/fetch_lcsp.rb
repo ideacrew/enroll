@@ -4,7 +4,7 @@ module Operations
   module Products
     # This class is to fetch lowest cost silver plan.
     class FetchLcsp
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       # @param [Hash of member premiums for silver plans] member_silver_product_premiums
 
       def call(params)

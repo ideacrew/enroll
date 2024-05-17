@@ -8,7 +8,7 @@ module FinancialAssistance
     module Applications
       # This operation can be used to handle needed retries of evidences
       class RetryEvidences
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [Hash] opts The options to retry evidences
         # @option opts [Array] :applicants

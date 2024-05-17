@@ -7,7 +7,7 @@ module Operations
   module Households
     # checks existing shop coverage in enroll for a person
     class CheckExistingCoverageByPerson
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(*args)
         args = args.first
