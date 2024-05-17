@@ -64,6 +64,8 @@ class VerificationType
   scope :citizenship_type, -> { by_name("Citizenship").active }
   scope :alive_status_type, -> { by_name("Alive Status").active }
 
+  scope :without_alive_status_type, -> { where(:type_name.ne => ALIVE_STATUS) }
+
   # embeds_many :external_service_responses  -> needs datamigration
   embeds_many :type_history_elements
 
@@ -73,10 +75,6 @@ class VerificationType
     def uploaded
       @target.select{|document| document.identifier }
     end
-  end
-
-  def filtered_verification_types
-    verification_types.reject { |type| type == 'Alive Status' }
   end
 
   def accept(visitor)
