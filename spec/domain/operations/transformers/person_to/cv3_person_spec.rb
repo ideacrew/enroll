@@ -163,6 +163,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
   describe '#transform_verification_types' do
     context 'due date is nil' do
       before do
+        person.verification_types.create(type_name: 'Alive Status')
         @subject = ::Operations::Transformers::PersonTo::Cv3Person.new.send(:transform_verification_types, person.verification_types)
       end
 

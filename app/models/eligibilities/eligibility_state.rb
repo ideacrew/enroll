@@ -22,12 +22,14 @@ module Eligibilities
 
     accepts_nested_attributes_for :evidence_states, :grants
 
-    def eligibility_states_cv3_hash
+    # seliarizable_cv_hash for eligibility states including evidence states
+    # @return [Hash] hash of eligibility states
+    def serializable_cv_hash
       evidence_states_hash = if evidence_states.present?
                                evidence_states.collect do |evidence_state|
                                  Hash[
                                    evidence_state.evidence_item_key,
-                                   evidence_state.evidence_states_cv3_hash
+                                   evidence_state.serializable_cv_hash
                                  ]
                                end.reduce(:merge)
                              else

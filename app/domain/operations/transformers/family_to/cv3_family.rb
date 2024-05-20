@@ -60,7 +60,7 @@ module Operations
 
         def transform_eligibility_determinination(family)
           return {} if family.eligibility_determination.nil?
-          family.eligibility_determination.determination_cv3_hash
+          family.eligibility_determination.serializable_cv_hash
         end
 
         def transform_applications(family, exclude_applications)

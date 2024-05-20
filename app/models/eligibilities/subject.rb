@@ -39,11 +39,13 @@ module Eligibilities
       ::Person.find(person_id)
     end
 
-    def subject_cv3_hash
+    # seliarizable_cv_hash for subject including eligibility states
+    # @return [Hash] hash of subject
+    def serializable_cv_hash
       eligibility_states_hash = eligibility_states.collect do |eligibility_state|
         Hash[
           eligibility_state.eligibility_item_key,
-          eligibility_state.eligibility_states_cv3_hash
+          eligibility_state.serializable_cv_hash
         ]
       end.reduce(:merge)
 

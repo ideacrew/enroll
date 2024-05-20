@@ -17,11 +17,14 @@ module Eligibilities
 
     accepts_nested_attributes_for :subjects, :grants
 
-    def determination_cv3_hash
+    # seliarizable_cv_hash for family determination including subjects
+    # @return [Hash] hash of family determination
+    # Used in family cv3 payload
+    def serializable_cv_hash
       subjects_cv3 = subjects.collect do |subject|
         Hash[
           URI(subject.gid),
-          subject.subject_cv3_hash
+          subject.serializable_cv_hash
         ]
       end.reduce(:merge)
 
