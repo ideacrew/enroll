@@ -9,7 +9,7 @@
   <% to_account_text = is_complete ? continue_to_account_text : l10n("back_to_my_account") %>
 
   <% if show_account_button || is_complete %>
-    <%= link_to to_account_text, main_app.family_account_path, class: "button btn-block my-4 text-center #{is_complete ? 'btn-primary' : 'secondary outline'}", id: 'btn-continue' %>
+    <%= h(link_to to_account_text, main_app.family_account_path, class: "button btn-block my-4 text-center #{is_complete ? 'btn-primary' : 'secondary outline'}", id: 'btn-continue') %>
   <% end %>
 
   <div style="display: flex; flex-direction: column;">
@@ -70,7 +70,7 @@
   <% to_account_text = is_complete ? continue_to_account_text : l10n("back_to_my_account") %>
 
   <% if show_account_button || is_complete %>
-    <%= link_to to_account_text, family_account_path, class: "btn btn btn-md full_width #{is_complete ? 'btn-primary' : 'btn-default'}", id: 'btn-continue', style: 'width: 100%; margin-top: 16px;' %>
+    <%= h(link_to to_account_text, family_account_path, class: "btn btn btn-md full_width #{is_complete ? 'btn-primary' : 'btn-default'}", id: 'btn-continue', style: 'width: 100%; margin-top: 16px;') %>
   <% end %>
 
   <div style="display: flex; flex-direction: column;">
