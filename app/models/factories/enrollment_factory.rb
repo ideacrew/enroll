@@ -18,9 +18,6 @@ module Factories
       is_state_resident = new_is_state_resident
       citizen_status = new_citizen_status
 
-      # all users w/consumer_role required to have a demographics_group
-      person.build_demographics_group
-
       # Assign consumer-specifc attributes
       consumer_role = person.build_consumer_role(ssn: ssn,
                                                  dob: dob,
@@ -107,6 +104,10 @@ module Factories
 
     def self.build_consumer_role(person, person_new)
       role = find_or_build_consumer_role(person)
+
+      # all users w/consumer_role required to have a demographics_group
+      person.build_demographics_group
+
       family, primary_applicant = initialize_family(person,[])
       family.family_members.map(&:__association_reload_on_person)
       saved = save_all_or_delete_new(family, primary_applicant, role)
