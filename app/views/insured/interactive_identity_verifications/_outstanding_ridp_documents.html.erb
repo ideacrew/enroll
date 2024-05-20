@@ -15,7 +15,9 @@
         <span class="d-flex align-content-center badge badge-lg badge-<%=ridp_type_class(ridp_type, @person)%>" id="status"><%= ridp_status_translated(ridp_type, @person) %></span> <%= pundit_span Family, :updateable? %>
         <div class="d-flex align-content-center">
         <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
-            <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Admin Actions', class: "button-select mr-2"} %>
+          <div class="v-type-actions mr-2">
+            <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Admin Actions', class: "button-select"} %>
+          </div>
         <% end %>
         <% if ridp_type_unverified?(ridp_type, @person) %>
           <% if ridp_type == 'Identity' %>
@@ -36,6 +38,13 @@
           <% end %>
         <% end %>
         </div>
+      </div>
+      <div class="w-100 px-0">
+        <% if ridp_type == "Identity" && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?) %>
+            <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+        <% elsif ridp_type == "Application" &&  pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?) %>
+            <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+        <% end %>
       </div>
     <% end %>
   </section>
