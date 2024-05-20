@@ -21,7 +21,7 @@ module Eligibilities
     # @return [Hash] hash of family determination
     # Used in family cv3 payload
     def serializable_cv_hash
-      subjects_cv3 = subjects.collect do |subject|
+      subjects_hash = subjects.collect do |subject|
         Hash[
           URI(subject.gid),
           subject.serializable_cv_hash
@@ -29,7 +29,7 @@ module Eligibilities
       end.reduce(:merge)
 
       {effective_date: effective_date,
-       subjects: subjects_cv3,
+       subjects: subjects_hash,
        outstanding_verification_status: outstanding_verification_status,
        outstanding_verification_earliest_due_date: outstanding_verification_earliest_due_date,
        outstanding_verification_document_status: outstanding_verification_document_status}.deep_symbolize_keys
