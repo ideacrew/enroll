@@ -417,7 +417,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.address_2_desc' => "Apt, Unit, etc.",
   :'en.city' => "City",
   :'en.state' => "State",
-  :'en.county' => "County",
   :'en.zip' => "Zip",
   :'en.zip_code' => "Zip Code",
   :'en.race_or_ethnicity' => "Race/Ethinicity",
