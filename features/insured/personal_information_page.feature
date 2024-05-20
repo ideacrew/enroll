@@ -30,3 +30,14 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual clicks on continue
     Then Individual agrees to the privacy agreeement
 
+  Scenario: Consumer clicks the continue button twice
+    When Individual creates a new HBX account
+    Then Individual should see a successful sign up message
+    And Individual sees Your Information page
+    When the user registers as an individual
+    And the Continue button is visible on the Account Setup page
+    And Individual clicks on the Continue button of the Account Setup page
+    Then Individual sees form to enter personal information
+    Then the continue button has data disabled attribute
+
+
