@@ -166,9 +166,9 @@ namespace :employers do
 
         profile = organization.employer_profile
         applications = if params[:start_date].present?
-                         profile.benefit_applications.where(:"effective_period.min".gte => start_date)
+                         profile&.benefit_applications&.where(:"effective_period.min".gte => start_date)
                        else
-                         profile.benefit_applications
+                         profile&.benefit_applications
                        end
         packages = applications&.map(&:benefit_packages)&.flatten
 
