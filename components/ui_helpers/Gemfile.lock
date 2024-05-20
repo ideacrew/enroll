@@ -33,7 +33,7 @@ PATH
       mongoid (~> 7.5.4)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
-      rails (~> 6.1.7.6)
+      rails (~> 6.1.7.7)
       slim (~> 3.0)
       symmetric-encryption (= 3.9.1)
 
@@ -41,7 +41,7 @@ PATH
   remote: .
   specs:
     ui_helpers (0.0.1)
-      rails (~> 6.1.7.6)
+      rails (~> 6.1.7.7)
 
 GEM
   remote: https://rubygems.org/
@@ -301,7 +301,7 @@ GEM
     rspec-expectations (3.13.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.0)
+    rspec-mocks (3.13.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-rails (5.0.3)
@@ -324,7 +324,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    sqlite3 (1.7.3)
+    sqlite3 (1.6.9)
       mini_portile2 (~> 2.8.0)
     symmetric-encryption (3.9.1)
       coercible (~> 1.0)
@@ -353,7 +353,7 @@ DEPENDENCIES
   financial_assistance!
   resource_registry!
   rspec-rails (~> 5.0.1)
-  sqlite3
+  sqlite3 (~> 1.6.9)
   ui_helpers!
 
 BUNDLED WITH
