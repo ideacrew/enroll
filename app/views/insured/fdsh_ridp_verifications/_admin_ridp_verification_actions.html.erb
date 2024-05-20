@@ -1,3 +1,32 @@
+<% if @bs4 %>
+  <% base_id = "#{@person.id}-#{ridp_type.split.join('-')}" %>
+  <!-- ***** Verification reason ***** -->
+  <div class="verification-update-reason" id=<%= base_id %> >
+    <label>Provide verification reason:</label>
+    <%= form_tag update_ridp_verification_type_documents_path, method: :put do %>
+      <%= hidden_field_tag 'person_id', @person.id  %>
+      <%= hidden_field_tag 'ridp_verification_type', ridp_type%>
+      <%= hidden_field_tag 'admin_action', 'verify' %>
+      <%= select_tag :verification_reason, options_for_select(::RidpDocument::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
+      <%= submit_tag "Confirm", class: "button v-type-confirm-button" %>
+    <%end%>
+  </div>
+  <!-- ==== verification reason ==== -->
+
+  <!-- ***** Reject reason ***** -->
+  <div class="verification-update-reason" id=<%="#{base_id}-return"%> >
+    <label>Reject reason:</label>
+    <%= form_tag update_ridp_verification_type_documents_path, method: :put do %>
+      <%= hidden_field_tag 'person_id', @person.id  %>
+      <%= hidden_field_tag 'ridp_verification_type', ridp_type%>
+      <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
+      <%= select_tag :verification_reason, options_for_select(::RidpDocument::RETURNING_FOR_DEF_REASONS), {prompt: ' Select Reason', required: true}%>
+      <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+    <%end%>
+  </div>
+  <!-- ==== reject reason ==== -->
+
+<% else %>
 <!-- ***** Verification reason ***** -->
 <div class="row">
   <div class="verification-update-reason col-md-12" id=<%="#{@person.id}-#{ridp_type.split.join('-')}"%>>
@@ -39,3 +68,4 @@
   </div>
 </div>
 <!-- ==== reject reason ==== -->
+<% end %>
