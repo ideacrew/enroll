@@ -111,7 +111,6 @@ module Factories
       family.family_members.map(&:__association_reload_on_person)
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
-        person.create_demographics_group
         role
       elsif person_new
         person.delete
