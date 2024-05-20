@@ -2,7 +2,6 @@ class WelcomeController < ApplicationController
   layout 'bootstrap_4'
   skip_before_action :require_login
   before_action :set_cookie_attributes, only: [:index]
-  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
   def show_hints
     current_user.hints = !current_user.hints
@@ -11,7 +10,7 @@ class WelcomeController < ApplicationController
   end
 
   def index
-    @
+    @bs4 = true if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   end
 
   def qna_bot
@@ -28,10 +27,6 @@ class WelcomeController < ApplicationController
   def set_cookie_attributes
     response.headers['Set-Cookie'] = "_session_id=#{session.id}; SameSite=Strict; Secure=true; HttpOnly"
     response.headers['Strict-Transport-Security'] = "max-age=31536000; includeSubDomains; preload"
-  end
-
-  def enable_bs4_layout
-    @bs4 = true
   end
 
 end
