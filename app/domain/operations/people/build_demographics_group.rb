@@ -10,16 +10,22 @@ module Operations
       include Dry::Monads[:result, :do]
 
       def call(person)
-        result = yield build_demographics_group(person)
+        valid_person = yield validate(person)
+        result = yield build_demographics_group(valid_person)
 
         Success(result)
       end
 
       private
 
-      def build_demographics_group(person)
-        return Failure('person does not have a consumer_role') unless person.consumer_role.present?
+      def validate(person)
+        return Failure('invalid person object') unless person&.valid?
+        return Failure('invalid consumer_role object') unless person.consumer_role&.valid?
 
+        Success(person)
+      end
+
+      def build_demographics_group(person)
         person.demographics_group = DemographicsGroup.new if person.demographics_group.blank?
         build_alive_status(person.demographics_group)
 

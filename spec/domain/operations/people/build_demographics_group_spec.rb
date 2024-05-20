@@ -13,7 +13,7 @@ describe Operations::People::BuildDemographicsGroup, dbclean: :after_each do
 
     it 'returns a failure' do
       expect(@result.failure?).to be_truthy
-      expect(@result.failure).to eq 'person does not have a consumer_role'
+      expect(@result.failure).to eq 'invalid consumer_role object'
     end
 
     it 'does not add a demographics group' do
