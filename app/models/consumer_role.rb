@@ -790,10 +790,22 @@ class ConsumerRole
 
   def collect_live_types
     live_types = []
+
+    # Add 'LOCATION_RESIDENCY' if the feature is enabled
     live_types << LOCATION_RESIDENCY if EnrollRegistry.feature_enabled?(:location_residency_verification_type)
-    live_types.concat(['Social Security Number', 'Alive Status']) if ssn
+
+    # Add 'Social Security Number' if SSN is present
+    live_types << 'Social Security Number' if ssn
+
+    # Add 'American Indian Status' if applicable
     live_types << 'American Indian Status' if ai_or_an?
+
+    # Add either 'Citizenship' or 'Immigration status' based on us_citizen
     live_types << (us_citizen ? 'Citizenship' : 'Immigration status') unless us_citizen.nil?
+
+    # Ensure 'Alive Status' is at the end of the array if it's included
+    live_types << 'Alive Status' if ssn.present? && EnrollRegistry.feature_enabled?(:enable_alive_status)
+
     live_types
   end
 
@@ -1191,7 +1203,7 @@ class ConsumerRole
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
-    verification_types.each do |v_type|
+    verification_types.reject { |type| ["Alive Status"].include?(type.type_name) }.each do |v_type|
       v_type.pending_type unless VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? (v_type.type_name)
     end
   end
