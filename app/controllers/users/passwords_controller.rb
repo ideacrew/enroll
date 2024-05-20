@@ -4,6 +4,8 @@ class Users::PasswordsController < Devise::PasswordsController
   include ActionView::Helpers::TranslationHelper
   include L10nHelper
 
+  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
   rescue_from 'Mongoid::Errors::DocumentNotFound', with: :user_not_found
   def create
     if verify_recaptcha_if_needed
@@ -77,5 +79,9 @@ class Users::PasswordsController < Devise::PasswordsController
 
   def after_resetting_password_path_for(resource_name)
     root_url
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end
