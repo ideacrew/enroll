@@ -565,9 +565,15 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
+      - name: Install Legacy Chrome
+        run: |
+          wget https://storage.googleapis.com/chrome-for-testing-public/124.0.6367.207/linux64/chrome-linux64.zip
+          unzip chrome-linux64.zip
       - name: Run tests
         env:
           COVERAGE: 'true'
+          WD_VERSION: "124.0.6367.207"
+          WD_CHROME_PATH: ${{ github.workspace }}/chrome-linux64/chrome
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
