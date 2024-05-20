@@ -1383,25 +1383,11 @@ class Person
   #   - used as a failsafe in case any family_members are missing a consumer role
   # 4.) Operations::People::CreateOrUpdateConsumerRole -> create_consumer_role
   #   - used when the legacy ::FinancialAssistance::Operations::Families::CreateOrUpdateMember propagates an applicant to a family_member
-  def create_demographics_group
-    # only create demographics_group for users with consumer roles
-    return unless consumer_role.present?
-
-    # check edge case: if users have demographics_group but not alive_status
-    if demographics_group.present? && demographics_group.alive_status.blank?
-      create_alive_status
-    elsif demographics_group.blank?
-      demographics_group = DemographicsGroup.new(alive_status: AliveStatus.new)
-      update(demographics_group: demographics_group)
-    end
+  def build_demographics_group
+    Operations::People::BuildDemographicsGroup.new.call(self)
   end
 
   private
-
-  def create_alive_status
-    alive_status = AliveStatus.new
-    demographics_group.update(alive_status: alive_status)
-  end
 
   def assign(collection, association)
     collection.each do |attributes|

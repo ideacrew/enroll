@@ -18,6 +18,9 @@ module Factories
       is_state_resident = new_is_state_resident
       citizen_status = new_citizen_status
 
+      # all users w/consumer_role required to have a demographics_group
+      person.build_demographics_group
+
       # Assign consumer-specifc attributes
       consumer_role = person.build_consumer_role(ssn: ssn,
                                                  dob: dob,
