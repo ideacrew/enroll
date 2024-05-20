@@ -11,6 +11,7 @@ module Exchanges
     layout 'bootstrap_4'
     before_action :set_seed, only: %i[edit]
     before_action :csv_format_valid?, only: %i[create]
+    before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     before_action :redirect_if_prod, :check_hbx_staff_role
     def new
@@ -125,6 +126,10 @@ module Exchanges
 
     def set_seed
       @seed = Seeds::Seed.find(params[:id])
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
   end
 end
