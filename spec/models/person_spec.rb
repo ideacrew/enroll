@@ -1811,6 +1811,45 @@ describe Person, :dbclean => :after_each do
   end
 end
 
+describe Person, "create_demographics_group", dbclean: :after_each do
+  context 'a user without a consumer_role' do
+    let(:person) { FactoryBot.create(:person, :with_broker_role) }
+
+    it 'does not add a demographics group' do
+      person.create_demographics_group
+
+      expect(person.demographics_group).to be_nil
+    end
+  end
+
+  context 'a user with a consumer_role' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+    context 'but without a demographics_group' do
+      it 'adds a demographics_group and an alive_status' do
+        person.create_demographics_group
+        demographics_group = person.demographics_group
+
+        expect(demographics_group).to be_instance_of DemographicsGroup
+        expect(demographics_group.alive_status).to be_instance_of AliveStatus
+      end
+    end
+
+    context 'with a demographics group but no alive_status' do
+      before do
+        person.update(demographics_group: DemographicsGroup.new)
+      end
+
+      it 'adds an alive_status to an existing demographics_group' do
+        person.create_demographics_group
+        alive_status = person.demographics_group.alive_status
+
+        expect(alive_status).to be_instance_of AliveStatus
+      end
+    end
+  end
+end
+
 describe Person, "with index definitions" do
   it "creates the indexes" do
     Person.remove_indexes
