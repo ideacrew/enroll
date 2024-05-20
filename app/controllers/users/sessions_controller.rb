@@ -5,7 +5,6 @@ class Users::SessionsController < Devise::SessionsController
   after_action :log_failed_login, :only => :new
   before_action :set_ie_flash_by_announcement, only: [:new]
   before_action :enable_bs4_layout, only: [:create, :new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-  before_action :enable_updated_layout, only: [:create, :new]
 
   def new
     super do
@@ -55,9 +54,5 @@ class Users::SessionsController < Devise::SessionsController
 
   def enable_bs4_layout
     @bs4 = true
-  end
-
-  def enable_updated_layout
-    @use_bs4_layout = true
   end
 end
