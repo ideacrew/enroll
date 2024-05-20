@@ -38,7 +38,11 @@
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
   </head>
   <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm d-flex flex-column justify-content-between min-vh-100">
-    <%= render partial: './ui-components/bs4/v1/navs/header' %>
+    <% if @bs4 %>
+     <%= render partial: './ui-components/bs4/v1/navs/header' %>
+    <% else %>
+      <%= render partial: './ui-components/v1/navs/header' %>
+    <% end %>
 
     <%= yield :horizontal_menu %>
 
@@ -59,8 +63,11 @@
         <%= yield %>
       <% end %>
     </main>
-
-    <%= render partial: './ui-components/bs4/v1/footers/footer' %>
+    <% if @bs4 %>
+      <%= render partial: './ui-components/bs4/v1/footers/footer' %>
+    <% else %>
+      <%= render partial: './ui-components/v1/layouts/footer' %>
+    <% end %>
     <% if EnrollRegistry.feature_enabled?(:jquery_migrate) %>
       <% if EnrollRegistry[:jquery_migrate].setting(:show_warnings).item == true %>
         <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
