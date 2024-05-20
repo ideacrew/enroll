@@ -10,6 +10,7 @@ module Exchanges
     before_action :updateable?
     layout 'single_column', except: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
     layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
+    before_action :enable_bs4_layout, only: [:new, :edit, :create, :update, :sorting_sep_types, :clone] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     def new
       @qle = Forms::QualifyingLifeEventKindForm.for_new
@@ -149,6 +150,10 @@ module Exchanges
       authorize QualifyingLifeEventKind, :can_manage_qles?
     rescue StandardError
       redirect_to root_path, :flash => { :error => l10n("controller.manage_sep_type.not_authorized") }
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
   end
 end
