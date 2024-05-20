@@ -9,6 +9,7 @@ module Exchanges
     before_action :set_current_user
     before_action :perform_authorization
     before_action :set_cache_headers, only: [:index, :new]
+    before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     def index
       @bulk_notices = Admin::BulkNotice.all.order([:updated_at, :desc])
@@ -70,6 +71,10 @@ module Exchanges
 
     def perform_authorization
       authorize HbxProfile, :can_send_secure_message?
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
   end
 end
