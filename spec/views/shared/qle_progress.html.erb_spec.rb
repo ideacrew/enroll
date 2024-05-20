@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe "shared/_qle_progress.html.erb" do
@@ -8,7 +10,7 @@ describe "shared/_qle_progress.html.erb" do
     before :each do
       assign :change_plan, "change"
       allow(person).to receive(:consumer_role).and_return(true)
-      @person=person
+      @person = person
       render 'shared/qle_progress', step: '1'
     end
 
@@ -21,7 +23,7 @@ describe "shared/_qle_progress.html.erb" do
     end
 
     it "should have 25% complete" do
-      expect(rendered).to match /25%/
+      expect(rendered).to match(/25%/)
     end
   end
 
@@ -36,7 +38,7 @@ describe "shared/_qle_progress.html.erb" do
     end
 
     it "should have 75% complete" do
-      expect(rendered).to match /75%/
+      expect(rendered).to match(/75%/)
     end
 
     it "should have li option for household" do
@@ -48,7 +50,7 @@ describe "shared/_qle_progress.html.erb" do
     end
 
     it "should have previous option" do
-      expect(rendered).to match /PREVIOUS/i
+      expect(rendered).to match(/PREVIOUS/i)
     end
 
     it "should not have disabled link" do
@@ -67,7 +69,7 @@ describe "shared/_qle_progress.html.erb" do
     end
 
     it "should have 75% complete" do
-      expect(rendered).to match /75%/
+      expect(rendered).to match(/75%/)
     end
 
     it "should have li option for household" do
@@ -79,7 +81,7 @@ describe "shared/_qle_progress.html.erb" do
     end
 
     it "should have previous option" do
-      expect(rendered).to match /PREVIOUS/i
+      expect(rendered).to match(/PREVIOUS/i)
     end
 
     it "should have disabled link" do
