@@ -299,6 +299,8 @@ ul.list-right-section li {
   line-height: 40px;
 }
 
+.verification-update-reason {display: none}
+
 @media screen and (max-width: 767px) {
   .sm-space, .col-sm {
     margin-bottom: $spacer;
