@@ -41,7 +41,6 @@ export default class extends Controller {
       event.preventDefault();
       //clone new location node, unhide remove button, modify name attribute
       var newLocation = document.importNode(this.officeLocationTarget, true)
-      console.log(this.officeLocationTarget);
       var totalLocations = document.importNode(this.officeLocationsTarget, true)
       // totalLocationsCount includes currently loaded OL form too
       var totalLocationsCount = totalLocations.querySelectorAll('.ol_title').length;
