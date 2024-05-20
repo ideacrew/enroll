@@ -710,9 +710,13 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
         end
 
         describe "pending verification type updates" do
+          before do
+            allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+          end
+
           it "updates validation status to pending for unverified consumers" do
             consumer.coverage_purchased!
-            expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "unverified", "pending"])
+            expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending", "unverified"])
           end
 
           it "updates indian tribe validition status to negative_response_received and to pending for the rest" do
@@ -992,6 +996,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
       shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
         before do
+          allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
           allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
           person.ssn = nil unless ssn
           person.us_citizen = citizen
@@ -1014,7 +1019,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       end
 
       context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Alive Status", "Citizenship"], 4, "2222222222", true, nil, 25
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "Alive Status"], 4, "2222222222", true, nil, 25
       end
 
       context "SSN + Immigrant" do
@@ -1022,7 +1027,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       end
 
       context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Alive Status", "Citizenship", "American Indian Status"], 5, "2222222222", true, "native", 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "Alive Status", "American Indian Status"], 5, "2222222222", true, "native", 20
       end
 
       context "Citizen with NO SSN" do
