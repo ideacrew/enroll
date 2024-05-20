@@ -4,6 +4,7 @@ class Users::SessionsController < Devise::SessionsController
   respond_to :html, :js
   after_action :log_failed_login, :only => :new
   before_action :set_ie_flash_by_announcement, only: [:new]
+  before_action :enable_bs4_layout, only: [:create, :new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
   def new
     super do
@@ -45,5 +46,9 @@ class Users::SessionsController < Devise::SessionsController
 
   def failed_login?
    (options = Rails.env["warden.options"]) && options[:action] == "unauthenticated"
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end
