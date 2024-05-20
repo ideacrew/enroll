@@ -1191,7 +1191,7 @@ class ConsumerRole
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
-    verification_types.each do |v_type|
+    verification_types.without_alive_status_type.each do |v_type|
       v_type.pending_type unless VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? (v_type.type_name)
     end
   end
