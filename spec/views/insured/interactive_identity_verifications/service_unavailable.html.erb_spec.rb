@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 describe "insured/interactive_identity_verifications/service_unavailable" do
