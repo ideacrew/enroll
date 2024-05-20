@@ -30,7 +30,7 @@
               <%= address.hidden_field :_destroy %></span>
 
               <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")} *" %>
-              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "full-width", required: required.present? %>
+              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} full-width", required: required.present? %>
             </div>
           </div>
           <div class="mr col-sm col-md-6 p-0">
