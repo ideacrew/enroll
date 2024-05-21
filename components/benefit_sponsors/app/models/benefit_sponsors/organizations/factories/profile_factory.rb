@@ -188,9 +188,10 @@ module BenefitSponsors
 
         def build_person
           Person.new({
-                       :first_name => first_name.strip,
-                       :last_name => last_name.strip,
-                       :dob => dob
+                       first_name: first_name.strip,
+                       last_name: last_name.strip,
+                       dob: dob,
+                       no_ssn: 1
                      })
         end
 
