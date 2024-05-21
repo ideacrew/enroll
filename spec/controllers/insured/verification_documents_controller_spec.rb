@@ -163,6 +163,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
             context 'uploading alive_status verification documentation' do
               before do
+                allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
                 alive_status = person.verification_type_by_name('Alive Status')
                 file = fixture_file_upload("#{Rails.root}/test/uhic.jpg")
                 allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
