@@ -1,3 +1,32 @@
+<% if @bs4 %>
+<div class="modal backdrop-modal" id="sessionExpirationWarningModal" tabindex="-1" role="dialog" role="document" data-backdrop="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="d-flex align-items-center">
+        <div class="pl-2">
+          <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+        </div>
+        <div class="my-1 pl-0 pr-2">
+          <h4 class="modal-title">Session Ending Soon</h4>
+        </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p>
+          Your session will expire in <strong><%= @time_left %></strong>
+          seconds. If you’d like to continue with your application, select STAY LOGGED IN.
+        </p>
+        <ul class="application-warnings"></ul>
+      </div>
+      <div class="modal-footer">
+        <%= link_to l10n(".logout"), destroy_user_session_path, method: "delete", class: "button outline", tabindex: "0" %>
+        <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'stay-logged-in')", id="stay-logged-in" class="button" data-dismiss="modal"><%= l10n("faa.stay_logged_in") %></span>
+      </div>
+    </div>
+  </div>
+</div>
+<% else %>
 <div class="modal" id="sessionExpirationWarningModal" tabindex="-1" role="dialog" role="document">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -6,10 +35,7 @@
       </div>
       <div class="modal-body">
         <p>
-          Your session will expire in
-          <strong>
-            <%= @time_left %>
-          </strong>
+          Your session will expire in <strong><%= @time_left %></strong>
           seconds. If you’d like to continue with your application, select STAY LOGGED IN.
         </p>
         <ul class="application-warnings"></ul>
@@ -21,3 +47,4 @@
     </div>
   </div>
 </div>
+<% end %>
