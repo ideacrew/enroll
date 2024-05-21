@@ -70,7 +70,7 @@ module VerificationHelper
     when 'in review'
       l10n("ridp_status.in_review")
     when 'valid'
-      l10n("ridp_status.valid")
+      l10n("ridp_status.verified")
     when 'rejected'
       l10n('verification_type.validation_status')
     else
