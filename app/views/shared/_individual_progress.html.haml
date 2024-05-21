@@ -41,7 +41,7 @@
   = link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary  btn-block'
 - elsif step == 1
   %span{tabindex: '0', onkeydown: "handleButtonKeyDown(event, 'continue_button')", id: 'continue_button', class: 'btn btn-lg btn-primary btn-br btn-block', onkeydown: 'handleButtonKeyDown(event, "continue_button");', onclick: 'PersonValidations.manageRequiredValidations($(this));'} CONTINUE
-  %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue.hidden{type: 'submit'}
+  %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue.hidden{type: 'submit', 'data-disable-with': l10n("please_wait")}
     CONTINUE
 - elsif ridp == true && step == 2
   - if next_link.present?  && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper")
