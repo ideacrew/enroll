@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WelcomeController < ApplicationController
   layout 'bootstrap_4'
   skip_before_action :require_login
@@ -16,7 +18,6 @@ class WelcomeController < ApplicationController
   def qna_bot
     render :layout => false
   end
-
 
   def form_template
     # created for generic form template access at '/templates/form-template'
