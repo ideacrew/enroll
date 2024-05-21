@@ -65,6 +65,12 @@
     "false_positive": true,
     "ignored_at": "2024-05-20T19:53:58Z"
   },
+  "dc369468d8a5d5bb522d023ae7485376_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but the value exists in development environment configuration file. This is a dummy value and only used in local development.",
+    "false_positive": true,
+    "ignored_at": "2024-05-21T19:12:52Z"
+  },
   "dc369468d8a5d5bb522d023ae7485376_1": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The value 'dchbx 2017' is a dummy value used for local development and testing, and does not represent a real API secret.",

@@ -23,7 +23,7 @@ module BenefitSponsors
         if :renew_sponsor_benefit == event_name
           process_event { renew_sponsor_benefit(async_workflow_id) }
         else
-          process_event { eval(event_name.to_s) }
+          process_event { event_name_to_event(event_name.to_s) }
         end
       else
         # log()
@@ -156,6 +156,29 @@ module BenefitSponsors
     end
 
     private
+
+    def event_name_to_event(event_name)
+      case event_name
+      when 'begin_open_enrollment'
+        begin_open_enrollment
+      when 'end_open_enrollment'
+        end_open_enrollment
+      when 'begin_sponsor_benefit'
+        begin_sponsor_benefit
+      when 'end_sponsor_benefit'
+        end_sponsor_benefit
+      when 'terminate_sponsor_benefit'
+        terminate_sponsor_benefit
+      when 'terminate_pending_sponsor_benefit'
+        terminate_pending_sponsor_benefit
+      when 'mark_initial_ineligible'
+        mark_initial_ineligible
+      when 'auto_cancel_ineligible'
+        auto_cancel_ineligible
+      when 'auto_submit_application'
+        auto_submit_application
+      end
+    end
 
     def update_fein_errors(error_messages, new_fein)
       error_messages.to_a.inject([]) do |f_errors, error|

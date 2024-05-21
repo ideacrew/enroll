@@ -68,12 +68,27 @@ module Importers::Mhc
         "employee_and_one_or_more_dependents",
         "family"
       ]
+
+      rt_contribution_mapping = {
+        'employee_only' => employee_only_rt_contribution,
+        'employee_and_spouse' => employee_and_spouse_rt_contribution,
+        'employee_and_one_or_more_dependents' => employee_and_one_or_more_dependents_rt_contribution,
+        'family' => family_rt_contribution
+      }
+
+      rt_premium_mapping = {
+        'employee_only' => employee_only_rt_premium,
+        'employee_and_spouse' => employee_and_spouse_rt_premium,
+        'employee_and_one_or_more_dependents' => employee_and_one_or_more_dependents_rt_premium,
+        'family' => family_rt_premium
+      }
+
       contribution_level_names.inject([]) do |contributions, sponsor_level_name|
         contributions << {
           relationship: sponsor_level_name,
           offered: tier_offered?(sponsor_level_name),
-          premium_pct: eval("#{sponsor_level_name}_rt_contribution"),
-          estimated_tier_premium: eval("#{sponsor_level_name}_rt_premium")
+          premium_pct: rt_contribution_mapping[sponsor_level_name],
+          estimated_tier_premium: rt_premium_mapping[sponsor_level_name]
         }
       end
     end

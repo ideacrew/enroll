@@ -58,10 +58,18 @@ module BenefitSponsors
             "employer_domestic_partner",
             "employer_child_under_26"
         ]
+
+        rt_contribution_mapping = {
+          'employee_only' => employee_only_rt_contribution,
+          'employee_and_spouse' => employee_and_spouse_rt_contribution,
+          'employer_domestic_partner' => employer_domestic_partner_rt_contribution,
+          'employer_child_under_26' => employer_child_under_26_rt_contribution
+        }
+
         contribution_level_names.inject([]) do |contributions, sponsor_level_name|
           contributions << {
-              relationship: sponsor_level_name,
-              premium_pct: eval("#{sponsor_level_name}_rt_contribution"),
+            relationship: sponsor_level_name,
+            premium_pct: rt_contribution_mapping[sponsor_level_name]
           }
         end
       end

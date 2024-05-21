@@ -57,19 +57,40 @@ module Importers::Mhc
     end
 
     def build_composite_tier_contributions(benefit_group)
+      rt_offered_mapping = {
+        'employee_and_one_or_more_dependents' => employee_and_one_or_more_dependents_rt_offered,
+        'employee_and_spouse' => employee_and_spouse_rt_offered,
+        'family' => family_rt_offered
+      }
+
+      rt_contribution_mapping = {
+        'employee_and_one_or_more_dependents' => employee_and_one_or_more_dependents_rt_contribution,
+        'employee_and_spouse' => employee_and_spouse_rt_contribution,
+        'family' => family_rt_contribution
+      }
+
+      rt_premium_mapping = {
+        'employee_and_one_or_more_dependents' => employee_and_one_or_more_dependents_rt_premium,
+        'employee_and_spouse' => employee_and_spouse_rt_premium,
+        'family' => family_rt_premium
+      }
+
       composite_tiers = []
       composite_tiers << build_employee_rating_tier(benefit_group)
 
       rating_tier_names = CompositeRatingTier::NAMES.reject{|rating_tier| rating_tier == 'employee_only'}
 
       rating_tier_names.each do |rating_tier|
-        composite_tiers << benefit_group.composite_tier_contributions.build({
-          composite_rating_tier: rating_tier, 
-          offered: tier_offered?(eval("#{rating_tier}_rt_offered").to_s),
-          employer_contribution_percent: eval("#{rating_tier}_rt_contribution"),
-          estimated_tier_premium: eval("#{rating_tier}_rt_premium"),
-          final_tier_premium: eval("#{rating_tier}_rt_premium")
-        })
+        tier_premium = rt_premium_mapping[rating_tier]
+        composite_tiers << benefit_group.composite_tier_contributions.build(
+          {
+            composite_rating_tier: rating_tier,
+            offered: tier_offered?(rt_offered_mapping[rating_tier].to_s),
+            employer_contribution_percent: rt_contribution_mapping[rating_tier],
+            estimated_tier_premium: tier_premium,
+            final_tier_premium: tier_premium
+          }
+        )
       end
 
       composite_tiers
