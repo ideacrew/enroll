@@ -78,8 +78,8 @@ input.full-width, select.full-width, .input.full-width {
   width: 100%;
 }
 
-input + label,
-input + fieldset,
+input:not([type="hidden"]) + label,
+input:not([type="hidden"]) + fieldset,
 select + label,
 select + fieldset,
 .input + label,
