@@ -59,7 +59,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :"en.insured.consumer_roles.contact_info_for" => "Contact Information for",
   :"en.insured.consumer_roles.home_address" => "Home Address",
   :"en.insured.consumer_roles.phone_and_email" => "Phone and Email",
-  :"en.insured.consumer_roles.please_provide" => "Please provide as much information as possible",
   :"en.insured.consumer_roles.immigration_field_warning1" => "It's important to enter as many fields from your immigration documents as possible",
   :'en.your_information' => "Privacy & Use of Your Information",
   :'en.continue_next' => "Continue to Next Step",
