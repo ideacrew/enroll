@@ -5,10 +5,10 @@ module Factories
     def self.add_consumer_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
                                new_is_state_resident:, new_citizen_status:)
 
-      [:new_is_incarcerated, :new_is_applicant, :new_is_state_resident, :new_citizen_status].each do |value|
-        name = value.id2name
-        raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
-      end
+      raise ArgumentError.new('missing value: new_is_incarcerated, expected as keyword') if new_is_incarcerated.blank?
+      raise ArgumentError.new('missing value: new_is_applicant, expected as keyword') if new_is_applicant.blank?
+      raise ArgumentError.new('missing value: new_is_state_resident, expected as keyword') if new_is_state_resident.blank?
+      raise ArgumentError.new('missing value: new_citizen_status, expected as keyword') if new_citizen_status.blank?
 
       ssn = new_ssn
       dob = new_dob
@@ -37,10 +37,10 @@ module Factories
     def self.add_resident_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
                                new_is_state_resident:, new_citizen_status:)
 
-      [:new_is_incarcerated, :new_is_applicant, :new_is_state_resident, :new_citizen_status].each do |value|
-        name = value.id2name
-        raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
-      end
+      raise ArgumentError.new('missing value: new_is_incarcerated, expected as keyword') if new_is_incarcerated.blank?
+      raise ArgumentError.new('missing value: new_is_applicant, expected as keyword') if new_is_applicant.blank?
+      raise ArgumentError.new('missing value: new_is_state_resident, expected as keyword') if new_is_state_resident.blank?
+      raise ArgumentError.new('missing value: new_citizen_status, expected as keyword') if new_citizen_status.blank?
 
       ssn = new_ssn
       dob = new_dob
@@ -123,11 +123,9 @@ module Factories
 
     def self.add_broker_role(person:, new_kind:, new_npn:, new_mailing_address:)
 
-      [:new_kind, :new_npn, :new_mailing_address].each do |value|
-        name = value.id2name
-
-        raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
-      end
+      raise ArgumentError.new('missing value: new_kind, expected as keyword') if new_kind.blank?
+      raise ArgumentError.new('missing value: new_npn, expected as keyword') if new_npn.blank?
+      raise ArgumentError.new('missing value: new_mailing_address, expected as keyword') if new_mailing_address.blank?
 
       kind = new_kind
       npn = new_npn

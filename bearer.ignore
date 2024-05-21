@@ -1,92 +1,86 @@
 {
-  '218f24cab2d393b88605c63b725bfadf_0': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:52:47Z'
+  "218f24cab2d393b88605c63b725bfadf_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:52:47Z"
   },
-  '218f24cab2d393b88605c63b725bfadf_1': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:53:12Z'
+  "218f24cab2d393b88605c63b725bfadf_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:53:12Z"
   },
-  '306528f9fa20c7611275ed35b93bc7ad_0': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The use of 'guest' here is not a security issue. It's just a placeholder value that's used in non production environment like development and test. In the production environment, the RABBITMQ_PASSWORD environment variable will be set to a secure value.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T21:18:40Z'
+  "306528f9fa20c7611275ed35b93bc7ad_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The use of 'guest' here is not a security issue. It's just a placeholder value that's used in non production environment like development and test. In the production environment, the RABBITMQ_PASSWORD environment variable will be set to a secure value.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T21:18:40Z"
   },
-  '4319d938db66ae9f4ea873a42f393d4f_0': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Leakage of information in logger message [CWE-532]'. The value 'e2dab122-114a-43a3-aaf5-78caafbbec02' is a dummy value used for local development and testing, and does not represent a real API key.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T20:34:38Z'
+  "56bf1733fc31b3b3a17467150c5967e6_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' . The use of 'dummy' here is not a security issue. It's just a placeholder value that's used when the real API key is not available. In the production environment, the WF_API_KEY environment variable will be set to a secure value.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T20:15:54Z"
   },
-  '56bf1733fc31b3b3a17467150c5967e6_0': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' . The use of 'dummy' here is not a security issue. It's just a placeholder value that's used when the real API key is not available. In the production environment, the WF_API_KEY environment variable will be set to a secure value.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T20:15:54Z'
+  "56bf1733fc31b3b3a17467150c5967e6_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The use of 'dummy' here is not a security issue. It's just a placeholder value that's used when the real API secret is not available. In the production environment, the WF_API_SECRET environment variable will be set to a secure value.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T20:23:32Z"
   },
-  '56bf1733fc31b3b3a17467150c5967e6_1': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The use of 'dummy' here is not a security issue. It's just a placeholder value that's used when the real API secret is not available. In the production environment, the WF_API_SECRET environment variable will be set to a secure value.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T20:23:32Z'
+  "a261fe84031c542c9d50b0d4fe1a9c0f_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:54:15Z"
   },
-  'a261fe84031c542c9d50b0d4fe1a9c0f_0': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:54:15Z'
+  "a261fe84031c542c9d50b0d4fe1a9c0f_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:54:32Z"
   },
-  'a261fe84031c542c9d50b0d4fe1a9c0f_1': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:54:32Z'
+  "b513de77a9efc0c21c839a00b5477815_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:47:28Z"
   },
-  'b513de77a9efc0c21c839a00b5477815_0': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:47:28Z'
+  "b513de77a9efc0c21c839a00b5477815_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:50:18Z"
   },
-  'b513de77a9efc0c21c839a00b5477815_1': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:50:18Z'
+  "d5f5bf4a6b1ec5af16b2f7cbe2056219_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:53:38Z"
   },
-  'd5f5bf4a6b1ec5af16b2f7cbe2056219_0': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:53:38Z'
+  "d5f5bf4a6b1ec5af16b2f7cbe2056219_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:53:58Z"
   },
-  'd5f5bf4a6b1ec5af16b2f7cbe2056219_1': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:53:58Z'
+  "dc369468d8a5d5bb522d023ae7485376_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The value 'dchbx 2017' is a dummy value used for local development and testing, and does not represent a real API secret.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T20:37:12Z"
   },
-  'dc369468d8a5d5bb522d023ae7485376_1': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The value 'dchbx 2017' is a dummy value used for local development and testing, and does not represent a real API secret.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T20:37:12Z'
+  "e20e516739cd3c5ce52de20620547521_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:51:15Z"
   },
-  'e20e516739cd3c5ce52de20620547521_0': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:51:15Z'
-  },
-  'e20e516739cd3c5ce52de20620547521_1': {
-    'author': 'Sai Kumar Kotagiri',
-    'comment': "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
-    'false_positive': true,
-    'ignored_at': '2024-05-20T19:51:49Z'
+  "e20e516739cd3c5ce52de20620547521_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:51:49Z"
   }
 }
