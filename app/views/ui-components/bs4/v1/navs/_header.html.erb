@@ -27,7 +27,8 @@
         <% if signed_in? %>
           <li class="nav-item-divider"></li>
           <li class="nav-item d-flex flex-column align-items-end">
-            <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= l10n('layout.header.user_and_id', name: user_first_name_last_name_and_suffix, id: current_user.try(:person).try(:hbx_id)) %></span>
+            <% user_id = current_user.try(:person).try(:hbx_id) %>
+            <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= " #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
             <span class="horizontal-links">
               <%= render partial: "shared/my_portal_links" %>
               <span>
