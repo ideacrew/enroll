@@ -29,6 +29,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
 -li- How to find the SEVIS ID: On the DS-2019, the number is on the top right hand side of the page in the box above the barcode.",
   :'en.insured.consumer_roles.docs_shared.visa_number' => "Visa Number",
   :'en.insured.consumer_roles.docs_shared.visa_number_req' => "Enter 8-12 numbers. -li- Do not enter any other characters or spaces.",
+  :'en.insured.consumer_roles.docs_shared.other_status_question' => "Does this person also have any of these document types or statuses?",
+  :'en.insured.consumer_roles.docs_shared.none_of_above_note' => "(Select this if this person doesn't have a listed document. You can continue the application without selecting a document or status type)",
   :'en.personal_information' => "Personal Information",
   :'en.personal_info' => "Personal Info",
   :"en.tell_us_about_yourself" => "Tell Us About Yourself",
