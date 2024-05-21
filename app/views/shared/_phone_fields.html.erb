@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <div id="phone_info">
-    <div class="phone d-flex mb-md-4 row col-sm">
+    <div class="phone d-flex mb-md-2 row col-sm">
       <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
         <% kind = phone.object.kind.upcase %>
         <% required = kind == 'HOME' ? "required" : "" %>
