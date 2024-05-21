@@ -329,3 +329,16 @@ ul.list-right-section li {
 .full-height {
   height: 70vh;
 }
+
+// modals
+
+.backdrop-modal {
+  background: hsla(0, 0%, 0%, 0.2);
+  .modal-header {
+    border-bottom: 0;
+  }
+
+  .modal-footer {
+    border-top: 0;
+  }
+}
