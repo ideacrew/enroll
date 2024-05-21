@@ -14,7 +14,7 @@
     </legend>
     <div class="d-flex align-items-center">
       <label for="agreement_agree" tabindex="0" class="radio" data-radio-event="agreement_disagree">
-        <%= radio_button_tag :agreement, "agree", class: "required", id: 'agreement_agree' %>
+        <%= radio_button_tag :agreement, "agree", true, class: "required", id: 'agreement_agree' %>
         <%= l10n('faa.i_agree') %>
       </label>
       <%= javascript_tag do %>
@@ -27,7 +27,7 @@
       <% end %>
 
       <label for="agreement_disagree" tabindex="0" class="radio" data-radio-event="agreement_disagree">
-        <%= radio_button_tag :agreement, "disagree", class: "required", id: 'agreement_disagree' %>
+        <%= radio_button_tag :agreement, "disagree", false, class: "required", id: 'agreement_disagree' %>
         <%= l10n('faa.i_disagree') %>
       </label>
     </div>
