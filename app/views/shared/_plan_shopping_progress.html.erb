@@ -1,8 +1,5 @@
 <% step = (defined? step) ? step.to_i : 1 %>
-<% ridp = (defined? ridp) ? ridp : false %>
-<% continue_disabled = (defined? continue_disabled) ? continue_disabled : false %>
 
-<% step = (defined? step) ? step.to_i : 1 %>
 <% content_for(:step) { step } %>
 <% content_for(:title) { l10n('insured.enroll_in_coverage') } %>
 <% content_for(:nav_options) do %>

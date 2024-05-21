@@ -44,16 +44,6 @@ module NavigationHelper
     end
   end
 
-  def family_info_progress_hash
-    if @change_plan.present?
-      {step: '1', option_hash: qle_nav_options}
-    elsif @type == "employee"
-      {step: '4', option_hash: sep_nav_options}
-    else
-      {step: '3', option_hash: individual_nav_options}
-    end
-  end
-
   def plan_shopping_progress_hash
     if @change_plan.blank? && @market_kind == "individual"
       if @enrollment_kind.blank? && is_under_open_enrollment?
