@@ -58,9 +58,7 @@
     <fieldset class="d-flex row col-sm">
       <legend class="required"><%= l10n("does_person_need_coverage", person: @person.first_name.present? ? @person.first_name : "this person") %></legend>
       <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
-      <div class="d-flex align-items-center mt-2">
-        <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
-      </div>
+      <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
     </fieldset>
   </div>
   <%= render 'shared/ssn_coverage_msg' %>
