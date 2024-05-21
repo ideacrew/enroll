@@ -365,7 +365,7 @@ module ApplicationHelper
   end
 
   def get_flash(use_bs4, type, msg)
-    type = use_bs4 ? get_bs4_flash_type(type) : type
+    type = use_bs4 ? get_flash_type(type) : type
     if is_announcement?(msg)
       render(:partial => 'layouts/announcement_flash', :locals => {:type => type, :message => msg[:announcement]})
     else
@@ -373,7 +373,7 @@ module ApplicationHelper
     end
   end
 
-  def get_bs4_flash_type(type)
+  def get_flash_type(type)
     case type
     when "notice"
       "info"
