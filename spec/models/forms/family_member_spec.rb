@@ -400,28 +400,49 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
     end
 
     describe "for a new person" do
-      let(:new_family_member_id) { double }
-      let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save => true) }
-      let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
+      context 'creating a new person' do
+        let(:new_family_member_id) { double }
+        let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save => true) }
+        let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
 
-      before do
-        allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
-        allow(family).to receive(:save!).and_return(true)
-        allow(subject).to receive(:assign_person_address).and_return true
+        before do
+          allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
+          allow(family).to receive(:save!).and_return(true)
+          allow(subject).to receive(:assign_person_address).and_return true
+        end
+
+        it "should create a new person" do
+          person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
+          expect(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil, :age_off_excluded => nil})).and_return(new_person)
+          subject.save
+        end
+
+        it "should create a new family member and call save_relevant_coverage_households" do
+          person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
+          allow(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil, :age_off_excluded => nil})).and_return(new_person)
+          expect(family).to receive(:save_relevant_coverage_households)
+          subject.save
+          expect(subject.id).to eq new_family_member_id
+        end
       end
 
-      it "should create a new person" do
-        person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
-        expect(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil, :age_off_excluded => nil})).and_return(new_person)
-        subject.save
-      end
+      context 'creating demographics_group and alive_status after creating a consumer_role' do
+        let(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 12.years.ago, ssn: '472743442') }
+        let(:demo_family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
-      it "should create a new family member and call save_relevant_coverage_households" do
-        person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
-        allow(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil, :age_off_excluded => nil})).and_return(new_person)
-        expect(family).to receive(:save_relevant_coverage_households)
-        subject.save
-        expect(subject.id).to eq new_family_member_id
+        subject { Forms::FamilyMember.new(person_properties.merge({family_id: demo_family.id, relationship: :child_under_26, is_consumer_role: 'true' })) }
+
+        before do
+          allow(Family).to receive(:find).and_return(demo_family)
+        end
+
+        it 'should create demographics_group and alive_status after creating consumer role' do
+          subject.save
+          demographics_group = subject.family_member.person.demographics_group
+
+          expect(demographics_group).to be_a DemographicsGroup
+          expect(demographics_group.alive_status).to be_a AliveStatus
+        end
       end
     end
   end
