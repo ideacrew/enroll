@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <div class="mt-4 mb-4">
-    <%= label_tag :citizenship_number, l10n("insured.consumer_roles.docs_shared.citizenship_number"), class: "#{!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "required" : ""}doc_fields" %>
+    <%= label_tag :citizenship_number, l10n("insured.consumer_roles.docs_shared.citizenship_number"), class: "weight-n #{!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "required" : ""}doc_fields" %>
     <%= v.text_field :citizenship_number, :placeholder => l10n("insured.consumer_roles.docs_shared.citizenship_number"),
                    :pattern => "[a-zA-Z0-9]{6,12}",
                    :class => "doc_fields",
