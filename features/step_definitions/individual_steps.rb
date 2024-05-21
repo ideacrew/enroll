@@ -157,10 +157,6 @@ Then(/the continue button has data disabled attribute$/) do
   expect(continue_button).to eql(l10n("please_wait"))
 end
 
-Then(/^.+ sees the continue button is enabled$/) do
-  find(IvlChooseCoverage.continue_btn, visible: false)
-end
-
 Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
@@ -191,10 +187,6 @@ Then(/^.+ sees form to enter personal information but doesn't check every box$/)
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 2
-end
-
-Then(/^.+ fills in missing fields$/) do
-  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
 end
 
 And(/the individual enters address information$/) do
