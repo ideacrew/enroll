@@ -7,7 +7,6 @@ class Insured::VerificationDocumentsController < ApplicationController
   before_action :set_current_person
   before_action :find_type, :find_docs_owner, :alive_status_authorization?, only: [:upload]
   before_action :check_for_consumer_role
-  # before_action :check_alive_status_authorization
 
   def upload
     authorize @consumer_role, :verification_document_upload?
