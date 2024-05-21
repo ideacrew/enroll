@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 2} %>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
   <h1><%= l10n("verify_identity") %></h1>
   <p><%= l10n(".answer_the_following_questions_when_you_finish") %></p>
   <%= form_for(@interactive_verification, as: :interactive_verification, url: insured_interactive_identity_verifications_path, method: :post) do |f| %>
