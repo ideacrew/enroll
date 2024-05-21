@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <div class="mt-4 mb-4">
-    <%= label_tag :sevis_id, l10n("insured.consumer_roles.docs_shared.sevis_id") %>
+    <%= label_tag :sevis_id, l10n("insured.consumer_roles.docs_shared.sevis_id"), class: "weight-n" %>
     <%= v.text_field :sevis_id, :placeholder => l10n("insured.consumer_roles.docs_shared.sevis_id"),
                     :pattern => "\\d{10}",
                     :class => "doc_fields",
