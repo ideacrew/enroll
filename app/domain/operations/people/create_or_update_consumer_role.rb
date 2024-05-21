@@ -45,6 +45,8 @@ module Operations
           person.build_consumer_role({:is_applicant => false}.merge(entity.to_h))
         end
 
+        # All persons with a consumer_role are required to have a demographics_group
+        person.build_demographics_group
         person.save!
 
         Success(person.consumer_role)

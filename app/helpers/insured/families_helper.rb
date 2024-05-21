@@ -385,11 +385,12 @@ module Insured::FamiliesHelper
     if family.primary_applicant.person == person
       contact_method = person.resident_role&.contact_method ? person.resident_role.contact_method : "Paper and Electronic communications"
       person.build_consumer_role({:is_applicant => true, :contact_method => contact_method})
-      person.save!
     else
       person.build_consumer_role({:is_applicant => false})
-      person.save!
     end
+    # All persons with a consumer_role are required to have a demographics_group
+    person.build_demographics_group
+    person.save!
   end
 
   def build_resident_role(person, family)
