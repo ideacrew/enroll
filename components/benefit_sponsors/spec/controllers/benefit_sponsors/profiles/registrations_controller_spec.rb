@@ -346,7 +346,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
               expect(response.location.include?("new?profile_type=general_agency")).to eq true if profile_type == "general_agency"
             end
 
-            it "should create stuff person with no ssn" do
+            it "should create staff person with no ssn" do
               person = Person.where(
                 first_name: staff_roles_attributes[0][:first_name],
                 last_name: staff_roles_attributes[0][:last_name],
