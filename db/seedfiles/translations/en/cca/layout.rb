@@ -1,6 +1,6 @@
 LAYOUT_TRANSLATIONS = {
   "en.layout.header.customer_service" => "Call Customer Service",
-  "en.layout.header.user_and_id" => "%{name} ID: %{id}",
+  "en.layout.header.id" => "ID:",
   "en.layout.header.help" => "Help",
   "en.layout.header.logout" => "Logout",
   "en.layout.header.role.admin" => "Admin",
