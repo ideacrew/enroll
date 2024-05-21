@@ -31,7 +31,7 @@
             <% end %>
             <% verification_filter.each do |verif_type| %>
               <% v_type = verif_type.type_name %>
-              <% if can_display_type?(verif_type) %>
+              <% if can_display_or_modify_type?(verif_type) %>
                 <div class="row">
                   <div class="v-type col-md-12">
                     <div class="v-type-name col-md-2">

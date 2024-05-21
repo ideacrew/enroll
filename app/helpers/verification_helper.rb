@@ -1,6 +1,11 @@
+# frozen_string_literal: true
+
+require "#{Rails.root}/app/helpers/verifications/alive_status_helper"
+
 module VerificationHelper
   include DocumentsVerificationStatus
   include HtmlScrubberUtil
+  include Verifications::AliveStatusHelper
 
   def doc_status_label(doc)
     case doc.status
@@ -46,21 +51,6 @@ module VerificationHelper
     else
       v_type
     end
-  end
-
-  # method added specifically to handle the displaying of 'Alive Status'
-  # this verification type should always be visible to admin
-  # but should only display for consumers/brokers/broker agency staff if the validation_status is 'outstanding'
-  def can_display_type?(verif_type)
-    return true unless verif_type.type_name == 'Alive Status'
-    return false unless EnrollRegistry.feature_enabled?(:enable_alive_status)
-    return true if current_user.has_hbx_staff_role?
-
-    previous_states = verif_type.type_history_elements.pluck(:from_validation_status).compact
-    return true if previous_states.include?('outstanding')
-    return true if verif_type.validation_status == 'outstanding'
-
-    false
   end
 
   def verification_type_class(status)

@@ -93,17 +93,42 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               expect(flash[:error]).to include("Unable to upload file.")
             end
 
-            it "does not allow docx files to be uploaded" do
-              file = fixture_file_upload("#{Rails.root}/test/fake_sample.docx.jpg")
-              params = { person: {consumer_role: person.consumer_role}, file: [file] }
-              post :upload, params: params
+          end
 
-              expect(flash[:error]).to include("Unable to upload file.")
+          context 'uploading alive_status verification documentation' do
+            let(:person) { FactoryBot.create(:person, :with_consumer_role, user: user) }
+            let(:alive_status_verification) { person.verification_type_by_name('Alive Status') }
+            let(:file) { fixture_file_upload("#{Rails.root}/test/uhic.jpg") }
+            let(:doc_uri) { 'doc_uri' }
+            let(:family) { double("Family", :update_family_document_status! => true)}
+            let(:params) { { person: { consumer_role: person.consumer_role }, file: [file] } }
+
+            before do
+              allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+              allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
+              allow(controller).to receive(:file_name).and_return("sample-filename")
+              allow(controller).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
+
+              person.consumer_role.move_identity_documents_to_verified
+              controller.instance_variable_set(:"@family", family)
+              controller.instance_variable_set(:"@verification_type", alive_status_verification)
+              sign_in user
             end
 
-            context 'uploading alive_status documentation' do
-              before do
-                allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+            context "when the validation_status is not 'outstanding'" do
+              it 'will not allow upload' do
+                post :upload, params: params
+
+                expect(flash[:error]).to eq('You are not authorized to upload this document')
+              end
+            end
+
+            context "when the validation_status is 'outstanding'" do
+              it 'will allow upload' do
+                alive_status_verification.update(validation_status: 'outstanding')
+                post :upload, params: params
+
+                expect(flash[:notice]).to eq("File Saved")
               end
             end
           end
@@ -134,6 +159,21 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               post :upload, params: params
 
               expect(flash[:notice]).to eq("File Saved")
+            end
+
+            context 'uploading alive_status verification documentation' do
+              before do
+                alive_status = person.verification_type_by_name('Alive Status')
+                file = fixture_file_upload("#{Rails.root}/test/uhic.jpg")
+                allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
+                controller.instance_variable_set(:"@verification_type", alive_status)
+                params = { person: { consumer_role: person.consumer_role }, file: [file] }
+                post :upload, params: params
+              end
+
+              it "uploads alive_status verification file successfully" do
+                expect(flash[:notice]).to eq("File Saved")
+              end
             end
 
             # does not allow invalid files to be uploaded
@@ -181,6 +221,61 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
 
+      context 'alive_status download' do
+        let(:person) { FactoryBot.create(:person, :with_consumer_role, user: user) }
+        let(:alive_status_verification) { person.verification_type_by_name('Alive Status') }
+        let(:vlp_doc) { VlpDocument.new }
+
+        before do
+          person.consumer_role.move_identity_documents_to_verified
+
+          allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+          allow(controller).to receive(:vlp_docs_clean).and_return(true)
+          allow(person.consumer_role).to receive(:find_vlp_document_by_key).with('sample-key').and_return(vlp_doc)
+          allow(vlp_doc).to receive(:documentable).and_return(alive_status_verification)
+        end
+
+        context 'as a user' do
+          before do
+            sign_in user
+          end
+
+          context 'when an alive_status does not have an outstanding validation status' do
+            it 'will not download' do
+              get :download, params: { key: "sample-key" }
+
+              expect(flash[:error]).to eq 'File does not exist or you are not authorized to access it.'
+              expect(response).to have_http_status(:redirect)
+            end
+          end
+
+          context 'when an alive_status has an outstanding validation status' do
+            it 'will download successfully' do
+              alive_status_verification.update(validation_status: 'outstanding')
+              get :download, params: { key: "sample-key" }
+
+              expect(flash[:error]).to be_nil
+              expect(response).to have_http_status(:success)
+            end
+          end
+        end
+
+        context 'as an admin' do
+          before do
+            allow(controller).to receive(:set_current_person).and_return(true)
+            controller.instance_variable_set(:"@person", person)
+
+            sign_in admin_user
+          end
+
+          it 'will download regardless of verification validation_status' do
+            get :download, params: { key: "sample-key" }
+
+            expect(flash[:error]).to be_nil
+            expect(response).to have_http_status(:success)
+          end
+        end
+      end
     end
   end
 end
