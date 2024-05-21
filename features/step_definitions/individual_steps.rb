@@ -761,7 +761,6 @@ And(/^the Continue button is visible on the Account Setup page/i) do
 end
 
 And(/^.+ clicks? on the Continue button of the Account Setup page$/i) do
-  find("#personal_info").click
   wait_for_ajax
   find(IvlPersonalInformation.continue_btn, wait: 5).click
 end
