@@ -104,7 +104,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:params) { { person: { consumer_role: person.consumer_role }, file: [file] } }
 
             before do
-              binding.irb
               allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
               allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
               allow(controller).to receive(:file_name).and_return("sample-filename")
