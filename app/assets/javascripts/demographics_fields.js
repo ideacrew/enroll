@@ -427,10 +427,9 @@ var PersonValidations = (function (window, undefined) {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
     if (!document.getElementById('dependent_ul') && immigration_field) {
-      return (
-        document.getElementById('person_us_citizen_false').checked ||
-        document.getElementById('person_naturalized_citizen_true').checked
-      );
+      var us_citizen = document.getElementById('person_us_citizen_false') || document.getElementById('us_citizen_false');
+      var naturalized_citizen = document.getElementById('person_naturalized_citizen_true') || document.getElementById('naturalized_citizen_true');
+      return ( us_citizen.checked || naturalized_citizen.checked );
     } else if (immigration_field) {
       return (
         document.getElementById('dependent_us_citizen_false').checked ||
@@ -658,14 +657,14 @@ var PersonValidations = (function (window, undefined) {
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email').prop('checked')) {
+      if ($('#contact_type_email').prop('checked')) {
         if (!$('#person_emails_attributes_0_address').val()) {
           alert('You must enter an email address to receive notices and updates by email.');
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
 
-      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text').prop('checked')) {
+      if ($('#contact_type_text').prop('checked')) {
         if (document.querySelector('.mobile-phone-number').value.length < 1) {
           alert('You must enter a mobile phone number to receive notices and updates by text.');
           PersonValidations.restoreRequiredAttributes(e);
