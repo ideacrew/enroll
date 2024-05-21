@@ -204,7 +204,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).and_return(nil)
           allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
           sign_in user
-          get :download, params: { key:"sample-key" }
+          get :download, params: { key: "sample-key" }
           expect(flash[:error]).to eq("File does not exist or you are not authorized to access it.")
         end
       end
@@ -216,7 +216,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
           allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).with('sample-key').and_return(VlpDocument.new)
           sign_in user
-          get :download, params: { key:"sample-key" }
+          get :download, params: { key: "sample-key" }
           expect(flash[:error]).to be_nil
           expect(response.status).to eq(200)
         end
