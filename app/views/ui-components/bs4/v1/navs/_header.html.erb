@@ -53,6 +53,7 @@
         url: "<%= main_app.check_time_until_logout_path(format: :js) %>",
         method: 'GET',
         dataType: 'script',
+        data:{bs4: <%= @bs4 %>},
         success: function(response){
         },
         error: function(response){
