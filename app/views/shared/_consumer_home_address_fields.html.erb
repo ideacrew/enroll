@@ -29,7 +29,7 @@
               <span><%= address.hidden_field :kind, value: address.object.kind %>
               <%= address.hidden_field :_destroy %></span>
 
-              <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}" %>
+              <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "#{'required' if required.present?}" %>
               <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} full-width", required: required.present? %>
             </div>
           </div>
@@ -44,17 +44,17 @@
           <div class="d-flex mb-md-4 row col-sm">
             <div class="d-flex col-sm col-md-6 pl-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
-                <%= address.label :city %>
-                <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "#{required} full-width", required: required.present? %>
+                <%= address.label :city, class: "#{'required' if required.present?}" %>
+                <%= address.text_field :city, placeholder: "City", class: "#{required} full-width", required: required.present? %>
               </div>
               <div class="col-sm col-md-6 pr-0">
-                <%= address.label :state %>
+                <%= address.label :state, class: "required" %>
                 <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:'full-width stateInput', required: true) %>
               </div>
             </div>
             <div class="d-flex col-sm col-md-6 pr-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
-                <%= address.label :zip, l10n("zip_code") %>
+                <%= address.label :zip, l10n("zip_code"), class: "required" %>
                 <%= address.text_field :zip, class: "full-width", required: true, placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
               </div>
               <% if EnrollRegistry.feature_enabled?(:display_county) %>
