@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require "#{Rails.root}/app/helpers/verifications/alive_status_helper"
-
 module VerificationHelper
   include DocumentsVerificationStatus
   include HtmlScrubberUtil
-  include Verifications::AliveStatusHelper
 
   def doc_status_label(doc)
     case doc.status
