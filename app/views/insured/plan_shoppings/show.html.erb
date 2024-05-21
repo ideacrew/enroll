@@ -620,7 +620,6 @@
   if (marketKind === 'individual' || marketKind === 'coverall') {
     $(document).ready(function () {
       var coverageKind = "<%= @hbx_enrollment.coverage_kind %>";
-      debugger;
       $.ajax({
         url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present? %>",
         type: "GET"

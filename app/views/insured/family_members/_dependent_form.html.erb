@@ -191,12 +191,8 @@
             </a>
             <a href="#" class="close-1 outline-error remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
           <% else %>
-            <%= link_to(insured_family_member_path(dependent, {bs4: @bs4}), :remote => true, class: "btn button outline" ) do %>
-              <%= l10n("cancel") %>
-            <% end %>
-            <%= link_to(insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button outline-error close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) do %>
-              <%= l10n('remove_member') %>
-            <% end %>
+            <%= h(link_to l10n("cancel"), insured_family_member_path(dependent, {bs4: @bs4}), :remote => true, class: "btn button outline") %>
+            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button outline-error close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
           <% end %>
 
           <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>
@@ -243,17 +239,6 @@
       });
     </script>
   </div>
-
-
-
-
-
-
-
-
-
-
-
 
 <% else %>
   <li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">

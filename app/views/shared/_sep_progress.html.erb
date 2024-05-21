@@ -49,26 +49,26 @@
   </button>
 <% elsif ridp == true && step == 2 %>
   <% if EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>
-    <%= link_to "Continue", new_insured_fdsh_ridp_verification_path, class: 'button btn btn-lg btn-primary btn-block interaction-click-control-continue', id: 'btn-continue', disabled: true %>
+    <%= h(link_to "Continue", new_insured_fdsh_ridp_verification_path, class: 'button btn btn-lg btn-primary btn-block interaction-click-control-continue', id: 'btn-continue', disabled: true) %>
   <% else %>
-    <%= link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary btn-block interaction-click-control-continue', id: 'btn-continue', disabled: true %>
+    <%= h(link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary btn-block interaction-click-control-continue', id: 'btn-continue', disabled: true) %>
   <% end %>
 <% elsif defined? url %>
-  <%= link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue' %>
+  <%= h(link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue') %>
 <% elsif step == 4 %>
   <% if button_continue == true %>
     <button class="btn btn-lg btn-primary btn-block interaction-click-control-continue" type="submit">
       CONTINUE
     </button>
   <% else %>
-    <%= link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary btn-block no-sep-continue', disabled: continue_disabled, id: 'btn-continue' %>
+    <%= h(link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary btn-block no-sep-continue', disabled: continue_disabled, id: 'btn-continue') %>
   <% end %>
 <% elsif step == 5 %>
   <button class="btn btn-lg btn-primary btn-block" id="btn-continue">
     CONTINUE
   </button>
 <% elsif step == 6 %>
-  <%= link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: 'btn btn-lg btn-primary btn-block disabled', id: 'btn-continue', method: :post, disabled: !@enrollable %>
+  <%= h(link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: 'btn btn-lg btn-primary btn-block disabled', id: 'btn-continue', method: :post, disabled: !@enrollable) %>
 <% elsif step != 7 %>
   <button class="btn btn-lg btn-primary btn-block" id="btn-continue" type="submit">
     CONTINUE

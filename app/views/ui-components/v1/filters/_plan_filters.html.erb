@@ -10,10 +10,10 @@
       <h4><%= find_my_doctor %></h4>
       <% if checkbook_integration_enabled? %>
         <% if @market_kind == "individual" && @coverage_kind == "health" %>
-          <h4><%= link_to l10n("estimate_your_cost"), "", data: {toggle: "modal", target: "#plan_match_redirection"} %></h4>
+          <h4><%= h(link_to l10n("estimate_your_cost"), "", data: {toggle: "modal", target: "#plan_match_redirection"}) %></h4>
         <% end %>
         <% if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year %>
-          <h4><%= link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"} %></h4>
+          <h4><%= h(link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"}) %></h4>
           <br>
         <% end %>
         <h4><%= estimate_your_costs %></h4>
@@ -37,7 +37,7 @@
         <div class="modal-footer" style="padding:10px">
           <div>
             <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= link_to l10n("proceed"), @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
+            <%= h(link_to l10n("proceed"), @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url") %>
           </div>
         </div>
       </div>
@@ -60,7 +60,7 @@
         <div class="modal-footer" style="padding:10px">
           <div>
             <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= link_to l10n("proceed"), l10n("sadpi_url"), class: "btn btn-primary" %>
+            <%= h(link_to l10n("proceed"), l10n("sadpi_url"), class: "btn btn-primary") %>
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@
         <div class="modal-footer" style="padding:10px">
           <div>
             <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary mtz", target: '_blank', rel: 'noopener noreferrer' %>
+            <%= h(link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary mtz", target: '_blank', rel: 'noopener noreferrer') %>
           </div>
         </div>
       </div>
@@ -106,7 +106,7 @@
         <div class="modal-footer" style="padding:10px">
           <div>
             <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= link_to l10n("proceed"), Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide"), class: "btn btn-primary", target: '_blank', rel: 'noopener noreferrer' %>
+            <%= h(link_to l10n("proceed"), Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide"), class: "btn btn-primary", target: '_blank', rel: 'noopener noreferrer') %>
           </div>
         </div>
       </div>
@@ -129,7 +129,7 @@
         <div class="modal-footer" style="padding:10px">
           <div>
             <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= link_to l10n("proceed"), @plan_comparison_checkbook_url, class: "btn btn-primary" %>
+            <%= h(link_to l10n("proceed"), @plan_comparison_checkbook_url, class: "btn btn-primary") %>
           </div>
         </div>
       </div>
@@ -230,7 +230,7 @@
             %
           </span>
         </form>
-        <h6 style="font-weight:400; margin-top:0;"><%= link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"} %></h6>
+        <h6 style="font-weight:400; margin-top:0;"><%= h(link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}) %></h6>
       </div>
     </div>
   <% end %>
