@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <div class="mt-4 mb-4">
-    <%= label_tag :passport_number, l10n("insured.passport_number") %>
+    <%= label_tag :passport_number, l10n("insured.passport_number"), class: "weight-n" %>
     <%= v.text_field :passport_number, :placeholder => l10n("insured.passport_number"),
                     :pattern => "[a-zA-Z0-9]{6,12}",
                     :class => "doc_fields",
