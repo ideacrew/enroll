@@ -189,6 +189,10 @@ Then(/^.+ sees form to enter personal information but doesn't check every box$/)
   sleep 2
 end
 
+Then(/^.+ fills in missing fields$/) do
+  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
+end
+
 And(/the individual enters address information$/) do
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"

@@ -26,11 +26,11 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual sees form to enter personal information but doesn't check every box
     Then Individual clicks on continue
     And the user will have to accept alert pop up for missing field
-    Then Individual sees form to enter personal information
+    Then Individual fills in missing fields
     Then Individual clicks on continue
     Then Individual agrees to the privacy agreeement
 
-  Scenario: Consumer clicks the continue button twice
+  Scenario: Consumer clicks the personal information page continue button
     When Individual creates a new HBX account
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
