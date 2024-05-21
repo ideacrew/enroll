@@ -348,27 +348,41 @@ module ApplicationHelper
             '#', class: "add_fields #{classes}", data: {id: id, fields: fields.gsub("\n", "")})
   end
 
-  def render_flash
+  def render_flash(use_bs4 = false)
     rendered = []
     flash.each do |type, messages|
       next if messages.blank? || (messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string"))
 
       if messages.respond_to?(:each)
         messages.each do |m|
-          rendered << get_flash(type, m) if m.present?
+          rendered << get_flash(use_bs4, type, m) if m.present?
         end
       else
-        rendered << get_flash(type, messages)
+        rendered << get_flash(use_bs4, type, messages)
       end
     end
     sanitize_html(rendered.join)
   end
 
-  def get_flash(type, msg)
+  def get_flash(use_bs4, type, msg)
+    type = use_bs4 ? get_flash_type(type) : type
     if is_announcement?(msg)
       render(:partial => 'layouts/announcement_flash', :locals => {:type => type, :message => msg[:announcement]})
     else
       render(:partial => 'layouts/flash', :locals => {:type => type, :message => msg})
+    end
+  end
+
+  def get_flash_type(type)
+    case type
+    when "notice"
+      "info"
+    when "warning", "message" 
+      "warning"
+    when "success"
+      "success"
+    else 
+      "severe"
     end
   end
 
