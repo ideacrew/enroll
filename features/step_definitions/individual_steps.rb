@@ -157,6 +157,10 @@ Then(/the continue button has data disabled attribute$/) do
   expect(continue_button).to eql(l10n("please_wait"))
 end
 
+Then(/^.+ sees the continue button is enabled$/) do
+  find(IvlChooseCoverage.continue_btn)
+end
+
 Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
