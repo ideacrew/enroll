@@ -1,4 +1,17 @@
-<br />
+<% if @bs4 %>
+<div id="ssn-coverage-msg">
+  <div class="alert alert-info d-flex mt-4" role="info">
+    <div>
+      <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
+    </div>
+    <div class="my-1">
+      Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs.
+    </div>
+  </div>
+</div>
+
+<% else %>
+  <br />
   <div id="ssn-coverage-msg">
     <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
       <div class="alert alert-success alert-dismissible">
@@ -6,3 +19,4 @@
       </div>
     </div>
   </div>
+<% end %>
