@@ -152,6 +152,11 @@ Then(/^.+ sees form to enter personal information$/) do
   sleep 30
 end
 
+Then(/the continue button has data disabled attribute$/) do
+  continue_button = find('button.interaction-click-control-continue', visible: false)['data-disable-with']
+  expect(continue_button).to eql(l10n("please_wait"))
+end
+
 Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
@@ -750,8 +755,14 @@ Then(/Individual asks for help$/) do
   find(".interaction-click-control-×").click
 end
 
+And(/^the Continue button is visible on the Account Setup page/i) do
+  continue_button = find(IvlPersonalInformation.continue_btn)
+  expect(continue_button).to be_visible
+end
+
 And(/^.+ clicks? on the Continue button of the Account Setup page$/i) do
-  find(IvlPersonalInformation.continue_btn).click
+  wait_for_ajax
+  find(IvlPersonalInformation.continue_btn, wait: 5).click
 end
 
 Then(/^.+ sees the Verify Identity Consent page/)  do
