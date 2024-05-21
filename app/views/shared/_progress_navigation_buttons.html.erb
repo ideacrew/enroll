@@ -32,7 +32,7 @@
           <%= l10n("continue_next") %>
         </button>
       <% else %>
-        <%= h(link_to l10n("continue_next"), next_link, method: link_method, class: 'btn', disabled: disable_link, id: "btn-continue") %>
+        <%= h(link_to l10n("continue_next"), next_link, method: link_method, class: "btn #{'disabled' if disable_link}", id: "btn-continue") %>
       <% end %>
     <% end %>
   <% end %>
