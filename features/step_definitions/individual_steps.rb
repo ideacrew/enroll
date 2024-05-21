@@ -158,7 +158,7 @@ Then(/the continue button has data disabled attribute$/) do
 end
 
 Then(/^.+ sees the continue button is enabled$/) do
-  find(IvlChooseCoverage.continue_btn)
+  find(IvlChooseCoverage.continue_btn, visible: false)
 end
 
 Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
