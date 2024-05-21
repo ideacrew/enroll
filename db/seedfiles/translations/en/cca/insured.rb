@@ -31,7 +31,6 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :"en.insured.consumer_roles.contact_info_for" => "Contact Information for",
   :"en.insured.consumer_roles.home_address" => "Home Address",
   :"en.insured.consumer_roles.phone_and_email" => "Phone and Email",
-  :"en.insured.consumer_roles.please_provide" => "Please provide as much information as possible",
   :"en.insured.consumer_roles.immigration_field_warning1" => "It's important to enter as many fields from your immigration documents as possible",
   :'en.your_information' => "Privacy & Use of Your Information",
   :'en.insured.consumer_roles.help_question_info' => "Enter your personal information and answer the following questions. When you're finished, select CONTINUE.",
