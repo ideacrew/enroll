@@ -35,6 +35,14 @@ RSpec.describe ::Operations::People::CreateOrUpdateConsumerRole, dbclean: :after
         expect(applicant_person.consumer_role).to be_present
         expect(applicant_person.consumer_role.citizen_status).to eq applicant.citizen_status
       end
+
+      it 'should create demographics_group and alive_status after creating consumer role' do
+        subject.call(params: params)
+        demographics_group = applicant_person.demographics_group
+
+        expect(demographics_group).to be_a DemographicsGroup
+        expect(demographics_group.alive_status).to be_a AliveStatus
+      end
     end
   end
 

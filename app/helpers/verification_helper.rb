@@ -37,6 +37,32 @@ module VerificationHelper
     end
   end
 
+  def display_verification_type_name(v_type)
+    case v_type
+    when 'ME Residency'
+      'Income'
+    when 'Alive Status'
+      'Deceased'
+    else
+      v_type
+    end
+  end
+
+  # method added specifically to handle the displaying of 'Alive Status'
+  # this verification type should always be visible to admin
+  # but should only display for consumers/brokers/broker agency staff if the validation_status is 'outstanding'
+  def can_display_type?(verif_type)
+    return true unless verif_type.type_name == 'Alive Status'
+    return false unless EnrollRegistry.feature_enabled?(:enable_alive_status)
+    return true if current_user.has_hbx_staff_role?
+
+    previous_states = verif_type.type_history_elements.pluck(:from_validation_status).compact
+    return true if previous_states.include?('outstanding')
+    return true if verif_type.validation_status == 'outstanding'
+
+    false
+  end
+
   def verification_type_class(status)
     case status
     when 'verified', 'valid'
@@ -239,7 +265,7 @@ module VerificationHelper
   end
 
   def build_admin_actions_list(v_type, f_member)
-    if f_member.consumer_role.aasm_state == 'unverified'
+    if f_member.consumer_role.aasm_state == 'unverified' || v_type.type_name == 'Alive Status'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
     elsif verification_type_status(v_type, f_member) == 'outstanding'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }

@@ -103,16 +103,22 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
   end
 
   describe '#construct_person_demographics' do
-
-    subject { ::Operations::Transformers::PersonTo::Cv3Person.new.construct_person_demographics(person) }
+    let(:person) { create(:person, :with_consumer_role, :with_demographics_group, is_incarcerated: nil) }
+    let(:demographics_group) { person.demographics_group }
 
     context 'when is_incarcerated is nil' do
       before do
-        person.update(is_incarcerated: nil)
+        create(:alive_status, demographics_group: demographics_group)
+        person.reload
+        @subject = ::Operations::Transformers::PersonTo::Cv3Person.new.send(:construct_person_demographics, person)
       end
 
       it 'should set the value of the field to false' do
-        expect(subject[:is_incarcerated]).to eq false
+        expect(@subject[:is_incarcerated]).to eq false
+      end
+
+      it 'should have alive status' do
+        expect(@subject[:alive_status].to_s).to eq "{:is_deceased=>false, :date_of_death=>nil}"
       end
     end
   end
@@ -155,13 +161,18 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
 
 
   describe '#transform_verification_types' do
-
-    subject { ::Operations::Transformers::PersonTo::Cv3Person.new.transform_verification_types(person.verification_types) }
-
     context 'due date is nil' do
+      before do
+        person.verification_types.create(type_name: 'Alive Status')
+        @subject = ::Operations::Transformers::PersonTo::Cv3Person.new.send(:transform_verification_types, person.verification_types)
+      end
 
       it 'should populate the due date field' do
-        expect(subject.first[:due_date]).to eq person.verification_types.first.verif_due_date
+        expect(@subject.first[:due_date]).to eq person.verification_types.first.verif_due_date
+      end
+
+      it 'should have alive status' do
+        expect(@subject.pluck(:type_name).include?("Alive Status")).to eq true
       end
     end
   end
