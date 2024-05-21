@@ -11,6 +11,7 @@ class SessionTimeoutController < ApplicationController
 
   def check_time_until_logout
     @time_left = Devise.timeout_in - (Time.now - (user_session["last_request_at"] || Time.now)).to_i.round
+    @bs4 = true if params[:bs4] == "true"
     if @time_left <= 0
       sign_out(current_user)
       respond_to do |format|
