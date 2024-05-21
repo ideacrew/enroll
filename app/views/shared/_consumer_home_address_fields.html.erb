@@ -45,7 +45,7 @@
             <div class="d-flex col-sm col-md-6 pl-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
                 <%= address.label :city, class: "#{'required' if required.present?}" %>
-                <%= address.text_field :city, placeholder: "City", class: "#{required} full-width" %>
+                <%= address.text_field :city, placeholder: "City", class: "#{required} full-width", required: required.present? %>
               </div>
               <div class="col-sm col-md-6 pr-0">
                 <%= address.label :state, class: "required" %>
