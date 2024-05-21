@@ -1440,6 +1440,26 @@ module FinancialAssistance
       addresses.mailing.first
     end
 
+    # Fetches the evidence based on the provided evidence type.
+    #
+    # This method accepts an evidence type as a parameter and returns the corresponding evidence.
+    # The evidence type can be one of the following: 'income_evidence', 'esi_evidence', 'non_esi_evidence', or 'local_mec_evidence'.
+    #
+    # @param evidence_type [String] The type of evidence to fetch.
+    # @return [Object] The evidence corresponding to the provided type.
+    def fetch_evidence(evidence_type)
+      case evidence_type
+      when 'income_evidence'
+        income_evidence
+      when 'esi_evidence'
+        esi_evidence
+      when 'non_esi_evidence'
+        non_esi_evidence
+      when 'local_mec_evidence'
+        local_mec_evidence
+      end
+    end
+
     private
 
     def fetch_evidence_params(evidence)

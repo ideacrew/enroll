@@ -72,7 +72,10 @@ module Effective
       end
 
       def benefit_sponsor_home_url(row)
-        benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home')
+        ::BenefitSponsors::Engine.routes.url_helpers.profiles_employers_employer_profile_path(
+          row.sponsor_profile_id,
+          tab: 'home'
+        )
       end
 
       def on_general_agency_portal?
