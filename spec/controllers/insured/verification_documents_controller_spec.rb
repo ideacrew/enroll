@@ -4,7 +4,7 @@ require 'rails_helper'
 
 # spec to test insured/verification_documents_controller
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
+  RSpec.describe Insured::VerificationDocumentsController, :type => :controller, dbclean: :after_each do
     let(:user) { FactoryBot.create(:user) }
     let(:person) { FactoryBot.build(:person, :with_consumer_role) }
     let(:consumer_role) { {consumer_role: ''} }
@@ -104,6 +104,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:params) { { person: { consumer_role: person.consumer_role }, file: [file] } }
 
             before do
+              binding.irb
               allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
               allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
               allow(controller).to receive(:file_name).and_return("sample-filename")
@@ -143,6 +144,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:family) { double("Family", :update_family_document_status! => true)}
 
             before do
+              allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
               allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:add_type_history_element)
               allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).and_return("sample-filename")
               allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
@@ -162,12 +164,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
 
             context 'uploading alive_status verification documentation' do
+              let(:alive_status_verification) { person.verification_type_by_name('Alive Status') }
+
               before do
                 allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
-                alive_status = person.verification_type_by_name('Alive Status')
                 file = fixture_file_upload("#{Rails.root}/test/uhic.jpg")
                 allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
-                controller.instance_variable_set(:"@verification_type", alive_status)
+                controller.instance_variable_set(:"@verification_type", alive_status_verification)
+                session[:person_id] = person.id.to_s
                 params = { person: { consumer_role: person.consumer_role }, file: [file] }
                 post :upload, params: params
               end
@@ -228,12 +232,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:vlp_doc) { VlpDocument.new }
 
         before do
-          person.consumer_role.move_identity_documents_to_verified
-
           allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
           allow(controller).to receive(:vlp_docs_clean).and_return(true)
           allow(person.consumer_role).to receive(:find_vlp_document_by_key).with('sample-key').and_return(vlp_doc)
           allow(vlp_doc).to receive(:documentable).and_return(alive_status_verification)
+
+          person.consumer_role.move_identity_documents_to_verified
         end
 
         context 'as a user' do
@@ -265,6 +269,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           before do
             allow(controller).to receive(:set_current_person).and_return(true)
             controller.instance_variable_set(:"@person", person)
+            session[:person_id] = person.id.to_s
 
             sign_in admin_user
           end
