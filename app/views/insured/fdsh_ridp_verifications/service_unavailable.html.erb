@@ -5,7 +5,7 @@
     <%= render partial: 'insured/fdsh_ridp_verifications/options_to_verify_identity' %>
     <%= render partial: 'shared/application_types_list' %>
     <div class="outstanding-ridp-documents">
-      <%= render partial: 'insured/fdsh_ridp_verifications/outstanding_ridp_documents' %>
+      <%= render partial: 'insured/fdsh_ridp_verifications/outstanding_ridp_documents', locals: { show_faq_button: @verification_transaction_id.blank? } %>
     </div>
   </div>
   <% redirect_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: @person.consumer_role.id) %>
