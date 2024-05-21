@@ -83,7 +83,8 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user has verified their identity in the individual market, false otherwise.
   def individual_market_ridp_verified?
-    individual_market_role&.identity_verified?
+    # Note here, for now, we need to support the identity verification also present on the user.
+    individual_market_role&.identity_verified? || user.identity_verified?
   end
 
   # Determines if the primary person of the family has verified their identity (RIDP).
