@@ -2,6 +2,7 @@
 
 module Analytics
   module Dimensions
+    # This class represents a monthly dimension for analytics
     class Monthly
       include Mongoid::Document
 
