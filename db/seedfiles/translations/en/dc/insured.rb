@@ -115,7 +115,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.application_type' => "Application Type",
   :'en.confirm_selection' => "Confirm",
   :'en.ridp_status.in_review' => "In Review",
-  :'en.ridp_status.valid' => "Valid",
+  :'en.ridp_status.verified' => "Verified",
   :'en.ridp_status.outstanding' => "Outstanding",
   :'en.suffix' => "Suffix",
   :'en.insured.families.get_help_sign_up' => "Get Help Signing Up",
