@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <fieldset id="immigration_doc_statuses" class="mt-4">
-    <legend><%= l10n("insured.consumer_roles.docs_shared.other_status_question") %></legend>
+    <legend class="weight-n"><%= l10n("insured.consumer_roles.docs_shared.other_status_question") %></legend>
     <div>
       <% ::ConsumerRole::IMMIGRATION_DOCUMENT_STATUSES.each_with_index do |status, index| %>
         <label for="<%= status.gsub(/[^\w\s_-]+/, '').gsub(/\s+/, '_') %>" class="mb-3">
