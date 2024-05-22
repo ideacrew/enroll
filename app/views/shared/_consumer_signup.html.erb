@@ -7,10 +7,13 @@
     <li class="<%= 'complete' if step > nav_option[:step] %> <%= 'active' if step == nav_option[:step] %>">
       <span class="circle-progress"></span>
       <div class="vertical-line-progress"></div>
-      <a class="<%= 'cna disabled' unless step > nav_option[:step] or step == nav_option[:step] %>"><%= nav_option[:label] %></a>
+      <a class="<%= 'cna disabled' unless step > nav_option[:step] or step == nav_option[:step] %>">
+        <%= nav_option[:display_label] %>
+      </a>
     </li>
   <% end %>
 <% end %>
+
 <% content_for(:show_exit_button) { !@no_save_button && step < 6 } %>
 <% content_for(:show_previous_button) { !@no_previous_button && ![1,6].include?(step) } %>
 <% content_for(:show_account_button) { step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>

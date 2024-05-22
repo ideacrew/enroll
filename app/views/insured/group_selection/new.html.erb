@@ -1,7 +1,6 @@
 <% if @bs4 %>
   <%# Left Nav %>
-  <% current_progress = plan_shopping_progress_hash%>
-  <%= render partial: 'shared/plan_shopping_progress', locals: current_progress %>
+  <%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :household_info, nav_options: plan_shopping_progress_hash } %>
 
   <%# Main Content (right) %>
   <div id="choose_coverage_page">
