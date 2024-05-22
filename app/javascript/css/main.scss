@@ -285,13 +285,34 @@ ul.list-right-section li {
   font-size: 1em;
 }
 
-.badge-success, .vertically-centered-row .badge{
-  background-color: #F2FFF4;
+.badge-success {
+  background-color: var(--success-shade);
   border-radius: 10px;
-  border: 1px solid #027314;
+  border: 1px solid var(--success-color);
   color: var(--default-font-color);
   font-size: 16px;
   font-weight: 600;
+  inline-size: fit-content;
+}
+
+.badge-danger {
+  background-color: var(--danger-shade);
+  border-radius: 10px;
+  border: 1px solid var(--enrollment-status-red);
+  color: var(--default-font-color);
+  font-size: 16px;
+  font-weight: 600;
+  inline-size: fit-content;
+}
+
+.badge-warning {
+  background-color: var(--warning-shade);
+  border-radius: 10px;
+  border: 1px solid var(--warning-border);
+  color: var(--default-font-color);
+  font-size: 16px;
+  font-weight: 600;
+  inline-size: fit-content;
 }
 
 .float-end {
