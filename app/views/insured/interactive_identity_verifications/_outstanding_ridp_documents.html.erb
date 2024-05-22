@@ -150,7 +150,7 @@
                                 <div class="ridp-doc-elem col-md-12">
                                   <div class="v-doc col-md-11">
                                     <% if ridp_doc.identifier.present? %>
-                                        <% key = ridp_doc.identifier.split('#').last %>
+                                      <% key = ridp_doc.identifier.split('#').last %>
                                       <%= h(content_tag(:a, href: "/insured/ridp_documents/download/#{key}", title: "Download", data: {toggle: "tooltip"}, target: "_blank", rel: "noopener noreferrer") do %>
                                         <%= ridp_doc.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
                                       <% end) %>
