@@ -25,7 +25,7 @@
           </div>
           <div class="col pr-0">
             <div class="row float-right no-gutters">
-              <% if true %>
+              <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
                 <div class="col v-type-actions mr-1">
                   <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Admin Actions', class: "float-right button-select"} %>
                 </div>
