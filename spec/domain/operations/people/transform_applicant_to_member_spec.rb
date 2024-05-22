@@ -53,6 +53,22 @@ RSpec.describe Operations::People::TransformApplicantToMember, dbclean: :after_e
         expect(member_hash[:consumer_role]).to have_key(:is_applicant)
         expect(member_hash[:consumer_role]).to have_key(:immigration_documents_attributes)
       end
+
+      it 'returns a member hash with consumer role attributes' do
+        member_hash = @result.success
+        expect(member_hash).to have_key(:consumer_role)
+        expect(member_hash[:consumer_role]).to have_key(:skip_consumer_role_callbacks)
+        expect(member_hash[:consumer_role]).to have_key(:is_applicant)
+        expect(member_hash[:consumer_role]).to have_key(:immigration_documents_attributes)
+      end
+
+      it 'returns a member hash with demographics group attributes' do
+        member_hash = @result.success
+        expect(member_hash).to have_key(:demographics_group)
+        expect(member_hash[:demographics_group]).to have_key(:alive_status)
+        expect(member_hash[:demographics_group][:alive_status]).to have_key(:is_deceased)
+        expect(member_hash[:demographics_group][:alive_status]).to have_key(:date_of_death)
+      end
     end
 
     context 'failure' do
