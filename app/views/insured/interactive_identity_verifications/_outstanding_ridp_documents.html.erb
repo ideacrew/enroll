@@ -17,7 +17,7 @@
           <div class="col-auto">
             <div class="d-flex row">
               <div class="col badge badge-lg badge-<%=ridp_type_class(ridp_type, @person)%>" id="status">
-              <%= ridp_status_translated(ridp_type, @person) %>
+                <%= ridp_status_translated(ridp_type, @person) %>
               </div>
             </div>
             <div class="row d-flex mb-auto">
@@ -61,7 +61,7 @@
         <div class="row">
           <div class="ridp-doc-list col-md-12 px-0 py-2">
             <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
-              <div class="row" id="doc_table_row_<%=ridp_doc.id%>">
+              <div class="row py-1" id="doc_table_row_<%=ridp_doc.id%>">
                 <div class="col-11">
                   <% if ridp_doc.identifier.present? %>
                       <% key = ridp_doc.identifier.split('#').last %>
