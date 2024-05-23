@@ -80,8 +80,8 @@ class CoverageHousehold
       is_subscriber: family_member.is_primary_applicant?
     )
 
-    # family.active_household.save!
-    household.save!
+    family.active_household.save!
+    # household.save!
 
     # chm.save_parent
     # household.save
