@@ -163,7 +163,8 @@ RSpec.describe Family, dbclean: :around_each do
         subject = determination.subjects.create(
           gid: "gid://enroll/FamilyMember/#{family_member.id}",
           is_primary: family_member.is_primary_applicant,
-          person_id: family_member.person.id
+          person_id: family_member.person.id,
+          encrypted_ssn: family_member.person.encrypted_ssn
         )
 
         state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
@@ -175,6 +176,7 @@ RSpec.describe Family, dbclean: :around_each do
           assistance_year: TimeKeeper.date_of_record.year,
           member_ids: family.family_members.map(&:id)
         )
+        subject.eligibility_states.create(eligibility_item_key: 'health_product_enrollment_status', is_eligible: true)
       end
 
       determination
@@ -360,6 +362,20 @@ RSpec.describe Family, dbclean: :around_each do
 
       it 'when csr is passed as array of integer values' do
         result = Family.with_active_coverage_and_aptc_csr_grants_for_year(assistance_year, [87, 94])
+
+        expect(result).to include(family)
+        expect(result.count).to eq(1)
+      end
+    end
+
+    context 'enrolled_members_with_ssn' do
+      let(:yearly_expected_contribution_current) { 1000 }
+      let(:yearly_expected_contribution_previous) { 0 }
+      let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+      let!(:applied_aptc_amount) { 0 }
+
+      it 'should fetch eligible families' do
+        result = Family.enrolled_members_with_ssn
 
         expect(result).to include(family)
         expect(result.count).to eq(1)
