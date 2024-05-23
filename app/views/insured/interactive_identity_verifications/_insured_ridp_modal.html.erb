@@ -31,10 +31,11 @@
                     :native_american => "Native American tribal document", 
                     :coast_guard => "U.S. Coast Guard Merchant Mariner card"
                     } %>
-                  <% options.each_with_index do |(option, option_id), index| %>
+                  <% element_name = "ridp_subject" %>
+                  <% options.each_with_index do |(option, input_value), index| %>
                     <div class="d-inline-flex flex-row-reverse align-items-center mb-2">
-                      <label class="weight-n mb-0" for=<%= "ridp_subject_#{option_id.split().join("_")}" %>><%= l10n("insured.consumer_roles.upload_ridp_documents.#{option}") %></label>
-                      <div class="col-auto px-0"><%= radio_button_tag 'ridp_subject', option_id, index == 0 %></div>
+                      <label class="weight-n mb-0" for=<%= "#{element_name}_#{option}" %>><%= l10n("insured.consumer_roles.upload_ridp_documents.#{option}") %></label>
+                      <div class="col-auto px-0"><%= radio_button_tag element_name, option, index == 0, value: input_value %></div>
                     </div>
                   <% end %>
                 </span>
