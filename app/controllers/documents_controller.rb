@@ -286,7 +286,9 @@ class DocumentsController < ApplicationController
     set_verification_type
     @document = @verification_type.vlp_documents.where(id: params[:id]).first
     # Handles the specific exception where an ID of a non existing document is called.
-    Rails.logger.warn("Unable to find document with ID #{params[:id]} for person with hbx_id: #{@person&.full_name || Person.where(_id: params[:person_id])&.first&.full_name}") if @document.blank?
+    Rails.logger.warn(
+      "Unable to find document with ID #{params[:id]} for person with hbx_id: #{@person&.hbx_id || Person.where(_id: params[:person_id])&.first&.hbx_id}"
+    ) if @document.blank?
     error_message = l10n("documents.controller.missing_document_message", contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item) if @document.blank?
     redirect_back(fallback_location: verification_insured_families_path, :flash => {error: error_message}) if @document.blank?
   end

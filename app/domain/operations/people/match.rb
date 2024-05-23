@@ -59,8 +59,8 @@ module Operations
         if result
           Success(
             {
-              first_name: /^#{Regexp.escape(params[:first_name])}$/i,
-              last_name: /^#{Regexp.escape(params[:last_name])}$/i,
+              first_name: params[:first_name].is_a?(String) ? /^#{Regexp.escape(params[:first_name])}$/i : params[:first_name],
+              last_name: params[:last_name].is_a?(String) ? /^#{Regexp.escape(params[:last_name])}$/i : params[:last_name],
               dob: params[:dob].to_date,
               encrypted_ssn: Person.encrypt_ssn(params[:ssn]&.delete('^0-9'))
             }

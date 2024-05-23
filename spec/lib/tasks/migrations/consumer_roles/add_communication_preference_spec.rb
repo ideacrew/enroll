@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Adds missing communication preference', :type => :task, dbclean: :around_each do
   before :all do
-    Rake.application.rake_require 'tasks/migrations/consumer_role'
+    Rake.application.rake_require 'tasks/migrations/add_communication_preference'
     Rake::Task.define_task(:environment)
   end
 
