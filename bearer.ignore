@@ -17,6 +17,72 @@
     "false_positive": true,
     "ignored_at": "2024-05-20T21:18:40Z"
   },
+  "409b7fe60c72b1e43accae962119b1aa_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:05:27Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:07:31Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:08:11Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:10:11Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_3": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:10:33Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_4": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:10:58Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_5": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:11:21Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_6": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:11:36Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_7": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:11:48Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_8": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:12:28Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_9": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:12:43Z"
+  },
   "56bf1733fc31b3b3a17467150c5967e6_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' . The use of 'dummy' here is not a security issue. It's just a placeholder value that's used when the real API key is not available. In the production environment, the WF_API_KEY environment variable will be set to a secure value.",
@@ -29,6 +95,12 @@
     "false_positive": true,
     "ignored_at": "2024-05-20T20:23:32Z"
   },
+  "90044d583bc2c48f13dbe6af50dd996c_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:17:10Z"
+  },
   "a261fe84031c542c9d50b0d4fe1a9c0f_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
@@ -40,6 +112,18 @@
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
     "false_positive": true,
     "ignored_at": "2024-05-20T19:54:32Z"
+  },
+  "a5ee3fb474f80f68f62bea8235642f55_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:06:19Z"
+  },
+  "a5ee3fb474f80f68f62bea8235642f55_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:16:59Z"
   },
   "b513de77a9efc0c21c839a00b5477815_0": {
     "author": "Sai Kumar Kotagiri",
