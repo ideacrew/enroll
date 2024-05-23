@@ -20,7 +20,8 @@
           <div>
             <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
               <fieldset>
-                <legend for="ridp_subject"><%= l10n("insured.consumer_roles.upload_ridp_documents.document_type") %></legend>
+                <% element_name = "ridp_subject" %>
+                <legend for=<%= element_name %>><%= l10n("insured.consumer_roles.upload_ridp_documents.document_type") %></legend>
                 <span>
                   <% options = {
                     :driver_license => "Driver's License issued by state or territory", 
@@ -31,7 +32,6 @@
                     :native_american => "Native American tribal document", 
                     :coast_guard => "U.S. Coast Guard Merchant Mariner card"
                     } %>
-                  <% element_name = "ridp_subject" %>
                   <% options.each_with_index do |(option, input_value), index| %>
                     <div class="d-inline-flex flex-row-reverse align-items-center mb-2">
                       <label class="weight-n mb-0" for=<%= "#{element_name}_#{option}" %>><%= l10n("insured.consumer_roles.upload_ridp_documents.#{option}") %></label>
