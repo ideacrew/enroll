@@ -57,7 +57,14 @@ module Operations
         end
 
         if result
-          Success({first_name: /^#{params[:first_name]}$/i, last_name: /^#{params[:last_name]}$/i, dob: params[:dob].to_date, encrypted_ssn: Person.encrypt_ssn(params[:ssn]&.delete('^0-9'))})
+          Success(
+            {
+              first_name: /^#{Regexp.escape(params[:first_name])}$/i,
+              last_name: /^#{Regexp.escape(params[:last_name])}$/i,
+              dob: params[:dob].to_date,
+              encrypted_ssn: Person.encrypt_ssn(params[:ssn]&.delete('^0-9'))
+            }
+          )
         else
           Failure("invalid params")
         end
