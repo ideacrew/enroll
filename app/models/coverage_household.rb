@@ -70,18 +70,12 @@ class CoverageHousehold
   end
 
   def add_coverage_household_member(family_member)
-    # family.family_members.count
-    # family.active_household.coverage_households[0].coverage_household_members
-    binding.irb
     return if coverage_household_members.where(family_member_id: family_member.id).present?
 
     coverage_household_members.build(
       family_member: family_member,
       is_subscriber: family_member.is_primary_applicant?
     )
-
-    family.active_household.save!
-    # household.save!
 
     # chm.save_parent
     # household.save
