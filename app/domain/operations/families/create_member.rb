@@ -80,7 +80,6 @@ module Operations
       def persist_family(family_member, family)
         family_member.save!
 
-        #ADDED THIS
         family.active_household.coverage_households.each { |ch| ch.save! if ch.changed? }
         # family.save!
         Success(family_member.id)

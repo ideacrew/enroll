@@ -77,6 +77,7 @@ class CoverageHousehold
       is_subscriber: family_member.is_primary_applicant?
     )
 
+
     # chm.save_parent
     # household.save
   end
