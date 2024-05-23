@@ -140,6 +140,7 @@ class Family
           'eligibility_determination.subjects.eligibility_states.evidence_states.due_on': 1},
         { name: 'subjects_evidence_states_status_due_on'})
 
+  index({ "verification_types.type_name" => 1 })
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
@@ -244,6 +245,12 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+  scope :enrolled_members_with_ssn, lambda {
+                                      where(:'eligibility_determination.subjects' =>
+                                      { :$elemMatch => { :encrypted_ssn.exists => true, :eligibility_states =>
+                                      { :$elemMatch => { :eligibility_item_key.in => ['health_product_enrollment_status', 'dental_product_enrollment_status'],
+                                                         :is_eligible => true } } } })
+                                    }
 
   scope :outstanding_verification,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))
