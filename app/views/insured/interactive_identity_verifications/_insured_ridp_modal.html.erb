@@ -22,16 +22,37 @@
               <fieldset>
                 <legend for="ridp_subject"><%= l10n("insured.consumer_roles.upload_ridp_documents.document_type") %></legend>
                 <span>
-                  <label class="weight-n mb-4" for="ridp_subject_Driver_s_License_issued_by_state_or_territory"><%= radio_button_tag 'ridp_subject', "Driver's License issued by state or territory", true %><%= l10n("insured.consumer_roles.upload_ridp_documents.driver_license") %></label>
-                  <label class="weight-n mb-4" for="ridp_subject_School_identification_card"><%= radio_button_tag 'ridp_subject', 'School identification card', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.school_id") %></label>
-                  <label class="weight-n mb-4" for="ridp_subject_U.S._military_card_or_draft_record"><%= radio_button_tag 'ridp_subject', 'U.S. military card or draft record', false%><%= l10n("insured.consumer_roles.upload_ridp_documents.military_id") %></label>
-                  <label class="weight-n mb-4" for="ridp_subject_Identification_card_issued_by_the_federal__state_or_local_government__including_a_U.S._Passport"><%= radio_button_tag 'ridp_subject', 'Identification card issued by the federal, state or local government, including a U.S. Passport', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.passport") %></label>
-                  <label class="weight-n mb-4" for="ridp_subject_Military_dependent_s_identification_card"><%= radio_button_tag 'ridp_subject', "Military dependent's identification card", false %><%= l10n("insured.consumer_roles.upload_ridp_documents.military_dependent") %></label>
-                  <label class="weight-n mb-4" for="ridp_subject_Native_American_tribal_document"><%= radio_button_tag 'ridp_subject', 'Native American tribal document', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.native_american") %></label>
-                  <label class="weight-n mb-4" for="ridp_subject_U.S._Coast_Guard_Merchant_Mariner_card"><%= radio_button_tag 'ridp_subject', 'U.S. Coast Guard Merchant Mariner card', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.coast_guard") %></label>
+                  <div class="d-inline-flex flex-row-reverse align-items-center mb-4">
+                    <label class="weight-n mb-0" for="ridp_subject_Driver_s_License_issued_by_state_or_territory"><%= l10n("insured.consumer_roles.upload_ridp_documents.driver_license") %></label>
+                    <div class="col-auto px-0"><%= radio_button_tag 'ridp_subject', "Driver's License issued by state or territory", true %></div>
+                  </div>
+                  <div class="d-inline-flex flex-row-reverse align-items-center mb-4">
+                    <label class="weight-n mb-0" for="ridp_subject_School_identification_card"><%= l10n("insured.consumer_roles.upload_ridp_documents.school_id") %></label>
+                    <div class="col-auto px-0"><%= radio_button_tag 'ridp_subject', 'School identification card', false %></div>
+                  </div>
+                  <div class="d-inline-flex flex-row-reverse align-items-center mb-4">
+                    <label class="weight-n mb-0" for="ridp_subject_U.S._military_card_or_draft_record"><%= l10n("insured.consumer_roles.upload_ridp_documents.military_id") %></label>
+                    <div class="col-auto px-0"><%= radio_button_tag 'ridp_subject', 'U.S. military card or draft record', false%></div>
+                  </div>
+                  <div class="d-inline-flex flex-row-reverse align-items-center mb-4">
+                    <label class="weight-n mb-0" for="ridp_subject_Identification_card_issued_by_the_federal__state_or_local_government__including_a_U.S._Passport"><%= l10n("insured.consumer_roles.upload_ridp_documents.passport") %></label>
+                    <div class="col-auto px-0"><%= radio_button_tag 'ridp_subject', 'Identification card issued by the federal, state or local government, including a U.S. Passport', false %></div>
+                  </div>
+                  <div class="d-inline-flex flex-row-reverse align-items-center mb-4">
+                    <label class="weight-n mb-0" for="ridp_subject_Military_dependent_s_identification_card"><%= l10n("insured.consumer_roles.upload_ridp_documents.military_dependent") %></label>
+                    <div class="col-auto px-0"><%= radio_button_tag 'ridp_subject', "Military dependent's identification card", false %></div>
+                  </div>
+                  <div class="d-inline-flex flex-row-reverse align-items-center mb-4">
+                    <label class="weight-n mb-0" for="ridp_subject_Native_American_tribal_document"><%= l10n("insured.consumer_roles.upload_ridp_documents.native_american") %></label>
+                    <div class="col-auto px-0"><%= radio_button_tag 'ridp_subject', 'Native American tribal document', false %></div>
+                  </div>
+                  <div class="d-inline-flex flex-row-reverse align-items-center mb-4">
+                    <label class="weight-n mb-0" for="ridp_subject_U.S._Coast_Guard_Merchant_Mariner_card"><%= l10n("insured.consumer_roles.upload_ridp_documents.coast_guard") %></label>
+                    <div class="col-auto px-0"><%= radio_button_tag 'ridp_subject', 'U.S. Coast Guard Merchant Mariner card', false %></div>
+                  </div>
                 </span>
               </fieldset>
-              <div class="d-flex flex-column flex-sm-row align-items-center float-right">
+              <div class="d-flex flex-column flex-sm-row align-items-center mt-3 float-right">
                 <button type="button" class="btn outline mr-2" data-dismiss="modal"> <%= l10n("insured.consumer_roles.upload_ridp_documents.cancel") %> </button>
                 <button type="button" class="btn-default btn-file">
                   <i class="fa fa-upload" aria-hidden="true"></i>
