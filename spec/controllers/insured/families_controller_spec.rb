@@ -2108,7 +2108,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:enable_alive_status).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:alive_status).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
       ivl_person.consumer_role.move_identity_documents_to_verified
       sign_in(ivl_user)

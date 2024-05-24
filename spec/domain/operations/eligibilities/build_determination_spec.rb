@@ -123,7 +123,6 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
       EnrollRegistry[feature_key].feature.stub(:is_enabled).and_return(true)
     end
     allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
-    allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
   end
 
   it 'should be a container-ready operation' do

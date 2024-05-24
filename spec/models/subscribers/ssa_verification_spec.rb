@@ -25,7 +25,7 @@ describe Subscribers::SsaVerification do
     let(:payload) { {:individual_id => individual_id, :body => xml} }
 
     before :each do
-      allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:location_residency_verification_type].feature).to receive(:is_enabled).and_return(true)
       consumer_role.aasm_state="ssa_pending"
     end
