@@ -7,6 +7,7 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
+    before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -15,13 +16,14 @@ module FinancialAssistance
     include Acapi::Notifiers
     include FinancialAssistance::L10nHelper
     include ::FileUploadHelper
+    include FinancialAssistance::NavigationHelper
     require 'securerandom'
 
     before_action :check_eligibility, only: [:copy]
     before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
-    layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
+    layout :resolve_layout
 
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
@@ -154,16 +156,13 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      respond_to do |format|
-        format.html { render layout: 'financial_assistance' }
-      end
+      respond_to :html
     end
 
     def application_checklist
       authorize @application, :application_checklist?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-
       respond_to :html
     end
 
@@ -376,6 +375,21 @@ module FinancialAssistance
 
     def set_family
       @family = @person.primary_family
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
+    end
+
+    def resolve_layout
+      case action_name
+      when "edit", "step", "review_and_submit", "eligibility_response_error", "application_publish_error"
+        "financial_assistance_nav"
+      when %i[application_year_selection application_checklist]
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
+      else
+        "financial_assistance"
+      end
     end
 
     def determination_token_present?(application)
