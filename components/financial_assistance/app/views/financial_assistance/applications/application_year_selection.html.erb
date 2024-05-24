@@ -1,3 +1,4 @@
+<%= render partial: 'faa_progress_options', locals: {step: 1} if @bs4 %>
 <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form) %>
   <% if HbxProfile.current_hbx.under_open_enrollment? %>
     <%= render 'year_selection_form' %>
@@ -5,64 +6,91 @@
     <%= render 'non_oe_year_selection_form' %>
   <% end %>
 <% else %>
-  <div class="container">
-    <div id="new_person_wrapper">
-      <div class="row">
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-          <%= render :partial => '/financial_assistance/shared/fa_left_nav' %>
-        </div>
-        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+  <% if @bs4 %>
+    <h1><%= l10n("faa.year_selection_header") %></h1>
+    <p><%= l10n("faa.year_selection_subheader") %></p>
+    <h2>
+      <i class="far fa-check-square"></i>
+      <%= assistance_year %>
+      <%= l10n("faa.year_selection_oe_year") %>
+    </h2>
+    <p><%= l10n("faa.see_if_you_qualify_1", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, medicaid_or_chip_program_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
+    <p>
+      <%= assistance_year %>
+      <%= l10n("faa.see_if_you_qualify_2", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, medicaid_or_chip_program_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+    </p>
+    <p>
+      <% oe_start_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on %>
+      <b><%= l10n("faa.year_selection_oe_range_from") %></b>
+      <b><%= oe_start_on %></b>
+      <b><%= l10n("faa.year_selection_oe_range_through") %></b>
+      <b><%= HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on %></b>
+    </p>
+    <p><i class="fas fa-info-circle"></i> <%= l10n("faa.year_selection_learn_more", year: oe_start_on.year, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
+    <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+      previous_link: main_app.help_paying_coverage_insured_consumer_role_index_path,
+      next_link: financial_assistance.application_checklist_application_path(@application)
+    } %>
+  <% else %>
+    <div class="container">
+      <div id="new_person_wrapper">
+        <div class="row">
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+            <%= render :partial => '/financial_assistance/shared/fa_left_nav' %>
+          </div>
+          <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
 
-          <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-pd">
-            <h2 class="darkblue"><%= l10n("faa.year_selection_header") %></h2>
-            <p><%= l10n("faa.year_selection_subheader") %></p>
-            <div class="faa-year-selection mt-20">
-              <div class="faays-title">
-                <div>
-                  <i class="far fa-check-square"></i>
+            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-pd">
+              <h2 class="darkblue"><%= l10n("faa.year_selection_header") %></h2>
+              <p><%= l10n("faa.year_selection_subheader") %></p>
+              <div class="faa-year-selection mt-20">
+                <div class="faays-title">
+                  <div>
+                    <i class="far fa-check-square"></i>
+                  </div>
+                  <div>
+                    <h3>
+                      <%= assistance_year %>
+                      <%= l10n("faa.year_selection_oe_year") %>
+                    </h3>
+                  </div>
                 </div>
-                <div>
-                  <h3>
+                <div class="border-bottom-2px"></div>
+                <div class="faays-body">
+                  <p>
+                    <%= l10n("faa.see_if_you_qualify_1") %>
                     <%= assistance_year %>
-                    <%= l10n("faa.year_selection_oe_year") %>
-                  </h3>
+                    <%= l10n("faa.see_if_you_qualify_2", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, medicaid_or_chip_program_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+                  </p>
+                  <p>
+                    <% oe_start_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on %>
+                    <b><%= l10n("faa.year_selection_oe_range_from") %></b>
+                    <b><%= oe_start_on %></b>
+                    <b><%= l10n("faa.year_selection_oe_range_through") %></b>
+                    <b><%= HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on %></b>
+                  </p>
                 </div>
-              </div>
-              <div class="border-bottom-2px"></div>
-              <div class="faays-body">
-                <p>
-                  <%= l10n("faa.see_if_you_qualify_1") %>
-                  <%= assistance_year %>
-                  <%= l10n("faa.see_if_you_qualify_2", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, medicaid_or_chip_program_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-                </p>
-                <p>
-                  <% oe_start_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on %>
-                  <b><%= l10n("faa.year_selection_oe_range_from") %></b>
-                  <b><%= oe_start_on %></b>
-                  <b><%= l10n("faa.year_selection_oe_range_through") %></b>
-                  <b><%= HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on %></b>
-                </p>
-              </div>
-              <div class="border-bottom-2px"></div>
-              <div class="faays-body">
-                <div>
-                  <i class="fas fa-info-circle"></i>
-                </div>
-                <div>
-                  <p><%= l10n("faa.year_selection_learn_more", year: oe_start_on.year, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
+                <div class="border-bottom-2px"></div>
+                <div class="faays-body">
+                  <div>
+                    <i class="fas fa-info-circle"></i>
+                  </div>
+                  <div>
+                    <p><%= l10n("faa.year_selection_learn_more", year: oe_start_on.year, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-            <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-              previous_url: main_app.help_paying_coverage_insured_consumer_role_index_path,
-              next_url: financial_assistance.application_checklist_application_path(@application)
-            } %>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+              <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+                previous_url: main_app.help_paying_coverage_insured_consumer_role_index_path,
+                next_url: financial_assistance.application_checklist_application_path(@application)
+              } %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  <% end %>
 <% end %>
