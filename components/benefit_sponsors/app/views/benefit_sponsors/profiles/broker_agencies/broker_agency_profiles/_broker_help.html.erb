@@ -38,9 +38,9 @@
     </dl>
     <dl class="parent my-2">
       <dt><%= l10n("broker_agencies.profiles.new_clients")%>:</dt>
-      <dd><%= broker_agency_profile.accept_new_clients? ? 'Yes' : 'No' %></dd>
+      <dd><%= broker_agency_profile.accept_new_clients? ? l10n("yes") : l10n("no") %></dd>
       <dt><%= l10n("broker_agencies.profiles.weekend_evening_hours")%>:</dt>
-      <dd><%= broker_agency_profile.working_hours? ? 'Yes' : 'No' %></dd>
+      <dd><%= broker_agency_profile.working_hours? ? l10n("yes") : l10n("no") %></dd>
       <dt><%= l10n("language")%>:</dt>
       <dd><%= broker_agency_profile.languages %></dd>
     </dl>
@@ -97,14 +97,14 @@
               <%= l10n("broker_agencies.profiles.new_clients")%>:
             </span>
             <span class="dg">
-              <%= broker_agency_profile.accept_new_clients? ? 'Yes' : 'No' %>
+              <%= broker_agency_profile.accept_new_clients? ? l10n("yes") : l10n("no") %>
             </span>
             <br/>
             <span class="lg ttu twelve">
               <%= l10n("broker_agencies.profiles.weekend_evening_hours")%>:
             </span>
             <span class="dg">
-              <%= broker_agency_profile.working_hours? ? 'Yes' : 'No' %>
+              <%= broker_agency_profile.working_hours? ? l10n("yes") : l10n("no") %>
             </span>
           </div>
           <div class="col-xs-6">

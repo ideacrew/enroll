@@ -21,6 +21,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.general_agencies" => "General Agencies",
 	"en.select_general_agency" => "Select General Agency",
 	"en.clear_assignment" => "Clear Assignment",
+  "en.shop_and_individual" => "SHOP & Individual",
 	"en.hbx_acct" => "HBX Acct",
 	"en.ee_ct" => "EE Ct",
 	"en.enroll_status" => "Enroll Status",

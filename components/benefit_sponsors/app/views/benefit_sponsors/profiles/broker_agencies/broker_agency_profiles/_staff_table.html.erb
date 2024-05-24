@@ -14,7 +14,7 @@
         <td class='col-sm-4'><%= staff.first_name + ' ' + staff.last_name %></td>
         <td class='col-sm-3'><%= organization.legal_name %></td>
         <td class='col-sm-3'><% market_kind = organization.broker_agency_profile.market_kind.to_s %>
-          <%= (market_kind.eql? "both") ? "SHOP & Individual" : market_kind.titleize %><%= l10n("market")%></td>
+          <%= (market_kind.eql? "both") ? l10n("shop_and_individual") : market_kind.titleize %><%= l10n("market")%></td>
         <td class='col-sm-2'><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'><%= l10n("select")%></a></td>
     </tr>
     <% end %>
@@ -35,7 +35,7 @@
         <td class='col-sm-4'><%= staff.first_name + ' ' + staff.last_name %></td>
         <td class='col-sm-3'><%= organization.legal_name %></td>
         <td class='col-sm-3'><% market_kind = organization.broker_agency_profile.market_kind.to_s %>
-          <%= (market_kind.eql? "both") ? "SHOP & Individual" : market_kind.titleize %><%= l10n("market")%></td>
+          <%= (market_kind.eql? "both") ? l10n("shop_and_individual") : market_kind.titleize %><%= l10n("market")%></td>
         <td class='col-sm-2'><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'><%= l10n("select")%></a></td>
     </tr>
     <% end %>
