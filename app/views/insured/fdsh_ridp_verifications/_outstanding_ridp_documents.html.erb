@@ -49,7 +49,7 @@
               <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
             <% end %>
           </div>
-          <div class>
+          <div>
             <% if ridp_documents_list(@person, ridp_type).any? %>
               <span><label class="my-0"><%= l10n("insured.consumer_roles.upload_ridp_documents.list_header", ridp_type: ridp_type) %></label></span>
               <div class="ridp-doc-list col-md-12 px-0">
