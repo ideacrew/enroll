@@ -1,0 +1,46 @@
+name: Daily Tools Summary
+
+on:
+    workflow_dispatch:
+    # schedule:
+    #   - cron: "0 0 * * *"
+
+jobs:
+    daily-tools-summary:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Download CodeQL artifact
+              uses: actions/download-artifact@v2
+              with:
+                  name: codeql-results
+
+            - name: Download Coverage Report
+              uses: actions/download-artifact@v2
+              with:
+                  name: coverage-report
+
+            - name: Write to Job Summary
+              run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+
+            # - name: Check status of last full-suite run
+            #   run: |
+            #       # Add your code here to check the status of the last full-suite run
+            #       # You can use the downloaded CodeQL artifact to retrieve the necessary information
+
+            # - name: Create summary
+            #   run: |
+            #       # Add your code here to create a summary based on the status of the last full-suite run
+            #       # You can use the information obtained in the previous step
+
+            # - name: Send Slack message
+            #   uses: rtCamp/action-slack-notify@v2
+            #   with:
+            #       status: ${{ job.status }}
+            #       message: |
+            #           Summary of the daily tools:
+            #           # Add your summary here
