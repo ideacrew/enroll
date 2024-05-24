@@ -11,13 +11,13 @@
     <hr>
     <% @person.ridp_verification_types.each do |ridp_type| %>
       <div class="my-md-3">
-        <div class="w-100 d-flex col-sm p-0 justify-content-between align-content-center vertically-centered-row" id="<%= ridp_type %>">
+        <div class="w-100 d-flex col-sm mb-2 p-0 justify-content-between align-content-center vertically-centered-row" id="<%= ridp_type %>">
           <span class="d-flex align-items-center"><label class="my-0"><%= ridp_type %></label></span>
           <span class="d-flex align-content-center badge badge-lg badge-<%=ridp_type_class(ridp_type, @person)%>" id="status"><%= ridp_status_translated(ridp_type, @person) %></span> <%= pundit_span Family, :updateable? %>
           <div class="d-flex align-content-center">
-          <% if true || current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
+          <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
             <div class="v-type-actions mr-2">
-              <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: "Actions", class: "button-select"} %>
+              <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
             </div>
           <% end %>
           <% if ridp_type_unverified?(ridp_type, @person) %>

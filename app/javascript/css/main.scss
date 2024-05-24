@@ -282,6 +282,9 @@ ul.list-right-section li {
   hr.subcard-divider {
     border-top: 1px solid rgba(0, 0, 0, 0.04);
   }
+  hr.subcard-divider:last-child {
+    display: none;
+  }
 }
 
 .badge-lg {
