@@ -4,6 +4,31 @@
 
 # rubocop:disable Layout/LineLength
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
+  "en.faa.nav.my_applications" => "My Applications",
+  "en.faa.nav.family_info" => "Family Info",
+  "en.faa.nav.family_relationships" => "Family Relationships",
+  "en.faa.nav.review" => "Review & Submit",
+  "en.faa.checklist.heading" => "Application Checklist",
+  "en.faa.checklist.instructions1" => "Before you get started, please review the application checklist below. If you gather the information in advance, you can complete the application quickly. When you’re ready to begin, select ‘Begin Application’. This application takes about 15-20 minutes to complete, you may save your progress at any time.",
+  "en.faa.checklist.instructions2" => "You will need detailed information on each person in your household (even if they don’t need coverage) to complete the application.",
+  "en.faa.checklist.needs_insurance_header" => "For each person in your household who needs health insurance, you’ll need:",
+  "en.faa.checklist.doesnt_need_insurance_header" => "For each person in your household who needs health insurance, you’ll need:",
+  "en.faa.checklist.require_bullet1" => "Full legal names, birth dates, social security numbers, and addresses",
+  "en.faa.checklist.require_bullet2" => "Tax filing plans for the year you want coverage. For example:",
+  "en.faa.checklist.require_bullet2_a" => "Who will file federal taxes?",
+  "en.faa.checklist.require_bullet2_b" => "Who will be claiming dependents on their tax return?",
+  "en.faa.checklist.require_bullet2_c" => "If anyone is married, will they file taxes jointly?",
+  "en.faa.checklist.require_bullet3" => "Information about income (how much you get, how often you get it, etc.). It helps to have:",
+  "en.faa.checklist.require_bullet3_a" => "Your most recent tax return",
+  "en.faa.checklist.require_bullet3_b" => "Recent paystubs",
+  "en.faa.checklist.require_bullet3_c" => "Recent statements for benefits like social security or unemployment",
+  "en.faa.checklist.require_bullet3_d" => "Recent bank and brokerage statements that show interest, capital gains, dividends or retirement distributions",
+  "en.faa.checklist.require_bullet4" => "For anyone who could get health insurance through a job, a completed Employer Coverage Tool Form",
+  "en.faa.checklist.require_bullet5" => "For anyone who is not a US citizen, immigration documents such as an:",
+  "en.faa.checklist.require_bullet5_a" => "I-551 (also called a green card)",
+  "en.faa.checklist.require_bullet5_b" => "I-94 (also called an arrival/departure record)",
+  "en.faa.checklist.require_bullet5_c" => "Employment authorization card",
+  "en.faa.checklist.begin_application" => "Begin Application",
   "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings
      on CoverME.gov. Please call CoverME.gov at (866) 636-0355 to make updates to that application.
       If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on CoverME.gov, but won't be able to tell you if you qualify for Medicaid or cost savings.",
