@@ -3,7 +3,7 @@
 <% content_for(:step) { step } %>
 <% content_for(:show_exit_button) { "true" } %>
 <% content_for(:show_previous_button) { "false" } %>
-<% content_for(:show_account_button) { EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
+<% content_for(:show_account_button) { EnrollRegistry.feature_enabled?(:back_to_account_all_shop)&.to_s } %>
 <% content_for(:show_help_button) { "true" } %>
 <% content_for(:back_to_account_flag) { "true" } %>
 

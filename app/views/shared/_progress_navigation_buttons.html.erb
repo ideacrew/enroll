@@ -1,6 +1,5 @@
 <%# previous button params %>
 <% dont_show_prev_button = local_assigns[:dont_show_prev_button] ? dont_show_prev_button : false %>
-<% previous_link = local_assigns[:previous_link] ? previous_link : '#' %>
 <% previous_style = local_assigns[:previous_style] ? previous_style : "outline" %>
 
 <%# continue button params %>
@@ -33,18 +32,8 @@
           <%= l10n("continue_next") %>
         </button>
       <% else %>
-        <%= h(link_to l10n("continue_next"), next_link, method: link_method, class: 'btn', disabled: disable_link, id: "btn-continue") %>
+        <%= h(link_to l10n("continue_next"), next_link, method: link_method, class: "btn #{'disabled' if disable_link}", id: "btn-continue") %>
       <% end %>
     <% end %>
   <% end %>
 </div>
-
-<script>
-  // Without this, the user can use the continue button to continue to navigate through the workflow via the enter button.
-  // The original approach with the disabled setting does not prevent keyboard navigation, only use of mouse clicks.
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter' && event.target.id === 'btn-continue' && event.target.getAttribute('disabled') === 'disabled') {
-      event.preventDefault();
-    }
-  });
-</script>
