@@ -178,14 +178,13 @@
               </div>
             </div>
           </div>
-        </div>
     </div>
   </div>
 
 
-
 <div class="row">
   <div class="col-xs-12">
+    <%= h(link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank', rel: "noopener noreferrer") %>
     <%= h(link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank', rel: "noopener noreferrer") %>
   </div>
 
