@@ -4,6 +4,7 @@
   <% show_previous_button = local_assigned_boolean(local_assigns[:show_previous_button], true) %>
   <% show_account_button = local_assigned_boolean(local_assigns[:show_account_button], back_to_account_flag) %>
   <% show_help_button = local_assigned_boolean(local_assigns[:show_help_button], !is_complete) %>
+  <% show_exit_button = local_assigned_boolean(local_assigns[:show_exit_button], !is_complete) %>
 
   <% continue_to_account_text ||= l10n("insured.plan_shoppings.receipt.go_to_my_account") %>
   <% to_account_text = is_complete ? continue_to_account_text : l10n("back_to_my_account") %>
@@ -35,7 +36,7 @@
             <%= l10n("save_and_exit") %>
           </a>
         </li>
-        <% unless back_to_account_flag %>
+        <% unless back_to_account_flag || @bs4 %>
           <br>
           <br>
           <li>
