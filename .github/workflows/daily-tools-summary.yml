@@ -1,6 +1,7 @@
 name: Daily Tools Summary
 
 on:
+    push:
     workflow_dispatch:
     # schedule:
     #   - cron: "0 0 * * *"
@@ -22,6 +23,9 @@ jobs:
               uses: actions/download-artifact@v2
               with:
                   name: coverage-report
+
+            - name: figure it out what we have
+              run: ls -lha
 
             - name: Write to Job Summary
               run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
