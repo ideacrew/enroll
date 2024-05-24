@@ -1047,7 +1047,9 @@ class Exchanges::HbxProfilesController < ApplicationController
       result.deliver_now
       puts result.to_s if Rails.env.development?
     else
-      Rails.logger.warn("No email found for #{full_name} with hbx_id #{hbx_id}")
+      Rails.logger.warn(
+        "No email found for person with hbx_id #{hbx_id}, person_id: #{params[:consumer_person_id] || params[:person]}"
+      )
     end
   end
 
