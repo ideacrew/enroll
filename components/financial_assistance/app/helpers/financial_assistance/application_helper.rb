@@ -2,7 +2,6 @@
 
 module FinancialAssistance
   module ApplicationHelper
-    include ::FinancialAssistance::ReviewAndSubmitHelper
 
     def to_est(datetime)
       datetime.in_time_zone("Eastern Time (US & Canada)") if datetime.present?
@@ -212,19 +211,9 @@ module FinancialAssistance
 
     def applicant_currently_enrolled
       if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
-        'Is this person currently enrolled in health coverage?'
+        'Is this person currently enrolled in health coverage? *'
       elsif FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).item
-        'Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?'
-      else
-        ''
-      end
-    end
-
-    def applicant_currently_enrolled_short_key
-      if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
-        'has_enrolled_health_coverage_short'
-      elsif FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).item
-        'has_enrolled_health_coverage_from_hra_short'
+        'Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement? *'
       else
         ''
       end
@@ -242,23 +231,11 @@ module FinancialAssistance
 
     def applicant_eligibly_enrolled
       if FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).item
-        'Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?'
+        'Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person? *'
       elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
-        'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in?'
+        'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in? *'
       elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item
-        'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in (including through another person, like a spouse or parent)?'
-      else
-        ''
-      end
-    end
-
-    def applicant_eligibly_enrolled_short_key
-      if FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).item
-        'has_eligible_health_coverage_short'
-      elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
-        'has_eligible_health_coverage_from_hra_short'
-      elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item
-        'has_eligible_health_coverage_from_hra_short_min'
+        'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in (including through another person, like a spouse or parent)? *'
       else
         ''
       end
@@ -302,9 +279,9 @@ module FinancialAssistance
       ::FinancialAssistance::Applicant.find(id)&.full_name
     end
 
-    def immigration_document_options_submission_url(application, model, bs4)
+    def immigration_document_options_submission_url(application, model)
       if model.try(:persisted?)
-        { :remote => true, method: :put, :url => application_applicant_path(application_id: application.id, id: model.id, bs4: bs4), :as => :applicant }
+        { :remote => true, method: :put, :url => application_applicant_path(application_id: application.id, id: model.id), :as => :applicant }
       else
         { :remote => true, method: :post, :url => "/applications/#{application.id}/applicants", :as => :applicant }
       end
@@ -395,77 +372,26 @@ module FinancialAssistance
       @assistance_year = year_selection_enabled ? @application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
     end
 
-    def renewal_year_select_options
-      options = []
-      (1..5).reverse_each do |year|
-        options << ["#{year} #{l10n('insured.preferences.renewal_year_option')}", year]
-      end
-      options << [l10n('insured.preferences.renewal_year_none', site_short_name: site_short_name), 0]
-    end
-
-    def faa_nav_options(step, application, applicant)
-      nav = {}
-
-      nav[:nav_options] = applicant.present? ? applicant_faa_nav_options(application, applicant) : no_applicant_faa_nav_options(application)
-      nav[:links] = true
-      nav[:step] = step
-      view_applications = (applicant.present? || step != 1) && application.is_draft?
-      nav[:title] = view_applications ? l10n("faa.left_nav.my_household") : l10n("faa.results.view_my_applications").titleize
-      nav[:title_link] = view_applications ? edit_application_path(application) : financial_assistance.applications_path
-      nav[:subheading] = l10n("faa.nav.applicant_subheader")
-
-      nav[:show_help_button] = true
-      nav[:show_exit_button] = true
-      nav[:show_previous_button] = false
-      nav[:show_account_button] = EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
-      nav[:back_to_account_flag] = true
-
-      nav
-    end
-
-    def applicant_faa_nav_options(application, applicant)
-      [
-        {step: 1, label: l10n('faa.nav.tax_info'), link: go_to_step_application_applicant_path(application, applicant, 1), step_complete: applicant.tax_info_complete? },
-        {step: 2, label: l10n('faa.nav.job_income'), link: application_applicant_incomes_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:income) },
-        {step: 3, label: l10n('faa.nav.other_income'), link: other_application_applicant_incomes_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:other_income) },
-        {step: 4, label: l10n('faa.nav.income_adjustments'), link: application_applicant_deductions_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:income_adjustment) },
-        {step: 5, label: l10n('faa.nav.health_coverage'), link: application_applicant_benefits_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:health_coverage) },
-        {step: 6, label: l10n('faa.nav.other_questions'), link: other_questions_application_applicant_path(application, applicant), step_complete: applicant.other_questions_complete? }
-      ]
-    end
-
     def no_applicant_faa_nav_options(application)
       step1_link = (application.present? && application.is_draft?) ? financial_assistance.edit_application_path(application) : "javascript:void(0);"
       links = [
-        {step: 1, label: l10n('faa.nav.family_info'), link: step1_link}
+        {step: 1, label: l10n('faa.nav.family_info', link: step1_link)},
       ]
       relationship_step = {step: 2, label: l10n('faa.nav.family_relationships'), link: "javascript:void(0);"}
       review_step = {step: 2, label: l10n('faa.nav.review'), link: "javascript:void(0);"}
+      if application && application.incomplete_applicants?
+        relationship_step[:link] = nil
+      elsif application && application.applicants.count > 1 && application.is_draft?
+        relationship_step[:link] = financial_assistance.application_relationships_path(application)
+      end
 
-      if application&.applicants && application.applicants.count > 1
-        relationship_step[:link] = financial_assistance.application_relationships_path(application) if application.is_draft?
+      if application.applicants.count > 1
         links << relationship_step
         review_step[:step] = 3
       end
+
       review_step[:link] = financial_assistance.review_and_submit_application_path(application) if application.present? && application.ready_for_attestation? && application.is_draft?
-
       links << review_step
-    end
-
-    def other_questions_prompt(key, use_applicant_name: false)
-      l10n("faa.other_ques.#{key}", subject: use_applicant_name ? @applicant.first_name.capitalize : l10n("faa.this_person"))
-    end
-
-    def hr_kind(kind, insurance_kind)
-      eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
-      term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}"
-      l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
-    end
-
-    def insurance_kind_select_options(kind)
-      FinancialAssistance::Benefit.valid_insurance_kinds.map do |insurance_kind|
-        [hr_kind(kind, insurance_kind), insurance_kind, {:'data-esi' => display_esi_fields?(insurance_kind, kind), :'data-mvsq' => display_minimum_value_standard_question?(insurance_kind)}]
-      end
     end
   end
 end

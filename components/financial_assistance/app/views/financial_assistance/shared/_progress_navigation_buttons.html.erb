@@ -3,9 +3,8 @@
 
 <%# previous button params %>
 <% dont_show_prev_button = local_assigns[:dont_show_prev_button] ? dont_show_prev_button : false %>
-<% previous_style = local_assigns[:previous_style] ? previous_style : "outline" %>
-<% previous_class = "#{previous_style} #{'back' unless local_assigns[:previous_link].present?}" %>
 <% previous_link = local_assigns[:previous_link] ? previous_link : '#' %>
+<% previous_style = local_assigns[:previous_style] ? previous_style : "outline" %>
 
 <%# continue button params %>
 <% dont_show_next_button = local_assigns[:dont_show_next_button] ? dont_show_next_button : false %>
@@ -15,11 +14,11 @@
 
 <div class="d-flex align-items-center">
   <% if @application && show_back_to_household_button %>
-    <%= h(link_to_with_noopener_noreferrer("Back to All Household Members", financial_assistance.edit_application_path(@application), class: 'button outline mr-2')) %>
+    <%= h(link_to_with_noopener_noreferrer("Back to All Household Members", financial_assistance.edit_application_path(@application), class: 'button btn-continue', id: 'btn-continue')) %>
   <% end %>
 
   <% unless dont_show_prev_button || @no_previous_button %>
-    <a class="button <%= previous_class %> mr-2" href=<%= previous_link %>><%= l10n("previous_step") %></a>
+    <a class="back button <%= previous_style %> mr-2" href=<%= previous_link %>><%= l10n("previous_step") %></a>
   <% end %>
 
   <% unless dont_show_next_button %>
@@ -27,7 +26,7 @@
       <%= yield :submit_button %>
     <% else %>
       <% unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
-        <%= h(link_to_with_noopener_noreferrer(l10n("continue_next"), next_link, class: 'button btn-continue', id: 'btn-continue', disabled: disable_link)) %>
+        <%= h(link_to_with_noopener_noreferrer(l10n("continue_next"), next_link, class: 'button btn-continue', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled))) %>
       <% end %>
     <% end %>
   <% end %>
