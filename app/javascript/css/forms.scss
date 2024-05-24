@@ -78,8 +78,8 @@ input.full-width, select.full-width, .input.full-width {
   width: 100%;
 }
 
-input + label,
-input + fieldset,
+input:not([type="hidden"]) + label,
+input:not([type="hidden"]) + fieldset,
 select + label,
 select + fieldset,
 .input + label,
@@ -149,4 +149,25 @@ select:invalid,
 input[type='date']:invalid::-webkit-datetime-edit {
   color: var(--placeholder-color);
   -webkit-text-fill-color: var(--placeholder-color);
+}
+
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  outline: none;
+  background: white;
+  cursor: inherit;
+  display: block;
 }

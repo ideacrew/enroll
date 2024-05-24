@@ -346,3 +346,16 @@ ul.list-right-section li {
   padding: 13px 12px;
   background: var(--grey-000);
 }
+
+// modals
+
+.backdrop-modal {
+  background: hsla(0, 0%, 0%, 0.2);
+  .modal-header {
+    border-bottom: 0;
+  }
+
+  .modal-footer {
+    border-top: 0;
+  }
+}
