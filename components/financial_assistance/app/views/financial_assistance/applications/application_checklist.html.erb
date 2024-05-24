@@ -1,3 +1,68 @@
+<% if @bs4 %>
+  <%= render partial: 'faa_progress_options', locals: {step: 1} %>
+  <h1><%= l10n("faa.checklist.heading") %></h1>
+  <p><%= l10n("faa.checklist.instructions1") %></p>
+  <p class="b"><%= l10n("faa.checklist.instructions2") %></p>
+  <div class="d-flex sm-block my-4">
+    <div class="mr-auto col-sm col-md-6 pl-0">
+      <p class="b"><%= l10n("faa.checklist.needs_insurance_header") %></p>
+      <ul class="spaced">
+        <li class="mb-4"><%= l10n("faa.checklist.require_bullet1") %></li>
+        <li class="mb-4"><%= l10n("faa.checklist.require_bullet2") %>
+          <ul>
+            <li><%= l10n("faa.checklist.require_bullet2_a") %></li>
+            <li><%= l10n("faa.checklist.require_bullet2_b") %></li>
+            <li><%= l10n("faa.checklist.require_bullet2_c") %></li>
+          </ul>
+        </li>
+        <li class="mb-4"><%= l10n("faa.checklist.require_bullet3") %>
+          <ul>
+            <li><%= l10n("faa.checklist.require_bullet3_a") %></li>
+            <li><%= l10n("faa.checklist.require_bullet3_b") %></li>
+            <li><%= l10n("faa.checklist.require_bullet3_c") %></li>
+            <li><%= l10n("faa.checklist.require_bullet3_d") %></li>
+          </ul>
+        </li>
+        <li class="mb-4"><%= l10n("faa.checklist.require_bullet4") %></li>
+        <li><%= l10n("faa.checklist.require_bullet5") %>
+          <ul>
+            <li><%= l10n("faa.checklist.require_bullet5_a") %></li>
+            <li><%= l10n("faa.checklist.require_bullet5_b") %></li>
+            <li><%= l10n("faa.checklist.require_bullet5_c") %></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm col-md-6 pr-0">
+      <p class="b"><%= l10n("faa.checklist.doesnt_need_insurance_header") %></p>
+      <ul class="spaced">
+        <li class="mb-4"><%= l10n("faa.checklist.require_bullet1") %></li>
+        <li class="mb-4"><%= l10n("faa.checklist.require_bullet2") %>
+          <ul>
+            <li><%= l10n("faa.checklist.require_bullet2_a") %></li>
+            <li><%= l10n("faa.checklist.require_bullet2_b") %></li>
+            <li><%= l10n("faa.checklist.require_bullet2_c") %></li>
+          </ul>
+        </li>
+        <li class="mb-4"><%= l10n("faa.checklist.require_bullet3") %>
+          <ul>
+            <li><%= l10n("faa.checklist.require_bullet3_a") %></li>
+            <li><%= l10n("faa.checklist.require_bullet3_b") %></li>
+            <li><%= l10n("faa.checklist.require_bullet3_c") %></li>
+            <li><%= l10n("faa.checklist.require_bullet3_d") %></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <% content_for :submit_button do %>
+    <%= h(link_to_with_noopener_noreferrer(l10n("faa.checklist.begin_application"), financial_assistance.edit_application_path(@application), class: 'button btn-continue', id: 'btn-continue')) %>
+  <% end %>
+  <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+      previous_link: application_checklist_previous_url(@application),
+      next_link: financial_assistance.edit_application_path(@application)
+    } %>
+<% else %>
 <div class="container">
   <div id="new_person_wrapper">
     <div class="row">
@@ -45,3 +110,4 @@
     </div>
   </div>
 </div>
+<% end %>
