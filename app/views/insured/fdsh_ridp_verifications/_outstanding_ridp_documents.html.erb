@@ -1,40 +1,50 @@
 <% if @person.ridp_verification_types.present? %>
 <% if @bs4 %>
+  <% show_faq_button = (defined? show_faq_button) ? show_faq_button : true %>
   <div class="mt-4 mb-4">
-  <%= link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer' %>
-  <h2 class="mt-4">Household Members</h2>
+  <% if show_faq_button %>
+    <%= sanitize(link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer') %>
+  <% end %>
+  <h2 class="mt-4"><%= l10n("insured.consumer_roles.upload_ridp_documents.outstanding_header") %></h2>
   <section class="card">
     <h3 class="mb-0"><%= @person.full_name %></h3>
     <hr>
     <% @person.ridp_verification_types.each do |ridp_type| %>
-      <div class="d-flex mb-md-4 row col-sm align-content-center" id="<%= ridp_type %>">
-        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0"><%= ridp_type %></div>
-        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0"><%= ridp_status_translated(ridp_type, @person) %> <%= pundit_span Family, :updateable? %></div>
+      <div class="w-100 d-flex mb-md-4 col-sm  mt-2 p-0 justify-content-between align-content-center vertically-centered-row" id="<%= ridp_type %>">
+        <span class="d-flex align-content-center"><%= ridp_type %></span>
+        <span class="d-flex align-content-center badge badge-lg badge-<%=ridp_type_class(ridp_type, @person)%>" id="status"><%= ridp_status_translated(ridp_type, @person) %></span> <%= pundit_span Family, :updateable? %>
+        <div class="d-flex align-content-center">
         <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
-          <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-            <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Action'} %>
+          <div class="v-type-actions mr-2">
+            <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Admin Actions', class: "button-select"} %>
           </div>
         <% end %>
-        <div class="col-sm col-md-6 col-lg-3 p-0">
-          <% if ridp_type_unverified?(ridp_type, @person) %>
-            <% if ridp_type == 'Identity' %>
-                <span class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
-                  <i class="fa fa-upload" aria-hidden="true"></i>
-                  <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
-                </span>
-                <%= render partial: 'insured/fdsh_ridp_verifications/insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
-            <% else %>
-              <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
-                <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
-                  <i class="fa fa-upload" aria-hidden="true"></i>
-                  <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
-                  <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
-                </span>
-                <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
-              <% end %>
+        <% if ridp_type_unverified?(ridp_type, @person) %>
+          <% if ridp_type == 'Identity' %>
+              <span class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
+                <i class="fa fa-upload" aria-hidden="true"></i>
+                <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
+              </span>
+              <%= render partial: 'insured/fdsh_ridp_verifications/insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
+          <% else %>
+            <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
+              <span class="btn btn-default btn-file float-end" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
+                <i class="fa fa-upload" aria-hidden="true"></i>
+                <label><%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %></label>
+                <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: l10n("upload_documents") %>
+              </span>
+              <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
             <% end %>
           <% end %>
+        <% end %>
         </div>
+      </div>
+      <div class="w-100 px-0">
+        <% if ridp_type == "Identity" && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?) %>
+            <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+        <% elsif ridp_type == "Application" &&  pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?) %>
+            <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+        <% end %>
       </div>
     <% end %>
   </section>
@@ -130,17 +140,10 @@
     </div>
   </div>
 
-<<<<<<< HEAD
+
 <div class="row">
   <div class="col-xs-12">
     <%= h(link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank', rel: "noopener noreferrer") %>
-=======
-
-  <div class="row">
-    <div class="col-xs-12">
-      <%= link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank' %>
-    </div>
->>>>>>> e17ec9fd74 (fix fonts, more ridp work started)
   </div>
 
   <div class="collapse" id="docs-verification-faq">

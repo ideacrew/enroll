@@ -9,10 +9,9 @@
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
 
-    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag "application", 'data-turbolinks-track': 'reload' %>
-    <%= yield :head %>
-    <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application' %>
+    <%= javascript_include_tag "application" %>
+    <%= stylesheet_pack_tag 'application' %>
 
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
@@ -29,13 +28,12 @@
       <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
     <% end %>
 
-    <% if EnrollRegistry.feature_enabled?(:jquery_migrate) %>
-      <% if EnrollRegistry[:jquery_migrate].setting(:show_warnings).item == true %>
-        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
-      <% else %>
-        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
-      <% end %>
-    <% end %>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
   </head>
@@ -45,38 +43,43 @@
       <% if aca_security_questions %>
         <%= render 'users/security_question_responses/modal' %>
       <% end %>
-      <% side_nav = content_for?(:side_nav) ? yield(:side_nav) : "" %>
-      <% if content_for?(:side_nav) %>
-        <div class="mt-4 mb-4">
-          <div class="container mt-4">
-            <div class="row">
-              <% nav_width = content_for?(:nav_width) ? yield(:nav_width).to_i : 3 %>
-              <div class="col-sm-12 col-md-12 col-lg-<%= nav_width %> mr-auto p-2 p-md-0 progress-nav-container">
-                <%= side_nav %>
-              </div>
-              <div class="col-sm-12 col-md-12 col-lg-<%= 12 - nav_width %> pl-4">
-                <%= render_flash use_bs4: @bs4 %>
-                <% if content_for? :content %>
-                  <%= yield :content %>
+
+      <div class="mt-4 mb-4">
+        <div class="container mt-4">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-0 progress-nav-container">
+              <% step = content_for?(:step) ? yield(:step).to_i : 1 %>
+              <% title = content_for?(:title) ? yield(:title) : "" %>
+              <% title_link = content_for?(:title_link) ? yield(:title_link) : nil %>
+              <nav class="progress-nav">
+                <% if title_link.present? %>
+                  <h3><a href="<%= title_link %>"><i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i> <%= title %></a></h3>
                 <% else %>
-                  <%= yield %>
+                  <h3><%= title %></h3>
                 <% end %>
-              </div>
+                <ul class="progress-wrapper">
+                  <%= yield(:nav_options) if content_for?(:nav_options) %>
+                </ul>
+              </nav>
+              <%= render partial: 'shared/shopping_nav_panel',
+                  locals: { show_exit_button: content_for?(:show_exit_button) ? yield(:show_exit_button) : false,
+                            show_previous_button: content_for?(:show_previous_button) ? yield(:show_previous_button) : false,
+                            show_account_button: content_for?(:show_account_button) ? yield(:show_account_button) : false,
+                            is_complete: content_for?(:is_complete) ? yield(:is_complete) : false,
+                            show_help_button: content_for?(:show_help_button) ? yield(:show_help_button) : false,
+                            back_to_account_flag: content_for?(:back_to_account_flag) ? yield(:back_to_account_flag) : EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-9 pl-4">
+              <%= render_flash use_bs4: @bs4 %>
+              <% if content_for? :content %>
+                <%= yield :content %>
+              <% else %>
+                <%= yield %>
+              <% end %>
             </div>
           </div>
         </div>
-      <% else %>
-        <div class="container">
-          <div class=<%= "mt-4" if @bs4 %>>
-            <%= render_flash use_bs4: @bs4 %>
-          </div>
-          <% if content_for? :content %>
-            <%= yield :content %>
-          <% else %>
-            <%= yield %>
-          <% end %>
-        </div>
-      <% end %>
+      </div>
     </main>
 
     <%= render partial: './ui-components/bs4/v1/footers/footer' %>

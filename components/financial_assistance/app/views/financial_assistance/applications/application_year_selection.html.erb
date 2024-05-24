@@ -1,4 +1,4 @@
-<%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 1} if @bs4 %>
+<%= render partial: 'faa_progress_options', locals: {step: 1} if @bs4 %>
 <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form) %>
   <% if HbxProfile.current_hbx.under_open_enrollment? %>
     <%= render 'year_selection_form' %>
