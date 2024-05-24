@@ -66,6 +66,13 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
       it 'creates a new address' do
         expect(@person.addresses.present?).to be_truthy
       end
+
+      it 'creates demographics_group and alive_status' do
+        demographics_group = @person.demographics_group
+
+        expect(demographics_group.present?).to be_truthy
+        expect(demographics_group.alive_status.present?).to be_truthy
+      end
     end
 
     context 'failure' do
