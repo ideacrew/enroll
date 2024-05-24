@@ -264,9 +264,7 @@ module FinancialAssistance
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
 
-      respond_to do |format|
-        format.html { render layout: 'financial_assistance' }
-      end
+      respond_to :html
     end
 
     def eligibility_results
@@ -388,10 +386,12 @@ module FinancialAssistance
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
       when "eligibility_results"
         if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-          return params.keys.include?('cur') ? "financial_assistance_progress" : "bs4_financial_assistance.html"
+          return params.keys.include?('cur') ? "financial_assistance_progress" : "bs4_financial_assistance"
         else
           return params.keys.include?('cur') ? "financial_assistance_nav" : "financial_assistance"
         end
+      when "wait_for_eligibility_response"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "bs4_financial_assistance" : "financial_assistance"
       else
         "financial_assistance"
       end
