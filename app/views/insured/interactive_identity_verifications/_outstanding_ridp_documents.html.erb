@@ -10,13 +10,13 @@
     <h3 class="mb-0"><%= @person.full_name %></h3>
     <hr>
     <% @person.ridp_verification_types.each do |ridp_type| %>
-      <div class="w-100 d-flex mb-md-4 col-sm  mt-2 p-0 justify-content-between align-content-center vertically-centered-row" id="<%= ridp_type %>">
+      <div class="w-100 d-flex mb-md-4 col-sm mt-2 p-0 justify-content-between align-content-center vertically-centered-row" id="<%= ridp_type %>">
         <span class="d-flex align-content-center"><%= ridp_type %></span>
         <span class="d-flex align-content-center badge badge-lg badge-<%=ridp_type_class(ridp_type, @person)%>" id="status"><%= ridp_status_translated(ridp_type, @person) %></span> <%= pundit_span Family, :updateable? %>
         <div class="d-flex align-content-center">
-        <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
+        <% if true || current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
           <div class="v-type-actions mr-2">
-            <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Admin Actions', class: "button-select"} %>
+            <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
           </div>
         <% end %>
         <% if ridp_type_unverified?(ridp_type, @person) %>
@@ -44,35 +44,35 @@
           <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
         <% end %>
       </div>
-      <div class="row">
+      <div class>
         <% if ridp_documents_list(@person, ridp_type).any? %>
-            <div class="ridp-doc-list col-md-12">
-              <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
-                  <div class="row" id="doc_table_row_<%=ridp_doc.id%>">
-                    <div class="ridp-doc-elem col-md-12">
-                      <div class="v-doc col-md-11">
-                        <% if ridp_doc.identifier.present? %>
-                            <% key = ridp_doc.identifier.split('#').last %>
-                            <%= h(content_tag(:a, href: "/insured/ridp_documents/download/#{key}", title: "Download", data: {toggle: "tooltip"}, target: "_blank", rel: "noopener noreferrer") do %>
-                              <%= ridp_doc.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
-                            <% end) %>
-                        <% end %>
-                      </div>
-                      <div class="v-doc col-md-1">
-                        <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
-                          <span class="<%=pundit_class(Family, :updateable?)%>" >
-                              <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true do %>
-                                <i class="far fa-trash-alt fa-lg role-trashcan" title="Delete"></i>
-                            <% end %>
-                          </span>
-                        <% end %>
-                      </div>
-                    </div>
-                  </div>
-              <% end %>
-            </div>
+          <label><%= l10n("insured.consumer_roles.upload_ridp_documents.list_header", ridp_type: ridp_type) %></label>
+          <div class="ridp-doc-list col-md-12 px-0 py-2">
+            <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
+              <div class="d-flex py-1 px-0 align-items-center" id="doc_table_row_<%=ridp_doc.id%>">
+                <div class="col-11 px-0">
+                  <% if ridp_doc.identifier.present? %>
+                      <% key = ridp_doc.identifier.split('#').last %>
+                    <%= h(content_tag(:a, href: "/insured/ridp_documents/download/#{key}", title: "Download", data: {toggle: "tooltip"}, target: "_blank", rel: "noopener noreferrer") do %>
+                      <%= ridp_doc.title.titleize %> <i class='fa fa-download fa-lg px-1' aria-hidden='true'></i>
+                    <% end) %>
+                  <% end %>
+                </div>
+                <div class="col-1 px-0">
+                  <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
+                    <span class="<%=pundit_class(Family, :updateable?)%> float-right" >
+                        <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true do %>
+                          <i class="far fa-trash-alt fa-lg role-trashcan text-danger" title="Delete"></i>
+                      <% end %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
         <% end %>
       </div>
+      <hr class="subcard-divider">
     <% end %>
   </section>
   </div>
