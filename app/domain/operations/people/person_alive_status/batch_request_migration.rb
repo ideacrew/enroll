@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Operations::People::PersonAliveStatus::BatchRequestMigration.new.call
+
 module Operations
   module People
     module PersonAliveStatus
@@ -9,24 +11,47 @@ module Operations
         include EventSource::Command
         include EventSource::Logging
 
-
-        def call(params)
-          values = yield validate(params)
-          people = yield fetch_people_with_consumer_role(values)
-          yield publish(people)
-
-          Success("Successfully Migrated Person Alive Status")
+        def call
+          people = yield fetch_people_with_consumer_role
+          yield batch_process(people)
         end
 
         private
 
-        def validate(params)
-          errors = []
-          errors << 'person_id ref missing' unless params[:person_id]
+        def fetch_people_with_consumer_role
+          result = Person.where(hbx_id: "171458776845154").exists(consumer_role: true)
+
+          if result.present?
+            Success(result)
+          else
+            Failure("No people found with consumer role")
+          end
         end
 
-        def fetch_people_with_consumer_role(_params)
-          Person.exists(consumer_role: true)
+        def build_and_publish_event(person)
+          event = event('events.people.person_alive_status.data_migration.requested', attributes: { person_hbx_id: person.hbx_id })
+
+          if event.success?
+            Success(event.success.publish)
+
+          else
+            Failure(event.failure)
+          end
+        end
+
+        def batch_process(people)
+          field_names = %w[HBX_ID Published?]
+          file_name = "#{Rails.root}/alive_status_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
+
+          CSV.open(file_name, 'w', force_quotes: true) do |csv|
+            csv << field_names
+            people.each do |person|
+              result = build_and_publish_event(person)
+              csv << [person.hbx_id, result.success?]
+            end
+          end
+
+          Success("Successfully processed batch request")
         end
       end
     end
