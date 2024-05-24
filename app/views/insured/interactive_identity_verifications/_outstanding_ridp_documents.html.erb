@@ -13,7 +13,11 @@
       <div class="my-md-3">
         <div class="w-100 d-flex col-sm mb-2 p-0 justify-content-between align-content-center vertically-centered-row" id="<%= ridp_type %>">
           <span class="d-flex align-items-center"><label class="my-0"><%= ridp_type %></label></span>
-          <span class="d-flex align-content-center badge badge-lg badge-<%=ridp_type_class(ridp_type, @person)%>" id="status"><%= ridp_status_translated(ridp_type, @person) %></span> <%= pundit_span Family, :updateable? %>
+          <span class="d-flex align-content-center">
+            <span class="badge badge-lg badge-<%=ridp_type_class(ridp_type, @person)%>" id="status">
+              <%= ridp_status_translated(ridp_type, @person) %>
+            </span>
+          </span> <%= pundit_span Family, :updateable? %>
           <div class="d-flex align-content-center">
           <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
             <div class="v-type-actions mr-2">
