@@ -45,7 +45,7 @@
                 <button type="button" class="btn-default btn-file" id="select_upload_identity">
                   <i class="fa fa-upload" aria-hidden="true"></i>
                   <%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %>
-                  <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true %>
+                  <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true %>
                 </button>
               </div>
               <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
