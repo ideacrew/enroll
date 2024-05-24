@@ -25,17 +25,16 @@ module Operations
           private
 
           def query_families_with_active_members
-            return Success(Family.enrolled_members_with_ssn) if EnrollRegistry.feature_enabled?(:alive_status)
+            return Failure('ALIVE_STATUS is not enabled for this env') unless EnrollRegistry.feature_enabled?(:alive_status)
 
-            error_message = 'ALIVE_STATUS is not enabled for this environment'
-            pvc_logger.error(error_message)
-            Failure(error_message)
+            families = Family.enrolled_members_with_ssn
+            Success(families)
           end
 
           def submit_for_dmf_determination(families)
             count = 0
 
-            families.no_timeout.each do |family|
+            families.each do |family|
               values = build_family_transmittable_values(family)
 
               if values.present?
@@ -43,12 +42,12 @@ module Operations
                 publish({ family_hbx_id: family.hbx_assigned_id, job_id: job.job_id })
 
                 count += 1
-                pvc_logger.info("********************************* published #{count} families *********************************") if count % 100 == 0
+                started_dmf_logger.info("********************************* published #{count} families *********************************") if count % 100 == 0
               else
-                pvc_logger.error("Family with id #{family.id} is missing hbx_assigned_id -- unable to proceed with dmf determination")
+                started_dmf_logger.error("Family with id #{family.id} is missing hbx_assigned_id -- unable to proceed with dmf determination")
               end
             rescue StandardError => e
-              pvc_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}")
+              started_dmf_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}")
             end
           end
 
@@ -76,8 +75,8 @@ module Operations
             Success("Successfully published dmf determination payload")
           end
 
-          def pvc_logger
-            @pvc_logger ||= Logger.new("#{Rails.root}/log/dmf_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          def started_dmf_logger
+            @started_dmf_logger ||= Logger.new("#{Rails.root}/log/started_dmf_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
           end
         end
       end
