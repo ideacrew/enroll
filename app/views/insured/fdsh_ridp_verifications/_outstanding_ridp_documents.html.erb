@@ -14,7 +14,7 @@
           <div class="w-100 d-flex col-sm mb-2 p-0 justify-content-between align-content-center vertically-centered-row" id="<%= ridp_type %>">
             <span class="d-flex align-items-center"><h6 class="my-0"><%= ridp_type %></h6></span>
             <span class="d-flex align-content-center">
-              <span class="badge badge-lg badge-<%=ridp_type_class(ridp_type, @person)%>" id="status">
+              <span class="badge badge-status badge-<%=ridp_type_class(ridp_type, @person)%>" id="status">
                 <%= ridp_status_translated(ridp_type, @person) %>
               </span>
             </span> <%= pundit_span Family, :updateable? %>

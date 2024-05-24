@@ -1,35 +1,94 @@
-<div class="modal fade read-only-modal" id="insured_ridp_modal" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>&nbsp;
-      </div>
-      <div class="modal-body">
-        <div>
-            <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
-              <div class="text-center">
-                <span class="btn btn-default btn-file" id="select_upload_identity">
-                  <i class="fa fa-upload" aria-hidden="true"></i>
-                  <label for="file_"><%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %></label>
-                  <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
-                </span>
-              </div>
+<% if @bs4 %>
+  <div class="modal fade read-only-modal" tabindex="-1" id="insured_ridp_modal" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="container modal-content">
+        <div class="d-flex mb-4 mt-2 align-items-center">
+          <div class="col-auto px-0">
+            <div class="info-icon icon" alt="Info">&nbsp;</div>
+          </div>
+          <div class="col pl-0">
+            <h5 class="modal-title"><%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %></h5>
+          </div>
+          <div class="col-auto px-0">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body px-0 pt-0">
+          <label class="weight-n mb-2"><%= l10n("insured.consumer_roles.upload_ridp_documents.document_info") %></label>
+          <div>
+            <%= form_tag insured_ridp_documents_upload_path, multipart: true do %>
               <fieldset>
-                <legend for="ridp_subject"><%= l10n("insured.consumer_roles.upload_ridp_documents.id_type") %></legend>
+                <legend><%= l10n("insured.consumer_roles.upload_ridp_documents.document_type") %></legend>
                 <span>
-                  <label class="mb-4" for="ridp_subject_Driver_s_License_issued_by_state_or_territory"><%= radio_button_tag 'ridp_subject', "Driver's License issued by state or territory", true %><%= l10n("insured.consumer_roles.upload_ridp_documents.driver_license") %></label>
-                  <label class="mb-4" for="ridp_subject_School_identification_card"><%= radio_button_tag 'ridp_subject', 'School identification card', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.school_id") %></label>
-                  <label class="mb-4" for="ridp_subject_U.S._military_card_or_draft_record"><%= radio_button_tag 'ridp_subject', 'U.S. military card or draft record', false%><%= l10n("insured.consumer_roles.upload_ridp_documents.military_id") %></label>
-                  <label class="mb-4" for="ridp_subject_Identification_card_issued_by_the_federal__state_or_local_government__including_a_U.S._Passport"><%= radio_button_tag 'ridp_subject', 'Identification card issued by the federal, state or local government, including a U.S. Passport', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.passport") %></label>
-                  <label class="mb-4" for="ridp_subject_Military_dependent_s_identification_card"><%= radio_button_tag 'ridp_subject', "Military dependent's identification card", false %><%= l10n("insured.consumer_roles.upload_ridp_documents.military_dependent") %></label>
-                  <label class="mb-4" for="ridp_subject_Native_American_tribal_document"><%= radio_button_tag 'ridp_subject', 'Native American tribal document', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.native_american") %></label>
-                  <label class="mb-4" for="ridp_subject_U.S._Coast_Guard_Merchant_Mariner_card"><%= radio_button_tag 'ridp_subject', 'U.S. Coast Guard Merchant Mariner card', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.coast_guard") %></label>
+                  <% options = {
+                    :driver_license => "Driver's License issued by state or territory", 
+                    :school_id => "School identification card", 
+                    :military_id => "U.S. military card or draft record", 
+                    :passport => "Identification card issued by the federal, state or local government, including a U.S. Passport", 
+                    :military_dependent => "Military dependent's identification card", 
+                    :native_american => "Native American tribal document", 
+                    :coast_guard => "U.S. Coast Guard Merchant Mariner card"
+                    } %>
+                  <% element_name = "ridp_subject" %>
+                  <% options.each_with_index do |(option, input_value), index| %>
+                    <div class="d-inline-flex flex-row-reverse align-items-center mb-2">
+                      <label class="weight-n mb-0" for=<%= "#{element_name}_#{option}" %>><%= l10n("insured.consumer_roles.upload_ridp_documents.#{option}") %></label>
+                      <div class="col-auto px-0"><%= radio_button_tag element_name, option, index == 0, value: input_value %></div>
+                    </div>
+                  <% end %>
                 </span>
               </fieldset>
-                <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
+              <div class="d-flex align-items-center mt-4 float-right">
+                <button type="button" class="btn outline mr-2" data-dismiss="modal"> <%= l10n("insured.consumer_roles.upload_ridp_documents.cancel") %> </button>
+                <button type="button" class="btn-default btn-file" id="select_upload_identity">
+                  <i class="fa fa-upload" aria-hidden="true"></i>
+                  <%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %>
+                  <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true %>
+                </button>
+              </div>
+              <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
             <% end %>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+<% else %>
+  <div class="modal fade read-only-modal" id="insured_ridp_modal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>&nbsp;
+        </div>
+        <div class="modal-body">
+          <div>
+              <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
+                <div class="text-center">
+                  <span class="btn btn-default btn-file" id="select_upload_identity">
+                    <i class="fa fa-upload" aria-hidden="true"></i>
+                    <label for="file_"><%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %></label>
+                    <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
+                  </span>
+                </div>
+                <fieldset>
+                  <legend for="ridp_subject"><%= l10n("insured.consumer_roles.upload_ridp_documents.id_type") %></legend>
+                  <span>
+                    <label class="mb-4" for="ridp_subject_Driver_s_License_issued_by_state_or_territory"><%= radio_button_tag 'ridp_subject', "Driver's License issued by state or territory", true %><%= l10n("insured.consumer_roles.upload_ridp_documents.driver_license") %></label>
+                    <label class="mb-4" for="ridp_subject_School_identification_card"><%= radio_button_tag 'ridp_subject', 'School identification card', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.school_id") %></label>
+                    <label class="mb-4" for="ridp_subject_U.S._military_card_or_draft_record"><%= radio_button_tag 'ridp_subject', 'U.S. military card or draft record', false%><%= l10n("insured.consumer_roles.upload_ridp_documents.military_id") %></label>
+                    <label class="mb-4" for="ridp_subject_Identification_card_issued_by_the_federal__state_or_local_government__including_a_U.S._Passport"><%= radio_button_tag 'ridp_subject', 'Identification card issued by the federal, state or local government, including a U.S. Passport', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.passport") %></label>
+                    <label class="mb-4" for="ridp_subject_Military_dependent_s_identification_card"><%= radio_button_tag 'ridp_subject', "Military dependent's identification card", false %><%= l10n("insured.consumer_roles.upload_ridp_documents.military_dependent") %></label>
+                    <label class="mb-4" for="ridp_subject_Native_American_tribal_document"><%= radio_button_tag 'ridp_subject', 'Native American tribal document', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.native_american") %></label>
+                    <label class="mb-4" for="ridp_subject_U.S._Coast_Guard_Merchant_Mariner_card"><%= radio_button_tag 'ridp_subject', 'U.S. Coast Guard Merchant Mariner card', false %><%= l10n("insured.consumer_roles.upload_ridp_documents.coast_guard") %></label>
+                  </span>
+                </fieldset>
+                  <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
+              <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
