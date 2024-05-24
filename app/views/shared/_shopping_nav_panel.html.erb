@@ -12,7 +12,7 @@
     <%= h(link_to to_account_text, main_app.family_account_path, class: "button btn-block my-4 text-center #{is_complete ? 'btn-primary' : 'secondary outline'}", id: 'btn-continue') %>
   <% end %>
 
-  <div style="display: flex; flex-direction: column;">
+  <div class=" d-flex flex-column mt-2">
     <ul class="list-unstyled list-right-section">
       <% if show_previous_button %>
         <li>
