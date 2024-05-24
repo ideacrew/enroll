@@ -2033,7 +2033,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
     end
 
-    context '.new_benefit_application' do
+    context '#new_benefit_application' do
       before :each do
         get :new_benefit_application, params: {benefit_sponsorship_id: benefit_sponsorship.id.to_s}, xhr: true
       end

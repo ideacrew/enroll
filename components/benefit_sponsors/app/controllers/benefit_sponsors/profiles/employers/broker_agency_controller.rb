@@ -2,6 +2,8 @@ module BenefitSponsors
   module Profiles
     module Employers
       class BrokerAgencyController < ::BenefitSponsors::ApplicationController
+        include StringScrubberUtil
+
         before_action :find_employer
         before_action :find_broker_agency, :except => [:index, :active_broker]
         before_action :updateable?, only: [:create, :terminate]
@@ -53,7 +55,7 @@ module BenefitSponsors
         end
 
         def terminate
-          @broker_management_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_terminate(params)
+          @broker_management_form = BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.for_terminate(terminate_params)
 
           if @broker_management_form.terminate && @broker_management_form.direct_terminate
             flash[:notice] = "Broker terminated successfully."
@@ -64,6 +66,16 @@ module BenefitSponsors
         end
 
         private
+
+        def terminate_params
+          {
+            employer_profile_id: sanitize_to_hex(params[:employer_profile_id]),
+            broker_agency_profile_id: sanitize_to_hex(params[:broker_agency_id]),
+            broker_role_id: sanitize_to_hex(params[:broker_role_id]),
+            termination_date: params[:termination_date],
+            direct_terminate: params[:direct_terminate]
+          }
+        end
 
         def sanitized_params
           params.permit(:broker_agency_id,
