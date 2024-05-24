@@ -150,3 +150,7 @@ input[type='date']:invalid::-webkit-datetime-edit {
   color: var(--placeholder-color);
   -webkit-text-fill-color: var(--placeholder-color);
 }
+
+.destroy-icon {
+  color: var(--status-red);
+}
