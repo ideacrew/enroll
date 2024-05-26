@@ -53,9 +53,17 @@ function addEventOnSsn(target) {
   });
 }
 
+function enableContinueButton() {
+  var continueButton = $('.interaction-click-control-continue');
+  if(continueButton.disabled) {
+    continueButton.prop('disabled', false);
+  }
+}
+
 function applyListenersFor(target) {
   // target is person or dependent
   $("input[name='" + target + "[us_citizen]']").change(function () {
+    enableContinueButton();
     $('#vlp_documents_container').hide();
     $('#vlp_documents_container .vlp_doc_area').html('');
     $("input[name='" + target + "[naturalized_citizen]']").prop(
@@ -80,6 +88,7 @@ function applyListenersFor(target) {
   });
 
   $("input[name='" + target + "[naturalized_citizen]']").change(function () {
+    enableContinueButton();
     var selected_doc_type = $('#naturalization_doc_type').val();
     if ($(this).val() == 'true') {
       $('#vlp_documents_container').show();
@@ -96,6 +105,7 @@ function applyListenersFor(target) {
 
   $("input[name='" + target + "[eligible_immigration_status]']").change(
     function () {
+      enableContinueButton();
       var selected_doc_type = $('#immigration_doc_type').val();
       if ($(this).val() == 'true' && this.checked) {
         $('#vlp_documents_container').show();
@@ -122,6 +132,7 @@ function applyListenersFor(target) {
 
   // tribal-state change - select from options
   $('select#tribal-state').on("change", function() {
+    enableContinueButton();
     var enroll_state_abbr = $('#enroll_state_abbr').val();
     var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
 
@@ -132,7 +143,7 @@ function applyListenersFor(target) {
       }).get();
       var tribal_name_container_show_on_select = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
 
-      if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
+      if (true) {
         $('.featured-tribe-container').removeClass('hide');
         if (tribal_name_container_show_on_select) {
           $('.tribal-name-container').removeClass('hide');
@@ -156,6 +167,26 @@ function applyListenersFor(target) {
     }
   });
   //end tribe option controls
+
+  $('input[name="person[is_incarcerated]"]').change(function () {
+    enableContinueButton();
+  })
+
+  $('input[name="person[tribal_id]"]').change(function () {
+    enableContinueButton();
+  })
+
+  $('input[name="person[tribal_name]"]').change(function () {
+    enableContinueButton();
+  })
+
+  $('.mobile-phone-number').change(function() {
+    enableContinueButton();
+  })
+
+  $('.tribe_codes').change(function() {
+    enableContinueButton();
+  })
 }
 
 function showOnly(selected) {
