@@ -24,7 +24,7 @@ jobs:
               with:
                   name: coverage-report
                   repository: ideacrew/enroll
-                  github-token: ${{ secrets.SECURE_API_TOKEN }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
 
             # - name: "Download artifact"
             #   run: |
