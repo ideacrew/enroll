@@ -54,8 +54,8 @@ function addEventOnSsn(target) {
 }
 
 function enableContinueButton() {
-  var continueButton = $('.interaction-click-control-continue');
-  if(continueButton.disabled) {
+  var continueButton =  $('.interaction-click-control-continue');
+  if (continueButton.is(':disabled')) {
     continueButton.prop('disabled', false);
   }
 }
@@ -185,6 +185,10 @@ function applyListenersFor(target) {
   })
 
   $('.tribe_codes').change(function() {
+    enableContinueButton();
+  })
+
+  $('input[name="person[indian_tribe_member]"]').change(function() {
     enableContinueButton();
   })
 }
