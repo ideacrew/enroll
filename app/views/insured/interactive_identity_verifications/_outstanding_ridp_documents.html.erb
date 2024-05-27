@@ -16,8 +16,8 @@
             <div class="col-sm align-content-center">
               <span class="badge badge-status badge-<%=ridp_type_class(ridp_type, @person)%> p-2 float-sm-right float-md-left" id="status">
                 <%= ridp_status_translated(ridp_type, @person) %>
-              </div>
-            </span> <%= pundit_span Family, :updateable? %>
+              </span>
+            </div> <%= pundit_span Family, :updateable? %>
             <div class="d-flex col-sm">
               <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
                 <span class="v-type-actions mr-2">
