@@ -11,7 +11,7 @@
       <hr>
       <% @person.ridp_verification_types.each do |ridp_type| %>
         <div class="my-3">
-          <div class="row mb-2 p-0 align-content-center" id="<%= ridp_type %>">
+          <div class="row mb-2 p-0" id="<%= ridp_type %>">
             <div class="d-flex col-sm"><h6 class="my-0 align-self-center"><%= ridp_type %></h6></div>
             <div class="col-sm align-content-center">
               <span class="badge badge-status badge-<%=ridp_type_class(ridp_type, @person)%> p-2 float-sm-right float-md-left" id="status">
