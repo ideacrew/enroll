@@ -38,6 +38,8 @@ jobs:
 
             - name: "Last full suite status"
               run: gh run --repo ideacrew/enroll list --workflow full-suite.yml -e schedule --limit 1 
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
             - name: figure it out what we have
               run: ls -lha
