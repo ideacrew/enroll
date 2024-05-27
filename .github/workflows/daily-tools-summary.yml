@@ -33,6 +33,8 @@ jobs:
                 ARTIFACT_NAME="code-coverage-report"
                 RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow ${WF_NAME} --json databaseId --jq .[0].databaseId`
                 gh run --repo ${OTHER_REPO} download ${RUN_ID} -n ${ARTIFACT_NAME}
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
             - name: figure it out what we have
               run: ls -lha
