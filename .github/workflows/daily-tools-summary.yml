@@ -26,15 +26,18 @@ jobs:
             #       repository: ideacrew/enroll
             #       github-token: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: "Download artifact"
-              run: |
-                OTHER_REPO="ideacrew/enroll"
-                WF_NAME="full-suite.yml"
-                ARTIFACT_NAME="code-coverage-report"
-                RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow ${WF_NAME} --json databaseId --jq .[0].databaseId`
-                gh run --repo ${OTHER_REPO} download ${RUN_ID} -n ${ARTIFACT_NAME}
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            # - name: "Download artifact"
+            #   run: |
+            #     OTHER_REPO="ideacrew/enroll"
+            #     WF_NAME="full-suite.yml"
+            #     ARTIFACT_NAME="code-coverage-report"
+            #     RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow ${WF_NAME} --json databaseId --jq .[0].databaseId`
+            #     gh run --repo ${OTHER_REPO} download ${RUN_ID} -n ${ARTIFACT_NAME}
+            #   env:
+            #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: "Last full suite status"
+              run: gh run --repo ideacrew/enroll list --workflow full-suite.yml -e schedule --limit 1 
       
             - name: figure it out what we have
               run: ls -lha
