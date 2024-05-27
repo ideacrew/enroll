@@ -33,7 +33,7 @@
                   <%= render partial: 'insured/interactive_identity_verifications/insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
                 <% else %>
                   <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
-                    <span class="btn btn-default btn-file float-end" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
+                    <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
                       <i class="fa fa-upload" aria-hidden="true"></i>
                       <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
                       <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
