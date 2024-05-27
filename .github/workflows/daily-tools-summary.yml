@@ -22,7 +22,7 @@ jobs:
             - name: Download Coverage Report
               uses: actions/download-artifact@v4
               with:
-                  name: coverage-report
+                  name: code-coverage-report
                   repository: ideacrew/enroll
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 
