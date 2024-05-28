@@ -47,7 +47,10 @@ module BenefitSponsors
         def staff_index
           # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
           authorize BenefitSponsors::Organizations::BrokerAgencyProfile
+          bs4 = params.permit(:bs4)[:bs4]
+          @bs4 = bs4 == "true" if bs4
           @q = params.permit(:q)[:q]
+
           @staff = eligible_brokers
           @page_alphabets = page_alphabets(@staff, "last_name")
           page_no = cur_page_no(@page_alphabets.first)

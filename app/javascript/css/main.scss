@@ -372,12 +372,52 @@ ul.list-right-section li {
 // modals
 
 .backdrop-modal {
-  background: hsla(0, 0%, 0%, 0.2);
   .modal-header {
     border-bottom: 0;
   }
 
   .modal-footer {
     border-top: 0;
+  }
+}
+
+.modal-backdrop.in {
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+// lists
+ul.plain {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+// tables
+.border-top-0 {
+  th, td {
+    border-top: 0
+  }
+}
+
+// pagination
+.pagination {
+  li.page-item a {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  li.active.page-item a {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--grey-000);
+  }
+
+  li.page-item.active:hover a {
+    background-color: var(--primary-color-darker);
+  }
+
+  li.page-item:hover:not(.active):not(.disabled) a {
+    background-color: var(--grey-020);
   }
 }
