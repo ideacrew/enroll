@@ -2,6 +2,52 @@
 <% broker_agency_profile =  active_broker.broker_agency_profile%>
 
 <div id="broker_show_<%= active_broker.id %>" tabindex="-1" class='hide broker_selection_choice'>
+<% if @bs4 %>
+  <section id="active_broker_tab">
+    <div class="alert alert-warning d-flex" role="alert">
+      <div class="d-flex">
+        <div class="pl-2">
+          <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+        </div>
+        <div class="my-1 pl-0 pr-2">
+          <% if !broker_agency_profile.accept_new_clients %>
+            <p class="b"><%= l10n("broker_agencies.profiles.not_accepting_clients") %></p>
+          <% end %>
+          <p><%= l10n("broker_agencies.profiles.warning_for_existing_broker") %></p>
+        </div>
+      </div>
+    </div>
+    <h2><%= active_broker.person.full_name %></h2>
+    <h3><%= broker_agency_profile.legal_name %></h3>
+    <dl class="parent">
+      <dt><%= l10n("broker_agencies.profiles.phone")%>:</dt>
+      <dd><%= active_broker.phone ? active_broker.phone.to_s : l10n("broker_agencies.profiles.no_phone_number") %></dd>
+      <dt><%= l10n("email")%>:</dt>
+      <dd><a href="mailto:<%= active_broker.email.address %>"><%= active_broker.email.address %></a></dd>
+      <dt><%= l10n("address")%>:</dt>
+      <dd>
+        <% if broker_agency_profile.office_locations.any? %>
+          <%= broker_agency_profile.primary_office_location.address.address_1 %>,
+          <%= broker_agency_profile.primary_office_location.address.city %>,
+          <%= broker_agency_profile.primary_office_location.address.state %>
+          <%= broker_agency_profile.primary_office_location.address.zip %>
+        <% else %>
+          <%= l10n("broker_agencies.profiles.no_address")%>
+        <% end %>
+      </dd>
+    </dl>
+    <dl class="parent my-2">
+      <dt><%= l10n("broker_agencies.profiles.new_clients")%>:</dt>
+      <dd><%= broker_agency_profile.accept_new_clients? ? l10n("yes") : l10n("no") %></dd>
+      <dt><%= l10n("broker_agencies.profiles.weekend_evening_hours")%>:</dt>
+      <dd><%= broker_agency_profile.working_hours? ? l10n("yes") : l10n("no") %></dd>
+      <dt><%= l10n("language")%>:</dt>
+      <dd><%= broker_agency_profile.languages %></dd>
+    </dl>
+    <button type="button" class="outline close_broker_select"><%= l10n("close")%></button>
+    <button type="button" <%= 'disabled' if !broker_agency_profile.accept_new_clients %> class="help_button close_broker_select" data-broker='<%=@staff.id%>'><%= l10n("broker_agencies.profiles.select_this_broker")%></button>
+  </section>
+<% else %>
   <div class="no-buffer" id="active_broker_tab">
     <div class="col-xs-12">
       <div class="panel benefits-tab col-xs-12">
@@ -51,14 +97,14 @@
               <%= l10n("broker_agencies.profiles.new_clients")%>:
             </span>
             <span class="dg">
-              <%= broker_agency_profile.accept_new_clients? ? 'Yes' : 'No' %>
+              <%= broker_agency_profile.accept_new_clients? ? l10n("yes") : l10n("no") %>
             </span>
             <br/>
             <span class="lg ttu twelve">
               <%= l10n("broker_agencies.profiles.weekend_evening_hours")%>:
             </span>
             <span class="dg">
-              <%= broker_agency_profile.working_hours? ? 'Yes' : 'No' %>
+              <%= broker_agency_profile.working_hours? ? l10n("yes") : l10n("no") %>
             </span>
           </div>
           <div class="col-xs-6">
@@ -78,4 +124,5 @@
       </div>
     </div>
   </div>
+  <% end %>
 </div>
