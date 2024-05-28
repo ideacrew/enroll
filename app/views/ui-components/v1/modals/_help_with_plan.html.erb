@@ -1,0 +1,99 @@
+<% if @bs4 %>
+  <div class="modal backdrop-modal" id="help_with_plan_shopping" tabindex="-1" role="dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="help_sign_up_title"><%= l10n("insured.plan_shoppings.help_me_sign_up_options").titlecase %></h4>
+          <h4 class="modal-title broker-search-title hide" id="help_from_expert_title"><%= l10n("insured.plan_shoppings.help_from_a_broker").titlecase %></h4>
+          <button type="button" class="close unstyled" data-dismiss="modal" aria-label=<%= l10n("close") %>>
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="help_list">
+            <ul class="<%= 'plain' unless EnrollRegistry.feature_enabled?(:in_person_assister) || EnrollRegistry.feature_enabled?(:contact_customer_service_representative)  %>">
+              <li><%= link_to l10n("insured.plan_shoppings.help_from_a_broker"), benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path(bs4: @bs4), remote: true, class: "expert_link" %></li>
+              <% if EnrollRegistry.feature_enabled?(:in_person_assister) %>
+                <li><%= link_to l10n("insured.plan_shoppings.help_from_an_inperson_assister"), main_app.assister_index_exchanges_hbx_profiles_path, remote: true %></li>
+              <% end %>
+              <% if EnrollRegistry.feature_enabled?(:contact_customer_service_representative) %>
+                <li class="name_search_only" id="CSR"><%= link_to l10n("insured.plan_shoppings.help_from_a_customer_service_representative") %></li>
+                <li class="name_search_only" id="CAC"><%= link_to l10n("insured.plan_shoppings.help_from_a_certified_applicant_counselor") %></li>
+              <% end %>
+            </ul>
+          </div>
+          <div id="help_search" class="help_reset">
+            <h4><%= l10n("search_by_name") %></h4>
+            <label for="help_first_name"><%= l10n('first_name') %>:</label>
+            <input id="help_first_name" type="text">
+            <label for="help_last_name"><%= l10n('last_name') %>:</label>
+            <input id="help_last_name" type="text">
+            <button id="search_for_plan_shopping_help"><%= l10n("search_for_help") %></button>
+            <div class="hide" id="help_requestor"><%= @person.try(:id) %></div>
+            <div class="hide" id="help_requestor_email"><%= current_user.oim_id %></div>
+            <div class="hide" id="help_type"></div>
+          </div>
+          <div id="inbox" class="help_reset">
+            <div class=""></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="" data-dismiss="modal" id="close_help_modal"><%= l10n("close") %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %>
+<div class="modal fade" id="help_with_plan_shopping" role="dialog">
+  <div class="modal-dialog" style="min-height: 600px; width: 720px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body" style="height: 650px; overflow-y: scroll">
+        <div id="help_list" style="font-size: 140%; margin: 140px 100px 0px">
+          <b><%= l10n("insured.plan_shoppings.help_me_sign_up_options") %></b>
+          <br>
+          <br>
+          <ul>
+            <li><%= link_to l10n("insured.plan_shoppings.help_from_a_broker"), benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path, remote: true %></li>
+            <% if EnrollRegistry.feature_enabled?(:in_person_assister) %>
+              <li><%= link_to l10n("insured.plan_shoppings.help_from_an_inperson_assister"), main_app.assister_index_exchanges_hbx_profiles_path, remote: true %></li>
+            <% end %>
+            <% if EnrollRegistry.feature_enabled?(:contact_customer_service_representative) %>
+              <li class="name_search_only" id="CSR"><%= link_to l10n("insured.plan_shoppings.help_from_a_customer_service_representative") %></li>
+              <li class="name_search_only" id="CAC"><%= link_to l10n("insured.plan_shoppings.help_from_a_certified_applicant_counselor") %></li>
+            <% end %>
+          </ul>
+        </div>
+        <div id="help_search" class="help_reset">
+          <h4><%= l10n("search_by_name") %></h4>
+          <label for="help_first_name"><%= l10n('first_name') %>:</label>
+          <br>
+          <input id="help_first_name" type="text">
+          <br>
+          <label for="help_last_name"><%= l10n('last_name') %>:</label>
+          <br>
+          <input id="help_last_name" type="text">
+          <button class="btn btn-primary" id="search_for_plan_shopping_help"><%= l10n("search_for_help") %></button>
+          <br>
+          <% unless @bs4 %>
+            <h4 id="help_status"></h4>
+          <% end %>
+          <div class="hide" id="help_requestor"><%= @person.try(:id) %></div>
+          <div class="hide" id="help_requestor_email"><%= current_user.oim_id %></div>
+          <div class="hide" id="help_type"></div>
+        </div>
+        <div id="inbox" class="help_reset">
+          <div class="col-md-10 col-md-12 col-lg-12"></div>
+        </div>
+        <div class="col-md-3">
+          <div class="col-md-8 btn btn-default hide" id="back_to_help"><%= l10n("back") %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
