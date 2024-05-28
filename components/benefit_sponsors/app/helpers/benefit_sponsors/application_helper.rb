@@ -198,5 +198,19 @@ module BenefitSponsors
 
       metal_levels.sort_by{|level| metal_levels_order[level]}
     end
+
+    def previous_page(pages, current_page)
+      active_page = current_page || pages.first
+      active_page_index = pages.find_index(active_page)
+      prev_page_index = active_page_index.to_i - 1
+      pages[prev_page_index]
+    end
+
+    def next_page(pages, current_page)
+      active_page = current_page || pages.first
+      active_page_index = pages.find_index(active_page)
+      next_page_index = active_page_index.to_i + 1
+      pages[next_page_index]
+    end
   end
 end
