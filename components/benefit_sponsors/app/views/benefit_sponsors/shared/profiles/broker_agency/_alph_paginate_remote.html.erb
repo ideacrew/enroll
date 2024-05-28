@@ -2,16 +2,40 @@
 <% remote = remote.blank? ? false : remote %>
 <% status ||= nil %>
 <% url_params ||= {} %>
-<ul class='pagination'>
-  <% if all %>
-      <% all_url = all %>
-      <% all_url += "?" + url_params.inject([]){|arr, (k,v)| arr << "#{k}=#{v}"}.join("&") if !url_params.empty? %>
-    <li><%= link_to "ALL", all_url, remote: true %></li>
-  <% end %>
-  <% alphs.each do |alph| %>
-    <% alph_url = url + "?page=#{alph}" %>
-    <% alph_url += "&status=#{status}" if status %>
-    <% alph_url += "&" + url_params.inject([]){|arr, (k,v)| arr << "#{k}=#{v}"}.join("&") if !url_params.empty? %>
-    <li class="<%= 'active' if alph == params[:page] %>"><%= link_to alph, (alph_url), remote: true %></li>
-  <% end %>
-</ul>
+<% if @bs4 %>
+  <% url += "&" + url_params.inject([]){|arr, (k,v)| arr << "#{k}=#{v}"}.join("&") if !url_params.empty? %>
+  <% url += "&status=#{status}" if status %>
+  <% current_page = params[:page] || alphs.first %>
+  <nav aria-label="broker navigation by last name">
+    <ul class="pagination justify-content-center">
+      <% prev_alph = previous_page(alphs, current_page) %>
+      <li class="page-item <%= 'disabled' if current_page == alphs.first %>"><%= h(link_to l10n("previous"), (prev_alph.present? ? url + "&page=#{prev_alph}" : "#"), remote: true, class: 'page-link') %></li>
+      <% if all %>
+        <% all_url = all %>
+        <% all_url += "&" + url_params.inject([]){|arr, (k,v)| arr << "#{k}=#{v}"}.join("&") if !url_params.empty? %>
+        <li class="page-item"><%= link_to "ALL", all_url, remote: true, class:"page-link" %></li>
+      <% end %>
+      <% alphs.each_with_index do |alph, index| %>
+        <% alph_url = url + "&page=#{alph}" %>
+        <% active = params[:page] ? alph == params[:page] : index == 0 %>
+        <li class="page-item <%= 'active' if active %>"><%= link_to alph, (alph_url), remote: true, class: 'page-link' %></li>
+      <% end %>
+      <% next_alph = next_page(alphs, current_page) %>
+      <li class="page-item <%= 'disabled' if current_page == alphs.last %>"><%= h(link_to l10n("next"), (next_alph.present? ? url + "&page=#{next_alph}" : "#"), remote: true, class: 'page-link') %></li>
+    </ul>
+  </nav>
+<% else %>
+  <ul class='pagination'>
+    <% if all %>
+        <% all_url = all %>
+        <% all_url += "?" + url_params.inject([]){|arr, (k,v)| arr << "#{k}=#{v}"}.join("&") if !url_params.empty? %>
+      <li><%= link_to "ALL", all_url, remote: true %></li>
+    <% end %>
+    <% alphs.each do |alph| %>
+      <% alph_url = url + "?page=#{alph}" %>
+      <% alph_url += "&status=#{status}" if status %>
+      <% alph_url += "&" + url_params.inject([]){|arr, (k,v)| arr << "#{k}=#{v}"}.join("&") if !url_params.empty? %>
+      <li class="<%= 'active' if alph == params[:page] %>"><%= link_to alph, (alph_url), remote: true %></li>
+    <% end %>
+  </ul>
+<% end %>
