@@ -1,23 +1,21 @@
-# frozen_string_literal: true
-
 module BenefitSponsors
   module ApplicationHelper
     include HtmlScrubberUtil
 
-    def bootstrap_class_for(flash_type)
+    def bootstrap_class_for flash_type
       case flash_type
-      when "notice"
-        "alert-info"
-      when "success"
-        "alert-success"
-      when "error"
-        "alert-danger"
-      when "alert"
-        "alert-warning"
+        when "notice"
+          "alert-info"
+        when "success"
+          "alert-success"
+        when "error"
+          "alert-danger"
+        when "alert"
+          "alert-warning"
       end
     end
 
-    def flash_messages(_opts = {})
+    def flash_messages(opts = {})
       flash.each do |msg_type, message|
         concat(content_tag(:div, message, class: "alert #{bootstrap_class_for(msg_type)} alert-dismissible fade show") do
           concat content_tag(:button, 'x', class: "close", data: { dismiss: 'alert' })
@@ -41,7 +39,7 @@ module BenefitSponsors
 
     def user_first_name_last_name_and_suffix
       if signed_in?
-        current_user.person.try(:first_name_last_name_and_suffix) ? current_user.person.first_name_last_name_and_suffix : current_user.oim_id.downcase
+        current_user.person.try(:first_name_last_name_and_suffix) ? current_user.person.first_name_last_name_and_suffix : (current_user.oim_id).downcase
       end
     end
 
@@ -66,7 +64,7 @@ module BenefitSponsors
       amount < 0 ? 'style=color:red' : ""
     end
 
-    def render_flash(*)
+    def render_flash
       rendered = []
       flash.each do |type, messages|
         next if messages.blank?
@@ -108,13 +106,12 @@ module BenefitSponsors
 
     def employer_contribution_tool_tip_helper
       employer_contribution = "Employers are required to contribute at least #{aca_shop_market_employer_contribution_percent_minimum}% of the premium costs for employees based on the reference plan selected, except during the special annual enrollment period at the end of each year."
-      add_on_text = if individual_market_is_enabled?
-                      "Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."
-                    else
-                      "Offering family coverage is optional, but if offered, employers are required to contribute at least #{aca_shop_market_employer_family_contribution_percent_minimum}% towards family premiums,
-                      except during the special annual enrollment period at the end of each year."
-                    end
-      employer_contribution + add_on_text
+          if individual_market_is_enabled?
+            add_on_text = "Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."
+          else
+            add_on_text = "Offering family coverage is optional, but if offered, employers are required to contribute at least #{aca_shop_market_employer_family_contribution_percent_minimum}% towards family premiums, except during the special annual enrollment period at the end of each year."
+          end
+      return employer_contribution + add_on_text
     end
 
     def offered_tool_tip_helper
@@ -138,22 +135,16 @@ module BenefitSponsors
       return [], "#claimBenefitApplicationQuoteModal" unless benefit_application
 
       if benefit_application.is_renewing?
-        [
-["<p>Claiming this quote will replace your existing renewal draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p>
-<p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
-]
+        return ["<p>Claiming this quote will replace your existing renewal draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
       else
-        [
-["<p>Claiming this quote will replace your existing draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p>
-<p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
-]
+        return ["<p>Claiming this quote will replace your existing draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
       end
     end
 
     def retrieve_inbox(provider, folder: 'inbox')
       broker_agency_mailbox = inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
       return broker_agency_mailbox if provider.try(:broker_role)
-      case provider.model_name.name.split('::').last
+      case (provider.model_name.name.split('::').last)
       when "AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
         inbox_profiles_employers_employer_profile_path(id: provider.id.to_s, folder: folder)
       when "HbxProfile"
@@ -166,7 +157,9 @@ module BenefitSponsors
     end
 
     def benefit_sponsor_display_families_tab(user,profile_id)
-      user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_benefit_sponsor_active_broker?(profile_id) if user.present?
+      if user.present?
+        user.has_broker_agency_staff_role? || user.has_general_agency_staff_role? || user.is_benefit_sponsor_active_broker?(profile_id)
+      end
     end
 
     def total_active_census_employees(profile_id)
@@ -175,9 +168,7 @@ module BenefitSponsors
     end
 
     def profile_unread_messages_count(profile)
-      (profile.is_a?(BenefitSponsors::Organizations::Profile) ? profile.inbox.unread_messages.count : profile.inbox.unread_messages_count)
-    rescue StandardError
-      0
+      (profile.is_a?(BenefitSponsors::Organizations::Profile) ? profile.inbox.unread_messages.count : profile.inbox.unread_messages_count) rescue 0
     end
 
     def total_messages(record_id)
@@ -187,7 +178,7 @@ module BenefitSponsors
         person = profile.primary_broker_role.person
         person.inbox.unread_messages.count
       else
-        0
+        return 0
       end
     end
 
@@ -220,13 +211,6 @@ module BenefitSponsors
       active_page_index = pages.find_index(active_page)
       next_page_index = active_page_index.to_i + 1
       pages[next_page_index]
-    end
-
-    def current_page(page_param, pages)
-      return pages.first unless page_param.present?
-      JSON.parse(page_param)
-    rescue JSON::ParserError, TypeError
-      page_param
     end
   end
 end
