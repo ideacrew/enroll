@@ -6,6 +6,6 @@ setTimeout(function() {
       $('#doc_table_row_<%= @document.id %>').remove();
     });
 
-  $("div#<%= @document.ridp_verification_type %> span#status").attr("class", 'badge badge-status badge-<%= ridp_type_class(@document.ridp_verification_type, @person) %>');
+  $("div#<%= @document.ridp_verification_type %> span#status").attr("class", 'badge badge-status badge-<%= ridp_type_class(@document.ridp_verification_type, @person) %> p-2');
   $("div#<%= @document.ridp_verification_type %> span#status").html('<%= ridp_status_translated(@document.ridp_verification_type, @person) %>');
 }, 500);
