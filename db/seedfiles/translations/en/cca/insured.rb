@@ -88,6 +88,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.consumer_roles.upload_ridp_documents.coast_guard' => "U.S. Coast Guard Merchant Mariner card",
   :'en.insured.consumer_roles.upload_ridp_documents.list_header' => "Uploaded Documents for %{ridp_type}",
   :'en.insured.consumer_roles.upload_ridp_documents.cancel' => "Cancel Upload",
+  :'en.insured.consumer_roles.upload_ridp_documents.remove' => "Remove Document",
   :'en.insured.consumer_roles.ridp_document_list.header' => "To verify your identity, you’ll need to provide a copy of one of the following types of picture IDs:",
   :'en.insured.consumer_roles.ridp_document_list.conditional' => "Two of the following (names must match):",
   :'en.insured.consumer_roles.ridp_document_list.birth_certificate' => "Birth certificate",
