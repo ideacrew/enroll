@@ -29,8 +29,12 @@ class IvlVerifyIdentity
   end
 
   def self.continue_application_btn
-    '.interaction-click-control-continue-application'
-  end
+     if EnrollRegistry[:bs4_consumer_flow].enabled?
+      
+     else
+      '.interaction-click-control-continue'
+     end
+    end
 
   def self.upload_identity_docs_btn
     '#upload_identity'
