@@ -57,7 +57,7 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     And Individual sees Your Information page
     When validate SSN feature is disabled
     When the user registers as an individual with invalid SSN
-    When Individual clicks on continue
+    When the Individual clicks CONTINUE
     And Individual should not see the error message Invalid SSN
 
   Scenario: Strong password feature is enabled
