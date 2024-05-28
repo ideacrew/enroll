@@ -1,15 +1,31 @@
 <% opts = opts || {} %>
-<%= form_tag url, { method: :get, remote: (defined?(remote) ? remote : false), class: "form form-inline input-no-pd", role: "search", style: "margin: 0;"} do %>
-  <div class="input-group">
+<% if @bs4 %>
+  <% opts[:bs4] = @bs4 %>
+  <%= form_tag url, { method: :get, remote: (defined?(remote) ? remote : false), class: "", role: "search" } do %>
+    <div class="mr-2">
       <%= label_tag :q, "Search term", {class: "sr-only"} %>
-      <%= text_field_tag :q, q, {placeholder: placeholder, class: "form-control"} %>
+      <div class="search-input-with-icon">
+        <%= text_field_tag :q, q, {placeholder: placeholder, class: "", type: "search"} %>
+        <button type="submit" class="py-1 unstyled"><span class="search-glyph" aria-label="Search">&#9906;</span></button>
+      </div>
       <% opts.each do |k,v|%>
         <%= hidden_field_tag k, v %>
       <% end %>
-      <span class="input-group-btn">
-          <button class="btn btn-default" type="submit">
-              <span class="glyphicon glyphicon-search" aria-hidden="true"><span class="hide"><%= l10n("search") %></span></span>
-          </button>
-      </span>
-  </div>
+    </div>
+  <% end %>
+<% else %>
+  <%= form_tag url, { method: :get, remote: (defined?(remote) ? remote : false), class: "form form-inline input-no-pd", role: "search", style: "margin: 0;"} do %>
+    <div class="input-group">
+        <%= label_tag :q, "Search term", {class: "sr-only"} %>
+        <%= text_field_tag :q, q, {placeholder: placeholder, class: "form-control"} %>
+        <% opts.each do |k,v|%>
+          <%= hidden_field_tag k, v %>
+        <% end %>
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="submit">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"><span class="hide"><%= l10n("search") %></span></span>
+            </button>
+        </span>
+    </div>
+  <% end %>
 <% end %>
