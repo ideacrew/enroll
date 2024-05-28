@@ -151,6 +151,33 @@ input[type='date']:invalid::-webkit-datetime-edit {
   -webkit-text-fill-color: var(--placeholder-color);
 }
 
+.search-input-with-icon {
+  position: relative;
+  width: 100%;
+  height: 36px;
+  input {
+    height: 100%;
+    width: 100%;
+    padding-right: $spacer * 2;
+  }
+  button, .button, .btn {
+    position: absolute;
+    right: $spacer / 2;
+    top: $spacer / 4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  .search-glyph {
+    font-size: 1.5em;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+      -o-transform: rotate(-45deg);
+         transform: rotate(-45deg);
+  }
+}
+
 .btn-file {
   position: relative;
   overflow: hidden;
