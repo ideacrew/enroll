@@ -285,6 +285,28 @@ ul.list-right-section li {
   font-size: 1em;
 }
 
+.badge-status {
+  border-radius: 10px;
+  color: var(--default-font-color);
+  font-size: 16px;
+  font-weight: 600;
+
+  &.badge-success {
+    background-color: var(--success-status-tint);
+    border: 1px solid var(--success-color);
+  }
+
+  &.badge-danger {
+    background-color: var(--danger-status-tint);
+    border: 1px solid var(--enrollment-status-red);
+  }
+
+  &.badge-warning {
+    background-color: var(--warning-status-tint);
+    border: 1px solid var(--warning-border);
+  }
+}
+
 .float-end {
   float: inline-end;
 }
@@ -302,6 +324,15 @@ ul.list-right-section li {
 .verification-update-reason {display: none}
 
 @media screen and (max-width: 767px) {
+  .d-flex.sm-block {
+    display: block !important;
+  }
+
+  .progress-nav-container {
+    margin-left: $spacer;
+    margin-right: $spacer;
+  }
+
   .sm-space, .col-sm {
     margin-bottom: $spacer;
   }
@@ -328,6 +359,14 @@ ul.list-right-section li {
 
 .full-height {
   height: 70vh;
+}
+
+.card {
+  border: 1px solid var(--grey-060);
+  border-radius: 5px;
+  margin-bottom: $spacer;
+  padding: 13px 12px;
+  background: var(--grey-000);
 }
 
 // modals
