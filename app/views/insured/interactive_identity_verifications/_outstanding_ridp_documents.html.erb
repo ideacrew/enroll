@@ -40,7 +40,7 @@
                     <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
                       <i class="fa fa-upload" aria-hidden="true"></i>
                       <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
-                      <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
+                      <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, value: "Upload Documents" %>
                     </span>
                     <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
                   <% end %>
@@ -71,7 +71,7 @@
                           </span>
                         <% end) %>
                       <% end %>
-                      <% if true || pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
+                      <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
                         <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
                           <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true, class: "btn-error outline text-nowrap" do %>
                             <%= l10n("insured.consumer_roles.upload_ridp_documents.remove") %>
