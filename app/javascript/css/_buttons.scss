@@ -91,3 +91,17 @@ a.button:hover {
   text-decoration: none;
   cursor: pointer;
 }
+
+button.unstyled {
+  background-color: transparent;
+  border: none;
+  color: var(--button-primary-color);
+  cursor: pointer;
+  padding: 0;
+  &:hover {
+    background-color: transparent;
+  }
+  &:active {
+    color: var(--button-primary-active-color);
+  }
+}
