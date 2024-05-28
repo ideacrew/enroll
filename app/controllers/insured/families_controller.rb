@@ -20,6 +20,8 @@ class Insured::FamiliesController < FamiliesController
     :healthcare_for_childcare_program_form,
     :update_osse_eligibilities
   ]
+  before_action :enable_bs4_layout, only: [:find_sep] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
 
   around_action :cache_hbx, only: [:home]
 
@@ -676,5 +678,9 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end
