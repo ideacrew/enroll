@@ -151,14 +151,6 @@ input[type='date']:invalid::-webkit-datetime-edit {
   -webkit-text-fill-color: var(--placeholder-color);
 }
 
-.destroy-icon {
-  background-image: url('data:image/svg+xml,%3Csvg width="52" height="44" viewBox="0 0 52 44" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cg clip-path="url(%23clip0_2639_205593)"%3E%3Cpath d="M35.5 16C35.5 16.5128 35.114 16.9355 34.6166 16.9933L34.5 17H33.6553L32.4239 29.5192C32.2854 30.9269 31.1016 32 29.6871 32H22.3129C20.8984 32 19.7146 30.9269 19.5761 29.5192L18.3447 17H17.5C16.9477 17 16.5 16.5523 16.5 16C16.5 15.4477 16.9477 15 17.5 15H22.5C22.5 13.067 24.067 11.5 26 11.5C27.933 11.5 29.5 13.067 29.5 15H34.5C35.0523 15 35.5 15.4477 35.5 16ZM28.25 19.25C27.8703 19.25 27.5565 19.5322 27.5068 19.8982L27.5 20V27L27.5068 27.1018C27.5565 27.4678 27.8703 27.75 28.25 27.75C28.6297 27.75 28.9435 27.4678 28.9932 27.1018L29 27V20L28.9932 19.8982C28.9435 19.5322 28.6297 19.25 28.25 19.25ZM23.75 19.25C23.3703 19.25 23.0565 19.5322 23.0068 19.8982L23 20V27L23.0068 27.1018C23.0565 27.4678 23.3703 27.75 23.75 27.75C24.1297 27.75 24.4435 27.4678 24.4932 27.1018L24.5 27V20L24.4932 19.8982C24.4435 19.5322 24.1297 19.25 23.75 19.25ZM26 13.5C25.1716 13.5 24.5 14.1716 24.5 15H27.5C27.5 14.1716 26.8284 13.5 26 13.5Z" fill="%23A21E1F"/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id="clip0_2639_205593"%3E%3Crect width="20" height="20" fill="white" transform="translate(16 12)"/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E');
-  background-repeat: no-repeat;
-  background-position: center;
-  color: transparent !important;
-  font-size: 27px !important;
-}
-
 .btn-file {
   position: relative;
   overflow: hidden;
