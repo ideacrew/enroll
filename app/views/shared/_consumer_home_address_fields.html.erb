@@ -104,9 +104,10 @@
     <% end %>
   </div>
   <% if f.object.addresses[1].present? %>
-  <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'remove_mailing_address')" class="form-action btn-secondary <%= pundit_class Family, :updateable?%>" id="remove_mailing_address" data-cuke="remove_mailing_address">Remove Mailing Address</span>
+  <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'remove_mailing_address')" class="form-action btn-secondary <%= pundit_class Family, :updateable?%>" id="remove_mailing_address" data-cuke="remove_mailing_address">Remove Mailing Address</button>
+  <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_mailing_address')" id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4 d-none">Add Mailing Address</button>
   <% else %>
-  <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_mailing_address')" id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4">Add Mailing Address</span>
+  <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_mailing_address')" id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4">Add Mailing Address</button>
   <% end %>
   <div class="mt-2">&nbsp;</div>
 <% else %>
