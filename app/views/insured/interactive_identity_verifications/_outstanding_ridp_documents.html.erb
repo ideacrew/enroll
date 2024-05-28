@@ -12,7 +12,7 @@
       <% @person.ridp_verification_types.each do |ridp_type| %>
         <div class="my-3">
           <div class="row mb-2 p-0" id="<%= ridp_type %>">
-            <div class="d-flex col-md align-items-center">
+            <div class="d-flex col-sm align-items-center">
               <div class="col-5 px-0">
                 <h6 class="my-0"><%= ridp_type %></h6>
               </div>
@@ -22,7 +22,7 @@
                 </span>
               </div>
             </div> <%= pundit_span Family, :updateable? %>
-            <div class="d-flex col-md">
+            <div class="d-flex col-sm">
               <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
                 <span class="v-type-actions mr-2">
                   <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
