@@ -1,6 +1,6 @@
 $(document).on('click', '#search_for_plan_shopping_help', function() {
   $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {firstname: $('#help_first_name').val(), lastname: $('#help_last_name').val(), type: $('#help_type').html(),
            person: $('#help_requestor').html(), email: $('#help_requestor_email').html(),
            first_name: $('#person_first_name').val(), last_name: $('#person_last_name').val(),
@@ -14,7 +14,7 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
 
 $(document).on('click', '.help_button', function(){
 $.ajax({
-    type: 'GET', 
+    type: 'GET',
     data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),
            person: $('#help_requestor').html(), email: $('#help_requestor_email').html(),
            first_name: $('#person_first_name').val(), last_name: $('#person_last_name').val(),
@@ -43,4 +43,6 @@ $(document).on('click', '#back_to_help', function(){
   $("#back_to_help").addClass('hide');
   $('#help_list').removeClass("hide");
   $('#help_status').html('')
+  $('#help_sign_up_title').removeClass('hide');
+  $('#help_from_expert_title').addClass('hide');
 })
