@@ -10,31 +10,31 @@
   <li class="<%= add_progress_class(1, step) %>">
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
-    Plan Selection
+    <%= l10n('plan_selection') %>
   </li>
   <li class="<%= add_progress_class(2, step) %>">
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
-    Review
+    <%= l10n('review') %>
   </li>
   <li class="<%= add_progress_class(3, step) %>">
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
-    Complete
+    <%= l10n('complete') %>
   </li>
 </ul>
 
 <% if show_waive %>
   <% enrollment = @hbx_enrollment || @enrollment %>
   <% if (enrollment && (enrollment.employee_role.present? || enrollment.benefit_group.present?)) %>
-    <%= h(link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default')%>
+    <%= h(link_to l10n('waive_coverage'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default')%>
   <% end %>
 <% end %>
 
 <% if step == 2 && !no_purchase %>
   <% enrollment = @hbx_enrollment || @enrollment %>
   <% disabled_in_ivl = (enrollment && enrollment.is_shop?) ? '' : 'disabled' %>
-  <%= h(link_to 'Confirm', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-lg btn-primary btn-block #{disabled_in_ivl}", id: 'btn-continue', method: :post, disabled: disable_purchase?(!@enrollable, @enrollment), 'data-disable-with' => l10n("please_wait")) %>
+  <%= h(link_to l10n('confirm_selection'), checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-lg btn-primary btn-block #{disabled_in_ivl}", id: 'btn-continue', method: :post, disabled: disable_purchase?(!@enrollable, @enrollment), 'data-disable-with' => l10n("please_wait")) %>
 <% end %>
 
 <%= render partial: 'shared/shopping_nav_panel',

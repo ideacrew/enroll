@@ -11,28 +11,28 @@
   <li class="<%= add_progress_class(1, step) %>">
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
-    Household
+    <%= l10n('household_info')%>
   </li>
   <li class="<%= add_progress_class(2, step) %>">
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
-    Plan Selection
+    <%= l10n('plan_selection') %>
   </li>
   <li class="<%= add_progress_class(3, step) %>">
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
-    Review
+    <%= l10n('review') %>
   </li>
   <li class="<%= add_progress_class(4, step) %>">
     <span class="circle-progress"></span>
     <div class="vertical-line-progress"></div>
-    Complete
+    <%= l10n('complete') %>
   </li>
 </ul>
 
 <% if (@market_kind == 'shop' || @market_kind == 'fehb') && step == 2 && show_button == 'true' %>
   <% if @hbx_enrollment and @hbx_enrollment.employee_role.present? %>
-    <%= h(link_to 'Waive Coverage', '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default') %>
+    <%= h(link_to l10n('waive_coverage'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default') %>
   <% end %>
 <% end %>
 

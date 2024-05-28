@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <%= link_to l10n("edit_member"), main_app.edit_insured_family_member_path(dependent, {bs4: @bs4}), id: 'edit-dependent-person', remote: true, class: 'btn button outline close-2 my-3' %>
+      <%= h(link_to l10n("edit_member"), main_app.edit_insured_family_member_path(dependent, {bs4: @bs4}), id: 'edit-dependent-person', remote: true, class: 'btn button outline close-2 my-3') %>
 
     </div>
   </div>

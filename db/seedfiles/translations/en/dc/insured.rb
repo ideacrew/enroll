@@ -607,6 +607,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.select_waive_reason' => "Select Waive Reason",
   :'en.please_select_waive_reason' => "Please select waive reason",
   :'en.unable_to_waive_coverage' => "Unable to Waive Coverage",
+  :'en.waive_coverage' => "Waive Coverage",
   :'en.insured.plan_shoppings.you_can_not_waive_confirmation_msg' => "You cannot waive coverage unless you’re in Open Enrollment or a Special Enrollment Period.",
   :'en.insured.plan_shoppings.print_waiver.print_waiver_html' => "<h3>Waiver confirmation</h3><p>You have successfully waived the coverage at %{updated_at}. </p><p>Waiver Reason : %{waiver_reason}. </p><p>Please print this page for your records. </p>",
   :'en.print' => "Print",
