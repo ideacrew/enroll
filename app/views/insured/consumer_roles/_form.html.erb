@@ -17,7 +17,7 @@
     <p><%= l10n("insured.consumer_roles.help_question_info") %></p>
     <%= render "shared/error_messages", object: f.object %>
     <%= render 'shared/person/consumer_information', f: f %>
-    <h2><%= l10n("insured.consumer_roles.demo_info_for") %> <%= @person.full_name %></h2>
+    <h2 class="mt-4"><%= l10n("insured.consumer_roles.demo_info_for") %> <%= @person.full_name %></h2>
     <div id="consumer_fields_sets">
       <%= render 'shared/consumer_fields', f: f %>
     </div>
