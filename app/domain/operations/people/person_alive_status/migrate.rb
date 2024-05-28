@@ -51,9 +51,9 @@ module Operations
         # @return [Dry::Monads::Result] A result object.
         def validate(params)
           errors = []
-          errors << 'person_id ref missing' unless params[:person_id]
-          errors << "alive_status feature is disabled" unless EnrollRegistry.feature_enabled?(:alive_status)
-          errors.empty? ? Success(params) : log_error_and_return_failure(errors)
+          errors << 'person_id ref missing' unless params[:person_hbx_id]
+          errors << "alive_status feature is disabled" unless true
+          errors.empty? ? Success(params) : Failure(errors)
         end
 
         # Finds the person to migrate.
@@ -61,8 +61,7 @@ module Operations
         # @param params [Hash] The parameters to use to find the person.
         # @return [Dry::Monads::Result] A result object.
         def find_person(params)
-          person = Person.find(params[:person_id])
-          person.present? ? Success(person) : Failure("Person not found with id: #{params[:person_id]}")
+          ::Operations::People::Find.new.call(person_hbx_id: params[:person_hbx_id])
         end
 
         # Builds the payload for the demographics group.
@@ -79,17 +78,17 @@ module Operations
         def migrate(person)
           #BuildDemographicsGroup
           payload = build_demographics_group_payload
-          person.demographics_group.create!(payload)
+          person.create_demographics_group(payload)
 
-          if ssn.present?
+          if person.ssn.present?
             person.add_new_verification_type("Alive Status")
-            person.alive_status_type.save!
+            person.verification_types.where(type_name: "Alive Status").first.save!
             person.families.each(&:update_family_document_status!)
           end
 
           Success(person)
         rescue StandardError => e
-          Failure(e.message)
+          Failure(e.inspect)
         end
 
         # Builds the family determination.

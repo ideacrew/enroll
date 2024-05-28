@@ -19,7 +19,7 @@ module Operations
         private
 
         def fetch_people_with_consumer_role
-          result = Person.where(hbx_id: "171458776845154").exists(consumer_role: true)
+          result = Person.exists(consumer_role: true)
 
           if result.present?
             Success(result)
