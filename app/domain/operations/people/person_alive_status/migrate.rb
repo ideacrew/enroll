@@ -52,7 +52,7 @@ module Operations
         def validate(params)
           errors = []
           errors << 'person_id ref missing' unless params[:person_hbx_id]
-          errors << "alive_status feature is disabled" unless true
+          errors << "alive_status feature is disabled" unless EnrollRegistry.feature_enabled?(:alive_status)
           errors.empty? ? Success(params) : Failure(errors)
         end
 
