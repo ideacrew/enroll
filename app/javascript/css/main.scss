@@ -361,6 +361,37 @@ ul.list-right-section li {
     margin-bottom: $spacer;
     width: 100%;
   }
+
+  .navbar-brand img {
+    padding-left: $spacer / 2;
+  }
+
+  .navbar-collapse {
+    position: absolute;
+    top: 68px;
+    left: 75%;
+    margin-top: 0;
+    padding: $spacer;
+    width: 75vw;
+    transition: all 0.4s ease;
+    display: block;
+  }
+  .navbar-collapse.collapsing {
+    height: auto !important;
+    margin-left: 50%;
+    left: 50%;
+    transition: all 0.2s ease;
+  }
+  .navbar-collapse.show {
+    left: 25vw;
+    background: var(--grey-000);
+    height: 100vh;
+    padding-top: $spacer;
+    .align-items-md-end {
+      margin-top: $spacer;
+    }
+    z-index: 105;
+  }
 }
 
 .full-height {
@@ -407,6 +438,7 @@ ul.list-right-section li {
       content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6" fill="none"><path d="M11 0.5L6.70711 4.79289C6.31658 5.18342 5.68342 5.18342 5.29289 4.79289L1 0.5" stroke="%23323130" stroke-linecap="round" stroke-linejoin="round"/></svg>');
     }
   }
+}
 
 .modal-backdrop.in {
   background-color: rgba(0, 0, 0, 0.01);
