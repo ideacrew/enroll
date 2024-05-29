@@ -15,8 +15,8 @@ Then(/^I should see Documents link$/) do
 end
 
 When(/^.+ clicks on Documents link$/) do
-  expect(page).to have_content "Documents"
-  click_link "Documents"
+  visit verification_insured_families_path(tab: 'verification')
+  find(".interaction-click-control-documents", wait: 5).click
 end
 
 Given(/^I should see page for documents verification$/) do
@@ -60,6 +60,11 @@ end
 Then(/^the consumer visits verification page$/) do
   visit verification_insured_families_path(tab: 'verification')
   find(".interaction-click-control-documents", wait: 5).click
+end
+
+Then(/^the selectric class is visible$/) do
+  visit(current_url)
+  expect(page).to have_css('.selectric')
 end
 
 When(/^the consumer should see documents verification page$/) do

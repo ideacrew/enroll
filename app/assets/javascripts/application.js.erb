@@ -50,8 +50,11 @@ var disableSelectric = false;
 
 $(document).on('ready page:load turbolinks:load', function () {
   Freebies.fadeElement($("body"));
-  Freebies.allFreebies();
   Responsive.setSizeListeners();
+});
+
+document.addEventListener('DOMContentLoaded', function(event) {
+  Freebies.allFreebies();
 });
 
 function applyJQDatePickerSetup(ele) {
