@@ -320,6 +320,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.change_tax_credits_or_cost_sharing_reductions' => "Change in income that may impact my tax credits/cost-sharing reductions",
   :'en.insured.qle_detail.eligible_to_enroll_limited_time' => "Based on the information you entered, you may be eligible to enroll now but there is limited time.",
   :'en.insured.qle_detail.error_text' => "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at %{contact_center_phone_number} to give us more information so we can see if you qualify.",
+  :'en.insured.match_person.dob_valid_error' => "Please verify your date of birth. If it's correct, please %{continue_substring}.",
   :'en.insured.families.qles_panel.life_event' => "Life event",
   :'en.insured.eligible_to_enroll' => "Eligible TO Enroll",
   :'en.insured.choose_the_date_you_want_your_plan_start' => "Choose the date you want your plan to start.",
