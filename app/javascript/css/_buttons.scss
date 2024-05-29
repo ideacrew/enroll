@@ -87,6 +87,10 @@ button.error, .button.error, .btn.error, .btn-error {
   @include ghost-button;
 }
 
+.button-error.outline, .btn-error.outline {
+  @include ghost-button(var(--button-error-color), var(--button-error-hover-color), var(--button-error-active-color));
+}
+
 a.button:hover {
   text-decoration: none;
   cursor: pointer;
