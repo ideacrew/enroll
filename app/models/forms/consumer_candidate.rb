@@ -160,7 +160,8 @@ module Forms
       return unless (self.dob_check == "false" || self.dob_check.blank?) && self.dob.present?
 
       if ::TimeKeeper.date_of_record.year - self.dob.year < 18
-        errors.add(:base, "Please verify your date of birth. If it's correct, please continue.", :level => :warning)
+        continue_substring_key = EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "continue_next" : "continue"
+        errors.add(:base, l10n("insured.match_person.dob_valid_error", continue_substring: l10n(continue_substring_key).downcase), :level => :warning)
         self.dob_check = true
       else
         self.dob_check = false
