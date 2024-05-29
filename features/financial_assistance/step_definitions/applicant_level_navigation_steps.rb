@@ -9,7 +9,7 @@ Then(/^the user will navigate to the Tax Info page for the corresponding applica
 end
 
 Given(/^that the user is on the Tax Info page for a given applicant$/) do
-  visit financial_assistance.go_to_step_application_applicant_path(application, application.primary_applicant, 1)
+  visit financial_assistance.tax_info_application_applicant_path(application, application.primary_applicant)
 end
 
 When(/^the user clicks My Household section on the left navigation$/) do

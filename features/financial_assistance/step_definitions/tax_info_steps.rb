@@ -38,7 +38,7 @@ Given(/^the user is editing an application for financial assistance$/) do
 end
 
 When(/^the user navigates to the Tax Info page for a given applicant$/) do
-  visit financial_assistance.go_to_step_application_applicant_path(application, application.primary_applicant, 1)
+  visit tax_info_application_applicant_path(application, application.primary_applicant)
 end
 
 When(/^Will this person file taxes for <system year>\? has a nil value stored$/) do
@@ -80,7 +80,7 @@ Then(/^should be actionable\.$/) do
 end
 
 Given(/^the user is on the Tax Info page for a given applicant$/) do
-  visit financial_assistance.go_to_step_application_applicant_path(application, application.primary_applicant, 1)
+  visit tax_info_application_applicant_path(application, application.primary_applicant)
 end
 
 Given(/^the user is on the Tax Info page for a dependent applicant$/) do
@@ -90,7 +90,7 @@ Given(/^the user is on the Tax Info page for a dependent applicant$/) do
     dob: consumer.primary_family.family_members.last.dob)
   application.reload
   dependent_applicant = application.applicants.last
-  visit financial_assistance.go_to_step_application_applicant_path(application, dependent_applicant, 1)
+  visit tax_info_application_applicant_path(application, dependent_applicant)
 end
 
 

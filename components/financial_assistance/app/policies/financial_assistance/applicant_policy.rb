@@ -85,6 +85,22 @@ module FinancialAssistance
       edit?
     end
 
+    # Determines if the current user has permission to view tax information.
+    # The user can view tax information if they have permission to edit the applicant.
+    #
+    # @return [Boolean] Returns true if the user has permission to view tax information, false otherwise.
+    def tax_info?
+      edit?
+    end
+
+    # Determines if the current user has permission to save tax information.
+    # The user can save tax information if they have permission to edit the applicant.
+    #
+    # @return [Boolean] Returns true if the user has permission to save tax information, false otherwise.
+    def save_tax_info?
+      edit?
+    end
+
     # Determines if the current user has permission to check the age of the applicant.
     # The user can check the age of the applicant if they have permission to edit the applicant.
     #

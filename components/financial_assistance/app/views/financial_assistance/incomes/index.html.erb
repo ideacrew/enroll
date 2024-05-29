@@ -203,7 +203,7 @@
 
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: go_to_step_application_applicant_path(@application, @applicant, 1),
+      previous_url: tax_info_application_applicant_path(@application, @applicant),
       next_url:  other_application_applicant_incomes_path(@application, @applicant)
     } %>
   </div>

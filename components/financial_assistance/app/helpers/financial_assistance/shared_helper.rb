@@ -20,7 +20,7 @@ module FinancialAssistance
                 elsif controller_name == 'family_members'
                   :household_info
                 elsif controller_name == 'applicants'
-                  if action_name == 'step'
+                  if action_name == 'tax_info'
                     :tax_info
                   elsif action_name == 'other_questions'
                     :other_questions

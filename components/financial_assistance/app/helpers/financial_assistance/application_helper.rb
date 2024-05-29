@@ -51,7 +51,7 @@ module FinancialAssistance
 
     def find_next_application_path(application)
       if application.incomplete_applicants?
-        go_to_step_application_applicant_path application, application.next_incomplete_applicant, 1
+        tax_info_application_applicant_path application, application.next_incomplete_applicant
       else
         review_and_submit_application_path application
       end
@@ -89,7 +89,7 @@ module FinancialAssistance
         # and instead we'll short circuit by checking that -1 is less then i, which always would be true
         ((reverse_document_flow.index(options[:current]) || -1) < reverse_document_flow.index(embeded_document)) && applicant.send(embeded_document).present?
       end
-      previous_path ? send("application_applicant_#{previous_path}_path", application, applicant) : go_to_step_application_applicant_path(application, applicant, 2)
+      previous_path ? send("application_applicant_#{previous_path}_path", application, applicant) : tax_info_application_applicant_path(application, applicant)
     end
 
     def left_nav_css(conditional)
@@ -370,6 +370,28 @@ module FinancialAssistance
 
       year_selection_enabled = FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form))
       @assistance_year = year_selection_enabled ? @application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
+    end
+
+    def no_applicant_faa_nav_options(application)
+      step1_link = (application.present? && application.is_draft?) ? financial_assistance.edit_application_path(application) : "javascript:void(0);"
+      links = [
+        {step: 1, label: l10n('faa.nav.family_info', link: step1_link)},
+      ]
+      relationship_step = {step: 2, label: l10n('faa.nav.family_relationships'), link: "javascript:void(0);"}
+      review_step = {step: 2, label: l10n('faa.nav.review'), link: "javascript:void(0);"}
+      if application && application.incomplete_applicants?
+        relationship_step[:link] = nil
+      elsif application && application.applicants.count > 1 && application.is_draft?
+        relationship_step[:link] = financial_assistance.application_relationships_path(application)
+      end
+
+      if application.applicants.count > 1
+        links << relationship_step
+        review_step[:step] = 3
+      end
+
+      review_step[:link] = financial_assistance.review_and_submit_application_path(application) if application.present? && application.ready_for_attestation? && application.is_draft?
+      links << review_step
     end
   end
 end
