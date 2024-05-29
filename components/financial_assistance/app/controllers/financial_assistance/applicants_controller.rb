@@ -120,7 +120,6 @@ module FinancialAssistance
       redirect_to tax_info_application_applicant_path(@application, @applicant)
     end
 
-
     def age_of_applicant
       authorize @applicant, :age_of_applicant?
 

@@ -9,15 +9,15 @@
               <i class="fa fa-pencil-square-o fa-2x"></i>
             </span>
           </div>
-          <h2 class="fa-darkblue"><%= personalize_heading_text("Tax Info") %></h2>
+          <h2 class="fa-darkblue"><%= l10n("faa.tax_info.header") %></h2>
         </div>
       </div>
-      <p><%= translation_placeholder_text("Tell us about this person's tax info. When you're finished select CONTINUE.") %></p>
+      <p><%= l10n("faa.tax_info.subheader") %></p>
       <p class="memo"><%= l10n('faa.question.required_indicator') %></p>
 
       <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
         <div class="col-md-6">
-          <h5 class="fa-text-color">Will this person file taxes for <%= assistance_year %> *</h5>
+          <h5 class="fa-text-color"><%= l10n("faa.tax_info.question1", year: assistance_year) %> *</h5>
         </div>
         <div class="col-md-2">
           <%= f.radio_button("is_required_to_file_taxes", true, class: "radio-yml", id: "is_required_to_file_taxes_yes") %>
@@ -36,7 +36,7 @@
       </div>
       <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements hide">
         <div class="col-md-6">
-          <h5 class="fa-text-color">Will this person be filing jointly?</h5>
+          <h5 class="fa-text-color"><%= l10n("faa.tax_info.question2") %> *</h5>
         </div>
         <div class="col-md-2">
           <%= f.radio_button("is_joint_tax_filing", true, class: "radio-yml", id: "is_joint_tax_filing_yes") %>
@@ -55,7 +55,7 @@
       </div>
       <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements hide filing-as-head-of-household">
         <div class="col-md-6">
-          <h5 class="fa-text-color">Will this person be filing as head of household? *</h5>
+          <h5 class="fa-text-color"><%= l10n("faa.tax_info.question3") %> *</h5>
         </div>
         <div class="col-md-2">
           <%= f.radio_button("is_filing_as_head_of_household", true, class: "radio-yml", id: "is_filing_as_head_of_household_yes") %>
@@ -72,7 +72,7 @@
       </div>
       <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
         <div class="col-md-6">
-          <h5 class="fa-text-color">Will this person be claimed as a tax dependent for <%= assistance_year %>? *</h5>
+          <h5 class="fa-text-color"><%= l10n("faa.tax_info.question4", year: assistance_year) %> *</h5>
         </div>
         <div class="col-md-2">
           <%= f.radio_button("is_claimed_as_tax_dependent", true, class: "radio-yml", id: "is_claimed_as_tax_dependent_yes") %>
@@ -89,10 +89,10 @@
       </div>
       <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
         <div class="col-md-6">
-          <h5 class="fa-text-color">This person will be claimed as a dependent by</h5>
+          <h5 class="fa-text-color"><%= l10n("faa.tax_info.claimed_by") %></h5>
         </div>
         <div class="col-md-4">
-          <%= select_tag("claimed_as_tax_dependent_by", options_for_select(claim_eligible_tax_dependents), prompt: 'NONE', class: "form-control claimed-dependent-dropdown") %>
+          <%= select_tag("claimed_as_tax_dependent_by", options_for_select(claim_eligible_tax_dependents), prompt: l10n("faa.tax_info.none"), class: "form-control claimed-dependent-dropdown") %>
         </div>
         <div class='col-md-2 left-seprator'>
           <a href="#claimed_as_tax_dependent_by" data-toggle="modal" data-target="#claimed_as_tax_dependent_by"><%= l10n('faa.question.not_sure') %></a>
@@ -106,7 +106,7 @@
         <div class="col-xs-12">
           <div class="back-link">
             <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-            <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= financial_assistance.edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+            <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= financial_assistance.edit_application_path(@application) %>"> <b><%= l10n("faa.tax_info.back") %></b> </a> <span><%= l10n("faa.tax_info.back_paranthetical") %></span>
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@
     </div>
 
     <%= content_for :submit_button do %>
-      <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" %>
+      <%= submit_tag l10n("faa.tax_info.continue"), :class => "btn btn-lg btn-primary btn-block" %>
     <% end %>
 
     <div class='col-md-3'>
