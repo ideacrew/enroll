@@ -7,7 +7,7 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
-    before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :eligibility_results] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -264,18 +264,15 @@ module FinancialAssistance
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
 
-      respond_to do |format|
-        format.html { render layout: 'financial_assistance' }
-      end
+      respond_to :html
     end
 
     def eligibility_results
       authorize @application, :eligibility_results?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      respond_to do |format|
-        format.html { render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance') }
-      end
+      @in_application_flow = true if params.keys.include?('cur')
+      respond_to :html
     end
 
     def application_publish_error
@@ -385,8 +382,16 @@ module FinancialAssistance
       case action_name
       when "edit", "step", "review_and_submit", "eligibility_response_error", "application_publish_error"
         "financial_assistance_nav"
-      when %i[application_year_selection application_checklist]
+      when "application_year_selection", "application_checklist"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
+      when "eligibility_results"
+        if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+          return params.keys.include?('cur') ? "financial_assistance_progress" : "bs4_financial_assistance"
+        else
+          return params.keys.include?('cur') ? "financial_assistance_nav" : "financial_assistance"
+        end
+      when "wait_for_eligibility_response"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "bs4_financial_assistance" : "financial_assistance"
       else
         "financial_assistance"
       end
@@ -559,3 +564,4 @@ module FinancialAssistance
     end
   end
 end
+

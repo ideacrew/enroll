@@ -290,6 +290,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
   "en.faa.verification.documents" => "Financial Assistance Documents",
   "en.faa.view_complete_checklist" => "View the Complete Application Checklist",
+  "en.faa.page_refresh" => "Page will automatically refresh.",
+  "en.faa.getting_eligibility" => "Getting your eligibility results...",
   'en.faa.add_mailing_address' => 'Add Mailing Address',
   'en.faa.remove_mailing_address' => 'Remove Mailing Address'
 }.freeze
