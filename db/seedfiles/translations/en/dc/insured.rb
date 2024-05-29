@@ -383,6 +383,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.manage_family' => "Manage Family",
   :'en.personal' => "Personal",
   :'en.insured.families.make_a_first_payment' => "Make a first Payment for a new plan",
+  :'en.insured.event_details' => "Event Details",
   :'en.insured.report_life_changes' => "Report Life Changes",
   :'en.insured.change_tax_credits_or_cost_sharing_reductions' => "Change in income that may impact my tax credits/cost-sharing reductions",
   :'en.insured.qle_detail.eligible_to_enroll_limited_time' => "Based on the information you entered, you may be eligible to enroll now but there is limited time.",

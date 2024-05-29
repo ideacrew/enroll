@@ -9,7 +9,7 @@ var QLE = ( function( window, undefined ) {
   function qle_question(url){
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), bs4: $("#bs4").val()},
       url: "/insured/families/" + url
     });
   }
@@ -59,7 +59,7 @@ $(function () {
   function get_qle_date() {
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), bs4: $("#bs4").val()},
       url: "/insured/families/check_qle_date.js"
     });
   }

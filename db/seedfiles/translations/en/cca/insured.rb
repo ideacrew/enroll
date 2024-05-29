@@ -330,6 +330,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.my_account' => "My Account",
   :'en.manage_family' => "Manage Family",
   :'en.personal' => "Personal",
+  :'en.insured.event_details' => "Event Details",
   :'en.insured.report_life_changes' => "Report Life Changes",
   :'en.insured.change_tax_credits_or_cost_sharing_reductions' => "Change in income that may impact my tax credits/cost-sharing reductions",
   :'en.insured.qle_detail.eligible_to_enroll_limited_time' => "Based on the information you entered, you may be eligible to enroll now but there is limited time.",

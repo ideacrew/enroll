@@ -5,6 +5,7 @@ class Insured::FamiliesController < FamiliesController
   include Config::SiteConcern
   include Insured::FamiliesHelper
 
+  layout :resolve_layout
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
@@ -20,7 +21,7 @@ class Insured::FamiliesController < FamiliesController
     :healthcare_for_childcare_program_form,
     :update_osse_eligibilities
   ]
-  before_action :enable_bs4_layout, only: [:find_sep] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:find_sep, :record_sep, :check_qle_date] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
 
   around_action :cache_hbx, only: [:home]
@@ -141,7 +142,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     respond_to do |format|
-      format.html { render :layout => 'application' }
+      format.html
     end
   end
 
@@ -374,7 +375,7 @@ class Insured::FamiliesController < FamiliesController
       @terminate_date = fetch_terminate_date(params["terminate_date_#{@enrollment.hbx_id}"]) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
       respond_to do |format|
-        format.html { render :layout => 'application' }
+        format.html
       end
     else
       redirect_to :back
@@ -682,5 +683,14 @@ class Insured::FamiliesController < FamiliesController
 
   def enable_bs4_layout
     @bs4 = true
+  end
+
+  def resolve_layout
+    case action_name
+    when "find_sep"
+      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application"
+    when "purchase"
+      "application"
+    end
   end
 end

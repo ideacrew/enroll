@@ -1,11 +1,55 @@
 <% if @bs4 %>
-  <% if @qualifying_life_events %>
-    <ul>
-      <% @qualifying_life_events.each_with_index do |qle, index| %>
-        <li class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generater(qle, index) %></li>
+  <div>
+    <div class="mb-5">
+      <h1><%= l10n("insured.families.special_enrollment_period") %></h1>
+      <p class="mb-4"><%= l10n("insured.families.final_sep_experienced_any_events") %></p>
+      <h2><%= l10n("insured.top_life_changes") %></h2>
+      <% if @qualifying_life_events %>
+        <ul>
+          <% @qualifying_life_events.each_with_index do |qle, index| %>
+            <li class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generater(qle, index) %></li>
+          <% end %>
+        </ul>
       <% end %>
-    </ul>
-  <% end %>
+
+      <%= hidden_field_tag 'id', @hbx_enrollment_id %>
+      <%= hidden_field_tag 'market_kind', @market_kind %>
+      <%= hidden_field_tag 'coverage_kind', @coverage_kind %>
+      <div class="align-content-center">
+        <input type="checkbox" id="no_qle_checkbox" data-toggle="modal" data-target="#outside-open-enrollment" name="no_qualifying_event" value="true"><%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
+      </div>
+    </div>
+    <%= render partial: 'qle_detail', locals: {url: record_sep_insured_families_path, :http_method => :post} %>
+  </div>
+  
+  <div class="modal fade" id="outside-open-enrollment" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="container pt-2 pb-4 modal-content">
+        <% is_open_enrollment = (@market_kind == ('individual' || 'coverall') && is_under_open_enrollment?) %>
+        <div class="d-flex mb-4 align-items-center">
+          <div class="col-auto px-0">
+            <div class="info-icon icon" alt="Info">&nbsp;</div>
+          </div>
+          <div class="col pl-0">
+            <% title = is_open_enrollment ? l10n("insured.families.open_enrollment") : l10n("insured.families.outside_open_enrollment") %>
+              <h5 class="modal-title"><%= title %></h5>
+          </div>
+          <div class="col-auto px-0">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body px-0">
+          <%= is_open_enrollment ? l10n("insured.families.final_sep_open_enrollment_body") : l10n("insured.families.final_sep_outside_open_enrollment_body", next_ivl_open_enrollment_date: HbxProfile.current_hbx&.benefit_sponsorship&.current_benefit_coverage_period&.open_enrollment_start_on.try(:strftime, "%B %e")) %>
+        </div>
+        <div class="d-flex align-items-center mt-4 justify-content-end">
+          <button type="button" class="btn outline mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>
+          <%= link_to l10n('back_to_my_account_title'), family_account_path, class: 'btn btn-primary' %>
+        </div>
+      </div>
+    </div>
+  </div>
 <% else %>
   <div class="container">
     <div class="row">
