@@ -154,7 +154,7 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
-      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.qle_on = get_date(:qle_date)
       special_enrollment_period.market_kind = qle.market_kind == "individual" ? "ivl" : qle.market_kind
       special_enrollment_period.save
     end
@@ -252,7 +252,7 @@ class Insured::FamiliesController < FamiliesController
     today = TimeKeeper.date_of_record
     start_date = today - 30.days
     end_date = today + 30.days
-    @qle_event_date = get_date
+    @qle_event_date = get_date(:date_val)
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
@@ -663,7 +663,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def calculate_dates
-    @qle_event_date = get_date
+    @qle_event_date = get_date(:date_val)
     @qle = QualifyingLifeEventKind.find(params[:qle_id])
     @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : TimeKeeper.date_of_record
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
@@ -681,9 +681,9 @@ class Insured::FamiliesController < FamiliesController
 
   end
 
-  def get_date
+  def get_date(parameter)
     date_format = params[:bs4] == "true" ? "%Y-%m-%d" : "%m/%d/%Y"
-    Date.strptime(params[:date_val], date_format)
+    Date.strptime(params[parameter], date_format)
   end
 
   def enable_bs4_layout
