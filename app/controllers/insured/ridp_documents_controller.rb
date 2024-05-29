@@ -4,6 +4,7 @@ class Insured::RidpDocumentsController < ApplicationController
   before_action :get_person
   before_action :check_for_consumer_role
   before_action :set_document,  only: [:destroy]
+  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
   def upload
     consumer_role = person_consumer_role
@@ -66,7 +67,7 @@ class Insured::RidpDocumentsController < ApplicationController
     end
 
     respond_to do |format|
-      format.js
+      format.js { render (@bs4 ? "destroy_updated" : "destroy") }
     end
   end
 
@@ -147,4 +148,8 @@ class Insured::RidpDocumentsController < ApplicationController
     person_consumer_role.save
   end
 
+
+  def enable_bs4_layout
+    @bs4 = true
+  end
 end
