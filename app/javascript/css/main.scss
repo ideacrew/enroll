@@ -387,6 +387,27 @@ ul.list-right-section li {
   }
 }
 
+
+// accordion
+.accordion {
+  .accordion-header {
+    padding-bottom: $spacer;
+    border-bottom: 1px solid var(--grey-060);
+    &:after {
+      content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6" fill="none"><path d="M1 5.5L5.29289 1.20711C5.68342 0.816583 6.31658 0.816582 6.70711 1.20711L11 5.5" stroke="%23323130" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+      float: right;
+    }
+  }
+
+  .accordion-header.collapsed {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+    &:after {
+      content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6" fill="none"><path d="M11 0.5L6.70711 4.79289C6.31658 5.18342 5.68342 5.18342 5.29289 4.79289L1 0.5" stroke="%23323130" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    }
+  }
+
 .modal-backdrop.in {
   background-color: rgba(0, 0, 0, 0.01);
 }
