@@ -252,7 +252,7 @@ class Insured::FamiliesController < FamiliesController
     today = TimeKeeper.date_of_record
     start_date = today - 30.days
     end_date = today + 30.days
-    @qle_event_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle_event_date = get_date
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
@@ -663,7 +663,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def calculate_dates
-    @qle_event_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle_event_date = get_date
     @qle = QualifyingLifeEventKind.find(params[:qle_id])
     @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : TimeKeeper.date_of_record
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
@@ -679,6 +679,11 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
+  end
+
+  def get_date
+    date_format = params[:bs4] == "true" ? "%Y-%m-%d" : "%m/%d/%Y"
+    Date.strptime(params[:date_val], date_format)
   end
 
   def enable_bs4_layout
