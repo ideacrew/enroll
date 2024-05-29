@@ -48,7 +48,7 @@ module Operations
             csv << field_names
             people.each do |person|
               result = build_and_publish_event(person)
-              counter = counter + 1 if result.success?
+              counter += 1 if result.success?
               csv << [person.hbx_id, result.success?]
             end
           end

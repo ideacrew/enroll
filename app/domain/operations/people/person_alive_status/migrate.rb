@@ -7,7 +7,7 @@
 #   |
 #   v
 # Validate Parameters
-#   |<------------------+
+#   |<-----------------+
 #   v                  |
 # Find Person          |
 #   |                  |
@@ -76,14 +76,18 @@ module Operations
         # @param person [Person] The person to migrate.
         # @return [Dry::Monads::Result] A result object.
         def migrate(person)
-          #BuildDemographicsGroup
-          payload = build_demographics_group_payload
-          person.create_demographics_group(payload)
+          return Failure("Person does not have consumer role") unless person.consumer_role.present?
 
-          if person.ssn.present?
+          payload = build_demographics_group_payload
+          person.create_demographics_group(payload) unless person.demographics_group.present? && person.demographics_group.alive_status.present?
+
+          if person.ssn.present? && person.verification_types.alive_status_type.empty?
             person.add_new_verification_type("Alive Status")
             person.verification_types.where(type_name: "Alive Status").first.save!
             person.families.each(&:update_family_document_status!)
+
+          else
+            Failure("Person #{person.hbx_id} already has alive status or does not have ssn")
           end
 
           Success(person)
