@@ -13,13 +13,13 @@ module Operations
 
         def call
           people = yield fetch_people_with_consumer_role
-          yield batch_process(people)
+          batch_process(people)
         end
 
         private
 
         def fetch_people_with_consumer_role
-          result = Person.exists(consumer_role: true)
+          result = Person.exists(consumer_role: true).exists(demographics_group: false)
 
           if result.present?
             Success(result)
@@ -42,16 +42,18 @@ module Operations
         def batch_process(people)
           field_names = %w[HBX_ID Published?]
           file_name = "#{Rails.root}/alive_status_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
+          counter = 0
 
           CSV.open(file_name, 'w', force_quotes: true) do |csv|
             csv << field_names
             people.each do |person|
               result = build_and_publish_event(person)
+              counter = counter + 1 if result.success?
               csv << [person.hbx_id, result.success?]
             end
           end
 
-          Success("Successfully processed batch request")
+          Success("Successfully processed batch request for #{counter} people. Report is generated at #{file_name}")
         end
       end
     end
