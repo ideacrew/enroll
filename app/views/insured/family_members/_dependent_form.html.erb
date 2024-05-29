@@ -1,6 +1,7 @@
 <% if @bs4 %>
   <div id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
-    <div id="add_info_<%= dependent.id %>" class="<%= pundit_class Family, :updateable?%>">
+    <h2><%= dependent.id.present? ? l10n("edit_member") : l10n("add_member") %></h2>
+    <div id="add_info_<%= dependent.id %>" class="<%= pundit_class Family, :updateable? %>">
       <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
         <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
         <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
@@ -30,41 +31,40 @@
          <div id="personal_info" class="house">
           <div class="dependent_notice_div_<%= dependent.id%>"></div>
 
-          <div class="d-flex mb-md-4 row col-sm">
-            <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <div class="d-flex mb-md-4">
+            <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :first_name, l10n("first_name"), class: "required" %>
               <%= f.text_field :first_name, class: "required", required: true, placeholder: l10n("first_name"), autocomplete: :off %>
             </div>
-            <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+            <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :middle_name, l10n("middle_name") %>
               <%= f.text_field :middle_name, class: "required", required: false, placeholder: l10n("middle_name"), autocomplete: :off %>
             </div>
-            <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+            <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :last_name, l10n("last_name"), class: "required" %>
               <%= f.text_field :last_name, class: "required", required: true, placeholder: l10n("last_name"), autocomplete: :off %>
             </div>
-            <div class="col-sm col-md-6 col-lg-3 p-0">
+            <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :name_sfx, l10n("suffix") %>
               <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => l10n("none"), autocomplete: :off %>
             </div>
           </div>
 
-          <div class="d-flex mb-md-4 row col-sm">
-            <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <div class="d-flex mb-md-4">
+            <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
               <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
             </div>
-            <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+            <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :gender, l10n("gender"), class: 'required'  %>
               <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], autocomplete: :off, required: true %>
               <a href="#sex_gender" data-toggle="modal" data-target="#sex_gender" class="d-block"><%= l10n("not_sure") %></a>
               <%= render partial: 'shared/modal_support_text_household', locals: {key: "sex_gender"} %>
             </div>
-            <div class="mr-auto col-sm col-md-6 p-0 sm-hide"></div>
           </div>
 
-          <div class="d-flex mb-md-4 row col-sm">
-            <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <div class="d-flex mb-md-4">
+            <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :ssn, "Social Security" %>
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
                 <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
@@ -75,18 +75,17 @@
                   readonly: f.object.is_a?(Forms::EmployeeRole) %>
               <% end %>
             </div>
-            <div class="col-sm col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
+            <div class="col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
               <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
-                <%= f.check_box :no_ssn %><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %>
+                <%= f.check_box :no_ssn %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
                 <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
                 <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
-              <% end %><span>
+              <% end %>
             </div>
-            <div class="mr-auto col-sm col-md-6 p-0 sm-hide"></div>
           </div>
 
           <% if @person.has_active_consumer_role? %>
-            <fieldset class="d-flex mb-md-4 row col-sm">
+            <fieldset class="d-flex mb-md-4">
               <legend class="required"><%= l10n("does_person_need_coverage", person: dependent.first_name.present? ? dependent.first_name : "this person") %></legend>
               <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
               <div class="d-flex align-items-center mt-2">
@@ -95,42 +94,7 @@
             </fieldset>
           <% end %>
 
-          <div class="row row-form-wrapper no-buffer hidden">
-            <% if has_active_consumer_dependent?(@person,@dependent) %>
-              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
-                <label class="static_label label-floatlabel mt-label">NAME</label>
-                <label id="is_applying_coverage_value_dep_1" class= "ml-label">
-                  <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : 'this person' %>
-                </label>
-              </div>
-            <% end %>
-            <div class="col-md-5 mt18">
-              <div class="select-positioning ml-label"> <label>is</label> </div>
-              <label class="static_label label-floatlabel mt-label">RELATIONSHIP |
-                <% if FinancialAssistanceRegistry[:enroll_app].settings(:site_key).item.to_s.downcase == 'me' %>
-                  <a href="#relationship" data-toggle="modal" data-target="#relationship">Not sure?</a>
-                <% else %>
-                  <a class='hidden'></a>
-                <% end %>
-              </label>
-              <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
-              <div class="select-relation rs_selection">
-                <%= f.select :relationship, relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => "floatlabel form-control"}  %>
-              </div>
-              <label class="position-left"> of</label>
-              <div class="icon-rel">
-                <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
-                <i class="fa fa-link" aria-hidden="true"></i>
-                <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
-              </div>
-            </div>
-            <div class="col-lg-4 mt18 static-font">
-              <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
-              <span class="position-full-name"> <%= @person.full_name %> </span>
-            </div>
-          </div>
-
-          <div class="d-flex mb-md-4 row col-sm">
+          <div class="d-flex mb-md-4">
             <div class="">
               <%= f.label :relationship, "Relationship to primary account member" %>
               <%= f.select :relationship, relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => ""}  %>
@@ -138,7 +102,6 @@
               <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
             </div>
           </div>
-
 
           <% if current_user.does_not_have_any_staff_role? && !current_user.has_insured_role? %>
             <%= render 'shared/age_off_excluded', f: f %>
@@ -186,19 +149,19 @@
 
         <div id="add_info_buttons_<%= dependent.id %>" class="pt-2">
           <% if !dependent.persisted? %>
-            <a href="#" class="btn button outline remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled')" data-target="#new_employee_dependent_form">
+            <a href="#" class="btn button outline remove-new-employee-dependent" data-target="#new_employee_dependent_form">
               <%= l10n("cancel") %>
             </a>
-            <a href="#" class="close-1 outline-error remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
+            <a href="#" class="close-1 btn outline-error remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
           <% else %>
             <%= h(link_to l10n("cancel"), insured_family_member_path(dependent, {bs4: @bs4}), :remote => true, class: "btn button outline") %>
             <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button outline-error close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
           <% end %>
 
-          <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>
+          <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden") do %>
             <%= l10n("confirm_member") %>
           <% end %>
-          <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')", id='confirm-dependent' class="btn btn-primary">
+          <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')" id="confirm-dependent" class="btn btn-primary">
             <%= l10n("confirm_member") %>
           </span>
         </div>

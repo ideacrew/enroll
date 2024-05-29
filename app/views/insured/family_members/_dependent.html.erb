@@ -1,5 +1,6 @@
 <% if @bs4 %>
   <div id="add_member_list_<%= dependent.id %>" class="dependent_list">
+    <h2><%= l10n('member') %> <%= local_assigns[:member_number] ? member_number : "" %></h2>
     <div id="add_info_<%= dependent.id %>">
       <div class="dependent_notice_div_<%= dependent.id%>"></div>
 

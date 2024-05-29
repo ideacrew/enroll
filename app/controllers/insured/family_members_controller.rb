@@ -62,6 +62,8 @@ class Insured::FamilyMembersController < ApplicationController
 
     @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
     set_view_person
+
+    @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
       format.html
       format.js
@@ -100,6 +102,7 @@ class Insured::FamilyMembersController < ApplicationController
       @created = true
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       fire_consumer_roles_create_for_vlp_docs(consumer_role) if consumer_role
+      @bs4 = true if params[:bs4] == "true"
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }

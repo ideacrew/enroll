@@ -65,27 +65,54 @@
   }
 }
 
-.button, button, .button-primary, .btn, .btn-primary {
+button,
+.btn-primary,
+.btn,
+.button-primary,
+.button
+{
   @include solid-button;
 }
 
-button.secondary, .button.secondary, .btn.secondary, .btn-secondary {
+button.secondary,
+.btn-secondary,
+.btn.secondary,
+.button.secondary
+{
   @include solid-button(var(--button-secondary-color), var(--grey-000), var(--button-secondary-hover-color), var(--button-secondary-active-color));
 }
 
-button.tertiary, .button.tertiary, .btn.tertiary, .btn-tertiary {
+button.tertiary,
+.btn-tertiary,
+.btn.tertiary,
+.button.tertiary
+{
   @include solid-button(var(--button-tertiary-color), var(--grey-000), var(--button-tertiary-hover-color), var(--button-tertiary-active-color));
 }
 
-button.error, .button.error, .btn.error, .btn-error {
+button.error,
+.btn-error,
+.btn.error,
+.button.error
+{
   @include solid-button(var(--button-error-color), var(--grey-000), var(--button-error-hover-color), var(--button-error-active-color));
 }
 
-.button.outline, button.outline, .button-primary.outline, .btn.outline, .btn-primary.outline {
+button.outline,
+.btn-primary.outline,
+.btn.outline,
+.button-primary.outline,
+.button.outline
+{
   @include ghost-button;
 }
 
-.button.outline-error, button.outline-error, .button-primary.outline-error, .btn.outline-error, .btn-primary.outline-error {
+button.outline-error,
+.btn-error.outline-error,
+.btn.outline-error,
+.button-primary.outline-error,
+.button.outline-error
+{
   @include ghost-button(var(--button-error-color), var(--button-error-hover-color), var(--button-error-active-color));
 }
 

@@ -39,10 +39,9 @@
   <%# FAA 'info needed' row - add income & coverage info buttons %>
   <%= yield :primary_member_fa %>
 
-  <div id="dependent_ul" class="my-3">
+  <div id="dependent_ul">
     <% @family.active_family_members.reject(&:is_primary_applicant).each_with_index do |dependent, index| %>
-      <h2><%= l10n('member') %> <%= index + 2 %></h2>
-      <%= render "insured/family_members/dependent", dependent: dependent, person: @person %>
+      <%= render "insured/family_members/dependent", dependent: dependent, person: @person, member_number: index+2 %>
     <% end %>
   </div>
 
