@@ -51,6 +51,10 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
         expect(family.family_members.count).to eq(2)
       end
 
+      it 'creates a new coverage household member associated to new family member' do
+        expect(family.active_household.coverage_households[0].coverage_household_members.count).to eq(2)
+      end
+
       it 'creates a new consumer role' do
         expect(@person.consumer_role.present?).to be_truthy
       end
@@ -61,6 +65,13 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
 
       it 'creates a new address' do
         expect(@person.addresses.present?).to be_truthy
+      end
+
+      it 'creates demographics_group and alive_status' do
+        demographics_group = @person.demographics_group
+
+        expect(demographics_group).to be_a DemographicsGroup
+        expect(demographics_group.alive_status).to be_a AliveStatus
       end
     end
   end
@@ -83,6 +94,10 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
 
       it 'should not create family member' do
         expect(family.family_members.count).not_to eq 2
+      end
+
+      it 'should not create coverage household member as family member is not created' do
+        expect(family.active_household.coverage_households[0].coverage_household_members.count).not_to eq 2
       end
     end
   end

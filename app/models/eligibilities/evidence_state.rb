@@ -24,5 +24,15 @@ module Eligibilities
     field :due_on, type: Date
     field :visited_at, type: DateTime
     field :meta, type: Hash
+
+    # seliarizable_cv_hash for evidence states
+    # @return [Hash] hash of evidence states
+    def serializable_cv_hash
+      evidence_state_attributes = attributes.except("_id", "updated_at", "created_at", "visited_at", "evidence_gid")
+      evidence_state_attributes[:visited_at] = visited_at
+      evidence_state_attributes[:evidence_gid] = URI(evidence_gid)
+
+      evidence_state_attributes
+    end
   end
 end

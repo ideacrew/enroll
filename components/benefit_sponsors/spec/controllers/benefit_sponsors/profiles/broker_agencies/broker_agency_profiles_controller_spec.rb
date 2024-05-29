@@ -121,6 +121,27 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response).to redirect_to(profiles_broker_agencies_broker_agency_profile_path(:id => bap_id))
         end
       end
+
+      context 'with the incorrect MIME type' do
+        before do
+          initialize_and_login_admin[super_permission]
+        end
+
+        it "js should return http success" do
+          get :index, format: :js
+          expect(response).to have_http_status(:success)
+        end
+
+        it "json should return http success" do
+          get :index, format: :json
+          expect(response).to have_http_status(:not_acceptable)
+        end
+
+        it "xml should return http success" do
+          get :index, format: :xml
+          expect(response).to have_http_status(:not_acceptable)
+        end
+      end
     end
 
     describe "#show" do
@@ -154,6 +175,27 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
           it "should render the show template" do
             expect(response).to_not render_template("show")
+          end
+        end
+
+        context "with an invalid MIME type" do
+          before :each do
+            initialize_and_login_admin[super_permission]
+          end
+
+          it 'js returns a failure' do
+            get :show, params: { id: bap_id }, format: :js
+            expect(response).to have_http_status(:not_acceptable)
+          end
+
+          it 'json returns a failure' do
+            get :show, params: { id: bap_id }, format: :json
+            expect(response).to have_http_status(:not_acceptable)
+          end
+
+          it 'xml returns a failure' do
+            get :show, params: { id: bap_id }, format: :xml
+            expect(response).to have_http_status(:not_acceptable)
           end
         end
       end
@@ -354,6 +396,27 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
           it "should not be a success" do
             expect(response.status).to_not have_http_status(:success)
+          end
+        end
+
+        context 'with invalid MIME type' do
+          before do
+            initialize_and_login_admin[super_permission]
+          end
+
+          it 'html should return an error' do
+            post :family_datatable, params: { id: bap_id }
+            expect(response).to have_http_status(:not_acceptable)
+          end
+
+          it 'html should return an error' do
+            post :family_datatable, params: { id: bap_id }, format: :js
+            expect(response).to have_http_status(:not_acceptable)
+          end
+
+          it 'html should return an error' do
+            post :family_datatable, params: { id: bap_id }, format: :xml
+            expect(response).to have_http_status(:not_acceptable)
           end
         end
       end
@@ -1037,6 +1100,27 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
           it "should not render the inbox template" do
             expect(response).to_not render_template("inbox")
+          end
+        end
+
+        context "with an invalid MIME type" do
+          before :each do
+            initialize_and_login_admin[super_permission]
+          end
+
+          it 'html returns a failure' do
+            get :inbox, params: { id: person02.id }
+            expect(response).to have_http_status(:not_acceptable)
+          end
+
+          it 'json returns a failure' do
+            get :inbox, params: { id: person02.id }, format: :json
+            expect(response).to have_http_status(:not_acceptable)
+          end
+
+          it 'xml returns a failure' do
+            get :inbox, params: { id: person02.id }, format: :xml
+            expect(response).to have_http_status(:not_acceptable)
           end
         end
       end

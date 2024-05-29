@@ -1,4 +1,3 @@
-
 @mixin solid-button($button-color: var(--button-primary-color), $color: var(--grey-000), $hover: var(--button-primary-hover-color), $active: var(--button-primary-active-color)) {
   background-color: $button-color;
   font-weight: 600;
@@ -65,54 +64,27 @@
   }
 }
 
-button,
-.btn-primary,
-.btn,
-.button-primary,
-.button
-{
+.button, button, .button-primary, .btn, .btn-primary {
   @include solid-button;
 }
 
-button.secondary,
-.btn-secondary,
-.btn.secondary,
-.button.secondary
-{
+button.secondary, .button.secondary, .btn.secondary, .btn-secondary {
   @include solid-button(var(--button-secondary-color), var(--grey-000), var(--button-secondary-hover-color), var(--button-secondary-active-color));
 }
 
-button.tertiary,
-.btn-tertiary,
-.btn.tertiary,
-.button.tertiary
-{
+button.tertiary, .button.tertiary, .btn.tertiary, .btn-tertiary {
   @include solid-button(var(--button-tertiary-color), var(--grey-000), var(--button-tertiary-hover-color), var(--button-tertiary-active-color));
 }
 
-button.error,
-.btn-error,
-.btn.error,
-.button.error
-{
+button.error, .button.error, .btn.error, .btn-error {
   @include solid-button(var(--button-error-color), var(--grey-000), var(--button-error-hover-color), var(--button-error-active-color));
 }
 
-button.outline,
-.btn-primary.outline,
-.btn.outline,
-.button-primary.outline,
-.button.outline
-{
+.button.outline, button.outline, .button-primary.outline, .btn.outline, .btn-primary.outline {
   @include ghost-button;
 }
 
-button.outline-error,
-.btn-error.outline-error,
-.btn.outline-error,
-.button-primary.outline-error,
-.button.outline-error
-{
+.button-error.outline, .btn-error.outline {
   @include ghost-button(var(--button-error-color), var(--button-error-hover-color), var(--button-error-active-color));
 }
 
