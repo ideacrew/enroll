@@ -53,8 +53,8 @@ $(document).on('ready page:load turbolinks:load', function () {
   Responsive.setSizeListeners();
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-  Freebies.allFreebies();
+$(document).on('turbolinks:load', function () {
+   Freebies.allFreebies();
 });
 
 function applyJQDatePickerSetup(ele) {
