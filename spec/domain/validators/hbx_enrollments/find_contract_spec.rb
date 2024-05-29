@@ -1,7 +1,6 @@
-# spec/domain/validators/hbx_enrollments/find_contract_spec.rb
+# frozen_string_literal: true
 
 require 'rails_helper'
-require 'dry/validation/contract'
 
 RSpec.describe Validators::HbxEnrollments::FindContract, type: :model do
   describe '#call' do
@@ -13,7 +12,7 @@ RSpec.describe Validators::HbxEnrollments::FindContract, type: :model do
       end
 
       it 'fails validation when datatype is incorrect' do
-        result = subject.call(hbx_id: 87834876473)
+        result = subject.call(hbx_id: 87_834_876_473)
         expect(result.errors.to_h[:hbx_id]).to eq(['must be a string', 'size must be within 1 - 15'])
       end
 
@@ -36,7 +35,7 @@ RSpec.describe Validators::HbxEnrollments::FindContract, type: :model do
       end
 
       it 'fails validation when datatype is incorrect' do
-        result = subject.call(id: 8924768267843374)
+        result = subject.call(id: 8_924_768_267_843_374)
         expect(result.errors.to_h[:id]).to eq(['must be a string', 'size must be 24'])
       end
 
@@ -59,7 +58,7 @@ RSpec.describe Validators::HbxEnrollments::FindContract, type: :model do
       end
 
       it 'fails validation when datatype is incorrect' do
-        result = subject.call(external_id: 23876273838)
+        result = subject.call(external_id: 23_876_273_838)
         expect(result.errors.to_h[:external_id]).to eq(['must be a string'])
       end
 
