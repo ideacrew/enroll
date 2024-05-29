@@ -106,7 +106,7 @@ module FinancialAssistance
       @applicant = @application.active_applicants.find(params[:id])
       @applicant.assign_attributes(permit_params(params[:applicant])) if params[:applicant].present?
       if @applicant.save(context: :tax_info)
-        redirect_to edit_application_path(@application)
+        redirect_to application_applicant_incomes_path(@application, @applicant)
       else
         @applicant.save(validate: false)
         flash[:error] = build_error_messages_for_tax_info(@applicant)
@@ -115,6 +115,7 @@ module FinancialAssistance
     end
 
     def step
+      authorize @applicant, :step?
       raise ActionController::UnknownFormat unless request.format.html?
 
       redirect_to tax_info_application_applicant_path(@application, @applicant)

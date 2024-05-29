@@ -92,6 +92,34 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
+    describe '#tax_info' do
+      let(:params) { { application_id: application.id, id: applicant.id } }
+
+      context 'logged in user has developer role' do
+        it 'denies access and redirects to a different path' do
+          applicant
+          get :tax_info, params: params
+          expect(flash[:error]).to eq(
+            'Access not allowed for financial_assistance/applicant_policy.tax_info?, (Pundit policy)'
+          )
+        end
+      end
+    end
+
+    describe '#save_tax_info' do
+      let(:params) { { application_id: application.id, id: applicant.id } }
+
+      context 'logged in user has developer role' do
+        it 'denies access and redirects to a different path' do
+          applicant
+          get :save_tax_info, params: params
+          expect(flash[:error]).to eq(
+            'Access not allowed for financial_assistance/applicant_policy.save_tax_info?, (Pundit policy)'
+          )
+        end
+      end
+    end
+
     describe '#immigration_document_options' do
       context 'logged in user has developer role' do
         context 'with target_type and target_id in input params' do

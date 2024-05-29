@@ -3,13 +3,14 @@
 </div>
 
 <div class="col-md-8 col-sm-2 form-group-lg white-background right">
+  <% path = h(tax_info_application_applicant_path(applicant.application, applicant)) %>
  <% if applicant.workflow.present? %>
-    <%= link_to tax_info_application_applicant_path(applicant.application, applicant), class: "btn btn-default" do %>
+    <%= link_to path, class: "btn btn-default" do %>
       <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
       EDIT INCOME & COVERAGE INFO
     <% end %>
   <% else %>
-    <%= link_to tax_info_application_applicant_path(applicant.application, applicant), class: "btn btn-default add" do %>
+    <%= link_to path, class: "btn btn-default add" do %>
       <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
       ADD INCOME & COVERAGE INFO
     <% end %>

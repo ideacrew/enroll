@@ -47,7 +47,7 @@ FinancialAssistance::Engine.routes.draw do
       get 'other_questions', on: :member, action: 'other_questions', as: 'other_questions'
       get 'save_questions', on: :member, action: 'save_questions', as: 'save_questions'
       get 'tax_info', on: :member, action: 'tax_info', as: 'tax_info'
-      get 'save_tax_info', on: :member, action: 'save_tax_info', as: 'save_tax_info'
+      post :save_tax_info, on: :member
       get :immigration_document_options, on: :collection
       post :update, on: :member
       delete :destroy, on: :member
