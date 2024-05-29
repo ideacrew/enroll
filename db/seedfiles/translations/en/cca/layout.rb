@@ -2,6 +2,7 @@ LAYOUT_TRANSLATIONS = {
   "en.layout.header.customer_service" => "Call Customer Service",
   "en.layout.header.id" => "ID:",
   "en.layout.header.help" => "Help",
+  "en.layout.header.home" => "Home",
   "en.layout.header.logout" => "Logout",
   "en.layout.header.role.admin" => "Admin",
   "en.layout.header.role.broker" => "Broker",
