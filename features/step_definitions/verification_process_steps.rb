@@ -15,8 +15,8 @@ Then(/^I should see Documents link$/) do
 end
 
 When(/^.+ clicks on Documents link$/) do
-  visit verification_insured_families_path(tab: 'verification')
-  find(".interaction-click-control-documents", wait: 5).click
+  expect(page).to have_content "Documents"
+  click_link "Documents"
 end
 
 Given(/^I should see page for documents verification$/) do
