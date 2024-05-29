@@ -492,7 +492,8 @@
     "ignored_at": "2024-05-23T20:06:43Z"
   },
   "3d13ffead5a5f7be41998f5cb20b8cec_0": {
-    "author": "Sai Kumar Kotagiri", "comment": "This is flagged as 'Unsanitized user input in file path [CWE-73]' but the user input is validated in the line before this.",
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized user input in file path [CWE-73]' but the user input is validated in the line before this.",
     "false_positive": true,
     "ignored_at": "2024-05-23T21:31:45Z"
   },
@@ -711,6 +712,12 @@
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
     "false_positive": true,
     "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "540988895fddb81a9e0061cd7332dd2d_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but the params are validated as part of a contract.",
+    "false_positive": true,
+    "ignored_at": "2024-05-29T19:08:42Z"
   },
   "56bf1733fc31b3b3a17467150c5967e6_0": {
     "author": "Sai Kumar Kotagiri",

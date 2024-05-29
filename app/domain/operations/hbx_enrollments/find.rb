@@ -19,10 +19,12 @@ module Operations
       private
 
       def validate(query_hash)
-        if query_hash.is_a?(Hash)
-          Success(query_hash)
+        result = Validators::HbxEnrollments::FindContract.new.call(query_hash)
+
+        if result.success?
+          Success(result.to_h)
         else
-          Failure('expected input to be in Hash format')
+          Failure(result.errors.to_h)
         end
       end
 
