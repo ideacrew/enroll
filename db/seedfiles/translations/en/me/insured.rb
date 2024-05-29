@@ -660,6 +660,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.individual_agreement.electronic_signature.desc' => 'When I type my name below, it means I sign the form and promise that all of the information in it is true and complete to the best of my knowledge.',
   :'en.insured.ssn_configuration_warning' => "Please check your information and try again. If you’ve already done an application with Healthcare.gov, the Maine Office for Family Independence, or %{site_short_name}, you’ll need to enter your information the same way here. If you have questions, call the %{site_short_name} Consumer Assistance Center at %{site_phone_number} TTY: %{site_tty_number}.",
   :'en.insured.match_person.ssn_dob_name_error' => "Please check your information and try again. If you’ve already done an application with Healthcare.gov, the Maine Office for Family Independence, or %{site_short_name}, you’ll need to enter your information the same way here. If you have questions, call the %{contact_center_name} at %{contact_center_phone_number} TTY: %{contact_center_tty_number}.",
+  :'en.insured.match_person.dob_valid_error' => "Please verify your date of birth. If it's correct, please %{continue_substring}.",
   :'en.insured.out_of_state_error_message' => "Address is out of state or the supported area, please review your application details to update your address",
   :'en.enrollment.details.header' => 'Enrollment Detail',
   :'en.enrollment.members.header' => 'Enrollment Member Detail',
