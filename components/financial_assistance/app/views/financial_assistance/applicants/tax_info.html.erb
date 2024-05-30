@@ -9,7 +9,7 @@
               <i class="fa fa-pencil-square-o fa-2x"></i>
             </span>
           </div>
-          <h2 class="fa-darkblue"><%= l10n("faa.tax_info.header") %></h2>
+          <h2 class="fa-darkblue"><%= l10n("faa.tax_info.header", person: @applicant.first_name) %></h2>
         </div>
       </div>
       <p><%= l10n("faa.tax_info.subheader") %></p>
@@ -123,3 +123,4 @@
 
   </div>
 <% end %>
+<%= render partial: '/financial_assistance/shared/to_previous_modal' %>
