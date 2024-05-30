@@ -375,6 +375,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.change_tax_credits_or_cost_sharing_reductions' => "Change in income that may impact my tax credits/cost-sharing reductions",
   :'en.insured.qle_detail.eligible_to_enroll_limited_time' => "Based on the information you entered, you may be eligible to enroll now but there is limited time.",
   :'en.insured.qle_detail.error_text' => "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at %{contact_center_phone_number} to give us more information so we can see if you qualify.",
+  :'en.insured.qle_detail.error_text_outside_period' => "The date you submitted does not qualify for special enrollment.",
+  :'en.insured.qle_detail.error_text_outside_period2' => "Please double check the date or contact %{contact_center_name}: %{contact_center_phone_number}.",
   :'en.insured.families.qles_panel.life_event' => "Life event",
   :'en.insured.eligible_to_enroll' => "Eligible TO Enroll",
   :'en.insured.choose_the_date_you_want_your_plan_start' => "Choose the date you want your plan to start.",
