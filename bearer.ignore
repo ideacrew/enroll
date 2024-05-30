@@ -37,7 +37,7 @@
   },
   "0382d1023e671565e59bfb00804979ea_0": {
     "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'bearer ignore add 0382d1023e671565e59bfb00804979ea_0' but the params are already sanitized in the above steps of the operation.",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but the params are already sanitized in the above steps of the operation.",
     "false_positive": true,
     "ignored_at": "2024-05-23T21:19:15Z"
   },
@@ -1006,6 +1006,12 @@
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
     "false_positive": true,
     "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "70a004cf777a1f00f2c34ba46c1e901c_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The warning 'Unsanitized input in NoSQL query [CWE-943]' is incorrect for the selected line of code. This line is creating a new instance of the FileSaver object, which is used for client-side file saving. It does not involve any NoSQL database operations, hence there's no possibility of a NoSQL injection vulnerability here.",
+    "false_positive": true,
+    "ignored_at": "2024-05-30T21:32:28Z"
   },
   "71ce79a4a33890c58dadfe834a381003_0": {
     "author": "Sai Kumar Kotagiri",
