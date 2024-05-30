@@ -22,7 +22,9 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual sees form to enter personal information but doesn't check every box
     And Individual clicks on continue
     Then the user will have to accept alert pop up for missing field
-
+    Then Individual sees form to enter personal information
+    Then Individual clicks on continue
+    Then Individual agrees to the privacy agreeement
 
   Scenario: Consumer clicks the personal information page continue button
     Given the Continue button is visible on the Account Setup page
