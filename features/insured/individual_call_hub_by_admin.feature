@@ -24,4 +24,3 @@ Feature: Consumer verification process
     Then Admin navigates to view history section
     Then Admin should see the failed request recorded in the view history table
 
-
