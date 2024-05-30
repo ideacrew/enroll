@@ -148,9 +148,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11 form-heading"> TAX INFO</div>
                   <div class="col-md-1">
-                    <%= link_to tax_info_application_applicant_path(@application, applicant), id: 'edit-tax-info-pencil' do %>
-                      <i class="fa fa-pencil fa-lg"><span class="hide"><%=l10n("edit")%></span></i>
-                    <% end %>
+                    <%= h(link_to raw("<i class='fa fa-pencil fa-lg'><span class='hide'>#{l10n('edit')}</span></i>"), tax_info_application_applicant_path(@application, applicant), id: 'edit-tax-info-pencil') %>
                   </div>
                 </div>
 

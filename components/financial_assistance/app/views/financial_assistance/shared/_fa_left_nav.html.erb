@@ -15,13 +15,9 @@
         <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %> applicant-nav">
           <% if @applicant.tax_info_complete?%>
             <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
-            <%= link_to financial_assistance.tax_info_application_applicant_path(@application, @applicant), class: "" do %>
-              Tax Info
-            <% end %>
+            <%= h(link_to l10n("faa.tax_info"), financial_assistance.tax_info_application_applicant_path(@application, @applicant)) %>
           <% else %>
-            <%= link_to financial_assistance.tax_info_application_applicant_path(@application, @applicant), class: "no-check" do %>
-              Tax Info
-            <% end %>
+            <%= h(link_to l10n("faa.tax_info"), financial_assistance.tax_info_application_applicant_path(@application, @applicant), class: 'no-check') %>
           <% end %>
         </li>
 

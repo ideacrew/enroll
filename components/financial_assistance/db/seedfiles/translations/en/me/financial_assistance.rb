@@ -11,6 +11,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
      Please call CoverME.gov at (866) 636-0355 to make updates to your case.
      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on CoverME.gov, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
+  "en.faa.tax_info" => "Tax Info",
   "en.faa.tax_info.header" => "Tax Info for %{person}",
   "en.faa.tax_info.subheader" => "Tell us about this person's tax info. When you're finished select CONTINUE.",
   "en.faa.tax_info.question1" => "Will this person file taxes for %{year}?",
