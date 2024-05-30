@@ -196,8 +196,8 @@ input[type='date']:invalid::-webkit-datetime-edit {
   }
   button, .button, .btn {
     position: absolute;
-    right: $spacer / 2;
-    top: $spacer / 4;
+    right: calc($spacer / 2);
+    top: calc($spacer / 4);
     display: flex;
     justify-content: center;
     align-items: center;
