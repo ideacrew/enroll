@@ -23,4 +23,3 @@ Feature: Consumer verification process
     And Admin clicks on esi evidence action dropdown
     Then Admin navigates to view history section
     Then Admin should see the failed request recorded in the view history table
-
