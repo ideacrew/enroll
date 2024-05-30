@@ -1100,7 +1100,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "hbx" })}
 
     before do
-      allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should move Citizenship verification type to pending state" do
