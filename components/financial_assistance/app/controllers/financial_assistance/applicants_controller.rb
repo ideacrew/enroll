@@ -104,7 +104,8 @@ module FinancialAssistance
     def save_tax_info
       authorize @applicant, :save_tax_info?
       @applicant = @application.active_applicants.find(params[:id])
-      @applicant.assign_attributes(permit_params(params[:applicant])) if params[:applicant].present?
+      @applicant.update_attributes(permit_params(params[:applicant])) if params[:applicant].present?
+
       if @applicant.save(context: :tax_info)
         redirect_to application_applicant_incomes_path(@application, @applicant)
       else

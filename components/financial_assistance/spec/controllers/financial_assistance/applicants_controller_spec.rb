@@ -123,23 +123,36 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
   end
 
-  context "GET save_tax_info" do
-    it "should not render tax_info if request is not html" do
-      get :save_tax_info, params: { application_id: application.id, id: applicant.id }, format: :js
-      expect(response).not_to render_template 'financial_assistance_nav'
+  context "POST save_tax_info" do
+    let(:family_member_id2) { BSON::ObjectId.new }
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: TimeKeeper.date_of_record - 40.years,
+                        is_primary_applicant: false,
+                        is_required_to_file_taxes: nil,
+                        is_claimed_as_tax_dependent: nil,
+                        is_self_attested_blind: false,
+                        has_daily_living_help: false,
+                        need_help_paying_bills: false,
+                        family_member_id: family_member_id2)
     end
-    it "should save tax info and redirect to job income page", dbclean: :after_each do
-      get :save_tax_info, params: { application_id: application.id, id: applicant.id, applicant: applicant_params }
-      expect(response.headers['Location']).to have_content 'incomes'
-      expect(response.status).to eq 302
-      expect(response).to redirect_to(application_applicant_incomes_path(application, applicant))
+    it "should not render tax_info if request is not html" do
+      post :save_tax_info, params: { application_id: application.id, id: applicant.id }, format: :js
+      expect(response).not_to render_template 'financial_assistance_nav'
     end
 
     it "should not redirect to job income page when not passing correct params" do
-      get :save_tax_info, params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_invalid }
+      post :save_tax_info, params: { application_id: application.id, id: applicant2.id, applicant: {claimed_as_tax_dependent_by: nil, is_claimed_as_tax_dependent: true} }
       expect(response.status).to eq 302
       expect(response.headers['Location']).not_to have_content 'incomes'
       expect(response.headers['Location']).to have_content 'tax_info'
+    end
+
+    it "should save tax info and redirect to job income page with valid params", dbclean: :after_each do
+      post :save_tax_info, params: { application_id: application.id, id: applicant2.id, applicant: applicant_params }
+      expect(response.status).to eq 302
+      expect(response).to redirect_to(application_applicant_incomes_path(application, applicant2))
     end
   end
 
