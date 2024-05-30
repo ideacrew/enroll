@@ -1811,6 +1811,12 @@
     "false_positive": true,
     "ignored_at": "2024-05-30T13:06:01Z"
   },
+  "e3a7e8a460c17513a7652ddf24bbd785_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the variable 'estimate' is not user input. It is a value from the reponse of the endpoint 'calculate_employer_contributions'.",
+    "false_positive": true,
+    "ignored_at": "2024-05-30T13:12:25Z"
+  },
   "e3c686a378dbe8ed6cd48111821680fd_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
