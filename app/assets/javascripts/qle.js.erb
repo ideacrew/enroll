@@ -49,7 +49,9 @@ $(function () {
 
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
-    $('.sep-form #btn-continue').attr('disabled', 'disabled');
+    $('.sep-form #btn-continue').prop('id', "qle_submit");
+    $('.sep-form #qle_submit').attr('disabled', 'disabled')
+    $('.sep-form #qle_submit').attr('type', 'button'); 
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
@@ -110,11 +112,11 @@ $(function () {
         clearTimeout(typingTimer);
         typingTimer = setTimeout(function() {
           if ($(".sep-form #qle_date").val()) {
-            $('.sep-form #btn-continue').removeAttr('disabled');
+            $('.sep-form #qle_submit').removeAttr('disabled');
+            $('.sep-form #qle_submit').removeClass('disabled');
           } else {
-            $('.sep-form #btn-continue').attr('disabled', 'disabled');
+            $('.sep-form #qle_submit').attr('disabled', 'disabled');
           }
-          submit_qle_date();
         }, doneTypingInterval);
     });
   }
@@ -214,7 +216,9 @@ $(function () {
 	/* QLE Date Validator */
   $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
-    submit_qle_date();
+    if ($('#qle_submit').attr('type') != 'submit') { // type submit should be used to submit the entire form, otherwise it validates the date
+      submit_qle_date();
+    }
   });
 
   $(document).on('click', '#qle_submit_reason', function() {

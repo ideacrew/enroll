@@ -22,7 +22,7 @@
     <%= form_tag record_sep_insured_families_path, :method => :post, class: 'sep-form qle-detail-for-existing-kind', id: 'qle_form' do %>
       <%= render partial: 'qle_detail' %>
       <div class="mt-4 <%= pundit_class Family,:updateable? %>">
-        <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "submit", disable_link: true} %>
+        <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", disable_link: true} %>
       </div>
     <% end %>
   </div>
