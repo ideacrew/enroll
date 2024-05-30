@@ -3,10 +3,10 @@ $('#qle-details #qle-date-chose').addClass('hidden');
 function toggleSuccess(toggle) {
   if (toggle) {
     $('#qle-details .success-info').removeClass('hidden');
-    $('#sep-navigation-buttons #btn-continue').removeAttr('disabled');
+    $('.sep-form #btn-continue').removeAttr('disabled');
   } else {
     $('#qle-details .success-info').addClass('hidden');
-    $('#sep-navigation-buttons #btn-continue').attr('disabled', 'disabled');
+    $('.sep-form #btn-continue').attr('disabled', 'disabled');
   }
 }
 

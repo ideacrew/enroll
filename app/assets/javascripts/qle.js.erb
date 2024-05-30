@@ -49,7 +49,7 @@ $(function () {
 
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
-    $('#sep-navigation-buttons #btn-continue').attr('disabled', 'disabled');
+    $('.sep-form #btn-continue').attr('disabled', 'disabled');
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
@@ -63,6 +63,18 @@ $(function () {
       data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), bs4: $("#bs4").val()},
       url: "/insured/families/check_qle_date.js"
     });
+  }
+
+  function submit_qle_date() {
+    if(check_qle_date()) {
+      $('#qle_date').removeClass('input-error');
+
+      if(QLE.check_qle_reason()){
+        get_qle_date();
+      }
+    } else {
+      $('#qle_date').addClass('input-error');
+    }
   }
 
   function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, cdate) {
@@ -91,6 +103,17 @@ $(function () {
       dateFormat: 'mm/dd/yy',
       defaultDate: cdate
 		});
+
+    var temp='';
+    $(".sep-form #qle_date").on("focusin", function() {
+      temp = $("#qle_date").val();
+    });
+
+    $(".sep-form #qle_date").on("focusout", function() {
+      if (temp != $("#qle_date").val()) {
+        submit_qle_date();
+      }
+    });
   }
 
   $(document).on('click', 'a.qle-menu-item', function() {
@@ -176,7 +199,7 @@ $(function () {
     var code = e.keyCode || e.which;
     if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
       e.preventDefault();
-      $("#qle_submit").click();
+      submit_qle_date();
       return false;
     } else if (code == 13 && $("div.n-radio-row").is(":focus")) {
       e.preventDefault();
@@ -188,15 +211,7 @@ $(function () {
 	/* QLE Date Validator */
   $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
-    if(check_qle_date()) {
-      $('#qle_date').removeClass('input-error');
-
-      if(QLE.check_qle_reason()){
-        get_qle_date();
-      }
-    } else {
-      $('#qle_date').addClass('input-error');
-    }
+    submit_qle_date();
   });
 
   $(document).on('click', '#qle_submit_reason', function() {
