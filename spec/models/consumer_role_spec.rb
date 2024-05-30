@@ -1099,6 +1099,10 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
     let(:verification_types) { consumer.verification_types }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "hbx" })}
 
+    before do
+      allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+    end
+
     it "should move Citizenship verification type to pending state" do
       consumer.lawful_presence_determination.authorize!(verification_attr)
       consumer.revert_lawful_presence(verification_attr)
@@ -1106,6 +1110,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       expect(consumer.verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status).to eq "unverified"
       expect(consumer.verification_types.by_name("Social Security Number").first.validation_status).to eq "unverified"
       expect(consumer.verification_types.by_name("Citizenship").first.validation_status).to eq "pending"
+      expect(consumer.verification_types.by_name("Alive Status").first.validation_status).to eq "unverified"
     end
   end
 
