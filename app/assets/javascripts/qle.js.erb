@@ -104,15 +104,18 @@ $(function () {
       defaultDate: cdate
 		});
 
-    var temp='';
-    $(".sep-form #qle_date").on("focusin", function() {
-      temp = $("#qle_date").val();
-    });
-
-    $(".sep-form #qle_date").on("focusout", function() {
-      if (temp != $("#qle_date").val()) {
-        submit_qle_date();
-      }
+    var typingTimer;
+    const doneTypingInterval = 1500;
+    $(".sep-form #qle_date").on("change", function(){
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(function() {
+          if ($(".sep-form #qle_date").val()) {
+            $('.sep-form #btn-continue').removeAttr('disabled');
+          } else {
+            $('.sep-form #btn-continue').attr('disabled', 'disabled');
+          }
+          submit_qle_date();
+        }, doneTypingInterval);
     });
   }
 
