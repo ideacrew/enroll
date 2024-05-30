@@ -15,5 +15,15 @@ FactoryBot.define do
       started_at { DateTime.now }
       job_id { nil }
     end
+
+    trait :dmf_determination do
+      key { :dmf_determination }
+      title { "DMF Determination" }
+      description { "Request for DMF Determination to fdsh gateway" }
+      correlation_id { family_hbx_id }
+      publish_on { DateTime.now }
+      started_at { DateTime.now }
+      job_id { "dmf_determination_#{Time.now.to_i}" }
+    end
   end
 end

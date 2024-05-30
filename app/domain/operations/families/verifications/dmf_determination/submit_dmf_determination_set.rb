@@ -55,9 +55,9 @@ module Operations
             return unless family&.hbx_assigned_id
 
             {
-              key: :started_dmf_determination,
-              title: 'Started DMF Determination',
-              description: 'Initialized DMF Determination for individual Family',
+              key: :dmf_determination,
+              title: 'DMF Determination',
+              description: 'Request for DMF Determination to fdsh gateway',
               correlation_id: family.hbx_assigned_id,
               started_at: DateTime.now,
               publish_on: DateTime.now
