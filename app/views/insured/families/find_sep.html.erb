@@ -21,7 +21,7 @@
     </div>
     <%= form_tag record_sep_insured_families_path, :method => :post, class: 'qle-detail-for-existing-kind', id: 'qle_form' do %>
       <%= render partial: 'qle_detail' %>
-      <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+      <div id="sep-navigation-buttons" class="mt-4<%= pundit_class Family,:updateable? %>">
         <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "submit", disable_link: true} %>
       </div>
     <% end %>

@@ -253,6 +253,7 @@ class Insured::FamiliesController < FamiliesController
     start_date = today - 30.days
     end_date = today + 30.days
     @qle_event_date = get_date(:date_val)
+    enable_bs4_layout if params[:bs4] == "true"
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])

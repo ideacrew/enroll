@@ -3,14 +3,10 @@ $('#qle-details #qle-date-chose').addClass('hidden');
 function toggleSuccess(toggle) {
   if (toggle) {
     $('#qle-details .success-info').removeClass('hidden');
-    <% if @bs4 %>
-      $('#btn-continue').removeAttr('disabled');
-    <% end %>
+    $('#sep-navigation-buttons #btn-continue').removeAttr('disabled');
   } else {
     $('#qle-details .success-info').addClass('hidden');
-    <% if @bs4 %>
-      $('#btn-continue').attr('disabled', 'disabled');
-    <% end %>
+    $('#sep-navigation-buttons #btn-continue').attr('disabled', 'disabled');
   }
 }
 
@@ -31,7 +27,7 @@ function toggleSuccess(toggle) {
     $(".spec_reasons").html("<%= escape_javascript(render 'special_reasons') %>");
   <% end %>
 <% else %>
-  var errorNotice = "<%= l10n('insured.qle_detail.error_text_outside_period') %><br><%= l10n('insured.qle_detail.error_text_outside_period2', contact_center_name: raw(contact_center_name), contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
+  var errorNotice = "<%= l10n('insured.qle_detail.error_text_outside_period') %><%= @bs4 ? ' ' : raw('<br>') %><%= l10n('insured.qle_detail.error_text_outside_period2', contact_center_name: raw(contact_center_name), contact_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
   $("#qle-details .error-text").html(errorNotice);
   $('#qle-details .error-info').removeClass('hidden');
   toggleSuccess(false);
