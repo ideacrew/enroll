@@ -3,6 +3,7 @@
   $("#qle_reason").show();
   $("#qle_reason").html("<%= escape_javascript(render 'insurance_fields') %>");
   $('#qle_reason .special_qle_reasons').removeClass('hidden');
+  $('.sep-form #qle_submit').prop('id', "qle_submit_reason"); //TODO: add bs4 flag 
 <% else %>
   $.ajax({
       type: "GET",

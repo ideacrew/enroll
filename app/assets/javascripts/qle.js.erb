@@ -41,7 +41,7 @@ var QLE = ( function( window, undefined ) {
 } )( window );
 
 $(function () {
-	function check_qle_date() {
+	function validate_qle_date_input() {
 		var date_value = $('#qle_date').val();
 		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
 		return true;
@@ -59,7 +59,7 @@ $(function () {
     $("#qle-details .error-text").html(errorNotice);
   }
 
-  function get_qle_date() {
+  function check_qle_date() {
     $.ajax({
       type: "GET",
       data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), bs4: $("#bs4").val()},
@@ -68,11 +68,11 @@ $(function () {
   }
 
   function submit_qle_date() {
-    if(check_qle_date()) {
+    if(validate_qle_date_input()) {
       $('#qle_date').removeClass('input-error');
 
       if(QLE.check_qle_reason()){
-        get_qle_date();
+        check_qle_date();
       }
     } else {
       $('#qle_date').addClass('input-error');
@@ -225,9 +225,12 @@ $(function () {
     var health_message = ($("#health-ending-expanded").length == 1 );
     var not_expected_response = ( health_message ) ? 'no' : 'yes';
 
+    $('.sep-form #qle_submit_reason').prop('id', "qle_submit");
+
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
-      get_qle_date();
+      check_qle_date();
     } else {
+      $('.sep-form #qle_submit').attr('disabled', 'disabled');
       $('#qle_reason').hide();
       var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
       $("#qle-details .error-text").html(errorNoticeAction);
