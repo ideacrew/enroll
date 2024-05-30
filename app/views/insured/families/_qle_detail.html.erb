@@ -5,40 +5,40 @@
     <div class="hidden qle-label"></div> <%#= TODO:  %>
     <div>
       <div class="alert alert-severe hidden" id='qle_effective_on_kind_alert-4' role="alert"><%= l10n("please_select_effective_date") %></div>
-        <div class="col px-0">
-          <div id='qle-date-chose'>
-            <div class="mb-2">
-              <%#= TODO: error for when submit without date entered - legacy highlights the field in red border %>
-              <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", required: true %>
+      <div class="col px-0">
+        <div id='qle-date-chose'>
+          <div class="mb-2">
+            <%#= TODO: error for when submit without date entered - legacy highlights the field in red border %>
+            <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", required: true %>
+          </div>
+        </div>
+        <div id="qle_reason"></div>
+        <div id="qle_message">
+          <div class="success-info hidden">
+            <%= hidden_field_tag 'change_plan' %>
+            <%= hidden_field_tag 'qle_id' %>
+            <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
+            <%= hidden_field_tag 'resident_role_id', @person.try(:resident_role).try(:id) %>
+            <%= hidden_field_tag 'bs4', true %>
+            <div class="alert alert-success d-flex align-items-center justify-content-start" role="alert">
+              <div class="success-icon icon align-self-start">&nbsp;</div>
+              <div class="col px-0 py-1">
+                <p class="mb-1"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></p>
+                <a id="shop-link" href="#"><%= l10n("insured.shop_for_plans") %></a>
+              </div>
+            </div>
+            <div class="effective_on_kinds"> <%# TODO: update the partial for this JS %>
+            </div>
+            <div class="spec_reasons">
             </div>
           </div>
-          <div id="qle_reason"></div>
-          <div id="qle_message">
-            <div class="success-info hidden">
-              <%= hidden_field_tag 'change_plan' %>
-              <%= hidden_field_tag 'qle_id' %>
-              <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
-              <%= hidden_field_tag 'resident_role_id', @person.try(:resident_role).try(:id) %>
-              <%= hidden_field_tag 'bs4', true %>
-              <div class="alert alert-success d-flex align-items-center justify-content-start" role="alert">
-                <div class="success-icon icon align-self-start">&nbsp;</div>
-                <div class="col px-0 py-1">
-                  <p class="mb-1"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></p>
-                  <a id="shop-link" href="#"><%= l10n("insured.shop_for_plans") %></a>
-                </div>
-              </div>
-              <div class="effective_on_kinds"> <%# TODO: update the partial for this JS %>
-              </div>
-              <div class="spec_reasons">
-              </div>
-            </div>
-            <div class="error-info hidden">
-              <div class="error-text">
-                <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
-              </div>
+          <div class="error-info hidden">
+            <div class="error-text">
+              <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>
