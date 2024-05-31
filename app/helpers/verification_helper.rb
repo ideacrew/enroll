@@ -175,7 +175,7 @@ module VerificationHelper
   def get_person_v_type_status(people)
     v_type_status_list = []
     people.each do |person|
-      person.verification_types.reject { |type| ["Alive Status"].include?(type.type_name) }.each do |v_type|
+      person.verification_types.without_alive_status_type.each do |v_type|
         v_type_status_list << verification_type_status(v_type, person)
       end
     end
