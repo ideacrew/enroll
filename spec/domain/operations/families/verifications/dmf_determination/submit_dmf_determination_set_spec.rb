@@ -26,8 +26,8 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::SubmitDmfD
     end
 
     it "should create jobs" do
-      jobs = ::Transmittable::Job.where(key: :started_dmf_determination)
-      expect(jobs.size).to eq(2)
+      jobs = ::Transmittable::Job.where(key: :dmf_determination)
+      expect(jobs.size).to eq(1)
 
       job = jobs.first
       expect(job.process_status.latest_state).to eq :initial
