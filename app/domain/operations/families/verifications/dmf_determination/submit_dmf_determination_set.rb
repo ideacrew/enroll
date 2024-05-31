@@ -60,8 +60,6 @@ module Operations
             rescue StandardError => e
               dmf_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}")
             end
-
-            update_status("successfully published eligible families for dmf verification", :started, { job: @job })
           end
 
           def build_event(payload)
