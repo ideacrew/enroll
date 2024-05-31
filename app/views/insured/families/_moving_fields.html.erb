@@ -90,7 +90,7 @@
 </div>
 
 <script type="text/javascript">
-  <% if true %>
+  <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
     $('#qle_submit_reason').on('click keydown', function(event) {
       if (event.type === 'click' || (event.type === 'keydown' && event.keyCode === 13)) {
         if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
