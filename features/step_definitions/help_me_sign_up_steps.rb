@@ -32,6 +32,14 @@ And(/^Individual selects a broker?/) do
   find(".broker_select_button", wait: 5).click
 end
 
+And(/^Individual confirms a broker/) do
+  find(IvlHomepage.select_this_broker).click
+end
+
+And(/^Individual sees your expert widget/) do
+  expect(page).to have_content(l10n("insured.your_broker_or_assister"))
+end
+
 And(/^Individual clicks on Select this Broker button$/) do
   find(".help_button").click
 end

@@ -122,6 +122,8 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     ].each do |feature_key|
       EnrollRegistry[feature_key].feature.stub(:is_enabled).and_return(true)
     end
+    allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
   end
 
   it 'should be a container-ready operation' do
@@ -207,6 +209,36 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
       expect(result.success?).to be_truthy
       result.value!.subjects.each do |subject|
         expect(subject.last.dig(:eligibility_states, :aca_individual_market_eligibility, :evidence_states, :residency)).to be_present
+      end
+    end
+  end
+
+  context "enable alive_status verification" do
+    before do
+      person1.verification_types.new(type_name: 'Alive Status', inactive: false, validation_status: 'unverified')
+      person1.save
+      person2.verification_types.new(type_name: 'Alive Status', inactive: false, validation_status: 'unverified')
+      person2.save
+    end
+
+    let(:eligibility_items_requested) do
+      { aca_individual_market_eligibility: { evidence_items: [:alive_status] } }
+    end
+
+    let(:required_params) do
+      {
+        subjects: subjects,
+        effective_date: effective_date,
+        family: family,
+        eligibility_items_requested: eligibility_items_requested
+      }
+    end
+
+    it 'should build evidences for alive_status' do
+      result = subject.call(required_params)
+      expect(result.success?).to be_truthy
+      result.value!.subjects.each do |subject|
+        expect(subject.last.dig(:eligibility_states, :aca_individual_market_eligibility, :evidence_states, :alive_status)).to be_present
       end
     end
   end

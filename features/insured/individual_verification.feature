@@ -115,3 +115,11 @@ Scenario: Outstanding verification
     When an HBX admin exists
     And clicks on the person in families tab
     Then the admin should see the Alive Status verification type
+
+  Scenario: Selectric is enabled
+    Given a consumer exists
+    And the user is RIDP verified
+    And the user with hbx_staff role is logged in
+    When admin visits home page
+    And Individual clicks on Documents link
+    Then the selectric class is visible

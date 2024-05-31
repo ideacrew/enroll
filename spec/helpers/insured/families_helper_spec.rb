@@ -453,9 +453,19 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     let(:person) { FactoryBot.create(:person)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
 
-    it "should build consumer role for a person" do
+    before do
       helper.build_consumer_role(person,family)
-      expect(person.consumer_role.present?). to eq true
+    end
+
+    it "should build consumer role for a person" do
+      expect(person.consumer_role.present?).to eq true
+    end
+
+    it 'should build demographics_group and alive_status for a person' do
+      demographics_group = person.demographics_group
+
+      expect(demographics_group).to be_a DemographicsGroup
+      expect(demographics_group.alive_status).to be_a AliveStatus
     end
   end
 
