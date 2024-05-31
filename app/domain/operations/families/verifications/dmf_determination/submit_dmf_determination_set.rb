@@ -18,10 +18,9 @@ module Operations
           def call
             families = yield query_families_with_active_members
             job = yield create_job(dmf_job_params)
-            yield submit_for_dmf_determination(families, job)
+            result = yield submit_for_dmf_determination(families, job)
 
-            # still pending info on updating job process_status after completion
-            Success("Successfully Submitted DMF Set")
+            Success(result)
           end
 
           private
@@ -47,9 +46,7 @@ module Operations
             count = 0
 
             families.each do |family|
-              values = build_family_transmittable_values(family)
-
-              if values.present?
+              if family.hbx_assigned_id.present?
                 publish({ family_hbx_id: family.hbx_assigned_id, job_id: job.job_id })
 
                 count += 1
@@ -60,6 +57,8 @@ module Operations
             rescue StandardError => e
               dmf_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}")
             end
+
+            Success('Published all dmf-eligible family hbx_ids')
           end
 
           def build_event(payload)
