@@ -27,14 +27,14 @@
     </div>
   </div>
     <div class="hidden zip_compare">
-      <label class="weight-n mb-2">Enter your old zipcode and your new zipcode.</label>
+      <label class="weight-n mb-2"><%= l10n("insured.qle_detail.special_reason.move.enter_zip") %></label>
       <div style="flex-column col-6">
         <div>
-          <label>Old Zip Code</label>
+          <label><%= l10n("insured.qle_detail.special_reason.move.old_zip") %></label>
           <input class="old_zip_code required zip"/>
         </div>
         <div>
-          <label>New Zip Code</label>
+          <label><%= l10n("insured.qle_detail.special_reason.move.new_zip") %></label>
           <input class="new_zip_code required zip"/>
         </div>
       </div>
@@ -44,7 +44,6 @@
       $.inputMasks();
     });
   </script>
-  <%# TODO: zip compare section, check n-radio if can be refactored as radio in qle-detail in qle.js check %>
 <% else %>
   <div class="special_qle_reasons hidden">
     <h4><%= l10n("insured.indicate_following_circumstances_apply_to_you") %>: </h4> <br/>
