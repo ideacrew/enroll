@@ -3,13 +3,13 @@
     <label class="weight-n mb-2"><%= l10n("insured.indicate_following_circumstances_apply_to_you") %>: </label>
     <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
       <label class="weight-n" for="reason_accept">
-        <%= radio_button_tag :reason, true, id: 'reason_accept', class: "zip-check" %>
+        <%= radio_button_tag :reason, "", true, id: 'reason_accept', class: "zip-check" %>
         <span id="date-change"></span>
       </label>
     </div>
     <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
       <label class="weight-n" for="reason_accept1">
-        <%= radio_button_tag :reason, false, id: 'reason_accept1' %>
+        <%= radio_button_tag :reason, "I was living outside the US or in a US territory", false, id: 'reason_accept1' %>
         <%= l10n("insured.living_outside_the_US_or_in_US_territory") %>
       </label>
     </div>
