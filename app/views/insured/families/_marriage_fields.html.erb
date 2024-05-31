@@ -11,8 +11,9 @@
         </div>
         <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
           <label class="weight-n" for="reason_accept">
-          <%= radio_button_tag :reason, "yes", true, id: 'reason_accept', class: "n-radio" %>
-          <%= l10n("no") %>
+            <%= radio_button_tag :reason, "yes", true, id: 'reason_accept', class: "n-radio" %>
+            <%= l10n("no") %>
+          </label>
         </div>
       </div>
     </div>
