@@ -30,7 +30,7 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::SubmitDmfD
       expect(jobs.size).to eq(1)
 
       job = jobs.first
-      expect(job.process_status.latest_state).to eq :initial
+      expect(job.process_status.latest_state).to eq :started
     end
   end
 end

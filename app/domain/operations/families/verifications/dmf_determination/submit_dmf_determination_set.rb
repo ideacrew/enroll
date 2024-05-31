@@ -18,7 +18,7 @@ module Operations
           def call
             families = yield query_families_with_active_members
             job = yield create_job(dmf_job_params)
-            submit_for_dmf_determination(families, job)
+            yield submit_for_dmf_determination(families, job)
 
             # still pending info on updating job process_status after completion
             Success("Successfully Submitted DMF Set")
@@ -60,6 +60,8 @@ module Operations
             rescue StandardError => e
               dmf_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}")
             end
+
+            update_status("successfully published eligible families for dmf verification", :started, { job: @job })
           end
 
           def build_event(payload)
