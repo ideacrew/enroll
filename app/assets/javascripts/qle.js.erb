@@ -189,6 +189,11 @@ $(function () {
 		$('#qle_flow_info #qle-menu').show();
 	});
 
+  $('.sep-modal .modal').on('hide.bs.modal', function() {
+    init_qle_message();
+		$('#qle-details').addClass('hidden');
+  });
+
   $(document).on('click', '#qle-details-for-existing-sep .close-popup, #qle-details-for-existing-sep .cancel', function() {
     //init_qle_message();
     //$('.seps-panel').removeClass('hidden');
