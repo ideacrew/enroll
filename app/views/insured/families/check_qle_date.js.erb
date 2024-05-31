@@ -30,6 +30,6 @@ $('#qle-details .initial-info').addClass('hidden');
 <% end %>
 
 <% if @future_qualified_date %>
-  const errorNoticeAction = "The date you submitted does not qualify for a special enrollment period. Qualifying life events may be reported up to 30 days after the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. For further assistance, please contact <%= raw(contact_center_name) %>: <%= EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item %>.";
+  const errorNoticeAction = "<%= l10n('insured.qle_detail.error_text_future_date', contact_center_name: raw(contact_center_name), contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
   toggleSuccess(errorNoticeAction);
 <% end %>
