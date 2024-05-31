@@ -26,6 +26,24 @@
       </label>
     </div>
   </div>
+    <div class="hidden zip_compare">
+      <label class="weight-n mb-2">Enter your old zipcode and your new zipcode.</label>
+      <div style="flex-column col-6">
+        <div>
+          <label>Old Zip Code</label>
+          <input class="old_zip_code required zip"/>
+        </div>
+        <div>
+          <label>New Zip Code</label>
+          <input class="new_zip_code required zip"/>
+        </div>
+      </div>
+  </div>
+  <script>
+    $(document).ready(function() {
+      $.inputMasks();
+    });
+  </script>
   <%# TODO: zip compare section, check n-radio if can be refactored as radio in qle-detail in qle.js check %>
 <% else %>
   <div class="special_qle_reasons hidden">
@@ -68,26 +86,25 @@
       </div>
     </div>
   </div>
+  <div class="zip_compare hidden form-group" style="padding: 2%">
+    <p><strong>Enter your old zipcode and your new zipcode.</strong></p>
+    <div style="display: flex; flex-direction: column; width: 50%">
+      <div>
+        <label>Old Zip Code</label>
+        <input class="form-control old_zip_code number required zip" />
+      </div>
+      
+      <div>
+        <label>New Zip Code</label>
+        <input class="form-control new_zip_code number required zip" />
+      </div>
+    </div>
+
+    <div>
+      <%= link_to l10n('continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_zip_compare' %>
+    </div>
+  </div>
 <% end %>
-
-<div class="zip_compare hidden form-group" style="padding: 2%">
-  <p><strong>Enter your old zipcode and your new zipcode.</strong></p>
-  <div style="display: flex; flex-direction: column; width: 50%">
-    <div>
-      <label>Old Zip Code</label>
-      <input class="form-control old_zip_code number required zip" />
-    </div>
-
-    <div>
-      <label>New Zip Code</label>
-      <input class="form-control new_zip_code number required zip" />
-    </div>
-  </div>
-
-  <div>
-    <%= link_to l10n('continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_zip_compare' %>
-  </div>
-</div>
 
 <script type="text/javascript">
   <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
