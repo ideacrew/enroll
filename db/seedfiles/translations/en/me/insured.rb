@@ -383,6 +383,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.qle_detail.error_text_not_eligible' => "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact %{site_short_name} customer service at %{contact_center_phone_number}.",
   :'en.insured.qle_detail.error_text_outside_period' => "The date you submitted does not qualify for special enrollment.",
   :'en.insured.qle_detail.error_text_outside_period2' => "Please double check the date or contact %{contact_center_name}: %{contact_center_phone_number}.",
+  :'en.insured.qle_detail.error_text_middle_of_month' => "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on %{immediate_month_date} instead of %{following_month_date}. Please call us at %{contact_center_phone_number} by %{call_date} to use this option",
   :'en.insured.families.qles_panel.life_event' => "Life event",
   :'en.insured.eligible_to_enroll' => "Eligible TO Enroll",
   :'en.insured.choose_the_date_you_want_your_plan_start' => "Choose the date you want your plan to start.",

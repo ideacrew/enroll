@@ -18,7 +18,7 @@ $('#qle-details .initial-info').addClass('hidden');
   toggleSuccess();
   $('#qle_reason').hide();
   <% if @effective_on_options.present? && @effective_on_options.is_a?(Array) %>
-    const mecNotice = "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on <%= @qle_date.beginning_of_month %> instead of <%= (@qle_date + 1.month).beginning_of_month %>. Please call us at <%= contact_center_phone_number %> by <%= (@qle_date.beginning_of_month - 1.day) %> to use this option";
+    const mecNotice = "<%= l10n('insured.qle_detail.error_text_middle_of_month', immediate_month_date: @qle_date.beginning_of_month, following_month_date: (@qle_date + 1.month).beginning_of_month, contact_center_phone_number: contact_center_phone_number, call_date: @qle_date.beginning_of_month - 1.day) %>";
     toggleSuccess(mecNotice);
   <% elsif @qle.present? %>
     $(".effective_on_kinds").html("<%= escape_javascript(render 'effective_on_kind_fields') %>");

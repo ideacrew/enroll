@@ -343,6 +343,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.qle_detail.error_text_not_eligible' => "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact %{site_short_name} customer service at %{contact_center_phone_number}.",
   :'en.insured.qle_detail.error_text_outside_period' => "The date you submitted does not qualify for special enrollment.",
   :'en.insured.qle_detail.error_text_outside_period2' => "Please double check the date or contact %{contact_center_name}: %{contact_center_phone_number}.",
+  :'en.insured.qle_detail.error_text_middle_of_month' => "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on %{immediate_month_date} instead of %{following_month_date}. Please call us at %{contact_center_phone_number} by %{call_date} to use this option",
   :'en.insured.match_person.dob_valid_error' => "Please verify your date of birth. If it's correct, please %{continue_substring}.",
   :'en.insured.families.qles_panel.life_event' => "Life event",
   :'en.insured.eligible_to_enroll' => "Eligible TO Enroll",
