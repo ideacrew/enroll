@@ -129,7 +129,7 @@ class IvlPersonalInformation
     if EnrollRegistry[:bs4_consumer_flow].enabled?
     
     else 
-      'a[id*="continue"]'
+      'a[class="btn btn-lg btn-primary btn-block interaction-click-control-continue"]'
     end
   end
 

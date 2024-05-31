@@ -765,7 +765,7 @@ end
 
 And(/^.+ clicks? on the Continue button of the Account Setup page$/i) do
   wait_for_ajax
-  find(IvlPersonalInformation.continue_btn, wait: 5).click
+  find(IvlPersonalInformation.continue_btn_2, wait: 5).click
 end
 
 Then(/^.+ sees the Verify Identity Consent page/)  do
