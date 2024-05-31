@@ -18,7 +18,7 @@
           <h4 class="switch-header">
             <% if @market_kind == "shop" && EnrollRegistry.feature_enabled?(:display_cost_warning_message) %>
               <% if @hbx_enrollment.sponsored_benefit.single_plan_type? %>
-                <strong><%= l10n("Please note your final cost may change based on the final enrollment of all employees.") %></strong>
+                <strong><%= l10n("insured.plan_shoppings.final_cost_change") %></strong>
               <% end %>
               <% if display_plan_cost_warning(@benefit_group) %>
                 <b><%= l10n("insured.plan_shoppings.final_cost_change") %></b>
@@ -30,13 +30,13 @@
           </div>
           <p class="pull-right">
             <% if @market_kind == "individual" || @market_kind == 'coverall' %>
-              <a class="btn btn-default ivl-compare-selected-plans-link" href="javascript:void(0);" style="display: none;" data-cuke="ivl-compare-selected-plans-link"
+              <a class="btn btn-default ivl-compare-selected-plans-link d-none" href="javascript:void(0);" data-cuke="ivl-compare-selected-plans-link"
               data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                 <%= l10n("compare_plans").to_s.upcase %>
               </a>
             <% end %>
             <% if @market_kind == "shop" || @market_kind == 'fehb' %>
-              <a class="btn btn-default compare-selected-plans-link" href="javascript:void(0);" style="display: none;"
+              <a class="btn btn-default compare-selected-plans-link d-none" href="javascript:void(0);"
               data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                 <%= l10n("compare_plans").to_s.upcase %>
               </a>
@@ -45,7 +45,7 @@
           <div id="plan-summary"></div>
           <div id="all-plans" class="all-filters-row">
             <%= render partial: './ui-components/v1/filters/plan_filters' %>
-            <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12" id="planContainer" style="padding-right:0">
+            <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12 pr-0" id="planContainer">
               <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
                 <button class="btn btn-default pull-right hidden" id="compareBtn" onclick="compareResults()" data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                   <%= l10n("compare_plans").to_s.upcase %>

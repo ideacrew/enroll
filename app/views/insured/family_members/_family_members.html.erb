@@ -4,7 +4,7 @@
   <% end %>
 
   <% if @sep.present? %>
-    <h3><%= @sep.title %> on: <%= @sep.qle_on %></h3>
+    <h3><%= l10n("insured.family_members.index.sep_header", sep: @sep.title, sep_date: @sep.qle_on)%> </h3>
   <% end %>
 
   <h1><%= l10n("family_information") %></h1>
@@ -48,14 +48,14 @@
   <div id="dependent_buttons" class="<%= 'hidden' if @family.active_family_members.empty? %> <%= pundit_class Family, :updateable?%> d-flex flex-column flex-md-row mt-md-5">
       <%= hidden_field_tag 'origin_source', @source %>
 
-      <%= link_to(main_app.new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), bs4: @bs4), :remote => true, :id => "household_info_add_member", class:"button secondary d-flex" ) do %>
+      <%= h(link_to(main_app.new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), bs4: @bs4), :remote => true, :id => "household_info_add_member", class:"button secondary d-flex") do %>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M9.99978 5.99982V9.99976H5.99985" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M10.0001 13.9997L10.0001 9.99976L14.0001 9.99976" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="10" cy="10" r="9" stroke="#FFFFFF" stroke-width="2"/>
         </svg>
         <span class="ml-2"><%= l10n("add_new_member") %></span>
-      <% end %>
+      <% end) %>
 
       <div class="help-to-decide align-content-around ml-3">
         <a href="#help_me_decide" data-toggle="modal" data-target="#help_me_decide" class="d-block"><%= l10n("help_me_decide_title") %></a>
