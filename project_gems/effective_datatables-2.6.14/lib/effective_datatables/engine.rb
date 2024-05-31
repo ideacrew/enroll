@@ -14,8 +14,7 @@ module EffectiveDatatables
 
     # Set up our default configuration options.
     initializer "effective_datatables.defaults", :before => :load_config_initializers do |app|
-      eval File.read("#{config.root}/lib/generators/templates/effective_datatables.rb")
+      require "#{config.root}/lib/generators/templates/effective_datatables"
     end
-
   end
 end
