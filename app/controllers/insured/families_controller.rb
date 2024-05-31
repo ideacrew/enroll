@@ -685,9 +685,9 @@ class Insured::FamiliesController < FamiliesController
 
   end
 
-  def get_date(parameter)
+  def get_date(date_param)
     date_format = params[:bs4] == "true" ? "%Y-%m-%d" : "%m/%d/%Y"
-    Date.strptime(params[parameter], date_format)
+    Date.strptime(params[date_param], date_format)
   end
 
   def enable_bs4_layout
