@@ -49,6 +49,11 @@ Then(/^the consumer visits verification page$/) do
   find(".interaction-click-control-documents", wait: 5).click
 end
 
+Then(/^the selectric class is visible$/) do
+  visit(current_url)
+  expect(page).to have_css('.selectric')
+end
+
 When(/^the consumer should see documents verification page$/) do
   expect(page).to have_content('We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.')
   expect(page).to have_content "Documents We Accept"
