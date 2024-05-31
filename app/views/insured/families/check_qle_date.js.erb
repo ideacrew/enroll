@@ -1,41 +1,35 @@
-function toggleSuccess(toggle) {
-  if (toggle) {
+function toggleSuccess(errorMessage = "") {
+  if (!errorMessage) {
     $('#qle-details .success-info').removeClass('hidden');
     $('#qle-details .error-info').addClass('hidden');
     $('.sep-form #qle_submit').attr('type', 'submit');
   } else {
     $('#qle-details .success-info').addClass('hidden');
+    $("#qle-details .error-text").html(errorMessage);
     $('#qle-details .error-info').removeClass('hidden');
     $('.sep-form #qle_submit').attr('disabled', 'disabled');
   }
 }
 
 $('#qle-details #qle-date-chose').addClass('hidden');
+$('#qle-details .initial-info').addClass('hidden');
 
 <% if @qualified_date %>
-  toggleSuccess(true);
-  $('#qle-details .initial-info').addClass('hidden');
+  toggleSuccess();
   $('#qle_reason').hide();
-  <% case %>
-  <% when (@effective_on_options.present? && @effective_on_options.is_a?(Array)) %>
-    toggleSuccess(false);
-    var mecNotice = "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on <%= @qle_date.beginning_of_month %> instead of <%= (@qle_date + 1.month).beginning_of_month %>. Please call us at <%= contact_center_phone_number %> by <%= (@qle_date.beginning_of_month - 1.day) %> to use this option";
-    $("#qle-details .error-text").html(mecNotice);
-    $('#qle-details .initial-info').addClass('hidden');
-  <% when @qle.present? %>
+  <% if @effective_on_options.present? && @effective_on_options.is_a?(Array) %>
+    const mecNotice = "Because your other health insurance is ending in the middle of the month, you can opt to have your coverage start on <%= @qle_date.beginning_of_month %> instead of <%= (@qle_date + 1.month).beginning_of_month %>. Please call us at <%= contact_center_phone_number %> by <%= (@qle_date.beginning_of_month - 1.day) %> to use this option";
+    toggleSuccess(mecNotice);
+  <% elsif @qle.present? %>
     $(".effective_on_kinds").html("<%= escape_javascript(render 'effective_on_kind_fields') %>");
     $(".spec_reasons").html("<%= escape_javascript(render 'special_reasons') %>");
   <% end %>
 <% else %>
-  toggleSuccess(false);
-  var errorNotice = "<%= l10n('insured.qle_detail.error_text_outside_period') %><%= @bs4 ? ' ' : raw('<br>') %><%= l10n('insured.qle_detail.error_text_outside_period2', contact_center_name: raw(contact_center_name), contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
-  $("#qle-details .error-text").html(errorNotice);
-  $('#qle-details .initial-info').addClass('hidden');
+  const errorNotice = "<%= l10n('insured.qle_detail.error_text_outside_period') %><%= @bs4 ? ' ' : raw('<br>') %><%= l10n('insured.qle_detail.error_text_outside_period2', contact_center_name: raw(contact_center_name), contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
+  toggleSuccess(errorNotice);
 <% end %>
 
 <% if @future_qualified_date %>
-  toggleSuccess(false);
-  var errorNoticeAction = "The date you submitted does not qualify for a special enrollment period. Qualifying life events may be reported up to 30 days after the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. For further assistance, please contact <%= raw(contact_center_name) %>: <%= EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item %>.";
-  $("#qle-details .error-text").html(errorNoticeAction);
-  $('#qle-details .initial-info').addClass('hidden');
+  const errorNoticeAction = "The date you submitted does not qualify for a special enrollment period. Qualifying life events may be reported up to 30 days after the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. For further assistance, please contact <%= raw(contact_center_name) %>: <%= EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item %>.";
+  toggleSuccess(errorNoticeAction);
 <% end %>
