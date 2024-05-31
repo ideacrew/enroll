@@ -1559,6 +1559,12 @@
     "false_positive": true,
     "ignored_at": "2024-05-24T18:51:24Z"
   },
+  "c80ef62f6dc7e0a10c6cf21e205be731_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is a dummy value. The actual secret is picked from the environment variable 'ENROLL_JWT_SECRET' in the Docker environment. Refer to .docker/config/devise.rb for more details.",
+    "false_positive": true,
+    "ignored_at": "2024-05-31T18:17:58Z"
+  },
   "c97ec2bb359f822cdb87ff349ccdc165_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
