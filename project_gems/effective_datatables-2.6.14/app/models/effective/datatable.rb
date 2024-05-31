@@ -184,10 +184,6 @@ module Effective
       view.try(:params) || HashWithIndifferentAccess.new()
     end
 
-    def table_tool
-      @table_tool ||= ActiveRecordDatatableTool.new(self, table_columns.reject { |_, col| col[:array_column] })
-    end
-
     def array_tool
       @array_tool ||= ArrayDatatableTool.new(self, table_columns.select { |_, col| col[:array_column] })
     end
