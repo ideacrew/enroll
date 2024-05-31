@@ -67,7 +67,7 @@ Then(/^I can see the error message (.*?)$/) do |message|
 end
 
 And(/the user sees Your Information page$/) do
-  expect(page).to have_content(l10n('your_information'))
+  expect(page).to have_content YourInformation.your_information_text
   find(YourInformation.continue_btn).click
 end
 
@@ -78,6 +78,10 @@ When(/the user registers as an individual$/) do
   fill_in IvlPersonalInformation.ssn, :with => "262-61-3061"
   find(IvlPersonalInformation.male_radiobtn).click
   screenshot("register")
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+When(/the individual clicks continue on the personal information page$/) do
   find(IvlPersonalInformation.continue_btn).click
 end
 
@@ -392,8 +396,7 @@ end
 Then(/^.+ agrees to the privacy agreeement/) do
   wait_for_ajax
   expect(page).to have_content IvlAuthorizationAndConsent.authorization_and_consent_text
-  find(IvlAuthorizationAndConsent.continue_btn).click
-  sleep 2
+  find_all(IvlAuthorizationAndConsent.continue_btn)[0].click
 end
 
 When(/^Individual clicks on Individual and Family link/) do

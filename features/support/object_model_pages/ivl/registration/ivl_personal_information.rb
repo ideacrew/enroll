@@ -13,47 +13,96 @@ class IvlPersonalInformation
   end
 
   def self.first_name
-    'FIRST NAME *'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'person_first_name'
+    else 
+      'FIRST NAME *'
+    end
   end
+    
 
   def self.middle_name
-    'MIDDLE NAME'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'person_middle_name'
+    else
+      'MIDDLE NAME'
+    end
   end
 
   def self.last_name
-    'LAST NAME *'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'person_last_name'
+    else  
+      'LAST NAME *'
+    end
   end
 
   def self.suffix_dropdown
-    'div.selectric-labeled span.label'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'person_name_sfx'
+    else
+      'div.selectric-labeled span.label'
+    end
   end
 
   def self.sr_option
-    'div.selectric-open li[data-index="2"]'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'person_name_sfx li[2]'
+    else
+      'div.selectric-open li[data-index="2"]'
+    end
   end
 
   def self.need_coverage_yes
-    'div.col-xs-2 span.yes_no_pair'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '#is_applying_coverage_true'
+    else
+      'div.col-xs-2 span.yes_no_pair'
+    end
   end
 
   def self.need_coverage_no
-    'label[for="is_applying_coverage_false"] span.yes_no_pair'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'is_applying_coverage_false'
+    else
+      'label[for="is_applying_coverage_false"] span.yes_no_pair'
+    end
   end
 
   def self.dob
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'person_dob'
+    else
     'jq_datepicker_ignore_person[dob]'
+    end
   end
 
   def self.ssn
-    'person[ssn]'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'person_ssn'
+    else
+      'person[ssn]'
+    end
   end
 
   def self.i_dont_have_an_ssn_checkbox
+     if EnrollRegistry[:bs4_consumer_flow].enabled?
+      'person_no_ssn'
+     else
     '.interaction-choice-control-value-person-no-ssn'
+     end
   end
 
+  def self.gender
+    'person_gender'
+  end
+  
   def self.male_radiobtn
-    'label[for="radio_male"] span'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+     '.interaction-choice-control-person-gender-0'
+    else
+      'label[for="radio_male"] span'
+    end
   end
 
   def self.female_radiobtn
@@ -69,7 +118,19 @@ class IvlPersonalInformation
   end
 
   def self.continue_btn
-    'span.no-op span.btn-lg, a.interaction-click-control-continue'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+    
+    else 
+      'span[id*="continue"]'
+    end
+  end
+
+  def self.continue_btn_2
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+    
+    else 
+      'a[id*="continue"]'
+    end
   end
 
   def self.select_continue_message
