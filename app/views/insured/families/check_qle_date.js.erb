@@ -1,5 +1,3 @@
-$('#qle-details #qle-date-chose').addClass('hidden');
-
 function toggleSuccess(toggle) {
   if (toggle) {
     $('#qle-details .success-info').removeClass('hidden');
@@ -9,6 +7,8 @@ function toggleSuccess(toggle) {
     $('.sep-form #qle_submit').attr('disabled', 'disabled');
   }
 }
+
+$('#qle-details #qle-date-chose').addClass('hidden');
 
 <% if @qualified_date %>
   toggleSuccess(true);
