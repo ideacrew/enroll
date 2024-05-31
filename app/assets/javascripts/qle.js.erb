@@ -132,7 +132,7 @@ $(function () {
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
-    $('#qle_reason .special_qle_reasons').addClass('hidden');
+    $('#qle_reason > *').addClass('hidden');
     $('#qle-date-chose').show();
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
