@@ -108,11 +108,12 @@
 
 <script type="text/javascript">
   <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
-    $('#qle_submit_reason').on('click keydown', function(event) {
+    $('div').on('click keydown', '#qle_submit_reason', function(event) {
       if (event.type === 'click' || (event.type === 'keydown' && event.keyCode === 13)) {
         if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
           $('.special_qle_reasons').addClass('hidden');
           $('.zip_compare').removeClass('hidden');
+          $('.sep-form #qle_submit_reason').prop('id', "qle_zip_compare");
           event.preventDefault();
           event.stopImmediatePropagation();
         }
@@ -120,7 +121,15 @@
     })
   <% end %>
 
-  $('#qle_zip_compare').on('click', function() {
+  $('div').on('click', '#qle_zip_compare', function() {
+    function handleFailure() {
+      $('#qle_reason').hide();
+      var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
+      $("#qle-details .error-text").html(errorNoticeAction);
+      $('#qle-details .error-info').removeClass('hidden');
+      $('.sep-form #qle_submit').attr('disabled', 'disabled');
+    }
+
     $.ajax({
       type: "GET",
       data:{old_zip: $('.old_zip_code').val(), new_zip: $('.new_zip_code').val()},
@@ -133,12 +142,16 @@
             url: "/insured/families/check_qle_date.js"
           });
         } else {
-          $('#qle_reason').hide();
-          var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
-          $("#qle-details .error-text").html(errorNoticeAction);
-          $('#qle-details .error-info').removeClass('hidden');
+          handleFailure();
         }
+      },
+      error: function() {
+        handleFailure();
       }
     });
+
+    $('.sep-form #qle_zip_compare').prop('id', "qle_submit");
+    event.preventDefault();
+    event.stopImmediatePropagation();
   })
 </script>
