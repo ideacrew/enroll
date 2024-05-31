@@ -21,7 +21,7 @@ class Insured::FamiliesController < FamiliesController
     :healthcare_for_childcare_program_form,
     :update_osse_eligibilities
   ]
-  before_action :enable_bs4_layout, only: [:find_sep, :record_sep, :check_qle_date] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:find_sep] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
 
   around_action :cache_hbx, only: [:home]
@@ -332,16 +332,19 @@ class Insured::FamiliesController < FamiliesController
 
   def check_move_reason
     authorize @family, :check_qle_reason?
+    enable_bs4_layout if params[:bs4] == "true"
     respond_to :js
   end
 
   def check_insurance_reason
     authorize @family, :check_qle_reason?
+    enable_bs4_layout if params[:bs4] == "true"
     respond_to :js
   end
 
   def check_marriage_reason
     authorize @family, :check_qle_reason?
+    enable_bs4_layout if params[:bs4] == "true"
     respond_to :js
   end
 

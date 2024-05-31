@@ -1,35 +1,60 @@
-<div class="special_qle_reasons hidden">
-  <% translation_keys = {
-        contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
-        contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,
-        contact_center_name: EnrollRegistry[:enroll_app].settings(:contact_center_name).item
-      } %>
-  <h4>
-    <% if EnrollRegistry.feature_enabled?(:is_your_health_coverage_ending_expanded_question) %> 
-      <%= l10n("insured.is_your_health_coverage_ending_expanded", translation_keys) %> <div id="health-ending-expanded" />
-    <% else %>
-      <%= l10n("insured.is_your_health_coverage_ending") %>
-    <% end %>
-  </h4> <br/>
-  <div class = 'moving_radio_btn'>
-    <div class="n-radio-group">
-      <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
-    	  <label class="n-radio vertically-aligned-row" for="reason_accept">
-    	    <%= radio_button_tag :reason, "yes",  !EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept', class: "n-radio" %>
-    	    <span class = "n-radio"></span>
-    	      <%= l10n("yes") %>
-    	  </label>
-      </div>
-      <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
-        <label class="n-radio" for="reason_accept1">
-        <%= radio_button_tag :reason, "no", EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept1', class: "n-radio" %>
-        <span class="n-radio"></span>
-          <%= l10n("no") %>
-        </label>
-      </div>
+<% if @bs4 %>
+  <div class="special_qle_reasons hidden">
+    <label class="weight-n mb-2">
+      <% if EnrollRegistry.feature_enabled?(:is_your_health_coverage_ending_expanded_question) %> 
+        <%= l10n("insured.is_your_health_coverage_ending_expanded", contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item, contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item, contact_center_name: EnrollRegistry[:enroll_app].settings(:contact_center_name).item) %> 
+        <div id="health-ending-expanded"></div>
+      <% else %>
+        <%= l10n("insured.is_your_health_coverage_ending") %>
+      <% end %>
+    </label>
+    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
+      <label class="weight-n" for="reason_accept">
+        <%= radio_button_tag :reason, "yes", !EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept' %>
+        <%= l10n("yes") %>
+      </label>
     </div>
-    <div class="center">
-      <%= link_to l10n("continue").to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit_reason' %>
+    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
+      <label class="weight-n" for="reason_accept1">
+        <%= radio_button_tag :reason, "no", EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept1', class: "n-radio" %>
+        <%= l10n("no") %>
+      </label>
     </div>
   </div>
-</div>
+<% else %>
+  <div class="special_qle_reasons hidden">
+    <% translation_keys = {
+          contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
+          contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item,
+          contact_center_name: EnrollRegistry[:enroll_app].settings(:contact_center_name).item
+        } %>
+    <h4>
+      <% if EnrollRegistry.feature_enabled?(:is_your_health_coverage_ending_expanded_question) %> 
+        <%= l10n("insured.is_your_health_coverage_ending_expanded", translation_keys) %> <div id="health-ending-expanded" />
+      <% else %>
+        <%= l10n("insured.is_your_health_coverage_ending") %>
+      <% end %>
+    </h4> <br/>
+    <div class = 'moving_radio_btn'>
+      <div class="n-radio-group">
+        <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
+          <label class="n-radio vertically-aligned-row" for="reason_accept">
+            <%= radio_button_tag :reason, "yes",  !EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept', class: "n-radio" %>
+            <span class = "n-radio"></span>
+              <%= l10n("yes") %>
+          </label>
+        </div>
+        <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
+          <label class="n-radio" for="reason_accept1">
+          <%= radio_button_tag :reason, "no", EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept1', class: "n-radio" %>
+          <span class="n-radio"></span>
+            <%= l10n("no") %>
+          </label>
+        </div>
+      </div>
+      <div class="center">
+        <%= link_to l10n("continue").to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit_reason' %>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -49,9 +49,7 @@ $(function () {
 
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
-    $('.sep-form #btn-continue').prop('id', "qle_submit");
-    $('.sep-form #qle_submit').attr('disabled', 'disabled')
-    $('.sep-form #qle_submit').attr('type', 'button'); 
+    $('.sep-form button').prop('id', "qle_submit").attr('disabled', 'disabled').attr('type', 'button');
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
