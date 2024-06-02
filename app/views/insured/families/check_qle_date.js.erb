@@ -18,18 +18,18 @@ $('#qle-details .initial-info').addClass('hidden');
   toggleSuccess();
   $('#qle_reason').hide();
   <% if @effective_on_options.present? && @effective_on_options.is_a?(Array) %>
-    const mecNotice = "<%= l10n('insured.qle_detail.error_text_middle_of_month', immediate_month_date: @qle_date.beginning_of_month, following_month_date: (@qle_date + 1.month).beginning_of_month, contact_center_phone_number: contact_center_phone_number, call_date: @qle_date.beginning_of_month - 1.day) %>";
+    var mecNotice = "<%= l10n('insured.qle_detail.error_text_middle_of_month', immediate_month_date: @qle_date.beginning_of_month, following_month_date: (@qle_date + 1.month).beginning_of_month, contact_center_phone_number: contact_center_phone_number, call_date: @qle_date.beginning_of_month - 1.day) %>";
     toggleSuccess(mecNotice);
   <% elsif @qle.present? %>
     $(".effective_on_kinds").html("<%= escape_javascript(render 'effective_on_kind_fields') %>");
     $(".spec_reasons").html("<%= escape_javascript(render 'special_reasons') %>");
   <% end %>
 <% else %>
-  const errorNotice = "<%= l10n('insured.qle_detail.error_text_outside_period') %><%= @bs4 ? ' ' : raw('<br>') %><%= l10n('insured.qle_detail.error_text_outside_period2', contact_center_name: raw(contact_center_name), contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
+  var errorNotice = "<%= l10n('insured.qle_detail.error_text_outside_period') %><%= @bs4 ? ' ' : raw('<br>') %><%= l10n('insured.qle_detail.error_text_outside_period2', contact_center_name: raw(contact_center_name), contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
   toggleSuccess(errorNotice);
 <% end %>
 
 <% if @future_qualified_date %>
-  const errorNoticeAction = "<%= l10n('insured.qle_detail.error_text_future_date', contact_center_name: raw(contact_center_name), contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
+  var errorNoticeAction = "<%= l10n('insured.qle_detail.error_text_future_date', contact_center_name: raw(contact_center_name), contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>";
   toggleSuccess(errorNoticeAction);
 <% end %>
