@@ -129,6 +129,7 @@
       $('#qle-nav #qle_submit').attr('disabled', 'disabled');
     }
 
+    $('#qle-nav #qle_zip_compare').prop('id', "qle_submit");
     $.ajax({
       type: "GET",
       data:{old_zip: $('.old_zip_code').val(), new_zip: $('.new_zip_code').val()},
@@ -147,7 +148,6 @@
       error: handleFailure
     });
 
-    $('#qle-nav #qle_zip_compare').prop('id', "qle_submit");
     event.preventDefault();
     event.stopImmediatePropagation();
   })
