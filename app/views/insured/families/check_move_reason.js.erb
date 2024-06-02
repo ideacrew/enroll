@@ -3,7 +3,7 @@
   $("#qle_reason").show();
   $("#qle_reason").html("<%= escape_javascript(render 'moving_fields') %>");
   $('#qle_reason .special_qle_reasons').removeClass('hidden');
-  $('.sep-form #qle_submit').prop('id', "qle_submit_reason");
+  $('#qle-nav #qle_submit').prop('id', "qle_submit_reason");
   $("input:radio[name=reason]:first").click();
   var moving_notice = "<%= l10n('insured.qle_detail.special_reason.move', qle_start_date: @qle_date_calc, qle_date: @qle_date) %>"
   $("#date-change").html(moving_notice);

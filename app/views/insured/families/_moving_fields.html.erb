@@ -112,7 +112,7 @@
         if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
           $('.special_qle_reasons').addClass('hidden');
           $('.zip_compare').removeClass('hidden');
-          $('.sep-form #qle_submit_reason').prop('id', "qle_zip_compare");
+          $('#qle-nav #qle_submit_reason').prop('id', "qle_zip_compare");
           event.preventDefault();
           event.stopImmediatePropagation();
         }
@@ -126,7 +126,7 @@
       var errorNoticeAction = "<%= l10n('insured.qle_detail.error_text_not_eligible', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item) %>";
       $("#qle-details .error-text").html(errorNoticeAction);
       $('#qle-details .error-info').removeClass('hidden');
-      $('.sep-form #qle_submit').attr('disabled', 'disabled');
+      $('#qle-nav #qle_submit').attr('disabled', 'disabled');
     }
 
     $.ajax({
@@ -149,7 +149,7 @@
       }
     });
 
-    $('.sep-form #qle_zip_compare').prop('id', "qle_submit");
+    $('#qle-nav #qle_zip_compare').prop('id', "qle_submit");
     event.preventDefault();
     event.stopImmediatePropagation();
   })

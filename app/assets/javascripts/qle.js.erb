@@ -49,7 +49,7 @@ $(function () {
 
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
-    $('.sep-form button').prop('id', "qle_submit").attr('disabled', 'disabled').attr('type', 'button');
+    $('#qle-nav button').prop('id', "qle_submit").attr('disabled', 'disabled').attr('type', 'button');
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
@@ -110,10 +110,9 @@ $(function () {
         clearTimeout(typingTimer);
         typingTimer = setTimeout(function() {
           if ($(".sep-form #qle_date").val()) {
-            $('.sep-form #qle_submit').removeAttr('disabled');
-            $('.sep-form #qle_submit').removeClass('disabled');
+            $('#qle-nav #qle_submit').removeAttr('disabled');
           } else {
-            $('.sep-form #qle_submit').attr('disabled', 'disabled');
+            $('#qle-nav #qle_submit').attr('disabled', 'disabled');
           }
         }, doneTypingInterval);
     });
@@ -228,12 +227,12 @@ $(function () {
     var health_message = ($("#health-ending-expanded").length == 1 );
     var not_expected_response = ( health_message ) ? 'no' : 'yes';
 
-    $('.sep-form #qle_submit_reason').prop('id', "qle_submit");
+    $('#qle-nav #qle_submit_reason').prop('id', "qle_submit");
 
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
       check_qle_date();
     } else {
-      $('.sep-form #qle_submit').attr('disabled', 'disabled');
+      $('#qle-nav #qle_submit').attr('disabled', 'disabled');
       $('#qle_reason').hide();
       var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
       $("#qle-details .error-text").html(errorNoticeAction);
