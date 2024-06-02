@@ -144,9 +144,7 @@
           handleFailure();
         }
       },
-      error: function() {
-        handleFailure();
-      }
+      error: handleFailure
     });
 
     $('#qle-nav #qle_zip_compare').prop('id', "qle_submit");
