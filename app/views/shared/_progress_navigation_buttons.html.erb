@@ -9,7 +9,6 @@
 <% confirmation_link = local_assigns[:confirmation_link] ? confirmation_link : false %>
 <% link_method = local_assigns[:method] ? method : nil %>
 <% button_type = local_assigns[:button_type] ? button_type : nil %>
-<% button_id = local_assigns[:button_id] ? button_id : "continue_button" %>
 <% run_person_validations = local_assigns[:run_person_validations] ? run_person_validations : false %>
 
 <div class="d-flex flex-column flex-sm-row align-items-center">
@@ -21,12 +20,12 @@
     <% if confirmation_link %>
       <%= h(link_to l10n("confirm"), checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-primary btn-block disabled", id: 'continue_button', method: :post, disabled: !@enrollable) %>
     <% elsif !button_type.nil? %>
-      <button id=<%= button_id %> <%= "disabled=#{disable_link}" if disable_link == true %> type="<%= button_type %>" method="<%= link_method %>">
+      <button id="continue_button" <%= "disabled=#{disable_link}" if disable_link == true %> type="<%= button_type %>" method="<%= link_method %>">
         <%= l10n("continue_next") %>
       </button>
     <% else %>
       <% if run_person_validations.present? %>
-        <button tabindex="0" type="button" id=<%= button_id %> class="btn interaction-click-control-continue" onkeydown="handleButtonKeyDown(event, 'continue_button');" onclick="PersonValidations.manageRequiredValidations($(this));">
+        <button tabindex="0" id="continue_button" class="btn interaction-click-control-continue" onkeydown="handleButtonKeyDown(event, 'continue_button');" onclick="PersonValidations.manageRequiredValidations($(this));">
           <%= l10n("continue_next") %>
         </button>
         <button class="btn interaction-click-control-continue hidden" type="submit">

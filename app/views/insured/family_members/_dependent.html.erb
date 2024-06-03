@@ -1,10 +1,6 @@
 <% if @bs4 %>
-
-  <div id="add_member_list_<%= dependent.id %>" class="dependent_list py-4">
-    <div class="d-flex flex-row">
-      <h2><%= l10n('member') %> <%= local_assigns[:member_number] ? member_number : "" %></h2>
-    </div>
-
+  <div id="add_member_list_<%= dependent.id %>" class="dependent_list">
+    <h2><%= l10n('member') %> <%= local_assigns[:member_number] ? member_number : "" %></h2>
     <div id="add_info_<%= dependent.id %>">
       <div class="dependent_notice_div_<%= dependent.id%>"></div>
 
@@ -23,11 +19,11 @@
         </div>
         <div>
           <label for="relation"><%= l10n("relationship")%></label>
-          <input id="relation" type="text" value="<%= dependent.relationship.try(:humanize)%>" disabled >
+          <input id="relation" type="text" value="<%= dependent.relationship.try(:humanize) %>" disabled >
         </div>
       </div>
 
-      <%= h(link_to l10n("edit_member"), main_app.edit_insured_family_member_path(dependent, {bs4: @bs4}), id: 'edit-dependent-person', remote: true, class: 'btn button outline close-2') %>
+      <%= h(link_to l10n("edit_member"), main_app.edit_insured_family_member_path(dependent, {bs4: @bs4}), id: 'edit-dependent-person', remote: true, class: 'btn button outline close-2 my-3') %>
 
     </div>
   </div>
@@ -52,6 +48,7 @@
           <div class="form-group form-group-lg">
             <label class="static_label label-floatlabel"><%= l10n("gender").to_s.upcase %></label>
             <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender.try(:humanize) %></span>
+
           </div>
         </div>
 

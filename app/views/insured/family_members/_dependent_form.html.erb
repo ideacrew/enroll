@@ -11,11 +11,11 @@
         <% if dependent.errors.any? %>
           <div class="alert alert-error">
             <h4>
-              <%= l10n("insured.consumer_roles.dependent_error.header") %>
+              <%= "Correct the following to add this family member:" %>
             </h4>
             <ul>
               <% dependent.errors.full_messages.each do |msg| %>
-                <% msg = (msg == l10n("insured.consumer_roles.dependent_error.gender") && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? l10n("insured.consumer_roles.dependent_error.sex") : msg %>
+                <% msg = (msg == "Gender can't be blank" && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? "Sex can't be blank" : msg %>
                 <li> <%= msg %> </li>
               <% end %>
             </ul>
@@ -96,7 +96,7 @@
 
           <div class="d-flex mb-md-4">
             <div class="">
-              <%= f.label :relationship, l10n("relationship_to_primary_member"), class: "required" %>
+              <%= f.label :relationship, "Relationship to primary account member" %>
               <%= f.select :relationship, relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => ""}  %>
               <a href="#relationship" data-toggle="modal" data-target="#relationship" class="d-block"><%= l10n("not_sure") %></a>
               <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
@@ -117,23 +117,23 @@
           <div id="dependent-address" class="my-3">
             <div class="row row-form-wrapper no-buffer">
               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
+                <legend><%= l10n("insured.consumer_roles.home_address")%></legend>
+
                 <div class="d-flex flex-row align-items-center my-3">
                   <%= f.check_box :same_with_primary, {'data-cuke': "lives_with_primary_checkbox"}, "true", "false" %>
-                  <label for="dependent_same_with_primary" class="my-0">
-                    <%=l10n("dependent_lives_with_primary_subscriber") %>
-                  </label>
+                  <span for="dependent_same_with_primary"><%=l10n("dependent_lives_with_primary_subscriber") %></span>
                 </div>
               </div>
             </div>
 
             <div class="row row-form-wrapper no-buffer" id="home-info" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
-              <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address")%></h4>
                 <i class="fa fa-info-circle"></i> <%= l10n('insured.dependent_home_address_info') %>
               </div>
             </div>
+
             <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
-              <% if has_active_consumer_dependent?(@person, @dependent) %>
+              <% if has_active_consumer_dependent?(@person,@dependent) %>
                   <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
               <% elsif @person.has_active_employee_role? %>
                 <%= render 'shared/address_fields_for_dependent', f: f %>
@@ -145,15 +145,17 @@
           <div id="remove_confirm" class="hidden"></div>
         </div>
 
+        <%= render partial: 'shared/address_change_confirmation_modal' %>
+
         <div id="add_info_buttons_<%= dependent.id %>" class="pt-2">
           <% if !dependent.persisted? %>
             <a href="#" class="btn button outline remove-new-employee-dependent" data-target="#new_employee_dependent_form">
               <%= l10n("cancel") %>
             </a>
-            <a href="#" class="close-1 btn outline button-error remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
+            <a href="#" class="close-1 btn outline-error remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
           <% else %>
             <%= h(link_to l10n("cancel"), insured_family_member_path(dependent, {bs4: @bs4}), :remote => true, class: "btn button outline") %>
-            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button-error outline close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
+            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button outline-error close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
           <% end %>
 
           <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden") do %>

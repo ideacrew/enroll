@@ -29,12 +29,9 @@ module NavigationHelper
     return true if controller_name == "family_members" && action_name == "index"
   end
 
-  def special_enrollment_period_hash
-    if @change_plan.blank?
-      sep_nav_options
-    else
-      sep_shop_for_plans_nav_options
-    end
+  def local_assigned_boolean(local, default)
+    return default unless local
+    local == "true"
   end
 
   def family_info_progress_hash
@@ -65,42 +62,17 @@ module NavigationHelper
     end
   end
 
-  def plan_shopping_nav_options(step, nav_options)
-    nav = {}
-
-    nav[:nav_options] = nav_options
-    nav[:links] = false
-    nav[:step] = step
-    nav[:title] = l10n('insured.enroll_in_coverage')
-
-    nav
-  end
-
-  def sign_up_nav_options(step, show_help_button = false)
-    nav = {}
-
-    nav[:nav_options] = [
+  def sign_up_nav_options
+    [
       {step: 1, page_key: :personal_info, display_label: l10n('tell_us_about_yourself')},
       {step: 2, page_key: :family_info, display_label: l10n('family_info')}
     ]
-    nav[:links] = false
-    nav[:step] = step
-    nav[:title] = l10n('account_setup')
-
-    nav[:show_help_button] = show_help_button ? true : (step == 2)
-    nav[:show_exit_button] = !['match', 'search'].include?(action_name)
-    nav[:show_previous_button] = false
-    nav[:show_account_button] = false
-    nav[:is_complete] = false
-    nav[:back_to_account_flag] = false
-
-    nav
   end
 
   def individual_nav_options
     [
       {step: 1, page_key: :personal_info, display_label: l10n('personal_information')},
-      {step: 2, page_key: :verify_identity, display_label: l10n('verify_identity')},
+      {step: 2, page_key: :verify_identity, display_label: l10n('insured.consumer_roles.upload_ridp_documents.header')},
       {step: 3, page_key: :household_info, display_label: l10n('household_info')},
       {step: 4, page_key: :choose_plan, display_label: l10n('choose_plan')},
       {step: 5, page_key: :review, display_label: l10n('confirm_selection')},
