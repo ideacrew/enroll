@@ -6,7 +6,7 @@ $(document).on('click', '#search_for_plan_shopping_help', function() {
            first_name: $('#person_first_name').val(), last_name: $('#person_last_name').val(),
            ssn: $('#person_ssn').val(), dob: $('#jq_datepicker_ignore_person_dob').val()
          },
-    url: '/exchanges/hbx_profiles/request_help?',
+    url: '/exchanges/hbx_profiles/request_help.html?',
   }).done(function(response) {
     $('#help_status').html(JSON.parse(response)['status'])
   });
@@ -20,7 +20,7 @@ $.ajax({
            first_name: $('#person_first_name').val(), last_name: $('#person_last_name').val(),
            ssn: $('#person_ssn').val(), dob: $('#jq_datepicker_ignore_person_dob').val()
          },
-    url: '/exchanges/hbx_profiles/request_help?',
+    url: '/exchanges/hbx_profiles/request_help.html?',
   }).done(function(response) {
     broker_status = JSON.parse(response)
     var status = broker_status['status']
