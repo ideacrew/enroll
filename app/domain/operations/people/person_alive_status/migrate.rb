@@ -81,14 +81,11 @@ module Operations
           payload = build_demographics_group_payload
           person.create_demographics_group(payload) unless person.demographics_group.present? && person.demographics_group.alive_status.present?
 
-          if person.ssn.present? && person.verification_types.alive_status_type.empty?
-            person.add_new_verification_type("Alive Status")
-            person.verification_types.where(type_name: "Alive Status").first.save!
-            person.families.each(&:update_family_document_status!)
+          return Success(person) unless person.ssn.present? && person.verification_types.alive_status_type.empty?
 
-          else
-            return Failure("Person #{person.hbx_id} already has alive status verification type or does not have ssn")
-          end
+          person.add_new_verification_type("Alive Status")
+          person.verification_types.where(type_name: "Alive Status").first.save!
+          person.families.each(&:update_family_document_status!)
 
           Success(person)
         rescue StandardError => e
