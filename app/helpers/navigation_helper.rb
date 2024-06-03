@@ -34,6 +34,14 @@ module NavigationHelper
     local == "true"
   end
 
+  def special_enrollment_period_hash
+    if @change_plan.blank?
+      sep_nav_options
+    else
+      sep_shop_for_plans_nav_options
+    end
+  end
+
   def family_info_progress_hash
     if @change_plan.present?
       qle_nav_options

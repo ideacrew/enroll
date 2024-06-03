@@ -1,4 +1,8 @@
 <% if @bs4 %>
+  <%# Left Nav %>
+  <%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :sep, nav_options: special_enrollment_period_hash } %>
+
+  <%# Main Content (right) %>
   <div>
     <div class="mb-4">
       <h1><%= l10n("insured.families.special_enrollment_period") %></h1>
