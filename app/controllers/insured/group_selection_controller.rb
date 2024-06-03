@@ -4,6 +4,10 @@ class Insured::GroupSelectionController < ApplicationController
   include L10nHelper
   include Insured::FamiliesHelper
 
+
+  layout 'progress', only: [:new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
@@ -508,5 +512,9 @@ class Insured::GroupSelectionController < ApplicationController
       member = members.where(applicant_id: id).first
       member.update_attributes(tobacco_use: params["is_tobacco_user_#{id}"])
     end
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end
