@@ -24,7 +24,7 @@
           <%end%>
         </td>
         <td>
-          <%= h(link_to "Add Info", tax_info_application_applicant_path(@application, @application.active_applicants.find_by(family_member_id: member.id)), class: "btn btn-info")  %>
+          <%= link_to "Add Info", tax_info_application_applicant_path(@application, @application.active_applicants.find_by(family_member_id: member.id)), class: "btn btn-info" %>
         </td>
       </tr>
     <%end%>

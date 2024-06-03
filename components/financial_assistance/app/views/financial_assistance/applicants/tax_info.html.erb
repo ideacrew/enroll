@@ -75,12 +75,12 @@
           <h5 class="fa-text-color"><%= l10n("faa.tax_info.question4", year: assistance_year) %> *</h5>
         </div>
         <div class="col-md-2">
-          <%= f.radio_button("is_claimed_as_tax_dependent", true, class: "radio-yml", id: "is_claimed_as_tax_dependent_true") %>
-          <label class="radio-yml" for="is_claimed_as_tax_dependent_true"><%= l10n('yes') %></label>
+          <%= f.radio_button("is_claimed_as_tax_dependent", true, class: "radio-yml", id: "is_claimed_as_tax_dependent_yes") %>
+          <label class="radio-yml" for="is_claimed_as_tax_dependent_yes"><%= l10n('yes') %></label>
         </div>
         <div class="col-md-2">
-          <%= f.radio_button("is_claimed_as_tax_dependent", false, class: "radio-yml", id: "is_claimed_as_tax_dependent_false") %>
-          <label class="radio-yml" for="is_claimed_as_tax_dependent_false"><%= l10n('no') %></label>
+          <%= f.radio_button("is_claimed_as_tax_dependent", false, class: "radio-yml", id: "is_claimed_as_tax_dependent_no") %>
+          <label class="radio-yml" for="is_claimed_as_tax_dependent_no"><%= l10n('no') %></label>
         </div>
         <div class='col-md-2 left-seprator'>
           <a href="#is_claimed_as_tax_dependent" data-toggle="modal" data-target="#is_claimed_as_tax_dependent"><%= l10n('faa.question.not_sure') %></a>
@@ -114,7 +114,7 @@
     </div>
 
     <%= content_for :submit_button do %>
-      <%= submit_tag l10n("faa.tax_info.continue"), :class => "btn btn-lg btn-primary btn-block" %>
+      <%= submit_tag l10n("faa.tax_info.continue"), class: "btn btn-lg btn-primary btn-block", id: 'btn-continue' %>
     <% end %>
 
     <div class='col-md-3'>

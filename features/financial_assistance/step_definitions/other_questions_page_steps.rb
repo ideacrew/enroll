@@ -14,7 +14,7 @@ Given(/^all applicants fill all pages except other questions$/) do
     fill_in 'income[amount]', with: '100'
     fill_in 'income[start_on]', with: '1/1/2018'
     find_all("#job_income .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
-    find_all("#job_income li.interaction-choice-control-income-frequency-kind-7").first.click
+    find_all("#job_income fa-frequency-kind li:last-of-type").first.click
     unless FinancialAssistanceRegistry[:disable_employer_address_fields].enabled?
       fill_in 'income[employer_address][address_1]', with: '1 K Street'
       fill_in 'income[employer_address][city]', with: 'Washington'
