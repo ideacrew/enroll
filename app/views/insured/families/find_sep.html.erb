@@ -23,7 +23,7 @@
         <input type="checkbox" id="no_qle_checkbox" data-toggle="modal" data-target="#outside-open-enrollment" name="no_qualifying_event" value="true"><%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
       </div>
     </div>
-    <%= form_tag record_sep_insured_families_path, :method => :post, class: 'sep-form', id: 'qle_form' do %>
+    <%= form_tag record_sep_insured_families_path, :method => :post, id: 'qle_form' do %>
       <%= render partial: 'qle_detail' %>
       <div class="mt-4 <%= pundit_class Family,:updateable? %>" id="qle-nav">
         <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", disable_link: true} %>

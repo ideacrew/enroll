@@ -106,10 +106,10 @@ $(function () {
 
     var typingTimer;
     const doneTypingInterval = 750;
-    $(".sep-form #qle_date").on("change", function(){
+    $(".sep-date #qle_date").on("change", function(){
         clearTimeout(typingTimer);
         typingTimer = setTimeout(function() {
-          if ($(".sep-form #qle_date").val()) {
+          if ($(".sep-date #qle_date").val()) {
             $('#qle-nav #qle_submit').removeAttr('disabled');
           } else {
             $('#qle-nav #qle_submit').attr('disabled', 'disabled');
