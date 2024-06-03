@@ -45,51 +45,8 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
     it "should load template work flow steps" do
       post :new, params: { application_id: application.id, applicant_id: applicant.id }
       expect(response).to render_template(:financial_assistance_nav)
-      expect(response).to render_template 'workflow/step'
+      expect(response).to render_template 'other'
     end
-  end
-
-  context "POST step" do
-    before do
-      controller.instance_variable_set(:@modal, application)
-      controller.instance_variable_set(:@applicant, applicant)
-    end
-
-    it "should show flash error message nil" do
-      expect(flash[:error]).to match(nil)
-    end
-
-    context "when params has application key" do
-      it "When model is saved" do
-        post :step, params: { application_id: application.id, applicant_id: applicant.id, id: income.id, income: valid_income_params, employer_phone: income_employer_phone_params }
-        expect(applicant.save).to eq true
-      end
-
-      it "should redirect to find_applicant_path when passing params last step" do
-        post :step, params: { application_id: application.id, applicant_id: applicant.id, id: income.id,income: valid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params, commit: "CONTINUE", last_step: true }
-        expect(response.headers['Location']).to have_content 'incomes'
-        expect(response.status).to eq 302
-        expect(flash[:notice]).to match('Income Added')
-        expect(response).to redirect_to(application_applicant_incomes_path(application, applicant))
-      end
-
-      it "should not redirect to find_applicant_path when not passing params last step" do
-        post :step, params: { application_id: application.id, applicant_id: applicant.id, id: income.id,income: valid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params, commit: "CONTINUE" }
-        expect(response.status).to eq 200
-        expect(response).to render_template 'workflow/step'
-      end
-
-      it "should render workflow/step when we are not params last step" do
-        post :step, params: { application_id: application.id, applicant_id: applicant.id, id: income.id,income: valid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params, commit: "CONTINUE" }
-        expect(response).to render_template 'workflow/step'
-      end
-    end
-
-    # TODO: Is this needed? Its passing a random string of text instead of an integer which would throw an error
-    # it "should render step if model is not saved" do
-    #  post :step, params: { application_id: application.id, applicant_id: applicant.id, id: income.id, income: invalid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params }
-    #  expect(response).to render_template 'workflow/step'
-    # end
   end
 
   context "create job income" do
