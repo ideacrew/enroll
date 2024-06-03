@@ -1,36 +1,49 @@
-<% if !@person.has_consumer_role? || (@person.has_active_employee_role? && @person.has_consumer_role?) %>
-  <% content_for :horizontal_status do %>
-    <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
-  <% end %>
-<% end %>
-<div class="container">
-  <div id="dependents_info_wrapper">
-    <div class="row">
-      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-        <%= render :partial => 'shared/left_nav' %>
-      </div>
-      <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+<% if @bs4 %>
+  <%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :household_info, nav_options: family_info_progress_hash } %>
+
+  <div id="family_information" class="">
+    <div id="dependents_info_wrapper">
         <%= render partial: 'family_members' %>
-      </div>
+    </div>
+  </div>
 
-      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-        <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], resident_role_id: @resident_role.try(:id)) %>
-        <% find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)%>
+  <div id="plan-shopping-page-navigation-buttons" class="d-flex flex-column flex-md-row mt-4" >
+    <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], resident_role_id: @resident_role.try(:id)) %>
+    <% find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)%>
+    <% url = (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url) %>
 
-        <% if @change_plan.present? %>
-          <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
-        <% elsif @type == "employee" %>
-          <%= render  partial: 'shared/signup_progress', locals: {
-            step: '4',
-            url: group_selection_url
-          } %>
-        <% else %>
-          <%= render  partial: 'shared/individual_progress', locals: {
-            step: '3',
-            url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
-          } %>
-        <% end %>
+    <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: url } %>
+  </div>
+
+<% else %>
+  <% if !@person.has_consumer_role? || (@person.has_active_employee_role? && @person.has_consumer_role?) %>
+    <% content_for :horizontal_status do %>
+      <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+    <% end %>
+  <% end %>
+  <div class="container">
+    <div id="dependents_info_wrapper">
+      <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+          <%= render :partial => 'shared/left_nav' %>
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+          <%= render partial: 'family_members' %>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+          <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], resident_role_id: @resident_role.try(:id)) %>
+          <% find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)%>
+
+          <% if @change_plan.present? %>
+            <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
+          <% elsif @type == "employee" %>
+            <%= render  partial: 'shared/signup_progress', locals: {step: '4', url: group_selection_url} %>
+          <% else %>
+            <%= render  partial: 'shared/individual_progress', locals: { step: '3', url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)} %>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
-</div>
+<% end %>

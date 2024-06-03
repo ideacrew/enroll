@@ -25,7 +25,9 @@ $('.remove-new-employee-dependent').each(function(idx, ele) {
     return false;
   });
 });
-$('select').selectric();
+if (!disableSelectric) {
+  $("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select, .no-selectric').selectric();
+}
 applyJQDatePickers();
 applyListeners();
 demographicValidations();
