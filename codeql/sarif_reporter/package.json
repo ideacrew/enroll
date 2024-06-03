@@ -14,5 +14,9 @@
     "@types/node": "^20.12.7",
     "@types/sarif": "^2.1.7",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "cmd-ts": "^0.13.0",
+    "yaml": "^2.4.3"
   }
 }

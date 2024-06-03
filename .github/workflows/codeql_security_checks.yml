@@ -30,4 +30,4 @@ jobs:
             cd codeql/sarif_reporter/
             npm install
             npm run compile
-            cat ../../codeql.sarif | npm run-script run
+            cat ../../codeql.sarif | npm run-script run -- --ignore-file=../ignore.yaml
