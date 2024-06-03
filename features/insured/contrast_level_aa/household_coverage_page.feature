@@ -1,4 +1,3 @@
-@accessibility
 Feature: Contrast level AA is enabled - Household Coverage Selection Page
 
  Background: Individual market setup

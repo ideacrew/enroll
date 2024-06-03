@@ -1,4 +1,3 @@
-@accessibility
 Feature: Contrast level AA is enabled - Start a new Financial Assistance Application and answers questions on Other Questions page
 
   Background: User logs in and visits applicant's other questions page
