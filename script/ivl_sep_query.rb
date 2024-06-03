@@ -9,6 +9,7 @@ class IvlEnrollmentsPublisher
   def self.publish_action(action_name, hbx_id, action)
     reply_to = "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler"
 
+    Rails.logger.info "publish_action: action_name = #{action_name}, reply_to = #{reply_to}, hbx_enrollment_id = #{hbx_id}, enrollment_action_uri = #{action}"
     notify(
       action_name, {
       :reply_to => reply_to,
