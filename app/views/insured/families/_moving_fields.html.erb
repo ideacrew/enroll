@@ -4,7 +4,7 @@
     <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
       <label class="weight-n" for="reason_accept">
         <%= radio_button_tag :reason, "", true, id: 'reason_accept', class: "zip-check" %>
-        <span id="date-change"></span>
+        <span><%= l10n('insured.qle_detail.special_reason.move', qle_start_date: @qle_date_calc, qle_date: @qle_date) %></span>
       </label>
     </div>
     <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
@@ -16,7 +16,7 @@
     <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept2')" class="n-radio-row">
       <label class="weight-n" for="reason_accept2">
         <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "zip-check"%>
-        <span><%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= h(link_to("(Use the calculator to see if you qualify)", 'http://www.healthcare.gov/lower-costs', target: :_blank, rel: "noopener noreferrer")) if individual_market_is_enabled? %></span>
+        <span><%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= h(link_to(l10n("insured.qle_detail.special_reason.move.calculator"), 'http://www.healthcare.gov/lower-costs', target: :_blank, rel: "noopener noreferrer")) if individual_market_is_enabled? %></span>
       </label>
     </div>
     <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_reject')" class="n-radio-row">
@@ -53,7 +53,7 @@
           <label class="n-radio vertically-aligned-row" for="reason_accept">
             <%= radio_button_tag :reason, "",  true, id: 'reason_accept', class: "n-radio zip-check" %>
             <span class = "n-radio"></span>
-            <span id="date-change"></span>
+            <span><%= l10n('insured.qle_detail.special_reason.move', qle_start_date: @qle_date_calc, qle_date: @qle_date) %></span>
           </label>
         </div>
         <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">

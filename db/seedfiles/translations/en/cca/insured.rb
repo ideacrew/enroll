@@ -338,6 +338,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.qle_detail.special_reason.move.enter_zip' => "Enter your old zipcode and your new zipcode.",
   :'en.insured.qle_detail.special_reason.move.old_zip' => "Old Zip Code",
   :'en.insured.qle_detail.special_reason.move.new_zip' => "New Zip Code",
+  :'en.insured.qle_detail.special_reason.move.calculator' => "(Use the calculator to see if you qualify)",
   :'en.insured.qle_detail.eligible_to_enroll_limited_time' => "Based on the information you entered, you may be eligible to enroll now but there is limited time.",
   :'en.insured.qle_detail.error_text' => "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at %{contact_center_phone_number} to give us more information so we can see if you qualify.",
   :'en.insured.qle_detail.error_text_not_eligible' => "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact %{site_short_name} customer service at %{contact_center_phone_number}.",
