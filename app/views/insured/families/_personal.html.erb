@@ -5,5 +5,7 @@
 <% end %>
 <script>
 	Freebies.floatlabels();
-	$('select').not('.no-selectric').selectric();
+	if (!disableSelectric) {
+		$("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select, .no-selectric').selectric();
+	}
 </script>

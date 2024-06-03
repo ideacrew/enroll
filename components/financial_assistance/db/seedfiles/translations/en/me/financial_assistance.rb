@@ -4,6 +4,31 @@
 
 # rubocop:disable Layout/LineLength
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
+  "en.faa.nav.my_applications" => "My Applications",
+  "en.faa.nav.family_info" => "Family Info",
+  "en.faa.nav.family_relationships" => "Family Relationships",
+  "en.faa.nav.review" => "Review & Submit",
+  "en.faa.checklist.heading" => "Application Checklist",
+  "en.faa.checklist.instructions1" => "Before you get started, please review the application checklist below. If you gather the information in advance, you can complete the application quickly. When you’re ready to begin, select ‘Begin Application’. This application takes about 15-20 minutes to complete, you may save your progress at any time.",
+  "en.faa.checklist.instructions2" => "You will need detailed information on each person in your household (even if they don’t need coverage) to complete the application.",
+  "en.faa.checklist.needs_insurance_header" => "For each person in your household who needs health insurance, you’ll need:",
+  "en.faa.checklist.doesnt_need_insurance_header" => "For each person in your household who needs health insurance, you’ll need:",
+  "en.faa.checklist.require_bullet1" => "Full legal names, birth dates, social security numbers, and addresses",
+  "en.faa.checklist.require_bullet2" => "Tax filing plans for the year you want coverage. For example:",
+  "en.faa.checklist.require_bullet2_a" => "Who will file federal taxes?",
+  "en.faa.checklist.require_bullet2_b" => "Who will be claiming dependents on their tax return?",
+  "en.faa.checklist.require_bullet2_c" => "If anyone is married, will they file taxes jointly?",
+  "en.faa.checklist.require_bullet3" => "Information about income (how much you get, how often you get it, etc.). It helps to have:",
+  "en.faa.checklist.require_bullet3_a" => "Your most recent tax return",
+  "en.faa.checklist.require_bullet3_b" => "Recent paystubs",
+  "en.faa.checklist.require_bullet3_c" => "Recent statements for benefits like social security or unemployment",
+  "en.faa.checklist.require_bullet3_d" => "Recent bank and brokerage statements that show interest, capital gains, dividends or retirement distributions",
+  "en.faa.checklist.require_bullet4" => "For anyone who could get health insurance through a job, a completed Employer Coverage Tool Form",
+  "en.faa.checklist.require_bullet5" => "For anyone who is not a US citizen, immigration documents such as an:",
+  "en.faa.checklist.require_bullet5_a" => "I-551 (also called a green card)",
+  "en.faa.checklist.require_bullet5_b" => "I-94 (also called an arrival/departure record)",
+  "en.faa.checklist.require_bullet5_c" => "Employment authorization card",
+  "en.faa.checklist.begin_application" => "Begin Application",
   "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings
      on CoverME.gov. Please call CoverME.gov at (866) 636-0355 to make updates to that application.
       If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on CoverME.gov, but won't be able to tell you if you qualify for Medicaid or cost savings.",
@@ -129,7 +154,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.question.required_indicator" => "* = required field",
   "en.faa.question.not_sure" => "Not sure?",
   "en.faa.question.eligible_immigration_status" => "Does this person have an eligible immigration status?",
-  "en.faa.question.immigration_continue_note_1" => "<br><br>Note: You can continue the application without answering this question, but if you don't answer it, this person won't be eligible for full Medicaid or Marketplace coverage. ",
+  "en.faa.question.immigration_continue_note_1" => "Note: You can continue the application without answering this question, but if you don't answer it, this person won't be eligible for full Medicaid or Marketplace coverage. ",
   "en.faa.question.immigration_continue_note_2" => "They'll only be considered for coverage of emergency services, including labor and delivery services.",
   # Submit Your Application Page
   "en.faa.submit_your_application" => "Submit Your Application",
@@ -181,6 +206,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "If you've already enrolled in a CoverME.gov Individual & Family plan, you're finished! You'll see your updated plan in a minute or two. Select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
+  "en.faa.application_for_premium_reductions" => "Your Application for Premium Reductions",
+  "en.faa.all_required_info" => "All required information must entered for each member of your household.",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
   # Mec check
@@ -263,6 +290,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
   "en.faa.verification.documents" => "Financial Assistance Documents",
   "en.faa.view_complete_checklist" => "View the Complete Application Checklist",
+  "en.faa.page_refresh" => "Page will automatically refresh.",
+  "en.faa.getting_eligibility" => "Getting your eligibility results...",
   'en.faa.add_mailing_address' => 'Add Mailing Address',
   'en.faa.remove_mailing_address' => 'Remove Mailing Address'
 }.freeze

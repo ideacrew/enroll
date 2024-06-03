@@ -1,0 +1,21 @@
+<% step = (defined? step) ? step.to_i : 1 %>
+<% show_help_button = local_assigns[:show_help_button] ? true : step != 1 && step < 6 %>
+<% content_for(:step) { step } %>
+<% content_for(:title) { l10n('account_setup') } %>
+<% content_for(:nav_options) do %>
+  <% sign_up_nav_options.each do |nav_option| %>
+    <li class="<%= 'complete' if step > nav_option[:step] %> <%= 'active' if step == nav_option[:step] %>">
+      <span class="circle-progress"></span>
+      <div class="vertical-line-progress"></div>
+      <a class="<%= 'cna disabled' unless step > nav_option[:step] or step == nav_option[:step] %>">
+        <%= nav_option[:display_label] %>
+      </a>
+    </li>
+  <% end %>
+<% end %>
+<% content_for(:show_exit_button) { (!@no_save_button && step < 6).to_s } %>
+<% content_for(:show_previous_button) { (!@no_previous_button && ![6].include?(step)).to_s } %>
+<% content_for(:show_account_button) { step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
+<% content_for(:is_complete) { step == 6 } %>
+<% content_for(:show_help_button) { show_help_button } %>
+<% content_for(:back_to_account_flag) { "false" }%>

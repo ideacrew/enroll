@@ -1,0 +1,119 @@
+<% if @bs4 %>
+  <% back_to_account_flag = local_assigned_boolean(local_assigns[:back_to_account_flag], EnrollRegistry.feature_enabled?(:back_to_account_all_shop)) %>
+  <% is_complete = local_assigned_boolean(local_assigns[:is_complete], false) %>
+  <% show_previous_button = local_assigned_boolean(local_assigns[:show_previous_button], true) %>
+  <% show_account_button = local_assigned_boolean(local_assigns[:show_account_button], back_to_account_flag) %>
+  <% show_help_button = local_assigned_boolean(local_assigns[:show_help_button], !is_complete) %>
+  <% show_exit_button = local_assigned_boolean(local_assigns[:show_exit_button], !is_complete) %>
+
+  <% continue_to_account_text ||= l10n("insured.plan_shoppings.receipt.go_to_my_account") %>
+  <% to_account_text = is_complete ? continue_to_account_text : l10n("back_to_my_account") %>
+
+  <% if show_account_button || is_complete %>
+    <%= h(link_to to_account_text, main_app.family_account_path, class: "button btn-block my-4 text-center #{is_complete ? 'btn-primary' : 'secondary outline'}", id: 'btn-continue') %>
+  <% end %>
+
+  <div class=" d-flex flex-column mt-2">
+    <ul class="list-unstyled list-right-section">
+      <% if show_previous_button %>
+        <li>
+          <a class="back" href="#">
+            <%= l10n("previous_step") %>
+          </a>
+        </li>
+      <% end %>
+      <% if show_help_button && back_to_account_flag %>
+        <li>
+          <a data-target="#help_with_plan_shopping" data-toggle="modal" id="help_me_sign_up" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_me_sign_up')">
+            <%= l10n("help_sign_up") %>
+          </a>
+        </li>
+      <% end %>
+
+      <% if show_exit_button %>
+        <li>
+          <a href="#">
+            <%= l10n("save_and_exit") %>
+          </a>
+        </li>
+        <% unless back_to_account_flag || @bs4 %>
+          <br>
+          <br>
+          <li>
+            <p>
+              <%= "If you select #{t('save_and_exit')}, you can save your work and continue where you left off the next time you login." %>
+            </p>
+          </li>
+        <% end %>
+      <% end %>
+
+      <% if show_help_button && !back_to_account_flag %>
+        <div class="btn outline" data-target="#help_with_plan_shopping" id="help_with_plan_shopping_btn" data-toggle="modal" style="width: 100%;" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_with_plan_shopping_btn')">
+          <%= l10n("help_sign_up") %>
+        </div>
+      <% end %>
+    </ul>
+  </div>
+  <%= render partial: 'ui-components/v1/modals/help_with_plan' if show_help_button %>
+<% else %>
+  <% back_to_account_flag = EnrollRegistry.feature_enabled?(:back_to_account_all_shop) %>
+
+  <% default_value = Proc.new { |value, default| value.nil? ? default : value } %>
+
+  <% is_complete = default_value.call(is_complete, false) %>
+  <% show_exit_button = default_value.call(show_exit_button, true) %>
+  <% show_previous_button = default_value.call(show_previous_button, true) %>
+  <% show_account_button = default_value.call(show_account_button, back_to_account_flag) %>
+  <% show_help_button = default_value.call(show_help_button, !is_complete) %>
+
+  <% link_style = back_to_account_flag ? "font-size: 16px; text-decoration: underline;" : "text-transform: uppercase;" %>
+  <% continue_to_account_text ||= l10n("insured.plan_shoppings.receipt.go_to_my_account") %>
+  <% to_account_text = is_complete ? continue_to_account_text : l10n("back_to_my_account") %>
+
+  <% if show_account_button || is_complete %>
+    <%= h(link_to to_account_text, family_account_path, class: "btn btn btn-md full_width #{is_complete ? 'btn-primary' : 'btn-default'}", id: 'btn-continue', style: 'width: 100%; margin-top: 16px;') %>
+  <% end %>
+
+  <div style="display: flex; flex-direction: column;">
+    <ul class="list-unstyled list-right-section">
+      <% if show_previous_button %>
+        <li>
+          <a class="back" href="#" style="<%= link_style %>">
+            <%= l10n("previous_step") %>
+          </a>
+        </li>
+      <% end %>
+      <% if show_help_button && back_to_account_flag %>
+        <li>
+          <a data-target="#help_with_plan_shopping" data-toggle="modal" style="<%= link_style %>" id="help_me_sign_up" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_me_sign_up')">
+            <%= l10n("help_sign_up") %>
+          </a>
+        </li>
+      <% end %>
+
+      <% if show_exit_button %>
+        <li>
+          <a href="<%= destroy_user_session_path %>" style="<%= link_style %>">
+            <%= l10n("save_and_exit") %>
+          </a>
+        </li>
+        <% unless back_to_account_flag %>
+          <br>
+          <br>
+          <li>
+            <p>
+              <%= "If you select #{t('save_and_exit')}, you can save your work and continue where you left off the next time you login." %>
+            </p>
+          </li>
+        <% end %>
+      <% end %>
+
+      <% if show_help_button && !back_to_account_flag %>
+        <div class="btn btn-default" data-target="#help_with_plan_shopping" id="help_with_plan_shopping_btn" data-toggle="modal" style="width: 100%;" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_with_plan_shopping_btn')">
+          <%= l10n("help_sign_up") %>
+        </div>
+      <% end %>
+    </ul>
+  </div>
+  <%= render partial: 'ui-components/v1/modals/help_with_plan' if show_help_button %>
+<% end %>

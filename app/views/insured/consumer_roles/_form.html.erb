@@ -1,3 +1,49 @@
+<% if @bs4 %>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1, show_help_button: true} %>
+  <div id="new_person_wrapper">
+    <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+    <% if current_user.has_hbx_staff_role? %>
+      <div class="row_align_application_type mb-3">
+        <label for="application_type_id" class="required"><%= l10n("application_type") %></label>
+        <%= f.fields_for :family do |f| %>
+          <%= f.select(:application_type, options_for_select(*consumer_role_application_type_options(@person)), {include_blank: @person.primary_family.e_case_id.present? ? nil : "choose *"}, required: !@person.primary_family.e_case_id.present?, id:'application_type_id' ) %>
+        <% end %>
+      </div>
+    <% end %>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) %>
+      <%= render :partial => 'shared/optional_field_warning' %>
+    <% end %>
+    <h1><%= l10n("personal_information") %></h1>
+    <p><%= l10n("insured.consumer_roles.help_question_info") %></p>
+    <%= render "shared/error_messages", object: f.object %>
+    <%= render 'shared/person/consumer_information', f: f %>
+    <h2 class="mt-4"><%= l10n("insured.consumer_roles.demo_info_for") %> <%= @person.full_name %></h2>
+    <div id="consumer_fields_sets">
+      <%= render 'shared/consumer_fields', f: f %>
+    </div>
+    <h3 class="beta mt-4"><%= l10n("insured.consumer_roles.contact_info_for") %> <%= @person.full_name %></h3>
+    <section class="mb-4">
+      <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
+      <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
+    </section>
+    <section class="mb-4">
+      <h4 class="gamma mb-0"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
+      <%= render partial: 'shared/phone_fields', locals: {f: f, bs4: true} %>
+      <div id="email_info" class="">
+        <div class="email d-flex mb-md-4 row col-sm">
+          <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+            <%= render partial: 'shared/email_fields', locals: {f: email, bs4: true} %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-4 mt-4">
+      <%= render 'shared/contact_preferences', {f: f, role: :consumer_role, contact_preferences_mapping: nil, bs4: true } %>
+    </section>
+    <%= render partial: "shared/progress_navigation_buttons", locals: {dont_show_prev_button: true, run_person_validations: true} %>
+  </div>
+<% else %>
 <div class="container">
   <div id="new_person_wrapper">
     <div class="row">
@@ -55,3 +101,4 @@
   </div>
   <%= render partial: 'ui-components/v1/modals/help_with_plan'  %>
 </div>
+<% end %>

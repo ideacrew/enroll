@@ -1,0 +1,46 @@
+<% step = (defined? step) ? step.to_i : 1 %>
+<% no_purchase = (defined? no_purchase) ? no_purchase : false %>
+<% show_waive = (defined? show_waive) ? show_waive : false %>
+
+<% percent_complete = 0 %>
+<% percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 100 : 0)) %>
+
+<h3><%= "#{percent_complete}% Complete" %></h3>
+<ul class="list-unstyled progress-wrapper hidden-xs">
+  <li class="<%= add_progress_class(1, step) %>">
+    <span class="circle-progress"></span>
+    <div class="vertical-line-progress"></div>
+    <%= l10n('plan_selection') %>
+  </li>
+  <li class="<%= add_progress_class(2, step) %>">
+    <span class="circle-progress"></span>
+    <div class="vertical-line-progress"></div>
+    <%= l10n('review') %>
+  </li>
+  <li class="<%= add_progress_class(3, step) %>">
+    <span class="circle-progress"></span>
+    <div class="vertical-line-progress"></div>
+    <%= l10n('complete') %>
+  </li>
+</ul>
+
+<% if show_waive %>
+  <% enrollment = @hbx_enrollment || @enrollment %>
+  <% if (enrollment && (enrollment.employee_role.present? || enrollment.benefit_group.present?)) %>
+    <%= h(link_to l10n('waive_coverage'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default')%>
+  <% end %>
+<% end %>
+
+<% if step == 2 && !no_purchase %>
+  <% enrollment = @hbx_enrollment || @enrollment %>
+  <% disabled_in_ivl = (enrollment && enrollment.is_shop?) ? '' : 'disabled' %>
+  <%= h(link_to l10n('confirm_selection'), checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-lg btn-primary btn-block #{disabled_in_ivl}", id: 'btn-continue', method: :post, disabled: disable_purchase?(!@enrollable, @enrollment), 'data-disable-with' => l10n("please_wait")) %>
+<% end %>
+
+<%= render partial: 'shared/shopping_nav_panel',
+  locals: {show_exit_button: false,
+  show_previous_button: step == 2 && !no_purchase,
+  show_account_button: EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+  show_help_button: false,
+  is_complete: step == 3,
+  continue_to_account_text: @market_kind == "individual" ? nil : l10n('continue').upcase } %>

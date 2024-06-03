@@ -1,30 +1,64 @@
-<div class="row no-buffer">
-  <div class="form-group form-group-lg">
-    <p class="sixteen"><%= l10n("insured.contact_preference") %></p>
-  </div>
-  <div class="phone no-pd">
-    <%= f.fields_for role, errors: {}, fieldset: true do |person_role| %>
+<% if @bs4 %>
+  <h4 class="gamma mb-0">Notices</h4>
+  <p><%= l10n("insured.contact_preference") %></p>
+  <%= f.fields_for role, errors: {}, fieldset: true do |person_role| %>
       <%= person_role.hidden_field :id if role == :employee_roles %>
       <% next if role == :employee_roles && !person_role.object&.is_active? %>
-      <div class="row row-form-wrapper no-buffer <%= 'hidden' if @identifier %>">
-        <div class="col-md-6 col-sm-6 form-group-lg no-pd">
-          <label class='personal_landing_page_label'>Contact Method</label>
-          <br>
+      <div class="<%= 'hidden' if @identifier %>">
+        <fieldset class="d-block col-sm-12 p-0">
+          <legend>Contact Method(s)</legend>
           <% if EnrollRegistry.feature_enabled?(:contact_method_via_dropdown) %>
             <%= person_role.select :contact_method, options_for_select([["Only paper communication", "Only Paper communication"], ["Only electronic communications", "Only Electronic communications"], [ "Both electronic and paper communications", "Paper and Electronic communications"]], selected: person_role.object.contact_method), {prompt: 'Select communications preference'} %>
           <% else %>
-            <% ["Email", "Mail", "Text"].each do |type| %>
+          <div class="d-flex mb-md-4 row col-sm">
+            <% {:email => l10n("insured.contact_option.email"), :mail => l10n("insured.contact_option.mail"), :text => l10n("insured.contact_option.text")}.each do |type_key, type_string| %>
+            <div class="col-sm col-md-3 p-0">
+              <% check_box_id = "contact_type_#{type_key}" %>
+              <%= person_role.label(:contact_method, for: check_box_id) do %>
+                <div class="d-flex col-4 p-0 pr-3 align-items-center mb-2 option">
+                  <span class="mr-2 contact-method"><%= person_role.check_box(:contact_method, {checked: (contact_preferences_mapping || ConsumerRole::CONTACT_METHOD_MAPPING.invert)[person_role.object.contact_method].to_a.include?(type_string), multiple: true, id: check_box_id}, type_string, nil) %></span>
+                  <%= type_string %>
+                </div>
+              <% end %>
+            </div>
+            <% end %>
+          </div>
+          <% end%>
+          </div>
+        </fieldset>
+        <div class="col-sm-12 mb-4 p-0">
+          <%= person_role.label :language_preference, l10n("Language Preference"), class:'personal_landing_page_label' %>
+          <%= person_role.select :language_preference, options_for_select(EnrollRegistry[:state_based_language_preferences].item || ["English"], selected: person_role.object.language_preference), {prompt: 'Select communications language'} %>
+        </div>
+      </div>
+      <% if role == :employee_roles && @person.active_employee_roles.size > 1 %>
+        <% @identifier = true %>
+      <% end %>
+    <% end %>
+<% else %>
+  <h3>Notices</h3>
+  <p class="sixteen"><%= l10n("insured.contact_preference") %></p>
+  <div class="phone row">
+    <%= f.fields_for role, errors: {}, fieldset: true do |person_role| %>
+      <%= person_role.hidden_field :id if role == :employee_roles %>
+      <% next if role == :employee_roles && !person_role.object&.is_active? %>
+      <div class="<%= 'hidden' if @identifier %>">
+        <div class="col-sm-12">
+          <label class='personal_landing_page_label'>Contact Method</label>
+          <% if EnrollRegistry.feature_enabled?(:contact_method_via_dropdown) %>
+            <%= person_role.select :contact_method, options_for_select([["Only paper communication", "Only Paper communication"], ["Only electronic communications", "Only Electronic communications"], [ "Both electronic and paper communications", "Paper and Electronic communications"]], selected: person_role.object.contact_method), {prompt: 'Select communications preference'} %>
+          <% else %>
+            <% {:email => l10n("insured.contact_option.email"), :mail => l10n("insured.contact_option.mail"), :text => l10n("insured.contact_option.text")}.each do |type_key, type_string| %>
               <span class="contact-method <%= 'flag-enabled' if EnrollRegistry.feature_enabled?(:adtl_contact_required_for_text) %>" style="margin: 0 5px">
-                <%= person_role.check_box(:contact_method, {checked: (contact_preferences_mapping || ConsumerRole::CONTACT_METHOD_MAPPING.invert)[person_role.object.contact_method].to_a.include?(type), multiple: true }, type, nil) %>
+                <%= person_role.check_box(:contact_method, {checked: (contact_preferences_mapping || ConsumerRole::CONTACT_METHOD_MAPPING.invert)[person_role.object.contact_method].to_a.include?(type_string), multiple: true, id: "contact_type_#{type_key}"}, type_string, nil) %>
                 &nbsp;
-                <%= type%>
+                <%= type_string %>
               </span>
             <% end %>
           <% end%>
           </div>
-        <div class="col-md-6 col-sm-6 form-group-lg no-pd">
+        <div class="col-sm-12 mt-4 mb-4">
           <label class='personal_landing_page_label'>Language Preference</label>
-          <br>
           <%= person_role.select :language_preference, options_for_select(EnrollRegistry[:state_based_language_preferences].item || ["English"], selected: person_role.object.language_preference), {prompt: 'Select communications language'} %>
         </div>
       </div>
@@ -33,4 +67,4 @@
       <% end %>
     <% end %>
   </div>
-</div>
+<% end %>

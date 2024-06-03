@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WelcomeController < ApplicationController
   layout 'bootstrap_4'
   skip_before_action :require_login
@@ -10,12 +12,12 @@ class WelcomeController < ApplicationController
   end
 
   def index
+    @bs4 = true if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   end
 
   def qna_bot
     render :layout => false
   end
-
 
   def form_template
     # created for generic form template access at '/templates/form-template'

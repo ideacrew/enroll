@@ -1,0 +1,51 @@
+<% if @bs4 %>
+  <%= render partial: 'shared/consumer_signup', locals: {step: 1} %>
+  <h1><%= l10n("insured.consumer_roles.upload_ridp_documents.header") %></h1>
+  <% if EnrollRegistry.feature_enabled?(:ridp_h139) %>
+    <p><%= l10n("insured.consumer_roles.upload_ridp_documents.ridp_h139_info") %></p>
+    <%= render partial: 'insured/fdsh_ridp_verifications/options_to_verify_identity' %>
+    <%= render partial: 'shared/application_types_list' %>
+    <div class="outstanding-ridp-documents">
+      <%= render partial: 'insured/fdsh_ridp_verifications/outstanding_ridp_documents' %>
+    </div>
+  <% else %>
+    <p><%= l10n("insured.consumer_roles.upload_ridp_documents.non_ridp_h139_info") %></p>
+    <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+    <%= render partial: 'shared/application_types_list' %>
+    <br>
+    <div class="outstanding-ridp-documents">
+      <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
+    </div>
+  <% end %>
+  <%= render partial: "shared/progress_navigation_buttons", locals: {next_link: ridp_redirection_link(@person), disable_link: ridp_step_2_disabled(@person, @person.consumer_role.application_verified?, @person.consumer_role.identity_verified?)} %>
+<% else %>
+  <div class="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+          <% if EnrollRegistry.feature_enabled?(:ridp_h139) %>
+            <h4>Allowing Experian to verify your identity is the fastest way to continue your application. If you change your mind and want to use Experian, go back to the previous page.</h4>
+            <%= render partial: 'insured/fdsh_ridp_verifications/options_to_verify_identity' %>
+            <%= render partial: 'shared/application_types_list' %>
+            <br>
+            <div class="outstanding-ridp-documents">
+              <%= render partial: 'insured/fdsh_ridp_verifications/outstanding_ridp_documents' %>
+            </div>
+          <% else %>
+            <h4>Allowing Experian to verify your identity is the fastest way to continue your application. If you change your mind, go back to the previous page.</h4>
+            <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+            <%= render partial: 'shared/application_types_list' %>
+            <br>
+            <div class="outstanding-ridp-documents">
+              <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+          <%= render partial: 'shared/individual_progress', locals: {step: '2', next_link: ridp_redirection_link(@person), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?} %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -5,6 +5,9 @@ class Insured::ConsumerRolesController < ApplicationController
   include VlpDoc
   include ErrorBubble
 
+  layout :resolve_layout
+
+  before_action :enable_bs4_layout, only: [:privacy, :search, :match, :edit, :ridp_agreement, :help_paying_coverage, :upload_ridp_document] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
@@ -212,6 +215,7 @@ class Insured::ConsumerRolesController < ApplicationController
         @target = Forms::FamilyMember.new
       end
     end
+    @bs4 = true if params[:bs4] == "true"
     @vlp_doc_target = params[:vlp_doc_target]
     vlp_doc_subject = params[:vlp_doc_subject]
     @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
@@ -552,5 +556,19 @@ class Insured::ConsumerRolesController < ApplicationController
 
     @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
     @person_params.merge!({user_id: current_user.id})
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
+  end
+
+  def resolve_layout
+    return "application" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    case action_name
+    when "privacy"
+      "bootstrap_4"
+    else
+      "progress"
+    end
   end
 end

@@ -1,66 +1,64 @@
 <% insured = insured_role_exists?(current_user) %>
-<% employer_staff =  (current_user.person && current_user.person.active_employer_staff_roles) || []%>
+<% employer_staff = (current_user.person && current_user.person.active_employer_staff_roles) || [] %>
 <% employer = employer_staff.first %>
-<% broker_staff_roles =  (current_user.person && current_user.person.active_broker_staff_roles) || []%>
-<% ga_staff_roles =  (current_user.person && current_user.person.active_general_agency_staff_roles) || []%>
+<% broker_staff_roles = (current_user.person && current_user.person.active_broker_staff_roles) || [] %>
+<% ga_staff_roles = (current_user.person && current_user.person.active_general_agency_staff_roles) || [] %>
 <% roles = [insured] %>
-<% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_staff_roles.count + ga_staff_roles.count%>
+<% portal_count = roles.select { |role| role }.count + employer_staff.count + broker_staff_roles.count + ga_staff_roles.count %>
 
-  <% if portal_count == 1 %>
-    <span>
-      <%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'header-text' if insured %>
-      <%= link_to l10n('.my_employer_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: 'header-text' if employer_staff.present? %>
+<% if portal_count == 1 %>
+  <span>
+    <%= link_to l10n(".my_insured_portal"), main_app.family_account_path(tab: 'home'), class: 'header-text' if insured %>
+    <%= link_to l10n('.my_employer_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: 'header-text' if employer_staff.present? %>
 
-      <!-- The text for the Broker Agency Portal link should display the name of the Broker Agency. -->
-      <!-- The redirection link should go to the Broker Agency Portal home page instead of the Broker Agency Registration page. -->
-      <%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'header-text' if broker_staff_roles.any? %>
-      <%= link_to l10n('.my_general_agency_portal'), benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_staff_roles.first.general_agency_profile, tab:'home'), class: 'header-text' if ga_staff_roles.any? %>
-      <span> | </span>
-    </span>
-    <%elsif portal_count > 1 %>
-      <span>
-        <a href="#" class="dropdown-toggle header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Portals <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <% if current_user.hints == true %>
-            <li>
-              <i class="fa fa-question-circle fa-3x text-center" aria-hidden="true" style="display: block;"></i>
-              <h3 class="darkblue no-buffer text-center">Did You Know?</h3>
-                <div class="panel panel-default">
-                  <div class="panel-body">You can move between your insured, employer, broker accounts using this My Portals link.</div>
-                </div>
-            </li>
-          <% end %>
-          <% if insured %>
-            <% if eligible_to_redirect_to_home_page?(current_user) %>
-              <li><%= link_to l10n('.my_insured_portal'), main_app.family_account_path(tab: 'home'), class: 'header-text' %></li>
-            <% else %>
-              <li><%= sanitize link_to l10n('.my_insured_portal'), current_user.person&.consumer_role&.bookmark_url, class: 'header-text' %></li>
-            <% end %>
-          <% end %>
-          <% employer_staff.each do |employer_staff_role|  %>
-            <% id = employer_staff_role.benefit_sponsor_employer_profile_id %>
-              <% employer = BenefitSponsors::Organizations::Profile.find(id) %>
-              <li><%= link_to employer.organization.legal_name, benefit_sponsors.profiles_employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
-          <% end %>
-          <% broker_staff_roles.each do |broker_staff_role| %>
-            <%profile = broker_staff_role.broker_agency_profile%>
-            <% if profile.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile %>
-              <% broker_link = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(profile, tab:'home') %>
-            <% end %>
-            <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
-          <% end %>
-          <% ga_staff_roles.each do |ga_staff_role| %>
-            <%profile = ga_staff_role.general_agency_profile%>
+    <%# The text for the Broker Agency Portal link should display the name of the Broker Agency. %--%>
+    <%# The redirection link should go to the Broker Agency Portal home page instead of the Broker Agency Registration page. %>
+    <%= link_to l10n('.my_broker_agency_portal'), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: 'header-text' if broker_staff_roles.any? %>
+    <%= sanitize(link_to l10n('.my_general_agency_portal'), benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_staff_roles.first.general_agency_profile, tab: 'home'), class: 'header-text') if ga_staff_roles.any? %>
+  </span>
+<% elsif portal_count >= 1 %>
+  <span>
+    <a href="#" class="dropdown-toggle header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Portals <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <% if current_user.hints == true %>
+        <li>
+          <i class="fa fa-question-circle fa-3x text-center" aria-hidden="true" style="display: block;"></i>
+          <h3 class="darkblue no-buffer text-center">Did You Know?</h3>
+          <div class="panel panel-default">
+            <div class="panel-body">You can move between your insured, employer, broker accounts using this My Portals link.</div>
+          </div>
+        </li>
+      <% end %>
+      <% if insured %>
+        <% if eligible_to_redirect_to_home_page?(current_user) %>
+          <li><%= link_to l10n('.my_insured_portal'), main_app.family_account_path(tab: 'home'), class: 'header-text' %></li>
+        <% else %>
+          <li><%= sanitize link_to l10n('.my_insured_portal'), current_user.person&.consumer_role&.bookmark_url, class: 'header-text' %></li>
+        <% end %>
+      <% end %>
+      <% employer_staff.each do |employer_staff_role| %>
+        <% id = employer_staff_role.benefit_sponsor_employer_profile_id %>
+        <% employer = BenefitSponsors::Organizations::Profile.find(id) %>
+        <li><%= link_to employer.organization.legal_name, benefit_sponsors.profiles_employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
+      <% end %>
+      <% broker_staff_roles.each do |broker_staff_role| %>
+        <% profile = broker_staff_role.broker_agency_profile %>
+        <% if profile.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile %>
+          <% broker_link = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(profile, tab: 'home') %>
+        <% end %>
+        <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
+      <% end %>
+      <% ga_staff_roles.each do |ga_staff_role| %>
+        <% profile = ga_staff_role.general_agency_profile %>
 
-            <% if profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile %>
-              <% ga_link = benefit_sponsors.profiles_general_agencies_general_agency_profile_path(profile, tab:'home') %>
-            <% else %>
-              <% ga_link =  main_app.general_agencies_profile_path(profile) %>
-            <% end %>
+        <% if profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile %>
+          <% ga_link = benefit_sponsors.profiles_general_agencies_general_agency_profile_path(profile, tab: 'home') %>
+        <% else %>
+          <% ga_link = main_app.general_agencies_profile_path(profile) %>
+        <% end %>
 
-            <li style="text-align:left"><%= link_to profile.legal_name, ga_link, class: 'header-text' %></li>
-          <% end %>
-        </ul>
-        <span> | </span>
-      </span>
-  <% end %>
+        <li style="text-align:left"><%= link_to profile.legal_name, ga_link, class: 'header-text' %></li>
+      <% end %>
+    </ul>
+  </span>
+<% end %>

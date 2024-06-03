@@ -1,0 +1,65 @@
+<hidden id='dchbx_enroll_date_of_record' class='d-none'><%= TimeKeeper.date_of_record.iso8601 %></hidden>
+<header class="bg-white navbar-primary py-2 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
+
+  <nav class="navbar navbar-expand-lg container py-1 px-0">
+    <a class="navbar-brand mr-0" href="#" title="<%= l10n('welcome.index.logo_title')%>">
+      <%= image_pack_tag "logo_bs4_#{ENV['CLIENT'] || 'ic'}.svg", alt: "#{ENV['CLIENT']} logo"%>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-dynamic-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"><%= image_pack_tag "icons/menu-burger.svg", class:"h-100", alt:"navbar collapse burger" %></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav-dynamic-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item-divider"></li>
+        <li class="nav-item d-flex flex-column site-name-market">
+          <span><%= l10n('welcome.index.welcome_to_site_header')%></span>
+          <%= bs4_portal_type(controller_name) %>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item d-flex flex-column align-items-end">
+          <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
+          <% contact_center_short_number = EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>
+          <a href="tel:<%= contact_center_short_number %>">
+            <%= "#{contact_center_short_number} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %>
+          </a>
+        </li>
+        <% if signed_in? %>
+          <li class="nav-item-divider"></li>
+          <li class="nav-item d-flex flex-column align-items-end">
+            <% user_id = current_user.try(:person).try(:hbx_id) %>
+            <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= " #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
+            <span class="horizontal-links">
+              <%= render partial: "shared/my_portal_links" %>
+              <span>
+                <%= sanitize(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %>
+              </span>
+              <span>
+                <%= sanitize(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %>
+              </span>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </nav>
+
+</header>
+<% if user_signed_in? %>
+  <script>
+    // check time until logout
+    function check_time_until_logout(){
+      $.ajax({
+        url: "<%= main_app.check_time_until_logout_path(format: :js) %>",
+        method: 'GET',
+        dataType: 'script',
+        data:{bs4: <%= @bs4 %>},
+        success: function(response){
+        },
+        error: function(response){
+        }
+      });
+    }
+    var logout_check_timer = setTimeout(check_time_until_logout, 87000);
+  </script>
+<% end %>
