@@ -87,7 +87,7 @@ module Operations
             person.families.each(&:update_family_document_status!)
 
           else
-            Failure("Person #{person.hbx_id} already has alive status or does not have ssn")
+            return Failure("Person #{person.hbx_id} already has alive status verification type or does not have ssn")
           end
 
           Success(person)
