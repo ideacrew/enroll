@@ -1,6 +1,5 @@
 <% if @bs4 %>
   <%= form_for @person do |f| %>
-    <%= hidden_field_tag :bs4, true %>
     <div id="personal_info" class="module new_person_wrapper">
       <div class="d-flex mb-md-4 row col-sm">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
@@ -23,11 +22,11 @@
       <div class="d-flex mb-md-4 row col-sm">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
-          <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true, disabled: true, readonly: f.object.is_a?(Forms::EmployeeRole) || f.object.is_a?(Person) %>
+          <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :gender, l10n("gender"), class: 'required'  %>
-          <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], prompt: l10n("select_option"), autocomplete: :off, required: true %>
+          <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], autocomplete: :off, required: true %>
           <a href="#sex_gender" data-toggle="modal" data-target="#sex_gender" class="d-block"><%= l10n("not_sure") %></a>
           <%= render partial: 'shared/modal_support_text_household', locals: {key: "sex_gender"} %>
         </div>
@@ -36,24 +35,18 @@
       <div class="d-flex mb-md-4 row col-sm">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :ssn, "Social Security" %>
-          <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
-            <%= render partial: 'shared/person/ssn/consumer_ssn_field',
-              locals: { f: f, presenter: organize_ssn_params(f.object) } 
-            %>
+          <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
+              pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+              oninput: "this.setCustomValidity('')", disabled: true, readonly: f.object.is_a?(Forms::EmployeeRole) %>
           <% else %>
-            <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-              <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
-                pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-                oninput: "this.setCustomValidity('')", disabled: true, readonly: f.object.is_a?(Forms::EmployeeRole) %>
-            <% else %>
-              <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: true,
-                readonly: f.object.is_a?(Forms::EmployeeRole) %>
-            <% end %>
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: true,
+              readonly: f.object.is_a?(Forms::EmployeeRole) %>
           <% end %>
         </div>
         <div class="col-sm col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
           <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
-            <%= f.check_box :no_ssn, disabled: @person.try(:ssn) %><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %>
+            <%= f.check_box :no_ssn %><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %>
             <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
             <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
           <% end %><span>
@@ -61,24 +54,17 @@
         <div class="mr-auto col-sm col-md-6 p-0 sm-hide"></div>
       </div>
     </div>
-    <fieldset class="d-flex mb-md-4">
-      <legend class="required weight-n"><%= l10n("does_person_need_coverage", person: @person.first_name.present? ? @person.first_name : l10n("faa.this_person")) %></legend>
-      <div class="d-flex align-items-center mt-0">
-        <% first_checked, second_checked = is_applying_coverage_value_personal(@person) %>
-        <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
-      </div>
-    </fieldset>
 
     <% if current_user.does_not_have_any_staff_role? && !current_user.has_insured_role? %>
       <%= render 'shared/age_off_excluded', f: f %>
     <% end %>
-    
+
     <section class="mb-4">
       <% if @person.is_consumer_role_active? %>
         <div id="consumer_fields_sets ">
           <%= render 'shared/consumer_fields', f: f %>
         </div>
-        <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f} %>
+        <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
       <% else %>
         <%= render 'shared/home_address_fields', f: f %>
       <% end %>
@@ -87,11 +73,11 @@
     <section class="mb-4">
       <h4 class="gamma mb-0"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
       <p><%= l10n("insured.consumer_roles.please_provide") %></p>
-      <%= render partial: 'shared/phone_fields', locals: {f: f} %>
+      <%= render partial: 'shared/phone_fields', locals: {f: f, bs4: true} %>
       <div id="email_info" class="">
         <div class="email d-flex mb-md-4 row col-sm">
           <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-            <%= render partial: 'shared/email_fields', locals: {f: email} %>
+            <%= render partial: 'shared/email_fields', locals: {f: email, bs4: true} %>
           <% end %>
         </div>
       </div>
@@ -120,33 +106,14 @@
     <% end %>
 
     <div class="mb-5 <%= pundit_class Family, :updateable? %>">
-      <%= link_to l10n("discard_changes"), '#', class: "btn button outline remove-personal-form mr-2" %>
+      <%= h(link_to l10n("cancel"), insured_family_members_path, :remote => true, class: "btn button outline") %>
 
       <button type="submit" class="btn btn-primary btn-br hidden"><%= l10n("confirm_member") %></button>
       <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'save_personal')" id="save_personal" class='btn btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));' data-cuke="personal-save">
-        <%= l10n("save_changes") %>
+        <%= l10n("confirm_member") %>
       </span>
     </div>
   <% end %>
-  <script>
-    $('.remove-personal-form').off('click');
-    $('.remove-personal-form').on('click', function (e) {
-      $(".append_consumer_info").empty();
-      if ($(".my-household-page")) {
-        $("#person-<%= @person.id %>").addClass('hidden');
-        $("a[id^=edit-member]").removeClass('disabled');
-        $("a[id^=edit-member]").removeAttr('disabled');
-        // primary_family
-        var family_table = $("<%= escape_javascript(render 'insured/families/manage_family_table', members: @person.primary_family.active_family_members) %>");
-        $('#manage_family_content').html(family_table);
-      }
-    });
-
-    $(document).off('click', '.confirm-member');
-    $(document).on('click', '.confirm-member', function(e) {
-      $("#save_personal").click();
-    });
-  </script>
 
 <% else %>
   <%= form_for @person do |f|%>

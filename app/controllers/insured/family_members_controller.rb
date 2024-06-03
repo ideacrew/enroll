@@ -6,7 +6,7 @@ class Insured::FamilyMembersController < ApplicationController
   include ::L10nHelper
 
   layout 'progress', only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-  before_action :enable_bs4_layout, only: [:index, :destroy] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
@@ -144,24 +144,6 @@ class Insured::FamilyMembersController < ApplicationController
     end
   end
 
-  # NOTE: ensure that current user is either
-  # 1.) hbx admin, or
-  # 2.) the current user is the primary for the family AND the subject is a member of that family
-  def show_ssn
-    @family = Family.find(params[:family_id]) if params[:family_id]
-    authorize @family, :can_show_ssn?
-    @person = Person.find(params[:id]) unless @person.id == params[:id]
-
-    if @family.person_is_family_member?(@person)
-      payload = number_to_ssn(@person.ssn)
-      render json: { payload: payload, status: 200 }
-    else
-      render json: { message: "Unauthorized" }, status: 401
-    end
-  rescue Pundit::NotAuthorizedError, Mongoid::Errors::DocumentNotFound
-    render json: { message: "Unauthorized" }, status: 401
-  end
-
   def edit
     authorize @family, :edit?
 
@@ -171,8 +153,8 @@ class Insured::FamilyMembersController < ApplicationController
 
     @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
-      format.html { render 'edit.js.erb' }
-      format.js { render 'edit.js.erb' }
+      format.html
+      format.js
     end
   end
 
@@ -223,8 +205,8 @@ class Insured::FamilyMembersController < ApplicationController
       @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
       init_address_for_dependent
       respond_to do |format|
-        format.html { render 'edit.js.erb' }
-        format.js { render 'edit.js.erb' }
+        format.html { render 'edit' }
+        format.js { render 'edit' }
       end
     end
   end
@@ -319,8 +301,8 @@ class Insured::FamilyMembersController < ApplicationController
                        end
       @family = @person.primary_family
     when 'consumer'
-      @consumer_role = @person&.consumer_role
-      @family = @consumer_role&.person&.primary_family
+      @consumer_role = @person.consumer_role
+      @family = @consumer_role.person.primary_family
     end
 
     @family = Family.find(params[:family_id]) if params[:family_id]

@@ -30,23 +30,18 @@
         <input id="relation" type="text" value="<%= l10n("self").humanize %>" disabled >
       </div>
     </div>
-    <div id="person-<%= @person.id %>" class="hidden my-4">
-      <div class="append_consumer_info"></div>
-    </div>
-    <%= h(link_to l10n("edit_member"), personal_insured_families_path({bs4: @bs4, person: @person.id}), remote: true, id: 'edit-primary-person', class: 'btn button outline close-2 my-3') %>
+
+    <%= h(link_to l10n("edit_member"), personal_insured_families_path({bs4: @bs4}), remote: true, id: 'edit-primary-person', class: 'btn button outline close-2 my-3') %>
+
+    <div class="append_consumer_info"></div>
   </div>
 
   <%# FAA 'info needed' row - add income & coverage info buttons %>
   <%= yield :primary_member_fa %>
 
-  <div id="append_consumer_info"></div>
-
   <div id="dependent_ul">
     <% @family.active_family_members.reject(&:is_primary_applicant).each_with_index do |dependent, index| %>
       <%= render "insured/family_members/dependent", dependent: dependent, person: @person, member_number: index+2 %>
-      <div id="person-<%= dependent.id %>" class="hidden my-4">
-        <div class="append_consumer_info"></div>
-      </div>
     <% end %>
   </div>
 
@@ -59,20 +54,19 @@
           <path d="M10.0001 13.9997L10.0001 9.99976L14.0001 9.99976" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="10" cy="10" r="9" stroke="#FFFFFF" stroke-width="2"/>
         </svg>
-        <span class="ml-2"><%= l10n("add_member_to_household") %></span>
+        <span class="ml-2"><%= l10n("add_new_member") %></span>
       <% end) %>
-      <% if @application.present? %>
+
       <div class="help-to-decide align-content-around ml-3">
         <a href="#help_me_decide" data-toggle="modal" data-target="#help_me_decide" class="d-block"><%= l10n("help_me_decide_title") %></a>
-        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "help_me_decide"} %>
+        <%= render partial: 'shared/modal_support_text_household', locals: {key: "help_me_decide"} %>
       </div>
-      <% end %>
   </div>
 
   <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
     <p class="fail"><%= l10n("insured.family_members.index.add_member_info_html") %></p>
     <div class="<%= pundit_class Family, :updateable?%>">
-      <%= h(link_to l10n("add_member_to_household"), main_app.new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id)), :remote => true, :class => "btn btn-default") %>
+      <%= h(link_to l10n("add_member"), main_app.new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id)), :remote => true, :class => "btn btn-default") %>
     </div>
   </div>
 

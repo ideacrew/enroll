@@ -1,6 +1,4 @@
-
-@mixin solid-button($button-color: var(--button-primary-color), $color: var(--grey-000), $hover: var(--button-primary-hover-color),
-                    $active: var(--button-primary-active-color)) {
+@mixin solid-button($button-color: var(--button-primary-color), $color: var(--grey-000), $hover: var(--button-primary-hover-color), $active: var(--button-primary-active-color)) {
   background-color: $button-color;
   font-weight: 600;
   line-height: 20px;
@@ -33,8 +31,7 @@
   }
 }
 
-@mixin ghost-button($button-color: var(--button-primary-color), $hover: var(--button-primary-hover-color),
-                    $active: var(--button-primary-active-color)) {
+@mixin ghost-button($button-color: var(--button-primary-color), $hover: var(--button-primary-hover-color), $active: var(--button-primary-active-color)) {
   background-color: transparent;
   font-weight: 600;
   padding: 8px 12px;
