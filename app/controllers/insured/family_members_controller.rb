@@ -5,6 +5,9 @@ class Insured::FamilyMembersController < ApplicationController
   include ApplicationHelper
   include ::L10nHelper
 
+  layout 'progress', only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
   before_action :set_dependent_and_family, only: [:destroy, :show, :edit, :update]
@@ -59,6 +62,8 @@ class Insured::FamilyMembersController < ApplicationController
 
     @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
     set_view_person
+
+    @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
       format.html
       format.js
@@ -97,6 +102,7 @@ class Insured::FamilyMembersController < ApplicationController
       @created = true
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       fire_consumer_roles_create_for_vlp_docs(consumer_role) if consumer_role
+      @bs4 = true if params[:bs4] == "true"
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -130,6 +136,8 @@ class Insured::FamilyMembersController < ApplicationController
     authorize @family, :show?
 
     set_view_person
+
+    @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
       format.html
       format.js
@@ -142,6 +150,8 @@ class Insured::FamilyMembersController < ApplicationController
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
     set_view_person
+
+    @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
       format.html
       format.js
@@ -153,6 +163,8 @@ class Insured::FamilyMembersController < ApplicationController
 
     @dependent.skip_consumer_role_callbacks = true
     @address_errors = validate_address_params(params)
+
+    @bs4 = true if params[:bs4] == "true"
 
     if @dependent.family_member.try(:person).present? && @dependent.family_member.try(:person).is_resident_role_active?
       if @address_errors.blank? && @dependent.update_attributes(params[:dependent])
@@ -372,5 +384,9 @@ class Insured::FamilyMembersController < ApplicationController
     # an admin accessing family members on an unrelated user account
 
     @person = @family.primary_person if @person != @family.primary_person
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end
