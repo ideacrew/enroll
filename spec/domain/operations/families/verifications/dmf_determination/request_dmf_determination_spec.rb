@@ -52,6 +52,7 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::RequestDmf
 
   context "success" do
     before do
+      job.create_process_status
       @result = described_class.new.call(payload)
     end
 
@@ -60,6 +61,7 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::RequestDmf
     end
 
     it "should update the job" do
+      job.reload
       expect(job.process_status.latest_state).to eq :transmitted
     end
 
