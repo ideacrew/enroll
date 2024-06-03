@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-@accessibility
 Feature: Contrast level AA is enabled - unemployment and other income form page
 
   Background: User logs in and visits applicant's other income page
