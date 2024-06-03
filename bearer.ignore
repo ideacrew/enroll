@@ -1091,6 +1091,12 @@
     "false_positive": true,
     "ignored_at": "2024-05-23T20:06:43Z"
   },
+  "800a8691b4ab0422b23577f97f0d2a71_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This line is flagged as 'HIGH: Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but 'nodeName' is always one of the hardcoded strings 'row', 'c', 'v', 'is', 't', 'cols', 'col' and is not derived from user input.",
+    "false_positive": true,
+    "ignored_at": "2024-06-03T14:35:17Z"
+  },
   "81a3d388bb5781a91b0717ba4a8c7415_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
