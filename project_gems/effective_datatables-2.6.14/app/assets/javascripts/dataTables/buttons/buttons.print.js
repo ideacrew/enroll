@@ -126,13 +126,6 @@ DataTable.ext.buttons.print = {
 			head += _relToAbs( this );
 		} );
 
-		try {
-			win.document.head.innerHTML = head; // Work around for Edge
-		}
-		catch (e) {
-			$(win.document.head).html( head ); // Old IE
-		}
-
 		// Inject the table and other surrounding information
 		win.document.body.innerHTML =
 			'<h1>'+title+'</h1>'+
