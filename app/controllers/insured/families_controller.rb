@@ -178,6 +178,7 @@ class Insured::FamiliesController < FamiliesController
     @person.resident_role.build_nested_models_for_person if @person.is_resident_role_active?
     @resident = @person.is_resident_role_active?
 
+    @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
       format.html
       format.js
