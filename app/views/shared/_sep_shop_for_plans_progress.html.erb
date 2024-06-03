@@ -1,0 +1,53 @@
+<% step = (defined? step) ? step.to_i : 1 %>
+<% no_purchase = (defined? no_purchase) ? no_purchase : false %>
+
+<% percent_complete = 0 %>
+<% percent_complete = (step == 1) ? 33 : ((step == 2) ? 66 : ((step == 3) ? 85 : ((step == 4) ? 100: 0 ))) %>
+
+<h3><%= "#{percent_complete}% Complete" %></h3>
+<ul class="list-unstyled progress-wrapper hidden-xs">
+  <li class="<%= add_progress_class(1, step) %>">
+    <span class="circle-progress"></span>
+    <div class="vertical-line-progress"></div>
+    <%= l10n('insured.families.special_enrollment_period') %>
+  </li>
+  <li class="<%= add_progress_class(2, step) %>">
+    <span class="circle-progress"></span>
+    <div class="vertical-line-progress"></div>
+    <%= l10n('plan_selection') %>
+  </li>
+  <li class="<%= add_progress_class(3, step) %>">
+    <span class="circle-progress"></span>
+    <div class="vertical-line-progress"></div>
+    <%= l10n('review') %>
+  </li>
+  <li class="<%= add_progress_class(4, step) %>">
+    <span class="circle-progress"></span>
+    <div class="vertical-line-progress"></div>
+    <%= l10n('complete') %>
+  </li>
+</ul>
+
+<% if step == 2 && (@market_kind == 'shop' || @market_kind == 'fehb') %>
+  <% if @hbx_enrollment and @hbx_enrollment.employee_role.present? %>
+    <%= h(link_to l10n('waive_coverage'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn btn-waive btn-default') %>
+  <% end %>
+<% end %>
+
+<% if step == 3 && !no_purchase %>
+  <%= h(link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), class: "btn btn-lg btn-primary btn-block #{'disabled' if @market_kind == 'individual'}", id: 'btn-continue', method: :post) %>
+
+  <% if (@market_kind == 'shop' || @market_kind == 'fehb') %>
+    <%= h(link_to l10n('waive_coverage'), '#', data: {toggle: "modal", target: "#waive_confirm"}, class: 'btn-waive btn btn-round btn-default') if @enrollment and @enrollment.employee_role.present? %>
+  <% end %>
+<% elsif step == 1 %>
+  <%= h(link_to l10n('continue').upcase, family_account_path, class: 'btn btn-lg btn-primary btn-block no-sep-continue', disabled: true, id: 'btn-continue') %>
+<% end %>
+
+<%= render partial: 'shared/shopping_nav_panel',
+  locals: {show_exit_button: false,
+  show_previous_button: step == 3 && !no_purchase,
+  show_account_button: EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+  show_help_button: false,
+  is_complete: step == 4,
+  continue_to_account_text: l10n('continue').upcase } %>
