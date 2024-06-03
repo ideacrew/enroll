@@ -32,7 +32,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.select_yearly
-    'li[class="interaction-choice-control-income-frequency-kind-7 last interaction-choice-control-income-employer-address-state-7"]'
+    '.fa-frequency-kind li[data-index="7"]'
   end
 
   def self.income_from
@@ -64,7 +64,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.select_dc
-    'li[class="interaction-choice-control-income-employer-address-state-9 interaction-choice-control-income-frequency-kind-9"]'
+    '.selectric-interaction-choice-control-income-employer-address-state li[data-index="9"]'
   end
 
   def self.select_va_state
