@@ -1,12 +1,13 @@
 <% if @bs4 %>
   <div class="hidden" id="qle-details">
-    <h2> <%= l10n("insured.event_details") %> </h2>
+    <h2> <%= l10n("insured.qle_detail.event_details") %> </h2>
     <h3 class="qle-details-title"></h3>
     <div class="hidden qle-label"></div>
     <div>
       <div class="col px-0">
         <div id='qle-date-chose'>
           <div class="sep-date mb-2">
+            <label class="weight-n"><%= l10n("insured.qle_detail.event_date") %></label>
             <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", required: true %>
           </div>
         </div>
