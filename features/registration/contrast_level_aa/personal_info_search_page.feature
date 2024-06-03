@@ -1,4 +1,3 @@
-@accessibility
 Feature: Contrast level AA is enabled - Consumer goes to the search via personal info page
   Scenario: Consumer visits the search via personal info page
     Given the contrast level aa feature is enabled

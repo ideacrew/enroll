@@ -1,4 +1,3 @@
-@accessibility
 Feature: contrast level aa is enabled - A dedicated page that gives the user prior notice that that application will require a large amount of information for every member of the household.
 
   Background:

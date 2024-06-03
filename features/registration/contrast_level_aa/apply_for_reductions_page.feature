@@ -1,4 +1,3 @@
-@accessibility
 Feature: Contrast level AA is enabled - Consumer goes to verify identity questions page
   Scenario: Consumer visits the verify identity questions page
     Given the contrast level aa feature is enabled
