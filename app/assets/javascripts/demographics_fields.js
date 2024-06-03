@@ -431,10 +431,9 @@ var PersonValidations = (function (window, undefined) {
       var naturalized_citizen = document.getElementById('person_naturalized_citizen_true') || document.getElementById('naturalized_citizen_true');
       return ( us_citizen.checked || naturalized_citizen.checked );
     } else if (immigration_field) {
-      return (
-        document.getElementById('dependent_us_citizen_false').checked ||
-        document.getElementById('dependent_naturalized_citizen_true').checked
-      );
+      var us_citizen = document.getElementById('dependent_us_citizen_false') || document.getElementById('us_citizen_false');
+      var naturalized_citizen = document.getElementById('dependent_naturalized_citizen_true') || document.getElementById('naturalized_citizen_true');
+      return ( us_citizen.checked || naturalized_citizen.checked );
     }
   }
 
