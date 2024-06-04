@@ -5,7 +5,6 @@
   $('#qle_reason .special_qle_reasons').removeClass('hidden');
   $('#qle-nav #qle_submit').prop('id', "qle_submit_reason");
   $("input:radio[name=reason]:first").click();
-  $("input:radio[name=reason]:first").val(moving_notice);
 <% else %>
   $.ajax({
       type: "GET",
