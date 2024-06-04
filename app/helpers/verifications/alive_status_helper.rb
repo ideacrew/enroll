@@ -8,7 +8,7 @@ module Verifications
     # but should only display for consumers/brokers/broker agency staff if the validation_status is 'outstanding'
     def can_display_or_modify_type?(verif_type)
       return true unless verif_type&.type_name == 'Alive Status'
-      return false unless EnrollRegistry.feature_enabled?(:enable_alive_status)
+      return false unless EnrollRegistry.feature_enabled?(:alive_status)
       return true if current_user.has_hbx_staff_role?
 
       previous_states = verif_type&.type_history_elements&.pluck(:from_validation_status)&.compact

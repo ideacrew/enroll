@@ -1,4 +1,3 @@
-@accessibility
 Feature: Cost Savings -  Start New Application
 
   Admin/Consumer/Broker will be able to access Cost Savings - Start New Application
