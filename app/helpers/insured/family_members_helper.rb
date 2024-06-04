@@ -9,9 +9,9 @@ module Insured::FamilyMembersHelper
 
   def employee_dependent_submission_options_for(model)
     if model.try(:persisted?)
-      { :remote => true, method: :put, :url => insured_family_member_path(id: model.id), :as => :dependent }
+      { :remote => true, method: :put, :url => insured_family_member_path(id: model.id, bs4: @bs4), :as => :dependent }
     else
-      { :remote => true, method: :post, :url => insured_family_members_path, :as => :dependent }
+      { :remote => true, method: :post, :url => insured_family_members_path(bs4: @bs4), :as => :dependent }
     end
   end
 

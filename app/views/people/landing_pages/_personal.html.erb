@@ -1,136 +1,255 @@
-<%= form_for @person do |f|%>
-  <div class="row no-buffer">
-    <div id="personal_info" class="module">
-      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :first_name, id: "first-name", class: "floatlabel form-control", placeholder: "FIRST NAME", autocomplete: :off %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :middle_name, class: "floatlabel form-control", placeholder: "MIDDLE NAME", autocomplete: :off %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME", autocomplete: :off %>
-          </div>
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
-          </div>
+<% if @bs4 %>
+  <%= form_for @person do |f| %>
+    <div id="personal_info" class="module new_person_wrapper">
+      <div class="d-flex mb-md-4 row col-sm">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <%= f.label :first_name, l10n("first_name"), class: "required" %>
+          <%= f.text_field :first_name, class: "required", required: true, placeholder: l10n("first_name"), autocomplete: :off %>
         </div>
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH",
-                                             :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yy', disabled: 'disabled'} %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :ssn, class: "person_ssn number mask-ssn floatlabel form-control", placeholder: "SOCIAL SECURITY", id: "", title: "8 digits", disabled: 'disabled' %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
-            <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio skinned-form-controls skinned-form-controls-mac">
-              <%= f.radio_button :gender, "male", class: "required floatlabel", id: "radio_male" %>
-              <label for="radio_male" data-cuke="primary_radio_male"><span>MALE</span></label>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
-            <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio skinned-form-controls skinned-form-controls-mac">
-              <%= f.radio_button :gender, "female", class: "required floatlabel", id: "radio_female" %>
-              <label for="radio_female"><span>FEMALE</span></label>
-            </div>
-          </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <%= f.label :middle_name, l10n("middle_name") %>
+          <%= f.text_field :middle_name, class: "required", required: false, placeholder: l10n("middle_name"), autocomplete: :off %>
         </div>
-
-        <% if can_shop_individual?(@person) %>
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-            <span>Does <%= @person.first_name %> need coverage? *</span>
-          </div>
-            <% first_checked, second_checked = is_applying_coverage_value_personal(@person) %>
-          <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <%= f.label :last_name, l10n("last_name"), class: "required" %>
+          <%= f.text_field :last_name, class: "required", required: true, placeholder: l10n("last_name"), autocomplete: :off %>
         </div>
-        <% end %>
-        <% if current_user.does_not_have_any_staff_role? && !current_user.has_insured_role? %>
-          <div class="row row-form-wrapper no-buffer">
-            <%= render 'shared/age_off_excluded', f: f%>
-          </div>
+        <div class="col-sm col-md-6 col-lg-3 p-0">
+          <%= f.label :name_sfx, l10n("suffix") %>
+          <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => l10n("none"), autocomplete: :off %>
+        </div>
+      </div>
+      <div class="d-flex mb-md-4 row col-sm">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
+          <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
+        </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <%= f.label :gender, l10n("gender"), class: 'required'  %>
+          <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], autocomplete: :off, required: true %>
+          <a href="#sex_gender" data-toggle="modal" data-target="#sex_gender" class="d-block"><%= l10n("not_sure") %></a>
+          <%= render partial: 'shared/modal_support_text_household', locals: {key: "sex_gender"} %>
+        </div>
+        <div class="mr-auto col-sm col-md-6 p-0 sm-hide"></div>
+      </div>
+      <div class="d-flex mb-md-4 row col-sm">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <%= f.label :ssn, "Social Security" %>
+          <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
+              pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+              oninput: "this.setCustomValidity('')", disabled: true, readonly: f.object.is_a?(Forms::EmployeeRole) %>
+          <% else %>
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: true,
+              readonly: f.object.is_a?(Forms::EmployeeRole) %>
           <% end %>
+        </div>
+        <div class="col-sm col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
+          <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
+            <%= f.check_box :no_ssn %><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %>
+            <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
+            <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
+          <% end %><span>
+        </div>
+        <div class="mr-auto col-sm col-md-6 p-0 sm-hide"></div>
       </div>
     </div>
-  </div>
-<% if @person.is_consumer_role_active? && @person.has_active_employee_role? && @person.ssn.present? %>
-  <br>
-<div id="employer-coverage-msg">
-  <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-    <div class="alert alert-success alert-dismissible">
-      Your answer to this question does not apply to coverage offered by an employer.
-    </div>
-  </div>
-    </div>
-    <% end %>
-  <br />
-  <% if @person.is_consumer_role_active? %>
-  <div id="consumer_fields_sets">
-    <%= render 'shared/consumer_fields', f: f %><br>
-    </div>
-    <%= render 'shared/consumer_home_address_fields', f: f %><br>
-  <% else %>
-    <%= render 'shared/home_address_fields', f: f %><br>
-  <% end %>
 
-  <%=
-    unless f.object.phones.nil?
-      ["home","mobile","work","fax"].each do |kind|
-         f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
-      end
-    end
-
-    render 'shared/phone_fields', f: f
-  %><br>
-
-    <% unless f.object.emails.nil?
-         ["home","work"].each do |kind|
-           f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
-         end
-       end
-    %>
-
-    <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-      <div id="email_info" class="row row-form-wrapper no-buffer">
-      <%= render 'shared/email_fields', f: email %>
-        </div><br>
-
+    <% if current_user.does_not_have_any_staff_role? && !current_user.has_insured_role? %>
+      <%= render 'shared/age_off_excluded', f: f %>
     <% end %>
 
-     <div>
+    <section class="mb-4">
       <% if @person.is_consumer_role_active? %>
-        <%= render 'shared/contact_preferences', {f: f, role: :consumer_role, contact_preferences_mapping: nil} %></br>
-      <% elsif @person.is_resident_role_active? %>
-      <!-- contact_preferences_mapping feature is only developed for consumer role, refactor for other roles where there is a requirement -->
-        <%= render 'shared/contact_preferences', {f: f, role: :resident_role, contact_preferences_mapping: {}} %></br>
+        <div id="consumer_fields_sets ">
+          <%= render 'shared/consumer_fields', f: f %>
+        </div>
+        <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
       <% else %>
-        <%= render 'shared/contact_preferences', {f: f, role: :employee_roles, contact_preferences_mapping: {}} %></br>
+        <%= render 'shared/home_address_fields', f: f %>
       <% end %>
-    </div>
+    </section>
 
-    <div>
-      <div class="no-buffer no-border-top">
-        <div class="form-group form-group-lg">
-          <% if aca_security_questions %>
-            <p class="sixteen"><a class="update-security-responses-link" id='update_security_responses_link' href="#securityQuestionModal" data-toggle="modal" data-target="#securityQuestionModal">Update my security challenge responses</a>
-            </p>
+    <section class="mb-4">
+      <h4 class="gamma mb-0"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
+      <p><%= l10n("insured.consumer_roles.please_provide") %></p>
+      <%= render partial: 'shared/phone_fields', locals: {f: f, bs4: true} %>
+      <div id="email_info" class="">
+        <div class="email d-flex mb-md-4 row col-sm">
+          <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+            <%= render partial: 'shared/email_fields', locals: {f: email, bs4: true} %>
           <% end %>
         </div>
       </div>
+    </section>
+
+    <section class="my-4">
+      <% if @person.is_consumer_role_active? %>
+        <%= render 'shared/contact_preferences', {f: f, role: :consumer_role, contact_preferences_mapping: nil, bs4: true } %>
+      <% elsif @person.is_resident_role_active? %>
+        <%= render 'shared/contact_preferences', {f: f, role: :resident_role, contact_preferences_mapping: {}, bs4: true } %>
+      <% else %>
+        <%= render 'shared/contact_preferences', {f: f, role: :employee_roles, contact_preferences_mapping: {}, bs4: true } %>
+      <% end %>
+    </section>
+
+    <div class="no-buffer no-border-top">
+      <div class="form-group form-group-lg">
+        <% if aca_security_questions %>
+          <a class="update-security-responses-link" id='update_security_responses_link' href="#securityQuestionModal" data-toggle="modal" data-target="#securityQuestionModal">Update my security challenge responses</a>
+        <% end %>
+      </div>
     </div>
 
-  <%if @tab.nil?%>
-    <%= hidden_field_tag :page, "from_registration"%>
+    <% if @tab.nil? %>
+      <%= hidden_field_tag :page, "from_registration" %>
+    <% end %>
+
+    <div class="mb-5 <%= pundit_class Family, :updateable? %>">
+      <%= h(link_to l10n("cancel"), insured_family_members_path, :remote => true, class: "btn button outline") %>
+
+      <button type="submit" class="btn btn-primary btn-br hidden"><%= l10n("confirm_member") %></button>
+      <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'save_personal')" id="save_personal" class='btn btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));' data-cuke="personal-save">
+        <%= l10n("confirm_member") %>
+      </span>
+    </div>
   <% end %>
 
-  <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
-    <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus white"></i> Save</button>
-    <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'save_personal')" id="save_personal" class='btn btn-lg btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));' data-cuke="personal-save"><i class="fa fa-user-plus white"></i> Save</span>
-  </div>
+<% else %>
+  <%= form_for @person do |f|%>
+    <div class="row no-buffer">
+      <div id="personal_info" class="module">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%=f.text_field :first_name, id: "first-name", class: "floatlabel form-control", placeholder: "FIRST NAME", autocomplete: :off %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%=f.text_field :middle_name, class: "floatlabel form-control", placeholder: "MIDDLE NAME", autocomplete: :off %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%=f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME", autocomplete: :off %>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
+            </div>
+          </div>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH",
+                                              :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yy', disabled: 'disabled'} %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%=f.text_field :ssn, class: "person_ssn number mask-ssn floatlabel form-control", placeholder: "SOCIAL SECURITY", id: "", title: "8 digits", disabled: 'disabled' %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+              <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio skinned-form-controls skinned-form-controls-mac">
+                <%= f.radio_button :gender, "male", class: "required floatlabel", id: "radio_male" %>
+                <label for="radio_male" data-cuke="primary_radio_male"><span>MALE</span></label>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+              <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio skinned-form-controls skinned-form-controls-mac">
+                <%= f.radio_button :gender, "female", class: "required floatlabel", id: "radio_female" %>
+                <label for="radio_female"><span>FEMALE</span></label>
+              </div>
+            </div>
+          </div>
+
+          <% if can_shop_individual?(@person) %>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+              <span>Does <%= @person.first_name %> need coverage? *</span>
+            </div>
+              <% first_checked, second_checked = is_applying_coverage_value_personal(@person) %>
+            <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+          </div>
+          <% end %>
+          <% if current_user.does_not_have_any_staff_role? && !current_user.has_insured_role? %>
+            <div class="row row-form-wrapper no-buffer">
+              <%= render 'shared/age_off_excluded', f: f%>
+            </div>
+            <% end %>
+        </div>
+      </div>
+    </div>
+  <% if @person.is_consumer_role_active? && @person.has_active_employee_role? && @person.ssn.present? %>
+    <br>
+  <div id="employer-coverage-msg">
+    <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+      <div class="alert alert-success alert-dismissible">
+        Your answer to this question does not apply to coverage offered by an employer.
+      </div>
+    </div>
+      </div>
+      <% end %>
+    <br />
+    <% if @person.is_consumer_role_active? %>
+    <div id="consumer_fields_sets">
+      <%= render 'shared/consumer_fields', f: f %><br>
+      </div>
+      <%= render 'shared/consumer_home_address_fields', f: f %><br>
+    <% else %>
+      <%= render 'shared/home_address_fields', f: f %><br>
+    <% end %>
+
+    <%=
+      unless f.object.phones.nil?
+        ["home","mobile","work","fax"].each do |kind|
+          f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
+        end
+      end
+
+      render 'shared/phone_fields', f: f
+    %><br>
+
+      <% unless f.object.emails.nil?
+          ["home","work"].each do |kind|
+            f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
+          end
+        end
+      %>
+
+      <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+        <div id="email_info" class="row row-form-wrapper no-buffer">
+        <%= render 'shared/email_fields', f: email %>
+          </div><br>
+
+      <% end %>
+
+      <div>
+        <% if @person.is_consumer_role_active? %>
+          <%= render 'shared/contact_preferences', {f: f, role: :consumer_role, contact_preferences_mapping: nil} %></br>
+        <% elsif @person.is_resident_role_active? %>
+        <!-- contact_preferences_mapping feature is only developed for consumer role, refactor for other roles where there is a requirement -->
+          <%= render 'shared/contact_preferences', {f: f, role: :resident_role, contact_preferences_mapping: {}} %></br>
+        <% else %>
+          <%= render 'shared/contact_preferences', {f: f, role: :employee_roles, contact_preferences_mapping: {}} %></br>
+        <% end %>
+      </div>
+
+      <div>
+        <div class="no-buffer no-border-top">
+          <div class="form-group form-group-lg">
+            <% if aca_security_questions %>
+              <p class="sixteen"><a class="update-security-responses-link" id='update_security_responses_link' href="#securityQuestionModal" data-toggle="modal" data-target="#securityQuestionModal">Update my security challenge responses</a>
+              </p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+    <%if @tab.nil?%>
+      <%= hidden_field_tag :page, "from_registration"%>
+    <% end %>
+
+    <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
+      <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus white"></i> Save</button>
+      <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'save_personal')" id="save_personal" class='btn btn-lg btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));' data-cuke="personal-save"><i class="fa fa-user-plus white"></i> Save</span>
+    </div>
+  <% end %>
 <% end %>
-<br>
+
 <%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
 
 <script>
