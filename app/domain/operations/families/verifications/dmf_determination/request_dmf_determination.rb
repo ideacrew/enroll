@@ -50,10 +50,10 @@ module Operations
           end
 
           def find_job(job_id)
-            job = ::Transmittable::Job.where(job_id: job_id).last
-            return handle_dmf_error("Could not find Transmittable::Job with job_id #{job_id}") unless job.present?
-
+            job = ::Transmittable::Job.find_by(job_id: job_id.to_s).last
             Success(job)
+          rescue Mongoid::Errors::DocumentNotFound
+            handle_dmf_error("Could not find Transmittable::Job with job_id #{job_id}")
           end
 
           def construct_request_values(family_hbx_id)
