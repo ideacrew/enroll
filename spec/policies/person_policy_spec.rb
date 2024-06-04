@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe PersonPolicy, type: :policy do
+RSpec.describe PersonPolicy, type: :policy, dbclean: :after_each  do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
   context 'with hbx_staff_role' do
     let(:record_person) {FactoryBot.create(:person)}
     let(:admin_person){FactoryBot.create(:person)}
@@ -129,6 +134,69 @@ RSpec.describe PersonPolicy, type: :policy do
       end
 
       context 'unauthorized broker' do
+        it 'broker should not be able to update' do
+          expect(policy.can_update?).to be false
+        end
+      end
+    end
+  end
+
+  context "when shop broker is logged in", :dbclean => :around_each do
+    let(:employee_person) {FactoryBot.create(:person, :with_employee_role, :with_family)}
+    let(:family) {employee_person.primary_family}
+    let(:household) { FactoryBot.create(:household, family: family)}
+    let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package) }
+    let!(:employee_role) { FactoryBot.create(:employee_role, person: employee_person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
+    let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :shop) }
+    let!(:broker_role) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active", market_kind: 'both') }
+    let!(:broker_role_user) {FactoryBot.create(:user, :person => broker_role.person, roles: ['broker_role'])}
+    let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+    let!(:broker_agency_staff_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
+
+    context "when broker role person is logged in" do
+      let(:policy) { PersonPolicy.new(broker_role_user, employee_person) }
+
+      context "when broker is hired by an employer for employee" do
+        before do
+          family.primary_person.active_employee_roles.first.employer_profile.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                                                                          writing_agent_id: broker_role.id,
+                                                                                                                                                          start_on: Time.now,
+                                                                                                                                                          is_active: true)
+
+          family.save!
+        end
+
+        it 'broker should be able to update' do
+          expect(policy.can_update?).to be true
+        end
+      end
+
+      context "when broker is not hired by an employer" do
+        it 'broker should not be able to update' do
+          expect(policy.can_update?).to be false
+        end
+      end
+    end
+
+    context "when broker agency staff role is logged in" do
+      let(:policy) { PersonPolicy.new(broker_agency_staff_user, employee_person) }
+
+      context "when broker is hired by an employer for employee" do
+        before do
+          family.primary_person.active_employee_roles.first.employer_profile.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                                                                          writing_agent_id: broker_role.id,
+                                                                                                                                                          start_on: Time.now,
+                                                                                                                                                          is_active: true)
+
+          family.save!
+        end
+
+        it 'broker should be able to update' do
+          expect(policy.can_update?).to be true
+        end
+      end
+
+      context "when broker is not hired by an employer" do
         it 'broker should not be able to update' do
           expect(policy.can_update?).to be false
         end

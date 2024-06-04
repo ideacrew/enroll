@@ -96,8 +96,16 @@ class PersonPolicy < ApplicationPolicy
 
   private
 
+  # Determines if the current user has permission to show and update family(shop and ivl).
+  # an active associated broker, or an admin in the individual market and shop market,
+  #
+  # @return [Boolean] Returns true if the user has permission to show and update family, false otherwise.
   def allowed_to_modify?
-    allowed_to_access?
+    return true if allowed_to_access?
+    return true if active_associated_shop_market_family_broker?
+    return true if active_associated_shop_market_general_agency?
+
+    false
   end
 
   def allowed_to_download?
