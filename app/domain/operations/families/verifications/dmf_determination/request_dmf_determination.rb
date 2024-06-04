@@ -17,7 +17,7 @@ module Operations
           # @return [ Success ] Job successfully completed
           def call(payload)
             valid_payload = yield validate(payload)
-            family = yield find_family(valid_payload[:family_hbx_id])
+            family = yield find_family(valid_payload)
 
             @job = yield find_job(valid_payload[:job_id])
             values = yield construct_request_values(family.hbx_assigned_id)
@@ -42,11 +42,11 @@ module Operations
             Success(payload)
           end
 
-          def find_family(family_hbx_id)
-            family = Family.find_by(hbx_assigned_id: family_hbx_id)
+          def find_family(params[:family_hbx_id])
+            family = Family.find_by(hbx_assigned_id: params[:family_hbx_id])
             Success(family)
           rescue Mongoid::Errors::DocumentNotFound
-            handle_dmf_error("Family with hbx_id #{family_hbx_id} not found")
+            handle_dmf_error("Family with hbx_id #{params[:family_hbx_id]} not found")
           end
 
           def find_job(job_id)
