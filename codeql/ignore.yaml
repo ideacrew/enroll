@@ -1,0 +1,86 @@
+## TEMPORARY IGNORES - DEADLINE 2024-06-14.
+- fingerprint:
+    primaryLocationLineHash: fc76d15105f91445:1
+    primaryLocationStartColumnFingerprint: "67"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/exchanges/hbx_profiles_controller.rb:688"
+  comment: |
+    This is a TEMPORARY ignore.
+    It relies on the completion of ticket:
+    https://www.pivotaltracker.com/story/show/187729398.
+    If this ticket is not resolved by a deadline of 2024-06-14, remove this
+    ignore and resume failing the build.
+- fingerprint:
+    primaryLocationLineHash: 31e1e1409a26cfc3:1
+    primaryLocationStartColumnFingerprint: "32"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/exchanges/hbx_profiles_controller.rb:697"
+  comment: |
+    This is a TEMPORARY ignore.
+    It relies on the completion of ticket:
+    https://www.pivotaltracker.com/story/show/187729398.
+    If this ticket is not resolved by a deadline of 2024-06-14, remove this
+    ignore and resume failing the build.
+- fingerprint:
+    primaryLocationLineHash: 31e1e1409a26cfc3:1
+    primaryLocationStartColumnFingerprint: "62"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/exchanges/hbx_profiles_controller.rb:697"
+  comment: |
+    This is a TEMPORARY ignore.
+    It relies on the completion of ticket:
+    https://www.pivotaltracker.com/story/show/187729398.
+    If this ticket is not resolved by a deadline of 2024-06-14, remove this
+    ignore and resume failing the build.
+- fingerprint:
+    primaryLocationLineHash: a9e5d69c03e57bc9:1
+    primaryLocationStartColumnFingerprint: "76"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/exchanges/hbx_profiles_controller.rb:704"
+  comment: |
+    This is a TEMPORARY ignore.
+    It relies on the completion of ticket:
+    https://www.pivotaltracker.com/story/show/187729398.
+    If this ticket is not resolved by a deadline of 2024-06-14, remove this
+    ignore and resume failing the build.
+## END TEMPORARY IGNORES
+- fingerprint:
+    primaryLocationLineHash: 2b582675ce41ca:1
+    primaryLocationStartColumnFingerprint: "25"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/exchanges/employer_applications_controller.rb:18"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
+- fingerprint:
+    primaryLocationLineHash: b20c58d8092896a0:1
+    primaryLocationStartColumnFingerprint: "25"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/employers/employer_attestations_controller.rb:9"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
+- fingerprint:
+    primaryLocationLineHash: 809e267505a89381:1
+    primaryLocationStartColumnFingerprint: "60"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/employers/employer_attestations_controller.rb:21"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
+- fingerprint:
+    primaryLocationLineHash: "bb403573672ab05d:1"
+    primaryLocationStartColumnFingerprint: "21"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/employers/employer_attestations_controller.rb:72"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
+- fingerprint:
+    primaryLocationLineHash: 5bb6dbcd76a34e15:1
+    primaryLocationStartColumnFingerprint: "20"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/exchanges/residents_controller.rb:149"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
