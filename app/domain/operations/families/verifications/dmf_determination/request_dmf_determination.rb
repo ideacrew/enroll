@@ -43,7 +43,7 @@ module Operations
           end
 
           def find_family(params)
-            family = Family.find_by(hbx_assigned_id: params[:family_hbx_id])
+            family = Family.find_by(hbx_assigned_id: params[:family_hbx_id].to_i)
             Success(family)
           rescue Mongoid::Errors::DocumentNotFound
             handle_dmf_error("Family with hbx_id #{params[:family_hbx_id]} not found")
