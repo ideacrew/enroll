@@ -23,7 +23,6 @@ class Insured::FamiliesController < FamiliesController
     :update_osse_eligibilities
   ]
 
-
   around_action :cache_hbx, only: [:home]
 
   def home
