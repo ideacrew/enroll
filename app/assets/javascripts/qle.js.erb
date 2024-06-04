@@ -15,7 +15,7 @@ var QLE = ( function( window, undefined ) {
   }
 
   function check_qle_reason() {
-    switch ("Date of move"){
+    switch ($('.qle-label').html()){
       case "Coverage end date":
         QLE.qle_question("check_insurance_reason.js");
         test = false;
