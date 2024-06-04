@@ -191,11 +191,11 @@ $(function () {
 
   // Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keydown', function(e) {
-    if ($("#qle-nav").length > 0 && e.keyCode == 13 && $('#qle-nav button').prop('id') == "qle_submit") {
+    var code = e.keyCode || e.which;
+    if ($("#qle-nav").length > 0 && code == 13 && $('#qle-nav button').prop('id') == "qle_submit") {
       e.preventDefault();
       $('#qle_submit').click();
     } else {
-      var code = e.keyCode || e.which;
       if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
         e.preventDefault();
         $("#qle_submit").click();
@@ -211,8 +211,16 @@ $(function () {
 	/* QLE Date Validator */
   $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
-    if ($('#qle_submit').attr('type') != 'submit') { // type submit should be used to submit the entire form, otherwise it validates the date
-      validate_qle_date();
+    if ($('#qle_submit').attr('type') != 'submit' && $('#qle-nav button').prop('id') == "qle_submit") { // type submit should be used to submit the entire form, otherwise it validates the date
+      if(validate_qle_date_input()) {
+        $('#qle_date').removeClass('input-error');
+  
+        if(QLE.check_qle_reason()){
+          check_qle_date();
+        }
+      } else {
+        $('#qle_date').addClass('input-error');
+      }
     }
   });
 
