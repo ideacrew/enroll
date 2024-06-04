@@ -43,16 +43,10 @@ module Operations
           end
 
           def find_family(family_hbx_id)
-            families = Family.where(hbx_assigned_id: family_hbx_id)
-
-            case families.size
-            when 1
-              Success(families.first)
-            when 0
-              handle_dmf_error("Family with hbx_id #{family_hbx_id} not found")
-            else
-              handle_dmf_error("Multiple Families with hbx_id #{family_hbx_id} found: unable to proceed")
-            end
+            family = Family.find_by(hbx_assigned_id: family_hbx_id)
+            Success(family)
+          rescue Mongoid::Errors::DocumentNotFound
+            handle_dmf_error("Family with hbx_id #{family_hbx_id} not found")
           end
 
           def find_job(job_id)
