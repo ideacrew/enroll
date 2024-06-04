@@ -8,6 +8,7 @@ module Publishers
         include ::EventSource::Publisher[amqp: 'enroll.families.verifications.dmf_determination']
 
         register_event 'started'
+        register_event 'requested'
       end
     end
   end
