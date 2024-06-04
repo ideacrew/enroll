@@ -42,7 +42,7 @@ module Operations
             Success(payload)
           end
 
-          def find_family(params[:family_hbx_id])
+          def find_family(params)
             family = Family.find_by(hbx_assigned_id: params[:family_hbx_id])
             Success(family)
           rescue Mongoid::Errors::DocumentNotFound
