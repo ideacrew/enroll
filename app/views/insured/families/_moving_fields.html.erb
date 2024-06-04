@@ -107,8 +107,8 @@
 
 <script type="text/javascript">
   <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
-    $(document).off('click keydown', '#qle_submit_reason');
-    $(document).on('click keydown', '#qle_submit_reason', function(event) {
+    $("div").off('click keydown', '#qle_submit_reason');
+    $("div").on('click keydown', '#qle_submit_reason', function(event) {
       if (event.type === 'click' || (event.type === 'keydown' && event.keyCode === 13)) {
         if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
           $('.special_qle_reasons').addClass('hidden');
@@ -122,23 +122,22 @@
   <% end %>
 
   $(document).off('click', '#qle_zip_compare');
-  $(document).on('click', '#qle_zip_compare', function() {
+  $(document).on('click', '#qle_zip_compare', function(event) {
     function handleFailure() {
       $('#qle_reason').hide();
       var errorNoticeAction = "<%= l10n('insured.qle_detail.error_text_not_eligible', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item) %>";
       $("#qle-details .error-text").html(errorNoticeAction);
       $('#qle-details .error-info').removeClass('hidden');
-      $('#qle-nav #qle_zip_compare').prop('id', "qle_submit");
       $('#qle-nav #qle_submit').attr('disabled', 'disabled');
     }
 
+    $('#qle-nav #qle_zip_compare').prop('id', "qle_submit");
     $.ajax({
       type: "GET",
       data:{old_zip: $('.old_zip_code').val(), new_zip: $('.new_zip_code').val()},
       url: "/insured/families/sep_zip_compare.js",
       success: function(response){
         if (response.is_approved) {
-          $('#qle-nav #qle_zip_compare').prop('id', "qle_submit");
           $.ajax({
             type: "GET",
             data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), bs4: $("#bs4").val()},
@@ -153,5 +152,5 @@
 
     event.preventDefault();
     event.stopImmediatePropagation();
-  })
+  });
 </script>

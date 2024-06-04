@@ -92,17 +92,12 @@ $(function () {
       defaultDate: cdate
 		});
 
-    var typingTimer;
-    const doneTypingInterval = 750;
     $(".sep-date #qle_date").on("change", function(){
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(function() {
-          if ($(".sep-date #qle_date").val()) {
-            $('#qle-nav #qle_submit').removeAttr('disabled');
-          } else {
-            $('#qle-nav #qle_submit').attr('disabled', 'disabled');
-          }
-        }, doneTypingInterval);
+      if ($(".sep-date #qle_date").val()) {
+        $('#qle-nav #qle_submit').removeAttr('disabled');
+      } else {
+        $('#qle-nav #qle_submit').attr('disabled', 'disabled');
+      }
     });
   }
 
@@ -190,21 +185,20 @@ $(function () {
   });
 
   // Disable form submit on pressing Enter, instead click Submit link
-  $('#qle_form').on('keydown', function(e) {
+  $(document).on('keydown', '#qle_form', function(e) {
     var code = e.keyCode || e.which;
-    if ($("#qle-nav").length > 0 && code == 13 && $('#qle-nav button').prop('id') == "qle_submit") {
+    if ($("#qle-nav").length > 0) {
+      return;
+    }
+
+    if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
       e.preventDefault();
-      $('#qle_submit').click();
-    } else {
-      if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
-        e.preventDefault();
-        $("#qle_submit").click();
-        return false;
-      } else if (code == 13 && $("div.n-radio-row").is(":focus")) {
-        e.preventDefault();
-        $("#qle_submit_reason").click();
-        return false;
-      }
+      $("#qle_submit").click();
+      return false;
+    } else if (code == 13 && $("div.n-radio-row").is(":focus")) {
+      e.preventDefault();
+      $("#qle_submit_reason").click();
+      return false;
     }
   });
 
