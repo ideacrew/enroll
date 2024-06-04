@@ -30,7 +30,7 @@ class PersonPolicy < ApplicationPolicy
   end
 
   def can_download_document?
-    allowed_to_download?
+    can_download_sbc_documents?
   end
 
   def can_delete_document?
