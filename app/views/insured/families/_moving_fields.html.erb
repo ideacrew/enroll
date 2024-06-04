@@ -116,7 +116,6 @@
     $('#qle_submit_reason').on('click', function(event) {
       if (event.type === 'click' || (event.type === 'keydown' && event.keyCode === 13)) {
         if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
-          console.log("zip reason");
           $('.special_qle_reasons').addClass('hidden');
           $('.zip_compare').removeClass('hidden');
           event.preventDefault();
@@ -132,7 +131,6 @@
       var errorNoticeAction = "<%= l10n('insured.qle_detail.error_text_not_eligible', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item) %>";
       $("#qle-details .error-text").html(errorNoticeAction);
       $('#qle-details .error-info').removeClass('hidden');
-      $('#qle-nav #qle_submit').attr('disabled', 'disabled');
     }
 
     $.ajax({

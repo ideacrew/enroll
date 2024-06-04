@@ -207,7 +207,6 @@ $(function () {
 	/* QLE Date Validator */
   $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
-    console.log("clicked submit");
     if(validate_qle_date_input()) {
       $('#qle_date').removeClass('input-error');
 
@@ -223,8 +222,6 @@ $(function () {
   $(document).on('click', '#qle_submit_reason', function() {
     var health_message = ($("#health-ending-expanded").length == 1 );
     var not_expected_response = ( health_message ) ? 'no' : 'yes';
-
-    console.log("base reason");
 
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
       check_qle_date();
