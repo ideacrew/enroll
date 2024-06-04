@@ -34,7 +34,7 @@
                     <i class="fa fa-upload" aria-hidden="true"></i>
                     <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
                   </span>
-                  <%= render partial: 'insured/fdsh_ridp_verifications/_insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
+                  <%= render partial: 'insured/fdsh_ridp_verifications/insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
                 <% else %>
                   <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
                     <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
@@ -73,9 +73,9 @@
                       <% end %>
                       <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
                         <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
-                          <%= h(link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true, class: "btn-error outline text-nowrap" do %>
+                          <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true, class: "btn-error outline text-nowrap" do %>
                             <%= l10n("insured.consumer_roles.upload_ridp_documents.remove") %>
-                          <% end)%>
+                          <% end %>
                         </span>
                       <% end %>
                     </div>
