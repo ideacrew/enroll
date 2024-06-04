@@ -43,35 +43,35 @@
 
 <% unless @bs4 %>
   <% if step == 1 && search_page == true %>
-    <%= sanitize(link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary btn-block') %>
+    <%= h(link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary btn-block') %>
   <% elsif step == 1 %>
     <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'continue_button')" id="continue_button" class="btn btn-lg btn-primary btn-br btn-block" onkeydown="handleButtonKeyDown(event, 'continue_button');" onclick="PersonValidations.manageRequiredValidations($(this));">CONTINUE</span>
     <button class="btn btn-lg btn-primary btn-br btn-block interaction-click-control-continue hidden" type="submit">CONTINUE</button>
   <% elsif ridp == true && step == 2 %>
     <% if next_link.present? && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper") %>
-      <%= sanitize(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: (application_verified || identity_verified) ? false : true) %>
+      <%= h(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: (application_verified || identity_verified) ? false : true) %>
     <% elsif next_link.present? %>
-      <%= sanitize(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified) %>
+      <%= h(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified) %>
     <% elsif EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>
-      <%= sanitize(link_to "Continue", new_insured_fdsh_ridp_verification_path, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue') %>
+      <%= h(link_to "Continue", new_insured_fdsh_ridp_verification_path, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue') %>
     <% else %>
-      <%= sanitize(link_to "Continue", new_insured_interactive_identity_verification_path, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue') %>
+      <%= h(link_to "Continue", new_insured_interactive_identity_verification_path, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue') %>
     <% end %>
   <% elsif step == 2 %>
     <% if next_link.present? && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper") %>
-      <%= sanitize(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: (application_verified || identity_verified) ? false : true) %>
+      <%= h(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: (application_verified || identity_verified) ? false : true) %>
     <% elsif next_link.present? && current_user.has_hbx_staff_role? && @person.primary_family.application_type == "In Person" %>
-      <%= sanitize(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified) %>
+      <%= h(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified) %>
     <% elsif next_link.present? %>
-      <%= sanitize(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified) %>
+      <%= h(link_to "Continue", next_link, method: :get, class: "button btn btn-lg btn-primary btn-block interaction-click-control-continue", id: 'btn-continue', disabled: !identity_verified) %>
     <% end %>
   <% elsif defined? url %>
-    <%= sanitize(link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue') %>
+    <%= h(link_to 'Continue', url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue') %>
   <% elsif step == 4 %>
     <button class="btn btn-lg btn-primary btn-block" id="btn-continue" disabled="true">CONTINUE</button>
     <br>
   <% elsif step == 5 %>
-    <%= sanitize(link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: 'btn btn-lg btn-primary btn-block disabled', id: 'btn-continue', method: :post, disabled: !@enrollable) %>
+    <%= h(link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: 'btn btn-lg btn-primary btn-block disabled', id: 'btn-continue', method: :post, disabled: !@enrollable) %>
   <% elsif step != 6 %>
     <button class="btn btn-lg btn-primary btn-block" id="btn-continue" type="submit">CONTINUE</button>
   <% end %>
