@@ -107,6 +107,7 @@
 
 <script type="text/javascript">
   <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
+    $('div').off('click keydown', '#qle_submit_reason');
     $('div').on('click keydown', '#qle_submit_reason', function(event) {
       if (event.type === 'click' || (event.type === 'keydown' && event.keyCode === 13)) {
         if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
@@ -120,6 +121,7 @@
     })
   <% end %>
 
+  $('div').off('click', '#qle_zip_compare');
   $('div').on('click', '#qle_zip_compare', function() {
     function handleFailure() {
       $('#qle_reason').hide();
