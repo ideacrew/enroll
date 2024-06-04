@@ -65,18 +65,6 @@ $(function () {
     });
   }
 
-  function validate_qle_date() {
-    if(validate_qle_date_input()) {
-      $('#qle_date').removeClass('input-error');
-
-      if(QLE.check_qle_reason()){
-        check_qle_date();
-      }
-    } else {
-      $('#qle_date').addClass('input-error');
-    }
-  }
-
   function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, cdate) {
     var target = $('.qle-date-picker');
     var splitedate = cdate.split('/');
@@ -203,15 +191,20 @@ $(function () {
 
   // Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keydown', function(e) {
-    var code = e.keyCode || e.which;
-    if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
+    if ($("#qle-nav").length > 0 && e.keyCode == 13 && $('#qle-nav button').prop('id') == "qle_submit") {
       e.preventDefault();
-      validate_qle_date();
-      return false;
-    } else if (code == 13 && $("div.n-radio-row").is(":focus")) {
-      e.preventDefault();
-      $("#qle_submit_reason").click();
-      return false;
+      $('#qle_submit').click();
+    } else {
+      var code = e.keyCode || e.which;
+      if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
+        e.preventDefault();
+        $("#qle_submit").click();
+        return false;
+      } else if (code == 13 && $("div.n-radio-row").is(":focus")) {
+        e.preventDefault();
+        $("#qle_submit_reason").click();
+        return false;
+      }
     }
   });
 

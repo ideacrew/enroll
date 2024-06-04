@@ -29,11 +29,11 @@
     <div class="hidden zip_compare">
       <label class="weight-n mb-2"><%= l10n("insured.qle_detail.special_reason.move.enter_zip") %></label>
       <div style="flex-column col-6">
-        <div>
+        <div onkeydown="handleButtonKeyDown(event, 'qle_zip_compare')">
           <label><%= l10n("insured.qle_detail.special_reason.move.old_zip") %></label>
           <input class="old_zip_code required zip"/>
         </div>
-        <div>
+        <div onkeydown="handleButtonKeyDown(event, 'qle_zip_compare')">
           <label><%= l10n("insured.qle_detail.special_reason.move.new_zip") %></label>
           <input class="new_zip_code required zip"/>
         </div>
