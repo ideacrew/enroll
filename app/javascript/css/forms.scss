@@ -74,6 +74,22 @@ select,
   }
 }
 
+input[type="checkbox"] {
+  &:active,
+  &:focus {
+  outline: 1px solid var(--grey-150);
+  }
+}
+
+.focus {
+  &:active,
+  &:focus,
+  &:focus-within {
+  outline: -webkit-focus-ring-color auto 1px;
+  outline-offset: 4px;
+  }
+}
+
 input.full-width, select.full-width, .input.full-width {
   width: 100%;
 }
