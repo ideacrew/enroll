@@ -32,10 +32,10 @@
             <span class="horizontal-links">
               <%= render partial: "shared/my_portal_links" %>
               <span>
-                <%= sanitize(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %>
+                <%= h(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %>
               </span>
               <span>
-                <%= sanitize(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %>
+                <%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %>
               </span>
             </span>
           </li>
