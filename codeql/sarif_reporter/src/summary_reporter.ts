@@ -1,4 +1,5 @@
 import { Log, Run, ToolComponent, ReportingDescriptor, Result } from 'sarif';
+import { IgnoreFile } from './ignore_file';
 
 export class SummaryReporter {
   private errors = 0;
@@ -6,7 +7,7 @@ export class SummaryReporter {
   private notes = 0;
   private infos = 0;
 
-  constructor(private log: Log | undefined | null) {}
+  constructor(private log: Log | undefined | null, private ignoreFile: IgnoreFile | null) {}
 
   public execute() : number {
     if (this.log) {
@@ -30,6 +31,20 @@ export class SummaryReporter {
   private categorizeResult(rules: Map<string, ReportingDescriptor>, result: Result) {
     let ruleId = result.ruleId;
     if (ruleId) {
+      if (this.ignoreFile && this.ignoreFile.entries && this.ignoreFile.entries.length > 0) {
+        if (result.partialFingerprints) {
+          const pllHash = result.partialFingerprints.primaryLocationLineHash;
+          const plStartColumnFingerprint = result.partialFingerprints.primaryLocationStartColumnFingerprint;
+          const matchingIgnores = this.ignoreFile.entries.filter((entry) => {
+            return (pllHash == entry.fingerprint.primaryLocationLineHash) &&
+              (plStartColumnFingerprint.toString() == entry.fingerprint.primaryLocationStartColumnFingerprint.toString()) &&
+              (ruleId == entry.ruleId);
+          });
+          if (matchingIgnores.length > 0) {
+            return;
+          }
+        }
+      }
       let matchingRule = rules.get(ruleId);
       if (matchingRule) {
         if (matchingRule.defaultConfiguration) {
