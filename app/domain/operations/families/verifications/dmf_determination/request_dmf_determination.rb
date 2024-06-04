@@ -50,7 +50,7 @@ module Operations
           end
 
           def find_job(job_id)
-            job = ::Transmittable::Job.find_by(job_id: job_id.to_s).last
+            job = ::Transmittable::Job.find_by(job_id: job_id.to_s)
             Success(job)
           rescue Mongoid::Errors::DocumentNotFound
             handle_dmf_error("Could not find Transmittable::Job with job_id #{job_id}")
