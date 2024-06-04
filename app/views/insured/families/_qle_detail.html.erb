@@ -10,6 +10,9 @@
             <label class="weight-n"><%= l10n("insured.qle_detail.event_date") %></label>
             <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", required: true %>
           </div>
+          <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+            <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit", disable_link: true} %>
+          </div>
         </div>
         <div id="qle_reason"></div>
         <div id="qle_message">
@@ -28,10 +31,16 @@
             </div>
             <div class="effective_on_kinds"></div>
             <div class="spec_reasons"></div>
+            <div class="mt-4 <%= pundit_class Family,:updateable? %>" id="qle-nav">
+              <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_type: "submit", button_id: "qle_success_submit"} %>
+            </div>
           </div>
           <div class="error-info hidden">
             <div class="error-text">
               <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
+            </div>
+            <div class="mt-4 <%= pundit_class Family,:updateable? %>" id="qle-nav">
+              <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", disable_link: true} %>
             </div>
           </div>
         </div>

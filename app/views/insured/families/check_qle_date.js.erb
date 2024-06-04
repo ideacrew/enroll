@@ -2,17 +2,16 @@ function toggleSuccess(errorMessage = "") {
   if (!errorMessage) {
     $('#qle-details .success-info').removeClass('hidden');
     $('#qle-details .error-info').addClass('hidden');
-    $('#qle-nav #qle_submit').attr('type', 'submit');
   } else {
     $('#qle-details .success-info').addClass('hidden');
     $("#qle-details .error-text").html(errorMessage);
     $('#qle-details .error-info').removeClass('hidden');
-    $('#qle-nav #qle_submit').attr('disabled', 'disabled');
   }
 }
 
 $('#qle-details #qle-date-chose').addClass('hidden');
 $('#qle-details .initial-info').addClass('hidden');
+$('.qle-nav').addClass('hidden');
 
 <% if @qualified_date %>
   toggleSuccess();

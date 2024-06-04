@@ -15,6 +15,9 @@
             <%= l10n("no") %>
           </label>
         </div>
+        <div class="mt-4 <%= pundit_class Family,:updateable? %>" id="qle-nav">
+          <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit_reason"} %>
+        </div>
       </div>
     </div>
   </div>

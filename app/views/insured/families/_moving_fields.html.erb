@@ -25,6 +25,9 @@
         <%= l10n("none_of_the_above") %>
       </label>
     </div>
+    <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+      <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit_reason"} %>
+    </div>
   </div>
     <div class="hidden zip_compare">
       <label class="weight-n mb-2"><%= l10n("insured.qle_detail.special_reason.move.enter_zip") %></label>
@@ -36,6 +39,9 @@
         <div onkeydown="handleButtonKeyDown(event, 'qle_zip_compare')">
           <label><%= l10n("insured.qle_detail.special_reason.move.new_zip") %></label>
           <input class="new_zip_code required zip"/>
+        </div>
+        <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+          <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_zip_compare"} %>
         </div>
       </div>
   </div>
@@ -106,14 +112,13 @@
 <% end %>
 
 <script type="text/javascript">
-  <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
-    $("div").off('click keydown', '#qle_submit_reason');
-    $("div").on('click keydown', '#qle_submit_reason', function(event) {
+  <% if true || EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
+    $('#qle_submit_reason').on('click', function(event) {
       if (event.type === 'click' || (event.type === 'keydown' && event.keyCode === 13)) {
         if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
+          console.log("zip reason");
           $('.special_qle_reasons').addClass('hidden');
           $('.zip_compare').removeClass('hidden');
-          $('#qle-nav #qle_submit_reason').prop('id', "qle_zip_compare");
           event.preventDefault();
           event.stopImmediatePropagation();
         }
@@ -121,8 +126,7 @@
     })
   <% end %>
 
-  $(document).off('click', '#qle_zip_compare');
-  $(document).on('click', '#qle_zip_compare', function(event) {
+  $('#qle_zip_compare').on('click', function() {
     function handleFailure() {
       $('#qle_reason').hide();
       var errorNoticeAction = "<%= l10n('insured.qle_detail.error_text_not_eligible', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item) %>";
@@ -131,7 +135,6 @@
       $('#qle-nav #qle_submit').attr('disabled', 'disabled');
     }
 
-    $('#qle-nav #qle_zip_compare').prop('id', "qle_submit");
     $.ajax({
       type: "GET",
       data:{old_zip: $('.old_zip_code').val(), new_zip: $('.new_zip_code').val()},

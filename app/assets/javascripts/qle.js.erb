@@ -15,7 +15,7 @@ var QLE = ( function( window, undefined ) {
   }
 
   function check_qle_reason() {
-    switch ($('.qle-label').html()){
+    switch ("Date of move"){
       case "Coverage end date":
         QLE.qle_question("check_insurance_reason.js");
         test = false;
@@ -49,10 +49,10 @@ $(function () {
 
   function init_qle_message() {
     $('#qle-details .success-info').addClass('hidden');
-    $('#qle-nav button').prop('id', "qle_submit").attr('disabled', 'disabled').attr('type', 'button');
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
+    $('.qle-nav').removeClass('hidden');
     var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
@@ -94,9 +94,9 @@ $(function () {
 
     $(".sep-date #qle_date").on("change", function(){
       if ($(".sep-date #qle_date").val()) {
-        $('#qle-nav #qle_submit').removeAttr('disabled');
+        $('#qle_submit').removeAttr('disabled');
       } else {
-        $('#qle-nav #qle_submit').attr('disabled', 'disabled');
+        $('#qle_submit').attr('disabled', 'disabled');
       }
     });
   }
@@ -116,6 +116,8 @@ $(function () {
     $('#qle_id').val($(this).data('id'));
     $('#qle_reason > *').addClass('hidden');
     $('#qle-date-chose').show();
+    $('#qle_submit').attr('disabled', 'disabled');
+    $('.qle-nav').addClass('hidden');
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
       $('#qle-date-chose').addClass('hidden');
@@ -205,16 +207,16 @@ $(function () {
 	/* QLE Date Validator */
   $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
-    if ($('#qle_submit').attr('type') != 'submit') { // type submit should be used to submit the entire form, otherwise it validates the date
-      if(validate_qle_date_input()) {
-        $('#qle_date').removeClass('input-error');
-  
-        if(QLE.check_qle_reason()){
-          check_qle_date();
-        }
-      } else {
-        $('#qle_date').addClass('input-error');
+    console.log("clicked submit");
+    if(validate_qle_date_input()) {
+      $('#qle_date').removeClass('input-error');
+
+      $('#date-nav').addClass('hidden');
+      if(QLE.check_qle_reason()){
+        check_qle_date();
       }
+    } else {
+      $('#qle_date').addClass('input-error');
     }
   });
 
@@ -222,12 +224,11 @@ $(function () {
     var health_message = ($("#health-ending-expanded").length == 1 );
     var not_expected_response = ( health_message ) ? 'no' : 'yes';
 
-    $('#qle-nav #qle_submit_reason').prop('id', "qle_submit");
+    console.log("base reason");
 
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
       check_qle_date();
-    } else {
-      $('#qle-nav #qle_submit').attr('disabled', 'disabled');
+    } else {;
       $('#qle_reason').hide();
       var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
       $("#qle-details .error-text").html(errorNoticeAction);
@@ -285,6 +286,6 @@ $(function () {
   });
 
   $(document).on('click', '#shop-link', function() {
-		$('#qle_submit').trigger('click');
+		$('#qle_success_submit').trigger('click');
   });
 });
