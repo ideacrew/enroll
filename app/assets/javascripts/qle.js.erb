@@ -116,7 +116,7 @@ $(function () {
     $('#qle_id').val($(this).data('id'));
     $('#qle_reason > *').addClass('hidden');
     $('#qle-date-chose').show();
-    $('#qle_submit').attr('disabled', 'disabled');
+    $('.sep-date #qle_submit').attr('disabled', 'disabled');
     $('.qle-nav').addClass('hidden');
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
