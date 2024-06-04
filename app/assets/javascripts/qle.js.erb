@@ -211,7 +211,7 @@ $(function () {
 	/* QLE Date Validator */
   $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
-    if ($('#qle_submit').attr('type') != 'submit' && $('#qle-nav button').prop('id') == "qle_submit") { // type submit should be used to submit the entire form, otherwise it validates the date
+    if ($('#qle_submit').attr('type') != 'submit') { // type submit should be used to submit the entire form, otherwise it validates the date
       if(validate_qle_date_input()) {
         $('#qle_date').removeClass('input-error');
   
