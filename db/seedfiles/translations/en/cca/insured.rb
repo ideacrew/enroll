@@ -136,6 +136,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.content' => "Content",
   :'en.send_message' => "Send Message",
   :'en.cancel' => "Cancel",
+  :'en.insured.enroll_in_coverage' => "Enroll in Coverage",
   :'en.insured.employee_roles.no_employer_found' => "No employer found.",
   :'en.insured.employee_roles.no_match_info' => "Please check the information entered above and confirm with your employer that your demographic information is listed correctly on their roster. For further assistance, please contact %{contact_center_name}: %{contact_center_phone_number}.",
   :'en.insured.consumer_roles.no_match_info_2' => "We weren’t able to find an existing application on %{site_short_name} for you. Please verify that the information was entered correctly. We need to verify if you or you and your family are eligible to enroll in coverage through %{site_short_name}. Select “Continue to Next Step” to go to the next step of verification.",
