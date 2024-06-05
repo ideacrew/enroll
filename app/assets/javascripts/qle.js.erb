@@ -52,7 +52,7 @@ $(function () {
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
-    $('.qle-nav').removeClass('hidden');
+    $('#qle-nav').removeClass('hidden');
     var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
@@ -117,7 +117,7 @@ $(function () {
     $('#qle_reason > *').addClass('hidden');
     $('#qle-date-chose').show();
     $('.sep-date #qle_submit').attr('disabled', 'disabled');
-    $('.qle-nav').addClass('hidden');
+    $('#qle-nav').addClass('hidden');
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
       $('#qle-date-chose').addClass('hidden');
@@ -190,7 +190,8 @@ $(function () {
   $(document).on('keydown', '#qle_form', function(e) {
     var code = e.keyCode || e.which;
     if ($("#qle-nav").length > 0) {
-      return;
+      e.preventDefault();
+      return false;
     }
 
     if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
