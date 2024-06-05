@@ -226,7 +226,7 @@ $(function () {
 
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
       check_qle_date();
-    } else {;
+    } else {
       $('#qle_reason').hide();
       var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
       $("#qle-details .error-text").html(errorNoticeAction);
