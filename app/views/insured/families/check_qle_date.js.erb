@@ -2,6 +2,7 @@ function toggleSuccess(errorMessage = "") {
   if (!errorMessage) {
     $('#qle-details .success-info').removeClass('hidden');
     $('#qle-details .error-info').addClass('hidden');
+    $('#qle_success_submit').removeAttr('disabled');
   } else {
     $('#qle-details .success-info').addClass('hidden');
     $("#qle-details .error-text").html(errorMessage);
@@ -20,6 +21,7 @@ $('#qle-details .initial-info').addClass('hidden');
     toggleSuccess(mecNotice);
   <% elsif @qle.present? %>
     $(".effective_on_kinds").html("<%= escape_javascript(render 'effective_on_kind_fields') %>");
+    $('#qle_success_submit').attr('disabled', 'disabled');
     $(".spec_reasons").html("<%= escape_javascript(render 'special_reasons') %>");
   <% end %>
 <% else %>

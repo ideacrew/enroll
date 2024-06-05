@@ -265,6 +265,14 @@ $(function () {
     }
   });
 
+  $(document).on('change', '#effective_on_kind', function(e) {
+    if ($('#effective_on_kind').find(":selected").val()){
+      $('#qle_success_submit').removeAttr('disabled');
+    } else {
+      $('#qle_success_submit').attr('disabled', 'disabled');
+    }
+  });
+
   $(document).on('submit', '.qle-detail-for-existing-kind', function(e) {
     if($('#qle_date').val() == ''){
       $('#qle_effective_on_kind_alert-4').removeClass('hidden');
