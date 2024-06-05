@@ -685,7 +685,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def conditionally_bs4_enabled_actions
-    ["record_sep", "check_qle_date", "check_move_reason", "check_marriage_reason", "check_insurance_reason", "personal"]
+    %i[record_sep check_qle_date check_move_reason check_marriage_reason check_insurance_reason personal]
   end
 
   def enable_bs4_layout
