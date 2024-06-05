@@ -28,7 +28,7 @@ class VerificationType
 
   ALIVE_STATUS = 'Alive Status'.freeze
 
-  ADMIN_CALL_HUB_VERIFICATION_TYPES = ALL_VERIFICATION_TYPES - ["Alive Status"].freeze
+  ADMIN_CALL_HUB_VERIFICATION_TYPES = ALL_VERIFICATION_TYPES - ["Alive Status", "American Indian Status"].freeze
 
   NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam rejected].freeze
