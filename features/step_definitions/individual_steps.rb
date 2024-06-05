@@ -759,7 +759,7 @@ Then(/Individual asks for help$/) do
 end
 
 And(/^the Continue button is visible on the Account Setup page/i) do
-  continue_button = find(IvlPersonalInformation.continue_btn)
+  continue_button = find(IvlPersonalInformation.continue_btn_2)
   expect(continue_button).to be_visible
 end
 
