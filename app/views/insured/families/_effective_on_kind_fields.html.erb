@@ -1,7 +1,8 @@
 <% if true %>
   <% if @bs4 %>
     <div onkeydown="handleButtonKeyDown(event, 'qle_success_submit')">
-      <%= select_tag 'effective_on_kind', options_for_select(generate_options_for_effective_on_kinds(@qle, @qle_event_date)), include_blank: "#{l10n('.select_effective_date').to_s.upcase} *" %>
+      <label class="weight-n required"><%= l10n('please_select_effective_date') %></label>
+      <%= select_tag 'effective_on_kind', options_for_select(generate_options_for_effective_on_kinds(@qle, @qle_event_date)), include_blank: l10n("select"), class: "col-auto pr-4" %>
     </div>
   <% else %>
     <div class="alert alert-danger" id='qle_effective_on_kind_alert' role="alert" style='display:none'><%= l10n(".please_select_effective_date") %></div>

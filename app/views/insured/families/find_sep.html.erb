@@ -15,10 +15,6 @@
           <% end %>
         </ul>
       <% end %>
-
-      <%= hidden_field_tag 'id', @hbx_enrollment_id %>
-      <%= hidden_field_tag 'market_kind', @market_kind %>
-      <%= hidden_field_tag 'coverage_kind', @coverage_kind %>
       <div class="align-content-center">
         <input type="checkbox" id="no_qle_checkbox" data-toggle="modal" data-target="#outside-open-enrollment" name="no_qualifying_event" value="true"><%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
       </div>
