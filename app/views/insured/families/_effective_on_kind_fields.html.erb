@@ -1,4 +1,4 @@
-<% if true %>
+<% if @qle.effective_on_kinds.count > 1 %>
   <% if @bs4 %>
     <div onkeydown="handleButtonKeyDown(event, 'qle_success_submit')">
       <label class="weight-n required"><%= l10n('please_select_effective_date') %></label>
