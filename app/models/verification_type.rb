@@ -62,7 +62,7 @@ class VerificationType
   scope :by_name, ->(type_name) { where(:type_name => type_name) }
   scope :ssn_type, -> { by_name("Social Security Number").active }
   scope :citizenship_type, -> { by_name("Citizenship").active }
-  scope :alive_status_type, -> { by_name("Alive Status").active.first }
+  scope :alive_status_type, -> { by_name("Alive Status").active }
 
   scope :without_alive_status_type, -> { where(:type_name.ne => ALIVE_STATUS) }
 
