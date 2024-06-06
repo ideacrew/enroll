@@ -299,6 +299,12 @@
     "false_positive": true,
     "ignored_at": "2024-05-24T18:53:50Z"
   },
+  "1c54580237ce2d2a715bf478bf6a70bc_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'HIGH: Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the content that is inserted here comes from the db and not from the user input.",
+    "false_positive": true,
+    "ignored_at": "2024-06-06T18:21:03Z"
+  },
   "1c9d5aba4439da3904570088f0de4c81_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
