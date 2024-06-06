@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require 'rails_helper'
 
 RSpec.describe PersonPolicy, type: :policy do
   context 'with hbx_staff_role' do
@@ -516,19 +516,14 @@ describe PersonPolicy, "given a user who is a primary family member" do
   let(:dependent_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let(:family_members) { [user_person, dependent_person] }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: user_person, people: family_members) }
-
-  let(:user) {FactoryBot.create(:user, person: user_person)}
+  let(:user) { FactoryBot.create(:user, person: user_person) }
 
   context "deletes own documents" do
-
-    let(:record) { user_person }
-
     before do
-      user_person.consumer_role.update_attributes!(identity_validation: 'valid')
+      family.primary_person.consumer_role.move_identity_documents_to_verified
     end
 
-
-    subject { described_class.new(user, record) }
+    subject { described_class.new(user, user_person) }
 
     it "may delete document" do
       expect(subject.can_delete_document?).to be_truthy
