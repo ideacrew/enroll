@@ -22,17 +22,8 @@
               <fieldset>
                 <legend><%= l10n("insured.consumer_roles.upload_ridp_documents.document_type") %></legend>
                 <span>
-                  <% options = {
-                    :driver_license => "Driver's License issued by state or territory", 
-                    :school_id => "School identification card", 
-                    :military_id => "U.S. military card or draft record", 
-                    :passport => "Identification card issued by the federal, state or local government, including a U.S. Passport", 
-                    :military_dependent => "Military dependent's identification card", 
-                    :native_american => "Native American tribal document", 
-                    :coast_guard => "U.S. Coast Guard Merchant Mariner card"
-                    } %>
                   <% element_name = "ridp_subject" %>
-                  <% options.each_with_index do |(option, input_value), index| %>
+                  <% ridp_modal_options.each_with_index do |(option, input_value), index| %>
                     <div class="d-inline-flex flex-row-reverse align-items-center mb-2">
                       <label class="weight-n mb-0" for=<%= "#{element_name}_#{option}" %>><%= l10n("insured.consumer_roles.upload_ridp_documents.#{option}") %></label>
                       <div class="col-auto px-0"><%= radio_button_tag element_name, option, index == 0, value: input_value %></div>
@@ -45,7 +36,7 @@
                 <button type="button" class="btn-default btn-file" id="select_upload_identity">
                   <i class="fa fa-upload" aria-hidden="true"></i>
                   <%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %>
-                  <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true %>
+                  <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true %>
                 </button>
               </div>
               <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
