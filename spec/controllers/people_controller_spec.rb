@@ -9,11 +9,11 @@ RSpec.describe PeopleController, dbclean: :after_each do
   let(:employee_role){FactoryBot.build(:employee_role, :census_employee => census_employee)}
   let(:person) { FactoryBot.create(:person) }
   let(:user) { FactoryBot.create(:user, person: person) }
-
-
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:vlp_document){FactoryBot.build(:vlp_document)}
 
   before do
+    family
     consumer_role.move_identity_documents_to_verified
   end
 

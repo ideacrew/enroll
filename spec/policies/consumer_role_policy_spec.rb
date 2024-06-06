@@ -79,12 +79,13 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'when the user is a consumer' do
           let(:user_of_family) { FactoryBot.create(:user, person: person) }
           let(:logged_in_user) { user_of_family }
-          let!(:consumer_user) { FactoryBot.create(:user) }
-          let!(:person) { FactoryBot.create(:person, :with_consumer_role, user: consumer_user) }
+          let(:consumer_user) { FactoryBot.create(:user, person: person) }
+          let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+          let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
           context 'with user is consumer' do
             it 'grants access' do
-              expect(subject).to permit(consumer_user, person.consumer_role)
+              expect(subject).to permit(consumer_user, family.primary_person.consumer_role)
             end
           end
         end
@@ -288,13 +289,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'when the user is a consumer' do
           let(:user_of_family) { FactoryBot.create(:user, person: person) }
           let(:logged_in_user) { user_of_family }
-          let!(:consumer_user) { FactoryBot.create(:user) }
-          let!(:person) { FactoryBot.create(:person, :with_consumer_role, user: consumer_user) }
+          let(:consumer_user) { FactoryBot.create(:user, person: person) }
+          let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+          let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
           context 'with user is consumer' do
             it 'grants access' do
               person.consumer_role.move_identity_documents_to_verified
-              expect(subject).to permit(consumer_user, person.consumer_role)
+              expect(subject).to permit(consumer_user, family.primary_person.consumer_role)
             end
           end
         end
