@@ -270,7 +270,7 @@
           </div>
           <% if applicant.no_ssn == '1' && !applicant.is_ssn_applied.nil? %>
             <div class="row row-form-wrapper ptb no-buffer row-height form-content" data-cuke="review_is_ssn_applied">
-              <div class="col-md-6"><%= l10n('faa.other_ques.is_ssn_applied') %></div>
+              <div class="col-md-6"><%= l10n('faa.other_ques.ssn_apply') %></div>
               <div class="col-md-6"><%= human_boolean applicant.is_ssn_applied %></div>
             </div>
           <% end %>
