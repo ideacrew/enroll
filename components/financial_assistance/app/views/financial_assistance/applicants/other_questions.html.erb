@@ -1,221 +1,219 @@
 <% if @bs4 %>
   <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
     <%# TODO: remove all rows %>
-    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
       
-      <div class="col-md-9">
-        <p class="alert alert-error hide"></p> <%# TODO: needed? where is this being used? (ugh) %>
-        
-        <% applicant_name = @applicant.first_name.capitalize %>
-        <div class="row">
-          <div class="col-md-12">
-            <h1><%= l10n('faa.other_ques.title') %> <%= applicant_name %></h1>
+    <div>
+      <p class="alert alert-error hide"></p> <%# TODO: needed? where is this being used? (ugh) %>
+      
+      <% applicant_name = @applicant.first_name.capitalize %>
+      <div class="row">
+        <div class="col-md-12">
+          <h1><%= l10n('faa.other_ques.title') %> <%= applicant_name %></h1>
+        </div>
+      </div>
+      <label class="weight-n mb-3"><%= l10n('faa.other_ques.answer_questions', applicant_name: applicant_name) %></label>
+      <div class="memo"><div> <%# TODO: needed? date.js is being loaded... but the datepicker class is buggy with bs4 layout ALSO, the alert banner on legacy is shown but never even removed... weird UX there %>
+
+      <%# TODO: check which required are fields %>
+      <%# TODO: check asterisks %>
+      <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
+        <fieldset class="mb-4">
+          <legend class="weight-n required"><%= other_questions_prompt('ssn_apply') %></legend>
+          <label class="weight-n"><%= f.radio_button :is_ssn_applied, true, id: "is_ssn_applied_yes" %> <%= l10n('yes') %></label>
+          <label class="weight-n"><%= f.radio_button :is_ssn_applied, false, id: "is_ssn_applied_no" %> <%= l10n('no') %></label>
+        </fieldset>
+
+        <fieldset class="mb-4">
+          <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
+          <legend class="weight-n <%= 'required' if no_ssn_dropdown %>"><%= other_questions_prompt('why_no_ssn') %>"</legend>
+          <div data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
+            <% if no_ssn_dropdown %>
+              <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true) %>
+            <% else %>
+              <%= f.text_field :non_ssn_apply_reason, id: "no_ssn_reason", placeholder: l10n('faa.other_ques.ssn_reason') %>
+            <% end %> 
+          </div>
+        </fieldset>
+      <% end %>
+
+      <div class="mb-4">
+        <fieldset>
+          <legend class="weight-n required"><%= other_questions_prompt('is_pregnant') %></legend>
+          <label class="weight-n"><%= f.radio_button :is_pregnant, true, id: "is_pregnant_yes" %> <%= l10n('yes') %></label>
+          <label class="weight-n"><%= f.radio_button :is_pregnant, false, id: "is_pregnant_no" %> <%= l10n('no') %></label>
+        </fieldset>
+        <div>
+          <a href="#is_pregnant" data-toggle="modal" data-target="#is_pregnant"><%= l10n('faa.question.not_sure') %></a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_pregnant"} %> <%# TODO: modal %>
+        </div>
+      </div>
+
+      <fieldset class="mb-4">
+        <% is_due_date_required = FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required) %>
+        <legend class="weight-n <%= 'required' if is_due_date_required %>"><%= l10n("faa.other_ques.pregnancy_due_date") %></legend>
+        <%= date_field_tag :pregnancy_due_on, nil, id: "applicant_pregnancy_due_on", placeholder: "MM/DD/YYYY" %>
+      </fieldset>
+
+      <fieldset class="mb-4">
+        <legend class="weight-n required"><%= other_questions_prompt('children_expected') %></legend> <%# TODO: refactor below params %>
+          <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, id: 'children_expected_count', class: "col-4", prompt: true) %>
+      </fieldset>
+
+      <fieldset class="mb-4">
+        <% post_partum_prompt_key = FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? "pregnant_last_year" : "pregnant_last_60d" %>
+        <legend class="weight-n required"><%= other_questions_prompt(post_partum_prompt_key) %></legend>
+        <label class="weight-n"><%= f.radio_button :is_post_partum_period, true, id: "is_post_partum_period_yes" %> <%= l10n('yes') %></label>
+        <label class="weight-n"><%= f.radio_button :is_post_partum_period, false, id: "is_post_partum_period_no" %> <%= l10n('no') %></label>
+      </fieldset>
+
+      <fieldset class="mb-4">
+        <legend class="weight-n required"><%= l10n("faa.other_ques.pregnancy_end") %></legend>
+        <%= date_field_tag :pregnancy_end_on, nil, id: "applicant_pregnancy_end_on", placeholder: "MM/DD/YYYY" %>
+      </fieldset>
+
+      <% if @applicant.present? && @applicant.is_applying_coverage %>
+        <fieldset class="mb-4">
+          <legend class="weight-n required"><%= other_questions_prompt("is_enrolled_on_medicaid") %></legend>
+          <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
+          <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
+        </fieldset>
+
+        <fieldset class="mb-4">
+          <legend class="weight-n required"><%= other_questions_prompt("foster_care_at18") %></legend>
+          <label class="weight-n"><%= f.radio_button :is_former_foster_care, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
+          <label class="weight-n"><%= f.radio_button :is_former_foster_care, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
+        </fieldset>
+
+        <fieldset class="mb-4">
+          <legend class="weight-n"><%= other_questions_prompt("foster_care_state") %></legend>
+          <%= f.select :foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "NONE"}, id: 'foster_care_us_state', class: "col-4", prompt: true %>
+        </fieldset>
+
+        <fieldset class="mb-4">
+          <legend class="weight-n"><%= other_questions_prompt("foster_care_age_left") %></legend>
+          <%= f.select :age_left_foster_care, options_for_select([*1..applicant_age(@applicant)], selected: @applicant.age_left_foster_care), {:include_blank => "NONE"}, id: 'age_left_foster_care', class: "col-4", prompt: true %>
+        </fieldset>
+
+        <fieldset class="mb-4">
+          <legend class="weight-n"><%= other_questions_prompt("foster_care_medicaid") %></legend>
+          <label class="weight-n"><%= f.radio_button :had_medicaid_during_foster_care, true, id: "had_medicaid_during_foster_care_yes" %> <%= l10n('yes') %></label>
+          <label class="weight-n"><%= f.radio_button :had_medicaid_during_foster_care, false, id: "had_medicaid_during_foster_care_no" %> <%= l10n('no') %></label>
+        </fieldset>
+
+        <% if @applicant.display_student_question? %>
+          <fieldset class="mb-4">
+            <legend class="weight-n"><%= other_questions_prompt("is_student") %></legend>
+            <label class="weight-n"><%= f.radio_button :is_student, true, id: "is_student_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_student, false, id: "is_student_no" %> <%= l10n('no') %></label>
+          </fieldset>
+
+          <% if FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions) %>
+            <fieldset class="mb-4">
+              <legend class="weight-n"><%= l10n("faa.other_ques.student_type") %></legend>
+              <%= f.select :student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, id: 'student_kind', class: "col-4", prompt: true %>
+            </fieldset>
+
+            <fieldset class="mb-4">
+              <legend class="weight-n"><%= l10n("faa.other_ques.student_status_end") %></legend>
+              <%= date_field_tag :student_status_end_on, nil, id: "applicant_student_status_end_on", placeholder: "MM/DD/YYYY" %>
+            </fieldset>
+
+            <fieldset class="mb-4">
+              <legend class="weight-n"><%= l10n("faa.other_ques.student_school_type") %></legend> <%# Weird content for this string %>
+              <%= f.select :student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, id: 'student_school_kind', class: "col-4", prompt: true %>
+            </fieldset>
+          <% end %>
+        <% end %>
+
+        <% is_question_required = FinancialAssistanceRegistry.feature_enabled?(:question_required) %>
+        <div class="mb-4">
+          <fieldset>
+            <legend class="weight-n <%= 'required' if is_question_required %>"><%= other_questions_prompt("is_blind") %></legend>
+            <label class="weight-n"><%= f.radio_button :is_self_attested_blind, true, id: "is_self_attested_blind_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_self_attested_blind, false, id: "is_self_attested_blind_no" %> <%= l10n('no') %></label>
+          </fieldset>
+          <div>
+            <a href="#is_self_assisted_blind" data-toggle="modal" data-target="#is_self_assisted_blind"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_self_assisted_blind"} %> <%# TODO: modal %>
           </div>
         </div>
-        <label class="weight-n mb-3"><%= l10n('faa.other_ques.answer_questions', applicant_name: applicant_name) %></label>
-        <div class="memo"><div> <%# TODO: needed? date.js is being loaded... but the datepicker class is buggy with bs4 layout ALSO, the alert banner on legacy is shown but never even removed... weird UX there %>
-
-        <%# TODO: check which required are fields %>
-        <%# TODO: check asterisks %>
-        <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
-          <fieldset class="mb-4">
-            <legend class="weight-n required"><%= l10n("faa.other_ques.ssn_apply") %></legend>
-            <label class="weight-n"><%= f.radio_button :is_ssn_applied, true, id: "is_ssn_applied_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_ssn_applied, false, id: "is_ssn_applied_no" %> <%= l10n('no') %></label>
-          </fieldset>
-
-          <fieldset class="mb-4">
-            <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
-            <legend class="weight-n <%= 'required' if no_ssn_dropdown %>"><%= l10n("faa.other_ques.why_no_ssn") %>"</legend>
-            <div data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
-              <% if no_ssn_dropdown %>
-                <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-5", prompt: true) %>
-              <% else %>
-                <%= f.text_field :non_ssn_apply_reason, id: "no_ssn_reason", placeholder: l10n('faa.other_ques.ssn_reason') %>
-              <% end %> 
-            </div>
-          </fieldset>
-        <% end %>
 
         <div class="mb-4">
           <fieldset>
-            <legend class="weight-n required"><%= l10n("faa.other_ques.is_pregnant") %></legend>
-            <label class="weight-n"><%= f.radio_button :is_pregnant, true, id: "is_pregnant_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_pregnant, false, id: "is_pregnant_no" %> <%= l10n('no') %></label>
+            <legend class="weight-n <%= 'required' if is_question_required %>"><%= other_questions_prompt("daily_living_help") %></legend>
+            <label class="weight-n"><%= f.radio_button :has_daily_living_help, true, id: "has_daily_living_help_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :has_daily_living_help, false, id: "has_daily_living_help_no" %> <%= l10n('no') %></label>
           </fieldset>
           <div>
-            <a href="#is_pregnant" data-toggle="modal" data-target="#is_pregnant"><%= l10n('faa.question.not_sure') %></a>
-            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_pregnant"} %> <%# TODO: modal %>
+            <a href="#has_daily_living_help" data-toggle="modal" data-target="#has_daily_living_help"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_daily_living_help"} %> <%# TODO: modal %>
           </div>
         </div>
 
-        <fieldset class="mb-4">
-          <% is_due_date_required = FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required) %>
-          <legend class="weight-n <%= 'required' if is_due_date_required %>"><%= l10n("faa.other_ques.pregnancy_due_date") %></legend>
-          <%= date_field_tag :pregnancy_due_on, nil, id: "applicant_pregnancy_due_on", placeholder: "MM/DD/YYYY", required: is_due_date_required %>
-        </fieldset>
-
-        <fieldset class="mb-4">
-          <legend class="weight-n required"><%= l10n("faa.other_ques.children_expected") %></legend> <%# TODO: refactor below params %>
-            <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, id: 'children_expected_count', class: "col-5", prompt: true) %>
-        </fieldset>
-
-        <fieldset class="mb-4">
-          <legend class="weight-n required"><%= FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? l10n("faa.other_ques.pregnant_last_year") : l10n("faa.other_ques.pregnant_last_60d") %></legend>
-          <label class="weight-n"><%= f.radio_button :is_post_partum_period, true, id: "is_post_partum_period_yes" %> <%= l10n('yes') %></label>
-          <label class="weight-n"><%= f.radio_button :is_post_partum_period, false, id: "is_post_partum_period_no" %> <%= l10n('no') %></label>
-        </fieldset>
-
-        <fieldset class="mb-4">
-          <legend class="weight-n required"><%= l10n("faa.other_ques.pregnancy_end") %></legend>
-          <%= date_field_tag :pregnancy_end_on, nil, id: "applicant_pregnancy_end_on", placeholder: "MM/DD/YYYY", required: true %>
-        </fieldset>
-
-        <% if @applicant.present? && @applicant.is_applying_coverage %>
-          <fieldset class="mb-4">
-            <legend class="weight-n required"><%= l10n("faa.other_ques.is_enrolled_on_medicaid") %></legend>
-            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
+        <div class="mb-4">
+          <fieldset>
+            <legend class="weight-n <%= 'required' if is_question_required %>"><%= other_questions_prompt("help_paying_bills") %></legend>
+            <label class="weight-n"><%= f.radio_button :need_help_paying_bills, true, id: "need_help_paying_bills_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :need_help_paying_bills, false, id: "need_help_paying_bills_yes" %> <%= l10n('no') %></label>
           </fieldset>
+          <div>
+            <a href="#need_help_paying_bills" data-toggle="modal" data-target="#need_help_paying_bills"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "need_help_paying_bills"} %> <%# TODO: modal %>
+          </div>
+        </div>
 
-          <fieldset class="mb-4">
-            <legend class="weight-n required"><%= l10n("faa.other_ques.foster_care_at18") %></legend>
-            <label class="weight-n"><%= f.radio_button :is_former_foster_care, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_former_foster_care, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
+        <div class="mb-4">
+          <fieldset>
+            <legend class="weight-n <%= 'required' if is_question_required %>"><%= other_questions_prompt("disability_question") %></legend>
+            <label class="weight-n"><%= f.radio_button :is_physically_disabled, true, id: "radio_physically_disabled_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_physically_disabled, false, id: "radio_physically_disabled_yes" %> <%= l10n('no') %></label>
           </fieldset>
+          <div>
+            <a href="#is_physically_disabled" data-toggle="modal" data-target="#is_physically_disabled"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %> <%# TODO: modal %>
+          </div>
+        </div>
 
-          <fieldset class="mb-4">
-            <legend class="weight-n"><%= l10n("faa.other_ques.foster_care_state") %></legend>
-            <%= f.select :foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "NONE"}, id: 'foster_care_us_state', class: "col-5", prompt: true %>
-          </fieldset>
-
-          <fieldset class="mb-4">
-            <legend class="weight-n"><%= l10n("faa.other_ques.foster_care_age_left") %></legend>
-            <%= f.select :age_left_foster_care, options_for_select([*1..applicant_age(@applicant)], selected: @applicant.age_left_foster_care), {:include_blank => "NONE"}, id: 'age_left_foster_care', class: "col-5", prompt: true %>
-          </fieldset>
-
-          <fieldset class="mb-4">
-            <legend class="weight-n"><%= l10n("faa.other_ques.foster_care_medicaid") %></legend>
-            <label class="weight-n"><%= f.radio_button :had_medicaid_during_foster_care, true, id: "had_medicaid_during_foster_care_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :had_medicaid_during_foster_care, false, id: "had_medicaid_during_foster_care_no" %> <%= l10n('no') %></label>
-          </fieldset>
-
-          <% if @applicant.display_student_question? %>
-            <fieldset class="mb-4">
-              <legend class="weight-n"><%= l10n("faa.other_ques.is_student") %></legend>
-              <label class="weight-n"><%= f.radio_button :is_student, true, id: "is_student_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :is_student, false, id: "is_student_no" %> <%= l10n('no') %></label>
+        <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && @applicant.age_of_the_applicant >= 19 && @applicant.is_applying_coverage %>
+          <div class="mb-4">
+            <fieldset>
+              <legend class="weight-n"><%= other_questions_prompt("primary_caretaker_question_text") %></legend>
+              <label class="weight-n"><%= f.radio_button :is_primary_caregiver, true, id: "is_primary_caregiver_yes" %> <%= l10n('yes') %></label>
+              <label class="weight-n"><%= f.radio_button :is_primary_caregiver, false, id: "is_primary_caregiver_no" %> <%= l10n('no') %></label>
             </fieldset>
+            <div>
+              <a href="#primary_caretaker_question" data-toggle="modal" data-target="#primary_caretaker_question"><%= l10n('faa.question.not_sure') %></a>
+              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "primary_caretaker_question"} %> <%# TODO: modal %>
+            </div>
+          </div>
 
-            <% if FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions) %>
-              <fieldset class="mb-4">
-                <legend class="weight-n"><%= l10n("faa.other_ques.student_type") %></legend>
-                <%= f.select :student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, id: 'student_kind', class: "col-5", prompt: true %>
-              </fieldset>
-
-              <fieldset class="mb-4">
-                <legend class="weight-n"><%= l10n("faa.other_ques.student_status_end") %></legend>
-                <%= date_field_tag :student_status_end_on, nil, id: "applicant_student_status_end_on", placeholder: "MM/DD/YYYY" %>
-              </fieldset>
-
-              <fieldset class="mb-4">
-                <legend class="weight-n"><%= l10n("faa.other_ques.student_school_type") %></legend>
-                <%= f.select :student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, id: 'student_school_kind', class: "col-5", prompt: true %>
-              </fieldset>
+          <% if @applicant.is_primary_caregiver && FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question) %>
+            <%= f.collection_check_boxes(:is_primary_caregiver_for, @application.applicants.select{ |applicant| applicant.age_of_the_applicant <= 18 }, :person_hbx_id, :full_name, {}, :id => 'is_primary_caregiver_for')  do |applicant| %>
+              <div><%= applicant.label(:"data-value" => applicant.value) { applicant.check_box + applicant.text } %></div>
+            <% end %>
+            <%= f.collection_check_boxes(:is_primary_caregiver_for, [OpenStruct.new({name: l10n('none_of_the_above'), value: "none"})], :value, :name, {:id => 'is_primary_caregiver_for_none'}) do |applicant|%>
+              <div><%= applicant.label(:"data-value" => applicant.value) { applicant.check_box + applicant.text } %> </div>
             <% end %>
           <% end %>
-
-          <% is_question_required = FinancialAssistanceRegistry.feature_enabled?(:question_required) %>
-          <div class="mb-4">
-            <fieldset>
-              <legend class="weight-n <%= 'required' if is_question_required %>"><%= l10n("faa.other_ques.is_blind") %></legend>
-              <label class="weight-n"><%= f.radio_button :is_self_attested_blind, true, id: "is_self_attested_blind_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :is_self_attested_blind, false, id: "is_self_attested_blind_no" %> <%= l10n('no') %></label>
-            </fieldset>
-            <div>
-              <a href="#is_self_assisted_blind" data-toggle="modal" data-target="#is_self_assisted_blind"><%= l10n('faa.question.not_sure') %></a>
-              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_self_assisted_blind"} %> <%# TODO: modal %>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <fieldset>
-              <legend class="weight-n <%= 'required' if is_question_required %>"><%= l10n("faa.other_ques.daily_living_help") %></legend>
-              <label class="weight-n"><%= f.radio_button :has_daily_living_help, true, id: "has_daily_living_help_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :has_daily_living_help, false, id: "has_daily_living_help_no" %> <%= l10n('no') %></label>
-            </fieldset>
-            <div>
-              <a href="#has_daily_living_help" data-toggle="modal" data-target="#has_daily_living_help"><%= l10n('faa.question.not_sure') %></a>
-              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_daily_living_help"} %> <%# TODO: modal %>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <fieldset>
-              <legend class="weight-n <%= 'required' if is_question_required %>"><%= l10n("faa.other_ques.help_paying_bills") %></legend>
-              <label class="weight-n"><%= f.radio_button :need_help_paying_bills, true, id: "need_help_paying_bills_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :need_help_paying_bills, false, id: "need_help_paying_bills_yes" %> <%= l10n('no') %></label>
-            </fieldset>
-            <div>
-              <a href="#need_help_paying_bills" data-toggle="modal" data-target="#need_help_paying_bills"><%= l10n('faa.question.not_sure') %></a>
-              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "need_help_paying_bills"} %> <%# TODO: modal %>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <fieldset>
-              <legend class="weight-n <%= 'required' if is_question_required %>"><%= l10n("faa.other_ques.disability_question") %></legend>
-              <label class="weight-n"><%= f.radio_button :is_physically_disabled, true, id: "radio_physically_disabled_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :is_physically_disabled, false, id: "radio_physically_disabled_yes" %> <%= l10n('no') %></label>
-            </fieldset>
-            <div>
-              <a href="#is_physically_disabled" data-toggle="modal" data-target="#is_physically_disabled"><%= l10n('faa.question.not_sure') %></a>
-              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %> <%# TODO: modal %>
-            </div>
-          </div>
-
-          <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && @applicant.age_of_the_applicant >= 19 && @applicant.is_applying_coverage %>
-            <div class="mb-4">
-              <fieldset>
-                <legend class="weight-n"><%= l10n("faa.primary_caretaker_question_text") %></legend>
-                <label class="weight-n"><%= f.radio_button :is_primary_caregiver, true, id: "is_primary_caregiver_yes" %> <%= l10n('yes') %></label>
-                <label class="weight-n"><%= f.radio_button :is_primary_caregiver, false, id: "is_primary_caregiver_no" %> <%= l10n('no') %></label>
-              </fieldset>
-              <div>
-                <a href="#primary_caretaker_question" data-toggle="modal" data-target="#primary_caretaker_question"><%= l10n('faa.question.not_sure') %></a>
-                <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "primary_caretaker_question"} %> <%# TODO: modal %>
-              </div>
-            </div>
-
-            <% if @applicant.is_primary_caregiver && FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question) %>
-              <%= f.collection_check_boxes(:is_primary_caregiver_for, @application.applicants.select{ |applicant| applicant.age_of_the_applicant <= 18 }, :person_hbx_id, :full_name, {}, :id => 'is_primary_caregiver_for', class: "col-5")  do |applicant| %>
-                <div><%= applicant.label(:"data-value" => applicant.value) { applicant.check_box + applicant.text } %></div>
-              <% end %>
-              <%= f.collection_check_boxes(:is_primary_caregiver_for, [OpenStruct.new({name: l10n('none_of_the_above'), value: "none"})], :value, :name, {:id => 'is_primary_caregiver_for_none'}) do |applicant|%>
-                <div><%= applicant.label(:"data-value" => applicant.value) { applicant.check_box + applicant.text } %> </div>
-              <% end %>
-            <% end %>
-          <% end %>
-
-          <% if @applicant.eligible_immigration_status.present? %>
-            <fieldset class="mb-4">
-              <legend class="weight-n"> <%= l10n("faa.other_ques.is_resident_post_092296") %></legend>
-              <label class="weight-n"><%= f.radio_button :is_resident_post_092296, true, id: "is_resident_post_092296_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :is_resident_post_092296, false, id: "is_resident_post_092296_no" %> <%= l10n('no') %></label>
-            </fieldset>
-
-            <fieldset class="mb-4">
-              <legend class="weight-n"> <%= l10n("faa.other_ques.is_veteran_or_active_military") %></legend>
-              <label class="weight-n"><%= f.radio_button :is_veteran_or_active_military, true, id: "is_veteran_or_active_military_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :is_veteran_or_active_military, false, id: "is_veteran_or_active_military_no" %> <%= l10n('no') %></label>
-            </fieldset>
-          <% end %>
-
         <% end %>
 
-        <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "submit"} %>
-      </div>
+        <% if @applicant.eligible_immigration_status.present? %>
+          <fieldset class="mb-4">
+            <legend class="weight-n"> <%= l10n("faa.other_ques.is_resident_post_092296") %></legend> <%# Weird text %>
+            <label class="weight-n"><%= f.radio_button :is_resident_post_092296, true, id: "is_resident_post_092296_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_resident_post_092296, false, id: "is_resident_post_092296_no" %> <%= l10n('no') %></label>
+          </fieldset>
 
+          <fieldset class="mb-4">
+            <legend class="weight-n"> <%= l10n("faa.other_ques.is_veteran_or_active_military") %></legend> <%# Weird text %>
+            <label class="weight-n"><%= f.radio_button :is_veteran_or_active_military, true, id: "is_veteran_or_active_military_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_veteran_or_active_military, false, id: "is_veteran_or_active_military_no" %> <%= l10n('no') %></label>
+          </fieldset>
+        <% end %>
+
+      <% end %>
+
+      <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "submit"} %>
     </div>
   <% end %>
 <% else %>
@@ -242,7 +240,7 @@
         <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.ssn_apply') %>*</h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('ssn_apply') %>*</h5>
             </div>
             <div class='col-md-2'>
               <%= f.radio_button("is_ssn_applied", true, class: "radio-yml", id: "is_ssn_applied_yes") %>
@@ -257,7 +255,7 @@
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.why_no_ssn') %><%= "*" if no_ssn_dropdown %></h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('why_no_ssn') %><%= "*" if no_ssn_dropdown %></h5>
             </div>
             <div class='col-md-<%= no_ssn_dropdown ? 6 : 2 %>' data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
               <% if no_ssn_dropdown %>
@@ -271,7 +269,7 @@
 
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-md-6'>
-            <h5 class="fa-text-color"><%= l10n('faa.other_ques.is_pregnant') %>*</h5>
+            <h5 class="fa-text-color"><%= other_questions_prompt('is_pregnant') %>*</h5>
           </div>
           <div class='col-md-2'>
             <%= f.radio_button("is_pregnant", true, class: "radio-yml", id: "is_pregnant_yes") %>
@@ -308,9 +306,9 @@
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-md-6'>
             <% if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) %>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.pregnant_last_year') %>*</h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('pregnant_last_year') %>*</h5>
             <% else %>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.pregnant_last_60d') %>*</h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('pregnant_last_60d') %>*</h5>
             <% end %>
           </div>
           <div class='col-md-2'>
@@ -336,7 +334,7 @@
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
               <h5 class="fa-text-color">
-                <%= l10n('faa.other_ques.is_enrolled_on_medicaid') %>
+                <%= other_questions_prompt('is_enrolled_on_medicaid') %>
                 <%= ' *' if FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid) %>
               </h5>
             </div>
@@ -352,7 +350,7 @@
 
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.foster_care_at18') %>*</h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('foster_care_at18') %>*</h5>
             </div>
             <div class='col-md-2'>
               <%= f.radio_button("is_former_foster_care", true, class: "radio-yml", id: "is_former_foster_care_yes") %>
@@ -366,7 +364,7 @@
 
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.foster_care_state') %></h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('foster_care_state') %></h5>
             </div>
             <div class='col-md-2'>
               <label></label>
@@ -376,7 +374,7 @@
 
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.foster_care_age_left') %></h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('foster_care_age_left') %></h5>
             </div>
             <div class='col-md-2'>
               <label></label>
@@ -386,7 +384,7 @@
 
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.foster_care_medicaid') %></h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('foster_care_medicaid') %></h5>
             </div>
 
             <div class='col-md-2'>
@@ -403,7 +401,7 @@
           <% if @applicant.display_student_question? %>
             <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
               <div class='col-md-6'>
-                <h5 class="fa-text-color"><%= l10n('faa.other_ques.is_student') %>*</h5>
+                <h5 class="fa-text-color"><%= other_questions_prompt('is_student') %>*</h5>
               </div>
               <div class='col-md-2'>
                 <%= f.radio_button("is_student", true, class: "radio-yml", id: "is_student_yes") %>
@@ -449,7 +447,7 @@
 
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"> <%= l10n('faa.other_ques.is_blind') %><%= FinancialAssistanceRegistry.feature_enabled?(:question_required) ? '*' : '' %></h5>
+              <h5 class="fa-text-color"> <%= other_questions_prompt('is_blind') %><%= FinancialAssistanceRegistry.feature_enabled?(:question_required) ? '*' : '' %></h5>
             </div>
             <div class='col-md-2'>
               <%= f.radio_button("is_self_attested_blind", true, class: "radio-yml", id: "is_self_attested_blind_yes") %>
@@ -467,7 +465,7 @@
 
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.daily_living_help') %><%= FinancialAssistanceRegistry.feature_enabled?(:question_required) ? '*' : '' %></h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('daily_living_help') %><%= FinancialAssistanceRegistry.feature_enabled?(:question_required) ? '*' : '' %></h5>
             </div>
             <div class='col-md-2'>
               <%= f.radio_button("has_daily_living_help", true, class: "radio-yml", id: "has_daily_living_help_yes") %>
@@ -485,7 +483,7 @@
 
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n('faa.other_ques.help_paying_bills') %><%= FinancialAssistanceRegistry.feature_enabled?(:question_required) ? '*' : '' %></h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('help_paying_bills') %><%= FinancialAssistanceRegistry.feature_enabled?(:question_required) ? '*' : '' %></h5>
             </div>
             <div class='col-md-2'>
               <%= f.radio_button("need_help_paying_bills", true, class: "radio-yml", id: "need_help_paying_bills_yes")%>
@@ -503,7 +501,7 @@
 
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
-              <h5 class="fa-text-color"><%= l10n("faa.other_ques.disability_question") %> <%= FinancialAssistanceRegistry.feature_enabled?(:question_required) ? '*' : '' %></h5>
+              <h5 class="fa-text-color"><%= other_questions_prompt('disability_question') %> <%= FinancialAssistanceRegistry.feature_enabled?(:question_required) ? '*' : '' %></h5>
             </div>
             <div class='col-md-2'>
               <%= f.radio_button("is_physically_disabled", true, class: "radio-yml", id: 'radio_physically_disabled_yes') %>
@@ -522,7 +520,7 @@
           <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && @applicant.age_of_the_applicant >= 19 && @applicant.is_applying_coverage %>
             <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
               <div class='col-md-6'>
-                <h5 class="fa-text-color"><%= l10n("faa.primary_caretaker_question_text") %></h5>
+                <h5 class="fa-text-color"><%= other_questions_prompt('primary_caretaker_question_text') %></h5>
               </div>
               <div class='col-md-2'>
                 <%= f.radio_button("is_primary_caregiver", true, class: "radio-yml", id: "is_primary_caregiver_yes") %>
@@ -541,7 +539,7 @@
               <div class="row row-form-wrapper no-buffer check_box_collection <%= "hide" unless @applicant.is_primary_caregiver %>">
 
                 <div class="col-xs-12 form-group form-group-lg">
-                  <h5 class="fa-text-color"><%= l10n("faa.primary_caretaker_for_text") %></h5>
+                  <h5 class="fa-text-color"><%= other_questions_prompt('primary_caretaker_for_text') %></h5>
                 </div>
 
                 <div class="col-md-12 form-group form-group-lg">

@@ -404,5 +404,9 @@ module FinancialAssistance
       review_step[:link] = financial_assistance.review_and_submit_application_path(application) if application.present? && application.ready_for_attestation? && application.is_draft?
       links << review_step
     end
+
+    def other_questions_prompt(key)
+      l10n("faa.other_ques.#{key}", subject: @bs4 ? @applicant.first_name.capitalize : l10n("faa.other_ques.this_person"))
+    end
   end
 end
