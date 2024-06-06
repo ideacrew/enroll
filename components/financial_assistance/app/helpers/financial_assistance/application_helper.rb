@@ -405,8 +405,8 @@ module FinancialAssistance
       links << review_step
     end
 
-    def other_questions_prompt(key)
-      l10n("faa.other_ques.#{key}", subject: @bs4 ? @applicant.first_name.capitalize : l10n("faa.other_ques.this_person"))
+    def other_questions_prompt(key, use_applicant_name = false)
+      l10n("faa.other_ques.#{key}", subject: use_applicant_name ? @applicant.first_name.capitalize : l10n("faa.other_ques.this_person"))
     end
   end
 end
