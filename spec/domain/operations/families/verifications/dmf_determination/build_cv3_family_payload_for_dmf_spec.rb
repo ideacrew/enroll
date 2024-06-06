@@ -108,10 +108,10 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
 
       it "should add type verification element to ineligible member verification" do
         dependent.reload
-        last_element = dependent.alive_status.type_history_elements.last
+        element = dependent.alive_status.type_history_elements.last
 
-        expect(last_element.action).to eq 'DMF Determination Request Failure'
-        expect(last_element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} does not have a valid enrollment"
+        expect(element.action).to eq 'DMF Determination Request Failure'
+        expect(element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} does not have a valid enrollment"
       end
     end
 
@@ -121,7 +121,7 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
         all_member_ids = family.family_members.map(&:hbx_id)
         change_member_eligibility[all_member_ids]
 
-        family.dependents.last.person.update(ssn: '999999999')
+        dependent.update(ssn: '999999999')
         @result = described_class.new.call(family, transmittable_params)
       end
 
@@ -131,10 +131,10 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
 
       it "should add type verification element to ineligible member verification" do
         dependent.reload
-        last_element = dependent.alive_status.type_history_elements.last
+        element = dependent.alive_status.type_history_elements.last
 
-        expect(last_element.action).to eq 'DMF Determination Request Failure'
-        expect(last_element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} is not valid: [\"Invalid SSN\"]"
+        expect(element.action).to eq 'DMF Determination Request Failure'
+        expect(element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} is not valid: [\"Invalid SSN\"]"
       end
     end
   end
