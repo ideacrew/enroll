@@ -30,7 +30,7 @@
               <% end %>
               <% if ridp_type_unverified?(ridp_type, @person) %>
                 <% if ridp_type == 'Identity' %>
-                  <span class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
+                  <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity')" class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
                     <i class="fa fa-upload" aria-hidden="true"></i>
                     <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
                   </span>
