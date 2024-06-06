@@ -101,7 +101,6 @@ module Operations
 
           def transmittable_error_params
             {
-              job: @job,
               transmission: @transmission,
               transaction: @transaction
             }

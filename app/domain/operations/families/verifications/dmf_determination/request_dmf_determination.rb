@@ -103,8 +103,6 @@ module Operations
             message = "DMF Determination request for Family with hbx_id #{hbx_id} sent successfully"
             people = @family.family_members.map(&:person)
             people.select(&:alive_status).each { |p| p.alive_status.add_type_history_element(action: "DMF Determination Request", modifier: "System", update_reason: message) }
-
-            update_status(message, :transmitted, { job: @job })
             update_status(message, :succeeded, { transmission: @transmission, transaction: @transaction })
 
             Success(message)

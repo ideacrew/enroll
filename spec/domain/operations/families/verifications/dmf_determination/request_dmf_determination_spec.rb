@@ -71,11 +71,6 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::RequestDmf
       expect(alive_status_element.modifier).to eq 'System'
     end
 
-    it "should update the job" do
-      job.reload
-      expect(job.process_status.latest_state).to eq :transmitted
-    end
-
     it "should create a transmission" do
       transmission = ::Transmittable::Transmission.where(key: :dmf_determination_request).last
       expect(transmission).to be_truthy

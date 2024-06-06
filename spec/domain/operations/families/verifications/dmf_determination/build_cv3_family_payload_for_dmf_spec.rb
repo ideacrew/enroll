@@ -161,13 +161,6 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
         expect(alive_status_elements.all? { |elements| elements.last.update_reason.include?('Unable to transform family into cv3_family') }).to be_truthy
       end
 
-      it "should update job" do
-        job.reload
-        expect(job.process_status.latest_state).to eq :failed
-        expect(job.transmittable_errors.size).to eq 1
-        expect(job.transmittable_errors.last.message).to include('Unable to transform family into cv3_family')
-      end
-
       it "should update the transmission" do
         transmission.reload
         expect(transmission.process_status.latest_state).to eq :failed
@@ -202,13 +195,6 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
         expect(alive_status_elements.all? { |elements| elements.last.update_reason.include?('Invalid cv3 family') }).to be_truthy
       end
 
-      it "should update job" do
-        job.reload
-        expect(job.process_status.latest_state).to eq :failed
-        expect(job.transmittable_errors.size).to eq 1
-        expect(job.transmittable_errors.last.message).to include('Invalid cv3 family')
-      end
-
       it "should update the transmission" do
         transmission.reload
         expect(transmission.process_status.latest_state).to eq :failed
@@ -238,13 +224,6 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
         alive_status_elements = [primary.alive_status, dependent.alive_status].map(&:type_history_elements)
 
         expect(alive_status_elements.all? { |elements| elements.last.update_reason.include?('No Family Members valid') }).to be_truthy
-      end
-
-      it "should update job" do
-        job.reload
-        expect(job.process_status.latest_state).to eq :failed
-        expect(job.transmittable_errors.size).to eq 1
-        expect(job.transmittable_errors.last.message).to include('No Family Members valid')
       end
 
       it "should update the transmission" do
