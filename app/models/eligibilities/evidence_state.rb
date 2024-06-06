@@ -30,7 +30,7 @@ module Eligibilities
     def serializable_cv_hash
       evidence_state_attributes = attributes.except("_id", "updated_at", "created_at", "visited_at", "evidence_gid")
       evidence_state_attributes[:visited_at] = visited_at
-      evidence_state_attributes[:evidence_gid] = URI(evidence_gid)
+      evidence_state_attributes[:evidence_gid] = URI(evidence_gid).to_s
 
       evidence_state_attributes
     end

@@ -17,15 +17,15 @@ module Operations
           # @return [ Success ] Job successfully completed
           def call(payload)
             valid_payload = yield validate(payload)
-            family = yield find_family(valid_payload)
+            @family = yield find_family(valid_payload[:family_hbx_id])
 
             @job = yield find_job(valid_payload[:job_id])
-            values = yield construct_request_values(family.hbx_assigned_id)
+            values = yield construct_base_request_values
 
             @transmission = yield build_and_create_request_transmission(values)
-            @transaction = yield build_and_create_request_transaction(values, family)
+            @transaction = yield build_and_create_request_transaction(values)
 
-            payload = yield build_cv3_family_payload(family)
+            payload = yield build_cv3_family_payload
             event = yield build_event(payload)
             result = yield publish(event)
 
@@ -42,11 +42,11 @@ module Operations
             Success(payload)
           end
 
-          def find_family(params)
-            family = Family.find_by(hbx_assigned_id: params[:family_hbx_id].to_i)
+          def find_family(family_hbx_id)
+            family = Family.find_by(hbx_assigned_id: family_hbx_id.to_i)
             Success(family)
           rescue Mongoid::Errors::DocumentNotFound
-            handle_dmf_error("Family with hbx_id #{params[:family_hbx_id]} not found")
+            handle_dmf_error("Could not find Family with hbx_id #{family_hbx_id}")
           end
 
           def find_job(job_id)
@@ -56,60 +56,40 @@ module Operations
             handle_dmf_error("Could not find Transmittable::Job with job_id #{job_id}")
           end
 
-          def construct_request_values(family_hbx_id)
-            Success({
-                      key: @job&.key,
-                      title: @job&.title,
-                      description: @job&.description,
-                      correlation_id: family_hbx_id.to_s,
-                      started_at: @job&.started_at,
-                      publish_on: @job&.publish_on
-                    })
+          def construct_base_request_values
+            hbx_id = @family.hbx_assigned_id.to_s
+            values = {
+              key: :dmf_determination_request,
+              # title is 'DMF Determination', specify 'Request' in title
+              title: "#{@job.title} Request",
+              # specify in description which family in bulk call
+              description: "#{@job.description}: individual call for family with hbx_id #{hbx_id}",
+              correlation_id: hbx_id,
+              started_at: DateTime.now,
+              publish_on: DateTime.now,
+              event: 'initial',
+              state_key: :initial
+            }
+
+            Success(values)
           end
 
           def build_and_create_request_transmission(values)
-            values[:key] = :dmf_determination_request
-            values[:event] = 'initial'
-            values[:state_key] = :initial
             values[:job] = @job
 
             create_request_transmission(values, @job)
           end
 
-          def build_and_create_request_transaction(values, family)
-            values[:key] = :dmf_determination_request
-            values[:event] = 'initial'
-            values[:state_key] = :initial
+          def build_and_create_request_transaction(values)
             values[:transmission] = @transmission
-            values[:subject] = family
+            values[:subject] = @family
 
             create_request_transaction(values, @job)
           end
 
-          def build_cv3_family_payload(family)
-            cv3_family = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
-
-            if cv3_family.success?
-              @transaction.json_payload = cv3_family.value!.to_h
-              @transaction.save
-
-              payload = { family_hash: @transaction.json_payload, job_id: @job.job_id }
-              @transaction.json_payload ? Success(payload) : Failure("Unable to save transaction with payload")
-            else
-              message = "Unable to transform family into cv3_family"
-              add_errors(message, :build_and_validate_cv3_family, { job: @job, transmission: @transmission, transaction: @transaction })
-              status_result = update_status(message, :failed,
-                                            { job: @job, transmission: @transmission, transaction: @transaction })
-              return status_result if status_result.failure?
-              result
-            end
-          rescue StandardError
-            add_errors("Unable to save transaction with payload", :generate_transmittable_payload,
-                       { job: @job, transmission: @transmission, transaction: @transaction })
-            status_result = update_status("Unable to save transaction with payload", :failed,
-                                          { job: @job, transmission: @transmission, transaction: @transaction })
-            return status_result if status_result.failure?
-            result
+          def build_cv3_family_payload
+            transmission_params = { job: @job, transmission: @transmission, transaction: @transaction }
+            BuildCv3FamilyPayloadForDmf.new.call(@family, transmission_params)
           end
 
           def build_event(payload)
@@ -117,10 +97,13 @@ module Operations
           end
 
           def publish(event)
-            hbx_id = @transaction.json_payload[:hbx_id]
+            hbx_id = @transaction.json_payload[:family_hash][:hbx_id]
             event.publish
 
-            message = "successfully sent dmf determination request for family with hbx_id #{hbx_id} to fdsh_gateway"
+            message = "DMF Determination request for Family with hbx_id #{hbx_id} sent successfully"
+            people = @family.family_members.map(&:person)
+            people.select(&:alive_status).each { |p| p.alive_status.add_type_history_element(action: "DMF Determination Request", modifier: "System", update_reason: message) }
+
             update_status(message, :transmitted, { job: @job })
             update_status(message, :succeeded, { transmission: @transmission, transaction: @transaction })
 
@@ -128,7 +111,7 @@ module Operations
           end
 
           # logs error and returns Failure
-          # used to log all failures that occur prior to finding job
+          # used to log all failures that occur prior to finding transmittable job
           def handle_dmf_error(error)
             dmf_logger.error(error)
             Failure(error)

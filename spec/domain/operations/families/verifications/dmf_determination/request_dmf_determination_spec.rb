@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Operations::Families::Verifications::DmfDetermination::RequestDmfDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_ssn) }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:job) { FactoryBot.create(:transmittable_job, :dmf_determination) }
 
@@ -53,11 +53,22 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::RequestDmf
   context "success" do
     before do
       job.create_process_status
+      # need to run this operation to accurately handle cv3 family
+      Operations::Eligibilities::BuildFamilyDetermination.new.call({effective_date: Date.today, family: family})
+      family.eligibility_determination.subjects[0].eligibility_states.last.update(is_eligible: true)
       @result = described_class.new.call(payload)
     end
 
     it "should pass" do
       expect(@result).to be_success
+    end
+
+    it "should create a verification type history element" do
+      person.reload
+      alive_status_element = person.alive_status.type_history_elements.last
+
+      expect(alive_status_element.action).to eq 'DMF Determination Request'
+      expect(alive_status_element.modifier).to eq 'System'
     end
 
     it "should update the job" do
