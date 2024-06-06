@@ -90,6 +90,17 @@ input[type="checkbox"] {
   }
 }
 
+.focus-btn {
+  &:active,
+  &:focus,
+  &:focus-within {
+    border-color: var(--button-primary-hover-color);
+    outline: 2px solid hsl(30, 3%, 12%);
+    outline: 2px solid var(--grey-190);
+    outline-offset: 2px;
+  }
+}
+
 input.full-width, select.full-width, .input.full-width {
   width: 100%;
 }
