@@ -21,7 +21,7 @@
             <%= form_tag insured_ridp_documents_upload_path, multipart: true do %>
               <fieldset>
                 <legend><%= l10n("insured.consumer_roles.upload_ridp_documents.document_type") %></legend>
-                <span>
+                <span class="focus">
                   <% element_name = "ridp_subject" %>
                   <% ridp_modal_options.each_with_index do |(option, input_value), index| %>
                     <div class="d-inline-flex flex-row-reverse align-items-center mb-2">
