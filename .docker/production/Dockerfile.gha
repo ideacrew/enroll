@@ -212,10 +212,9 @@ RUN bundle exec rails assets:precompile \
 RUN rm -rf $GEM_HOME/bundle/ruby/*/cache
 
 ################################################################
-# Deployable image
+# Predeployment Inventory
 ################################################################
-
-FROM base as deploy
+FROM base as predeploy_inventory
 
 ARG HOSTNAME=localhost
 
@@ -270,6 +269,63 @@ COPY --chown=nonroot:nonroot ./.docker/config/production.rb $HOME/config/environ
 COPY --chown=nonroot:nonroot ./.docker/config/devise.rb $HOME/config/initializers
 COPY --chown=nonroot:nonroot ./.docker/config/redis.rb $HOME/config/initializers
 COPY --chown=nonroot:nonroot ./.docker/config/sidekiq.rb $HOME/config/initializers
+
+################################################################
+# SBOMer what SBOMs at midnight
+################################################################
+
+FROM builder as sbomber
+
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
+
+ARG CLIENT
+ENV CLIENT=$CLIENT
+
+RUN apt-get update -qq \
+    && apt-get install -yq --no-install-recommends \
+      git \
+      libicu67 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && truncate -s 0 /var/log/*log
+
+RUN curl -OL https://github.com/google/osv-scanner/releases/download/v1.8.1/osv-scanner_linux_amd64 && \
+    mv osv-scanner_linux_amd64 /usr/local/bin/osv-scanner && \
+    chmod u+x,g+x,o+x /usr/local/bin/osv-scanner
+RUN curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+RUN mkdir /tmp/sbom_generation
+RUN mkdir /tmp/sbom_generation/cyclonedx && \
+    cd /tmp/sbom_generation/cyclonedx && \
+    curl -OL https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.25.1/cyclonedx-linux-x64 && \
+    mv cyclonedx-linux-x64 /usr/local/bin/cyclonedx && \
+    chmod u+x /usr/local/bin/cyclonedx
+
+RUN mkdir /tmp/sbom_generation/enroll
+COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $HOME /tmp/sbom_generation/enroll
+RUN mkdir /tmp/sbom_generation/enroll/sbom/manifest/dpkg
+COPY --chown=nonroot:nonroot --from=predeploy_inventory /var/lib/dpkg /tmp/sbom_generation/enroll/sbom/manifest/dpkg
+
+RUN cd /tmp/sbom_generation/enroll/sbom/manifest && \
+    unzip oval-definitions-bullseye.zip
+
+RUN npm install --global @cyclonedx/cyclonedx-npm
+
+RUN cd /tmp/sbom_generation/ && \
+    git clone https://github.com/ideacrew/sbom_on_rails.git
+
+RUN cd /tmp/sbom_generation/sbom_on_rails && \
+    bundle install && \
+    bundle exec ruby /tmp/sbom_generation/enroll/sbom/manifest/sbom.rb
+
+################################################################
+# Deployable image
+################################################################
+
+FROM predeploy_inventory as deploy
+
+COPY --chown=nonroot:nonroot --from=sbomber /tmp/sbom_generation/enroll/sbom/sbom.json $HOME/sbom/sbom.json
 
 RUN echo '[ ! -z "$TERM" -a -r /etc/infra/motd ] && cat /etc/infra/motd' >> /etc/bash.bashrc
 
