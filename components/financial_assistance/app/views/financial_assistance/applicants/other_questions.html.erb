@@ -297,7 +297,7 @@
 
         <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
           <div class='col-md-6'>
-            <h5 class="fa-text-color"><%= l10n('faa.other_ques.children_expected') %>*</h5>
+            <h5 class="fa-text-color"><%= other_questions_prompt('children_expected') %>*</h5>
           </div>
           <div class='col-lg-3 col-md-3 fa-select select-box'>
             <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, {:id => 'children_expected_count', :prompt => true}) %>
