@@ -1,5 +1,6 @@
 Feature: Insured Plan Shopping on Individual market
   Background:
+    Given bs4_consumer_flow feature is disable
     Given the FAA feature configuration is enabled
     Given individual Qualifying life events are present
     Given Individual has not signed up as an HBX user
