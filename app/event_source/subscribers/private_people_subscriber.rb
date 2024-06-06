@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Subscribers
+  # Subscriber will receive private person saved requests
   class PrivatePeopleSubscriber
     include EventSource::Logging
     include ::EventSource::Subscriber[amqp: 'enroll.private']
