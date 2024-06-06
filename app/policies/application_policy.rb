@@ -112,11 +112,14 @@ class ApplicationPolicy
   # It checks if the user has any active broker agency staff roles and if the user's family has an active broker agency account.
   # If both conditions are met, it checks if any of the user's broker agency staff roles
   # are associated with the broker agency profile of the family's active broker agency account.
+  # Additionally, it checks if the broker staff's benefit sponsors broker agency profile ID matches the broker agency's ID.
   #
   # @return [Boolean] Returns true if the user is an active associated individual market family broker staff, false otherwise.
   def active_associated_individual_market_family_broker_staff?
     broker_staffs = account_holder_person&.broker_agency_staff_roles&.active
     return false if broker_staffs.blank?
+
+    return false if family.blank?
 
     broker_agency_account = family.active_broker_agency_account
     return false if broker_agency_account.blank?
