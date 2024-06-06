@@ -1,3 +1,5 @@
+console.log("date.js loaded");
+
 function check_dateformat(date) {
   var dateformat = /^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/;
   if(date.match(dateformat)){
@@ -35,12 +37,14 @@ function check_dateformat(date) {
 
 $(document).on('blur', 'input.jq-datepicker, input.date-picker, input.datepicker-js',  function(){
   var date = $(this).val();
+  // TODO: IF this is needed, update format... also look into stack overflow that implies we can change format from picker?
   if(date != "" && !check_dateformat(date)){
     var memo_element = $('.memo')
     var invalid_dob_element = $('.dependent-invalid-dob')
     if (invalid_dob_element.length) {
       invalid_dob_element.html("<div class='alert-plan-year alert-error'><h4><b>Invalid date format.</b> You must enter 2 numbers for the month, 2 numbers for the day, and 4 numbers for the year. Example: 05/09/1980.</h4> <br/></div>");
     }else if(memo_element.length) {
+      // TODO: if memo is needed, update this inserted html to follow BS4 UX
       memo_element.html("<div class='alert-plan-year alert-error'><h4><b>Invalid date format.</b> You must enter 2 numbers for the month, 2 numbers for the day, and 4 numbers for the year. Example: 05/09/1980.</h4> <br/></div>");
     } else {
       alert("invalid date format");
