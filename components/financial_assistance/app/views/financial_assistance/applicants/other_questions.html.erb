@@ -48,8 +48,7 @@
       </div>
 
       <fieldset class="mb-4 row-form-wrapper">
-        <% is_due_date_required = FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required) %>
-        <legend class="weight-n <%= 'required' if is_due_date_required %>"><%= l10n("faa.other_ques.pregnancy_due_date") %></legend>
+        <legend class="weight-n <%= 'required' if FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required) %>"><%= l10n("faa.other_ques.pregnancy_due_date") %></legend>
         <%= f.date_field :pregnancy_due_on, id: "applicant_pregnancy_due_on", placeholder: "MM/DD/YYYY" %>
       </fieldset>
 
