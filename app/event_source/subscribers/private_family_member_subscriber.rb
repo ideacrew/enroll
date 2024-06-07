@@ -13,8 +13,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.error "PrivateFamilyMemberSubscriber::Save, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.error "PrivateFamilyMemberSubscriber::Save, ack: #{payload}"
+      subscriber_logger.error "PrivateFamilyMemberSubscriber::Created, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "PrivateFamilyMemberSubscriber::Created, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
