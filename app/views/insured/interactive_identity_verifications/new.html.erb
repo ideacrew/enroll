@@ -14,15 +14,17 @@
       <% end %>
       <fieldset class="mt-4 mb-4 d-block">
         <legend class="weight-n required"><%= qf.object.question_text %></legend>
-        <% qf.object.responses.each do |r| %>
-          <div class="radio" tabindex="0" onkeydown="handleRadioKeyDown(event, 'interactive_verification_questions_attributes_#{qf.index}_response_id_#{r.response_id.downcase}')">
-            <%= qf.label "response_id_#{r.response_id.downcase}", class: "mb-4 weight-n" do %>
-              <%= qf.radio_button :response_id, r.response_id, class: 'required' %>
-              <span></span>
-              <%= r.response_text %>
-            <% end %>
-          </div>
-        <% end %>
+        <div class="focus">
+          <% qf.object.responses.each do |r| %>
+            <div class="radio">
+              <%= qf.label "response_id_#{r.response_id.downcase}", class: "mb-4 weight-n" do %>
+                <%= qf.radio_button :response_id, r.response_id, class: 'required' %>
+                <span></span>
+                <%= r.response_text %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
       </fieldset>
     <% end %>
     <%= f.submit l10n("submit"), class: 'btn' + pundit_class(Family, :updateable?) %>
