@@ -11,83 +11,11 @@
     "false_positive": true,
     "ignored_at": "2024-05-24T18:47:12Z"
   },
-  "00f35abfb5b664c1d3ab9cacdafeef2e_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:47:05Z"
-  },
-  "00f35abfb5b664c1d3ab9cacdafeef2e_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "031355a670958396286fddc5b0bbac3f_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "031355a670958396286fddc5b0bbac3f_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "0382d1023e671565e59bfb00804979ea_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but the params are already sanitized in the above steps of the operation.",
     "false_positive": true,
     "ignored_at": "2024-05-23T21:19:15Z"
-  },
-  "04e71e6830591e727d5e530cfb65053e_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "04e71e6830591e727d5e530cfb65053e_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "04e71e6830591e727d5e530cfb65053e_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "04e71e6830591e727d5e530cfb65053e_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "0743e14038209fbc577fd0e9afd2f34c_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "08ddd91659718c61a94e1e86860b8ce9_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:48:30Z"
-  },
-  "08ddd91659718c61a94e1e86860b8ce9_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "0d0640fe7883c6a0f4bd94d88bcdda7a_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
   },
   "0db60b36f40793ab5237b33d08d4a09e_0": {
     "author": "Sai Kumar Kotagiri",
@@ -107,162 +35,6 @@
     "false_positive": true,
     "ignored_at": "2024-05-23T21:17:48Z"
   },
-  "0e8d34517a655fa729efb3cba27c45c0_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:54:33Z"
-  },
-  "0e8d34517a655fa729efb3cba27c45c0_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "0e8d34517a655fa729efb3cba27c45c0_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "0e8d34517a655fa729efb3cba27c45c0_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "0e8d34517a655fa729efb3cba27c45c0_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
-  },
-  "0e8d34517a655fa729efb3cba27c45c0_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagges as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:30:11Z"
-  },
-  "0e8d34517a655fa729efb3cba27c45c0_6": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'HIGH: Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-06-07T15:23:07Z"
-  },
-  "0eeaa85053556b1553e85573ebcdb09e_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "0eeaa85053556b1553e85573ebcdb09e_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "0eeaa85053556b1553e85573ebcdb09e_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "0f54a55f0ba92e81160b67b9b8900320_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "0f54a55f0ba92e81160b67b9b8900320_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "0f54a55f0ba92e81160b67b9b8900320_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "0f54a55f0ba92e81160b67b9b8900320_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "0f54a55f0ba92e81160b67b9b8900320_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "0f54a55f0ba92e81160b67b9b8900320_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "11099489048cdca7db5dd515983934cc_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "11b5873a70b96f9239f93ace28cfe502_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:45:45Z"
-  },
-  "12438a5e5fa71213e3beec8871baed75_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "12438a5e5fa71213e3beec8871baed75_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "1336d1b1eb0753874fe3d0f80e1d1dbc_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "1336d1b1eb0753874fe3d0f80e1d1dbc_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "1336d1b1eb0753874fe3d0f80e1d1dbc_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "1336d1b1eb0753874fe3d0f80e1d1dbc_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "1336d1b1eb0753874fe3d0f80e1d1dbc_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "1336d1b1eb0753874fe3d0f80e1d1dbc_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "142d42d7d4a8f9321b8a6f128381fd87_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagges as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
@@ -275,59 +47,17 @@
     "false_positive": true,
     "ignored_at": "2024-06-07T15:18:04Z"
   },
-  "160bdb19d92b50f041b31c3bcc70f278_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "160bdb19d92b50f041b31c3bcc70f278_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "166ebdf3adb10dd891a22568ec5f1a1f_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "The flagged issue, 'Unsanitized external input in SQL query [CWE-89]', is a false positive in this case. The query_criteria is constructed using event source publisher without any user input, which means there's no risk of SQL injection from user-provided data.",
     "false_positive": true,
     "ignored_at": "2024-05-23T16:55:50Z"
   },
-  "1678b55288d2c819d1f0f05b9e28326d_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "1678b55288d2c819d1f0f05b9e28326d_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "1bc328ddfd2a8d777e1aa2408a11a801_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:53:50Z"
-  },
   "1c54580237ce2d2a715bf478bf6a70bc_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'HIGH: Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the content that is inserted here comes from the db and not from the user input.",
     "false_positive": true,
     "ignored_at": "2024-06-06T18:21:03Z"
-  },
-  "1c9d5aba4439da3904570088f0de4c81_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:43Z"
-  },
-  "1c9d5aba4439da3904570088f0de4c81_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
   },
   "2083fb52647c60ef7701bbeeea0b0036_0": {
     "author": "Sai Kumar Kotagiri",
@@ -347,227 +77,17 @@
     "false_positive": true,
     "ignored_at": "2024-05-20T19:53:12Z"
   },
-  "23e8bd11164d679d55e4ee624252192b_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:47:40Z"
-  },
-  "23e8bd11164d679d55e4ee624252192b_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "23e8bd11164d679d55e4ee624252192b_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "23e8bd11164d679d55e4ee624252192b_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "25e9ba93c7a752bce93b1fba05d3ca11_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "25e9ba93c7a752bce93b1fba05d3ca11_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_6": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_7": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "27e76a470102223564a43c8c405e219d_8": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "2f318536faab86d2ee75010b67565e3f_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "2f318536faab86d2ee75010b67565e3f_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "306528f9fa20c7611275ed35b93bc7ad_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The use of 'guest' here is not a security issue. It's just a placeholder value that's used in non production environment like development and test. In the production environment, the RABBITMQ_PASSWORD environment variable will be set to a secure value.",
     "false_positive": true,
     "ignored_at": "2024-05-20T21:18:40Z"
   },
-  "3250dd1e96dd13e824c5306632589973_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "3250dd1e96dd13e824c5306632589973_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "3250dd1e96dd13e824c5306632589973_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "3250dd1e96dd13e824c5306632589973_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "359201cc417920ab7ef6e0f813cee39a_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:46:02Z"
-  },
-  "359201cc417920ab7ef6e0f813cee39a_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "385506c67a98f4271d17fc5c5de26286_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:46:50Z"
-  },
-  "385506c67a98f4271d17fc5c5de26286_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "385506c67a98f4271d17fc5c5de26286_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
   "3d13ffead5a5f7be41998f5cb20b8cec_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Unsanitized user input in file path [CWE-73]' but the user input is validated in the line before this.",
     "false_positive": true,
     "ignored_at": "2024-05-23T21:31:45Z"
-  },
-  "3de1ecc40819df1180d5293c35655c06_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:09Z"
-  },
-  "3de1ecc40819df1180d5293c35655c06_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "3de1ecc40819df1180d5293c35655c06_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "3de1ecc40819df1180d5293c35655c06_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "3f00ceb8778528fdcf6672f5daac458a_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:56:39Z"
-  },
-  "3f00ceb8778528fdcf6672f5daac458a_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "3f00ceb8778528fdcf6672f5daac458a_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "3f00ceb8778528fdcf6672f5daac458a_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "3f00ceb8778528fdcf6672f5daac458a_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
   },
   "409b7fe60c72b1e43accae962119b1aa_0": {
     "author": "Sai Kumar Kotagiri",
@@ -580,18 +100,6 @@
     "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but there is no user input.",
     "false_positive": true,
     "ignored_at": "2024-05-23T21:23:11Z"
-  },
-  "426befabf94e7b24de974431fb8b550b_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "426befabf94e7b24de974431fb8b550b_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
   },
   "4641c2edaed0f2faa5094d6b8a1dde31_0": {
     "author": "Sai Kumar Kotagiri",
@@ -671,66 +179,6 @@
     "false_positive": true,
     "ignored_at": "2024-05-23T16:27:16Z"
   },
-  "4f466f349e6360253f1bf540f7193f12_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "4f466f349e6360253f1bf540f7193f12_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "511900510ed97f7ff1c0b81953572851_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "511900510ed97f7ff1c0b81953572851_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "511900510ed97f7ff1c0b81953572851_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "511900510ed97f7ff1c0b81953572851_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "511900510ed97f7ff1c0b81953572851_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
-  },
-  "511900510ed97f7ff1c0b81953572851_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagges as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:30:11Z"
-  },
-  "53c951f67bb993e36b7c718bcecd86bc_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "53c951f67bb993e36b7c718bcecd86bc_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "540988895fddb81a9e0061cd7332dd2d_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but the params are validated as part of a contract.",
@@ -748,48 +196,6 @@
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The use of 'dummy' here is not a security issue. It's just a placeholder value that's used when the real API secret is not available. In the production environment, the WF_API_SECRET environment variable will be set to a secure value.",
     "false_positive": true,
     "ignored_at": "2024-05-20T20:23:32Z"
-  },
-  "56ec12c30eda800ac2ac8632e71930bb_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "56ec12c30eda800ac2ac8632e71930bb_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "56ec12c30eda800ac2ac8632e71930bb_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "584d7dbbe1f2a53c1c73b6427162dfd8_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "584d7dbbe1f2a53c1c73b6427162dfd8_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "584d7dbbe1f2a53c1c73b6427162dfd8_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "584d7dbbe1f2a53c1c73b6427162dfd8_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
   },
   "58a6b586c4ca58e1c9803fa06222dbcf_0": {
     "author": "Sai Kumar Kotagiri",
@@ -827,203 +233,11 @@
     "false_positive": true,
     "ignored_at": "2024-05-23T20:06:43Z"
   },
-  "5f566bcc34af3eac186a8c19ef03dc51_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "5f566bcc34af3eac186a8c19ef03dc51_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "608b3c1ebbfdf4e43c36fe148e7075b5_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:48:40Z"
-  },
-  "608b3c1ebbfdf4e43c36fe148e7075b5_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "60c6fff36eb3f4046d394a4c4a708cad_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but there is no User input.",
     "false_positive": true,
     "ignored_at": "2024-05-23T21:14:51Z"
-  },
-  "612f05e329e49b2632bbcf0a040e57b6_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:52:18Z"
-  },
-  "612f05e329e49b2632bbcf0a040e57b6_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "612f05e329e49b2632bbcf0a040e57b6_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "612f05e329e49b2632bbcf0a040e57b6_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "612f05e329e49b2632bbcf0a040e57b6_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
-  },
-  "62aa82a2cd94b81d3d90633801f4cdd0_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:29Z"
-  },
-  "62aa82a2cd94b81d3d90633801f4cdd0_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:38Z"
-  },
-  "64eec05c61ae8c4a26744e76a604d2ac_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:59Z"
-  },
-  "64eec05c61ae8c4a26744e76a604d2ac_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "64eec05c61ae8c4a26744e76a604d2ac_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "64eec05c61ae8c4a26744e76a604d2ac_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:52:04Z"
-  },
-  "64eec05c61ae8c4a26744e76a604d2ac_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "64eec05c61ae8c4a26744e76a604d2ac_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "6540520a85d974810fe6d191f06e3ca5_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "6567d78d87146c92563c822ba04f932b_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:54:48Z"
-  },
-  "6567d78d87146c92563c822ba04f932b_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "6567d78d87146c92563c822ba04f932b_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "6a6e4231291f9374155ff1b4d23a2a7b_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:48:10Z"
-  },
-  "6a6e4231291f9374155ff1b4d23a2a7b_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "6f5889e478c8efb7d2c00a47e067154e_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "6f5889e478c8efb7d2c00a47e067154e_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "6f5889e478c8efb7d2c00a47e067154e_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "6f5889e478c8efb7d2c00a47e067154e_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "6f5889e478c8efb7d2c00a47e067154e_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "6f5889e478c8efb7d2c00a47e067154e_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "6f5889e478c8efb7d2c00a47e067154e_6": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "6f7fdfbd7464635acb2dc8bee4540d6d_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "6f7fdfbd7464635acb2dc8bee4540d6d_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
   },
   "70a004cf777a1f00f2c34ba46c1e901c_0": {
     "author": "Sai Kumar Kotagiri",
@@ -1031,161 +245,11 @@
     "false_positive": true,
     "ignored_at": "2024-05-30T21:32:28Z"
   },
-  "71ce79a4a33890c58dadfe834a381003_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "71ce79a4a33890c58dadfe834a381003_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "739df8ef26e0cf90b7eb9fe3a1afffc1_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "739df8ef26e0cf90b7eb9fe3a1afffc1_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "76ad7709b69a8b8eedd2b2073e60660c_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "76ad7709b69a8b8eedd2b2073e60660c_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "7ad2a9d64a516a2cc185de198bd0672e_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "7ad2a9d64a516a2cc185de198bd0672e_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "7b823d8e15c196b83105b5ab73fced56_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:46:43Z"
-  },
-  "7b823d8e15c196b83105b5ab73fced56_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "7f1b50802fe74ef1e8d207d7321d001d_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "7f1b50802fe74ef1e8d207d7321d001d_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "7f1b50802fe74ef1e8d207d7321d001d_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
   "800a8691b4ab0422b23577f97f0d2a71_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This line is flagged as 'HIGH: Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but 'nodeName' is always one of the hardcoded strings 'row', 'c', 'v', 'is', 't', 'cols', 'col' and is not derived from user input.",
     "false_positive": true,
     "ignored_at": "2024-06-03T14:35:17Z"
-  },
-  "81a3d388bb5781a91b0717ba4a8c7415_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:48Z"
-  },
-  "81a3d388bb5781a91b0717ba4a8c7415_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "84fe31f612d7e325a90405460c5654e6_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "84fe31f612d7e325a90405460c5654e6_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "84fe31f612d7e325a90405460c5654e6_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "84fe31f612d7e325a90405460c5654e6_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "88f4a6fe9ed783cfae898d3aa59167ab_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "88f4a6fe9ed783cfae898d3aa59167ab_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "88f4a6fe9ed783cfae898d3aa59167ab_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "88f4a6fe9ed783cfae898d3aa59167ab_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "8c1064bf3b5d29050cb41fd1f936d4c5_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:54:29Z"
-  },
-  "8c1064bf3b5d29050cb41fd1f936d4c5_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
   },
   "8dbb50137357262ff78f73c4560fc1c3_0": {
     "author": "Sai Kumar Kotagiri",
@@ -1211,30 +275,6 @@
     "false_positive": true,
     "ignored_at": "2024-05-23T15:17:10Z"
   },
-  "9101817aec9ac9855ca1c1eadd4de1f9_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "9101817aec9ac9855ca1c1eadd4de1f9_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "9101817aec9ac9855ca1c1eadd4de1f9_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "9101817aec9ac9855ca1c1eadd4de1f9_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
   "92fc8d572095844c1ec652cc66152003_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is data migration was supposed to be used for local development. All the data is dummy.",
@@ -1258,66 +298,6 @@
     "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
     "false_positive": true,
     "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "978ba807092d8a57196706851e2625db_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:46:57Z"
-  },
-  "980b9fffce273184523e3c7f10aefa97_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "9c3ae00ac5aa14b1cad09299929a7356_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "9c7b0653336558f29851bc7b13140c39_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "9e42fed1f95e343e3929466a68ed31a9_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:52:14Z"
-  },
-  "9e42fed1f95e343e3929466a68ed31a9_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "9e42fed1f95e343e3929466a68ed31a9_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "9e42fed1f95e343e3929466a68ed31a9_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "a13dfb3fbe0ac7ff6bb7a72fa25925e1_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:47:46Z"
-  },
-  "a13dfb3fbe0ac7ff6bb7a72fa25925e1_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
   },
   "a261fe84031c542c9d50b0d4fe1a9c0f_0": {
     "author": "Sai Kumar Kotagiri",
@@ -1367,18 +347,6 @@
     "false_positive": true,
     "ignored_at": "2024-05-24T21:30:11Z"
   },
-  "a48a795ad1b48c1a2002b91475d8cd07_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "a48a795ad1b48c1a2002b91475d8cd07_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
   "a5ee3fb474f80f68f62bea8235642f55_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
@@ -1396,66 +364,6 @@
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
     "false_positive": true,
     "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "a84801c19e614808a25f41c313f94c53_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "a84801c19e614808a25f41c313f94c53_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "aa7bdef834c7ae40ea3dfeae0936b5c1_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "aabc56f77f513a857e3df73b568ac17b_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "aabc56f77f513a857e3df73b568ac17b_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "aabc56f77f513a857e3df73b568ac17b_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "aabc56f77f513a857e3df73b568ac17b_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "aabc56f77f513a857e3df73b568ac17b_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
-  },
-  "aabc56f77f513a857e3df73b568ac17b_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagges as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:30:11Z"
-  },
-  "aabc56f77f513a857e3df73b568ac17b_6": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'HIGH: Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-06-07T16:24:13Z"
   },
   "ab3d61d87e5909f285cd133b0586c9fa_0": {
     "author": "Sai Kumar Kotagiri",
@@ -1475,54 +383,6 @@
     "false_positive": true,
     "ignored_at": "2024-05-23T20:06:43Z"
   },
-  "acbcea05fb3fe2ee67f47a824ff42119_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "acbcea05fb3fe2ee67f47a824ff42119_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "b39e529b6de0ad886909349e7d9fa030_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "b39e529b6de0ad886909349e7d9fa030_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "b39e529b6de0ad886909349e7d9fa030_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "b39e529b6de0ad886909349e7d9fa030_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "b39e529b6de0ad886909349e7d9fa030_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
-  },
-  "b39e529b6de0ad886909349e7d9fa030_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagges as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:30:11Z"
-  },
   "b513de77a9efc0c21c839a00b5477815_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
@@ -1534,30 +394,6 @@
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
     "false_positive": true,
     "ignored_at": "2024-05-20T19:50:18Z"
-  },
-  "b61913436f6ba063b8aa1be5afb5d740_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "b9abae46fae6bfe90dcc2788bcc3294e_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "bdcc84146f1eb1f3a0840e492aa24da9_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:48:16Z"
-  },
-  "bdcc84146f1eb1f3a0840e492aa24da9_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
   },
   "be9f96c477dc9e6c89cb2f6ec726e3ee_0": {
     "author": "Sai Kumar Kotagiri",
@@ -1583,119 +419,11 @@
     "false_positive": true,
     "ignored_at": "2024-05-24T21:01:12Z"
   },
-  "c4a8bd0e33533d6cafc66dcdbe29f2f0_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:24Z"
-  },
   "c80ef62f6dc7e0a10c6cf21e205be731_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is a dummy value. The actual secret is picked from the environment variable 'ENROLL_JWT_SECRET' in the Docker environment. Refer to .docker/config/devise.rb for more details.",
     "false_positive": true,
     "ignored_at": "2024-05-31T18:17:58Z"
-  },
-  "c97ec2bb359f822cdb87ff349ccdc165_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "c97ec2bb359f822cdb87ff349ccdc165_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "c9ca017a29d442042b8a837589e337ac_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "cbd00bfebcb3f92db820f697ab729ea6_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:14Z"
-  },
-  "cbd00bfebcb3f92db820f697ab729ea6_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:47:58Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:48:04Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_6": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_7": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_8": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "cc3cac9ba4e3dea2034d879acb8d9f45_9": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
-  },
-  "d39e24bc806d57301ff1dd2616bc007f_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:51:19Z"
-  },
-  "d39e24bc806d57301ff1dd2616bc007f_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
   },
   "d5f5bf4a6b1ec5af16b2f7cbe2056219_0": {
     "author": "Sai Kumar Kotagiri",
@@ -1721,18 +449,6 @@
     "false_positive": true,
     "ignored_at": "2024-05-24T20:45:40Z"
   },
-  "db7d15aa3c4942301073fdebe21ba97d_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "db7d15aa3c4942301073fdebe21ba97d_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "dc369468d8a5d5bb522d023ae7485376_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but the value exists in development environment configuration file. This is a dummy value and only used in local development.",
@@ -1745,54 +461,6 @@
     "false_positive": true,
     "ignored_at": "2024-05-20T20:37:12Z"
   },
-  "dd463d491af26b82b4b174174d53b16d_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:45:56Z"
-  },
-  "dd463d491af26b82b4b174174d53b16d_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "de20853a6501ba697e4e949f56178531_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:48:35Z"
-  },
-  "de20853a6501ba697e4e949f56178531_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "de20853a6501ba697e4e949f56178531_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "de20853a6501ba697e4e949f56178531_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "de23989b0b1117cda9dbbe8b3f5e9859_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "de23989b0b1117cda9dbbe8b3f5e9859_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "df352fc34e516725803b4c4d0fcf954e_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
@@ -1804,30 +472,6 @@
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
     "false_positive": true,
     "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "e15a71769ab3600fb6b4b7d9747ce588_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:54:23Z"
-  },
-  "e15a71769ab3600fb6b4b7d9747ce588_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "e15a71769ab3600fb6b4b7d9747ce588_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "e15a71769ab3600fb6b4b7d9747ce588_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
   },
   "e20e516739cd3c5ce52de20620547521_0": {
     "author": "Sai Kumar Kotagiri",
@@ -1859,214 +503,16 @@
     "false_positive": true,
     "ignored_at": "2024-05-30T13:12:25Z"
   },
-  "e3c686a378dbe8ed6cd48111821680fd_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e3c686a378dbe8ed6cd48111821680fd_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "e3ce4d15adeb9bfa0b1d7af928a265b3_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e3ce4d15adeb9bfa0b1d7af928a265b3_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "e3ce4d15adeb9bfa0b1d7af928a265b3_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e3ce4d15adeb9bfa0b1d7af928a265b3_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
   "e67e1a4c9599cd4747352f4bcad5f279_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'HIGH: Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the content that is inserted here comes from the db and not from the user input.",
     "false_positive": true,
     "ignored_at": "2024-06-06T15:28:31Z"
   },
-  "e8d9e9221327bf7228586eadb170a69f_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e8d9e9221327bf7228586eadb170a69f_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e8d9e9221327bf7228586eadb170a69f_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e8d9e9221327bf7228586eadb170a69f_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e8d9e9221327bf7228586eadb170a69f_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e8d9e9221327bf7228586eadb170a69f_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "e9d38fc7939a8a78a220f5d99045683e_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:47:52Z"
-  },
-  "e9d38fc7939a8a78a220f5d99045683e_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "ee91f050dd0422c67d54015b63f90d5f_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "ee91f050dd0422c67d54015b63f90d5f_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "ee91f050dd0422c67d54015b63f90d5f_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "eea2ba6029a7431f71c3e7df1343f88c_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:54:38Z"
-  },
-  "eea2ba6029a7431f71c3e7df1343f88c_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "eea2ba6029a7431f71c3e7df1343f88c_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "eea2ba6029a7431f71c3e7df1343f88c_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "eea2ba6029a7431f71c3e7df1343f88c_4": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:11:12Z"
-  },
-  "eea2ba6029a7431f71c3e7df1343f88c_5": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagges as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:30:11Z"
-  },
   "f0427f0b6b43e55b90e2e2ee5c122768_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but there is no user input.",
     "false_positive": true,
     "ignored_at": "2024-05-23T21:24:40Z"
-  },
-  "f2ad276e9d22f009352346cc2b5d1bed_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:55:54Z"
-  },
-  "f48ff202190aab11359ea013b5321b5f_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T18:54:55Z"
-  },
-  "f48ff202190aab11359ea013b5321b5f_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "f48ff202190aab11359ea013b5321b5f_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
-  },
-  "f48ff202190aab11359ea013b5321b5f_3": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T21:01:12Z"
-  },
-  "f55b03a4b922b328983f4852db8445d2_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "f55b03a4b922b328983f4852db8445d2_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "ff00120ff5ca17c59ad06c7487c69610_0": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T19:45:40Z"
-  },
-  "ff00120ff5ca17c59ad06c7487c69610_1": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
-    "false_positive": true,
-    "ignored_at": "2024-05-24T20:45:40Z"
-  },
-  "ff00120ff5ca17c59ad06c7487c69610_2": {
-    "author": "Sai Kumar Kotagiri",
-    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
-    "false_positive": true,
-    "ignored_at": "2024-05-23T20:06:43Z"
   }
 }
