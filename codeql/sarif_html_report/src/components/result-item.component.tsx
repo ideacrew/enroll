@@ -78,11 +78,30 @@ export class ResultItem extends Component<PropsType, StateType, any> {
     return "bi bi-arrow-down-circle h3 result-item-arrow";
   }
 
+  getDescription() {
+    let ignoreString = "";
+    if (this.dataLoader.ignores.length > 0) {
+      if (this.result.partialFingerprints) {
+        const pllHash = this.result.partialFingerprints.primaryLocationLineHash;
+        const plStartColumnFingerprint = this.result.partialFingerprints.primaryLocationStartColumnFingerprint;
+        const matchingIgnores = this.dataLoader.ignores.filter((entry) => {
+          return (pllHash === entry.fingerprint.primaryLocationLineHash) &&
+            (plStartColumnFingerprint.toString() === entry.fingerprint.primaryLocationStartColumnFingerprint.toString()) &&
+            (this.result.ruleId === entry.ruleId);
+        });
+        if (matchingIgnores.length > 0) {
+          ignoreString = "[IGNORED] ";
+        }
+      }
+    } 
+    return ignoreString + this.rule.shortDescription?.text;
+  }
+
   render(): ReactNode {
     return (
       <Fragment>
         <tr key={`result-item-table-row-${this.index}`} onClick={this.toggleItem}>
-          <td>{this.rule.shortDescription?.text}</td>
+          <td>{this.getDescription()}</td>
           <td>{this.extractLocation()}<i className={this.getArrowClass()}></i></td>
         </tr>
         <tr key={`result-item-table-body-${this.index}`} className={this.getExpansionClass()}>
