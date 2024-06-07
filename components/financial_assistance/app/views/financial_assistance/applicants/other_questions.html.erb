@@ -19,16 +19,16 @@
       <%# TODO: check asterisks %>
       <% def applicant_prompt(key) other_questions_prompt(key, true) end %>
       <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
-        <fieldset class="mb-4">
+        <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n fa-required"><%= applicant_prompt('ssn_apply') %></legend>
           <label class="weight-n"><%= f.radio_button :is_ssn_applied, true, id: "is_ssn_applied_yes" %> <%= l10n('yes') %></label>
           <label class="weight-n"><%= f.radio_button :is_ssn_applied, false, id: "is_ssn_applied_no" %> <%= l10n('no') %></label>
         </fieldset>
 
-        <fieldset class="mb-4">
           <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
+        <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n <%= 'fa-required' if no_ssn_dropdown %>"><%= applicant_prompt('why_no_ssn') %>"</legend>
-          <div data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
+          <div class="col px-0" data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
             <% if no_ssn_dropdown %>
               <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true) %>
             <% else %>
@@ -38,7 +38,7 @@
         </fieldset>
       <% end %>
 
-      <div class="mb-4">
+      <div class="mb-4 row-form-wrapper">
         <fieldset>
           <legend class="weight-n fa-required"><%= applicant_prompt('is_pregnant') %></legend>
           <label class="weight-n"><%= f.radio_button :is_pregnant, true, id: "is_pregnant_yes" %> <%= l10n('yes') %></label>
@@ -156,7 +156,7 @@
           <fieldset>
             <legend class="weight-n <%= 'fa-required' if is_question_required %>"><%= applicant_prompt("help_paying_bills") %></legend>
             <label class="weight-n"><%= f.radio_button :need_help_paying_bills, true, id: "need_help_paying_bills_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :need_help_paying_bills, false, id: "need_help_paying_bills_yes" %> <%= l10n('no') %></label>
+            <label class="weight-n"><%= f.radio_button :need_help_paying_bills, false, id: "need_help_paying_bills_no" %> <%= l10n('no') %></label>
           </fieldset>
           <div>
             <a href="#need_help_paying_bills" data-toggle="modal" data-target="#need_help_paying_bills"><%= l10n('faa.question.not_sure') %></a>
@@ -168,7 +168,7 @@
           <fieldset>
             <legend class="weight-n <%= 'fa-required' if is_question_required %>"><%= applicant_prompt("disability_question") %></legend>
             <label class="weight-n"><%= f.radio_button :is_physically_disabled, true, id: "radio_physically_disabled_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_physically_disabled, false, id: "radio_physically_disabled_yes" %> <%= l10n('no') %></label>
+            <label class="weight-n"><%= f.radio_button :is_physically_disabled, false, id: "radio_physically_disabled_no" %> <%= l10n('no') %></label>
           </fieldset>
           <div>
             <a href="#is_physically_disabled" data-toggle="modal" data-target="#is_physically_disabled"><%= l10n('faa.question.not_sure') %></a>
@@ -217,6 +217,13 @@
 
       <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "submit"} %>
     </div>
+    <script type="text/javascript">
+      $(document).on("change", "#is_pregnant_yes", function(){
+        if ($('#is_pregnant_yes').is(':checked')) {
+          $('#children_expected_count').selectric("destroy");
+        };
+      });
+    </script>
   <% end %>
 <% else %>
   <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
