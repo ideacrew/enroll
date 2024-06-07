@@ -175,7 +175,7 @@
         <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && @applicant.age_of_the_applicant >= 19 && @applicant.is_applying_coverage %>
           <div class="mb-4 row-form-wrapper">
             <fieldset>
-              <legend class="weight-n"><%= applicant_prompt("primary_caretaker_question_text") %></legend>
+              <legend class="weight-n required"><%= applicant_prompt("primary_caretaker_question_text") %></legend>
               <label class="weight-n"><%= f.radio_button :is_primary_caregiver, true, id: "is_primary_caregiver_yes" %> <%= l10n('yes') %></label>
               <label class="weight-n"><%= f.radio_button :is_primary_caregiver, false, id: "is_primary_caregiver_no" %> <%= l10n('no') %></label>
             </fieldset>
@@ -208,6 +208,12 @@
             <label class="weight-n"><%= f.radio_button :is_veteran_or_active_military, false, id: "is_veteran_or_active_military_no" %> <%= l10n('no') %></label>
           </fieldset>
         <% end %>
+      
+        <fieldset class="mb-4 row-form-wrapper">
+          <legend class="weight-n"> <%= l10n("faa.other_ques.is_vets_spouse_or_child") %></legend>
+          <label class="weight-n"><%= f.radio_button :is_vets_spouse_or_child, true, id: "is_vets_spouse_or_child_yes" %> <%= l10n('yes') %></label>
+          <label class="weight-n"><%= f.radio_button :is_vets_spouse_or_child, false, id: "is_vets_spouse_or_child_no" %> <%= l10n('no') %></label>
+        </fieldset>
 
       <% end %>
 
@@ -525,7 +531,7 @@
           <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && @applicant.age_of_the_applicant >= 19 && @applicant.is_applying_coverage %>
             <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
               <div class='col-md-6'>
-                <h5 class="fa-text-color"><%= other_questions_prompt('primary_caretaker_question_text') %></h5>
+                <h5 class="fa-text-color"><%= other_questions_prompt('primary_caretaker_question_text') %>*</h5>
               </div>
               <div class='col-md-2'>
                 <%= f.radio_button("is_primary_caregiver", true, class: "radio-yml", id: "is_primary_caregiver_yes") %>
