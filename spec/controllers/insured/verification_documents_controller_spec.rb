@@ -103,6 +103,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
             before do
               allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+              person.add_new_verification_type("Alive Status")
               allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
               allow(controller).to receive(:file_name).and_return("sample-filename")
               allow(controller).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
@@ -138,6 +139,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
             before do
               allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+              person.add_new_verification_type("Alive Status")
               allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:add_type_history_element)
               allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).and_return("sample-filename")
               allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
@@ -160,6 +162,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
               before do
                 allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+                person.add_new_verification_type("Alive Status")
                 file = fixture_file_upload("#{Rails.root}/test/uhic.jpg")
                 allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
                 controller.instance_variable_set(:"@verification_type", alive_status_verification)
@@ -220,6 +223,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         before do
           allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+          person.add_new_verification_type("Alive Status")
           allow(controller).to receive(:vlp_docs_clean).and_return(true)
           allow(consumer_role).to receive(:find_vlp_document_by_key).with('sample-key').and_return(vlp_doc)
           allow(vlp_doc).to receive(:documentable).and_return(alive_status_verification)
