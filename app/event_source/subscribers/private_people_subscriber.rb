@@ -19,7 +19,7 @@ module Subscribers
     end
 
     def pre_process_message(subscriber_logger, payload)
-      subscriber_logger.info "PeopleSubscriber, response: #{payload}"
+      subscriber_logger.info "PrivatePeopleSubscriber, response: #{payload}"
     end
 
     def subscriber_logger_for(event)
