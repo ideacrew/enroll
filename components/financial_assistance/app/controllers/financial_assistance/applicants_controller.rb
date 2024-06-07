@@ -272,7 +272,7 @@ module FinancialAssistance
     end
 
     def conditionally_enable_bs4_layout
-      @bs4 = true if params[:bs4] == "true"
+      enable_bs4_layout if params[:bs4] == "true"
     end
 
     def enable_bs4_layout
