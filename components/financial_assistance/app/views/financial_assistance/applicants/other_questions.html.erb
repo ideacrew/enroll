@@ -1,22 +1,19 @@
 <% if @bs4 %>
   <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
-    <%# TODO: remove all rows %>
     <%= hidden_field_tag :bs4, true %>
       
     <div>
-      <p class="alert alert-error hide"></p> <%# TODO: needed? where is this being used? (ugh) %>
+      <p class="alert alert-error hide"></p>
       
       <% applicant_name = @applicant.first_name.capitalize %>
-      <div class="row">
-        <div class="col-md-12">
+      <div>
+        <div class="col-md-12 px-0">
           <h1><%= l10n('faa.other_ques.title') %> <%= applicant_name %></h1>
         </div>
       </div>
       <label class="weight-n mb-3"><%= l10n('faa.other_ques.answer_questions', applicant_name: applicant_name) %></label>
-      <div class="memo"><div> <%# TODO: needed? date.js is being loaded... but the datepicker class is buggy with bs4 layout ALSO, the alert banner on legacy is shown but never even removed... weird UX there %>
+      <div class="memo"><div>
 
-      <%# TODO: check which required are fields %>
-      <%# TODO: check asterisks %>
       <% def applicant_prompt(key) other_questions_prompt(key, true) end %>
       <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
         <fieldset class="mb-4 row-form-wrapper">
@@ -46,7 +43,7 @@
         </fieldset>
         <div>
           <a href="#is_pregnant" data-toggle="modal" data-target="#is_pregnant"><%= l10n('faa.question.not_sure') %></a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_pregnant"} %> <%# TODO: modal %>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_pregnant"} %>
         </div>
       </div>
 
@@ -57,8 +54,8 @@
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
-        <legend class="weight-n required"><%= applicant_prompt('children_expected') %></legend> <%# TODO: refactor below params %>
           <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, id: 'children_expected_count', class: "col-4", prompt: true) %>
+        <legend class="weight-n required"><%= applicant_prompt('children_expected') %></legend>
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
@@ -136,7 +133,7 @@
           </fieldset>
           <div>
             <a href="#is_self_assisted_blind" data-toggle="modal" data-target="#is_self_assisted_blind"><%= l10n('faa.question.not_sure') %></a>
-            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_self_assisted_blind"} %> <%# TODO: modal %>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_self_assisted_blind"} %>
           </div>
         </div>
 
@@ -148,7 +145,7 @@
           </fieldset>
           <div>
             <a href="#has_daily_living_help" data-toggle="modal" data-target="#has_daily_living_help"><%= l10n('faa.question.not_sure') %></a>
-            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_daily_living_help"} %> <%# TODO: modal %>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_daily_living_help"} %>
           </div>
         </div>
 
@@ -160,7 +157,7 @@
           </fieldset>
           <div>
             <a href="#need_help_paying_bills" data-toggle="modal" data-target="#need_help_paying_bills"><%= l10n('faa.question.not_sure') %></a>
-            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "need_help_paying_bills"} %> <%# TODO: modal %>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "need_help_paying_bills"} %>
           </div>
         </div>
 
@@ -172,7 +169,7 @@
           </fieldset>
           <div>
             <a href="#is_physically_disabled" data-toggle="modal" data-target="#is_physically_disabled"><%= l10n('faa.question.not_sure') %></a>
-            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %> <%# TODO: modal %>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %>
           </div>
         </div>
 
@@ -185,7 +182,7 @@
             </fieldset>
             <div>
               <a href="#primary_caretaker_question" data-toggle="modal" data-target="#primary_caretaker_question"><%= l10n('faa.question.not_sure') %></a>
-              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "primary_caretaker_question"} %> <%# TODO: modal %>
+              <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "primary_caretaker_question"} %>
             </div>
           </div>
 
