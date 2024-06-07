@@ -143,6 +143,12 @@
     "false_positive": true,
     "ignored_at": "2024-05-24T21:30:11Z"
   },
+  "0e8d34517a655fa729efb3cba27c45c0_6": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'HIGH: Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-06-07T15:23:07Z"
+  },
   "0eeaa85053556b1553e85573ebcdb09e_0": {
     "author": "Sai Kumar Kotagiri",
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
