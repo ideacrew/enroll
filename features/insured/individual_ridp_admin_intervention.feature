@@ -11,8 +11,8 @@ Feature: Consumer agrees RIDP verification process with Admin intervention
     When user registers as an individual
     And the individual clicks on the Continue button of the Account Setup page 
     Then Individual sees form to enter personal information
-    When the individual clicks on continue on the personal information page
-  
+    When the individual clicks continue on the personal information page
+
   Scenario: New insured user chooses I Agree on Auth and Consent Page and uploaded documents for both identity and application and both are verified
     Given that the consumer has navigated to the AUTH & CONSENT page
     When the consumer selects “I Agree”

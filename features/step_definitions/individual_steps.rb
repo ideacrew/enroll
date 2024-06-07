@@ -1272,7 +1272,7 @@ And(/Individual signed in to resume enrollment$/) do
   visit '/'
   click_link('Consumer/Family Portal', wait: 10)
   sleep 2
-  find('.btn-link', :text => 'Sign In', wait: 5).click
+  find('.interaction-click-control-sign-in').click
   sleep 5
   fill_in SignIn.username, :with => "testflow@test.com"
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
