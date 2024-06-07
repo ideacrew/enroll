@@ -117,7 +117,7 @@
             </fieldset>
 
             <fieldset class="mb-4 row-form-wrapper">
-              <legend class="weight-n"><%= l10n("faa.other_ques.student_school_type") %></legend> <%# Weird content for this string %>
+              <legend class="weight-n"><%= l10n("faa.other_ques.student_school_type") %></legend>
               <%= f.select :student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, id: 'student_school_kind', class: "col-4", prompt: true %>
             </fieldset>
           <% end %>
@@ -197,13 +197,13 @@
 
         <% if @applicant.eligible_immigration_status.present? %>
           <fieldset class="mb-4 row-form-wrapper">
-            <legend class="weight-n"> <%= l10n("faa.other_ques.is_resident_post_092296") %></legend> <%# Weird text %>
+            <legend class="weight-n"> <%= l10n("faa.other_ques.is_resident_post_092296") %></legend>
             <label class="weight-n"><%= f.radio_button :is_resident_post_092296, true, id: "is_resident_post_092296_yes" %> <%= l10n('yes') %></label>
             <label class="weight-n"><%= f.radio_button :is_resident_post_092296, false, id: "is_resident_post_092296_no" %> <%= l10n('no') %></label>
           </fieldset>
 
           <fieldset class="mb-4 row-form-wrapper">
-            <legend class="weight-n"> <%= l10n("faa.other_ques.is_veteran_or_active_military") %></legend> <%# Weird text %>
+            <legend class="weight-n"> <%= l10n("faa.other_ques.is_veteran_or_active_military") %></legend>
             <label class="weight-n"><%= f.radio_button :is_veteran_or_active_military, true, id: "is_veteran_or_active_military_yes" %> <%= l10n('yes') %></label>
             <label class="weight-n"><%= f.radio_button :is_veteran_or_active_military, false, id: "is_veteran_or_active_military_no" %> <%= l10n('no') %></label>
           </fieldset>
