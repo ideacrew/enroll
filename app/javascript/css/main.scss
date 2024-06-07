@@ -110,6 +110,7 @@ nav .login-options li {
 
 .hide, .hidden {
   @extend .sr-only;
+  visibility: hidden;
 }
 
 .hidden_field {
