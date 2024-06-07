@@ -1,243 +1,423 @@
-<%= form_for @applicant, url: application_applicant_path(@application, @applicant), method: :patch do |f|%>
-  <%= hidden_field_tag :is_dependent, @applicant.is_dependent? %>
-  <div class="row no-buffer">
-    <div id="personal_info" class="module">
-      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :first_name, id: "first-name", class: "floatlabel form-control", placeholder: "FIRST NAME", autocomplete: :off %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :middle_name, class: "floatlabel form-control", placeholder: "MIDDLE NAME", autocomplete: :off %>
-          </div>
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME", autocomplete: :off %>
-          </div>
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
-              <div class="text-right">
-                <% unless @applicant.is_primary_applicant? %>
-                  <%= button_tag(id: "delete_applicant_button", class: "close") do %>
-                    <i class="fa fa-times"><span class="hide">Delete</span></i>
-                  <% end %>
-                <% end %>
-              </div>
-          </div>
+<% if @bs4 %>
+  <%= form_for @applicant, url: application_applicant_path(@application, @applicant), method: :patch do |f|%>
+    <%= hidden_field_tag :is_dependent, @applicant.is_dependent? %>
+    <% readonly_status = @applicant.is_primary_applicant? %>
 
+    <div id="personal_info" class="house">
+      <div class="@applicant_notice_div_<%= @applicant.id%>"></div>
+
+      <div class="d-flex mb-md-4">
+        <div class="col-md-6 col-lg-3 p-0">
+          <%= f.label :first_name, l10n("first_name"), class: "required" %>
+          <%= f.text_field :first_name, class: "required", required: true, placeholder: l10n("first_name"), autocomplete: :off %>
         </div>
-
-        <div class="modal" id="destroyApplicant" role="dialog">
-          <div class="modal-dialog" style="width: 500px;">
-            <div class="modal-content">
-              <div class="modal-body">
-                <%= l10n('faa.edit.delete_applicant') %>
-                <strong><br /><%= l10n('faa.edit.remove_warning') %></strong>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmDestoyApplicant(event, "<%=application_applicant_path(@application, @applicant)%>"); return false;'>Confirm</button>
-              </div>
-            </div>
-          </div>
+        <div class="col-md-6 col-lg-3 p-0">
+          <%= f.label :middle_name, l10n("middle_name") %>
+          <%= f.text_field :middle_name, class: "required", required: false, placeholder: l10n("middle_name"), autocomplete: :off %>
         </div>
-
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-            <span>Does <%= @applicant.first_name %> need coverage? *</span>
-          </div>
-          <%= render 'financial_assistance/shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
+        <div class="col-md-6 col-lg-3 p-0">
+          <%= f.label :last_name, l10n("last_name"), class: "required" %>
+          <%= f.text_field :last_name, class: "required", required: true, placeholder: l10n("last_name"), autocomplete: :off %>
         </div>
-
-        <div class="row row-form-wrapper no-buffer">
-          <% readonly_status = @applicant.is_primary_applicant? %>
-          <div class="col-md-3 col-sm-3 col-xs-12 no-pd">
-            <% readonly_status = @applicant.is_primary_applicant? %>
-            <div class="form-group form-group-lg">
-              <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "#{l10n("date_of_birth").to_s.upcase} *",
-                                               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: readonly_status, id: "family_member_dob_#{@applicant.id}"}, @applicant.dob %>
-            </div>
-          </div>
-        <div class="col-md-3 col-sm-3 no-pd">
-          <div class="form-group form-group-lg">
-            <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-              <%= f.text_field :ssn, class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}",
-                pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-                oninput: "this.setCustomValidity('')", readonly: readonly_status %>
-            <% else %>
-              <%= f.text_field :ssn, class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}", readonly: readonly_status %>
-            <% end %>
-          </div>
+        <div class="col-md-6 col-lg-3 p-0">
+          <%= f.label :name_sfx, l10n("suffix") %>
+          <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => l10n("none"), autocomplete: :off %>
         </div>
+      </div>
 
-          <div class="col-md-3 col-sm-3 no-pd">
-             <div class="col-xs-12">
-               <div class="">
-                 <div class="form-group form-group-lg top-buffer">
-                   <%= f.check_box :no_ssn %>
-                   <%= f.label :no_ssn, :value => true do %>
-                   <span class='no_ssn twelve'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
-                   <% end %>
-                   <!-- <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%#=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span> -->
-                 </div>
-               </div>
-             </div>
-
-             <div class="col-xs-2">
-             </div>
-          </div>
-
-          <div class="col-md-3 col-sm-3 no-pd">
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-              <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio">
-                <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male' %>
-                <label for="radio_male"><span><%= l10n("male").to_s.upcase %></span></label>
-              </div>
-            </div>
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-              <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio">
-                <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female'  %>
-                <label for="radio_female"><span><%= l10n("female").to_s.upcase %></span></label>
-              </div>
-            </div>
-          </div>
+      <div class="d-flex mb-md-4">
+        <div class="col-md-6 col-lg-3 p-0">
+          <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
+          <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true, disabled: @applicant.is_primary_applicant? %>
         </div>
-        <% unless @applicant.is_primary_applicant? %>
-          <div class="row row-form-wrapper no-buffer">
-            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
-              <label class="static_label label-floatlabel mt-label">NAME</label>
-              <label id="is_applying_coverage_value_dep_1" class= "ml-label">
-                <%= @applicant.first_name.present? ? @applicant.first_name : 'this person' %>
-              </label>
-            </div>
-            <div class="col-md-5 mt18">
-              <div class="select-positioning ml-label"> <label>is</label> </div>
-              <label class="static_label label-floatlabel mt-label">RELATIONSHIP |
-                <% if FinancialAssistanceRegistry[:enroll_app].settings(:site_key).item.to_s.downcase == 'me' %>
-                  <a href="#relationship" data-toggle="modal" data-target="#relationship">Not sure?</a>
-                <% else %>
-                  <a class='hidden'></a>
-                <% end %>
-              </label>
-              <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
-              <div class="select-relation rs_selection">
-                <%= f.select :relationship, faa_relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => "floatlabel form-control"}  %>
-              </div>
-              <label class="position-left">&nbsp;&nbsp;of</label>
-              <div class="icon-rel">
-                <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
-                <i class="fa fa-link" aria-hidden="true"></i>
-                <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
-              </div>
-            </div>
-            <div class="col-lg-4 mt18 static-font">
-              <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
-              <span class="position-full-name"> <%= @applicant.application.primary_applicant.full_name %> </span>
+        <div class="col-md-6 col-lg-3 p-0">
+          <%= f.label :gender, l10n("gender"), class: 'required'  %>
+          <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], autocomplete: :off, required: true %>
+          <a href="#sex_gender" data-toggle="modal" data-target="#sex_gender" class="d-block"><%= l10n("not_sure") %></a>
+          <%= render partial: 'shared/modal_support_text_household', locals: {key: "sex_gender"} %>
+        </div>
+      </div>
+
+      <div class="d-flex mb-md-4">
+        <div class="col-md-6 col-lg-3 p-0">
+          <%= f.label :ssn, "Social Security" %>
+          <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
+              pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+              oninput: "this.setCustomValidity('')", disabled: @applicant.is_primary_applicant? %>
+          <% else %>
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: @applicant.is_primary_applicant?,
+              readonly: f.object.is_a?(Forms::EmployeeRole) %>
+          <% end %>
+        </div>
+        <div class="col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
+          <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
+            <%= f.check_box :no_ssn %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
+            <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
+            <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
+          <% end %>
+        </div>
+      </div>
+
+      <fieldset class="d-flex mb-md-4">
+        <legend class="required"><%= l10n("does_person_need_coverage", person: @applicant.first_name.present? ? @applicant.first_name : "this person") %></legend>
+        <div class="d-flex align-items-center mt-2">
+          <%= render 'shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
+        </div>
+      </fieldset>
+
+      <h2 class="mt-4"><%= l10n("insured.consumer_roles.demo_info_for") %> <%= @applicant.full_name %></h2>
+      <div id="consumer_fields_sets">
+        <%= render 'financial_assistance/shared/consumer_fields', f: f %>
+      </div>
+
+      <h3 class="beta mt-4"><%= l10n("insured.consumer_roles.contact_info_for") %> <%= @applicant.full_name %></h3>
+      <section class="mb-4">
+        <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
+        <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
+      </section>
+
+      <% unless @applicant.is_primary_applicant? %>
+        <section class="mb-4">
+          <h4 class="gamma mb-0"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
+          <%= render partial: 'shared/phone_fields', locals: {f: f, bs4: true} %>
+          <div id="email_info" class="">
+            <div class="email d-flex mb-md-4 row col-sm">
+              <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+                <%= render partial: 'shared/email_fields', locals: {f: email, bs4: true} %>
+              <% end %>
             </div>
           </div>
+        </section>
+      <% end %>
+    </div>
+
+    <div class="no-buffer no-border-top">
+      <div class="form-group form-group-lg">
+        <% if aca_security_questions %>
+          <p class="sixteen"><a class="update-security-responses-link" id='update_security_responses_link' href="#securityQuestionModal" data-toggle="modal" data-target="#securityQuestionModal">Update my security challenge responses</a>
+          </p>
         <% end %>
       </div>
     </div>
-  </div>
-  <br />
-  <div id="consumer_fields_sets">
-    <%= render 'financial_assistance/shared/consumer_fields', f: f %><br>
-  </div>
-    <% unless @applicant.is_primary_applicant? %>
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
-          <%= f.check_box :same_with_primary, {}, "true", "false" %>
-          <label for="applicant_same_with_primary"><%=l10n("live_with_primary_subscriber") %></label>
-        </div>
-      </div>
-      <div id="applicant-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == true ? 'none' : 'block' %>">
-        <%= render 'financial_assistance/shared/consumer_home_address_fields', f: f %><br>
-      </div>
-    <% else %>
-      <%= render 'financial_assistance/shared/consumer_home_address_fields', f: f %><br>
-    <% end %>
-  <% if f.object.is_primary_applicant %>
-    <%=
-      unless f.object.phones.nil?
-        ["home","mobile","work","fax"].each do |kind|
-           f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
-        end
-      end
 
-      render 'financial_assistance/shared/phone_fields', f: f
-    %><br>
+    <div id="add_info_buttons_<%= @applicant.id %>" class="pt-2 <%= pundit_class Family, :updateable? %>">
+      <button type="button" class="btn button outline close_member_form hidden cancel_<%= @applicant.id %>_edit"><%= l10n("cancel") %></button>
 
-    <% unless f.object.emails.nil?
-         ["home","work"].each do |kind|
-           f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
-         end
-       end
-    %>
+      <% unless @applicant.is_primary_applicant? %>
+        <%= button_tag(id: "delete_applicant_button", class: "btn button-error outline close2") do %>
+          <%= l10n('remove_member') %>
+        <% end %>
+      <% end %>
 
-    <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-      <div id="email_info" class="row row-form-wrapper no-buffer">
-      <%= render 'financial_assistance/shared/email_fields', f: email %>
-        </div><br>
-
-    <% end %>
+      <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden") do %>
+        <%= l10n("confirm_member") %>
+      <% end %>
+      <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm_member')" id="confirm_member" class="btn btn-primary" onclick='PersonValidations.manageRequiredValidations($(this));'>
+        <%= l10n("confirm_member") %>
+      </span>
+    </div>
   <% end %>
-    <div>
-      <div class="no-buffer no-border-top">
-        <div class="form-group form-group-lg">
-          <% if aca_security_questions %>
-            <p class="sixteen"><a class="update-security-responses-link" id='update_security_responses_link' href="#securityQuestionModal" data-toggle="modal" data-target="#securityQuestionModal">Update my security challenge responses</a>
-            </p>
+
+  <%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
+
+  <div class="modal" id="destroyApplicant" role="dialog">
+  <div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+      <div class="modal-body">
+        <%= l10n('faa.edit.delete_applicant') %>
+        <strong><br /><%= l10n('faa.edit.remove_warning') %></strong>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmDestoyApplicant(event, "<%=application_applicant_path(@application, @applicant)%>"); return false;'>Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+    Freebies.floatlabels();
+    $.inputMasks();
+
+    $('#applicant_same_with_primary').click(function(){
+      if($(this).is(':checked')){
+          $('#applicant-home-address-area').css("display", "none");
+      } else {
+          $('#applicant-home-address-area').css("display", "block");
+      }
+    });
+
+    $(document).on('click', '#delete_applicant_button', function(e) {
+      e.preventDefault();
+      $("#destroyApplicant").modal();
+
+      $("#destroyApplicant .modal-cancel-button").click(function(e) {
+        $("#destroyApplicant").modal('hidden');
+      });
+      $(".btn-confirmation").removeAttr('disabled');
+    });
+
+    function confirmDestoyApplicant(event, url){
+      $(".btn-confirmation").prop('disabled', true);
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      //
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      $.ajax({
+        url: url,
+        type: "DELETE",
+        dataType: 'script',
+        contentType: false,
+        processData: false,
+      });
+    }
+  </script>
+
+<% else %>
+  <%= form_for @applicant, url: application_applicant_path(@application, @applicant), method: :patch do |f|%>
+    <%= hidden_field_tag :is_dependent, @applicant.is_dependent? %>
+    <div class="row no-buffer">
+      <div id="personal_info" class="module">
+        <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%=f.text_field :first_name, id: "first-name", class: "floatlabel form-control", placeholder: "FIRST NAME", autocomplete: :off %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%=f.text_field :middle_name, class: "floatlabel form-control", placeholder: "MIDDLE NAME", autocomplete: :off %>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+              <%=f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME", autocomplete: :off %>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
+                <div class="text-right">
+                  <% unless @applicant.is_primary_applicant? %>
+                    <%= button_tag(id: "delete_applicant_button", class: "close") do %>
+                      <i class="fa fa-times"><span class="hide">Delete</span></i>
+                    <% end %>
+                  <% end %>
+                </div>
+            </div>
+
+          </div>
+
+          <div class="modal" id="destroyApplicant" role="dialog">
+            <div class="modal-dialog" style="width: 500px;">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <%= l10n('faa.edit.delete_applicant') %>
+                  <strong><br /><%= l10n('faa.edit.remove_warning') %></strong>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmDestoyApplicant(event, "<%=application_applicant_path(@application, @applicant)%>"); return false;'>Confirm</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+              <span>Does <%= @applicant.first_name %> need coverage? *</span>
+            </div>
+            <%= render 'financial_assistance/shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
+          </div>
+
+          <div class="row row-form-wrapper no-buffer">
+            <% readonly_status = @applicant.is_primary_applicant? %>
+            <div class="col-md-3 col-sm-3 col-xs-12 no-pd">
+              <% readonly_status = @applicant.is_primary_applicant? %>
+              <div class="form-group form-group-lg">
+                <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "#{l10n("date_of_birth").to_s.upcase} *",
+                                                :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, readonly: readonly_status, id: "family_member_dob_#{@applicant.id}"}, @applicant.dob %>
+              </div>
+            </div>
+          <div class="col-md-3 col-sm-3 no-pd">
+            <div class="form-group form-group-lg">
+              <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
+                <%= f.text_field :ssn, class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}",
+                  pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+                  oninput: "this.setCustomValidity('')", readonly: readonly_status %>
+              <% else %>
+                <%= f.text_field :ssn, class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}", readonly: readonly_status %>
+              <% end %>
+            </div>
+          </div>
+
+            <div class="col-md-3 col-sm-3 no-pd">
+              <div class="col-xs-12">
+                <div class="">
+                  <div class="form-group form-group-lg top-buffer">
+                    <%= f.check_box :no_ssn %>
+                    <%= f.label :no_ssn, :value => true do %>
+                    <span class='no_ssn twelve'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
+                    <% end %>
+                    <!-- <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%#=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xs-2">
+              </div>
+            </div>
+
+            <div class="col-md-3 col-sm-3 no-pd">
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+                <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio">
+                  <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male' %>
+                  <label for="radio_male"><span><%= l10n("male").to_s.upcase %></span></label>
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+                <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio">
+                  <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female'  %>
+                  <label for="radio_female"><span><%= l10n("female").to_s.upcase %></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% unless @applicant.is_primary_applicant? %>
+            <div class="row row-form-wrapper no-buffer">
+              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
+                <label class="static_label label-floatlabel mt-label">NAME</label>
+                <label id="is_applying_coverage_value_dep_1" class= "ml-label">
+                  <%= @applicant.first_name.present? ? @applicant.first_name : 'this person' %>
+                </label>
+              </div>
+              <div class="col-md-5 mt18">
+                <div class="select-positioning ml-label"> <label>is</label> </div>
+                <label class="static_label label-floatlabel mt-label">RELATIONSHIP |
+                  <% if FinancialAssistanceRegistry[:enroll_app].settings(:site_key).item.to_s.downcase == 'me' %>
+                    <a href="#relationship" data-toggle="modal" data-target="#relationship">Not sure?</a>
+                  <% else %>
+                    <a class='hidden'></a>
+                  <% end %>
+                </label>
+                <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
+                <div class="select-relation rs_selection">
+                  <%= f.select :relationship, faa_relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => "floatlabel form-control"}  %>
+                </div>
+                <label class="position-left">&nbsp;&nbsp;of</label>
+                <div class="icon-rel">
+                  <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+                  <i class="fa fa-link" aria-hidden="true"></i>
+                  <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+                </div>
+              </div>
+              <div class="col-lg-4 mt18 static-font">
+                <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
+                <span class="position-full-name"> <%= @applicant.application.primary_applicant.full_name %> </span>
+              </div>
+            </div>
           <% end %>
         </div>
       </div>
     </div>
-    <%if @tab.nil?%>
-      <%= hidden_field_tag :page, "from_registration"%>
+    <br />
+    <div id="consumer_fields_sets">
+      <%= render 'financial_assistance/shared/consumer_fields', f: f %><br>
+    </div>
+      <% unless @applicant.is_primary_applicant? %>
+        <div class="row row-form-wrapper no-buffer">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
+            <%= f.check_box :same_with_primary, {}, "true", "false" %>
+            <label for="applicant_same_with_primary"><%=l10n("live_with_primary_subscriber") %></label>
+          </div>
+        </div>
+        <div id="applicant-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == true ? 'none' : 'block' %>">
+          <%= render 'financial_assistance/shared/consumer_home_address_fields', f: f %><br>
+        </div>
+      <% else %>
+        <%= render 'financial_assistance/shared/consumer_home_address_fields', f: f %><br>
+      <% end %>
+    <% if f.object.is_primary_applicant %>
+      <%=
+        unless f.object.phones.nil?
+          ["home","mobile","work","fax"].each do |kind|
+            f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
+          end
+        end
+
+        render 'financial_assistance/shared/phone_fields', f: f
+      %><br>
+
+      <% unless f.object.emails.nil?
+          ["home","work"].each do |kind|
+            f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
+          end
+        end
+      %>
+
+      <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+        <div id="email_info" class="row row-form-wrapper no-buffer">
+        <%= render 'financial_assistance/shared/email_fields', f: email %>
+          </div><br>
+
+      <% end %>
     <% end %>
+      <div>
+        <div class="no-buffer no-border-top">
+          <div class="form-group form-group-lg">
+            <% if aca_security_questions %>
+              <p class="sixteen"><a class="update-security-responses-link" id='update_security_responses_link' href="#securityQuestionModal" data-toggle="modal" data-target="#securityQuestionModal">Update my security challenge responses</a>
+              </p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <%if @tab.nil?%>
+        <%= hidden_field_tag :page, "from_registration"%>
+      <% end %>
 
-  <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
-    <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
-    <button type="button" class="btn btn-default close_member_form hide cancel_<%=@applicant.id%>_edit"> Cancel</button>
-    <span tabindex="0" tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm_member')" id="confirm_member" class='btn btn-primary btn-br save_member' onclick='PersonValidations.manageRequiredValidations($(this));'> Confirm member</span>
-  </div>
-<% end %>
-<br>
-<%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
-<script>
-  Freebies.floatlabels();
-  $.inputMasks();
+    <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
+      <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
+      <button type="button" class="btn btn-default close_member_form hide cancel_<%=@applicant.id%>_edit"> Cancel</button>
+      <span tabindex="0" tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm_member')" id="confirm_member" class='btn btn-primary btn-br save_member' onclick='PersonValidations.manageRequiredValidations($(this));'> Confirm member</span>
+    </div>
+  <% end %>
+  <br>
+  <%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
+  <script>
+    Freebies.floatlabels();
+    $.inputMasks();
 
-  $('#applicant_same_with_primary').click(function(){
-    if($(this).is(':checked')){
-        $('#applicant-home-address-area').css("display", "none");
-    } else {
-        $('#applicant-home-address-area').css("display", "block");
+    $('#applicant_same_with_primary').click(function(){
+      if($(this).is(':checked')){
+          $('#applicant-home-address-area').css("display", "none");
+      } else {
+          $('#applicant-home-address-area').css("display", "block");
+      }
+    });
+
+    $(document).on('click', '#delete_applicant_button', function(e) {
+      e.preventDefault();
+      $("#destroyApplicant").modal();
+
+      $("#destroyApplicant .modal-cancel-button").click(function(e) {
+        $("#destroyApplicant").modal('hide');
+      });
+      $(".btn-confirmation").removeAttr('disabled');
+    });
+
+    function confirmDestoyApplicant(event, url){
+      $(".btn-confirmation").prop('disabled', true);
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      //
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      $.ajax({
+        url: url,
+        type: "DELETE",
+        dataType: 'script',
+        contentType: false,
+        processData: false,
+      });
     }
-  });
-
-  $(document).on('click', '#delete_applicant_button', function(e) {
-    e.preventDefault();
-    $("#destroyApplicant").modal();
-
-    $("#destroyApplicant .modal-cancel-button").click(function(e) {
-      $("#destroyApplicant").modal('hide');
-    });
-    $(".btn-confirmation").removeAttr('disabled');
-  });
-
-  function confirmDestoyApplicant(event, url){
-    $(".btn-confirmation").prop('disabled', true);
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    //
-    $('.modal-backdrop').removeClass('modal-backdrop');
-    $('.modal-open').removeClass('modal-open');
-
-    $.ajax({
-      url: url,
-      type: "DELETE",
-      dataType: 'script',
-      contentType: false,
-      processData: false,
-    });
-  }
-</script>
+  </script>
+<% end %>

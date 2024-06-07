@@ -1,52 +1,96 @@
-<li id="add_member_list_<%= dependent.id %>" class="dependent_list">
-  <div id="add_info_<%= dependent.id %>">
-    <div class="dependent_notice_div_<%= dependent.id%>"></div>
-    <div class="row row-form-wrapper no-buffer">
-      <div class="col-md-4 col-sm-4 no-pd">
-        <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel">NAME</label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.full_name %></span>
-        </div>
+<% if @bs4 %>
+  <div id="add_member_list_<%= dependent.id %>" class="dependent_list py-4">
+    <div id="add_info_<%= dependent.id %>">
+      <div class="d-flex flex-row">
+        <h2><%= l10n('member') %> <%= local_assigns[:member_number] ? member_number : "" %></h2>
+        <%= render '/financial_assistance/shared/info_needed', applicant: dependent %>
       </div>
-      <div class="col-md-2 col-sm-4 no-pd">
-        <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel">AGE</label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.age_on(Date.today) %></span>
+      <div class="dependent_notice_div_<%= dependent.id%>"></div>
+
+      <div id="member-<%= dependent.id %>-info-display" class="d-flex flex-row flex-wrap justify-content-between">
+        <div>
+          <label for="name"><%= l10n("name")%></label>
+          <input id="name" type="text" value="<%= "#{dependent.first_name} #{dependent.middle_name} #{dependent.last_name}"%>" disabled >
+        </div>
+        <div>
+          <label for="age"><%= l10n("age")%></label>
+          <input id="age" type="text" value="<%= dependent.age_on(TimeKeeper.date_of_record) %>" disabled >
+        </div>
+        <div>
+          <label for="gender"><%= l10n("gender")%></label>
+          <input id="gender" type="text" value="<%= "#{dependent.gender.humanize}" %>" disabled >
+        </div>
+        <div>
+          <label for="relation"><%= l10n("relationship")%></label>
+          <input id="relation" type="text" value="<%= dependent.relationship.try(:humanize) || dependent.relation_with_primary.try(:humanize) %>" disabled >
         </div>
       </div>
 
-      <div class="col-md-3 col-sm-4 no-pd">
-        <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("gender").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender.try(:humanize) %></span>
-          
-        </div>
-      </div>
+      <div class="mt-3 member-<%= dependent.id %>-buttons">
+        <% if @application.workflow.present? %>
+          <%= h(link_to l10n('edit_income_coverage_info'), financial_assistance.go_to_step_application_applicant_path(@application, dependent, 1), class: "btn button button-primary mr-3") %>
+        <% else %>
+          <%= h(link_to l10n('add_income_coverage_info'), financial_assistance.go_to_step_application_applicant_path(@application, dependent, 1), class: "btn button button-primary add mr-3") %>
+        <% end %>
 
-      <div class="col-md-3 col-sm-4 no-pd">
-        <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("relationship").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel rel_label"> <%= dependent.relation_with_primary.try(:humanize) %> </span>
-          <div class="text-right">
-            <%= link_to(
-                  edit_application_applicant_path(@application, dependent),
-                  remote: true, class:
-                  'close close-2') do %>
-              <i class="fas fa-pencil-alt"><span class="hide">Edit</span></i>
-            <% end %>
+        <%= h(link_to l10n("edit_member"), edit_application_applicant_path(@application, dependent, {bs4: @bs4}), id: 'edit-dependent-person', remote: true, class: 'btn button outline close-2') %>
+      </div>
+    </div>
+
+    <div id="edit_applicant_<%= dependent.id %>_form_section"></div>
+  </div>
+
+<% else %>
+  <li id="add_member_list_<%= dependent.id %>" class="dependent_list">
+    <div id="add_info_<%= dependent.id %>">
+      <div class="dependent_notice_div_<%= dependent.id%>"></div>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-md-4 col-sm-4 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">NAME</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.full_name %></span>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel">AGE</label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.age_on(Date.today) %></span>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-4 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel"><%= l10n("gender").to_s.upcase %></label>
+            <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender.try(:humanize) %></span>
+
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-4 no-pd">
+          <div class="form-group form-group-lg">
+            <label class="static_label label-floatlabel"><%= l10n("relationship").to_s.upcase %></label>
+            <span class="field_value floatlabel form-control active-floatlabel rel_label"> <%= dependent.relation_with_primary.try(:humanize) %> </span>
+            <div class="text-right">
+              <%= link_to(
+                    edit_application_applicant_path(@application, dependent),
+                    remote: true, class:
+                    'close close-2') do %>
+                <i class="fas fa-pencil-alt"><span class="hide">Edit</span></i>
+              <% end %>
+            </div>
           </div>
         </div>
       </div>
+
+      <div id="edit_applicant_<%= dependent.id %>">
+        <%= yield "person_#{dependent.id}" %>
+      </div>
+      <div id="edit_applicant_<%= dependent.id %>_form_section">
+      </div>
+      <div class="clearfix"></div>
     </div>
-    
-    <div id="edit_applicant_<%= dependent.id %>">
-      <%= yield "person_#{dependent.id}" %>
-    </div>
-    <div id="edit_applicant_<%= dependent.id %>_form_section">
-    </div>
-    <div class="clearfix"></div>
-  </div>
-  <script>
-    Freebies.floatlabels();
-  </script>
-</li>
+    <script>
+      Freebies.floatlabels();
+    </script>
+  </li>
+<% end %>

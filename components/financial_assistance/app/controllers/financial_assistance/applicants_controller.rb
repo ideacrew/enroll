@@ -9,6 +9,7 @@ module FinancialAssistance
     before_action :find_applicant, only: [:age_of_applicant]
     before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
     before_action :set_cache_headers, only: [:other_questions, :step]
+    before_action :enable_bs4_layout, only: [:edit] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     def new
       authorize @application, :new?
@@ -266,6 +267,10 @@ module FinancialAssistance
       address_hash = params.find {|key| key.is_a?(Hash) && key[:addresses_attributes]}
       address_hash[:addresses_attributes] << :county if EnrollRegistry.feature_enabled?(:display_county) && address_hash.present?
       params
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
   end
 end
