@@ -49,11 +49,8 @@ label, legend {
 label.required:after, legend.required:after {
   content: '*';
   margin-left: 0.25ch;
-}
-
-label.fa-required:after, legend.fa-required:after {
-  @extend label.required:after;
   color: var(--enrollment-status-red);
+  font-weight: 600;
 }
 
 input:not([type="submit"]),

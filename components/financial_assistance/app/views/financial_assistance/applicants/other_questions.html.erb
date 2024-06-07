@@ -20,14 +20,14 @@
       <% def applicant_prompt(key) other_questions_prompt(key, true) end %>
       <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
         <fieldset class="mb-4 row-form-wrapper">
-          <legend class="weight-n fa-required"><%= applicant_prompt('ssn_apply') %></legend>
+          <legend class="weight-n required"><%= applicant_prompt('ssn_apply') %></legend>
           <label class="weight-n"><%= f.radio_button :is_ssn_applied, true, id: "is_ssn_applied_yes" %> <%= l10n('yes') %></label>
           <label class="weight-n"><%= f.radio_button :is_ssn_applied, false, id: "is_ssn_applied_no" %> <%= l10n('no') %></label>
         </fieldset>
 
           <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
         <fieldset class="mb-4 row-form-wrapper">
-          <legend class="weight-n <%= 'fa-required' if no_ssn_dropdown %>"><%= applicant_prompt('why_no_ssn') %>"</legend>
+          <legend class="weight-n <%= 'required' if no_ssn_dropdown %>"><%= applicant_prompt('why_no_ssn') %>"</legend>
           <div class="col px-0" data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
             <% if no_ssn_dropdown %>
               <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true) %>
@@ -40,7 +40,7 @@
 
       <div class="mb-4 row-form-wrapper">
         <fieldset>
-          <legend class="weight-n fa-required"><%= applicant_prompt('is_pregnant') %></legend>
+          <legend class="weight-n required"><%= applicant_prompt('is_pregnant') %></legend>
           <label class="weight-n"><%= f.radio_button :is_pregnant, true, id: "is_pregnant_yes" %> <%= l10n('yes') %></label>
           <label class="weight-n"><%= f.radio_button :is_pregnant, false, id: "is_pregnant_no" %> <%= l10n('no') %></label>
         </fieldset>
@@ -52,36 +52,36 @@
 
       <fieldset class="mb-4 row-form-wrapper">
         <% is_due_date_required = FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required) %>
-        <legend class="weight-n <%= 'fa-required' if is_due_date_required %>"><%= l10n("faa.other_ques.pregnancy_due_date") %></legend>
+        <legend class="weight-n <%= 'required' if is_due_date_required %>"><%= l10n("faa.other_ques.pregnancy_due_date") %></legend>
         <%= f.date_field :pregnancy_due_on, id: "applicant_pregnancy_due_on", placeholder: "MM/DD/YYYY" %>
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
-        <legend class="weight-n fa-required"><%= applicant_prompt('children_expected') %></legend> <%# TODO: refactor below params %>
+        <legend class="weight-n required"><%= applicant_prompt('children_expected') %></legend> <%# TODO: refactor below params %>
           <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, id: 'children_expected_count', class: "col-4", prompt: true) %>
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
         <% post_partum_prompt_key = FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? "pregnant_last_year" : "pregnant_last_60d" %>
-        <legend class="weight-n fa-required"><%= applicant_prompt(post_partum_prompt_key) %></legend>
+        <legend class="weight-n required"><%= applicant_prompt(post_partum_prompt_key) %></legend>
         <label class="weight-n"><%= f.radio_button :is_post_partum_period, true, id: "is_post_partum_period_yes" %> <%= l10n('yes') %></label>
         <label class="weight-n"><%= f.radio_button :is_post_partum_period, false, id: "is_post_partum_period_no" %> <%= l10n('no') %></label>
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
-        <legend class="weight-n fa-required"><%= l10n("faa.other_ques.pregnancy_end") %></legend>
+        <legend class="weight-n required"><%= l10n("faa.other_ques.pregnancy_end") %></legend>
         <%= f.date_field :pregnancy_end_on, id: "applicant_pregnancy_end_on", placeholder: "MM/DD/YYYY" %>
       </fieldset>
 
       <% if @applicant.present? && @applicant.is_applying_coverage %>
         <fieldset class="mb-4 row-form-wrapper">
-          <legend class="weight-n fa-required"><%= applicant_prompt("is_enrolled_on_medicaid") %></legend>
+          <legend class="weight-n required"><%= applicant_prompt("is_enrolled_on_medicaid") %></legend>
           <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
           <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
         </fieldset>
 
         <fieldset class="mb-4 row-form-wrapper">
-          <legend class="weight-n fa-required"><%= applicant_prompt("foster_care_at18") %></legend>
+          <legend class="weight-n required"><%= applicant_prompt("foster_care_at18") %></legend>
           <label class="weight-n"><%= f.radio_button :is_former_foster_care, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
           <label class="weight-n"><%= f.radio_button :is_former_foster_care, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
         </fieldset>
@@ -130,7 +130,7 @@
         <% is_question_required = FinancialAssistanceRegistry.feature_enabled?(:question_required) %>
         <div class="mb-4 row-form-wrapper">
           <fieldset>
-            <legend class="weight-n <%= 'fa-required' if is_question_required %>"><%= applicant_prompt("is_blind") %></legend>
+            <legend class="weight-n <%= 'required' if is_question_required %>"><%= applicant_prompt("is_blind") %></legend>
             <label class="weight-n"><%= f.radio_button :is_self_attested_blind, true, id: "is_self_attested_blind_yes" %> <%= l10n('yes') %></label>
             <label class="weight-n"><%= f.radio_button :is_self_attested_blind, false, id: "is_self_attested_blind_no" %> <%= l10n('no') %></label>
           </fieldset>
@@ -142,7 +142,7 @@
 
         <div class="mb-4 row-form-wrapper">
           <fieldset>
-            <legend class="weight-n <%= 'fa-required' if is_question_required %>"><%= applicant_prompt("daily_living_help") %></legend>
+            <legend class="weight-n <%= 'required' if is_question_required %>"><%= applicant_prompt("daily_living_help") %></legend>
             <label class="weight-n"><%= f.radio_button :has_daily_living_help, true, id: "has_daily_living_help_yes" %> <%= l10n('yes') %></label>
             <label class="weight-n"><%= f.radio_button :has_daily_living_help, false, id: "has_daily_living_help_no" %> <%= l10n('no') %></label>
           </fieldset>
@@ -154,7 +154,7 @@
 
         <div class="mb-4 row-form-wrapper">
           <fieldset>
-            <legend class="weight-n <%= 'fa-required' if is_question_required %>"><%= applicant_prompt("help_paying_bills") %></legend>
+            <legend class="weight-n <%= 'required' if is_question_required %>"><%= applicant_prompt("help_paying_bills") %></legend>
             <label class="weight-n"><%= f.radio_button :need_help_paying_bills, true, id: "need_help_paying_bills_yes" %> <%= l10n('yes') %></label>
             <label class="weight-n"><%= f.radio_button :need_help_paying_bills, false, id: "need_help_paying_bills_no" %> <%= l10n('no') %></label>
           </fieldset>
@@ -166,7 +166,7 @@
 
         <div class="mb-4 row-form-wrapper">
           <fieldset>
-            <legend class="weight-n <%= 'fa-required' if is_question_required %>"><%= applicant_prompt("disability_question") %></legend>
+            <legend class="weight-n <%= 'required' if is_question_required %>"><%= applicant_prompt("disability_question") %></legend>
             <label class="weight-n"><%= f.radio_button :is_physically_disabled, true, id: "radio_physically_disabled_yes" %> <%= l10n('yes') %></label>
             <label class="weight-n"><%= f.radio_button :is_physically_disabled, false, id: "radio_physically_disabled_no" %> <%= l10n('no') %></label>
           </fieldset>
