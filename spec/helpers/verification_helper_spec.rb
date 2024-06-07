@@ -600,7 +600,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
         person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
         person.save!
-        allow(EnrollRegistry[:enable_call_hub_for_ai].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:enable_call_hub_for_ai_an].feature).to receive(:is_enabled).and_return(true)
 
         allow(helper).to receive(:verification_type_status).and_return status
         allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
