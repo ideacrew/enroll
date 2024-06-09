@@ -703,7 +703,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
   :'en.insured.verification_max_file_size' => "File should not exceed 100 MB",
   :'en.waiting_for_eligibility' => "Waiting for your eligibility results...",
-  :'en.getting_response' => "Getting response...",
+  :'en.getting_response' => "Waiting for results",
   :'en.page_refresh' => "Page will automatically refresh.",
   :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.',
   :'en.insured.general_agency_index_disabled_warning' => 'The General Agency Index is Disabled',
