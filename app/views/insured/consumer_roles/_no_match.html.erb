@@ -1,7 +1,7 @@
 <% if @bs4 %>
-  <div class="alert alert-warning d-flex" role="alert">
+  <div class="alert alert-info d-flex" role="alert">
     <div class="pl-2">
-      <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+      <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
     </div>
     <div class="mt-1 pl-0 pr-2 mb-1">
       <% if @consumer_candidate&.match_person.present? && EnrollRegistry.feature_enabled?(:pii_match_success_message) %>
