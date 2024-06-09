@@ -93,7 +93,7 @@ a.button:hover {
   cursor: pointer;
 }
 
-button.unstyled {
+button.unstyled, button.close {
   background-color: transparent;
   border: none;
   color: var(--button-primary-color);
