@@ -10,20 +10,12 @@
     </button>
     <div class="collapse navbar-collapse" id="nav-dynamic-collapse">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item-divider"></li>
+        <% if signed_in? %><li class="nav-item-divider"></li><% end %>
         <li class="nav-item d-flex flex-column site-name-market">
-          <span><%= l10n('welcome.index.welcome_to_site_header')%></span>
           <%= bs4_portal_type(controller_name) %>
         </li>
       </ul>
       <ul class="navbar-nav">
-        <li class="nav-item d-flex flex-column align-items-end">
-          <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
-          <% contact_center_short_number = EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>
-          <a href="tel:<%= contact_center_short_number %>">
-            <%= "#{contact_center_short_number} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %>
-          </a>
-        </li>
         <% if signed_in? %>
           <li class="nav-item-divider"></li>
           <li class="nav-item d-flex flex-column align-items-end">
@@ -32,7 +24,7 @@
             <span class="horizontal-links">
               <%= render partial: "shared/my_portal_links" %>
               <span>
-                <%= h(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %>
+                <%= h(link_to l10n('layout.header.help'), site_help_url, target: '_blank', rel: "noopener noreferrer") %>
               </span>
               <span>
                 <%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %>
