@@ -16,7 +16,10 @@
         </ul>
       <% end %>
       <div class="align-content-center">
-        <input type="checkbox" id="no_qle_checkbox" data-toggle="modal" data-target="#outside-open-enrollment" name="no_qualifying_event" value="true"><%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
+        <label class="weight-n">
+          <input type="checkbox" id="no_qle_checkbox" data-toggle="modal" data-target="#outside-open-enrollment" name="no_qualifying_event" value="true">
+          <%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
+        </label>
       </div>
     </div>
     <%= form_tag record_sep_insured_families_path, :method => :post, class: "qle-detail-for-existing-kind", id: 'qle_form' do %>

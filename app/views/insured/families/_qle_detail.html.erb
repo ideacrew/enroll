@@ -7,7 +7,7 @@
       <div class="col px-0">
         <div id='qle-date-chose' class="sep-date">
           <div class="mb-2" onkeydown="handleButtonKeyDown(event, 'qle_submit')">
-            <label class="weight-n"><%= l10n("insured.qle_detail.event_date") %></label>
+            <label class="weight-n" for="qle_date"><%= l10n("insured.qle_detail.event_date") %></label>
             <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", required: true %>
           </div>
           <div class="mt-4 <%= pundit_class Family,:updateable? %>">
