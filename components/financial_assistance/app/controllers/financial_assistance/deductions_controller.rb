@@ -2,11 +2,9 @@
 
 module FinancialAssistance
   class DeductionsController < FinancialAssistance::ApplicationController
-    include ::UIHelpers::WorkflowController
     include NavigationHelper
 
     before_action :find_application_and_applicant
-    before_action :load_support_texts, only: [:index]
     before_action :set_cache_headers, only: [:index]
 
     def index
@@ -20,40 +18,16 @@ module FinancialAssistance
     def new
       authorize @applicant, :new?
       @model = @applicant.deductions.build
-      load_steps
-      current_step
-      render 'workflow/step', layout: 'financial_assistance_nav'
+      render 'index', layout: 'financial_assistance_nav'
     end
 
     def step
+      raise ActionController::UnknownFormat unless request.format.js? || request.format.html?
+
+      @model = @applicant.deductions.build
       authorize @model, :step?
-      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
-      set_admin_bookmark_url
-      model_name = @model.class.to_s.split('::').last.downcase
-      model_params = params[model_name]
-      format_date_params model_params if model_params.present?
-      @model.assign_attributes(permit_params(model_params)) if model_params.present?
 
-      if params.key?(model_name)
-        @model.workflow = { current_step: @current_step.to_i}
-        @current_step = @current_step.next_step if @current_step.next_step.present?
-      end
-
-      if params.key?(model_name)
-        if @model.save(context: "step_#{@current_step.to_i}".to_sym)
-          if params.key? :last_step
-            flash[:notice] = "Deduction Added - (#{@model.kind})"
-            redirect_to financial_assistance_application_applicant_deductions_path(@application, @applicant)
-          else
-            render 'workflow/step', layout: 'financial_assistance_nav'
-          end
-        else
-          flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance_nav'
-        end
-      else
-        render 'workflow/step', layout: 'financial_assistance_nav'
-      end
+      redirect_to action: :index
     end
 
     def create
