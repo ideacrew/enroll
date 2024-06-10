@@ -1024,7 +1024,7 @@ class Family
 
     publish_broker_hired_event(hire_params)
   end
-
+  # test comment
   def publish_broker_hired_event(hire_params)
     event = event('events.family.brokers.broker_hired', attributes: hire_params)
     event.success.publish if event.success?
