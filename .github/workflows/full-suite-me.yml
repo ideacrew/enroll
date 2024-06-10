@@ -3,7 +3,7 @@ on:
   push:
 
 concurrency:
-  group: qb-${{ github.ref }}
+  group: qb-${{ github.ref }}-maine
   cancel-in-progress: true #This is temporary to avoid trunk GHA collisions
 
 env:
