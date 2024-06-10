@@ -1,6 +1,8 @@
-$("#inbox .col-md-10").html("<%= escape_javascript render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/staff" %>");
+$("#inbox > div").html("<%= escape_javascript render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/staff" %>");
 $('#inbox').removeClass("hide")
 $('#help_list').addClass('hide')
+$('#help_sign_up_title').addClass('hide')
+$('#help_from_expert_title').removeClass('hide')
 $('#help_type').html('Broker')
 <% if EnrollRegistry.feature_enabled?(:staff_list_back) %>
   $('#back_to_help').removeClass('hide')
@@ -14,10 +16,24 @@ function show_broker(broker_id) {
 
 $('.broker_select_button').click(function(e) {
   show_broker(this.getAttribute('data-broker'))
+  $('#close_help_modal').addClass('hide')
   $('#help_index_status').html('')
   e.stopPropagation();
 })
 $('.close_broker_select').click(function(){
   $("#broker_index_view").removeClass('hide')
   $(".broker_selection_choice").addClass('hide')
+  $('#close_help_modal').removeClass('hide')
+})
+
+$(document).on('click', '#help_list a.expert_link', function(){
+  console.log('clicked expert link');
+  $('#help_sign_up_title').addClass("hide");
+  $('#help_from_expert_title').removeClass("hide");
+})
+
+$(document).on('click', '#close_help_modal', function(){
+  console.log('clicked close_help_modal');
+  $('#help_sign_up_title').removeClass("hide");
+  $('#help_from_expert_title').addClass("hide");
 })

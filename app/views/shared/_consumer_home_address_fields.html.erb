@@ -1,8 +1,6 @@
 <%= javascript_pack_tag 'benefit_sponsors' %>
-<div id="address_info" class="row no-buffer focus_effect personal-info-row">
-  <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-
-
+<% if @bs4 %>
+  <div id="address_info" class="">
     <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
       <% kind = address.object.kind %>
 
@@ -10,259 +8,374 @@
       <% div_class = kind+"-div" %>
       <% if kind != 'home' && address.object.new_record? %>
         <% if f.object.addresses[1].present? %>
-          <% style="display:block;" %>
+          <% display_class="d-block" %>
         <% else %>
-          <% style="display:none;" %>
+          <% display_class="d-none" %>
         <% end %>
       <% end %>
-      <!--<div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
-        <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-          <button class="btn btn-new-address">NEW ADDRESS</button>
-        </div>
+      <% required = kind =='home' ? "address_required" : '' %>
+      <div class="address-row <%= div_class %> <%= display_class %>">
+        <% if kind == 'home' %>
+          <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_home_address_info")%>
+        <% elsif kind == 'mailing' %>
+          <div><strong class="mt-4"><%=l10n("insured.enter_mailing_address")%></strong></div>
+          <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_mailing_address_info")%>
+        <% end %>
+      </div>
+      <div class="address-row <%= div_class %> <%= display_class %>">
+        <div class="d-flex mb-md-2 row col-sm">
+          <div class="col-sm col-md-6 p-0">
+            <div class="col-md-12 pl-0">
+              <span><%= address.hidden_field :kind, value: address.object.kind %>
+              <%= address.hidden_field :_destroy %></span>
 
-        <div class="col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd address">
-          <div class="form-group form-group-lg">
-            <div class="row" style="margin: 0;">
-              <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
-              <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
-                <div class="dropdown">
-                  <button class="form-control floatlabel adderess-select-box form_group_lg" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                    <label><%= kind.capitalize %> Address</label>
-                  </button>
-                </div>
-              </div>
-              <% if kind == 'home' %>
-                 <span>
-                  <i class='fa fa-question-circle no-pd'  id="home_address_tooltip" style='margin-top:20px;' data-toggle="tooltip" title="<%=l10n("insured.home_address_tooltip")%>"></i>
-                </span>
-              <% end %>
-              <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+              <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "#{'required' if required.present?}" %>
+              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} full-width", required: required.present? %>
+            </div>
+          </div>
+          <div class="mr col-sm col-md-6 p-0">
+            <div class="col-md-12 pr-0">
+              <%= address.label :address_2, "#{l10n("address_2")} #{l10n("address_2_desc")}" %>
+              <%= address.text_field :address_2, placeholder: l10n("address_2"), class: "full-width" %>
             </div>
           </div>
         </div>
-
+        <div class="address-row <%= div_class %> <%= display_class %>" data-controller="zip-check">
+          <div class="d-flex mb-md-4 row col-sm">
+            <div class="d-flex col-sm col-md-6 pl-0">
+              <div class="mr-auto col-sm col-md-6 pl-0">
+                <%= address.label :city, class: "#{'required' if required.present?}" %>
+                <%= address.text_field :city, placeholder: "City", class: "#{required} full-width", required: required.present? %>
+              </div>
+              <div class="col-sm col-md-6 pr-0">
+                <%= address.label :state, class: "required" %>
+                <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:'full-width stateInput', required: true) %>
+              </div>
+            </div>
+            <div class="d-flex col-sm col-md-6 pr-0">
+              <div class="mr-auto col-sm col-md-6 pl-0">
+                <%= address.label :zip, l10n("zip_code"), class: "required" %>
+                <%= address.text_field :zip, class: "full-width", required: true, placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
+              </div>
+              <% if EnrollRegistry.feature_enabled?(:display_county) %>
+                <div id="county-select-<%= f.index %>" class="col-sm col-md-6 pr-0">
+                  <% @counties = fetch_counties_by_zip(address.object) %>
+                  <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
+                  <% @counties = [@empty_message] if @counties.empty? %>
+                  <%= address.label :county %>
+                  <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'full-width', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.county_names })%>
+                </div>
+              <% else %>
+                <div class="col-sm col-md-6 pl-0 sm-hide"></div>
+              <% end %>
+            </div>
+          </div>
+        </div>
         <% if kind == 'home' %>
-          <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-            <% target = f.object.class.to_s.downcase %>
+          <% if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
+            <% display_class="d-none" %>
+          <% end %>
+          <div class="address-row show no-dc-address-reasons <%= display_class %>">
+            <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
+              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+                <div class="address_checkbox">
+                  <%= f.check_box :is_moving_to_state %>
+                  <label for="checkbox"><span><strong><%= l10n('insured.moving_to_dc') %></strong></span> <span><%= l10n('insured.moving_to_dc_extension') %></span></label>
+                </div>
+              </div>
+            <% end %>
+            <% if EnrollRegistry.feature_enabled?(:living_outside_state) %>
+              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+                <div class="address_checkbox">
+                  <%= f.check_box :is_temporarily_out_of_state %>
+                  <label for="checkbox"><span><strong><%= l10n('insured.outside_dc') %></strong></span> <span><%= l10n('insured.outside_dc_extension') %></span></label>
+                </div>
+              </div>
+            <% end %>
+            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+              <label for="is_homeless">
+                <%= f.check_box :is_homeless, id: "is_homeless" %>
+                <span><strong><%= l10n('insured.dc_homeless') %></strong></span> <span><%= l10n('insured.dc_homeless_extension') %></span>
+              </div>
+            </div>
           </div>
         <% end %>
-      </div>-->
+      </div>
+    <% end %>
+  </div>
+  <% if f.object.addresses[1].present? %>
+  <button class="form-action btn-secondary <%= pundit_class Family, :updateable?%>" id="remove_mailing_address" data-cuke="remove_mailing_address">Remove Mailing Address</button>
+  <button id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4 d-none">Add Mailing Address</button>
+  <% else %>
+  <button id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4">Add Mailing Address</button>
+  <% end %>
+  <div class="mt-2">&nbsp;</div>
+<% else %>
+  <div id="address_info" class="row no-buffer focus_effect personal-info-row">
+    <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+
+
+      <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
+        <% kind = address.object.kind %>
+
+        <% style = "" %>
+        <% div_class = kind+"-div" %>
+        <% if kind != 'home' && address.object.new_record? %>
+          <% if f.object.addresses[1].present? %>
+            <% style="display:block;" %>
+          <% else %>
+            <% style="display:none;" %>
+          <% end %>
+        <% end %>
+        <!--<div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
+          <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+            <button class="btn btn-new-address">NEW ADDRESS</button>
+          </div>
+
+          <div class="col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd address">
+            <div class="form-group form-group-lg">
+              <div class="row" style="margin: 0;">
+                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
+                  <div class="dropdown">
+                    <button class="form-control floatlabel adderess-select-box form_group_lg" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                      <label><%= kind.capitalize %> Address</label>
+                    </button>
+                  </div>
+                </div>
+                <% if kind == 'home' %>
+                  <span>
+                    <i class='fa fa-question-circle no-pd'  id="home_address_tooltip" style='margin-top:20px;' data-toggle="tooltip" title="<%=l10n("insured.home_address_tooltip")%>"></i>
+                  </span>
+                <% end %>
+                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+              </div>
+            </div>
+          </div>
+
+          <% if kind == 'home' %>
+            <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+              <% target = f.object.class.to_s.downcase %>
+            </div>
+          <% end %>
+        </div>-->
+
+          <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+            <div class="col-xs-12 form-group form-group-lg">
+              <% if kind == 'home' %>
+                <div><strong><%=l10n("insured.enter_home_address")%></strong></div>
+                <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_home_address_info")%>
+              <% elsif kind == 'mailing' %>
+                <br>
+                <strong><%=l10n("insured.enter_mailing_address")%></strong><br>
+                <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_mailing_address_info")%>
+              <% end %>
+            </div>
+          </div>
+
 
         <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-          <div class="col-xs-12 form-group form-group-lg">
-            <% if kind == 'home' %>
-              <div><strong><%=l10n("insured.enter_home_address")%></strong></div>
-              <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_home_address_info")%>
-            <% elsif kind == 'mailing' %>
-              <br>
-              <strong><%=l10n("insured.enter_mailing_address")%></strong><br>
-              <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_mailing_address_info")%>
+          <div class="col-xs-12 form-group form-group-lg no-pd">
+            <%= address.hidden_field :kind, value: address.object.kind %>
+            <%= address.hidden_field :_destroy %>
+
+            <% required = kind=='home' ? "address_required" : '' %>
+
+            <%= address.text_field :address_1, placeholder: "#{kind.upcase} ADDRESS LINE 1 (NUMBER, STREET, QUADRANT) #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
+        </div>
+        <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+          </div>
+          <div class="col-xs-12 form-group form-group-lg no-pd">
+            <%= address.text_field :address_2, placeholder: "#{kind.upcase} ADDRESS LINE 2 (APT, UNIT, ETC.)", class: "floatlabel form-control" %>
+          </div>
+        </div>
+
+        <% col_size = EnrollRegistry.feature_enabled?(:display_county) ? 3 : 4 %>
+        <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+          <div class="col-xs-<%= "#{col_size}" %> form-group form-group-lg no-pd">
+            <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
+          </div>
+
+          <div class="col-xs-<%= "#{col_size}" %> form-group form-group-lg no-pd">
+            <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true) %>
+          </div>
+
+          <div data-controller="zip-check">
+            <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+              <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
+            </div>
+
+            <% if EnrollRegistry.feature_enabled?(:display_county) %>
+              <div id="county-select-<%= f.index %>" class="county-select col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+                <% @counties = fetch_counties_by_zip(address.object) %>
+                <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
+                <% @counties = [@empty_message] if @counties.empty? %>
+                <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg county-input no-selectric', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.county_names })%>
+              </div>
             <% end %>
           </div>
         </div>
 
-
-      <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-        <div class="col-xs-12 form-group form-group-lg no-pd">
-          <%= address.hidden_field :kind, value: address.object.kind %>
-          <%= address.hidden_field :_destroy %>
-
-          <% required = kind=='home' ? "address_required" : '' %>
-
-          <%= address.text_field :address_1, placeholder: "#{kind.upcase} ADDRESS LINE 1 (NUMBER, STREET, QUADRANT) #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
-      </div>
-      <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-        </div>
-        <div class="col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :address_2, placeholder: "#{kind.upcase} ADDRESS LINE 2 (APT, UNIT, ETC.)", class: "floatlabel form-control" %>
-        </div>
-      </div>
-
-      <% col_size = EnrollRegistry.feature_enabled?(:display_county) ? 3 : 4 %>
-      <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-        <div class="col-xs-<%= "#{col_size}" %> form-group form-group-lg no-pd">
-          <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
-        </div>
-
-        <div class="col-xs-<%= "#{col_size}" %> form-group form-group-lg no-pd">
-          <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true) %>
-        </div>
-
-        <div data-controller="zip-check">
-          <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-            <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
-          </div>
-
-          <% if EnrollRegistry.feature_enabled?(:display_county) %>
-            <div id="county-select-<%= f.index %>" class="county-select col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-              <% @counties = fetch_counties_by_zip(address.object) %>
-              <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
-              <% @counties = [@empty_message] if @counties.empty? %>
-              <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg county-input no-selectric', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.county_names })%>
-            </div>
+        <% if kind == 'home' %>
+          <% if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
+            <% style="display:none;" %>
           <% end %>
-        </div>
-      </div>
-
-      <% if kind == 'home' %>
-        <% if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
-          <% style="display:none;" %>
+          <div style="<%= style %>" class="row no-buffer address-row show no-dc-address-reasons">
+            <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
+              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+                <div class="address_checkbox">
+                  <%= f.check_box :is_moving_to_state %>
+                  <label for="checkbox"><span><strong><%= l10n('insured.moving_to_dc') %></strong></span> <span><%= l10n('insured.moving_to_dc_extension') %></span></label>
+                </div>
+              </div>
+            <% end %>
+            <% if EnrollRegistry.feature_enabled?(:living_outside_state) %>
+              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+                <div class="address_checkbox">
+                  <%= f.check_box :is_temporarily_out_of_state %>
+                  <label for="checkbox"><span><strong><%= l10n('insured.outside_dc') %></strong></span> <span><%= l10n('insured.outside_dc_extension') %></span></label>
+                </div>
+              </div>
+            <% end %>
+            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+              <div class="address_checkbox">
+                <%= f.check_box :is_homeless %>
+                <label for="checkbox"><span><strong><%= l10n('insured.dc_homeless') %></strong></span><span><%= l10n('insured.dc_homeless_extension') %></span></label>
+              </div>
+            </div>
+          </div>
         <% end %>
-        <div style="<%= style %>" class="row no-buffer address-row show no-dc-address-reasons">
-          <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
-            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-              <div class="address_checkbox">
-                <%= f.check_box :is_moving_to_state %>
-                <label for="checkbox"><span><strong><%= l10n('insured.moving_to_dc') %></strong></span> <span><%= l10n('insured.moving_to_dc_extension') %></span></label>
-              </div>
-            </div>
-          <% end %>
-          <% if EnrollRegistry.feature_enabled?(:living_outside_state) %>
-            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-              <div class="address_checkbox">
-                <%= f.check_box :is_temporarily_out_of_state %>
-                <label for="checkbox"><span><strong><%= l10n('insured.outside_dc') %></strong></span> <span><%= l10n('insured.outside_dc_extension') %></span></label>
-              </div>
-            </div>
-          <% end %>
-          <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-            <div class="address_checkbox">
-              <%= f.check_box :is_homeless %>
-              <label for="checkbox"><span><strong><%= l10n('insured.dc_homeless') %></strong></span><span><%= l10n('insured.dc_homeless_extension') %></span></label>
-            </div>
-          </div>
-        </div>
-      <% end %>
 
-      <%# if kind == 'home' %>
-      <%# if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
-        <%# style="display:none;" %>
-      <%# end %>
-<!--      <div style="<%#= style %>" class="row no-buffer address-row <%#= div_class %> no-dc-address-reasons">-->
-<!--        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">-->
-<!--          <div class="radio">-->
-            <%#= f.radio_button :is_homeless, "I am homeless", id: 'radio_homeless' %>
-<!--            <label for="radio_homeless"><span>Select this option if you are a homeless DC resident</span></label>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">-->
-<!--          <div class="radio">-->
-            <%#= f.radio_button :is_temporarily_out_of_state, "I am temporarily living outside of DC", id: 'radio_outside' %>
-<!--            <label for="radio_outside">-->
-<!--              <span>Select this option if you're living outside of DC temporarily and intend to return</span>-->
-<!--            </label>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-      <%# end %>
-    <% end%>
+        <%# if kind == 'home' %>
+        <%# if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
+          <%# style="display:none;" %>
+        <%# end %>
+  <!--      <div style="<%#= style %>" class="row no-buffer address-row <%#= div_class %> no-dc-address-reasons">-->
+  <!--        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">-->
+  <!--          <div class="radio">-->
+              <%#= f.radio_button :is_homeless, "I am homeless", id: 'radio_homeless' %>
+  <!--            <label for="radio_homeless"><span>Select this option if you are a homeless DC resident</span></label>-->
+  <!--          </div>-->
+  <!--        </div>-->
+  <!--        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">-->
+  <!--          <div class="radio">-->
+              <%#= f.radio_button :is_temporarily_out_of_state, "I am temporarily living outside of DC", id: 'radio_outside' %>
+  <!--            <label for="radio_outside">-->
+  <!--              <span>Select this option if you're living outside of DC temporarily and intend to return</span>-->
+  <!--            </label>-->
+  <!--          </div>-->
+  <!--        </div>-->
+  <!--      </div>-->
+        <%# end %>
+      <% end%>
+    </div>
+
   </div>
-
-</div>
-
-<% if f.object.addresses[1].present? %>
-<span tabindex="0" onkeydown="handleButtonKeyDown(event, 'remove_mailing_address')" class="form-action btn btn-default <%= pundit_class Family, :updateable?%>" id="remove_mailing_address" data-cuke="remove_mailing_address">Remove Mailing Address</span>
-<% else %>
-<span tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_mailing_address')" id="add_mailing_address" class="form-action btn btn-default <%= pundit_class Family, :updateable?%>">Add Mailing Address</span>
-<% end %>
+    <% if f.object.addresses[1].present? %>
+  <span class="form-action btn btn-default <%= pundit_class Family, :updateable?%>" id="remove_mailing_address" data-cuke="remove_mailing_address">Remove Mailing Address</span>
+  <% else %>
+  <span id="add_mailing_address" class="form-action btn btn-default <%= pundit_class Family, :updateable?%>">Add Mailing Address</span>
+  <% end %>
+  <% end %>
 
 
-<% if EnrollRegistry.feature_enabled?(:address_verification) %>
-<script>
 
-  const baseFormValues = {
-    address1: '',
-    address2: '',
-    city: '',
-    state: '',
-    zip: '',
-  };
+  <% if EnrollRegistry.feature_enabled?(:address_verification) %>
+  <script>
+
+    const baseFormValues = {
+      address1: '',
+      address2: '',
+      city: '',
+      state: '',
+      zip: '',
+    };
 
 
-  const getInputFieldReference = (elementId) => {
-    return document.getElementById(elementId);
-  }
-
-  const addressInputField = getInputFieldReference('person_addresses_attributes_0_address_1');
-  const address2InputField = getInputFieldReference('person_addresses_attributes_0_address_2');
-  const cityInputField = getInputFieldReference('person_addresses_attributes_0_city');
-  const stateInputField = getInputFieldReference('inputState');
-  const zipInputField = getInputFieldReference('person_addresses_attributes_0_zip');
-
-  const formFields = [addressInputField, address2InputField, cityInputField, stateInputField, zipInputField];
-
-  baseFormValues.address1 = addressInputField.value;
-  baseFormValues.address2 = address2InputField.value;
-  baseFormValues.city = cityInputField.value;
-  baseFormValues.state = stateInputField.value;
-  baseFormValues.zip = zipInputField.value;
-
-  const getCurrentFormValues = () => {
-
-    return {
-      address1: addressInputField.value,
-      address2: address2InputField.value,
-      city: cityInputField.value,
-      state: stateInputField.value,
-      zip: zipInputField.value,
+    const getInputFieldReference = (elementId) => {
+      return document.getElementById(elementId);
     }
 
-  }
+    const addressInputField = getInputFieldReference('person_addresses_attributes_0_address_1');
+    const address2InputField = getInputFieldReference('person_addresses_attributes_0_address_2');
+    const cityInputField = getInputFieldReference('person_addresses_attributes_0_city');
+    const stateInputField = getInputFieldReference('inputState');
+    const zipInputField = getInputFieldReference('person_addresses_attributes_0_zip');
 
-  formFields.forEach(field => {
-    // field.addEventListener('focus', () => console.log(field, 'gained focus.'))
-    field.addEventListener('blur', () => validateAddress())
-  })
+    const formFields = [addressInputField, address2InputField, cityInputField, stateInputField, zipInputField];
 
-  const requiredFieldsHaveValues = () => {
-    const requiredFields = formFields.filter(field => field.required);
-    const fieldValues = requiredFields.map(field => field.value);
-    const fieldsHaveValues = fieldValues.every(value => value !== null && value !== '');
+    baseFormValues.address1 = addressInputField.value;
+    baseFormValues.address2 = address2InputField.value;
+    baseFormValues.city = cityInputField.value;
+    baseFormValues.state = stateInputField.value;
+    baseFormValues.zip = zipInputField.value;
 
-    return fieldsHaveValues;
-  }
+    const getCurrentFormValues = () => {
 
-  const fieldsHaveChanged = (baseFormValues, existingFormValues) => {
-    let changes = false;
+      return {
+        address1: addressInputField.value,
+        address2: address2InputField.value,
+        city: cityInputField.value,
+        state: stateInputField.value,
+        zip: zipInputField.value,
+      }
 
-    if (baseFormValues.address1 !== existingFormValues.address1) {
-      changes = true;
     }
 
-    if (baseFormValues.address2 !== existingFormValues.address2) {
-      changes = true;
+    formFields.forEach(field => {
+      // field.addEventListener('focus', () => console.log(field, 'gained focus.'))
+      field.addEventListener('blur', () => validateAddress())
+    })
+
+    const requiredFieldsHaveValues = () => {
+      const requiredFields = formFields.filter(field => field.required);
+      const fieldValues = requiredFields.map(field => field.value);
+      const fieldsHaveValues = fieldValues.every(value => value !== null && value !== '');
+
+      return fieldsHaveValues;
     }
 
-    if (baseFormValues.city !== existingFormValues.city) {
-      changes = true;
+    const fieldsHaveChanged = (baseFormValues, existingFormValues) => {
+      let changes = false;
+
+      if (baseFormValues.address1 !== existingFormValues.address1) {
+        changes = true;
+      }
+
+      if (baseFormValues.address2 !== existingFormValues.address2) {
+        changes = true;
+      }
+
+      if (baseFormValues.city !== existingFormValues.city) {
+        changes = true;
+      }
+
+      if (baseFormValues.state !== existingFormValues.state) {
+        changes = true;
+      }
+
+      if (baseFormValues.zip !== existingFormValues.zip) {
+        changes = true;
+      }
+
+      return changes;
     }
 
-    if (baseFormValues.state !== existingFormValues.state) {
-      changes = true;
+    const validateAddress = () => {
+      // Do all required fields have a value?
+      if (requiredFieldsHaveValues() === false) {
+        return;
+      }
+
+
+      // Have the values changed from what they originally were?
+      if (fieldsHaveChanged(baseFormValues, getCurrentFormValues()) === false) {
+        return;
+      }
+
+      // Make the api call
+      console.log('Making an API call!', getCurrentFormValues());
     }
 
-    if (baseFormValues.zip !== existingFormValues.zip) {
-      changes = true;
-    }
-
-    return changes;
-  }
-
-  const validateAddress = () => {
-    // Do all required fields have a value?
-    if (requiredFieldsHaveValues() === false) {
-      return;
-    }
-
-
-    // Have the values changed from what they originally were?
-    if (fieldsHaveChanged(baseFormValues, getCurrentFormValues()) === false) {
-      return;
-    }
-
-    // Make the api call
-    console.log('Making an API call!', getCurrentFormValues());
-  }
-
-</script>
+  </script>
 <% end %>

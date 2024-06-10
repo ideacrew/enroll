@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- extract to helper rather than use the ENV directly -->
+<html lang="en" data-theme="<%= ENV['CLIENT'] %>" data-contrast="<%= EnrollRegistry.feature_enabled?(:contrast_level_aa) %>" data-bs4="<%= @bs4 %>">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -10,6 +11,7 @@
 
 
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag "application", 'data-turbolinks-track': 'reload' %>
     <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
     <%= stylesheet_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
@@ -21,39 +23,49 @@
 
     <%= action_cable_meta_tag %>
     <%= csrf_meta_tags %>
+
     <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
       <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
     <% end %>
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-      <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-      <![endif]-->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
-
   </head>
-  <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm">
+  <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm d-flex flex-column justify-content-between min-vh-100">
     <%= render partial: './ui-components/bs4/v1/navs/header' %>
 
     <%= yield :horizontal_menu %>
 
-    <div class="content <%= controller_name %> content-bottom nm-content">
+    <main class="pb-5 <%= controller_name %> flex-grow-1">
       <% if aca_security_questions %>
         <%= render 'users/security_question_responses/modal' %>
       <% end %>
 
-      <%= render_flash %>
-      <div class="container">
-        <%= yield :horizontal_status %>
+      <div class=<%= "mt-4" if @bs4 %>>
+       <%= render_flash use_bs4: @bs4 %>
       </div>
+
+      <aside class="container">
+        <%= yield :horizontal_status %>
+      </aside>
+
+      <% if content_for? :content %>
+        <%= yield :content %>
+      <% else %>
         <%= yield %>
-    </div>
-    <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
-      <%= render "shared/customer_support/live_chat_widget" %>
+      <% end %>
+    </main>
+    <% if @bs4 %>
+      <%= render partial: './ui-components/bs4/v1/footers/footer' %>
+    <% else %>
+      <%= render partial: './ui-components/v1/layouts/footer' %>
     <% end %>
-    <%= render partial: './ui-components/bs4/v1/footers/footer' %>
     <% if EnrollRegistry.feature_enabled?(:jquery_migrate) %>
       <% if EnrollRegistry[:jquery_migrate].setting(:show_warnings).item == true %>
         <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
@@ -62,4 +74,9 @@
       <% end %>
     <% end %>
   </body>
+  <% if @bs4 %>
+    <script>
+      disableSelectric = true;
+    </script>
+  <% end %>
  </html>
