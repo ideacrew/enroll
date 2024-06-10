@@ -6,8 +6,6 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index]
-    before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-    before_action :conditionally_enable_bs4_layout, only: [:create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
     # This before_action needs to be called after finding the application
@@ -21,13 +19,13 @@ module FinancialAssistance
 
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      render layout: resolve_layout
+      render layout: 'financial_assistance_nav'
     end
 
     def new
       authorize @applicant, :new?
       @model = @applicant.deductions.build
-      render 'index', layout: resolve_layout
+      render 'index', layout: 'financial_assistance_nav'
     end
 
     def step
@@ -75,13 +73,14 @@ module FinancialAssistance
 
     def format_date(params)
       return if params[:deduction].blank?
-      params[:deduction][:start_on] = format_date_string(params[:deduction][:start_on].to_s)
-      params[:deduction][:end_on] = format_date_string(params[:deduction][:end_on].to_s) if params[:deduction][:end_on].present?
+      params[:deduction][:start_on] = Date.strptime(params[:deduction][:start_on].to_s, "%m/%d/%Y")
+      params[:deduction][:end_on] = Date.strptime(params[:deduction][:end_on].to_s, "%m/%d/%Y") if params[:deduction][:end_on].present?
     end
 
-    def format_date_string(string)
-      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
-      Date.strptime(string, date_format)
+    # this might not be needed anymore as forms (with dates) have come out of the YAML. Refactor and Replace with the method above.
+    def format_date_params(model_params)
+      model_params["start_on"] = Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
+      model_params["end_on"] = Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
     end
 
     def build_error_messages(model)
@@ -102,18 +101,6 @@ module FinancialAssistance
       FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.find(params[:id])
     rescue StandardError
       ''
-    end
-
-    def conditionally_enable_bs4_layout
-      enable_bs4_layout if params[:bs4] == "true"
-    end
-
-    def enable_bs4_layout
-      @bs4 = true
-    end
-
-    def resolve_layout
-      @bs4 ? 'financial_assistance_progress' : 'financial_assistance_nav'
     end
   end
 end
