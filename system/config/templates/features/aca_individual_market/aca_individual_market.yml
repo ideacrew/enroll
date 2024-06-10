@@ -151,3 +151,5 @@ registry:
             item: <%= ENV['BCP_CREATION_MONTH'] || 7 %>
           - key: :bcp_creation_day
             item: <%= ENV['BCP_CREATION_DAY'] || 10 %>
+      - key: :async_publish_updated_families
+        is_enabled: <%= ENV['ASYNC_PUBLISH_UPDATED_FAMILIES_IS_ENABLED'] || false %>
