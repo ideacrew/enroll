@@ -10,12 +10,12 @@
         <div class="mb-4">
           <fieldset>
             <legend id="us_citizen_value" class="weight-n"><%= l10n("insured.us_citizen") %> *</legend>
-            <div class="d-flex align-items-center">
-              <label for="us_citizen_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'us_citizen_true')" class="radio">
+            <div class="focus d-flex align-items-center">
+              <label for="us_citizen_true" class="radio">
                 <%= f.radio_button :us_citizen, true, class: "required", id: 'us_citizen_true' %>
                 <span class="yes_no_pair">Yes</span>
               </label>
-              <label for="us_citizen_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'us_citizen_false')" class="radio">
+              <label for="us_citizen_false" class="radio">
                 <%= f.radio_button :us_citizen, false, class: "required", id: 'us_citizen_false' %>
                 <span class="yes_no_pair">No</span>
               </label>
@@ -28,12 +28,12 @@
         <div class="<%= 'hidden_field' unless show_naturalized_citizen_container(f.object) %> mb-4" id="naturalized_citizen_container">
           <fieldset>
             <legend id="naturalized_citizen_value" class="weight-n"><%= l10n("insured.consumer_roles.naturalized_question") %> *</legend>
-            <div class="d-flex align-items-center">
-              <label for="naturalized_citizen_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'naturalized_citizen_true')" class="radio">
+            <div class="focus d-flex align-items-center">
+              <label for="naturalized_citizen_true" class="radio">
                 <%= f.radio_button :naturalized_citizen, true, class: "required", id: 'naturalized_citizen_true' %>
                 <span class="yes_no_pair">Yes</span>
               </label>
-              <label for="naturalized_citizen_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'naturalized_citizen_false')" class="radio">
+              <label for="naturalized_citizen_false" class="radio">
                 <%= f.radio_button :naturalized_citizen, false, class: "required", id: 'naturalized_citizen_false' %>
                 <span class="yes_no_pair">No</span>
               </label>
@@ -74,12 +74,12 @@
                   </div>
                 </div>
               </legend>
-              <div class="d-flex align-items-center">
-                <label for="eligible_immigration_status_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'eligible_immigration_status_true')" class="radio">
+              <div class="focus d-flex align-items-center">
+                <label for="eligible_immigration_status_true" class="radio">
                   <%= f.radio_button :eligible_immigration_status, true, class: "required", id: 'eligible_immigration_status_true' %>
                   <span class="yes_no_pair">Yes</span>
                 </label>
-                <label for="eligible_immigration_status_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'eligible_immigration_status_false')" class="radio">
+                <label for="eligible_immigration_status_false" class="radio">
                   <%= f.radio_button :eligible_immigration_status, false, class: "required", id: 'naturalized_citizen_false' %>
                   <span class="yes_no_pair">No</span>
                 </label>
@@ -101,12 +101,12 @@
         <div class="mb-4">
           <fieldset>
             <legend id="is_incarcerated_value" class="weight-n"><%= l10n("insured.incarcerated") %> *</legend>
-            <div class="d-flex align-items-center">
-              <label for="is_incarcerated_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_incarcerated_true')" class="radio">
+            <div class="focus d-flex align-items-center">
+              <label for="is_incarcerated_true" class="radio">
                 <%= f.radio_button :is_incarcerated, true, class: "required", id: 'is_incarcerated_true' %>
                 <span class="yes_no_pair">Yes</span>
               </label>
-              <label for="is_incarcerated_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_incarcerated_false')" class="radio">
+              <label for="is_incarcerated_false" class="radio">
                 <%= f.radio_button :is_incarcerated, false, class: "required", id: 'is_incarcerated_false' %>
                 <span class="yes_no_pair">No</span>
               </label>
@@ -146,12 +146,12 @@
             </div>
           </div>
 
-          <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_naturalized_citizen_container(f.object) %>" id="naturalized_citizen_container">
+          <div class="focus row row-form-wrapper no-buffer <%= 'hidden_field' unless show_naturalized_citizen_container(f.object) %>" id="naturalized_citizen_container">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer">
               <label> <%= l10n("insured.consumer_roles.naturalized_question") %> *</label>
             </div>
             <div class="col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-              <div tabindex="0" onkeydown="handleCitizenKeyDown(event, 'naturalized_citizen_true')" class="radio skinned-form-controls skinned-form-controls-mac">
+              <div class="radio skinned-form-controls skinned-form-controls-mac">
                 <%= f.radio_button :naturalized_citizen, true, required: true, class: "required floatlabel" %>
                 <%= f.label :naturalized_citizen, :value => true do %>
                   <span class="yes_no_pair">Yes</span>
@@ -159,7 +159,7 @@
               </div>
             </div>
             <div class="col-lg-1 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-              <div tabindex="0" onkeydown="handleCitizenKeyDown(event, 'naturalized_citizen_false')" class="radio skinned-form-controls skinned-form-controls-mac">
+              <div class="radio skinned-form-controls skinned-form-controls-mac">
                 <%= f.radio_button :naturalized_citizen, false, required: true, class: "required floatlabel" %>
                 <%= f.label :naturalized_citizen, :value => false do %>
                   <span class="yes_no_pair">No</span>
@@ -187,8 +187,8 @@
                 </div>
               </div>
             <% else %>
-              <div class="col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-                <div tabindex="0" onkeydown="handleCitizenKeyDown(event, 'eligible_immigration_status_true')" class="radio skinned-form-controls skinned-form-controls-mac">
+              <div class="focus col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+                <div class="radio skinned-form-controls skinned-form-controls-mac">
                   <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
                   <%= f.label :eligible_immigration_status, :value => true do %>
                     <span class="yes_no_pair">Yes</span>
@@ -196,7 +196,7 @@
                 </div>
               </div>
               <div class="col-lg-1 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-                <div tabindex="0" onkeydown="handleCitizenKeyDown(event, 'eligible_immigration_status_false')" class="radio skinned-form-controls skinned-form-controls-mac">
+                <div class="radio skinned-form-controls skinned-form-controls-mac">
                   <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
                   <%= f.label :eligible_immigration_status, :value => false do %>
                     <span class="yes_no_pair">No</span>
