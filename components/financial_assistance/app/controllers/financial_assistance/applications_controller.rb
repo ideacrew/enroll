@@ -21,7 +21,7 @@ module FinancialAssistance
     before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
-    layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
+    layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error preferences submit_your_application]
 
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
@@ -66,6 +66,77 @@ module FinancialAssistance
       load_support_texts
 
       respond_to :html
+    end
+
+    def preferences
+      authorize @application, :step?
+
+      save_faa_bookmark(request.original_url)
+      respond_to :html
+    end
+
+    def save_preferences
+      authorize @application, :step?
+      if params[:application].present?
+        @application.assign_attributes(permit_params(params[:application]))
+
+        if @application.save
+          redirect_to review_and_submit_application_path(@application)
+        else
+          @application.save!(validate: false)
+          flash[:error] = build_error_messages(@application).join(", ")
+          render 'preferences'
+        end
+      else
+        render 'preferences'
+      end
+    end
+
+    def submit_your_application
+      authorize @application, :step?
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+      respond_to :html
+    end
+
+    def submit
+      authorize @application, :step?
+
+      if params[:application].present?
+        @application.assign_attributes(permit_params(params[:application]))
+
+        if @application.save
+          if @application.imported?
+            redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
+            return
+          end
+          if @application.complete?
+            publish_result = determination_request_class.new.call(application_id: @application.id)
+            if publish_result.success?
+              redirect_to wait_for_eligibility_response_application_path(@application)
+            else
+              @application.unsubmit! if @application.may_unsubmit?
+              flash_message = case publish_result.failure
+                              when Dry::Validation::Result
+                                { error: validation_errors_parser(publish_result.failure) }
+                              when Exception
+                                { error: publish_result.failure.message }
+                              else
+                                { error: "Submission Error: #{publish_result.failure}" }
+                              end
+              redirect_to application_publish_error_application_path(@application), flash: flash_message
+            end
+          else
+            redirect_to application_publish_error_application_path(@application), flash: { error: build_error_messages(@model) }
+          end
+        else
+          @application.save!(validate: false)
+          flash[:error] = build_error_messages(@application).join(", ")
+          render 'submit_your_application'
+        end
+      else
+        render 'submit_your_application'
+      end
     end
 
     # rubocop:disable Metrics/AbcSize

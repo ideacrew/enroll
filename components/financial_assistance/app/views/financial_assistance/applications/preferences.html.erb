@@ -1,0 +1,75 @@
+<%= form_for @application, url: {action: "save_preferences"}, method: :put do |f| %>
+  <h1>Your Preferences</h1>
+  <p>Tell us your preferences. When you're finished, select CONTINUE.</p>
+  <h2>Agreements</h2>
+  <fieldset>
+    <legend class="weight-n">To make it easier to determine my eligibility for premium reductions in future years, I agree to allow CoverME.gov to use my income date, including information from tax returns, for the next five years. CoverME.gov will send me a notice, let me make any changes, and I can opt out at any time.</legend>
+    <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+      <div class='col-md-6'>
+        <h5 class="fa-text-color"><%= l10n('faa.other_ques.ssn_apply') %></h5>
+      </div>
+      <div class='col-md-2'>
+        <%= f.radio_button("is_renewal_authorized", true, class: "radio-yml", id: "eligibility_easier_yes") %>
+        <label class="radio-yml" for="eligibility_easier_yes">I agree</label>
+      </div>
+      <div class='col-md-2'>
+        <%= f.radio_button("is_renewal_authorized", false, class: "radio-yml", id: "eligibility_easier_no") %>
+        <label class="radio-yml" for="eligibility_easier_no">I disagree</label>
+      </div>
+    </div>
+  </fieldset>
+  <p>When it’s time to renew or change coverage, I authorize <short-name-placeholder> to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility.</p>
+  <div class="row row-form-wrapper radio-align no-buffer row-height yml-row">
+
+    <div class="col-md-12">
+        How long would you like your eligibility for premium reductions to be renewed? *
+
+    </div>
+
+    <div class="col-md-12">
+        <input type="radio" name="application[years_to_renew]" value="5" class="radio-yml" checked="checked">
+<label class="radio-yml span-text">5 years</label>
+
+    </div>
+
+    <div class="col-md-12">
+        <input type="radio" name="application[years_to_renew]" value="4" class="radio-yml">
+<label class="radio-yml span-text">4 years</label>
+
+    </div>
+
+    <div class="col-md-12">
+        <input type="radio" name="application[years_to_renew]" value="3" class="radio-yml">
+<label class="radio-yml span-text">3 years</label>
+
+    </div>
+
+    <div class="col-md-12">
+        <input type="radio" name="application[years_to_renew]" value="2" class="radio-yml">
+<label class="radio-yml span-text">2 years</label>
+
+    </div>
+
+    <div class="col-md-12">
+        <input type="radio" name="application[years_to_renew]" value="1" class="radio-yml">
+<label class="radio-yml span-text">1 year</label>
+
+    </div>
+
+    <div class="col-md-12">
+        <input type="radio" name="application[years_to_renew]" value="0" class="radio-yml">
+<label class="radio-yml span-text radio-inline-override label-max-width-renew">None. I understand that this means I won't get cost savings in future years unless I change my mind and tell CoverME.gov.</label>
+
+    </div>
+
+    </div>
+    <div class="row row-form-wrapper radio-align no-buffer row-height yml-row ">
+
+    <div class="col-md-12">
+        If you are not registered to vote where you live now and would like to apply to register to vote, visit: <a href="https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa" target="_blank" rel="noopener noreferrer" class="interaction-click-control-https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa">https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa</a>.
+
+    </div>
+
+    </div>
+    <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" %>
+<% end %>

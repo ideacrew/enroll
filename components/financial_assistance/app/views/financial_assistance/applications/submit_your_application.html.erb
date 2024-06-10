@@ -1,0 +1,154 @@
+<%= form_for @application, url: {action: "submit"}, method: :put do |f| %>
+  <h1></h1>
+  <p></p>
+  <div class="col-md-12">
+        <input type="checkbox" name="application[medicaid_terms]" id="application_medicaid_terms" value="yes" class="put-class-name-here interaction-choice-control-value-application-medicaid-terms" required="required">
+<label class="put-class-name-here">I agree *</label>
+
+    </div>
+
+    <div class="col-md-12">
+        <input type="checkbox" name="application[report_change_terms]" id="application_report_change_terms" value="yes" class="put-class-name-here interaction-choice-control-value-application-report-change-terms">
+<label class="put-class-name-here">I agree *</label>
+
+    </div>
+
+    <div class="col-md-12">
+        <input type="checkbox" name="application[medicaid_insurance_collection_terms]" id="application_medicaid_insurance_collection_terms" value="yes" class="put-class-name-here interaction-choice-control-value-application-medicaid-insurance-collection-terms" required="required">
+<label class="put-class-name-here">I agree *</label>
+
+    </div>
+
+    <div class="margin-bottom-30 margin-bottom-adjustment">
+
+    <div class="row row-form-wrapper radio-align no-buffer row-height yml-row ">
+
+    <div class="col-md-12">
+        <b>Does any child on this application have a parent living outside of the home?&nbsp;*</b>
+
+    </div>
+
+    <div class="col-md-2">
+        <input type="radio" name="application[parent_living_out_of_home_terms]" id="living_outside_yes" value="true" class="radio-yml interaction-choice-control-value-living-outside-yes" required="required">
+<label class="radio-yml span-text" for="living_outside_yes">Yes</label>
+
+    </div>
+
+    <div class="col-md-2">
+        <input type="radio" name="application[parent_living_out_of_home_terms]" id="living_outside_no" value="false" class="radio-yml interaction-choice-control-value-living-outside-no" required="required" checked="checked">
+<label class="radio-yml span-text" for="living_outside_no">No</label>
+
+    </div>
+
+    </div>
+    <div class="row row-form-wrapper radio-align no-buffer row-height yml-row hide">
+
+    <div class="col-md-12">
+        If yes, I know that, if anyone in my application group is found eligible for MaineCare, I will be asked to cooperate with the Child Support Agency  to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children,  I can tell my caseworker and I may not have to cooperate.
+
+    </div>
+
+    </div>
+    <div class="row row-form-wrapper radio-align no-buffer row-height yml-row hide">
+
+    <div class="col-md-12">
+        <input type="checkbox" name="application[attestation_terms]" id="application_attestation_terms" value="yes" class="put-class-name-here interaction-choice-control-value-application-attestation-terms">
+<label class="put-class-name-here">I agree *</label>
+
+    </div>
+
+    </div>
+<br><br>
+
+                </div>
+
+                <div class="margin-bottom-30 margin-bottom-adjustment">
+
+    <div class="row row-form-wrapper radio-align no-buffer row-height yml-row ">
+
+    <div class="col-md-12">
+        I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I am not truthful, there may be a penalty.
+
+    </div>
+
+    </div>
+    <div class="row row-form-wrapper radio-align no-buffer row-height yml-row ">
+
+    <div class="col-md-12">
+        <input type="checkbox" name="application[submission_terms]" id="application_submission_terms" value="yes" class="put-class-name-here interaction-choice-control-value-application-submission-terms" required="required">
+<label class="put-class-name-here">I agree *</label>
+
+    </div>
+
+    </div>
+<br><br>
+
+                </div>
+
+  <div class="margin-bottom-30 margin-bottom-adjustment">
+
+    <div class="row row-form-wrapper radio-align no-buffer row-height yml-row ">
+
+    <div class="col-md-12">
+        <h5><b>Electronic Signature * (enter your name)</b></h5>
+
+    </div>
+
+    </div>
+    <div class="row row-form-wrapper radio-align no-buffer row-height yml-row ">
+
+    <div class="col-md-4">
+        <div class="floatlabel-wrapper" style="position:relative"><label for="first_name_thank_you" class="label-floatlabel  " style="position: absolute; top: 0px; left: 8px; display: none; opacity: 0; font-size: 11px; font-weight: bold; color: var(--floatlabel-color); transition: all 0.1s ease-in-out 0s;">First Name *</label><input type="text" name="first_name_thank_you" id="first_name_thank_you" placeholder="First Name *" required="required" class="floatlabel thank_you_field interaction-field-control-first-name-thank-you" style="padding-top: 22px; transition: all 0.1s ease-in-out 0s;"></div>
+<input type="hidden" name="subscriber_first_name" id="subscriber_first_name" value="jonathan" autocomplete="off">
+<input type="hidden" name="subscriber_last_name" id="subscriber_last_name" value="hall" autocomplete="off">
+
+    </div>
+
+    <div class="col-md-4">
+        <div class="floatlabel-wrapper" style="position:relative"><label for="middle_name_thank_you" class="label-floatlabel  " style="position: absolute; top: 0px; left: 8px; display: none; opacity: 0; font-size: 11px; font-weight: bold; color: var(--floatlabel-color); transition: all 0.1s ease-in-out 0s;">Middle Name</label><input type="text" name="middle_name_thank_you" id="middle_name_thank_you" placeholder="Middle Name" class="floatlabel thank_you_field interaction-field-control-middle-name-thank-you" style="padding-top: 22px; transition: all 0.1s ease-in-out 0s;"></div>
+<input type="hidden" name="subscriber_first_name" id="subscriber_first_name" value="jonathan" autocomplete="off">
+<input type="hidden" name="subscriber_last_name" id="subscriber_last_name" value="hall" autocomplete="off">
+
+    </div>
+
+    <div class="col-md-4">
+        <div class="floatlabel-wrapper" style="position:relative"><label for="last_name_thank_you" class="label-floatlabel  " style="position: absolute; top: 0px; left: 8px; display: none; opacity: 0; font-size: 11px; font-weight: bold; color: var(--floatlabel-color); transition: all 0.1s ease-in-out 0s;">Last Name *</label><input type="text" name="last_name_thank_you" id="last_name_thank_you" placeholder="Last Name *" required="required" class="floatlabel thank_you_field interaction-field-control-last-name-thank-you" style="padding-top: 22px; transition: all 0.1s ease-in-out 0s;"></div>
+<input type="hidden" name="subscriber_first_name" id="subscriber_first_name" value="jonathan" autocomplete="off">
+<input type="hidden" name="subscriber_last_name" id="subscriber_last_name" value="hall" autocomplete="off">
+
+    </div>
+
+    </div>
+<br><br>
+
+                </div>
+  <div class="col-md-3">
+          <input type="submit" name="commit" value="Submit Application" class="btn btn-lg btn-primary interaction-click-control-submit-application disabled" data-disable-with="Submit Application">
+      <p class="small-left-margin very-small-margin-top faded">
+        </p><ul class="list-unstyled list-right-section">
+          <li>
+              <a href="/financial_assistance/applications/65e1fc5119a2220001cda8c4/step/1" class="interaction-click-control-previous">
+                PREVIOUS
+</a>          </li>
+          <li>
+            <a href="#" class="interaction-click-control-save---exit">
+              SAVE &amp; EXIT
+            </a>
+            <br>
+            <br>
+          </li>
+          <li>
+            <p>
+              If you select Save &amp; Exit, you can save your work and continue where you left off the next time you login.
+            </p>
+          </li>
+          <br class="clear">
+        </ul>
+      <p></p>
+
+      <div id="help_me_sign_up" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_me_sign_up')" class="btn btn-default btn-block help-me-sign-up" data-target="#help_with_plan_shopping" data-toggle="modal">
+        Help me sign up
+      </div>
+      <div class="modal fade" id="help_with_plan_shopping" role="dialog"><div class="modal-dialog" style="min-height: 600px; width: 720px"><div class="modal-content"><div class="modal-header"><button aria-label="Close" class="close interaction-click-control-×" data-dismiss="modal" type="button"><span aria-hidden="true"></span>×</button></div><div class="modal-body" style="height: 650px; overflow-y: scroll"><div id="help_list" style="font-size: 140%; margin: 140px 100px 0px"><b>Help me Sign Up Options</b><br><br><ul><li><a data-remote="true" href="/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/staff_index" class="interaction-click-control-help-from-an-expert">Help from an Expert</a></li></ul></div><div class="help_reset" id="help_search"><h4>Search by Name</h4>First Name:<br><input id="help_first_name" type="text" class="interaction-field-control-help-first-name"><br>Last Name:<br><input id="help_last_name" type="text" class="interaction-field-control-help-last-name"><button class="btn btn-primary interaction-click-control-search-for-help" id="search_for_plan_shopping_help">Search for Help</button><br><h4 id="help_status"></h4><div class="hide" id="help_requestor">53e693d7eb899ad9ca01e741</div><div class="hide" id="help_requestor_email">admin@dc.gov</div><div class="hide" id="help_type"></div></div><div class="help_reset" id="inbox"><div class="col-md-10 col-md-12 col-lg-12"></div></div><div class="col-md-3"><div class="col-md-8 btn btn-default hide" id="back_to_help">Back</div></div></div></div></div></div>
+    </div>
+<% end %>
