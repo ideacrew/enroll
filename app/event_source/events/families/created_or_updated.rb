@@ -5,5 +5,5 @@ module Events
     class CreatedOrUpdated < EventSource::Event
       publisher_path 'publishers.families.created_or_updated_publisher'
     end
-end
+  end
 end
