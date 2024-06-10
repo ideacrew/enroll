@@ -375,6 +375,37 @@ ul.list-right-section {
       width: 100%;
     }
   }
+
+  .navbar-brand img {
+    padding-left: $spacer / 2;
+  }
+
+  .navbar-collapse {
+    position: absolute;
+    top: 68px;
+    left: 75%;
+    margin-top: 0;
+    padding: $spacer;
+    width: 75vw;
+    transition: all 0.4s ease;
+    display: block;
+  }
+  .navbar-collapse.collapsing {
+    height: auto !important;
+    margin-left: 50%;
+    left: 50%;
+    transition: all 0.2s ease;
+  }
+  .navbar-collapse.show {
+    left: 25vw;
+    background: var(--grey-000);
+    height: 100vh;
+    padding-top: $spacer;
+    .align-items-md-end {
+      margin-top: $spacer;
+    }
+    z-index: 105;
+  }
 }
 
 .full-height {
