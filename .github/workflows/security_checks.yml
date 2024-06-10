@@ -1,0 +1,26 @@
+name: Security Checks
+on:
+  push:
+  schedule:
+    - cron: '30 5 * * *'
+
+jobs:
+  bundler-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: install bundler-audit
+        run: |
+          gem install bundler-audit && bundler-audit update
+      - name: run bundler-audit
+        run: |
+          bundler-audit --output=bundler_audit.txt
+      - name: upload bundler-audit failure report
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Security Reports
+          path: bundler_audit.txt
