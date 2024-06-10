@@ -11,16 +11,18 @@
         <%= l10n("insured.tribe_member_pt2") %>*
       </label>
     </div>
-    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
-      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_yes')" class="radio">
-        <%= f.radio_button :indian_tribe_member, "true", class: "required floatlabel", id: 'indian_tribe_member_yes' %>
-        <label for="indian_tribe_member_yes"><span class="yes_no_pair"><%= l10n("Yes") %></span></label>
+    <div class="focus">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+        <div class="radio">
+          <%= f.radio_button :indian_tribe_member, "true", class: "required floatlabel", id: 'indian_tribe_member_yes' %>
+          <label for="indian_tribe_member_yes"><span class="yes_no_pair"><%= l10n("Yes") %></span></label>
+        </div>
       </div>
-    </div>
-    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_no')" class="radio">
-        <%= f.radio_button :indian_tribe_member, "false", class: "required floatlabel", id: 'indian_tribe_member_no' %>
-        <label for="indian_tribe_member_no"><span class="yes_no_pair"><%= l10n("no") %></span></label>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio">
+          <%= f.radio_button :indian_tribe_member, "false", class: "required floatlabel", id: 'indian_tribe_member_no' %>
+          <label for="indian_tribe_member_no"><span class="yes_no_pair"><%= l10n("no") %></span></label>
+        </div>
       </div>
     </div>
   </div>
