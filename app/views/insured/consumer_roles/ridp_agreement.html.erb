@@ -1,64 +1,100 @@
-<% content_for :horizontal_status do %>
-  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
-<% end %>
-
-<div class="container <%=pundit_class Family, :updateable?%>">
-  <div class="col-lg-2 col-md-2 col-sm-2">
-    <%= render :partial => 'shared/left_nav' %>
+<% if @bs4 %>
+  <%= render partial: 'shared/consumer_signup', locals: {step: 1, show_help_button: true} %>
+  <h1><%= l10n("insured.consumer_roles.ridp_agreement.heading") %></h1>
+  <p><%= l10n("insured.consumer_roles.ridp_agreement.instruction1") %></p>
+  <p><%= l10n("insured.consumer_roles.ridp_agreement.instruction2") %></p>
+  <ul>
+    <li class="mb-2"><%= l10n("insured.consumer_roles.ridp_agreement.bullet1") %></li>
+    <li class="mb-2"><%= l10n("insured.consumer_roles.ridp_agreement.bullet2") %></li>
+    <li><%= l10n("insured.consumer_roles.ridp_agreement.bullet3") %></li>
+  </ul>
+  <fieldset class="mt-4 mb-4">
+    <legend class="weight-n">
+      <%= l10n("insured.consumer_roles.ridp_agreement.ridp_agreement_label") %>
+    </legend>
+    <div class="focus d-flex align-items-center">
+      <label for="agreement_agree" class="radio" data-radio-event="agreement_disagree">
+        <%= radio_button_tag :agreement, "agree", true, class: "required", id: 'agreement_agree' %>
+        <%= l10n('faa.i_agree') %>
+      </label>
+      <label for="agreement_disagree" class="radio" data-radio-event="agreement_disagree">
+        <%= radio_button_tag :agreement, "disagree", false, class: "required", id: 'agreement_disagree' %>
+        <%= l10n('faa.i_disagree') %>
+      </label>
+    </div>
+  </fieldset>
+  <div class="hide row-form-wrapper">
+    <div class="mt-4 mb-4 aut_cons_text">
+      <p>
+        <!-- We need to do some feature flagging in regards to the below, not sure that is an O&M task? -->
+        <b><%= l10n("insured.consumer_roles.ridp_agreement.requirement1") %></b> <%= l10n("insured.consumer_roles.ridp_agreement.requirement2") %> <%= sanitize(link_to t("insured.consumer_roles.ridp_agreement.link_text"), "https://www.coverme.gov/forms", target: "_blank", rel: "noopener noreferrer") %>.
+      </p>
+    </div>
   </div>
-  <div class="col-lg-7 col-md-7 col-sm-7">
-    <div class="panel">
-      <div class="panel-body">
-        <%= l10n("insured.consumer_roles.ridp_agreement.ridp_agreement_html") %>
-        <div class="disagree_placeholder_text" style="display: none">
-          <%= "Please contact #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item}: #{Settings.contact_center.phone_number} for more information" %>
+  <% next_link = EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') ? new_insured_fdsh_ridp_verification_path : new_insured_interactive_identity_verification_path %>
+  <%= render partial: "shared/progress_navigation_buttons", locals: {next_link: next_link} %>
+<% else %>
+  <% content_for :horizontal_status do %>
+    <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
+  <% end %>
+  <div class="container <%=pundit_class Family, :updateable?%>">
+    <div class="col-lg-2 col-md-2 col-sm-2">
+      <%= render :partial => 'shared/left_nav' %>
+    </div>
+    <div class="col-lg-7 col-md-7 col-sm-7">
+      <div class="panel">
+        <div class="panel-body">
+          <%= l10n("insured.consumer_roles.ridp_agreement.ridp_agreement_html") %>
+          <div class="disagree_placeholder_text" style="display: none">
+            <%= "Please contact #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item}: #{Settings.contact_center.phone_number} for more information" %>
+          </div>
         </div>
-      </div>
-      <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">
-        <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'agreement_agree')" class="col-lg-2 radio skinned-form-controls skinned-form-controls-mac">
-          <%= radio_button_tag :agreement, "agree", true, class: "required floatlabel"  %>
-          <label for="agreement_agree"><span style="white-space: nowrap;"><%= l10n('faa.i_agree') %></span></label>
+        <div class="focus">
+          <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">
+            <div class="col-lg-2 radio skinned-form-controls skinned-form-controls-mac">
+              <%= radio_button_tag :agreement, "agree", true, class: "required floatlabel"  %>
+              <label for="agreement_agree"><span style="white-space: nowrap;"><%= l10n('faa.i_agree') %></span></label>
+            </div>
+          </div>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-10 radio skinned-form-controls skinned-form-controls-mac">
+              <%= radio_button_tag :agreement, "disagree", false, class: "required floatlabel"  %>
+              <label for="agreement_disagree"><span style="white-space: nowrap;"><%= l10n('faa.i_disagree') %></span></label>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="row row-form-wrapper no-buffer">
-        <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'agreement_disagree')" class="col-lg-10 radio skinned-form-controls skinned-form-controls-mac">
-          <%= radio_button_tag :agreement, "disagree", false, class: "required floatlabel"  %>
-          <label for="agreement_disagree"><span style="white-space: nowrap;"><%= l10n('faa.i_disagree') %></span></label>
-        </div>
-      </div>
-      <br />
-      <div class="row row-form-wrapper no-buffer hide">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 edit pd aut_cons_text">
-          <p>
-            <b>We are required by federal law to verify your identity before you continue with your application.</b>
-            If you do not want to continue with identity verification through Experian, you can apply by completing and sending us a
-            <a href="https://dchealthlink.com/sites/default/files/v2/forms/DC_Health_Link_Application_for_Health_Coverage_201509.pdf" target="_blank" rel="noopener noreferrer">paper application </a>
-            or going to a <a href="https://dchealthlink.com/dhsservicecenters" target="_blank" rel="noopener noreferrer">Department of Human Services service center </a> to apply in person.
-          </p>
+        <br />
+        <div class="row row-form-wrapper no-buffer hide">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 edit pd aut_cons_text">
+            <p>
+              <b>We are required by federal law to verify your identity before you continue with your application.</b>
+              If you do not want to continue with identity verification through Experian, you can apply by completing and sending us a
+              <a href="https://dchealthlink.com/sites/default/files/v2/forms/DC_Health_Link_Application_for_Health_Coverage_201509.pdf" target="_blank" rel="noopener noreferrer">paper application </a>
+              or going to a <a href="https://dchealthlink.com/dhsservicecenters" target="_blank" rel="noopener noreferrer">Department of Human Services service center </a> to apply in person.
+            </p>
+          </div>
         </div>
       </div>
     </div>
+    <div class="col-lg-3 col-md-3 col-sm-3">
+      <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
+    </div>
   </div>
-  <div class="col-lg-3 col-md-3 col-sm-3">
-    <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
-  </div>
-</div>
+<% end %>
+  <script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+      let fdshEnabled = <%= EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>;
+      const path = fdshEnabled ? "/insured/fdsh_ridp_verifications/new" : "/insured/interactive_identity_verifications/new"
+      const agree = document.querySelector("[for='agreement_agree']");
+      const disagree = document.querySelector("[for='agreement_disagree']");
+      agree.addEventListener("click", function(){
+        $(".interaction-click-control-continue").attr("href", path);
+        $('.aut_cons_text').parents('.row-form-wrapper').addClass('hide');
+      });
 
-<script>
-  window.addEventListener('DOMContentLoaded', (event) => {
-    let fdshEnabled = <%= EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') %>;
-    const path = fdshEnabled ? "/insured/fdsh_ridp_verifications/new" : "/insured/interactive_identity_verifications/new"
-    const agree = document.querySelector(".interaction-choice-control-value-agreement-agree");
-    const disagree = document.querySelector(".interaction-choice-control-value-agreement-disagree");
-
-    agree.addEventListener("click", function(){
-      $(".interaction-click-control-continue").attr("href", path);
-      $('.aut_cons_text').parents('.row-form-wrapper').addClass('hide');
+      disagree.addEventListener("click", function(){
+        $(".interaction-click-control-continue").attr("href", "/insured/consumer_role/upload_ridp_document");
+        $('.aut_cons_text').parents('.row-form-wrapper').removeClass('hide');
+      });
     });
-
-    disagree.addEventListener("click", function(){
-      $(".interaction-click-control-continue").attr("href", "/insured/consumer_role/upload_ridp_document");
-      $('.aut_cons_text').parents('.row-form-wrapper').removeClass('hide');
-    });
-  });
-</script>
+  </script>

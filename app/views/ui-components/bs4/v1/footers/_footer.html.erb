@@ -1,0 +1,25 @@
+<footer class="page-footer">
+    <div id="footer-info" class="d-flex flex-column flex-sm-row justify-content-md-between align-items-md-center py-3 px-0 container">
+
+      <div id="left-column" class="footer-column d-flex flex-column pl-2 pl-md-0">
+        <span><%= EnrollRegistry[:enroll_app].setting(:long_name).item %></span>
+        <span><%= l10n("layout.footer.all_rights") %></span>
+      </div>
+
+      <div id="right-column" class="get-help-container footer-column d-flex flex-column flex-md-row align-items-md-center px-2 px-md-3 py-2">
+        <span><%= l10n("layout.footer.get_help") %></span>
+        <div class="btn-group">
+          <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
+            <%= render "shared/customer_support/live_chat_widget" %>
+          <% end %>
+          <a class="button btn-secondary" href="tel:<%=EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item%>">
+            <svg role="img" aria-label="phone icon" width="16" height="16" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.772.44L6.848.094c1.01-.322 2.087.199 2.52 1.218l.859 2.027c.374.883.167 1.922-.514 2.568L7.819 7.706c.116 1.076.478 2.135 1.084 3.177a8.678 8.678 0 002.271 2.595l2.275-.759c.863-.287 1.802.043 2.33.82l1.233 1.81c.615.904.505 2.15-.259 2.916l-.817.822c-.814.817-1.977 1.113-3.052.777-2.539-.791-4.873-3.143-7.003-7.053-2.133-3.916-2.886-7.239-2.258-9.968C3.887 1.695 4.704.78 5.772.44z" fill="currentColor"/>
+            </svg>
+            <%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %>
+          </a>
+        </div>
+      </div>
+
+    </div>
+</footer>

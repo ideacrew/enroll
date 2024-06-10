@@ -172,6 +172,7 @@
 
 body {
   font-family: var(--font);
+  color: var(--default-font-color);
 }
 
 input,
@@ -179,4 +180,50 @@ select,
 textarea,
 button {
   font-family: inherit;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6, b, .b, .bold {
+  font-weight: 700;
+  color: var(--bold-font-color);
+}
+
+h1, .alpha {
+  font-size: 36px;
+  line-height: 54px;
+}
+
+h2, .beta {
+  font-size: 24px;
+  line-height: 36px;
+}
+
+h3, .gamma {
+  font-size: 18px;
+  line-height: 27px;
+}
+
+h4, .delta {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+p {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.DialogBoxHeader {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.weight-n {
+  font-weight: 400;
+}
+
+.secondary-text {
+  color: var(--secondary-font-color);
 }

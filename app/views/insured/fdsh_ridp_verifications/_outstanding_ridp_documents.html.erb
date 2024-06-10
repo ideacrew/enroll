@@ -1,107 +1,196 @@
 <% if @person.ridp_verification_types.present? %>
-<div class="table table-sm">
-  <div class="module verification-process col-md-12">
-    <% @person%>
-        <div class="row">
-          <div class="family-member col-md-12">
-            <div class="person">
-              <%= @person.full_name %>
-            </div>
-            <div class="verification-types col-md-12">
-              <% @person.ridp_verification_types.each do |ridp_type| %>
-                  <div class="row" id="<%= ridp_type %>">
-                    <div class="v-type col-md-12">
-                      <div class="v-type-name col-md-2">
-                        <%= ridp_type %>
-                      </div>
-                      <div class="v-type-status col-md-3">
-                      <span class="label lb-md label-<%=ridp_type_class(ridp_type, @person)%>" id="status">
-                        <%= show_ridp_type(ridp_type, @person) %>
-                      </span>&nbsp;
-                        <%= pundit_span Family, :updateable? %>
-                      </div>
-                      <div class="v-type-upload col-md-4">
-                        <% if ridp_type_unverified?(ridp_type, @person) %>
-                          <% if ridp_type == 'Identity' %>
-                              <span class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
-                                <i class="fa fa-upload" aria-hidden="true"></i>
-                                Upload Documents
-                              </span>
-                              <%= render partial: 'insured/fdsh_ridp_verifications/insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
-                          <% else %>
-                                <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
-                                    <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
-                                      <i class="fa fa-upload" aria-hidden="true"></i>
-                                      Upload Documents
-                                      <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
-                                    </span>
-                                    <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
-                                <% end %>
-                            <% end %>
-                        <% end %>
-                      </div>
-                      <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
-                          <div class="v-type-actions col-md-3">
-                            <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Action'} %>
-                          </div>
-                      <% end %>
-                    </div>
-                  </div>
-
-                  <% if ridp_type == "Identity" && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?) %>
-                      <%= render :partial => "insured/fdsh_ridp_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
-                  <% elsif ridp_type == "Application" &&  pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?) %>
-                      <%= render :partial => "insured/fdsh_ridp_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+<% if @bs4 %>
+  <% show_faq_button = (defined? show_faq_button) ? show_faq_button : true %>
+  <div class="mt-4 mb-4">
+    <% if show_faq_button %>
+      <%= sanitize(link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer') %>
+    <% end %>
+    <h2 class="mt-4"><%= l10n("insured.consumer_roles.upload_ridp_documents.outstanding_header") %></h2>
+    <section class="card">
+      <h3 class="mb-0"><%= @person.full_name %></h3>
+      <hr>
+      <% @person.ridp_verification_types.each do |ridp_type| %>
+        <div class="my-3">
+          <div class="row mb-2 p-0" id="<%= ridp_type %>">
+            <div class="d-flex col-sm align-items-center">
+              <div class="col-5 px-0">
+                <h6 class="my-0"><%= ridp_type %></h6>
+              </div>
+              <div class="d-flex ml-sm-0 ml-auto">
+                <span class="badge badge-status badge-<%=ridp_type_class(ridp_type, @person)%> p-2" id="status">
+                  <%= ridp_status_translated(ridp_type, @person) %>
+                </span>
+              </div>
+            </div> <%= pundit_span Family, :updateable? %>
+            <div class="d-flex col-sm">
+              <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
+                <span class="v-type-actions mr-2">
+                  <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
+                </span>
+              <% end %>
+              <% if ridp_type_unverified?(ridp_type, @person) %>
+                <% if ridp_type == 'Identity' %>
+                  <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity')" class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
+                    <i class="fa fa-upload" aria-hidden="true"></i>
+                    <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
+                  </span>
+                  <%= render partial: 'insured/fdsh_ridp_verifications/insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
+                <% else %>
+                  <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
+                    <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
+                      <i class="fa fa-upload" aria-hidden="true"></i>
+                      <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
+                      <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, value: "Upload Documents" %>
+                    </span>
+                    <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
                   <% end %>
-                  <div class="row">
-                    <% if ridp_documents_list(@person, ridp_type).any? %>
-                        <div class="ridp-doc-list col-md-12">
-                          <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
-                              <div class="row" id="doc_table_row_<%=ridp_doc.id%>">
-                                <div class="ridp-doc-elem col-md-12">
-                                  <div class="v-doc col-md-11">
-                                    <% if ridp_doc.identifier.present? %>
-                                        <% key = ridp_doc.identifier.split('#').last %>
-                                        <%= link_to("/insured/ridp_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"}) do %>
-                                          <%= ridp_doc.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
-                                        <% end %>
-                                    <% end %>
-                                  </div>
-                                  <div class="v-doc col-md-1">
-                                    <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
-                                      <span class="<%=pundit_class(Family, :updateable?)%>" >
-                                          <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true do %>
-                                            <i class="far fa-trash-alt fa-lg role-trashcan" title="Delete"></i>
-                                        <% end %>
-                                      </span>
-                                    <% end %>
-                                  </div>
-                                </div>
-                              </div>
-                          <% end %>
-                        </div>
-                    <% end %>
-                  </div>
+                <% end %>
               <% end %>
             </div>
           </div>
+          <div class="w-100 px-0">
+            <% if (ridp_type == "Identity" && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == "Application" &&  pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?)) %>
+              <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+            <% end %>
+          </div>
+          <div>
+            <% if ridp_documents_list(@person, ridp_type).any? %>
+              <span><label class="my-0"><%= l10n("insured.consumer_roles.upload_ridp_documents.list_header", ridp_type: ridp_type) %></label></span>
+              <div class="ridp-doc-list col-sm-12 px-0">
+                <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
+                  <div class="d-flex row py-1 px-0 m-0 align-items-center" id="doc_table_row_<%=ridp_doc.id%>">
+                    <div class="col-sm px-0 m-0">
+                      <%= ridp_doc.title.titleize %>
+                    </div>
+                    <div class="d-flex col-sm align-items-center justify-content-sm-end px-0 mt-1 mt-sm-0 mb-0">
+                      <% if ridp_doc.identifier.present? %>
+                        <% key = ridp_doc.identifier.split('#').last %>
+                        <%= h(content_tag(:a, href: "/insured/ridp_documents/download/#{key}", title: "Download", data: {toggle: "tooltip"}, target: "_blank", rel: "noopener noreferrer", class: "btn outline text-nowrap") do %>
+                          <span>
+                           <i class='fa fa-download' aria-hidden='true'></i> <%= l10n("download") %>
+                          </span>
+                        <% end) %>
+                      <% end %>
+                      <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
+                        <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
+                          <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true, class: "btn-error outline text-nowrap" do %>
+                            <%= l10n("insured.consumer_roles.upload_ridp_documents.remove") %>
+                          <% end %>
+                        </span>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         </div>
+        <hr class="subcard-divider">
+      <% end %>
+    </section>
   </div>
-</div>
+<% else %>
+  <div class="table table-sm">
+    <div class="module verification-process col-md-12">
+      <% @person%>
+          <div class="row">
+            <div class="family-member col-md-12">
+              <div class="person">
+                <%= @person.full_name %>
+              </div>
+              <div class="verification-types col-md-12">
+                <% @person.ridp_verification_types.each do |ridp_type| %>
+                    <div class="row" id="<%= ridp_type %>">
+                      <div class="v-type col-md-12">
+                        <div class="v-type-name col-md-2">
+                          <%= ridp_type %>
+                        </div>
+                        <div class="v-type-status col-md-3">
+                        <span class="label lb-md label-<%=ridp_type_class(ridp_type, @person)%>" id="status">
+                          <%= show_ridp_type(ridp_type, @person) %>
+                        </span>&nbsp;
+                          <%= pundit_span Family, :updateable? %>
+                        </div>
+                        <div class="v-type-upload col-md-4">
+                          <% if ridp_type_unverified?(ridp_type, @person) %>
+                            <% if ridp_type == 'Identity' %>
+                                <span class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
+                                  <i class="fa fa-upload" aria-hidden="true"></i>
+                                  Upload Documents
+                                </span>
+                                <%= render partial: 'insured/fdsh_ridp_verifications/insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
+                            <% else %>
+                                  <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
+                                      <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
+                                        <i class="fa fa-upload" aria-hidden="true"></i>
+                                        Upload Documents
+                                        <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
+                                      </span>
+                                      <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
+                                  <% end %>
+                              <% end %>
+                          <% end %>
+                        </div>
+                        <% if current_user.has_hbx_staff_role? && ((ridp_type == 'Identity' && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?)) || (ridp_type == 'Application' && pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?))) %>
+                            <div class="v-type-actions col-md-3">
+                              <%= select_tag :verification_actions, ridp_admin_actions(ridp_type, @person), {id: "v-action-#{@person.id}-#{ridp_type.split.join('-')}", prompt: 'Action'} %>
+                            </div>
+                        <% end %>
+                      </div>
+                    </div>
+                    <% if ridp_type == "Identity" && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?) %>
+                        <%= render :partial => "insured/fdsh_ridp_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+                    <% elsif ridp_type == "Application" &&  pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?) %>
+                        <%= render :partial => "insured/fdsh_ridp_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
+                    <% end %>
+                    <div class="row">
+                      <% if ridp_documents_list(@person, ridp_type).any? %>
+                          <div class="ridp-doc-list col-md-12">
+                            <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
+                                <div class="row" id="doc_table_row_<%=ridp_doc.id%>">
+                                  <div class="ridp-doc-elem col-md-12">
+                                    <div class="v-doc col-md-11">
+                                      <% if ridp_doc.identifier.present? %>
+                                          <% key = ridp_doc.identifier.split('#').last %>
+                                          <%= link_to("/insured/ridp_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"}) do %>
+                                            <%= ridp_doc.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
+                                          <% end %>
+                                      <% end %>
+                                    </div>
+                                    <div class="v-doc col-md-1">
+                                      <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
+                                        <span class="<%=pundit_class(Family, :updateable?)%>" >
+                                            <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true do %>
+                                              <i class="far fa-trash-alt fa-lg role-trashcan" title="Delete"></i>
+                                          <% end %>
+                                        </span>
+                                      <% end %>
+                                    </div>
+                                  </div>
+                                </div>
+                            <% end %>
+                          </div>
+                      <% end %>
+                    </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+    </div>
+  </div>
 
 <div class="row">
   <div class="col-xs-12">
     <%= h(link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank', rel: "noopener noreferrer") %>
   </div>
-</div>
 
-<div class="collapse" id="docs-verification-faq">
-  <%= render partial: "insured/fdsh_ridp_verifications/ridp_document_list" %>
-</div>
+  <div class="collapse" id="docs-verification-faq">
+    <%= render partial: "insured/fdsh_ridp_verifications/ridp_document_list" %>
+  </div>
 <% end %>
-
 <script>
     $(document).ready(function() {
         Insured.custom_upload_init();
     });
 </script>
+<% end %>

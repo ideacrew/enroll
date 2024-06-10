@@ -1,7 +1,18 @@
 LAYOUT_TRANSLATIONS = {
-  "en.layouts.application_brand.byline" => "The Right Place for the Right Plan",
-  "en.layouts.application_brand.call_customer_service" => "Call Customer Service",
-  "en.layouts.application_brand.help" => "Help",
-  "en.layouts.application_brand.logout" => "Logout",
-  "en.layouts.application_brand.my_id" => "ID"
+  "en.layout.header.customer_service" => "Call Customer Service",
+  "en.layout.header.id" => "ID:",
+  "en.layout.header.help" => "Help",
+  "en.layout.header.home" => "Home",
+  "en.layout.header.logout" => "Logout",
+  "en.layout.header.open_menu" => "Open Menu",
+  "en.layout.header.close_menu" => "Close Menu",
+  "en.layout.header.role.admin" => "Admin",
+  "en.layout.header.role.broker" => "Broker",
+  "en.layout.header.role.trained_expert" => "Trained Expert",
+  "en.layout.header.role.general_agency" => "General Agency",
+  "en.layout.header.role.employer" => "Employer",
+  "en.layout.header.role.employee" => "Employee",
+  "en.layout.header.role.individual_and_family" => "Individual and Family",
+  "en.layout.footer.all_rights" => "All Rights Reserved.",
+  "en.layout.footer.get_help" => "Get Help",
 }

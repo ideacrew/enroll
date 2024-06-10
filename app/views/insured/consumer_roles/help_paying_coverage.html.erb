@@ -1,70 +1,131 @@
 <%= form_tag(help_paying_coverage_response_insured_consumer_role_index_path, method: :get) do %>
-  <div class="container">
-    <div id="new_person_wrapper">
-      <div class="row">
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-          <%= render :partial => 'shared/left_nav' %>
-        </div>
-        <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
-        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
-          <div class="bottom-pd">
-            <h2 class="darkblue">Your Application for Premium Reductions</h2>
-            <p><b>You can get help paying for coverage if you qualify.</b><span> If you don’t qualify for monthly <%= render partial:"shared/glossary", locals: {key: "Premium", title: "Premium", term: "premium" } %> reductions and lower
-            <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: " out-of-pocket costs" } %>, we’ll also check if you likely qualify for
-            <%= render partial:"shared/glossary", locals: {key: "medicaid", term: " Medicaid" } %></p>
-
-            <p class="memo">* = required field</p>
-
-            <div id="help_paying_coverage" class="focus_effect module">
-
-              <div class="row row-form-wrapper no-buffer <%= 'mt-3' if EnrollRegistry[:mainecare_cubcare_glossary].enabled? %>">
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 fa-text-color margin-tb-10">
-                    <%= l10n('faa.premium_reductions') %>
-                    <% if EnrollRegistry[:mainecare_cubcare_glossary].enabled? %>
-                      <%= render partial: 'shared/glossary', locals: {key: 'medicaid', term: 'MaineCare'} %>
-                      <%= l10n('faa.premium_reductions2') %>
-                      <%= render partial: 'shared/glossary', locals: {key: 'child_health_insurance_plan', term: 'Cub Care'} %>
-                      ?
-                    <% end %>
-                  </span>
-                </div>
-
-                <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio1')" class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-top: 14px">
-                  <input class=" " id="radio1" type="radio" value="true" name="is_applying_for_assistance" <%='checked' if @person&.is_applying_for_assistance %>>
-                  <label class="radio-label" for="radio1"><span>Yes</span></label>
-                </div>
-                <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio2')" class="col-lg-2 col-md-2 col-sm-1 col-xs-1" style="margin-top: 14px">
-                  <input class=" " id="radio2" type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person&.is_applying_for_assistance == false%>>
-                  <label class="radio-label" for="radio2"><span>No</span></label>
-                </div>
-                <div class="col-md-2 not-sure-margin left-seprator">
-                  <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not sure?</a>
-                  <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
-                    <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
-                  <% end %>
-                </div>
-              </div>
-                
-              <% if @person.mec_check_response == "Success" %>
-                <div id="mec-check-response">
-                  <%= render partial: 'financial_assistance/applications/mec_check_results', locals: { person: @person } %>
-                </div>             
-              <% end %>
-
-              <% if @shop_coverage_result.to_s == "true" %>
-                <div id="shop-check-response">
-                  <%= render partial: 'financial_assistance/applications/shop_check_results' %>
-                </div>             
-              <% end %>
-            </div>
-
+  <% if @bs4 %>
+    <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+    <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+    <% if @person.mec_check_response == "Success" %>
+      <div id="mec-check-response">
+        <div class="alert alert-warning d-flex" role="alert">
+          <div>
+            <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+          </div>
+          <div class="mt-2 mb-1">
+            <%= render partial: 'financial_assistance/applications/mec_check_results', locals: { person: @person } %>
           </div>
         </div>
+      </div>
+    <% end %>
+    <% if @shop_coverage_result.to_s == "true" %>
+      <div id="shop-check-response">
+        <div class="alert alert-warning d-flex" role="alert">
+          <div>
+            <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+          </div>
+          <div class="mt-2 mb-1">
+            <%= render partial: 'financial_assistance/applications/shop_check_results' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    <h1><%= l10n("insured.consumer_role.help_paying_coverage.header") %></h1>
+    <p><%= l10n("insured.consumer_role.help_paying_coverage.details1")%> <%= render partial:"shared/glossary", locals: {key: "Premium", title: "Premium", term: "premium" } %> <%= l10n("insured.consumer_role.help_paying_coverage.details2")%>
+      <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: " out-of-pocket costs" } %> <%= l10n("insured.consumer_role.help_paying_coverage.details3")%>
+      <%= render partial:"shared/glossary", locals: {key: "medicaid", term: " Medicaid" } %>.</p>
+    <fieldset id="help_paying_coverage" class="focus_effect module">
+      <legend class="weight-n required">
+        <%= l10n('faa.premium_reductions') %>
+        <% if EnrollRegistry[:mainecare_cubcare_glossary].enabled? %>
+          <%= render partial: 'shared/glossary', locals: {key: 'medicaid', term: 'MaineCare'} %>
+          <%= l10n('faa.premium_reductions2') %>
+          <%= render partial: 'shared/glossary', locals: {key: 'child_health_insurance_plan', term: 'Cub Care'} %>
+          ?
+        <% end %>
+      </legend>
+      <div class="d-flex align-items-center mt-2 mb-2">
+        <label class="radio-label radio" for="radio1" tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio1')">
+          <input class=" " id="radio1" type="radio" value="true" name="is_applying_for_assistance" <%='checked' if @person&.is_applying_for_assistance %>>
+          <span><%= l10n("Yes") %></span>
+        </label>
+        <label class="radio-label radio" for="radio2" tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio2')">
+          <input class=" " id="radio2" type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person&.is_applying_for_assistance == false%>>
+          <span><%= l10n("No") %></span>
+        </label>
+      </div>
+    </fieldset>
+    <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not sure?</a>
+    <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
+      <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
+    <% end %>
+    <div class="mt-4">
+      <%= render partial: "shared/progress_navigation_buttons", locals: {button_type: "submit"} %>
+    </div>
+  <% else %>
+    <div class="container">
+      <div id="new_person_wrapper">
+        <div class="row">
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+            <%= render :partial => 'shared/left_nav' %>
+          </div>
+          <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+          <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+            <div class="bottom-pd">
+              <h2 class="darkblue">Your Application for Premium Reductions</h2>
+              <p><b>You can get help paying for coverage if you qualify.</b><span> If you don’t qualify for monthly <%= render partial:"shared/glossary", locals: {key: "Premium", title: "Premium", term: "premium" } %> reductions and lower
+              <%= render partial:"shared/glossary", locals: {key: "Out_of_Pocket_Costs", title: "Out-of-Pocket Costs", term: " out-of-pocket costs" } %>, we’ll also check if you likely qualify for
+              <%= render partial:"shared/glossary", locals: {key: "medicaid", term: " Medicaid" } %></p>
 
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-          <%= render  partial: 'shared/individual_progress', locals: {step: 'help_paying_coverage'} %>
+              <p class="memo">* = required field</p>
+
+              <div id="help_paying_coverage" class="focus_effect module">
+
+                <div class="row row-form-wrapper no-buffer <%= 'mt-3' if EnrollRegistry[:mainecare_cubcare_glossary].enabled? %>">
+                  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 fa-text-color margin-tb-10">
+                      <%= l10n('faa.premium_reductions') %>
+                      <% if EnrollRegistry[:mainecare_cubcare_glossary].enabled? %>
+                        <%= render partial: 'shared/glossary', locals: {key: 'medicaid', term: 'MaineCare'} %>
+                        <%= l10n('faa.premium_reductions2') %>
+                        <%= render partial: 'shared/glossary', locals: {key: 'child_health_insurance_plan', term: 'Cub Care'} %>
+                        ?
+                      <% end %>
+                    </span>
+                  </div>
+
+                  <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio1')" class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-top: 14px">
+                    <input class=" " id="radio1" type="radio" value="true" name="is_applying_for_assistance" <%='checked' if @person&.is_applying_for_assistance %>>
+                    <label class="radio-label" for="radio1"><span>Yes</span></label>
+                  </div>
+                  <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio2')" class="col-lg-2 col-md-2 col-sm-1 col-xs-1" style="margin-top: 14px">
+                    <input class=" " id="radio2" type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person&.is_applying_for_assistance == false%>>
+                    <label class="radio-label" for="radio2"><span>No</span></label>
+                  </div>
+                  <div class="col-md-2 not-sure-margin left-seprator">
+                    <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not sure?</a>
+                    <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
+                      <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
+                    <% end %>
+                  </div>
+                </div>
+
+                <% if @person.mec_check_response == "Success" %>
+                  <div id="mec-check-response">
+                    <%= render partial: 'financial_assistance/applications/mec_check_results', locals: { person: @person } %>
+                  </div>
+                <% end %>
+
+                <% if @shop_coverage_result.to_s == "true" %>
+                  <div id="shop-check-response">
+                    <%= render partial: 'financial_assistance/applications/shop_check_results' %>
+                  </div>
+                <% end %>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+            <%= render  partial: 'shared/individual_progress', locals: {step: 'help_paying_coverage'} %>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-<%end%>
+  <% end %>
+<% end %>
