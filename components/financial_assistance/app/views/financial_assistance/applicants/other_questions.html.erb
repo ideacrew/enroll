@@ -48,12 +48,14 @@
       </div>
 
       <fieldset class="mb-4 row-form-wrapper">
-        <legend class="weight-n <%= 'required' if FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required) %>"><%= l10n("faa.other_ques.pregnancy_due_date") %></legend>
+        <legend>
+          <label class="weight-n <%= 'required' if FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required) %>" for="applicant_pregnancy_due_on"><%= l10n("faa.other_ques.pregnancy_due_date") %></label>
+        </legend>
         <%= f.date_field :pregnancy_due_on, id: "applicant_pregnancy_due_on", placeholder: "MM/DD/YYYY" %>
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
-          <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, id: 'children_expected_count', class: "col-4", prompt: true) %>
+        <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, id: 'children_expected_count', class: "col-4", prompt: true) %>
         <legend class="weight-n required"><%= applicant_prompt('children_expected') %></legend>
       </fieldset>
 
@@ -65,7 +67,9 @@
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
-        <legend class="weight-n required"><%= l10n("faa.other_ques.pregnancy_end") %></legend>
+        <legend>
+          <label class="weight-n required" for="applicant_pregnancy_end_on"><%= l10n("faa.other_ques.pregnancy_end") %></label>
+        </legend>
         <%= f.date_field :pregnancy_end_on, id: "applicant_pregnancy_end_on", placeholder: "MM/DD/YYYY" %>
       </fieldset>
 
@@ -112,7 +116,9 @@
             </fieldset>
 
             <fieldset class="mb-4 row-form-wrapper">
-              <legend class="weight-n"><%= l10n("faa.other_ques.student_status_end") %></legend>
+              <legend>
+                <label class="weight-n" for="applicant_student_status_end_on"><%= l10n("faa.other_ques.student_status_end") %></label>
+              </legend>
               <%= f.date_field :student_status_end_on, id: "applicant_student_status_end_on", placeholder: "MM/DD/YYYY" %>
             </fieldset>
 
