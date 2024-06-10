@@ -38,11 +38,7 @@
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
   </head>
   <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm d-flex flex-column justify-content-between min-vh-100">
-    <% if @bs4 %>
-     <%= render partial: './ui-components/bs4/v1/navs/header' %>
-    <% else %>
-      <%= render partial: './ui-components/v1/navs/header' %>
-    <% end %>
+    <%= render partial: './ui-components/bs4/v1/navs/header' %>
 
     <%= yield :horizontal_menu %>
 
