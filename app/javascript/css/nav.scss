@@ -49,16 +49,62 @@ header.navbar-primary {
       }
     }
 
-    .navbar-toggler {
-      border: 1px solid var(--grey-050);
+    .navbar-toggler-icon.open {
+      display: none;
+    }
+    .navbar-toggler-icon.closed {
+      display: block;
     }
 
-    .navbar-collapse.collapse.show{
-      margin-top: 1rem;
+    .navbar-toggler-icon path {
+      fill: var(--theme-secondary);
+      stroke: var(--theme-secondary);
+    }
+
+    .collapsed {
+      .navbar-toggler-icon.open {
+        display: block;
+      }
+      .navbar-toggler-icon.closed {
+        display: none;
+      }
+    }
+
+    .navbar-collapse.collapse.show {
       flex-direction: row;
 
       .nav-item-divider {
         display: none;
       }
+    }
+
+    #nav-overlay {
+      position: fixed;
+      top: 75px;
+      left: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .show + #nav-overlay {
+      background: hsla(0, 0%, 0%, 1);
+      opacity: 0.5;
+      z-index: 100;
+      width: 100vw;
+      height: 100vh;
+    }
+    .mobile-nav {
+      display: none
+    }
+    .desktop-nav {
+      display: flex;
+      width: 100%;
+
+    }
+    .show .mobile-nav {
+      display: block
+    }
+    .show .desktop-nav {
+      display: none
     }
   }
