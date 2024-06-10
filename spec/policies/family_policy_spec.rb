@@ -359,7 +359,7 @@ describe FamilyPolicy, "#hire_broker_agency?" do
     end
   end
 
-  let(:user) { instance_double(User, person: nil) }
+  let(:user) { instance_double(User, person: nil, identity_verified?: false) }
   let(:family) { instance_double(Family, primary_person: nil) }
 
   subject { described_class.new(user, family) }
@@ -409,7 +409,7 @@ describe FamilyPolicy, "#request_help?" do
     end
   end
 
-  let(:user) { instance_double(User, person: nil) }
+  let(:user) { instance_double(User, person: nil, identity_verified?: false) }
   let(:family) { instance_double(Family, primary_person: nil) }
 
   subject { described_class.new(user, family) }

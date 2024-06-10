@@ -781,30 +781,51 @@ class ConsumerRole
 
   # collect all verification types user can have based on information he provided
   def ensure_verification_types
-    if person
-      live_types = []
-      live_types << LOCATION_RESIDENCY if EnrollRegistry.feature_enabled?(:location_residency_verification_type)
-      live_types << 'Social Security Number' if ssn
-      if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
-        live_types << 'American Indian Status' if !(tribal_state.nil? || tribal_state.empty?) && !(check_tribal_name.nil? || check_tribal_name.empty?)
-      else
-        live_types << 'American Indian Status' unless tribal_id.nil? || tribal_id.empty?
-      end
-      if us_citizen
-        live_types << 'Citizenship'
-      else
-        live_types << 'Immigration status' if us_citizen != nil
-      end
-      inactive = verification_types.map(&:type_name) - live_types
-      new_types = live_types - verification_types.active.map(&:type_name)
-      person.deactivate_types(inactive)
-      new_types.each do |new_type|
-        person.add_new_verification_type(new_type)
-      end
-      person.families.each do |family|
-        family.update_family_document_status!
-      end
+    return unless person
+
+    live_types = collect_live_types
+    create_or_update_verification_types(live_types)
+    update_family_document_status
+  end
+
+  def collect_live_types
+    live_types = []
+
+    # Add 'LOCATION_RESIDENCY' if the feature is enabled
+    live_types << LOCATION_RESIDENCY if EnrollRegistry.feature_enabled?(:location_residency_verification_type)
+
+    # Add 'Social Security Number' if SSN is present
+    live_types << 'Social Security Number' if ssn
+
+    # Add 'American Indian Status' if applicable
+    live_types << 'American Indian Status' if ai_or_an?
+
+    # Add either 'Citizenship' or 'Immigration status' based on us_citizen
+    live_types << (us_citizen ? 'Citizenship' : 'Immigration status') unless us_citizen.nil?
+
+    # Ensure 'Alive Status' is at the end of the array if it's included
+    live_types << 'Alive Status' if ssn.present? && EnrollRegistry.feature_enabled?(:enable_alive_status)
+
+    live_types
+  end
+
+  def ai_or_an?
+    if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
+      !(tribal_state.nil? || tribal_state.empty?) && !(check_tribal_name.nil? || check_tribal_name.empty?)
+    else
+      !(tribal_id.nil? || tribal_id.empty?)
     end
+  end
+
+  def create_or_update_verification_types(live_types)
+    inactive = verification_types.map(&:type_name) - live_types
+    new_types = live_types - verification_types.active.map(&:type_name)
+    person.deactivate_types(inactive)
+    new_types.each { |new_type| person.add_new_verification_type(new_type) }
+  end
+
+  def update_family_document_status
+    person.families.each(&:update_family_document_status!)
   end
 
   def build_nested_models_for_person
@@ -1144,9 +1165,9 @@ class ConsumerRole
   end
 
   def move_types_to_pending(*args)
-    verification_types.each do |type|
-      type.pending_type unless (type.type_name == LOCATION_RESIDENCY) || (type.type_name == "American Indian Status")
-    end
+    types_to_reject = ['American Indian Status', LOCATION_RESIDENCY]
+
+    verification_types.without_alive_status_type.reject { |type| types_to_reject.include?(type.type_name) }.each(&:pending_type)
   end
 
   def pass_lawful_presence(*args)
@@ -1161,7 +1182,7 @@ class ConsumerRole
 
   def fail_lawful_presence(*args)
     lawful_presence_determination.deny!(*args)
-    verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type unless type.validation_status == 'review' }
+    verification_types.without_alive_status_type.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type unless type.validation_status == 'review' }
   end
 
   def revert_ssn
@@ -1182,7 +1203,7 @@ class ConsumerRole
 
   def revert_lawful_presence(*args)
     self.lawful_presence_determination.revert!(*args)
-    verification_types.each do |v_type|
+    verification_types.without_alive_status_type.each do |v_type|
       v_type.pending_type unless VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? (v_type.type_name)
     end
   end

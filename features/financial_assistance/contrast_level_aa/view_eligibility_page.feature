@@ -1,4 +1,3 @@
-@accessibility
 Feature: Contrast level AA is enabled - A dedicated page that visit the eligibility determination page
 
   Background: Submit Your Application page

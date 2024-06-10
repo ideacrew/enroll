@@ -28,6 +28,8 @@ class VerificationType
 
   ALIVE_STATUS = 'Alive Status'.freeze
 
+  ADMIN_CALL_HUB_VERIFICATION_TYPES = ALL_VERIFICATION_TYPES - ["Alive Status"].freeze
+
   NON_CITIZEN_IMMIGRATION_TYPES = [LOCATION_RESIDENCY, "Social Security Number", "American Indian Status"].freeze
   VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam rejected].freeze
   OUTSTANDING_STATES = %w[outstanding rejected].freeze
@@ -60,6 +62,9 @@ class VerificationType
   scope :by_name, ->(type_name) { where(:type_name => type_name) }
   scope :ssn_type, -> { by_name("Social Security Number").active }
   scope :citizenship_type, -> { by_name("Citizenship").active }
+  scope :alive_status_type, -> { by_name("Alive Status").active }
+
+  scope :without_alive_status_type, -> { where(:type_name.ne => ALIVE_STATUS) }
 
   # embeds_many :external_service_responses  -> needs datamigration
   embeds_many :type_history_elements

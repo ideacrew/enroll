@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Eligibilities
+  # family determinaiton model
   class Determination
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -15,5 +16,23 @@ module Eligibilities
     field :outstanding_verification_document_status, type: String
 
     accepts_nested_attributes_for :subjects, :grants
+
+    # seliarizable_cv_hash for family determination including subjects
+    # @return [Hash] hash of family determination
+    # Used in family cv3 payload
+    def serializable_cv_hash
+      subjects_hash = subjects.collect do |subject|
+        Hash[
+          URI(subject.gid),
+          subject.serializable_cv_hash
+        ]
+      end.reduce(:merge)
+
+      {effective_date: effective_date,
+       subjects: subjects_hash,
+       outstanding_verification_status: outstanding_verification_status,
+       outstanding_verification_earliest_due_date: outstanding_verification_earliest_due_date,
+       outstanding_verification_document_status: outstanding_verification_document_status}.deep_symbolize_keys
+    end
   end
 end

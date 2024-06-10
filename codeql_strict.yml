@@ -1,0 +1,17 @@
+paths:
+  - app
+  - config
+  - lib
+  - components
+  - project_gems
+paths-ignore:
+  - hugo
+  - node_modules
+  - "**/*.yml"
+  - "**/*.yaml"
+  - codeql
+  - project_gems/effective_datatables-2.6.14/effective_datatables-2.6.14.gemspec
+  - components/benefit_sponsors/spec/dummy
+packs:
+  ruby:
+    - codeql/ruby-queries

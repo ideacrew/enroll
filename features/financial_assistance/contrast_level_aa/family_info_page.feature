@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-@accessibility
 Feature: contrast level aa is enabled - A consumer should see the applications assistance year when feature enabled
   Background:
     Given the FAA feature configuration is enabled

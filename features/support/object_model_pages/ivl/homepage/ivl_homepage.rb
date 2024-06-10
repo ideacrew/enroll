@@ -102,4 +102,8 @@ class IvlHomepage
   def self.enrollment_member_detail
     '[data-cuke="enrollment_member_detail"]'
   end
+
+  def self.select_this_broker
+    '[data-cuke="select_this_broker"]'
+  end
 end

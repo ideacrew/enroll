@@ -82,6 +82,9 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 # Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
 
+Webdrivers::Chromedriver.required_version = ENV['WD_VERSION'] if ENV['WD_VERSION']
+Selenium::WebDriver::Chrome.path = ENV['WD_CHROME_PATH'] if ENV['WD_CHROME_PATH']
+
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 Capybara.register_driver :selenium_chrome do |app|

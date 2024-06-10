@@ -325,7 +325,19 @@ module Operations
             ethnicity: person.ethnicity,
             race: person.race,
             tribal_id: person.tribal_id,
-            language_code: person.language_code || person.user&.preferred_language || 'en'
+            language_code: person.language_code || person.user&.preferred_language || 'en',
+            alive_status: construct_alive_status(person)
+          }
+        end
+
+        def construct_alive_status(person)
+          demographics_group = person.demographics_group
+          return {} unless demographics_group&.alive_status
+
+          alive_status = demographics_group.alive_status
+          {
+            is_deceased: alive_status.is_deceased,
+            date_of_death: alive_status.date_of_death
           }
         end
 

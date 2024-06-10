@@ -132,8 +132,13 @@ RSpec.describe Family, dbclean: :around_each do
                         enrollment_members: [primary_applicant],
                         effective_on: date.beginning_of_month,
                         family: family,
-                        aasm_state: :coverage_selected)
+                        aasm_state: :coverage_selected,
+                        applied_aptc_amount: applied_aptc_amount)
     end
+
+    let!(:silver_03) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, hios_id: '41842ME12345S-03', csr_variant_id: '03') }
+    let!(:silver_04) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, hios_id: '41842ME12345S-04', csr_variant_id: '04') }
+
     let!(:thh_start_on) { tax_household_current.effective_starting_on }
 
     let(:family_member1) { family.family_members[0] }
@@ -158,7 +163,8 @@ RSpec.describe Family, dbclean: :around_each do
         subject = determination.subjects.create(
           gid: "gid://enroll/FamilyMember/#{family_member.id}",
           is_primary: family_member.is_primary_applicant,
-          person_id: family_member.person.id
+          person_id: family_member.person.id,
+          encrypted_ssn: family_member.person.encrypted_ssn
         )
 
         state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
@@ -170,6 +176,7 @@ RSpec.describe Family, dbclean: :around_each do
           assistance_year: TimeKeeper.date_of_record.year,
           member_ids: family.family_members.map(&:id)
         )
+        subject.eligibility_states.create(eligibility_item_key: 'health_product_enrollment_status', is_eligible: true)
       end
 
       determination
@@ -212,6 +219,7 @@ RSpec.describe Family, dbclean: :around_each do
       let(:yearly_expected_contribution_current) { 125.00 * 12 }
       let(:yearly_expected_contribution_previous) { 1000 }
       let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+      let!(:applied_aptc_amount) { 0 }
 
       it 'returns families with active assisted tax households for the given year' do
         result = Family.with_aptc_csr_grants_for_year(assistance_year, csr)
@@ -225,6 +233,7 @@ RSpec.describe Family, dbclean: :around_each do
       let(:yearly_expected_contribution_current) { 0 }
       let(:yearly_expected_contribution_previous) { 1000 }
       let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+      let!(:applied_aptc_amount) { 0 }
 
       it 'should not return families' do
         result = Family.with_aptc_csr_grants_for_year(assistance_year, csr)
@@ -237,6 +246,7 @@ RSpec.describe Family, dbclean: :around_each do
       let(:yearly_expected_contribution_current) { 1000 }
       let(:yearly_expected_contribution_previous) { 1000 }
       let(:members_csr_set) { {family_member1 => '0', family_member2 => '0'} }
+      let!(:applied_aptc_amount) { 0 }
 
       it 'should not return families' do
         result = Family.with_aptc_csr_grants_for_year(assistance_year, csr)
@@ -249,6 +259,7 @@ RSpec.describe Family, dbclean: :around_each do
       let(:yearly_expected_contribution_current) { 0 }
       let(:yearly_expected_contribution_previous) { 0 }
       let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+      let!(:applied_aptc_amount) { 0 }
 
       it 'should not return families' do
         result = Family.with_aptc_csr_grants_for_year(assistance_year - 1, csr)
@@ -257,10 +268,68 @@ RSpec.describe Family, dbclean: :around_each do
       end
     end
 
+    context 'family without applied aptc or csr product' do
+      let(:yearly_expected_contribution_current) { 0 }
+      let(:yearly_expected_contribution_previous) { 0 }
+      let(:members_csr_set) { {family_member1 => '100', family_member2 => '100'} }
+      let!(:applied_aptc_amount) { 0 }
+      let(:csr_product_variant) { '03' }
+
+      before do
+        hbx_enrollment.product = silver_03
+        hbx_enrollment.save!
+      end
+
+      it 'should not return families' do
+        result = Family.with_applied_aptc_or_csr_active_enrollments(['04', '05'])
+        expect(result).not_to include(family)
+        expect(result.count).to eq(0)
+      end
+    end
+
+    context 'family without csr product, but has applied aptc' do
+      let(:yearly_expected_contribution_current) { 100 }
+      let(:yearly_expected_contribution_previous) { 0 }
+      let(:members_csr_set) { {family_member1 => 'limited', family_member2 => 'limited'} }
+      let!(:applied_aptc_amount) { 100 }
+      let(:csr_product_variant) { '03' }
+
+      before do
+        hbx_enrollment.product = silver_03
+        hbx_enrollment.save!
+      end
+
+      it 'should return families' do
+        result = Family.with_applied_aptc_or_csr_active_enrollments(['04', '05'])
+        expect(result).to include(family)
+        expect(result.count).to eq(1)
+      end
+    end
+
+    context 'family without applied aptc, but has csr product' do
+      let(:yearly_expected_contribution_current) { 0 }
+      let(:yearly_expected_contribution_previous) { 0 }
+      let(:members_csr_set) { {family_member1 => '73', family_member2 => '73'} }
+      let!(:applied_aptc_amount) { 0 }
+      let(:csr_product_variant) { '04' }
+
+      before do
+        hbx_enrollment.product = silver_04
+        hbx_enrollment.save!
+      end
+
+      it 'should return families' do
+        result = Family.with_applied_aptc_or_csr_active_enrollments(['04', '05'])
+        expect(result).to include(family)
+        expect(result.count).to eq(1)
+      end
+    end
+
     context 'enrolled family with aptc and csr_87 for all members' do
       let(:yearly_expected_contribution_current) { 1000 }
       let(:yearly_expected_contribution_previous) { 0 }
       let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+      let!(:applied_aptc_amount) { 0 }
 
       it 'returns families' do
         result = Family.with_active_coverage_and_aptc_csr_grants_for_year(assistance_year, csr)
@@ -274,6 +343,7 @@ RSpec.describe Family, dbclean: :around_each do
       let(:yearly_expected_contribution_current) { 1000 }
       let(:yearly_expected_contribution_previous) { 0 }
       let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+      let!(:applied_aptc_amount) { 0 }
 
       it 'should not return families' do
         hbx_enrollment.update(aasm_state: 'coverage_canceled')
@@ -288,9 +358,24 @@ RSpec.describe Family, dbclean: :around_each do
       let(:yearly_expected_contribution_current) { 1000 }
       let(:yearly_expected_contribution_previous) { 0 }
       let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+      let!(:applied_aptc_amount) { 0 }
 
       it 'when csr is passed as array of integer values' do
         result = Family.with_active_coverage_and_aptc_csr_grants_for_year(assistance_year, [87, 94])
+
+        expect(result).to include(family)
+        expect(result.count).to eq(1)
+      end
+    end
+
+    context 'enrolled_members_with_ssn' do
+      let(:yearly_expected_contribution_current) { 1000 }
+      let(:yearly_expected_contribution_previous) { 0 }
+      let(:members_csr_set) { {family_member1 => '87', family_member2 => '87'} }
+      let!(:applied_aptc_amount) { 0 }
+
+      it 'should fetch eligible families' do
+        result = Family.enrolled_members_with_ssn
 
         expect(result).to include(family)
         expect(result.count).to eq(1)

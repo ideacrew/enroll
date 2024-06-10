@@ -596,9 +596,11 @@ RSpec.describe VerificationHelper, :type => :helper do
     shared_examples_for "admin actions dropdown list" do |type, status, state, actions|
       before do
         allow(helper).to receive(:verification_type_status).and_return status
+        allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
       end
       it "returns admin actions array" do
         person.consumer_role.update_attributes(aasm_state: "#{state}")
+        type = person.consumer_role.verification_types.where(type_name: type).first
         expect(helper.build_admin_actions_list(type, person)).to eq actions
       end
     end
@@ -611,6 +613,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "admin actions dropdown list", EnrollRegistry[:enroll_app].setting(:state_residency).item, "attested", "unverified",["Verify", "Reject", "View History", "Extend"]
     it_behaves_like "admin actions dropdown list", EnrollRegistry[:enroll_app].setting(:state_residency).item, "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
     it_behaves_like "admin actions dropdown list", EnrollRegistry[:enroll_app].setting(:state_residency).item, "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Alive Status", "unverified", "verification_outstanding", ["Verify", "Reject", "View History", "Extend"]
   end
 
   describe "#request response details" do

@@ -31,49 +31,47 @@
             <% end %>
             <% verification_filter.each do |verif_type| %>
               <% v_type = verif_type.type_name %>
-              <div class="row">
-                <div class="v-type col-md-12">
-                  <div class="v-type-name col-md-2">
-                    <% if v_type == "ME Residency" %>
-                      Income
-                    <% else %>
-                      <%= v_type %>
-                    <% end %>
-                  </div>
-                  <div class="v-type-status col-md-2 text-center">
-                    <span class="label lb-md label-<%=verification_type_class(verif_type.validation_status)%>">
-                      <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
-                    </span>&nbsp;
-                    <%= pundit_span Family, :updateable? %>
-                  </div>
-
-                  <div class="v-type-due-date col-md-3">
-                    <% if VerificationType::DUE_DATE_STATES.include? verif_type.validation_status %>
-                      <span class="text-danger"><%= l10n('due_date') %></span>
-                      <%= verif_type.verif_due_date %>
-                    <% end %>
-                  </div>
-
-                  <div class="v-type-upload col-md-3">
-                    <% if display_upload_for_verification?(verif_type) %>
-                      <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
-                        <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file">
-                          <i class="fa fa-upload" aria-hidden="true"></i>
-                          <%= l10n('upload_documents') %>
-                          <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents"%>
-                        </span  >
-                        <%= hidden_field_tag 'docs_owner', person.id  %>
-                        <%= hidden_field_tag 'verification_type', verif_type.id  %>
-                      <% end %>
-                    <% end %>
-                  </div>
-                  <% if current_user.has_hbx_staff_role? %>
-                    <div class="v-type-actions col-md-2">
-                      <%= select_tag :verification_actions, admin_actions(verif_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
+              <% if can_display_or_modify_type?(verif_type) %>
+                <div class="row">
+                  <div class="v-type col-md-12">
+                    <div class="v-type-name col-md-2">
+                      <%= display_verification_type_name(v_type) %>
                     </div>
-                  <% end %>
+                    <div class="v-type-status col-md-2 text-center">
+                      <span class="label lb-md label-<%=verification_type_class(verif_type.validation_status)%>">
+                        <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
+                      </span>&nbsp;
+                      <%= pundit_span Family, :updateable? %>
+                    </div>
+
+                    <div class="v-type-due-date col-md-3">
+                      <% if VerificationType::DUE_DATE_STATES.include? verif_type.validation_status %>
+                        <span class="text-danger"><%= l10n('due_date') %></span>
+                        <%= verif_type.verif_due_date %>
+                      <% end %>
+                    </div>
+
+                    <div class="v-type-upload col-md-3">
+                      <% if display_upload_for_verification?(verif_type) %>
+                        <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
+                          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file">
+                            <i class="fa fa-upload" aria-hidden="true"></i>
+                            <%= l10n('upload_documents') %>
+                            <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents"%>
+                          </span  >
+                          <%= hidden_field_tag 'docs_owner', person.id  %>
+                          <%= hidden_field_tag 'verification_type', verif_type.id  %>
+                        <% end %>
+                      <% end %>
+                    </div>
+                    <% if current_user.has_hbx_staff_role? %>
+                      <div class="v-type-actions col-md-2">
+                        <%= select_tag :verification_actions, admin_actions(verif_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
+                      </div>
+                    <% end %>
+                  </div>
                 </div>
-              </div>
+              <% end %>
               <% if current_user.has_hbx_staff_role? %>
                 <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
               <% end %>

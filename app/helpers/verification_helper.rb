@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module VerificationHelper
   include DocumentsVerificationStatus
   include HtmlScrubberUtil
@@ -34,6 +36,17 @@ module VerificationHelper
       else
         'outstanding'
       end
+    end
+  end
+
+  def display_verification_type_name(v_type)
+    case v_type
+    when 'ME Residency'
+      'Income'
+    when 'Alive Status'
+      'Deceased'
+    else
+      v_type
     end
   end
 
@@ -149,7 +162,7 @@ module VerificationHelper
   def get_person_v_type_status(people)
     v_type_status_list = []
     people.each do |person|
-      person.verification_types.each do |v_type|
+      person.verification_types.without_alive_status_type.each do |v_type|
         v_type_status_list << verification_type_status(v_type, person)
       end
     end
@@ -239,7 +252,7 @@ module VerificationHelper
   end
 
   def build_admin_actions_list(v_type, f_member)
-    if f_member.consumer_role.aasm_state == 'unverified'
+    if f_member.consumer_role.aasm_state == 'unverified' || v_type.type_name == 'Alive Status'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
     elsif verification_type_status(v_type, f_member) == 'outstanding'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }

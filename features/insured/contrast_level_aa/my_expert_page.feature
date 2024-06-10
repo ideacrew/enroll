@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-@accessibility
 Feature: Contrast level AA is enabled - existing consumer visits the my expert page
     Background:
     Given the contrast level aa feature is enabled
@@ -30,3 +29,11 @@ Feature: Contrast level AA is enabled - existing consumer visits the my expert p
     And the page is refreshed
     And Individual clicks on the My Broker link
     Then the page passes minimum level aa contrast guidelines
+
+  Scenario: User selects a broker in the Help Me Sign Up widget in families home page
+    And Individual clicks on the Help from an Expert link
+    And Individual selects a broker
+    Then Individual confirms a broker
+    And Individual clicks on close button
+    And the page is refreshed
+    And Individual sees your expert widget

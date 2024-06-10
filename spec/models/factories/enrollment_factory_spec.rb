@@ -787,6 +787,12 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
       expect(person.consumer_role.is_applying_coverage).to eq false
     end
 
+    it 'should generate demographics_group and alive_status for person' do
+      demographics_group = person.demographics_group
+
+      expect(demographics_group).to be_a DemographicsGroup
+      expect(demographics_group.alive_status).to be_a AliveStatus
+    end
   end
 
   context "with errors initializing the person" do

@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: d10013bfa0d5c772238eed7791a8d34d47adcbad
+  revision: 1fbb37c927e5fdf70a66dff48159ae01592cfa11
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -209,7 +209,7 @@ PATH
       dry-validation (~> 1.0)
       ffi (~> 1.9)
       holidays (~> 8.6)
-      kaminari (~> 0.17.0)
+      kaminari (~> 1.2.1)
       mongoid (~> 7.5.4)
       pundit (~> 2.0)
       rails (~> 6.1.7.6)
@@ -2144,11 +2144,16 @@ GEM
       addressable (>= 2.8)
     jsonapi-renderer (0.2.2)
     jwt (2.2.3)
-    kaminari (0.17.0)
-      actionpack (>= 3.0.0)
-      activesupport (>= 3.0.0)
+    kaminari (1.2.1)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.2.1)
+      kaminari-activerecord (= 1.2.1)
+      kaminari-core (= 1.2.1)
     kaminari-actionview (1.2.1)
       actionview
+      kaminari-core (= 1.2.1)
+    kaminari-activerecord (1.2.1)
+      activerecord
       kaminari-core (= 1.2.1)
     kaminari-core (1.2.1)
     kaminari-mongoid (1.0.2)
@@ -2638,7 +2643,7 @@ DEPENDENCIES
   jquery-rails (~> 4.4)
   jquery-ui-rails (~> 6.0)
   jwt (~> 2.2.1)
-  kaminari
+  kaminari (= 1.2.1)
   kaminari-actionview
   kaminari-mongoid
   language_list (~> 1)

@@ -44,9 +44,27 @@ And(/^the user is RIDP verified$/) do
   user.person.consumer_role.move_identity_documents_to_verified
 end
 
+Given(/the enable_alive_status feature is enabled/) do
+  allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+end
+
+And(/^the consumer's Alive Status is moved to outstanding$/) do
+  alive_status = user.person.verification_type_by_name('Alive Status')
+  alive_status.update(validation_status: 'outstanding')
+end
+
+And(/^the consumer's Alive Status is moved to verified$/) do
+  user.person.verification_type_by_name('Alive Status').pass_type
+end
+
 Then(/^the consumer visits verification page$/) do
   visit verification_insured_families_path(tab: 'verification')
   find(".interaction-click-control-documents", wait: 5).click
+end
+
+Then(/^the selectric class is visible$/) do
+  visit(current_url)
+  expect(page).to have_css('.selectric')
 end
 
 When(/^the consumer should see documents verification page$/) do
@@ -103,6 +121,14 @@ end
 
 Then(/^consumer should see Verification Due date label$/) do
   expect(page).to have_content('Due Date')
+end
+
+Then(/^.+ should not see the Alive Status verification type$/) do
+  expect(page).to_not have_content('Deceased') #should only display to consumer if 'outstanding'
+end
+
+Then(/^.+ should see the Alive Status verification type$/) do
+  expect(page).to have_content('Deceased')
 end
 
 Then(/^consumer should see Documents We Accept link$/) do

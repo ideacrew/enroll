@@ -145,6 +145,8 @@ class DocumentsController < ApplicationController
   def fed_hub_request
     authorize HbxProfile, :can_call_hub?
 
+    raise "Call hub feature is not available for #{@verification_type.type_name}" unless VerificationType::ADMIN_CALL_HUB_VERIFICATION_TYPES.include?(@verification_type.type_name)
+
     request_hash = { person_id: @person.id, verification_type: @verification_type.type_name }
     result = ::Operations::CallFedHub.new.call(request_hash)
     key, message = result.failure? ? result.failure : result.success

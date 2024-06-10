@@ -288,12 +288,23 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     describe "with a valid dependent" do
-      let(:save_result) { true }
+      let(:dependent_properties) do
+        {
+          family_id: test_family.id,
+          first_name: 'Robert',
+          last_name: 'Roberts',
+          relationship: 'child',
+          gender: 'male',
+          dob: "2024-04-23",
+          is_applying_coverage: false,
+          same_with_primary: true,
+          is_consumer_role: true
+        }
+      end
 
       before :each do
         sign_in(user)
-        allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
-        post :create, params: {dependent: dependent_properties}, :format => "js"
+        post :create, params: { dependent: dependent_properties }, format: :js
       end
 
       it "should assign the dependent" do
@@ -308,6 +319,15 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       it "should render the show template" do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
+      end
+
+      it "should create a demographics_group for the new family_member" do
+        test_family.reload
+        dependent = test_family.family_members.max_by(&:created_at)
+        demographics_group = dependent&.person&.demographics_group
+
+        expect(demographics_group).to be_a DemographicsGroup
+        expect(demographics_group.alive_status).to be_a AliveStatus
       end
     end
 

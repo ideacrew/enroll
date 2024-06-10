@@ -140,6 +140,7 @@ class Family
           'eligibility_determination.subjects.eligibility_states.evidence_states.due_on': 1},
         { name: 'subjects_evidence_states_status_due_on'})
 
+  index({ "verification_types.type_name" => 1 })
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
@@ -215,6 +216,15 @@ class Family
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
   scope :all_enrollments,                       ->{  where(:"_id".in => HbxEnrollment.enrolled_statuses.distinct(:family_id)) }
   scope :all_enrolled_and_renewal_enrollments, ->{  where(:"_id".in => HbxEnrollment.enrolled_and_renewal.distinct(:family_id)) }  # rubocop:disable Style/SymbolLiteral
+  scope :with_applied_aptc_or_csr_active_enrollments, lambda { |csr_list|
+    product_ids = BenefitMarkets::Products::Product.where(csr_variant_id: csr_list).pluck(:id)
+    enrollment_conditions = [
+      { :"applied_aptc_amount.cents".gt => 0 },
+      { :product_id.in => product_ids }
+    ]
+    family_ids = HbxEnrollment.enrolled_and_renewal.where('$or' => enrollment_conditions).distinct(:family_id)
+    where(:_id.in => family_ids)
+  }
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id) { where(:"_id".in => HbxEnrollment.by_writing_agent_id(broker_id).distinct(:family_id)) }
   scope :all_enrollments_by_benefit_group_ids,   ->(benefit_group_ids) { where(:"_id".in => HbxEnrollment.by_benefit_group_ids(benefit_group_ids).distinct(:family_id)) }
   scope :all_enrollments_by_benefit_sponsorship_id, ->(benefit_sponsorship_id){ where(:"_id".in => HbxEnrollment.by_benefit_sponsorship_id(benefit_sponsorship_id).distinct(:family_id))}
@@ -235,6 +245,12 @@ class Family
   scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
   scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
   scope :vlp_none_uploaded,                     ->{ where(:vlp_documents_status.in => ["None",nil])}
+  scope :enrolled_members_with_ssn, lambda {
+                                      where(:'eligibility_determination.subjects' =>
+                                      { :$elemMatch => { :encrypted_ssn.exists => true, :eligibility_states =>
+                                      { :$elemMatch => { :eligibility_item_key.in => ['health_product_enrollment_status', 'dental_product_enrollment_status'],
+                                                         :is_eligible => true } } } })
+                                    }
 
   scope :outstanding_verification,   ->{ where(
     :"_id".in => HbxEnrollment.individual_market.verification_outstanding.distinct(:family_id))
@@ -1181,6 +1197,8 @@ class Family
     person = family_member.person
     return if person.consumer_role.present?
     person.build_consumer_role({:is_applicant => false}.merge(opts))
+    # all persons with a consumer_role are required to have a demographics_group
+    person.build_demographics_group
     person.save!
   end
 

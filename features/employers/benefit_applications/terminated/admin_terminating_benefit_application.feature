@@ -14,6 +14,7 @@ Feature: As an admin user I should have the ability to terminate a given Employe
     When the user clicks Actions for that benefit application
     Then the user will see Terminate button
 
+  @flaky 
   Scenario Outline: As an HBX Staff with Super Admin subroles I should be able to terminate an benefit application
     When the user enters <termination_date> and other details for <termination_type> termination
     When user clicks submit button

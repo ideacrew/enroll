@@ -345,6 +345,15 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             it "should redirect to new for general agency" do
               expect(response.location.include?("new?profile_type=general_agency")).to eq true if profile_type == "general_agency"
             end
+
+            it "should create staff person with no ssn" do
+              person = Person.where(
+                first_name: staff_roles_attributes[0][:first_name],
+                last_name: staff_roles_attributes[0][:last_name],
+                dob: staff_roles_attributes[0][:dob]
+              ).first
+              expect("1").to eq person.no_ssn
+            end
           end
 
           it_behaves_like "store profile for create", "benefit_sponsor"

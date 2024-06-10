@@ -1373,6 +1373,20 @@ class Person
     @alive_status = verification_types.where(type_name: VerificationType::ALIVE_STATUS).first
   end
 
+  # In order to avoid adding another callback,
+  # this method is used after consumer_role is created for person
+  # 1.) Factories::EnrollmentFactory -> self.build_consumer_role
+  #   - used for consumer sign-up
+  # 2.) Family -> build_consumer_role
+  #   - used when creating a family_member from the 'Manage Family' from a user's homepage
+  # 3.) Insured::FamiliesHelper -> build_consumer_role
+  #   - used as a failsafe in case any family_members are missing a consumer role
+  # 4.) Operations::People::CreateOrUpdateConsumerRole -> create_consumer_role
+  #   - used when the legacy ::FinancialAssistance::Operations::Families::CreateOrUpdateMember propagates an applicant to a family_member
+  def build_demographics_group
+    Operations::People::BuildDemographicsGroup.new.call(self)
+  end
+
   private
 
   def assign(collection, association)

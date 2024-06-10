@@ -2,9 +2,10 @@
 
 class Insured::VerificationDocumentsController < ApplicationController
   include ApplicationHelper
+  include Verifications::AliveStatusHelper
 
   before_action :set_current_person
-  before_action :find_type, :find_docs_owner, only: [:upload]
+  before_action :find_type, :find_docs_owner, :alive_status_authorization?, only: [:upload]
   before_action :check_for_consumer_role
 
   def upload
@@ -38,7 +39,6 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def download
     authorize @consumer_role, :verification_document_download?
-
     document = get_document(params[:key])
     if document.present?
       bucket = env_bucket_name('id-verification')
@@ -63,6 +63,13 @@ class Insured::VerificationDocumentsController < ApplicationController
     return if @consumer_role
 
     flash[:error] = "No consumer role exists, you are not authorized to upload documents"
+    redirect_to verification_insured_families_path
+  end
+
+  def alive_status_authorization?
+    return true if can_display_or_modify_type?(@verification_type)
+
+    flash[:error] = "You are not authorized to upload this document"
     redirect_to verification_insured_families_path
   end
 
@@ -94,7 +101,8 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def get_document(key)
-    @person.consumer_role.find_vlp_document_by_key(key)
+    document = @person.consumer_role.find_vlp_document_by_key(key)
+    return document if document && can_display_or_modify_type?(document.documentable)
   end
 
   def download_options(document)

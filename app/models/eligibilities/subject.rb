@@ -38,6 +38,24 @@ module Eligibilities
     def person
       ::Person.find(person_id)
     end
+
+    # seliarizable_cv_hash for subject including eligibility states
+    # @return [Hash] hash of subject
+    def serializable_cv_hash
+      eligibility_states_hash = eligibility_states.collect do |eligibility_state|
+        Hash[
+          eligibility_state.eligibility_item_key,
+          eligibility_state.serializable_cv_hash
+        ]
+      end.reduce(:merge)
+
+      subject_attributes = attributes.slice('first_name', 'last_name', 'encrypted_ssn', 'hbx_id',
+                                            'person_id', 'outstanding_verification_status', 'is_primary')
+      subject_attributes[:dob] = dob
+      subject_attributes[:eligibility_states] = eligibility_states_hash
+
+      subject_attributes
+    end
   end
 end
 

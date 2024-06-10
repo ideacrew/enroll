@@ -30,7 +30,7 @@ describe HbxEnrollmentPolicy, "#pay_now?" do
     end
   end
 
-  let(:user) { instance_double(User, :person => nil) }
+  let(:user) { instance_double(User, :person => nil, :identity_verified? => true) }
   let(:record) { instance_double(HbxEnrollment, :is_shop? => true, :family => family) }
   let(:family) { instance_double(Family) }
 

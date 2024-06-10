@@ -1,0 +1,31 @@
+name: CodeQL Complete Inventory
+on:
+  workflow_dispatch:
+  push:
+
+concurrency:
+  group: codeql-c-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codeql-inventory:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Install CodeQL
+          run: |
+            cd ../
+            wget https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip
+            unzip codeql-linux64.zip
+        - name: Build Database
+          run: |
+            export PATH=$PATH:${GITHUB_WORKSPACE}/../codeql/
+            ./codeql/build_strict_db.sh
+        - name: Create Report
+          run: |
+            export PATH=$PATH:${GITHUB_WORKSPACE}/../codeql/
+            ./codeql/create_codeql_report.sh
+        - name: Upload Report
+          uses: github/codeql-action/upload-sarif@v3
+          with:
+            sarif_file: "./codeql.sarif"

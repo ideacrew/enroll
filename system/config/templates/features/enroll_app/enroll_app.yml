@@ -746,10 +746,10 @@ registry:
               ]
       - key: :crm_update_family_save
         item: :crm_update_family_save
-        is_enabled: false
+        is_enabled: <%= ENV['CRM_UPDATE_FAMILY_SAVE_IS_ENABLED'] || false %>
       - key: :crm_publish_primary_subscriber
         item: :crm_publish_primary_subscriber
-        is_enabled: false
+        is_enabled: <%= ENV['CRM_PUBLISH_PRIMARY_SUBSCRIBER_IS_ENABLED'] || false %>
       - key: :pii_match_success_message
         item: :pii_match_success_message
         is_enabled: false
@@ -904,4 +904,7 @@ registry:
         settings:
           - key: :show_warnings
             item: <%= ENV['SHOW_JQUERY_MIGRATE_WARNINGS'] || true %>
+      - key: :enable_alive_status
+        item: :enable_alive_status
+        is_enabled: <%= ENV['ENABLE_ALIVE_STATUS'] || false %>
 

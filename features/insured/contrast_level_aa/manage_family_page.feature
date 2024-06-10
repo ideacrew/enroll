@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-@accessibility
 Feature: Contrast level AA is enabled - existing consumer visits the manage family page
   Background:
     Given the contrast level aa feature is enabled

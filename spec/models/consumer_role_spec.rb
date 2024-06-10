@@ -710,9 +710,13 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
         end
 
         describe "pending verification type updates" do
+          before do
+            allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+          end
+
           it "updates validation status to pending for unverified consumers" do
             consumer.coverage_purchased!
-            expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending"])
+            expect(consumer.verification_types.map(&:validation_status)).to eq(["pending", "pending", "pending", "unverified"])
           end
 
           it "updates indian tribe validition status to negative_response_received and to pending for the rest" do
@@ -722,7 +726,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
               case verif.type_name
               when 'American Indian Status'
                 expect(verif.validation_status).to eq('negative_response_received')
-              when 'Citizenship'
+              when 'Citizenship', 'Alive Status'
                 # Validation Status stays same as we will not make DHS call for people who are 'us_citizen'
                 expect(verif.validation_status).to eq('unverified')
               else
@@ -992,6 +996,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
       shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
         before do
+          allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
           allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
           person.ssn = nil unless ssn
           person.us_citizen = citizen
@@ -1014,15 +1019,15 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       end
 
       context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "Alive Status"], 4, "2222222222", true, nil, 25
       end
 
       context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Alive Status", "Immigration status"], 4, "2222222222", false, nil, 20
       end
 
       context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "American Indian Status"], 4, "2222222222", true, "native", 20
+        it_behaves_like "collecting verification types for person", [VerificationType::LOCATION_RESIDENCY, "Social Security Number", "Citizenship", "Alive Status", "American Indian Status"], 5, "2222222222", true, "native", 20
       end
 
       context "Citizen with NO SSN" do
@@ -1094,6 +1099,10 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
     let(:verification_types) { consumer.verification_types }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "hbx" })}
 
+    before do
+      allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+    end
+
     it "should move Citizenship verification type to pending state" do
       consumer.lawful_presence_determination.authorize!(verification_attr)
       consumer.revert_lawful_presence(verification_attr)
@@ -1101,6 +1110,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       expect(consumer.verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.validation_status).to eq "unverified"
       expect(consumer.verification_types.by_name("Social Security Number").first.validation_status).to eq "unverified"
       expect(consumer.verification_types.by_name("Citizenship").first.validation_status).to eq "pending"
+      expect(consumer.verification_types.by_name("Alive Status").first.validation_status).to eq "unverified"
     end
   end
 

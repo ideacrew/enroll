@@ -387,4 +387,31 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       expect(tax_household_members.count).to eq(1)
     end
   end
+
+  context 'include family eligibility determination' do
+    before do
+      Operations::Eligibilities::BuildFamilyDetermination.new.call({effective_date: Date.today, family: family})
+      result = subject.call(family, true).value!
+      @eligibility_determination = result[:eligibility_determination]
+    end
+
+    it 'should have eligibility determination in the cv3 family' do
+      expect(@eligibility_determination).to be_present
+      expect(@eligibility_determination[:effective_date]).to eq Date.today
+    end
+
+    it 'determination should have subjects' do
+      expect(@eligibility_determination[:subjects].count).to eq 3
+    end
+
+    it 'subject should have eligibility states' do
+      expect(@eligibility_determination[:subjects].first.last[:eligibility_states]).to be_present
+    end
+
+    it 'eligibility states should have evidence states' do
+      ivl_evidence_state = @eligibility_determination[:subjects].first.last[:eligibility_states][:aca_individual_market_eligibility][:evidence_states]
+      expect(ivl_evidence_state).to be_present
+      expect(ivl_evidence_state[:citizenship][:evidence_item_key]).to eq :citizenship
+    end
+  end
 end

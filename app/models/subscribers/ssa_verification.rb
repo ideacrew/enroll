@@ -24,7 +24,7 @@ module Subscribers
         consumer_role = person.consumer_role
         event_response_record = EventResponse.new({received_at: Time.now, body: xml})
         consumer_role.lawful_presence_determination.ssa_responses << event_response_record
-        person.verification_types.active.reject{|type| [VerificationType::LOCATION_RESIDENCY, "American Indian Status", "Immigration status"].include? type.type_name}.each do |type|
+        person.verification_types.without_alive_status_type.active.reject{|type| [VerificationType::LOCATION_RESIDENCY, "American Indian Status", "Immigration status"].include? type.type_name}.each do |type|
           type.add_type_history_element(action: "SSA Hub Response",
                                         modifier: "external Hub",
                                         update_reason: "Hub response",

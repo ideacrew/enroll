@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+# The ApplicationPolicy class is the parent class for all policy classes in the application.
+# It defines the basic rules for which actions can be performed on a record object by whom.
+# The private methods are helper methods used to determine whether a user has the necessary permissions to perform an action.
 class ApplicationPolicy
   attr_reader :user, :record, :family
 
@@ -68,6 +73,8 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is a primary family member in the individual market, false otherwise.
   def individual_market_primary_family_member?
+    return false if account_holder_family.nil? || family.nil?
+
     individual_market_ridp_verified? && (account_holder_family == family)
   end
 
@@ -76,6 +83,8 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is a primary family member in the individual market who has not verified their identity, false otherwise.
   def individual_market_non_ridp_primary_family_member?
+    return false if account_holder_family.nil? || family.nil?
+
     individual_market_role && (account_holder_family == family)
   end
 
@@ -83,7 +92,8 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user has verified their identity in the individual market, false otherwise.
   def individual_market_ridp_verified?
-    individual_market_role&.identity_verified?
+    # Note here, for now, we need to support the identity verification also present on the user.
+    individual_market_role&.identity_verified? || user.identity_verified?
   end
 
   # Determines if the primary person of the family has verified their identity (RIDP).
@@ -111,11 +121,14 @@ class ApplicationPolicy
   # It checks if the user has any active broker agency staff roles and if the user's family has an active broker agency account.
   # If both conditions are met, it checks if any of the user's broker agency staff roles
   # are associated with the broker agency profile of the family's active broker agency account.
+  # Additionally, it checks if the broker staff's benefit sponsors broker agency profile ID matches the broker agency's ID.
   #
   # @return [Boolean] Returns true if the user is an active associated individual market family broker staff, false otherwise.
   def active_associated_individual_market_family_broker_staff?
     broker_staffs = account_holder_person&.broker_agency_staff_roles&.active
     return false if broker_staffs.blank?
+
+    return false if family.blank?
 
     broker_agency_account = family.active_broker_agency_account
     return false if broker_agency_account.blank?
@@ -542,14 +555,30 @@ class ApplicationPolicy
   def individual_market_family_broker_agency_id
     return @individual_market_family_broker_agency_id if defined? @individual_market_family_broker_agency_id
 
-    @individual_market_family_broker_agency_id = family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
+    @individual_market_family_broker_agency_id = family&.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
   end
 
+  # Fetches the IDs of broker agencies associated with the family in the shop market.
+  # The method first checks if the IDs have already been fetched and stored in an instance variable.
+  # If not, it fetches the IDs and stores them in the instance variable for future use.
+  # If the family is not present, it returns an empty array.
+  #
+  # @return [Array<Integer>] An array of broker agency IDs associated with the family in the shop market.
   def shop_market_family_broker_agency_ids
     return @shop_market_family_broker_agency_ids if defined? @shop_market_family_broker_agency_ids
 
-    @shop_market_family_broker_agency_ids = family.primary_person.active_employee_roles.map do |er|
+    @shop_market_family_broker_agency_ids = family.present? ? fetch_broker_agency_ids : []
+  end
+
+  # Fetches the IDs of broker agencies associated with the family's primary person's active employee roles.
+  # For each active employee role, it gets the employer profile, then the active broker agency account,
+  # and finally the ID of the broker agency profile.
+  # If any of these associations are not present, it skips to the next employee role.
+  #
+  # @return [Array<Integer>] An array of broker agency IDs associated with the family's primary person's active employee roles.
+  def fetch_broker_agency_ids
+    family.primary_person.active_employee_roles.filter_map do |er|
       er.employer_profile&.active_broker_agency_account&.benefit_sponsors_broker_agency_profile_id
-    end.compact
+    end
   end
 end

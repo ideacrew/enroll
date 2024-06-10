@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 #RAILS_ENV=production bundle exec rake employers:export
+#RAILS_ENV=production bundle exec rake employers:export start_date="11/30/2021"
 
 require 'csv'
 
@@ -160,10 +161,16 @@ namespace :employers do
 
       puts "No general agency profile for CCA Employers" unless general_agency_enabled?
 
+      start_date = Date.strptime(ENV['start_date'], "%m/%d/%Y") if params[:start_date].present?
       organizations.no_timeout.each do |organization|
 
         profile = organization.employer_profile
-        packages = profile.benefit_applications.map(&:benefit_packages).flatten
+        applications = if params[:start_date].present?
+                         profile&.benefit_applications&.where(:"effective_period.min".gte => start_date)
+                       else
+                         profile&.benefit_applications
+                       end
+        packages = applications&.map(&:benefit_packages)&.flatten
 
         if packages.present?
           packages.each do |package|
