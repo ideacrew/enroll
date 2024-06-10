@@ -7,7 +7,7 @@
       <legend id="has_unemployment_income" class="weight-n required">
         <%= l10n('faa.other_incomes.unemployment_question', name: @applicant.first_name) %>
       </legend>
-      <div class="d-flex align-items-center">
+      <div class="focus d-flex align-items-center">
         <label for="has_unemployment_income_true" class="radio has_unemployment_income_true">
           <%= radio_button_tag("has_unemployment_income", true, @applicant.has_unemployment_income, class: "required", required: true, id: "has_unemployment_income_true") %>
           <span class="yes_no_pair"><%= l10n("yes") %></span>
@@ -39,7 +39,7 @@
     <legend id="has_unemployment_income" class="weight-n required">
       <%= l10n('faa.other_incomes.other_income_question', name: @applicant.first_name) %>
     </legend>
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center focus">
       <label for="has_other_income_true" class="radio has_unemployment_income_true">
         <%= radio_button_tag("has_other_income", true, @applicant.has_other_income, class: "radio", required: true, id: "has_other_income_true") %>
         <span class="yes_no_pair"><%= l10n("yes") %></span>
@@ -86,7 +86,7 @@
         <legend id="has_unemployment_income" class="weight-n required">
           <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
         </legend>
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center focus">
           <label for="has_american_indian_alaskan_native_income_true" class="radio has_american_indian_alaskan_native_income_true">
             <%= radio_button_tag("has_american_indian_alaskan_native_income", true, @applicant.has_american_indian_alaskan_native_income, class: "required", required: true, id: "has_american_indian_alaskan_native_income_true") %>
             <span class="yes_no_pair"><%= l10n("yes") %></span>
@@ -147,12 +147,12 @@
           <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
         </div>
         <div class="modal-body">
-          <p>Are you sure you want to remove everything you have entered for Other Income?</p>
+          <p><%= l10n("faa.other_incomes.sure_remove") %></p>
           <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
         </div>
       </div>
     </div>
@@ -164,15 +164,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'all-other-income-delete')" id="all-other-income-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
         </div>
         <div class="modal-body">
-          You are going to delete all exsting Other Incomes of this kind. <strong>Are you sure you want to continue?
-          <br />This cannot be undone.</strong>
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
         </div>
       </div>
     </div>
@@ -184,15 +184,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-existing-income-delete')" id="other-existing-income-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
         </div>
         <div class="modal-body">
-          You are going to delete all exsting Other Incomes. <strong>Are you sure you want to continue?
-          <br />This cannot be undone.</strong>
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
         </div>
       </div>
     </div>
@@ -204,34 +204,35 @@
       <div class="modal-content">
         <div class="modal-header">
           <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-delete')" id="unemployment-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove everything you have entered <strong>for Unemployment Income?
-          <br />This cannot be undone.</strong>
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Destroy all Exsting Job Incomes (modal) -->
+  <!-- Destroy all Exsting Unemployment Incomes (modal) -->
   <div class="modal" id="destroyAllUnemploymentIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove all unemployment income(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
         </div>
       </div>
     </div>
@@ -243,15 +244,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'ai-delete')" id="ai-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove everything you have entered <strong>for American Indian/Alaskan Native Income?
-          <br />This cannot be undone.</strong>
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
         </div>
       </div>
     </div>
@@ -263,14 +264,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove all American Indian/Alaskan Native income(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
         </div>
       </div>
     </div>
