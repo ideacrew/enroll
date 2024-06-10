@@ -40,12 +40,12 @@
           ?
         <% end %>
       </legend>
-      <div class="d-flex align-items-center mt-2 mb-2">
-        <label class="radio-label radio" for="radio1" tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio1')">
+      <div class="focus d-flex align-items-center mt-2 mb-2">
+        <label class="radio-label radio" for="radio1">
           <input class=" " id="radio1" type="radio" value="true" name="is_applying_for_assistance" <%='checked' if @person&.is_applying_for_assistance %>>
           <span><%= l10n("Yes") %></span>
         </label>
-        <label class="radio-label radio" for="radio2" tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio2')">
+        <label class="radio-label radio" for="radio2">
           <input class=" " id="radio2" type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person&.is_applying_for_assistance == false%>>
           <span><%= l10n("No") %></span>
         </label>
