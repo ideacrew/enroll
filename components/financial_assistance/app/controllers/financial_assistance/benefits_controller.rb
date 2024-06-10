@@ -2,11 +2,11 @@
 
 module FinancialAssistance
   class BenefitsController < FinancialAssistance::ApplicationController
-    include ::UIHelpers::WorkflowController
+    #include ::UIHelpers::WorkflowController
     include NavigationHelper
 
     before_action :find_application_and_applicant
-    before_action :load_support_texts, only: [:index, :create, :update]
+    #before_action :load_support_texts, only: [:index, :create, :update]
     before_action :set_cache_headers, only: [:index]
 
     def index
@@ -25,13 +25,9 @@ module FinancialAssistance
     def new
       # Authorizing on applicant before benefit record is built on it
       authorize @applicant, :new?
-      @model = @applicant.benefits.build
-
-      load_steps
-      current_step
 
       respond_to do |format|
-        format.html { render 'workflow/step', layout: 'financial_assistance_nav' }
+        format.html { render 'index', layout: 'financial_assistance_nav' }
       end
     end
 
