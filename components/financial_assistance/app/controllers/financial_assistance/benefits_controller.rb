@@ -2,13 +2,12 @@
 
 module FinancialAssistance
   class BenefitsController < FinancialAssistance::ApplicationController
+    #include ::UIHelpers::WorkflowController
     include NavigationHelper
 
     before_action :find_application_and_applicant
+    #before_action :load_support_texts, only: [:index, :create, :update]
     before_action :set_cache_headers, only: [:index]
-    before_action :enable_bs4_layout, only: [:index, :create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-
-    layout :resolve_layout
 
     # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
     # This before_action needs to be called after finding the application
@@ -26,7 +25,7 @@ module FinancialAssistance
       set_admin_bookmark_url
 
       respond_to do |format|
-        format.html
+        format.html { render layout: 'financial_assistance_nav' }
       end
     end
 
@@ -39,13 +38,41 @@ module FinancialAssistance
       end
     end
 
-    def step
+    def step # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
       raise ActionController::UnknownFormat unless request.format.js? || request.format.html?
 
       @model = @applicant.benefits.build
       authorize @model, :step?
-
       redirect_to action: :index
+
+      #save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
+      #set_admin_bookmark_url
+      #flash[:error] = nil
+      #model_name = @model.class.to_s.split('::').last.downcase
+      #model_params = params[model_name]
+      #@model.clean_conditional_params(params) if model_params.present?
+      #format_date_params model_params if model_params.present?
+      #@model.assign_attributes(permit_params(model_params)) if model_params.present?
+      # update_employer_contact(@model, params) if @model.insurance_kind == "employer_sponsored_insurance"
+
+      # if params.key?(model_name)
+      #   if @model.save(context: "step_#{@current_step.to_i}".to_sym)
+      #     @current_step = @current_step.next_step if @current_step.next_step.present?
+      #     if params.key? :last_step
+      #       @model.update_attributes!(workflow: { current_step: 1 })
+      #       flash[:notice] = 'Benefit Info Added.'
+      #       redirect_to application_applicant_benefits_path(@application, @applicant)
+      #     else
+      #       @model.update_attributes!(workflow: { current_step: @current_step.to_i })
+      #       render 'workflow/step', layout: 'financial_assistance_nav'
+      #     end
+      #   else
+      #     flash[:error] = build_error_messages(@model)
+      #     render 'workflow/step', layout: 'financial_assistance_nav'
+      #   end
+      # else
+      #   render 'workflow/step', layout: 'financial_assistance_nav'
+      # end
     end
 
     def create
@@ -55,8 +82,11 @@ module FinancialAssistance
       @benefit = @applicant.benefits.build permit_params(params[:benefit])
       authorize @benefit, :create?
 
+      @benefit_kind = @benefit.kind
+      @benefit_insurance_kind = @benefit.insurance_kind
+
       if @benefit.save
-        render :create, :locals => { kind: @benefit.kind, insurance_kind: @benefit.insurance_kind }
+        render :create, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
       else
         render head: 'ok'
       end
@@ -69,7 +99,7 @@ module FinancialAssistance
 
       if @benefit.update_attributes permit_params(params[:benefit])
         respond_to do |format|
-          format.js { render :update, :locals => { kind: @benefit.kind, insurance_kind: @benefit.insurance_kind } }
+          format.js { render :update, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] } }
         end
       else
         respond_to do |format|
@@ -92,9 +122,8 @@ module FinancialAssistance
     private
 
     def format_date(params)
-      date_format = params[:benefit][:start_on].match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
-      params[:benefit][:start_on] = Date.strptime(params[:benefit][:start_on].to_s, date_format)
-      params[:benefit][:end_on] = Date.strptime(params[:benefit][:end_on].to_s, date_format) if params[:benefit][:end_on].present?
+      params[:benefit][:start_on] = Date.strptime(params[:benefit][:start_on].to_s, "%m/%d/%Y")
+      params[:benefit][:end_on] = Date.strptime(params[:benefit][:end_on].to_s, "%m/%d/%Y") if params[:benefit][:end_on].present?
     end
 
     def update_employer_contact(_model, params)
@@ -130,19 +159,6 @@ module FinancialAssistance
     def format_date_params(model_params)
       model_params["start_on"] = Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["start_on"].present?
       model_params["end_on"] = Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
-    end
-
-    def enable_bs4_layout
-      @bs4 = true
-    end
-
-    def resolve_layout
-      case action_name
-      when "index"
-        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
-      else
-        "financial_assistance"
-      end
     end
   end
 end
