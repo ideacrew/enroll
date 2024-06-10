@@ -24,7 +24,9 @@
 
           <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
         <fieldset class="mb-4 row-form-wrapper">
-          <legend class="weight-n <%= 'required' if no_ssn_dropdown %>"><%= applicant_prompt('why_no_ssn') %>"</legend>
+          <legend>
+            <label class="weight-n <%= 'required' if no_ssn_dropdown %>" for="no_ssn_reason"><%= applicant_prompt('why_no_ssn') %>"</label>
+          </legend>
           <div class="col px-0" data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
             <% if no_ssn_dropdown %>
               <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true) %>
@@ -55,8 +57,10 @@
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
+        <legend>
+          <label class="weight-n required" for="children_expected_count"><%= applicant_prompt('children_expected') %></label>
+        </legend>
         <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, id: 'children_expected_count', class: "col-4", prompt: true) %>
-        <legend class="weight-n required"><%= applicant_prompt('children_expected') %></legend>
       </fieldset>
 
       <fieldset class="mb-4 row-form-wrapper">
@@ -87,12 +91,16 @@
         </fieldset>
 
         <fieldset class="mb-4 row-form-wrapper">
-          <legend class="weight-n"><%= applicant_prompt("foster_care_state") %></legend>
+          <legend>
+            <label class="weight-n" for="foster_care_us_state"><%= applicant_prompt("foster_care_state") %></label>
+          </legend>
           <%= f.select :foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "NONE"}, id: 'foster_care_us_state', class: "col-4", prompt: true %>
         </fieldset>
 
         <fieldset class="mb-4 row-form-wrapper">
-          <legend class="weight-n"><%= applicant_prompt("foster_care_age_left") %></legend>
+          <legend>
+            <label class="weight-n" for="age_left_foster_care"><%= applicant_prompt("foster_care_age_left") %></label>
+          </legend>
           <%= f.select :age_left_foster_care, options_for_select([*1..applicant_age(@applicant)], selected: @applicant.age_left_foster_care), {:include_blank => "NONE"}, id: 'age_left_foster_care', class: "col-4", prompt: true %>
         </fieldset>
 
@@ -111,7 +119,9 @@
 
           <% if FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions) %>
             <fieldset class="mb-4 row-form-wrapper">
-              <legend class="weight-n"><%= l10n("faa.other_ques.student_type") %></legend>
+              <legend>
+                <label class="weight-n" for="student_kind"><%= l10n("faa.other_ques.student_type") %></label>
+              </legend>
               <%= f.select :student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, id: 'student_kind', class: "col-4", prompt: true %>
             </fieldset>
 
@@ -123,7 +133,9 @@
             </fieldset>
 
             <fieldset class="mb-4 row-form-wrapper">
-              <legend class="weight-n"><%= l10n("faa.other_ques.student_school_type") %></legend>
+              <legend>
+                <label clas="weight-n" for="student_school_kind"><%= l10n("faa.other_ques.student_school_type") %></label>
+              </legend>
               <%= f.select :student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, id: 'student_school_kind', class: "col-4", prompt: true %>
             </fieldset>
           <% end %>
