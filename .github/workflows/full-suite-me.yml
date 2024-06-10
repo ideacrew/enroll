@@ -566,7 +566,10 @@ jobs:
       - name: Run tests
         env:
           COVERAGE: 'true'
-        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+        run: |
+          bundle exec rake configuration:client_configuration_toggler
+          bundle exec rake 'seed:translations[db/seedfiles/english_translations_seed.rb]'
+          cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
