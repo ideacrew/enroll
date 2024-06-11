@@ -225,7 +225,7 @@
     <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
         <div class="col-md-6 labelforcoverage">
-          <span class="fa-text-color"><%=l10n("faa.has_dependent_with_coverage")%></span>
+          <span class="fa-text-color"><%=l10n("faa.has_dependent_with_coverage")%>*</span>
         </div>
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
@@ -245,7 +245,7 @@
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-job-end-on'>
         <div class="col-md-10 labelforcoverage">
-          <span class="fa-text-color"><%=l10n("faa.dependent_job_end_on")%></span>
+          <span class="fa-text-color"><%=l10n("faa.dependent_job_end_on")%>*</span>
           <%= text_field_tag("dependent_job_end_on", @applicant.dependent_job_end_on, class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;') %>
         </div>
       </div>

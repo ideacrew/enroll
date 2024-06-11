@@ -507,16 +507,16 @@ module FinancialAssistance
 
     def generate_income_hash(applicant)
       income_hash = {
-        strip_tags(l10n('faa.incomes.from_employer', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_job_income),
+        strip_tags(l10n('faa.incomes.from_employer', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + '*') => human_boolean(applicant.has_job_income),
         "jobs" => generate_employment_hash(applicant.incomes.jobs),
-        strip_tags(l10n('faa.incomes.from_self_employment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_self_employment_income)
+        strip_tags(l10n('faa.incomes.from_self_employment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + '*') => human_boolean(applicant.has_self_employment_income)
       }
       if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
         income_hash.merge!(strip_tags(l10n('faa.other_incomes.unemployment',
-                                           assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_unemployment_income))
+                                           assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + 's') => human_boolean(applicant.has_unemployment_income))
       end
       income_hash.merge!(strip_tags(l10n('faa.other_incomes.other_sources',
-                                         assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) => human_boolean(applicant.has_other_income))
+                                         assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + 's') => human_boolean(applicant.has_other_income))
       income_hash
     end
 

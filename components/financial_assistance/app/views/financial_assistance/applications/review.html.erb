@@ -252,13 +252,13 @@
 
             <% if applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.has_dependent_with_coverage") %>
+                <div class="col-md-6"><%= l10n("faa.has_dependent_with_coverage") %>*
                 </div>
                 <div class="col-md-6"><%= human_boolean applicant.has_dependent_with_coverage %></div>
               </div>
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.dependent_job_end_on") %>
+                <div class="col-md-6"><%= l10n("faa.dependent_job_end_on") %>*
                 </div>
                 <div class="col-md-6"><%= applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : 'N/A'%></div>
               </div>
