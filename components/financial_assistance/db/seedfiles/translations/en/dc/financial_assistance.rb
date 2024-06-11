@@ -208,6 +208,16 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.application_for_coverage" => "Application for Coverage",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
+  # Review and Submit Page
+  "en.faa.review.review_and_submit" => "Review Your Application",
+  "en.faa.review.almost_done" => "You're almost done! Review the application summary below and make sure it's correct. Select the “Edit“ button to go back to any section and make changes. When you’re finished, select “%{continue_text}”.",
+  "en.faa.review.income_and_adjustments" => "Income and Adjustments",
+  "en.faa.review.information_entered" => "The following is information you entered for everyone in this application:",
+  "en.faa.review.income_table.types" => "Types",
+  "en.faa.review.income_table.frequency" => "Frequency",
+  "en.faa.review.income_table.amount" => "Amount",
+  "en.faa.review.income_table.dates" => "Dates",
+  "en.faa.review.income_table.annual_income" => "%{applicant_name}'s estimated annual income for %{assistance_year}",
   # Mec check
   "en.faa.mc_success_existing" => "It looks like you already have Medicaid coverage.",
   "en.faa.mc_success_enroll" => "If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to %{medicaid_agency_url} or contact District Direct at %{medicaid_agency_phone} / TTD: %{medicaid_agency_phone_ttd}.",

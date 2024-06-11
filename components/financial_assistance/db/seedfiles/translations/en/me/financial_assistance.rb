@@ -247,6 +247,16 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.all_required_info" => "All required information must entered for each member of your household.",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
+  # Review and Submit Page
+  "en.faa.review.review_and_submit" => "Review Your Application",
+  "en.faa.review.almost_done" => "You're almost done! Review the application summary below and make sure it's correct. Select the “Edit“ button to go back to any section and make changes. When you’re finished, select “%{continue_text}”.",
+  "en.faa.review.income_and_adjustments" => "Income and Adjustments",
+  "en.faa.review.information_entered" => "The following is information you entered for everyone in this application:",
+  "en.faa.review.income_table.types" => "Types",
+  "en.faa.review.income_table.frequency" => "Frequency",
+  "en.faa.review.income_table.amount" => "Amount",
+  "en.faa.review.income_table.dates" => "Dates",
+  "en.faa.review.income_table.annual_income" => "%{applicant_name}'s estimated annual income for %{assistance_year}",
   # Mec check
   "en.faa.mc_success_existing" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at %{medicaid_agency_phone} to make these changes before completing a CoverME.gov application.",
   "en.faa.mc_success_enroll" => "",

@@ -11,7 +11,7 @@ table {
 
 td {
   border: none;
-  border-bottom: 0.5px solid gray;
+  border-bottom: 1px solid var(--grey-030);
   font-size: 12px;
   line-height: 20px;
   font-weight: 400;
@@ -28,7 +28,7 @@ tbody tr:hover {
 
 thead th {
   border: none;
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid var(--grey-060);
   text-align: left;
   vertical-align: top;
   font-size: 16px;
