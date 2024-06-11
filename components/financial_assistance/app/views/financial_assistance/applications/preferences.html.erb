@@ -63,6 +63,7 @@
     </div>
 
     </div>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:voter_registration_through_hbx) %>
     <div class="row row-form-wrapper radio-align no-buffer row-height yml-row ">
 
     <div class="col-md-12">
@@ -71,5 +72,34 @@
     </div>
 
     </div>
+    <% else %>
+      <fieldset>
+        <legend class="weight-n">Would you like to register to vote in <state-abbreviation-placeholder> or update your current registration? * (A form will be mailed to you)</legend>
+        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+          <div class='col-md-6'>
+            <h5 class="fa-text-color"><%= l10n('faa.other_ques.ssn_apply') %></h5>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_requesting_voter_registration_application_in_mail", true, class: "radio-yml", id: "mailed_yes") %>
+            <label class="radio-yml" for="mailed_yes">I agree</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_requesting_voter_registration_application_in_mail", false, class: "radio-yml", id: "mailed_no") %>
+            <label class="radio-yml" for="mailed_no">I disagree</label>
+          </div>
+        </div>
+      </fieldset>
+      <b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to have requested a voter registration form at this time.<br><br>
+                    You may file a complaint if you believe that someone has interfered with: <br><br>
+                    * Your right to register or not register to vote <br>
+                    * Your right to privacy in deciding whether or not to register to vote <br>
+                    * Your right to choose your own political party or other political choice <br><br>
+
+                    <b>To file a complaint, contact:</b><br>
+                   <board_of_elections_entity-placeholder> <br>
+                   <board_of_elections_address-placeholder> <br>
+                   <board_of_elections_email-placeholder> <br>
+                   Phone: <board_of_elections_phone_number-placeholder>
+    <% end %>
     <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" %>
 <% end %>

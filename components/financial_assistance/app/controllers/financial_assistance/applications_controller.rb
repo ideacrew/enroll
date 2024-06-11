@@ -3,7 +3,6 @@
 module FinancialAssistance
   # IAP application controller
   class ApplicationsController < FinancialAssistance::ApplicationController
-
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
@@ -139,64 +138,17 @@ module FinancialAssistance
       end
     end
 
-    # rubocop:disable Metrics/AbcSize
     def step
       raise ActionController::UnknownFormat unless request.format.html?
 
       authorize @application, :step?
-      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
-      set_admin_bookmark_url
-      flash[:error] = nil
-      model_name = @model.class.to_s.split('::').last.downcase
-      model_params = params[model_name]
-      @model.clean_conditional_params(model_params) if model_params.present?
-      @model.assign_attributes(permit_params(model_params)) if model_params.present?
-      @model.attributes = @model.attributes.except(:_id) unless @model.persisted?
 
-      # rubocop:disable Metrics/BlockNesting
-      if params.key?(model_name)
-        if @model.save
-          @current_step = @current_step.next_step if @current_step.next_step.present?
-          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-          if params[:commit] == "Submit Application"
-            if @application.imported?
-              redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
-              return
-            end
-            if @application.complete?
-              publish_result = determination_request_class.new.call(application_id: @application.id)
-              if publish_result.success?
-                redirect_to wait_for_eligibility_response_application_path(@application)
-              else
-                @application.unsubmit! if @application.may_unsubmit?
-                flash_message = case publish_result.failure
-                                when Dry::Validation::Result
-                                  { error: validation_errors_parser(publish_result.failure) }
-                                when Exception
-                                  { error: publish_result.failure.message }
-                                else
-                                  { error: "Submission Error: #{publish_result.failure}" }
-                                end
-                redirect_to application_publish_error_application_path(@application), flash: flash_message
-              end
-            else
-              redirect_to application_publish_error_application_path(@application), flash: { error: build_error_messages(@model) }
-            end
-          else
-            render 'workflow/step'
-          end
-        else
-          @model.assign_attributes(workflow: { current_step: @current_step.to_i })
-          @model.save!(validate: false)
-          flash[:error] = build_error_messages(@model).join(", ")
-          render 'workflow/step'
-        end
+      if params[:id] == 1
+        redirect_to preferences_application_path(@application)
       else
-        render 'workflow/step'
+        redirect_to submit_your_application_application_path(@application)
       end
-      # rubocop:enable Metrics/BlockNesting
     end
-    # rubocop:enable Metrics/AbcSize
 
     def copy
       authorize @application, :copy?
