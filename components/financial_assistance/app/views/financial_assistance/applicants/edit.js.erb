@@ -14,7 +14,6 @@
   $(".close_member_form.cancel_<%=@applicant.id%>_edit").removeClass('hidden');
 
   $("body").on("click", ".close_member_form.cancel_<%=@applicant.id%>_edit", function () {
-    console.log("cancel clicked");
     $("#edit_applicant_<%= @applicant.id %>_form_section").html('');
     $("#edit_applicant_<%= @applicant.id %>").html('');
 
