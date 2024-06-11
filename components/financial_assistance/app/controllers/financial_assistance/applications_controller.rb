@@ -80,7 +80,7 @@ module FinancialAssistance
         @application.assign_attributes(permit_params(params[:application]))
 
         if @application.save
-          redirect_to review_and_submit_application_path(@application)
+          redirect_to submit_your_application_application_path(@application)
         else
           @application.save!(validate: false)
           flash[:error] = build_error_messages(@application).join(", ")
