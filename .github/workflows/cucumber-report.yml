@@ -32,6 +32,10 @@ jobs:
             'permissions',
             'plan_shopping',
             'registration',
+            'financial_assistance/contrast_level_aa',
+            'insured/contrast_level_aa',
+            'registration/contrast_level_aa',
+            'footer/contrast_level_aa'
           ]
     runs-on: ubuntu-latest
     services:

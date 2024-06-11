@@ -4,8 +4,9 @@ module FinancialAssistance
   class RelationshipsController < FinancialAssistance::ApplicationController
     before_action :find_application
     before_action :set_cache_headers, only: [:index]
+    before_action :enable_bs4_layout, only: [:index]
 
-    layout 'financial_assistance_nav'
+    layout 'financial_assistance_progress'
 
     def index
       authorize @application, :index?
@@ -37,6 +38,10 @@ module FinancialAssistance
         format.html { redirect_to application_relationships_path, notice: 'Relationship was successfully updated.' }
         format.js
       end
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
   end
 end
