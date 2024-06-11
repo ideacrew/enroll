@@ -13,6 +13,7 @@ Feature: Help Paying for Coverage
   Scenario: FAA Feature Is Disabled - Consumer will redirect to Family members page
     Given the FAA feature configuration is disabled
     And the user answers all the VERIFY IDENTITY  questions
+    And the person named Patrick Doe is RIDP verified
     When the user clicks on submit button
     And the Experian returns a VERIFIED response
     Then the consumer will navigate to the Family Members page
@@ -25,6 +26,7 @@ Feature: Help Paying for Coverage
   Scenario: FAA Feature Is Enabled - Consumer will redirect to Help Paying for Coverage page
     Given the FAA feature configuration is enabled
     And the user answers all the VERIFY IDENTITY  questions
+    And the person named Patrick Doe is RIDP verified
     When the user clicks on submit button
     And the Experian returns a VERIFIED response
     Then the consumer will navigate to the Help Paying for Coverage page

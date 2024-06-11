@@ -19,12 +19,12 @@ And(/the primary member has filled mandatory information required$/) do
   visit privacy_insured_consumer_role_index_path
   expect(page).to have_content("Your Information")
   expect(page).to have_content("CONTINUE")
-  click_link "CONTINUE"
-  fill_in "person_first_name", with: personal_information[:first_name]
-  fill_in "person_last_name", with: personal_information[:last_name]
-  fill_in "jq_datepicker_ignore_person_dob", with: personal_information[:dob].to_s
-  fill_in "person_ssn", with: personal_information[:ssn]
-  find(:xpath, '//label[@for="radio_male"]').click
+  find(YourInformation.continue_btn).click
+  fill_in IvlPersonalInformation.first_name , with: "Patrick"
+  fill_in IvlPersonalInformation.last_name, with: "Doe"
+  fill_in IvlPersonalInformation.dob, with: personal_information[:dob].to_s
+  fill_in IvlPersonalInformation.ssn, with: personal_information[:ssn]
+  find(IvlPersonalInformation.male_radiobtn).click
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   find('.btn', text: 'CONTINUE').click
   expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
@@ -65,7 +65,7 @@ When(/^the user clicks on submit button$/) do
 end
 
 When(/^the Experian returns a VERIFIED response$/) do
-  click_link "Continue Application"
+  find_all('.interaction-click-control-continue').first.click
 end
 
 Then(/^the user will navigate to the Help Paying for Coverage page$/) do
