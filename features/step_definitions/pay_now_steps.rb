@@ -125,7 +125,7 @@ end
 
 When(/^the person enrolls in a Kaiser plan$/) do
   # screenshot("line 161")
-  find(IvlIapFamilyInformation.continue_btn).click
+  find_all('.interaction-click-control-continue').first.click
   find(IvlSpecialEnrollmentPeriod.married_link).click
   expect(page).to have_content "Married"
   # screenshot("past_qle_date")
@@ -237,7 +237,7 @@ And(/^creates a consumer with SEP$/) do
   find(IvlPersonalInformation.male_radiobtn, wait: 5).click
   find(IvlPersonalInformation.continue_btn).click
   expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{site_short_name}. Select CONTINUE.")
-  find(IvlPersonalInformation.continue_btn, wait: 5).click
+  find(IvlPersonalInformation.continue_btn_2, wait: 5).click
   find(IvlPersonalInformation.application_type_dropdown, wait: 5).click
   find("li", :text => "Paper").click
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn, wait: 5).click

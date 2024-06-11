@@ -5,6 +5,7 @@ Feature: Help Paying for Coverage
   consumer shall not be able see or access Help Paying for Coverage page.
 
   Background:
+    Given bs4_consumer_flow feature is disable
     Given the user is applying for a CONSUMER role
     And the primary member has filled mandatory information required
     And the primary member authorizes system to call EXPERIAN
