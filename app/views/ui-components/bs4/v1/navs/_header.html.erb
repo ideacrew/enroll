@@ -63,17 +63,17 @@
           <% end %>
           <li class="nav-item mb-2"><%= h(link_to l10n('layout.header.home'), "#", target: '_blank', rel: "noopener noreferrer") %></li>
           <li class="nav-item my-2"><%= h(link_to l10n('layout.header.help'), EnrollRegistry[:enroll_app].setting(:help_url).item, target: '_blank', rel: "noopener noreferrer") %></li>
-        </ul>
-        <div class="my-4 mobile-buttons">
-          <a href="tel:<%= contact_center_short_number %>" class="button outline my-4 w-100 d-block text-center">
-            <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
-          </a>
-          <% if signed_in? %>
-            <a href="<%= main_app.destroy_user_session_path %>" class="button-error outline my-4 w-100 d-block text-center">
-              <%= l10n("logout") %>
-            </a>
           <% end %>
-        </div>
+      </ul>
+      <div class="my-4 mobile-buttons">
+        <a href="tel:<%= contact_center_short_number %>" class="button outline my-4 w-100 d-block text-center">
+          <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
+        </a>
+        <% if signed_in? %>
+          <a href="<%= main_app.destroy_user_session_path %>" class="button-error outline my-4 w-100 d-block text-center">
+            <%= l10n("logout") %>
+          </a>
+        <% end %>
       </div>
       <!-- these links are for the desktop view !-->
       <div class="desktop-nav align-items-center">
