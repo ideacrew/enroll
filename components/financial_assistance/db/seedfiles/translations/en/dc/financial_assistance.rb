@@ -224,7 +224,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.mc_success_link" => "districtdirect.dc.gov",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a DC Health Link application.",
   "en.faa.mc_continue_bold" => "Still want to apply for lower monthly premiums or lost (or will soon lose) Medicaid coverage?",
-  "en.faa.mc_continue_application" => "Select CONTINUE to submit your application.",
+  "en.faa.mc_continue_application" => "Select %{continue_text} to submit your application.",
   # FAA display evidence type
   "en.faa.evidence_type_aces" => "Coverage from Medicaid and CHIP",
   "en.faa.evidence_type_esi" => "Coverage from a job",
