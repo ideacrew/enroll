@@ -256,6 +256,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.review.income.table.amount" => "Amount",
   "en.faa.review.income.table.dates" => "Dates",
   "en.faa.review.income.table.annual_income" => "%{applicant_name}'s estimated annual income for %{assistance_year}",
+  "en.faa.review.personal.incarcerated" => "Incarcerated",
+  "en.faa.review.personal.needs_coverage" => "Needs Coverage?",
+  "en.faa.review.tax_info" => "Tax Information",
+  "en.faa.review.income_adjustments" => "Income Adjustments",
+  "en.faa.review.other_questions" => "Other Questions",
   "en.faa.review.coverage.caretaker" => "Which member(s) of the household is this person the caretaker for?",
   # Mec check
   "en.faa.mc_success_existing" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at %{medicaid_agency_phone} to make these changes before completing a CoverME.gov application.",
