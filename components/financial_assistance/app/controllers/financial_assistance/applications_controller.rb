@@ -67,7 +67,7 @@ module FinancialAssistance
     end
 
     def preferences
-      authorize @application, :step?
+      authorize @application, :preferences?
 
       save_faa_bookmark(request.original_url)
       respond_to :html
@@ -76,7 +76,7 @@ module FinancialAssistance
     def save_preferences
       raise ActionController::UnknownFormat unless request.format.html?
 
-      authorize @application, :step?
+      authorize @application, :save_preferences?
       if params[:application].present?
         @application.assign_attributes(permit_params(params[:application]))
 
@@ -93,7 +93,7 @@ module FinancialAssistance
     end
 
     def submit_your_application
-      authorize @application, :step?
+      authorize @application, :submit_your_application?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       respond_to :html
@@ -102,7 +102,7 @@ module FinancialAssistance
     def submit
       raise ActionController::UnknownFormat unless request.format.html?
 
-      authorize @application, :step?
+      authorize @application, :submit?
 
       if params[:application].present?
         @application.assign_attributes(permit_params(params[:application]))
