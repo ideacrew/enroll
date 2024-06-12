@@ -221,6 +221,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.review.personal.needs_coverage" => "Needs Coverage?",
   "en.faa.review.tax_info" => "Tax Information",
   "en.faa.review.income_adjustments" => "Income Adjustments",
+  "en.faa.review.income.review_benefits_table.coverage_types" => "Coverage Type",
   "en.faa.review.other_questions" => "Other Questions",
   "en.faa.review.coverage.caretaker" => "Which member(s) of the household is this person the caretaker for?",
   # Mec check
