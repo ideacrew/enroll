@@ -390,7 +390,9 @@ module FinancialAssistance
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
       when "submit_your_application"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
-      when "application_year_selection", "application_checklist", "review_and_submit"
+      when "review_and_submit"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
+      when "application_year_selection", "application_checklist"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
       when "eligibility_results"
         if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
