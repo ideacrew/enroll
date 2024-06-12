@@ -17,12 +17,7 @@
             <td class="col-6"><b><%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></b></td>
             <td class="col-6"><%= start_to_end_dates(benefit) %></td>
             <% if display_esi_fields?(benefit.insurance_kind, kind) %>
-              <% review_benefits_esi_hash(benefit).each do |key, value| %>
-                <tr>
-                  <td><%= key %></td>
-                  <td><%= value %></td>
-                </tr>
-              <% end %>
+              <%= render partial: 'financial_assistance/applications/review_esi_benefit', locals: {benefit: benefit} %>
             <% end %>
           </tr>
         <% end %>
