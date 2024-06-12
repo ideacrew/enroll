@@ -86,7 +86,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.eligible_for_medicaid2" => "",
   "en.faa.dhs_decision" => "<span>NOTE: The Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>Medicaid</span>.</span>",
   "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling DC Health link at ",
-  "en.faa.primary_caretaker_for_text_review_page" => "Which member(s) of the household is this person the caretaker for?",
   "en.faa.premium_reductions_1" => "These people <strong>qualify for lower monthly premiums. The monthly premium reduction is %{reduction_amount} per month </strong>.",
   "en.faa.premium_reductions_2" => "per month.</span> This means they won't have to pay full price for health insurance.",
   "en.faa.qualify_for_lower_costs_1" => "They also qualify for lower out-of-pocket costs - a benefit that lowers other costs like the annual deductible and copayments. ",
@@ -210,6 +209,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.review.income_table.amount" => "Amount",
   "en.faa.review.income_table.dates" => "Dates",
   "en.faa.review.income_table.annual_income" => "%{applicant_name}'s estimated annual income for %{assistance_year}",
+  "en.faa.review.coverage.caretaker" => "Which member(s) of the household is this person the caretaker for?",
   # Mec check
   "en.faa.mc_success_existing" => "It looks like you already have Medicaid coverage.",
   "en.faa.mc_success_enroll" => "If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to %{medicaid_agency_url} or contact District Direct at %{medicaid_agency_phone} / TTD: %{medicaid_agency_phone_ttd}.",

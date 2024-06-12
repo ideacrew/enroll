@@ -115,7 +115,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.eligible_for_medicaid" => "These people <span>appear to be eligible</span> for ",
   "en.faa.eligible_for_medicaid2" => "MaineCare (Medicaid) or Cub Care (the Children's Health Insurance Program). Because of this, they do not qualify for a tax credit:",
   "en.faa.dhs_decision" => "<span>Next step: The Office for Family Independence will make a final decision on whether those listed qualify for <span class='run-glossary'>MaineCare and Cub Care</span>.</span>",
-  "en.faa.primary_caretaker_for_text_review_page" => "Which member(s) of the household is this person the caretaker for?",
   "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from OFI within 45 days, you may want to ask for an update by calling",
   "en.faa.qualified_reason" => "These people may qualify for MaineCare for reasons like age or disability.",
   "en.faa.next_step_with_non_magi" => "<b>NEXT STEP:</b> We are sending your application to the Department of Health and Human Services (DHHS). They will contact you to get more information to see if you qualify.",
@@ -257,6 +256,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.review.income_table.amount" => "Amount",
   "en.faa.review.income_table.dates" => "Dates",
   "en.faa.review.income_table.annual_income" => "%{applicant_name}'s estimated annual income for %{assistance_year}",
+  "en.faa.review.coverage.caretaker" => "Which member(s) of the household is this person the caretaker for?",
   # Mec check
   "en.faa.mc_success_existing" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at %{medicaid_agency_phone} to make these changes before completing a CoverME.gov application.",
   "en.faa.mc_success_enroll" => "",

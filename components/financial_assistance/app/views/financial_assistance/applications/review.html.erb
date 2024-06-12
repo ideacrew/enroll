@@ -297,7 +297,7 @@
             <% end %>
             <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.primary_caretaker_for_text_review_page") %></div>
+                <div class="col-md-6"><%= l10n("faa.review.coverage.caretaker") %></div>
                 <div class="col-md-6"><%= applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact %></div>
               </div>
             <% end %>
