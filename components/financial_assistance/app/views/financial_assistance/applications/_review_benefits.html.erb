@@ -1,29 +1,23 @@
 <% if @bs4 %>
-
-  <%# insurance_kinds = FinancialAssistance::Benefit.valid_insurance_kinds %>
-  <% insurance_kinds = ["cobra", "medicare_advantage"] %>
+  <% insurance_kinds = FinancialAssistance::Benefit.valid_insurance_kinds %>
   <% insurance_kinds.each do |insurance_kind| %>
-    <%# benefits = applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind) %>
-    <% benefits = ["medicare_advantage"] %>
+    <% benefits = applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind) %>
     <% if benefits.present? %>
       <table>
         <thead>
           <tr>
-            <!-- <th><%= l10n("faa.review.income.review_benefits_table.coverage_types") %></th> -->
-            <th> Coverage Types</th>
+            <th><%= l10n("faa.review.income.review_benefits_table.coverage_types") %></th>
             <th><%= l10n("faa.review.income.table.dates") %></th>
           </tr>
         </thead>
         <tbody>
         <% benefits.each do |benefit| %>
           <tr>
-            <%# term = benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
-            <% term = "faa.question.#{insurance_kind}" %>
+            <% term = benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
             <td class="col-6"><b><%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></b></td>
-            <!-- <td><%#= start_to_end_dates(benefit) %></td> -->
-            <td class="col-6"> 06/01/2022 - present </td>
+            <td class="col-6"><%= start_to_end_dates(benefit) %></td>
             <% if display_esi_fields?(benefit.insurance_kind, kind) %>
-              <% review_benefits_esi_fields(benefit).each do |key, value| %>
+              <% review_benefits_esi_hash(benefit).each do |key, value| %>
                 <tr>
                   <td><%= key %></td>
                   <td><%= value %></td>
@@ -36,7 +30,6 @@
       </table>
     <% end %>
   <% end %>
-
 <% else %>
   <% insurance_kinds = FinancialAssistance::Benefit.valid_insurance_kinds %>
   <% insurance_kinds.each do |insurance_kind| %>
