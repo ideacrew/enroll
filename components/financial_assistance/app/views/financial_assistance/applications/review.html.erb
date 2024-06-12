@@ -178,14 +178,14 @@
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6"><%= applicant_currently_enrolled.gsub(' *','')%></div>
+              <div class="col-md-6"><%= applicant_currently_enrolled %></div>
               <div class="col-md-6"><%= human_boolean applicant.has_enrolled_health_coverage %></div>
             </div>
             <div class="row ptb no-buffer row-height form-content">
               <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
             </div>
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6"><%= applicant_eligibly_enrolled.gsub(' *','')%>
+              <div class="col-md-6"><%= applicant_eligibly_enrolled %>
               </div>
               <div class="col-md-6"><%= human_boolean applicant.has_eligible_health_coverage %></div>
             </div>
@@ -220,19 +220,19 @@
 
             <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.medicaid_not_eligible") %>
+                  <div class="col-md-6"><%= l10n("faa.medicaid_not_eligible") %> *
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_eligible_medicaid_cubcare %></div>
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.medicaid_cubcare_end_date") %>
+                  <div class="col-md-6"><%= l10n("faa.medicaid_cubcare_end_date") %> *
                   </div>
                   <div class="col-md-6"><%= applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : 'N/A' %></div>
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.change_eligibility_status") %>
+                  <div class="col-md-6"><%= l10n("faa.change_eligibility_status") %> *
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_eligibility_changed %></div>
                 </div>
@@ -244,7 +244,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.person_medicaid_last_day") %></div>
+                  <div class="col-md-6"><%= l10n("faa.person_medicaid_last_day") %> *</div>
                   <div class="col-md-6"><%=  applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : 'N/A' %></div>
                 </div>
               </div>

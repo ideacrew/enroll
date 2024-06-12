@@ -42,7 +42,7 @@
         When was this person denied MaineCare (Medicaid) or CubCare (Children's Health Insurance Program)?*: <%=applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : 'N/A' %>
         Did this person have MaineCare (Medicaid) or CubCare (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?*: <%= applicant.has_eligibility_changed %>
         Has this person's household income or household size changed since they were told their coverage was ending?*: <%= applicant.has_household_income_changed %>
-        <%= l10n("faa.person_medicaid_last_day") %>: <%=applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : 'N/A' %>
+        <%= l10n("faa.person_medicaid_last_day") %> *: <%=applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : 'N/A' %>
         Was this person found not eligible for <%= FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item %> or CubCare (Children's Health Insurance Program) based on their immigration status since <%= @application.assistance_year - 5 %>?: <%= applicant.medicaid_chip_ineligible %>
         Has this person’s immigration status changed since they were not found eligible for <%= FinancialAssistanceRegistry[:medicaid_chip_driver_questions].setting(:medicaid_chip).item %> or CubCare (Children’s Health Insurance Program)?: <%= applicant.immigration_status_changed %>
         <% if applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
