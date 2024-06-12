@@ -10,7 +10,6 @@ module FinancialAssistance
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
     include ActionView::Helpers::SanitizeHelper
-    include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
     include FinancialAssistance::L10nHelper
     include ::FileUploadHelper
@@ -75,6 +74,8 @@ module FinancialAssistance
     end
 
     def save_preferences
+      raise ActionController::UnknownFormat unless request.format.html?
+
       authorize @application, :step?
       if params[:application].present?
         @application.assign_attributes(permit_params(params[:application]))
@@ -99,6 +100,8 @@ module FinancialAssistance
     end
 
     def submit
+      raise ActionController::UnknownFormat unless request.format.html?
+
       authorize @application, :step?
 
       if params[:application].present?
