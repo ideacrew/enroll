@@ -10,15 +10,15 @@
         <div class="d-flex align-items-center">
           <label for="us_citizen_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'us_citizen_true')" class="radio">
             <%= f.radio_button :us_citizen, true, class: "required", id: 'us_citizen_true' %>
-            <span class="yes_no_pair">Yes</span>
+            <span class="yes_no_pair"><%= l10n('yes') %></span>
           </label>
           <label for="us_citizen_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'us_citizen_false')" class="radio">
             <%= f.radio_button :us_citizen, false, class: "required", id: 'us_citizen_false' %>
-            <span class="yes_no_pair">No</span>
+            <span class="yes_no_pair"><%= l10n('no') %></span>
           </label>
         </div>
       </fieldset>
-      <a href="#us_citizen" data-toggle="modal" data-target="#us_citizen">Not sure?</a>
+      <a href="#us_citizen" data-toggle="modal" data-target="#us_citizen"><%= l10n('not_sure') %></a>
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "us_citizen"} %>
     </div>
 
@@ -28,15 +28,15 @@
         <div class="d-flex align-items-center">
           <label for="naturalized_citizen_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'naturalized_citizen_true')" class="radio">
             <%= f.radio_button :naturalized_citizen, true, class: "required", id: 'naturalized_citizen_true' %>
-            <span class="yes_no_pair">Yes</span>
+            <span class="yes_no_pair"><%= l10n('yes') %></span>
           </label>
           <label for="naturalized_citizen_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'naturalized_citizen_false')" class="radio">
             <%= f.radio_button :naturalized_citizen, false, class: "required", id: 'naturalized_citizen_false' %>
-            <span class="yes_no_pair">No</span>
+            <span class="yes_no_pair"><%= l10n('no') %></span>
           </label>
         </div>
       </fieldset>
-      <a href="#naturalized_citizen" data-toggle="modal" data-target="#naturalized_citizen">Not sure?</a>
+      <a href="#naturalized_citizen" data-toggle="modal" data-target="#naturalized_citizen"><%= l10n('not_sure') %></a>
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "naturalized_citizen"} %>
     </div>
 
@@ -74,16 +74,16 @@
           <div class="d-flex align-items-center">
             <label for="eligible_immigration_status_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'eligible_immigration_status_true')" class="radio">
               <%= f.radio_button :eligible_immigration_status, true, class: "required", id: 'eligible_immigration_status_true' %>
-              <span class="yes_no_pair">Yes</span>
+              <span class="yes_no_pair"><%= l10n('yes') %></span>
             </label>
             <label for="eligible_immigration_status_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'eligible_immigration_status_false')" class="radio">
               <%= f.radio_button :eligible_immigration_status, false, class: "required", id: 'naturalized_citizen_false' %>
-              <span class="yes_no_pair">No</span>
+              <span class="yes_no_pair"><%= l10n('no') %></span>
             </label>
           </div>
         </fieldset>
       <% end %>
-      <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status">Not sure?</a>
+      <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status"><%= l10n('not_sure') %></a>
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "eligible_immigration_status"} %>
     </div>
 
@@ -98,15 +98,15 @@
           <div class="d-flex align-items-center">
             <label for="is_incarcerated_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_incarcerated_true')" class="radio">
               <%= f.radio_button :is_incarcerated, true, class: "required", id: 'is_incarcerated_true' %>
-              <span class="yes_no_pair">Yes</span>
+              <span class="yes_no_pair"><%= l10n('yes') %></span>
             </label>
             <label for="is_incarcerated_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_incarcerated_false')" class="radio">
               <%= f.radio_button :is_incarcerated, false, class: "required", id: 'is_incarcerated_false' %>
-              <span class="yes_no_pair">No</span>
+              <span class="yes_no_pair"><%= l10n('no') %></span>
             </label>
           </div>
         </fieldset>
-        <a href="#is_incarcerated" data-toggle="modal" data-target="#is_incarcerated">Not sure?</a>
+        <a href="#is_incarcerated" data-toggle="modal" data-target="#is_incarcerated"><%= l10n('not_sure') %></a>
         <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_incarcerated"} %>
       </div>
       <%= render "shared/race_and_ethnicity_options", f: f %>
@@ -115,7 +115,7 @@
   <%= hidden_field_tag :form_for_consumer_role, f.object.is_a?(Person) %>
   <%= f.hidden_field :is_consumer_role, value: 'true' %>
 <% else %>
-<div id="consumer_fields" class="focus_effect">
+  <div id="consumer_fields" class="focus_effect">
   <% if FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) %>
     <%= render :partial => 'shared/optional_field_warning' %>
   <% end %>
@@ -128,7 +128,7 @@
         <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_us_citizen_true')" class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel" %>
           <%= f.label :us_citizen, :value => true do %>
-            <span class="yes_no_pair">Yes</span>
+            <span class="yes_no_pair"><%= l10n('yes') %></span>
           <% end %>
         </div>
       </div>
@@ -136,12 +136,12 @@
         <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_us_citizen_false')" class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :us_citizen, false, required: true, class: "required floatlabel" %>
           <%= f.label :us_citizen, :value => false do %>
-            <span class="yes_no_pair">No</span>
+            <span class="yes_no_pair"><%= l10n('no') %></span>
           <% end %>
         </div>
       </div>
       <div class="col-md-2 not-sure-margin left-seprator">
-        <a href="#us_citizen" data-toggle="modal" data-target="#us_citizen">Not sure?</a>
+        <a href="#us_citizen" data-toggle="modal" data-target="#us_citizen"><%= l10n('not_sure') %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "us_citizen"} %>
       </div>
     </div>
@@ -154,7 +154,7 @@
         <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_naturalized_citizen_true')" class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :naturalized_citizen, true, required: true, class: "required floatlabel" %>
           <%= f.label :naturalized_citizen, :value => true do %>
-            <span class="yes_no_pair">Yes</span>
+            <span class="yes_no_pair"><%= l10n('yes') %></span>
           <% end %>
         </div>
       </div>
@@ -162,12 +162,12 @@
         <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_naturalized_citizen_false')" class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :naturalized_citizen, false, required: true, class: "required floatlabel" %>
           <%= f.label :naturalized_citizen, :value => false do %>
-            <span class="yes_no_pair">No</span>
+            <span class="yes_no_pair"><%= l10n('no') %></span>
           <% end %>
         </div>
       </div>
       <div class="col-md-2 not-sure-margin left-seprator">
-        <a href="#naturalized_citizen" data-toggle="modal" data-target="#naturalized_citizen">Not sure?</a>
+        <a href="#naturalized_citizen" data-toggle="modal" data-target="#naturalized_citizen"><%= l10n('not_sure') %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "naturalized_citizen"} %>
       </div>
     </div>
@@ -192,7 +192,7 @@
           <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_eligible_immigration_status_true')" class="radio skinned-form-controls skinned-form-controls-mac">
             <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
             <%= f.label :eligible_immigration_status, :value => true do %>
-              <span class="yes_no_pair">Yes</span>
+              <span class="yes_no_pair"><%= l10n('yes') %></span>
             <% end %>
           </div>
         </div>
@@ -200,13 +200,13 @@
           <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_eligible_immigration_status_false')" class="radio skinned-form-controls skinned-form-controls-mac">
             <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
             <%= f.label :eligible_immigration_status, :value => false do %>
-              <span class="yes_no_pair">No</span>
+              <span class="yes_no_pair"><%= l10n('no') %></span>
             <% end %>
           </div>
         </div>
       <% end %>
       <div class="col-md-2 not-sure-margin left-seprator" >
-        <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status">Not sure?</a>
+        <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status"><%= l10n('not_sure') %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "eligible_immigration_status"} %>
       </div>
     </div>
@@ -222,17 +222,17 @@
       <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
         <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_incarcerated_yes')" class="radio">
           <%= f.radio_button :is_incarcerated, true, class: "required floatlabel", id: 'radio_incarcerated_yes', required: true %>
-          <label for="radio_incarcerated_yes"><span class="yes_no_pair">Yes</span></label>
+          <label for="radio_incarcerated_yes"><span class="yes_no_pair"><%= l10n('yes') %></span></label>
         </div>
       </div>
       <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
         <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_incarcerated_no')" class="radio">
           <%= f.radio_button :is_incarcerated, false, class: "required floatlabel", id: 'radio_incarcerated_no', required: true %>
-          <label for="radio_incarcerated_no"><span class="yes_no_pair">No</span></label>
+          <label for="radio_incarcerated_no"><span class="yes_no_pair"><%= l10n('no') %></span></label>
         </div>
       </div>
       <div class="col-md-2 not-sure-margin left-seprator">
-        <a href="#is_incarcerated" data-toggle="modal" data-target="#is_incarcerated">Not sure?</a>
+        <a href="#is_incarcerated" data-toggle="modal" data-target="#is_incarcerated"><%= l10n('not_sure') %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_incarcerated"} %>
       </div>
     </div>
