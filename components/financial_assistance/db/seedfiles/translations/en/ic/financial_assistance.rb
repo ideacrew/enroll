@@ -220,6 +220,12 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.review.income.review_benefits_table.esi.employee_minimum" => "How much would the employee only pay for the lowest cost minimum value standard plan?",
   "en.faa.review.other_questions" => "Other Questions",
   "en.faa.review.coverage.caretaker" => "Which member(s) of the household is this person the caretaker for?",
+  "en.faa.review.your_household" => "Your Household",
+  "en.faa.review.your_household.relationship" => "{related_name} is {relationship} of",
+  "en.faa.review.preferences" => "Preferences",
+  "en.faa.review.preferences.eligibility_renewal" => "How long would you like your eligibility for help paying for coverage to be renewed?",
+  "en.faa.review.more_about_your_household" => "More About Your Household",
+  "en.faa.review.more_about_your_household.parent_living_outside" => "Does any child on this application have a parent living outside of the home?",
   # Mec check
   "en.faa.mc_success_existing" => "It looks like you already have Medicaid coverage.",
   "en.faa.mc_success_enroll" => "If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to %{medicaid_agency_url} or contact District Direct at %{medicaid_agency_phone} / TTD: %{medicaid_agency_phone_ttd}.",
