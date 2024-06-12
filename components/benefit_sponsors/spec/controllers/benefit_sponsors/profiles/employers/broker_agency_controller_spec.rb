@@ -263,7 +263,7 @@ module BenefitSponsors
           broker_agency_profile1.update_attributes!(default_general_agency_profile: general_agency.profiles.first)
           allow_any_instance_of(HbxStaffRole).to receive(:permission).and_return(double(modify_employer: true))
           sign_in(user_with_hbx_staff_role)
-          @request.env['HTTP_REFERER'] = "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id.to_s}?tab=brokers"
+          @request.env['HTTP_REFERER'] = "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id}?tab=brokers"
           post :create, params: {employer_profile_id: employer_profile.id, broker_role_id: broker_role1.id, broker_agency_id: broker_agency_profile1.id}
         end
 
