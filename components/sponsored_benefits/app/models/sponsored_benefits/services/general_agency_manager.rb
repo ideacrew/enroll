@@ -35,7 +35,8 @@ module SponsoredBenefits
         return true if broker_agency_profile.default_general_agency_profile_id.blank?
         broker_role_id = broker_agency_profile.primary_broker_role.id
         ids.each do |id|
-          create_general_agency_account(id, broker_role_id, start_on, broker_agency_profile.default_general_agency_profile_id, broker_agency_profile.id) if plan_design_organization(id).active_general_agency_account.present?
+          next if plan_design_organization(id).active_general_agency_account.present?
+          create_general_agency_account(id, broker_role_id, start_on, broker_agency_profile.default_general_agency_profile_id, broker_agency_profile.id)
         end
       end
 
