@@ -513,10 +513,10 @@ module FinancialAssistance
       }
       if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
         income_hash.merge!(strip_tags(l10n('faa.other_incomes.unemployment',
-                                           assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + 's') => human_boolean(applicant.has_unemployment_income))
+                                           assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + '*') => human_boolean(applicant.has_unemployment_income))
       end
       income_hash.merge!(strip_tags(l10n('faa.other_incomes.other_sources',
-                                         assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + 's') => human_boolean(applicant.has_other_income))
+                                         assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + '*') => human_boolean(applicant.has_other_income))
       income_hash
     end
 
