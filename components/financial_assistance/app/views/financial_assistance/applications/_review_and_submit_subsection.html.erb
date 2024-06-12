@@ -1,0 +1,32 @@
+<% unless subsection.nil? || subsection.empty? %>
+  <div class="mb-5">
+    <%# Subsection title %>
+    <div class="d-flex justify-content-between">
+      <div class="align-self-end">
+        <h3 class="mb-0"><%= subsection[:title] %>
+      </div>
+      <% if subsection[:edit_link].present? %>
+        <div class="mb-2">
+          <%= h(link_to(subsection[:edit_link], class: "btn-secondary") do %>
+            <i class="fas fa-pencil-alt ml-0 mr-2"></i>
+            <span><%= l10n("edit") %></span>
+          <% end) %>
+        </div>
+      <% end %>
+    </div>
+    <hr class="my-1">
+    <%# Summary rows %>
+    <% subsection[:rows].each do |(key_string, value)| %>
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="col-8 px-0">
+          <label class=<%= "required" if value.is_a?(Hash) && value[:is_required].present? ? value[:is_required] : false %>><%= key_string %></label>
+        </div>
+        <label class="weight-n"><%= value.is_a?(Hash) && value[:value].present? ? value[:value] : value %></label>
+      </div>
+      <%# Review Benefits partial for Health Coverage subsection %>
+      <% if value.is_a?(Hash) && value[:review_benefits_partial].present? %>
+        <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: value[:review_benefits_partial], applicant: applicant} %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
