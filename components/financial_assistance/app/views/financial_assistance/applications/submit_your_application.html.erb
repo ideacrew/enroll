@@ -1,5 +1,5 @@
 <%= form_for @application, url: {action: "submit"}, method: :put do |f| %>
-  <h1></h1>
+  <h1 class="fa-darkblue">Submit Your Application</h1>
   <p></p>
   <div class="col-md-12">
         <input type="checkbox" name="application[medicaid_terms]" id="application_medicaid_terms" value="yes" class="put-class-name-here interaction-choice-control-value-application-medicaid-terms" required="required">
@@ -53,7 +53,7 @@
 
     <div class="col-md-12">
         <input type="checkbox" name="application[attestation_terms]" id="application_attestation_terms" value="yes" class="put-class-name-here interaction-choice-control-value-application-attestation-terms">
-<label class="put-class-name-here">I agree *</label>
+        <label class="put-class-name-here">I agree *</label>
 
     </div>
 
