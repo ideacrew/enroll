@@ -345,7 +345,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
-  context "POST step" do
+  context "POST save_preferences" do
     before do
       allow(controller).to receive(:haven_determination_is_enabled?).and_return(true)
       setup_faa_data
@@ -355,8 +355,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       controller.instance_variable_set(:@model, application.reload)
     end
 
-    it "showing errors when @model does not save" do
-      # to give errors
+    it "shows errors when @application does not save" do
       allow(application).to receive_message_chain('errors.full_messages').and_return(
         ["Hbx id can't be blank", "fake errors can't be blank"]
       )
@@ -364,23 +363,39 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       allow(application).to receive(:save).and_return(false)
       allow(application).to receive(:save!).with(validate: false).and_return(false)
       allow(application).to receive(:valid?).and_return(false)
-      post :step, params: {application: application.attributes, id: application.id }
+      post :save_preferences, params: {application: application.attributes, id: application.id }
       expect(flash[:error]).to eq("Hbx id can't be blank, fake errors can't be blank")
     end
 
-    it "showing errors when @model does not save and errors blank" do
+    it "shows errors when @model does not save and errors blank" do
       # to give errors
       allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
       allow(application).to receive(:save).and_return(false)
       allow(application).to receive(:save!).with(validate: false).and_return(false)
       allow(application).to receive(:valid?).and_return(false)
-      post :step, params: {application: application.attributes, id: application.id }
+      post :save_preferences, params: {application: application.attributes, id: application.id }
       expect(flash[:error]).to eq("")
     end
 
-    it "should render step if no key present in params with modal_name" do
-      post :step, params: { id: application.id }
-      expect(response).to render_template 'workflow/step'
+    it "should render preferences if model is not saved" do
+      post :save_preferences, params: { id: application.id }
+      expect(response).to render_template 'preferences'
+    end
+
+    it "should redirect to the submit your application page if successful" do
+      post :save_preferences, params: { id: application.id, application: application_valid_params }
+      expect(response).to redirect_to(submit_your_application_application_path(application))
+    end
+  end
+
+  context "POST submit" do
+    before do
+      allow(controller).to receive(:haven_determination_is_enabled?).and_return(true)
+      setup_faa_data
+      allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
+      allow(obj).to receive(:build_event).and_return(event)
+      allow(event.success).to receive(:publish).and_return(true)
+      controller.instance_variable_set(:@model, application.reload)
     end
 
     context "submit step with a valid but incomplete application" do
@@ -391,11 +406,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
         allow(controller).to receive(:build_error_messages)
 
-        post :step, params: { id: application.id, commit: 'Submit Application', application: application_valid_params }
-      end
-
-      it 'build errors for the model' do
-        expect(controller).to have_received(:build_error_messages).with(application)
+        post :submit, params: { id: application.id, application: application_valid_params }
       end
 
       it "should render error page when there is an incomplete or already submitted application" do
@@ -403,7 +414,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
 
-    context "submit step with a publish_result failure" do
+    context "submit with a publish_result failure" do
       # receive_message_chain(:new, :call).and_return(success_result)
       let(:operation) { double new: double(call: double(failure: failure, success?: false)) }
 
@@ -416,7 +427,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
         allow(controller).to receive(:determination_request_class).and_return(operation)
 
-        post :step, params: { id: application.id, commit: 'Submit Application', application: application_valid_params }
+        post :submit, params: { id: application.id, application: application_valid_params }
       end
 
       context "containing a failed Dry::Validation::Result" do
@@ -454,7 +465,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         end
       end
     end
-
     context "when params has application key" do
       let(:success_result) { double(success?: true)}
 
@@ -498,26 +508,26 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it "When model is saved" do
-        post :step, params: { id: application.id, application: application_valid_params }
+        post :submit, params: { id: application.id, application: application_valid_params }
         expect(application.save).to eq true
       end
 
       context "when the request type is invalid" do
-        it "should not render the raw_application template" do
-          post :step, params: { id: application.id, application: application_valid_params }, format: :csv
+        it "should be an error when csv" do
+          post :submit, params: { id: application.id, application: application_valid_params }, format: :csv
           expect(response.status).to eq 406
           expect(response.body).to eq "Unsupported format"
           expect(response.media_type).to eq "text/csv"
         end
 
-        it "should not render the raw_application template" do
-          post :step, params: { id: application.id, application: application_valid_params }, format: :js
+        it "should be an error when js" do
+          post :submit, params: { id: application.id, application: application_valid_params }, format: :js
           expect(response.status).to eq 406
           expect(response.body).to eq "Unsupported format"
         end
 
-        it "should not render the raw_application template" do
-          post :step, params: { id: application.id, application: application_valid_params }, format: :xml
+        it "should be an error when xml" do
+          post :submit, params: { id: application.id, application: application_valid_params }, format: :xml
           expect(response.status).to eq 406
           expect(response.body).to eq "<error>Unsupported format</error>"
         end
@@ -525,7 +535,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
       it "should fail during publish application and redirects to error_page" do
         application2.ensure_relationship_with_primary(application2.applicants[1], 'spouse')
-        post :step, params: { id: application2.id, commit: "Submit Application", application: application_valid_params }
+        post :submit, params: { id: application2.id, application: application_valid_params }
         expect(flash[:error]).to match(/Submission Error: /)
         expect(response).to redirect_to(application_publish_error_application_path(application2))
       end
@@ -538,14 +548,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         allow(application).to receive(:submit!).and_return(true)
         allow(FinancialAssistance::Operations::Application::RequestDetermination).to receive_message_chain(:new, :call).and_return(success_result)
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
-        post :step, params: { id: application.id, commit: "Submit Application", application: application_valid_params }
+        post :submit, params: { id: application.id, application: application_valid_params }
         expect(response).to redirect_to(wait_for_eligibility_response_application_path(application))
       end
     end
 
-    it "should render step if model is not saved" do
-      post :step, params: { id: application.id }
-      expect(response).to render_template 'workflow/step'
+    it "should re if model is not saved" do
+      post :submit, params: { id: application.id }
+      expect(response).to render_template 'financial_assistance/applications/submit_your_application'
     end
   end
 
