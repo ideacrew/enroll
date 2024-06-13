@@ -69,7 +69,7 @@ module Operations
 
             message = "DMF Determination not sent: no family members are eligible"
             # 'false' as third param prevent updating verification histories -> have already been updated
-            handle_dmf_failure(message, :build_cv3_family, false)
+            handle_dmf_failure(message, :build_cv3_family, update_histories: false)
           end
 
           def member_eligible?(family_member)
@@ -107,7 +107,7 @@ module Operations
             }
           end
 
-          def handle_dmf_failure(message, state, update_histories = true)
+          def handle_dmf_failure(message, state, update_histories: true)
             update_verification_type_histories(message) if update_histories
 
             add_errors(state, message, transmittable_error_params)
