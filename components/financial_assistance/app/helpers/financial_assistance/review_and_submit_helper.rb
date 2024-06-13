@@ -1,124 +1,126 @@
 module FinancialAssistance
-  module RowKeyTranslator
-    def translate_row_keys(hash, map_key)
-      hash.transform_keys { |row_key| 
-        map_value = send(map_key)[row_key]
-        translation_args = map_value.is_a?(Hash) ? map_value[:translation_key] : map_value
-        translation_mapper = map_value.is_a?(Hash) ? map_value[:translation_mapper] : :l10n
-        method(translation_mapper).call(*translation_args)
-      }
-    end
-
-    private
-
-    def personal_info_keys
-      {
-        age: 'age',
-        gender: 'gender',
-        relationship: 'relationship',
-        status: 'status',
-        incarcerated: 'faa.review.personal.incarcerated',
-        needs_coverage: 'faa.review.personal.needs_coverage'
-      }
-    end
-
-    def tax_info_keys
-      {
-        file_in_year: ['faa.tax.file_in_year', assistance_year: @application.assistance_year],
-        filing_jointly: 'faa.tax.filing_jointly',
-        dependent: ['faa.tax.dependent', assistance_year: @application.assistance_year],
-        dependent_by: 'faa.tax.dependent_by'
-      }
-    end
-
-    def income_info_keys
-      {
-        from_employer: ['faa.incomes.from_employer', assistance_year: assistance_year],
-        employer_name: 'employer_name',
-        employer_address_line_1: 'employer_address_line_1',
-        employer_address_line_2: 'employer_address_line_2',
-        city: 'city',
-        state: 'state',
-        zip: 'zip',
-        employer_phone: 'employer_phone',
-        from_self_employment: ['faa.incomes.from_self_employment', assistance_year: assistance_year],
-        unemployment: ['faa.other_incomes.unemployment', assistance_year: assistance_year],
-        alaska_native: 'faa.other_incomes.alaska_native',
-        other_sources: ['faa.other_incomes.other_sources', assistance_year: assistance_year],
-      }
-    end
-
-    def coverage_info_keys
-      {
-        is_enrolled: applicant_currently_enrolled_short_key,
-        is_eligible: applicant_eligibly_enrolled_short_key,
-        indian_health_service_eligible: 'faa.indian_health_service_eligible',
-        indian_health_service: 'faa.indian_health_service',
-        medicaid_not_eligible: 'faa.medicaid_not_eligible',
-        medicaid_cubcare_end_date: 'faa.medicaid_cubcare_end_date',
-        change_eligibility_status: 'faa.change_eligibility_status',
-        household_income_changed: 'faa.household_income_changed',
-        person_medicaid_last_day: 'faa.person_medicaid_last_day',
-        medicaid_chip_ineligible: ['faa.medicaid_chip_ineligible', year: TimeKeeper.date_of_record.year - 5],
-        immigration_status_changed: 'faa.immigration_status_changed',
-        has_dependent_with_coverage: 'faa.has_dependent_with_coverage',
-        dependent_job_end_on: 'faa.dependent_job_end_on'
-      }
-    end
-
-    def other_questions_keys
-      def other_questions_prompt_translation(key)
-        {translation_key: key, :translation_mapper => :other_questions_prompt}
-      end
-
-      {
-        ssn_apply: other_questions_prompt_translation('ssn_apply'),
-        ssn_reason: 'faa.other_ques.ssn_reason',
-        is_pregnant: other_questions_prompt_translation('is_pregnant'),
-        pregnancy_due_date: 'faa.other_ques.pregnancy_due_date',
-        children_expected: other_questions_prompt_translation('children_expected'),
-        pregnant_last_year: other_questions_prompt_translation(FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? 'pregnant_last_year' : 'pregnant_last_60d'),
-        pregnancy_end_date: 'faa.other_ques.pregnancy_end_date',
-        is_enrolled_on_medicaid: other_questions_prompt_translation('is_enrolled_on_medicaid'),
-        foster_care_at18: other_questions_prompt_translation('foster_care_at18'),
-        foster_care_state: other_questions_prompt_translation('foster_care_state'),
-        foster_care_age_left: other_questions_prompt_translation('foster_care_age_left'),
-        foster_care_medicaid: other_questions_prompt_translation('foster_care_medicaid'),
-        is_student: other_questions_prompt_translation('is_student'),
-        student_type: 'faa.other_ques.student_type',
-        student_status_end: 'faa.other_ques.student_status_end',
-        student_school_type: 'faa.other_ques.student_school_type',
-        is_blind: other_questions_prompt_translation('is_blind'),
-        primary_caretaker_question_text: other_questions_prompt_translation('faa.primary_caretaker_question_text'),
-        coverage_caretaker: 'faa.review.coverage.caretaker',
-        daily_living_help: other_questions_prompt_translation('daily_living_help'),
-        help_paying_bills: other_questions_prompt_translation('help_paying_bills'),
-        disability_question: other_questions_prompt_translation('disability_question')
-      }
-    end
-
-    def review_benefits_esi_keys
-      {
-        employer_name: 'hbx_profiles.employer_name',
-        employer_address_line_1: 'employer_address_line_1',
-        employer_address_line_2: 'employer_address_line_2',
-        city: 'city',
-        state: 'state',
-        zip: 'zip',
-        employer_phone: 'employer_phone',
-        esi_employer_ein: 'esi_employer_ein',
-        esi_employee_waiting_period: 'faa.review.income.review_benefits_table.esi.employee_waiting_period',
-        esi_employer_minimum_standard: 'faa.review.income.review_benefits_table.esi.employer_minimum_standard',
-        esi_covered: 'faa.review.income.review_benefits_table.esi.covered',
-        esi_employee_minimum: 'faa.review.income.review_benefits_table.esi.employee_minimum',
-        affordable_question: 'health_plan_meets_mvs_and_affordable_question',
-        type_of_hra: 'faa.question.type_of_hra',
-        max_employer_reimbursement: 'faa.question.max_employer_reimbursement'
-      }
-    end
-  end
-
   module ReviewAndSubmitHelper
+    module RowKeyTranslator
+      def translate_row_keys(hash, map_key)
+        hash.transform_keys { |row_key| 
+          map_value = send(map_key)[row_key]
+          translation_args = map_value.is_a?(Hash) ? map_value[:translation_key] : map_value
+          translation_mapper = map_value.is_a?(Hash) ? map_value[:translation_mapper] : :l10n
+          method(translation_mapper).call(*translation_args)
+        }
+      end
+  
+      private
+  
+      def personal_info_keys
+        {
+          age: 'age',
+          gender: 'gender',
+          relationship: 'relationship',
+          status: 'status',
+          incarcerated: 'faa.review.personal.incarcerated',
+          needs_coverage: 'faa.review.personal.needs_coverage'
+        }
+      end
+  
+      def tax_info_keys
+        {
+          file_in_year: ['faa.tax.file_in_year', assistance_year: @application.assistance_year],
+          filing_jointly: 'faa.tax.filing_jointly',
+          dependent: ['faa.tax.dependent', assistance_year: @application.assistance_year],
+          dependent_by: 'faa.tax.dependent_by'
+        }
+      end
+  
+      def income_info_keys
+        {
+          from_employer: ['faa.incomes.from_employer', assistance_year: assistance_year],
+          employer_name: 'employer_name',
+          employer_address_line_1: 'employer_address_line_1',
+          employer_address_line_2: 'employer_address_line_2',
+          city: 'city',
+          state: 'state',
+          zip: 'zip',
+          employer_phone: 'employer_phone',
+          from_self_employment: ['faa.incomes.from_self_employment', assistance_year: assistance_year],
+          unemployment: ['faa.other_incomes.unemployment', assistance_year: assistance_year],
+          alaska_native: 'faa.other_incomes.alaska_native',
+          other_sources: ['faa.other_incomes.other_sources', assistance_year: assistance_year],
+        }
+      end
+  
+      def coverage_info_keys
+        {
+          is_enrolled: applicant_currently_enrolled_short_key,
+          is_eligible: applicant_eligibly_enrolled_short_key,
+          indian_health_service_eligible: 'faa.indian_health_service_eligible',
+          indian_health_service: 'faa.indian_health_service',
+          medicaid_not_eligible: 'faa.medicaid_not_eligible',
+          medicaid_cubcare_end_date: 'faa.medicaid_cubcare_end_date',
+          change_eligibility_status: 'faa.change_eligibility_status',
+          household_income_changed: 'faa.household_income_changed',
+          person_medicaid_last_day: 'faa.person_medicaid_last_day',
+          medicaid_chip_ineligible: ['faa.medicaid_chip_ineligible', year: TimeKeeper.date_of_record.year - 5],
+          immigration_status_changed: 'faa.immigration_status_changed',
+          has_dependent_with_coverage: 'faa.has_dependent_with_coverage',
+          dependent_job_end_on: 'faa.dependent_job_end_on'
+        }
+      end
+  
+      def other_questions_keys
+        def other_questions_prompt_translation(key)
+          {translation_key: key, :translation_mapper => :other_questions_prompt}
+        end
+  
+        {
+          ssn_apply: other_questions_prompt_translation('ssn_apply'),
+          ssn_reason: 'faa.other_ques.ssn_reason',
+          is_pregnant: other_questions_prompt_translation('is_pregnant'),
+          pregnancy_due_date: 'faa.other_ques.pregnancy_due_date',
+          children_expected: other_questions_prompt_translation('children_expected'),
+          pregnant_last_year: other_questions_prompt_translation(FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? 'pregnant_last_year' : 'pregnant_last_60d'),
+          pregnancy_end_date: 'faa.other_ques.pregnancy_end_date',
+          is_enrolled_on_medicaid: other_questions_prompt_translation('is_enrolled_on_medicaid'),
+          foster_care_at18: other_questions_prompt_translation('foster_care_at18'),
+          foster_care_state: other_questions_prompt_translation('foster_care_state'),
+          foster_care_age_left: other_questions_prompt_translation('foster_care_age_left'),
+          foster_care_medicaid: other_questions_prompt_translation('foster_care_medicaid'),
+          is_student: other_questions_prompt_translation('is_student'),
+          student_type: 'faa.other_ques.student_type',
+          student_status_end: 'faa.other_ques.student_status_end',
+          student_school_type: 'faa.other_ques.student_school_type',
+          is_blind: other_questions_prompt_translation('is_blind'),
+          primary_caretaker_question_text: other_questions_prompt_translation('faa.primary_caretaker_question_text'),
+          coverage_caretaker: 'faa.review.coverage.caretaker',
+          daily_living_help: other_questions_prompt_translation('daily_living_help'),
+          help_paying_bills: other_questions_prompt_translation('help_paying_bills'),
+          disability_question: other_questions_prompt_translation('disability_question')
+        }
+      end
+  
+      def review_benefits_esi_keys
+        {
+          employer_name: 'hbx_profiles.employer_name',
+          employer_address_line_1: 'employer_address_line_1',
+          employer_address_line_2: 'employer_address_line_2',
+          city: 'city',
+          state: 'state',
+          zip: 'zip',
+          employer_phone: 'employer_phone',
+          esi_employer_ein: 'esi_employer_ein',
+          esi_employee_waiting_period: 'faa.review.income.review_benefits_table.esi.employee_waiting_period',
+          esi_employer_minimum_standard: 'faa.review.income.review_benefits_table.esi.employer_minimum_standard',
+          esi_covered: 'faa.review.income.review_benefits_table.esi.covered',
+          esi_employee_minimum: 'faa.review.income.review_benefits_table.esi.employee_minimum',
+          affordable_question: 'health_plan_meets_mvs_and_affordable_question',
+          type_of_hra: 'faa.question.type_of_hra',
+          max_employer_reimbursement: 'faa.question.max_employer_reimbursement'
+        }
+      end
+    end
+
+    private :RowKeyTranslator
+
     include RowKeyTranslator
 
     def applicant_summary_hashes(applicant)
@@ -144,14 +146,14 @@ module FinancialAssistance
             is_required: true
           }
         }
-        if displayable_applicant_field?(:is_joint_tax_filing)
+        if displayable_applicant_field?(applicant, :is_joint_tax_filing)
           hash[:filing_jointly] = human_boolean(applicant.is_joint_tax_filing)
         end
         hash[:dependent] = {
           value: human_boolean(applicant.is_claimed_as_tax_dependent),
           is_required: true
         }
-        if displayable_applicant_field?(:claimed_as_tax_dependent_by)
+        if displayable_applicant_field?(applicant, :claimed_as_tax_dependent_by)
           hash[:dependent_by] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name
         end
         
@@ -165,19 +167,19 @@ module FinancialAssistance
             is_required: true
           }
         }
-        if displayable_applicant_field?(:incomes_jobs)
+        if displayable_applicant_field?(applicant, :incomes_jobs)
           applicant.incomes.jobs.each do |job|
             hash[:employer_name] = job.employer_name
             if job.employer_address.present?
-              hash[:employer_address_line_1] = job.employer_address.address_1 #TODO: remove upcase when localized
+              hash[:employer_address_line_1] = job.employer_address.address_1
               if job.employer_address.address_2.present?
-                hash[:employer_address_line_2] = job.employer_address.address_2 #TODO: remove upcase when localized
+                hash[:employer_address_line_2] = job.employer_address.address_2
               end
-              hash[:city] = job.employer_address.city #TODO: remove upcase when localized
-              hash[:state] = job.employer_address.state #TODO: remove upcase when localized
-              hash[:zip] = job.employer_address.zip #TODO: remove upcase when localized
+              hash[:city] = job.employer_address.city
+              hash[:state] = job.employer_address.state
+              hash[:zip] = job.employer_address.zip
               if job.employer_phone.present?
-                hash[:employer_phone] = format_phone(income.employer_phone.full_phone_number) #TODO: remove upcase when localized
+                hash[:employer_phone] = format_phone(income.employer_phone.full_phone_number)
               end
             end
           end
@@ -271,40 +273,40 @@ module FinancialAssistance
       def other_questions_hash(applicant)
         hash = {}
         if applicant.is_applying_coverage
-          if displayable_applicant_field?(:is_ssn_applied)
+          if displayable_applicant_field?(applicant, :is_ssn_applied)
             hash[:ssn_apply] = human_boolean(applicant.is_ssn_applied)
           end
-          if displayable_applicant_field?(:non_ssn_apply_reason)
+          if displayable_applicant_field?(applicant, :non_ssn_apply_reason)
             hash[:ssn_reason] = applicant.non_ssn_apply_reason_readable.to_s
           end
         end
 
         hash[:is_pregnant] = human_boolean(applicant.is_pregnant)
-        if displayable_applicant_field?(:pregnancy_due_on)
+        if displayable_applicant_field?(applicant, :pregnancy_due_on)
           hash[:pregnancy_due_date] = applicant.pregnancy_due_on.to_s
           hash[other_questions_prompt('children_expected')] = applicant.children_expected_count
         end
-        if displayable_applicant_field?(:is_post_partum_period)
+        if displayable_applicant_field?(applicant, :is_post_partum_period)
           hash[:pregnant_last_year] = human_boolean(applicant.is_post_partum_period)
         end
-        if displayable_applicant_field?(:pregnancy_end_on)
+        if displayable_applicant_field?(applicant, :pregnancy_end_on)
           hash[:pregnancy_end_date] = applicant.pregnancy_end_on.to_s
         end
-        if displayable_applicant_field?(:is_enrolled_on_medicaid)
+        if displayable_applicant_field?(applicant, :is_enrolled_on_medicaid)
           hash[:is_enrolled_on_medicaid] = human_boolean(applicant.is_enrolled_on_medicaid)
         end
 
         if applicant.is_applying_coverage
-          if displayable_applicant_field?(:is_former_foster_care)
+          if displayable_applicant_field?(applicant, :is_former_foster_care)
             hash[:foster_care_at18] = human_boolean(applicant.is_former_foster_care)
           end
-          if displayable_applicant_field?(:foster_care_us_state)
+          if displayable_applicant_field?(applicant, :foster_care_us_state)
             hash[:foster_care_state] = applicant.foster_care_us_state
             hash[:foster_care_age_left] = applicant.age_left_foster_care
             hash[:foster_care_medicaid] = human_boolean(applicant.had_medicaid_during_foster_care)
           end
           hash[:is_student] = human_boolean(applicant.is_student)
-          if displayable_applicant_field?(:student_kind)
+          if displayable_applicant_field?(applicant, :student_kind)
             hash[:student_type] = applicant.student_kind
             hash[:student_status_end] = applicant.student_status_end_on
             hash[:student_school_type] = applicant.student_school_kind
@@ -377,15 +379,25 @@ module FinancialAssistance
     end
 
     def preferences_hash
-      return unless @application.years_to_renew.present? && @cfl_service.displayable_field?('application', @application.id, :years_to_renew)
+      return unless @application.years_to_renew.present? && displayable_application_field?(:years_to_renew)
 
       return {title: l10n('faa.review.preferences'), rows: {l10n("faa.review.preferences.eligibility_renewal") => @application.years_to_renew}}
     end
 
     def household_hash
-      return unless @cfl_service.displayable_field?('application', @application.id, :parent_living_out_of_home_terms)
+      return unless displayable_application_field?(:parent_living_out_of_home_terms)
 
       return {title: l10n('faa.review.more_about_your_household'), rows: {l10n("faa.review.more_about_your_household.parent_living_outside") => @application.parent_living_out_of_home_terms}}
+    end
+
+    private
+
+    def displayable_applicant_field?(applicant, attribute)
+      @cfl_service.displayable_field?('applicant', applicant.id, attribute)
+    end
+
+    def displayable_application_field?(attribute)
+      @cfl_service.displayable_field?('application', @application.id, attribute)
     end
   end
 end
