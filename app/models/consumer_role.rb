@@ -804,7 +804,7 @@ class ConsumerRole
     live_types << (us_citizen ? 'Citizenship' : 'Immigration status') unless us_citizen.nil?
 
     # Ensure 'Alive Status' is at the end of the array if it's included
-    live_types << 'Alive Status' if ssn.present? && EnrollRegistry.feature_enabled?(:enable_alive_status)
+    live_types << 'Alive Status' if ssn.present? && EnrollRegistry.feature_enabled?(:alive_status)
 
     live_types
   end
