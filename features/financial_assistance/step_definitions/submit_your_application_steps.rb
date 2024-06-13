@@ -181,6 +181,7 @@ Then(/^the user is on the Submit Your Application page$/) do
 end
 
 Then(/^the Parent Living Outside Home Attestation Checkbox is present$/) do
+  find('#living_outside_yes').click
   expect(page).to have_css("#application_attestation_terms")
 end
 
