@@ -159,9 +159,9 @@
       <p class="small-left-margin very-small-margin-top faded">
         <ul class='list-unstyled list-right-section'>
           <li>
-            <%= link_to preferences_application_path(@application) do %>
+            <%= h(link_to(preferences_application_path(@application)) do %>
               PREVIOUS
-            <% end %>
+            <% end) %>
           </li>
           <li>
             <a href="#">

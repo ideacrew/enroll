@@ -119,9 +119,9 @@
       <p class="small-left-margin very-small-margin-top faded">
         <ul class='list-unstyled list-right-section'>
           <li>
-            <%= link_to financial_assistance.review_and_submit_application_path(@application) do %>
+            <%= h(link_to(financial_assistance.review_and_submit_application_path(@application)) do %>
               PREVIOUS
-            <% end %>
+            <% end) %>
           </li>
           <li>
             <a href="#">
