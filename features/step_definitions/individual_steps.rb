@@ -98,6 +98,10 @@ Then(/^Individual sees the error message (.*)$/) do |error_message|
   page.should have_content(error_message)
 end
 
+Then(/^Individual should see the error message Invalid Social Security number$/) do
+  expect(page.find("input[class='required floatlabel form-control interaction-field-control-person-ssn active-floatlabel']")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
+end
+
 Then(/^Individual should not see the error message (.*)$/) do |error_message|
   expect(page).not_to have_content(error_message)
 end
@@ -516,7 +520,7 @@ When(/I click on none of the situations listed above apply checkbox$/) do
 end
 
 When(/Individual focus on the password field$/) do
-  page.execute_script("document.getElementById('user_password').focus()")
+  find('.interaction-field-control-user-password').click
 end
 
 When(/Individual enters the password$/) do

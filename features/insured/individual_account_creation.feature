@@ -49,7 +49,7 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     When validate SSN feature is enabled
     When the user registers as an individual with invalid SSN
     When Individual clicks on continue
-    And Individual sees the error message Invalid SSN
+    And Individual should see the error message Invalid Social Security number
 
   Scenario: New user attempts to create account with invalid SSN and validate SSN feature is disabled
     When Individual creates a new HBX account
@@ -57,7 +57,7 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     And Individual sees Your Information page
     When validate SSN feature is disabled
     When the user registers as an individual with invalid SSN
-    When the Individual clicks CONTINUE
+    When Individual clicks on continue
     And Individual should not see the error message Invalid SSN
 
   Scenario: Strong password feature is enabled

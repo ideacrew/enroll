@@ -106,7 +106,11 @@ class IvlPersonalInformation
   end
 
   def self.female_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      ''
+    else
     'label[for="radio_female"] span'
+    end
   end
 
   def self.reason_yes_radiobtn
@@ -119,7 +123,7 @@ class IvlPersonalInformation
 
   def self.continue_btn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-    
+      '#continue_button'
     else 
       'span[id*="continue"]'
     end
@@ -127,7 +131,7 @@ class IvlPersonalInformation
 
   def self.continue_btn_2
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-    
+      '#continue_button'
     else 
       'a[class="btn btn-lg btn-primary btn-block interaction-click-control-continue"]'
     end
@@ -150,19 +154,35 @@ class IvlPersonalInformation
   end
 
   def self.us_citizen_or_national_yes_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+     '#us_citizen_true'
+    else
     'label[for="person_us_citizen_true"] span'
+    end
   end
 
   def self.us_citizen_or_national_no_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+    '#us_citizen_false'
+    else
     'label[for="person_us_citizen_false"] span'
+    end
   end
 
   def self.naturalized_citizen_yes_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '#naturalized_citizen_true'
+    else
     'label[for="person_naturalized_citizen_true"] span'
+    end
   end
 
   def self.naturalized_citizen_no_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '#naturalized_citizen_false'
+    else
     'label[for="person_naturalized_citizen_false"] span'
+    end
   end
 
   def self.naturalized_citizen_select_doc_dropdown
@@ -202,11 +222,19 @@ class IvlPersonalInformation
   end
 
   def self.american_or_alaskan_native_yes_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+     '#indian_tribe_member_yes'
+    else
     'label[for="indian_tribe_member_yes"] span'
+    end
   end
 
   def self.american_or_alaskan_native_no_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+     '#indian_tribe_member_no'
+    else
     'label[for="indian_tribe_member_no"] span'
+    end
   end
 
   def self.tribe_state_dropdown
@@ -226,7 +254,11 @@ class IvlPersonalInformation
   end
 
   def self.incarcerated_no_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+    '#is_incarcerated_false'
+    else
     'label[for="radio_incarcerated_no"] span'
+    end
   end
 
   def self.white_checkbox
@@ -329,8 +361,16 @@ class IvlPersonalInformation
     'div.home-div span.label'
   end
 
+  def self.select_me_state
+    '.interaction-choice-control-person-addresses-attributes-0-state-24'
+  end
+  
   def self.select_dc_state
-    'div.selectric-address_required li[data-index="10"]'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+     '.interaction-choice-control-person-addresses-attributes-0-state-24'
+    else
+    '.interaction-choice-control-person-addresses-attributes-0-state-9'
+    end
   end
 
   def self.zip
@@ -403,5 +443,17 @@ class IvlPersonalInformation
 
   def self.personal_save
     '[data-cuke="personal-save"]'
+  end
+
+  def self.email_checkbox
+    '.interaction-choice-control-value-contact-type-email'
+  end
+
+  def self.mail_checkbox
+    '.interaction-choice-control-value-contact-type-mail'
+  end
+
+  def self.text_checkbox
+    '.interaction-choice-control-value-contact-type-text'
   end
 end
