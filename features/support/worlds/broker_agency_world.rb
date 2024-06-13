@@ -113,6 +113,11 @@ And(/^a consumer role family exists with broker$/) do
     writing_agent_id: @broker_agency_profile.primary_broker_role.id,
     is_active: true
   )
+  #@person.reload
+  puts "@person #{@person.inspect}"
+  puts "@person.primary_family.inspect #{@person.primary_family.inspect}"
+  # sleep 10
+  # @person.broker_role
 end
 
 And(/^broker lands on broker agency home page$/) do
@@ -121,7 +126,7 @@ end
 
 And(/^broker clicks on the name of the person in family index$/) do
   person_name = @person&.first_name || 'John'
-  find('a', :text => person_name, :wait => 10).click
+  find('a', :text => person_name, :wait => 5).click
 end
 
 Given(/^there is a Broker Agency exists for (.*?)$/) do |broker_agency_name|

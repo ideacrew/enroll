@@ -27,6 +27,7 @@ Given(/^that a broker exists$/) do
 end
 
 And(/^the broker is signed in$/) do
+  puts "broker ==== #{broker.person.broker_role.inspect}"
   login_as broker
 end
 

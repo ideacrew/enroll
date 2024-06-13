@@ -341,9 +341,13 @@ class ApplicationController < ActionController::Base
     def set_current_person(required: true)
       if current_user.try(:person).try(:agent?) && session[:person_id].present?
         @person = Person.find(session[:person_id])
+        puts "ApplicationController set_current_person current_user.try(:person).try(:agent?) && session[:person_id].present? = #{@person.inspect}"
       else
         @person = current_user&.person
+        puts "ApplicationController set_current_person else = #{@person.inspect}"
       end
+      puts "ApplicationController set_current_person current_user.try(:person).try(:agent?) #{current_user.try(:person).try(:agent?)}}"
+      puts "ApplicationController set_current_person session[:person_id].present?) #{session[:person_id].present?}}"
       redirect_to logout_saml_index_path if required && !set_current_person_succeeded?
     end
 

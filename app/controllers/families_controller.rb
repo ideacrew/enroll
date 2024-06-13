@@ -67,9 +67,12 @@ private
 
     if @person.primary_family.present?
       @family = @person.primary_family
+      puts "FamiliesController @person.primary_family.present? =  #{@family.inspect}"
     elsif params[:family].present?
       @family = Family.find(params[:family])
+      puts "FamiliesController params[:family].present? =  #{@family.inspect}"
     else
+      puts "FamiliesController redirect"
       redirect_path = @person.has_hbx_staff_role? ? "/exchanges/hbx_profiles" : root_path
       redirect_to redirect_path
     end

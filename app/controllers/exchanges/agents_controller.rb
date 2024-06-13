@@ -70,6 +70,7 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def check_for_paper_app
+    puts "Exchanges::AgentsController check_for_paper_app #{params[:person_id]}"
     session[:person_id] = params[:person_id]
     session[:original_application_type] = params['original_application_type']
     @person = Person.find(params[:person_id])

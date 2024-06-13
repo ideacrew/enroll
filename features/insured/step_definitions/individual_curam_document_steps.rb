@@ -25,7 +25,10 @@ And(/^the broker sees the documents tab$/) do
 end
 
 When(/^the broker visits verification page$/) do
+  # sleep 100
   visit verification_insured_families_path
+  # visit verification_insured_families_path(tab: 'verification')
+  # find(".interaction-click-control-documents", wait: 5).click
 end
 
 When(/^the user visits messages page$/) do
