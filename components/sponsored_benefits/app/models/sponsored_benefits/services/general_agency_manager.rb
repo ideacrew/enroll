@@ -45,7 +45,7 @@ module SponsoredBenefits
           plan_design_organization(id).general_agency_accounts.active.each do |account|
             account.terminate!
             employer_profile = account.plan_design_organization.employer_profile
-            if employer_profile
+            if employer_profile && account&.general_agency_profile
               send_message({
                 employer_profile: employer_profile,
                 general_agency_profile: account.general_agency_profile,
