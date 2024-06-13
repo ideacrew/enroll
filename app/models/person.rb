@@ -477,17 +477,23 @@ class Person
   end
 
   def generate_person_saved_event
-    event(
-      'events.private.person_saved',
-      headers: {
-        after_updated_at: updated_at,
-        before_updated_at: changed_attributes[:updated_at]
-      },
-      attributes: {
-        after_save_version: to_hash,
-        changed_attributes: changed_attributes
-      }
-    ).success&.publish
+    if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
+      event(
+        'events.private.person_saved',
+        headers: {
+          after_updated_at: updated_at,
+          before_updated_at: changed_attributes[:updated_at]
+        },
+        attributes: {
+          after_save_version: to_hash,
+          changed_attributes: changed_attributes
+        }
+      ).success&.publish
+    else
+      cv_person = Operations::Transformers::PersonTo::Cv3Person.new.call(self)
+      event = event('events.person_saved', attributes: {gid: self.to_global_id.uri, payload: cv_person})
+      event.success.publish if event.success?
+    end
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate person save event due to #{e.backtrace}" }
   end
