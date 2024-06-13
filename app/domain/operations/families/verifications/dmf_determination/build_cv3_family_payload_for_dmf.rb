@@ -67,6 +67,7 @@ module Operations
             # invalid_persons.size == family_members.size indicates no family members were valid
             return Success(aca_family) unless invalid_persons.size == aca_family.family_members.size
 
+            message = "DMF Determination not sent: no family members are eligible"
             # 'false' as third param prevent updating verification histories -> have already been updated
             handle_dmf_failure(message, :build_cv3_family, false)
           end
@@ -107,7 +108,7 @@ module Operations
           end
 
           def handle_dmf_failure(message, state, update_histories = true)
-            update_verification_type_histories(message)
+            update_verification_type_histories(message) if update_histories
 
             add_errors(state, message, transmittable_error_params)
             status_result = update_status(message, :failed, transmittable_error_params)

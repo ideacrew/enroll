@@ -33,23 +33,6 @@ module Operations
           return Failure("Missing/Invalid information on vlp document") if errors.present?
           Success()
         end
-
-        def validate_member_enrolled(person_entity)
-          binding.irb
-          # find_family using person entity
-          # first check if eligibility_determination has family member as a subject
-          subjects = family.eligibility_determination.subjects
-          subject = subjects.detect { |sub| sub.hbx_id == person_entity.hbx_id }
-          return false unless subject.present?
-
-          # then check if subject has any of the valid eligibility states
-          item_keys = ['health_product_enrollment_status', 'dental_product_enrollment_status']
-          states = subject&.eligibility_states&.select { |state| item_keys.include?(state.eligibility_item_key) }
-          return false unless states.present?
-
-          # last check if valid eligibility states have is_eligible as true
-          states.any?(&:is_eligible?)
-        end
       end
     end
   end

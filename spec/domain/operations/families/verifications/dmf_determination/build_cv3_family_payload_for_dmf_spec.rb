@@ -223,21 +223,21 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
       it 'should add a history element to all alive_status verifications' do
         alive_status_elements = [primary.alive_status, dependent.alive_status].map(&:type_history_elements)
 
-        expect(alive_status_elements.all? { |elements| elements.last.update_reason.include?('No Family Members valid') }).to be_truthy
+        expect(alive_status_elements.all? { |elements| elements.last.update_reason.include?('does not have a valid enrollment') }).to be_truthy
       end
 
       it "should update the transmission" do
         transmission.reload
         expect(transmission.process_status.latest_state).to eq :failed
         expect(transmission.transmittable_errors.size).to eq 1
-        expect(transmission.transmittable_errors.last.message).to include('No Family Members valid')
+        expect(transmission.transmittable_errors.last.message).to include('DMF Determination not sent: no family members are eligible')
       end
 
       it "should update the transaction" do
         transaction.reload
         expect(transaction.process_status.latest_state).to eq :failed
         expect(transaction.transmittable_errors.size).to eq 1
-        expect(transaction.transmittable_errors.last.message).to include('No Family Members valid')
+        expect(transaction.transmittable_errors.last.message).to include('DMF Determination not sent: no family members are eligible')
       end
     end
   end
