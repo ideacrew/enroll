@@ -119,16 +119,11 @@ module FinancialAssistance
       end
     end
 
-    private :RowKeyTranslator
-
     include RowKeyTranslator
 
     def applicant_summary_hashes(applicant)
       def personal_info_hash(applicant)
-        hash = {
-          :age => applicant.age_of_the_applicant, 
-          :gender => applicant.gender.humanize
-        }
+        hash = {age: applicant.age_of_the_applicant, gender: applicant.gender.humanize}
         unless @all_relationships.empty?
           hash[:relationship] = applicant.relationship_kind_with_primary.humanize
         end
@@ -136,7 +131,7 @@ module FinancialAssistance
         hash[:incarcerated] = human_boolean(applicant.is_incarcerated)
         hash[:needs_coverage] = human_boolean(applicant.is_applying_coverage)
 
-        return {title: l10n("personal_information"), rows: translate_row_keys(hash, :personal_info_keys)}
+        return {title: l10n('personal_information'), rows: translate_row_keys(hash, :personal_info_keys)}
       end
 
       def tax_info_hash(applicant)
@@ -157,7 +152,7 @@ module FinancialAssistance
           hash[:dependent_by] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name
         end
         
-        return {title: l10n("faa.review.tax_info"), edit_link: go_to_step_application_applicant_path(@application, applicant, 1), rows: translate_row_keys(hash, :tax_info_keys)}
+        return {title: l10n('faa.review.tax_info'), edit_link: go_to_step_application_applicant_path(@application, applicant, 1), rows: translate_row_keys(hash, :tax_info_keys)}
       end
 
       def income_info_hash(applicant)
@@ -194,23 +189,25 @@ module FinancialAssistance
             is_required: true
           }
         end
+
         if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
           hash[:alaska_native] = {
             value: human_boolean(applicant.has_american_indian_alaskan_native_income), 
             is_required: true
           }
         end
+
         hash[:other_sources] = {
           value: human_boolean(applicant.has_other_income), 
           is_required: true
         }
 
-        return {title: l10n("faa.evidence_type_income"), edit_link: application_applicant_incomes_path(@application, applicant), rows: translate_row_keys(hash, :income_info_keys)}
+        return {title: l10n('faa.evidence_type_income'), edit_link: application_applicant_incomes_path(@application, applicant), rows: translate_row_keys(hash, :income_info_keys)}
       end
 
       def deductions_info_hash(applicant)
         {
-          title: l10n("faa.review.income_adjustments"),
+          title: l10n('faa.review.income_adjustments'),
           edit_link: application_applicant_deductions_path(@application, applicant),
           rows: {
             strip_tags(l10n('faa.deductions.income_adjustments', assistance_year: assistance_year)) => {
@@ -223,13 +220,13 @@ module FinancialAssistance
 
       def coverage_info_hash(applicant)
         hash = {
-          :is_enrolled => {
+          is_enrolled: {
             value: human_boolean(applicant.has_enrolled_health_coverage),
-            review_benefits_partial: ("is_enrolled" if applicant.has_enrolled_health_coverage)
+            review_benefits_partial: ('is_enrolled' if applicant.has_enrolled_health_coverage)
           }.compact,
-          :is_eligible => {
+          is_eligible: {
             value: human_boolean(applicant.has_eligible_health_coverage),
-            review_benefits_partial: ("is_eligible" if applicant.has_eligible_health_coverage)
+            review_benefits_partial: ('is_eligible' if applicant.has_eligible_health_coverage)
           }.compact
         }
 
@@ -240,10 +237,10 @@ module FinancialAssistance
 
         if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
           hash[:medicaid_not_eligible] = human_boolean(applicant.has_eligible_medicaid_cubcare)
-          hash[:medicaid_cubcare_end_date] = applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : l10n("faa.not_applicable_abbreviation")
+          hash[:medicaid_cubcare_end_date] = applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : l10n('faa.not_applicable_abbreviation')
           hash[:change_eligibility_status] = human_boolean(applicant.has_eligibility_changed)
           hash[:household_income_changed] = human_boolean(applicant.has_household_income_changed)
-          hash[:person_medicaid_last_day] = applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : l10n("faa.not_applicable_abbreviation")
+          hash[:person_medicaid_last_day] = applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : l10n('faa.not_applicable_abbreviation')
         end
 
         if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && applicant.eligible_immigration_status
@@ -255,7 +252,7 @@ module FinancialAssistance
 
         if applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
           hash[:has_dependent_with_coverage] = human_boolean(applicant.has_dependent_with_coverage)
-          hash[:dependent_job_end_on] = applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : l10n("faa.not_applicable_abbreviation")
+          hash[:dependent_job_end_on] = applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : l10n('faa.not_applicable_abbreviation')
         end
 
         # all coverage related questions are required
@@ -267,7 +264,7 @@ module FinancialAssistance
             {value: value, is_required: true}
           end
         }
-        return {title: l10n("health_coverage"), edit_link: application_applicant_benefits_path(@application, applicant), rows: translate_row_keys(hash, :coverage_info_keys)}
+        return {title: l10n('health_coverage'), edit_link: application_applicant_benefits_path(@application, applicant), rows: translate_row_keys(hash, :coverage_info_keys)}
       end
 
       def other_questions_hash(applicant)
@@ -332,7 +329,7 @@ module FinancialAssistance
     end
 
     def review_benefits_esi_hash(benefit)
-      hash = {:employer_name => benefit.employer_name}
+      hash = {employer_name: benefit.employer_name}
       if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields)
         hash[:employer_address_line_1] = benefit.employer_address.address_1
         if benefit.employer_address.address_2.present?
@@ -370,7 +367,7 @@ module FinancialAssistance
 
       hash = @all_relationships.reduce({}) do |hash, relationship|
         if member_name_by_id(relationship.applicant_id).present?
-          relationship_key = l10n("faa.review.your_household.relationship", related_name: member_name_by_id(relationship.applicant_id), relationship: relationship.kind)
+          relationship_key = l10n('faa.review.your_household.relationship', related_name: member_name_by_id(relationship.applicant_id), relationship: relationship.kind)
           hash.update(relationship_key => member_name_by_id(er.relative_id))
         end
       end
@@ -381,13 +378,13 @@ module FinancialAssistance
     def preferences_hash
       return unless @application.years_to_renew.present? && displayable_application_field?(:years_to_renew)
 
-      return {title: l10n('faa.review.preferences'), rows: {l10n("faa.review.preferences.eligibility_renewal") => @application.years_to_renew}}
+      return {title: l10n('faa.review.preferences'), rows: {l10n('faa.review.preferences.eligibility_renewal') => @application.years_to_renew}}
     end
 
     def household_hash
       return unless displayable_application_field?(:parent_living_out_of_home_terms)
 
-      return {title: l10n('faa.review.more_about_your_household'), rows: {l10n("faa.review.more_about_your_household.parent_living_outside") => @application.parent_living_out_of_home_terms}}
+      return {title: l10n('faa.review.more_about_your_household'), rows: {l10n('faa.review.more_about_your_household.parent_living_outside') => @application.parent_living_out_of_home_terms}}
     end
 
     private
