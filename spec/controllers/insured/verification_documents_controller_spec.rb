@@ -21,7 +21,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:enable_alive_status).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:alive_status).and_return(true)
       family
       consumer_role&.move_identity_documents_to_verified
     end
