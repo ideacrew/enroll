@@ -639,6 +639,6 @@
   </div>
 
   <div class='col-md-3'>
-    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? financial_assistance.application_relationships_path(@application) : edit_application_path(@application), next_url: go_to_step_application_path(@application, 1), disabled: @application.incomplete_applicants? ? 'true' : false} %>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? financial_assistance.application_relationships_path(@application) : edit_application_path(@application), next_url: preferences_application_path(@application), disabled: @application.incomplete_applicants? ? 'true' : false} %>
   </div>
 </div>
