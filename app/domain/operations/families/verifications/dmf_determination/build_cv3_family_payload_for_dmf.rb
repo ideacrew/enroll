@@ -107,7 +107,7 @@ module Operations
             }
           end
 
-          def handle_dmf_failure(message, state, update_histories = true)
+          def handle_dmf_failure(message, state, update_histories: true)
             update_verification_type_histories(message) if update_histories
 
             add_errors(state, message, transmittable_error_params)
