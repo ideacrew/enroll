@@ -45,15 +45,12 @@ module SponsoredBenefits
           plan_design_organization(id).general_agency_accounts.active.each do |account|
             account.terminate!
             employer_profile = account.plan_design_organization.employer_profile
-            if employer_profile && account&.general_agency_profile
-              send_message({
-                employer_profile: employer_profile,
-                general_agency_profile: account.general_agency_profile,
-                broker_agency_profile: account.broker_agency_profile,
-                status: 'Terminate'
-              })
-              notify("acapi.info.events.employer.general_agent_terminated", {timestamp: Time.now.to_i, employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
-            end
+            next unless employer_profile && account&.general_agency_profile
+            send_message({ employer_profile: employer_profile,
+                           general_agency_profile: account.general_agency_profile,
+                           broker_agency_profile: account.broker_agency_profile,
+                           status: 'Terminate' })
+            notify("acapi.info.events.employer.general_agent_terminated", {timestamp: Time.now.to_i, employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
           end
         end
       end
