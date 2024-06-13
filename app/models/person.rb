@@ -29,6 +29,8 @@ class Person
   # transmittable subject
   include Transmittable::Subject
 
+  include Orms::Mongoid::DomainModel
+
   track_history :on => [:first_name,
                         :middle_name,
                         :last_name,
@@ -349,7 +351,6 @@ class Person
   before_save :strip_empty_fields
   before_save :check_indian if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
   before_save :check_crm_updates
-  #after_save :generate_family_search
   after_create :create_inbox
   after_create :notify_created
   after_update :notify_updated
@@ -476,9 +477,17 @@ class Person
   end
 
   def generate_person_saved_event
-    cv_person = Operations::Transformers::PersonTo::Cv3Person.new.call(self)
-    event = event('events.person_saved', attributes: {gid: self.to_global_id.uri, payload: cv_person})
-    event.success.publish if event.success?
+    event(
+      'events.private.person_saved',
+      headers: {
+        after_updated_at: updated_at,
+        before_updated_at: changed_attributes[:updated_at]
+      },
+      attributes: {
+        after_save_version: to_hash,
+        changed_attributes: changed_attributes
+      }
+    ).success&.publish
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate person save event due to #{e.backtrace}" }
   end
@@ -501,17 +510,6 @@ class Person
   def completed_identity_verification?
     return false unless user
     user.identity_verified?
-  end
-
-  #after_save :update_family_search_collection
-
-  # before_save :notify_change
-  # def notify_change
-  #   notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
-  # end
-
-  def update_family_search_collection
-    #  ViewFunctions::Person.run_after_save_search_update(self.id)
   end
 
   def generate_hbx_id
