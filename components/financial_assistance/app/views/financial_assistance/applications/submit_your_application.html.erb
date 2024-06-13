@@ -1,0 +1,189 @@
+<%= form_for @application, url: {action: "submit"}, method: :put do |f| %>
+  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+    <div class="col-md-9">
+      <div class="">
+        <p class="alert alert-error hide"></p>
+        <div class="row">
+          <div class="col-md-10">
+            <h2 class="fa-darkblue">Submit Your Application</h2>
+          </div>
+        </div>
+        <p><%= l10n('faa.last_step_1') %> <%= l10n('faa.last_step_2') %></p>
+        <p class="memo">* = required field</p>
+        <div class="focus_effect module">
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                <b><%= l10n('faa.i_understand_eligibility') %>*</b> <br><br> <%= l10n('faa.renewal_process_1', short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %><%= l10n('faa.renewal_process_2')%> <%= l10n('faa.send_notice_1', short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)%><%= l10n('faa.send_notice_2')%> <%= l10n('faa.send_notice_3') %>
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-3">
+                <%= f.check_box :medicaid_terms, {class: "put-class-name-here", required: true}, "yes", "no" %>
+                <%= f.label :medicaid_terms, "#{l10n('faa.i_agree')} *",  class: "put-class-name-here" %>
+              </div>
+            </div>
+          </div>
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                <b><%= l10n('faa.i_understand_eligibility_changes') %>*</b> <br> <br>
+                <%= l10n('faa.report_changes_1', short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %> <%= l10n('faa.report_changes_2') %> <br> <br>
+                <%= l10n('faa.signature_line_below_1')%><%= l10n('faa.signature_line_below_2')%> <br> <br>
+                <%= l10n('insured.review_information') %>
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-3">
+                <%= f.check_box :report_change_terms, {class: "put-class-name-here"}, "yes", "no" %>
+                <%= f.label :report_change_terms, "#{l10n('faa.i_agree')} *",  class: "put-class-name-here" %>
+              </div>
+            </div>
+          </div>
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12 span-text">
+                <%= l10n('faa.i_understand_evaluation_1')%><%= l10n('faa.i_understand_evaluation_2')%><%= l10n('faa.i_understand_evaluation_3')%>
+                        <%= l10n('faa.anyone_found_eligible_1') %>
+                        <%= l10n('faa.anyone_found_eligible_2') %>
+                        <%= l10n('faa.anyone_found_eligible_3') %>
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-3">
+                <%= f.check_box :medicaid_insurance_collection_terms, {class: "put-class-name-here"}, "yes", "no" %>
+                <%= f.label :medicaid_insurance_collection_terms, "#{l10n('faa.i_agree')} *",  class: "put-class-name-here" %>
+              </div>
+            </div>
+          </div>
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                <b>Does any child on this application have a parent living outside of the home?&nbsp;*</b>
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-2">
+                <%= f.radio_button("parent_living_out_of_home_terms", false, class: "radio-yml", id: "living_outside_yes", required: true) %>
+                <label class="radio-yml" for="living_outside_yes">Yes</label>
+              </div>
+              <div class='col-md-2'>
+                <%= f.radio_button("parent_living_out_of_home_terms", true, class: "radio-yml", id: "living_outside_no", required: true) %>
+                <label class="radio-yml" for="living_outside_no">No</label>
+              </div>
+            </div>
+          </div>
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12 span-text parent-outside-home-text">
+                <%= l10n('faa.parent_living_outside_of_home_1') %>
+                <%= l10n('faa.parent_living_outside_of_home_2') %>
+                <%= l10n('faa.parent_living_outside_of_home_3') %>
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                <%= f.check_box :attestation_terms, {class: "put-class-name-here"}, true, false %>
+                <%= f.label :attestation_terms, "#{l10n('faa.i_agree')} *",  class: "put-class-name-here" %>
+              </div>
+            </div>
+          </div>
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I am not truthful, there may be a penalty.
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                <%= f.check_box :submission_terms, {class: "put-class-name-here"}, "yes", "no" %>
+                <%= f.label :submission_terms, "#{l10n('faa.i_agree')} *",  class: "put-class-name-here" %>
+              </div>
+            </div>
+          </div>
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                <b><%= l10n("faa.medicaid_question")%></b>
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-2">
+                <%= f.radio_button("full_medicaid_determination", true, class: "radio-yml", id: "medicaid_determination_yes") %>
+                <label class="radio-yml" for="medicaid_determination_yes">Yes</label>
+              </div>
+              <div class='col-md-2'>
+                <%= f.radio_button("full_medicaid_determination", false, class: "radio-yml", id: "medicaid_determination_no") %>
+                <label class="radio-yml" for="medicaid_determination_no">No</label>
+              </div>
+            </div>
+          </div>
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                <h5><b>Electronic Signature * (enter your name)</b></h5>
+              </div>
+              <div class="col-md-4">
+                <%= text_field_tag "first_name_thank_you", nil, placeholder: "First Name *", required: true, class: "floatlabel thank_you_field", id: "first_name_thank_you" %>
+                <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+                <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
+                <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
+              </div>
+              <div class="col-md-4">
+                <%= text_field_tag "middle_name_thank_you", nil, placeholder: "Middle Name", required: false, class: "floatlabel thank_you_field" %>
+                <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+                <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
+                <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
+              </div>
+              <div class="col-md-4">
+                <%= text_field_tag "last_name_thank_you", nil, placeholder: "Last Name *", required: false, class: "floatlabel thank_you_field", id: "last_name_thank_you" %>
+                <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+                <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
+                <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="back-link">
+              <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+              <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= financial_assistance.edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <%= submit_tag 'Submit Application', :class => "btn btn-lg btn-primary"  %>
+      <p class="small-left-margin very-small-margin-top faded">
+        <ul class='list-unstyled list-right-section'>
+          <li>
+            <%= h(link_to(preferences_application_path(@application)) do %>
+              PREVIOUS
+            <% end) %>
+          </li>
+          <li>
+            <a href="#">
+              <%# <%= image_tag 'icons/list.png' %>
+              SAVE &amp; EXIT
+            </a>
+            <br>
+            <br>
+          </li>
+          <li>
+            <p>
+              If you select Save &amp; Exit, you can save your work and continue where you left off the next time you login.
+            </p>
+          </li>
+          <br class="clear">
+        </ul>
+      </p>
+      <div id="help_me_sign_up" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_me_sign_up')" class="btn btn-default btn-block help-me-sign-up" data-target="#help_with_plan_shopping" data-toggle="modal">
+        Help me sign up
+      </div>
+      <%= render partial: './ui-components/v1/modals/help_with_plan'  %>
+    </div>
+  </div>
+<% end %>
+<%= render partial: '/financial_assistance/shared/to_previous_modal' %>
