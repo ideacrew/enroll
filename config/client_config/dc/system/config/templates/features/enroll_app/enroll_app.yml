@@ -904,4 +904,7 @@ registry:
         settings:
           - key: :show_warnings
             item: <%= ENV['SHOW_JQUERY_MIGRATE_WARNINGS'] || true %>
+      - key: :enable_call_hub_for_ai_an
+        item: :enable_call_hub_for_ai_an
+        is_enabled: <%= ENV['ENABLE_CALL_HUB_FOR_AI_AN'] || false %>
 

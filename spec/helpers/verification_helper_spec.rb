@@ -595,6 +595,13 @@ RSpec.describe VerificationHelper, :type => :helper do
   describe "#build_admin_actions_list" do
     shared_examples_for "admin actions dropdown list" do |type, status, state, actions|
       before do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:indian_alaskan_tribe_codes].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
+        person.save!
+        allow(EnrollRegistry[:enable_call_hub_for_ai_an].feature).to receive(:is_enabled).and_return(true)
+
         allow(helper).to receive(:verification_type_status).and_return status
         allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
       end
@@ -614,6 +621,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "admin actions dropdown list", EnrollRegistry[:enroll_app].setting(:state_residency).item, "outstanding", "verification_outstanding",["Verify", "View History", "Call HUB", "Extend"]
     it_behaves_like "admin actions dropdown list", EnrollRegistry[:enroll_app].setting(:state_residency).item, "in review","verification_outstanding", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
     it_behaves_like "admin actions dropdown list", "Alive Status", "unverified", "verification_outstanding", ["Verify", "Reject", "View History", "Extend"]
+    it_behaves_like "admin actions dropdown list", "American Indian Status", "unverified", "verification_outstanding", ["Verify", "Reject", "View History", "Extend"]
   end
 
   describe "#request response details" do
