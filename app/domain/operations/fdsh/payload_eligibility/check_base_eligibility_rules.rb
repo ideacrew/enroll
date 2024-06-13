@@ -14,7 +14,7 @@ module Operations
           ssa: [:validate_ssn],
           dhs: [:validate_vlp_documents],
           local_residency: [],
-          alive_status: [:validate_ssn],
+          alive_status: [:validate_ssn, :validate_member_enrolled],
           income: [:validate_ssn],
           esi_mec: [:validate_ssn],
           non_esi_mec: [:validate_ssn],
