@@ -281,7 +281,7 @@ module FinancialAssistance
         hash[:is_pregnant] = human_boolean(applicant.is_pregnant)
         if displayable_applicant_field?(applicant, :pregnancy_due_on)
           hash[:pregnancy_due_date] = applicant.pregnancy_due_on.to_s
-          hash[other_questions_prompt('children_expected')] = applicant.children_expected_count
+          hash[:children_expected] = applicant.children_expected_count
         end
         if displayable_applicant_field?(applicant, :is_post_partum_period)
           hash[:pregnant_last_year] = human_boolean(applicant.is_post_partum_period)
