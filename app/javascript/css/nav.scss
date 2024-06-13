@@ -1,0 +1,110 @@
+
+header.navbar-primary {
+    font-size: 14px;
+    background-color: var(--grey-000);
+    border-bottom: solid 3px var(--theme-primary-blue, #007bc4);
+
+    .navbar-brand img {
+      max-height: 40px;
+    }
+
+    .navbar-nav {
+      .nav-item {
+        a {
+          text-decoration: underline;
+        }
+
+        img {
+          max-height: 16px;
+          padding-right: .5rem;
+        }
+
+        .horizontal-links {
+          span::after {
+            content: "|";
+            color: var(--grey-060);
+            padding: 0 .1rem;
+          }
+
+          span:last-child::after {
+            content: "";
+          }
+        }
+
+        &.site-name-market {
+          font-size: 16px;
+
+          :first-child {
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 13px;
+          }
+        }
+      }
+
+      .nav-item-divider {
+        background-color: var(--grey-050);
+        width: 1px;
+        margin: -.75rem 0.5rem;
+      }
+    }
+
+    .navbar-toggler-icon.open {
+      display: none;
+    }
+    .navbar-toggler-icon.closed {
+      display: block;
+    }
+
+    .navbar-toggler-icon path {
+      fill: var(--theme-secondary);
+      stroke: var(--theme-secondary);
+    }
+
+    .collapsed {
+      .navbar-toggler-icon.open {
+        display: block;
+      }
+      .navbar-toggler-icon.closed {
+        display: none;
+      }
+    }
+
+    .navbar-collapse.collapse.show {
+      flex-direction: row;
+
+      .nav-item-divider {
+        display: none;
+      }
+    }
+
+    #nav-overlay {
+      position: fixed;
+      top: 75px;
+      left: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .show + #nav-overlay {
+      background: hsla(0, 0%, 0%, 1);
+      opacity: 0.5;
+      z-index: 100;
+      width: 100vw;
+      height: 100vh;
+    }
+    .mobile-nav {
+      display: none
+    }
+    .desktop-nav {
+      display: flex;
+      width: 100%;
+
+    }
+    .show .mobile-nav {
+      display: block
+    }
+    .show .desktop-nav {
+      display: none
+    }
+  }

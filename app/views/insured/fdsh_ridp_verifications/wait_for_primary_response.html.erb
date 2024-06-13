@@ -1,20 +1,35 @@
-<% content_for :horizontal_status do %>
-  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
-<% end %>
-
-<div class="container <%=pundit_class Family, :updateable?%>">
-  <div class="col-lg-2 col-md-2 col-sm-2">
-    <%= render :partial => 'shared/left_nav' %>
-  </div>
-  <div class="col-lg-7 col-md-7 col-sm-7">
-    <p class="alert alert-error hide"></p>
-      <div align = "center">
-        <h1 class="darkblue"><%= l10n("waiting_for_eligibility") %></h1>
-        <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>
+<% if @bs4 %>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+  <div class="<%=pundit_class Family, :updateable?%>">
+    <div class="d-flex full-height justify-content-center align-items-center text-center">
+      <div>
+        <h1><%= l10n("getting_response") %></h1>
+        <div class="d-flex justify-content-center align-items-center mt-4 mb-4">
+          <i class="fa fa-circle-notch fa-4x fa-spin" aria-hidden="true"></i>
+        </div>
+        <p><%= l10n("page_refresh") %></p>
       </div>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-3">
-      <%= render  partial: 'shared/individual_progress', locals: {step: '2'} %>
+  </div>
+<% else %>
+  <% content_for :horizontal_status do %>
+    <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
+  <% end %>
+
+  <div class="container <%=pundit_class Family, :updateable?%>">
+    <div class="col-lg-2 col-md-2 col-sm-2">
+      <%= render :partial => 'shared/left_nav' %>
+    </div>
+    <div class="col-lg-7 col-md-7 col-sm-7">
+      <p class="alert alert-error hide"></p>
+        <div align = "center">
+          <h1 class="darkblue"><%= l10n("waiting_for_eligibility") %></h1>
+          <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3">
+        <%= render  partial: 'shared/individual_progress', locals: {step: '2'} %>
+      </div>
     </div>
   </div>
-</div>
+<% end %>

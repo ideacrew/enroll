@@ -19,38 +19,6 @@
   color: var(--error-color, #dc3545)
 }
 
-.btn-primary {
-  text-transform: uppercase;
-  font-weight: 600;
-  border-color: var(--secondary-green, var(--error-color, #e72b2d));
-  border-bottom-width: medium;
-  color: var(--grey-000);
-  background-color: var(--primary-green, var(--error-color, #e72b2d));
-
-  &:hover:not(:disabled) {
-    background-color: var(--primary-green, var(--error-shade));
-    border-color: var(--secondary-green, var(--error-color));
-  }
-
-  &:not(:disabled):not(:disabled):active {
-    background-color: var(--primary-green, var(--error-color));
-    border-color: var(--secondary-green, var(--error-color));
-    box-shadow: 0 0 0 0.2rem var(--secondary-green, var(--error-tint));
-  }
-
-  &:focus, &:hover {
-    background-color: var(--primary-green, var(--error-color));
-    box-shadow: 0 0 0 0.1rem var(--secondary-green, var(--error-tint));
-    border-color: var(--secondary-green, var(--error-color));
-  }
-
-  &:disabled {
-    opacity: 0.8;
-    background-color: var(--secondary-green, var(--error-shade));
-    border-color: var(--secondary-green, var(--error-shade));
-  }
-}
-
 .text-muted {
   color: var(--secondary-font-color, #6c757d) !important;
 }
@@ -119,23 +87,7 @@
   color: var(--grey-000) !important;
   background-color: var(--info-color) !important;
 
-  .call-customer-service {
-    color: var(--grey-000) !important;
-  }
-
-  span a {
-    color: var(--grey-000) !important;
-  }
-
-  .header-text {
-    color: var(--grey-000) !important;
-  }
-
-  span strong {
-    color: var(--grey-000) !important;
-  }
-
-  a.portal {
+  a {
     color: var(--grey-000) !important;
   }
 }

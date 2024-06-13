@@ -1,33 +1,118 @@
+<% if @bs4 %>
+  <div class="mb-4 <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>
+    <%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
+    <input type="hidden" id="is_indian_alaskan_tribe_details_enabled" value="<%= EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>">
+    <fieldset id="tribal_container">
+      <legend id="indian_tribe_member_value" class="weight-n required">
+        <%= l10n("insured.tribe_member_pt1") %>
+        <%= render partial:"shared/glossary", locals: {key: "american_indian", term: "American Indian" } %>
+        <%= l10n("or") %>
+        <%= render partial:"shared/glossary", locals: {key: "alaska_native", term: "Alaska Native" } %>
+        <%= l10n("insured.tribe_member_pt2") %>
+      </legend>
+      <div class="focus d-flex align-items-center">
+        <label for="indian_tribe_member_yes" class="radio">
+          <%= f.radio_button :indian_tribe_member, true, class: "required", id: 'indian_tribe_member_yes' %>
+          <span class="yes_no_pair"><%= l10n("yes") %></span>
+        </label>
+        <label for="indian_tribe_member_no" class="radio">
+          <%= f.radio_button :indian_tribe_member, false, class: "required", id: 'indian_tribe_member_no' %>
+          <span class="yes_no_pair"><%= l10n("no") %></span>
+        </label>
+      </div>
+    </fieldset>
+    <a href="#indian_tribe_member" data-toggle="modal" data-target="#indian_tribe_member">Not sure?</a>
+    <%= render partial: 'shared/modal_support_text_household', locals: {key: "indian_tribe_member"} %>
+  </div>
+  <div class="tribal-container <%= 'hide' unless f.object.indian_tribe_member %>">
+    <% if EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>
+      <input type="hidden" id="is_featured_tribes_selection_enabled" value="<%= FinancialAssistanceRegistry[:featured_tribes_selection].enabled? %>">
+      <input type="hidden" id="enroll_state_abbr" value="<%= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>">
+
+      <div class="mb-4" id="tribal-state-container">
+        <label for="tribal-state" class="weight-n"><%= l10n("insured.tribal_state") %></label>
+        <div id="tribal-state-alert" class="hide">
+          <div class="alert alert-warning d-flex" role="alert">
+            <div>
+              <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+            </div>
+            <div class="mt-2 mb-1">
+              <%= l10n("insured.tribal_state_alert") %>
+            </div>
+          </div>
+        </div>
+        <%= f.select(:tribal_state, options_for_select(State::NAME_IDS, selected: f.object.tribal_state), {include_blank: l10n("insured.consumer_roles.select_state")}, id: "tribal-state")  %>
+      </div>
+
+      <fieldset class="mb-4 featured-tribe-container hide">
+        <legend for="tribe_codes" class="weight-n"><%= l10n("insured.tribal_name") %> *</legend>
+        <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>
+          <div> <%= tribe.label(:"data-value" => tribe.value) { tribe.check_box + tribe.text } %> </div>
+        <% end %>
+      </fieldset>
+
+      <div class="mb-4 tribal-name-container hide">
+        <label for="tribal-name" class="weight-n"><%= l10n("insured.tribal_name") %> *</label>
+        <div id="tribal-name-alert" class="hide">
+          <div class="alert alert-warning d-flex" role="alert">
+            <div>
+              <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+            </div>
+            <div class="mt-2 mb-1">
+              <%= l10n("insured.tribal_name_alert") %>
+            </div>
+          </div>
+        </div>
+        <%= f.text_field :tribal_name, class: "required", id: "tribal-name", placeholder: l10n("insured.consumer_roles.tribe_name") %>
+      </div>
+    <% else %>
+      <div class="mb-4">
+        <label for="tribal_id" class="weight-n"><%= l10n("insured.tribal_name") %> *</label>
+        <div id="tribal-id-alert" class="hide">
+          <div class="alert alert-warning d-flex" role="alert">
+            <div>
+              <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+            </div>
+            <div class="mt-2 mb-1">
+              <%= l10n("insured.tribal_id_alert") %>
+            </div>
+          </div>
+        </div>
+        <%= f.text_field :tribal_id, class: "required", id: "tribal-id", placeholder: l10n("insured.consumer_roles.tribal_id") %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
 <div class="row no-buffer <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>
 <%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
   <input type="hidden" id="is_indian_alaskan_tribe_details_enabled" value="<%= EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>">
 
-  <div class="row row-form-wrapper no-buffer" id="tribal_container">
+  <div class="focus row row-form-wrapper no-buffer" id="tribal_container">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
       <label>
         <%= l10n("insured.tribe_member_pt1") %>
-        <%= render partial:"shared/glossary", locals: {key: "american_indian", term: "American Indian" } %> 
+        <%= render partial:"shared/glossary", locals: {key: "american_indian", term: "American Indian" } %>
         <%= l10n("or") %>
         <%= render partial:"shared/glossary", locals: {key: "alaska_native", term: "Alaska Native" } %>
-        <%= l10n("insured.tribe_member_pt2") %>
+        <%= l10n("insured.tribe_member_pt2") %>*
        </label>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
-      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_yes')" class="radio">
+      <div class="radio">
         <%= f.radio_button :indian_tribe_member, "true", class: "required floatlabel", id: 'indian_tribe_member_yes' %>
         <label for="indian_tribe_member_yes"><span class="yes_no_pair"><%= l10n("Yes") %></span></label>
       </div>
     </div>
     <div class="col-lg-1 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
-      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian_tribe_member_no')" class="radio">
+      <div class="radio">
         <%= f.radio_button :indian_tribe_member, "false", class: "required floatlabel", id: 'indian_tribe_member_no' %>
         <label for="indian_tribe_member_no"><span class="yes_no_pair"><%= l10n("no") %></span></label>
       </div>
     </div>
     <div class="col-md-2 not-sure-margin left-seprator">
-        <a href="#indian_tribe_member" data-toggle="modal" data-target="#indian_tribe_member">Not sure?</a>
-        <%= render partial: 'shared/modal_support_text_household', locals: {key: "indian_tribe_member"} %>
-      </div>
+      <a href="#indian_tribe_member" data-toggle="modal" data-target="#indian_tribe_member">Not sure?</a>
+      <%= render partial: 'shared/modal_support_text_household', locals: {key: "indian_tribe_member"} %>
+    </div>
   </div>
 
   <div class="tribal-container <%= 'hide' unless f.object.indian_tribe_member %>">
@@ -52,7 +137,7 @@
 
       <div class="row row-form-wrapper no-buffer featured-tribe-container hide">
         <div class="col-md-12">
-          <label><%= l10n("insured.tribal_name") %></label>
+          <label><%= l10n("insured.tribal_name") %>*</label>
         </div>
         <div class="col-md-12 form-group form-group-lg check_box_collection">
           <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>
@@ -88,6 +173,7 @@
   </div>
 
 </div>
+<% end %>
 
 <script>
     var enroll_state_abbr = $('#enroll_state_abbr').val();

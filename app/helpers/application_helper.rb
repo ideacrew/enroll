@@ -348,27 +348,41 @@ module ApplicationHelper
             '#', class: "add_fields #{classes}", data: {id: id, fields: fields.gsub("\n", "")})
   end
 
-  def render_flash
+  def render_flash(use_bs4 = false)
     rendered = []
     flash.each do |type, messages|
       next if messages.blank? || (messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string"))
 
       if messages.respond_to?(:each)
         messages.each do |m|
-          rendered << get_flash(type, m) if m.present?
+          rendered << get_flash(use_bs4, type, m) if m.present?
         end
       else
-        rendered << get_flash(type, messages)
+        rendered << get_flash(use_bs4, type, messages)
       end
     end
     sanitize_html(rendered.join)
   end
 
-  def get_flash(type, msg)
+  def get_flash(use_bs4, type, msg)
+    type = use_bs4 ? get_flash_type(type) : type
     if is_announcement?(msg)
       render(:partial => 'layouts/announcement_flash', :locals => {:type => type, :message => msg[:announcement]})
     else
       render(:partial => 'layouts/flash', :locals => {:type => type, :message => msg})
+    end
+  end
+
+  def get_flash_type(type)
+    case type
+    when "notice"
+      "info"
+    when "warning", "message" 
+      "warning"
+    when "success"
+      "success"
+    else 
+      "severe"
     end
   end
 
@@ -1085,4 +1099,23 @@ module ApplicationHelper
   end
 
   # => END: Broker Role Consumer Role(Dual Roles) Enhancement
+
+  # @method ridp_step_2_disabled
+  # Used to determine if the continue button should be disabled on ridp pages.
+  def ridp_step_2_disabled(person, application_verified, identity_verified)
+    return !identity_verified unless current_user.has_hbx_staff_role? && (person.primary_family.application_type == "Phone" || person.primary_family.application_type == "Paper")
+    (application_verified || identity_verified) ? false : true
+  end
+
+  def ridp_modal_options
+    {
+      :driver_license => "Driver's License issued by state or territory", 
+      :school_id => "School identification card", 
+      :military_id => "U.S. military card or draft record", 
+      :passport => "Identification card issued by the federal, state or local government, including a U.S. Passport", 
+      :military_dependent => "Military dependent's identification card", 
+      :native_american => "Native American tribal document", 
+      :coast_guard => "U.S. Coast Guard Merchant Mariner card"
+    }
+  end
 end

@@ -1,0 +1,31 @@
+<% if @bs4 %>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+  <h1><%= l10n('insured.interactive_identity_verifications.service_unavailable.try_again_later') %></h1>
+  <div class="mt-4 mb-4">
+    <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+    <%= render partial: 'shared/application_types_list' %>
+    <div class="outstanding-ridp-documents">
+      <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
+    </div>
+  </div>
+  <%= render partial: "shared/progress_navigation_buttons", locals: {next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : insured_family_members_path(consumer_role_id: @person.consumer_role.id), disable_link: ridp_step_2_disabled(@person, @person.consumer_role.application_verified?, @person.consumer_role.identity_verified?)} %>
+<% else %>
+  <div class="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+          <h4><%= t('insured.interactive_identity_verifications.service_unavailable.try_again_later') %></h4>
+          <br>
+          <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+          <%= render partial: 'shared/application_types_list' %>
+          <div class="outstanding-ridp-documents">
+            <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+          <%= render partial: 'shared/individual_progress', locals: {step: '2', next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : insured_family_members_path(consumer_role_id: @person.consumer_role.id), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?} %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,135 @@
+<hidden id='dchbx_enroll_date_of_record' class='d-none'><%= TimeKeeper.date_of_record.iso8601 %></hidden>
+<header class="bg-white navbar-primary py-2 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
+
+  <nav class="navbar navbar-expand-lg container py-1 px-0">
+    <a class="navbar-brand mr-0" href="#" title="<%= l10n('welcome.index.logo_title')%>">
+      <%= image_pack_tag "logo_bs4_#{ENV['CLIENT'] || 'ic'}.svg", alt: "#{ENV['CLIENT']} logo"%>
+    </a>
+    <button class="navbar-toggler unstyled collapsed" type="button" data-toggle="collapse" data-target="#nav-dynamic-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon open">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <title><%= l10n("layout.header.open_menu") %></title>
+          <path d="M3 17H21C21.5523 17 22 17.4477 22 18C22 18.5128 21.614 18.9355 21.1166 18.9933L21 19H3C2.44772 19 2 18.5523 2 18C2 17.4872 2.38604 17.0645 2.88338 17.0067L3 17H21H3ZM2.99988 11L20.9999 10.9978C21.5522 10.9978 22 11.4454 22 11.9977C22 12.5106 21.6141 12.9333 21.1167 12.9911L21.0001 12.9978L3.00012 13C2.44784 13.0001 2 12.5524 2 12.0001C2 11.4873 2.38594 11.0646 2.88326 11.0067L2.99988 11L20.9999 10.9978L2.99988 11ZM3 5H21C21.5523 5 22 5.44772 22 6C22 6.51284 21.614 6.93551 21.1166 6.99327L21 7H3C2.44772 7 2 6.55228 2 6C2 5.48716 2.38604 5.06449 2.88338 5.00673L3 5H21H3Z"/>
+        </svg>
+      </span>
+      <span class="navbar-toggler-icon closed">
+        <title><%= l10n("layout.header.close_menu") %></title>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_751_61740)">
+          <path d="M6 6L18 18M18 6L6 18" stroke-width="1.5" stroke-linecap="round"/>
+          </g>
+          <defs>
+          <clipPath id="clip0_751_61740">
+          <rect width="24" height="24" fill="white"/>
+          </clipPath>
+          </defs>
+        </svg>
+      </span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav-dynamic-collapse">
+      <ul class="navbar-nav mr-auto">
+        <% if signed_in? %><li class="nav-item-divider"></li><% end %>
+        <li class="nav-item d-flex flex-column site-name-market">
+          <%= bs4_portal_type(controller_name) %>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <% if signed_in? %>
+          <li class="nav-item-divider"></li>
+          <li class="nav-item d-flex flex-column align-items-end">
+            <% user_id = current_user.try(:person).try(:hbx_id) %>
+            <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= " #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
+            <span class="horizontal-links">
+              <%= render partial: "shared/my_portal_links" %>
+              <span>
+                <%= h(link_to l10n('layout.header.help'), site_help_url, target: '_blank', rel: "noopener noreferrer") %>
+              </span>
+              <span>
+                <%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %>
+              </span>
+            </span>
+          </li>
+          <% if signed_in? %>
+            <li class="nav-item d-flex flex-column align-items-md-end">
+              <% user_id = current_user.try(:person).try(:hbx_id) %>
+              <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= " #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
+              <span class="horizontal-links">
+                <%= render partial: "shared/my_portal_links" %>
+                <span>
+
+                </span>
+              </span>
+            </li>
+          <% end %>
+          <li class="nav-item mb-2"><%= h(link_to l10n('layout.header.home'), "#", target: '_blank', rel: "noopener noreferrer") %></li>
+          <li class="nav-item my-2"><%= h(link_to l10n('layout.header.help'), EnrollRegistry[:enroll_app].setting(:help_url).item, target: '_blank', rel: "noopener noreferrer") %></li>
+          <% end %>
+      </ul>
+      <div class="my-4 mobile-buttons">
+        <a href="tel:<%= contact_center_short_number %>" class="button outline my-4 w-100 d-block text-center">
+          <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
+        </a>
+        <% if signed_in? %>
+          <a href="<%= main_app.destroy_user_session_path %>" class="button-error outline my-4 w-100 d-block text-center">
+            <%= l10n("logout") %>
+          </a>
+        <% end %>
+      </div>
+      <!-- these links are for the desktop view !-->
+      <div class="desktop-nav align-items-center">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item-divider"></li>
+          <li class="nav-item d-flex flex-column site-name-market">
+            <span><%= l10n('welcome.index.welcome_to_site_header')%></span>
+            <%= bs4_portal_type(controller_name) %>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item d-flex flex-column align-items-md-end align-items-lg-end">
+            <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
+            <% contact_center_short_number = EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>
+            <a href="tel:<%= contact_center_short_number %>">
+              <%= "#{contact_center_short_number} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %>
+            </a>
+          </li>
+          <% if signed_in? %>
+            <li class="nav-item-divider"></li>
+            <li class="nav-item d-flex flex-column align-items-md-end align-items-lg-end">
+              <% user_id = current_user.try(:person).try(:hbx_id) %>
+              <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= " #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
+              <span class="horizontal-links">
+                <%= render partial: "shared/my_portal_links" %>
+                <span>
+                  <%= sanitize(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %>
+                </span>
+                <span>
+                  <%= sanitize(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %>
+                </span>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+    <div id="nav-overlay"></div>
+  </nav>
+</header>
+
+<% if user_signed_in? %>
+  <script>
+    // check time until logout
+    function check_time_until_logout(){
+      $.ajax({
+        url: "<%= main_app.check_time_until_logout_path(format: :js) %>",
+        method: 'GET',
+        dataType: 'script',
+        data:{bs4: <%= @bs4 %>},
+        success: function(response){
+        },
+        error: function(response){
+        }
+      });
+    }
+    var logout_check_timer = setTimeout(check_time_until_logout, 87000);
+  </script>
+<% end %>

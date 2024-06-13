@@ -50,6 +50,34 @@ module VerificationHelper
     end
   end
 
+  # method added specifically to handle the displaying of 'Alive Status'
+  # this verification type should always be visible to admin
+  # but should only display for consumers/brokers/broker agency staff if the validation_status is 'outstanding'
+  def can_display_type?(verif_type)
+    return true unless verif_type.type_name == 'Alive Status'
+    return false unless EnrollRegistry.feature_enabled?(:enable_alive_status)
+    return true if current_user.has_hbx_staff_role?
+
+    previous_states = verif_type.type_history_elements.pluck(:from_validation_status).compact
+    return true if previous_states.include?('outstanding')
+    return true if verif_type.validation_status == 'outstanding'
+
+    false
+  end
+
+  def ridp_status_translated(type, person)
+    case ridp_type_status(type, person)
+    when 'in review'
+      l10n("ridp_status.in_review")
+    when 'valid'
+      l10n("ridp_status.verified")
+    when 'rejected'
+      l10n('verification_type.validation_status')
+    else
+      l10n("ridp_status.outstanding")
+    end
+  end
+
   def verification_type_class(status)
     case status
     when 'verified', 'valid'

@@ -1,0 +1,120 @@
+<% content_for :horizontal_menu do %>
+  <div id="uic-primary-nav" class=" <%= "pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' %>">
+    <nav class="NEWBOOTSTRAP container navbar">
+      <ul id="primary-nav-bar" class="navbar-nav ho" role="tablist">
+        <li class="nav-item pl-0" role="presentation">
+          <a>
+            <%= sanitize(link_to(main_app.exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" )) do %>
+              <i class="fas fa-home fa-lg" aria-hidden="true"></i>
+            <% end %>
+          </a>
+        </li>
+        <% if individual_market_is_enabled? %>
+          <li class="nav-item" role="presentation">
+            <div class="dropdown pl-1">
+              <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="families_dropdown">Families</a>
+              <i class="fas fa-caret-down"></i>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'families', link_path: main_app.family_index_dt_exchanges_hbx_profiles_path, display_name: 'Families', active_tab: "families", remote: false, pundit_object: nil, pundit_method: nil} %></li>
+                <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'outstanding-verifications', link_path: main_app.outstanding_verification_dt_exchanges_hbx_profiles_path, display_name: 'Outstanding Verifications', active_tab: "outstanding-verifications", remote: false, pundit_object: HbxProfile, pundit_method: :access_outstanding_verification_sub_tab?} %></li>
+                <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'new-consumer-application', link_path: main_app.begin_consumer_enrollment_exchanges_agents_path(original_application_type: 'phone'), display_name: 'New Consumer Application', active_tab: "new-consumer-application", remote: false, pundit_object: ConsumerRole, pundit_method: :access_new_consumer_application_sub_tab?} %></li>
+                <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'identity_verification', link_path: main_app.identity_verification_exchanges_hbx_profiles_path, display_name: 'Identity Verification', active_tab: "identity_verification", remote: false, pundit_object: HbxProfile, pundit_method: :access_identity_verification_sub_tab?} %></li>
+                <% if EnrollRegistry.feature_enabled?(:no_transition_families) %>
+                  <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'dc-resident-application', link_path: main_app.begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'), display_name: "#{EnrollRegistry[:enroll_app].settings(:site_key).item.upcase} Resident Application", active_tab: "dc-resident-application", remote: false, pundit_object: ResidentRole, pundit_method: :begin_resident_enrollment?} %></li>
+                <% end %>
+              </ul>
+            </div>
+          </li>
+          <% if ::EnrollRegistry[:aca_shop_market].enabled? %>
+            <li class="nav-item" role="presentation">
+              <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers-invoice", remote: false, pundit_object: nil, pundit_method: nil} %>
+            </li>
+          <% end %>
+        <% else %>
+          <li class="nav-item" role="presentation">
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'families', link_path: main_app.family_index_dt_exchanges_hbx_profiles_path, display_name: 'Families', active_tab: "families", remote: true, pundit_object: nil, pundit_method: nil } %>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers", remote: true, pundit_object: nil, pundit_method: nil } %>
+          </li>
+        <% end %>
+        <% if aca_user_accounts_enabled %>
+          <li class="nav-item" role="presentation">
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'user-account', link_path: main_app.user_account_index_exchanges_hbx_profiles_path, display_name: 'User Accounts',active_tab: "user-account", remote: false, pundit_object: HbxProfile, pundit_method: :can_access_user_account_tab? } %>
+          </li>
+          <% if EnrollRegistry.feature_enabled?(:issuers_tab) %>
+            <li class="nav-item" role="presentation">
+              <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'issuers', link_path: main_app.exchanges_issuers_path, display_name: 'Issuers', active_tab: "issuers", remote: true, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? } %>
+            </li>
+          <% end %>
+          <li class="nav-item" role="presentation">
+            <div class="dropdown pl-1">
+              <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Brokers</a>
+              <i class="fas fa-caret-down"></i>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'brokers', link_path: main_app.exchanges_broker_applicants_path, display_name: 'Broker Applications', active_tab: "brokers", remote: false, pundit_object: nil, pundit_method: nil } %></li>
+                <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'broker-agencies', link_path: main_app.broker_agency_index_exchanges_hbx_profiles_path, display_name: 'Broker Agencies', active_tab: "broker-agencies", remote: false, pundit_object: nil, pundit_method: nil } %></li>
+                <% if general_agency_enabled? %>
+                  <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'general-agencies', link_path: main_app.general_agency_index_exchanges_hbx_profiles_path, display_name: 'General Agencies', active_tab: 'general-agencies', remote: false, pundit_object: nil, pundit_method: nil} %></li>
+                <% end %>
+                <% if external_application_configured?("admin") && EnrollRegistry.feature_enabled?(:agency_staff) %>
+                  <li>
+                    <% url = ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff" %>
+                    <%= sanitize(link_to(url, "aria-expanded" => "true", data: { turbolinks: false, jwt_token: jwt_for_external_application }, id: "agencyStaffLinkToExternal")) %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item" role="presentation">
+            <div class="dropdown pl-1">
+              <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
+              <i class="fas fa-caret-down"></i>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <% if EnrollRegistry.feature_enabled?(:calendar_tab) %>
+                  <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'calendar', link_path: main_app.exchanges_scheduled_events_path, display_name: 'Calendar', active_tab: 'calendar', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? } %></li>
+                <% end %>
+                <% if policy_helper(HbxProfile).view_the_configuration_tab? %>
+                  <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'configuration', link_path: main_app.configuration_exchanges_hbx_profiles_path, display_name: 'Config', active_tab: 'config', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? } %></li>
+                <% end %>
+                <% if EnrollRegistry.feature_enabled?(:staff_tab) %>
+                  <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'staff', link_path: main_app.staff_index_exchanges_hbx_profiles_path, display_name: 'Staff', active_tab: 'staff', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? } %></li>
+                <% end %>
+                <% if EnrollRegistry.feature_enabled?(:orphan_accounts_tab) %>
+                  <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'users-orphans', link_path: main_app.users_orphans_path, display_name: 'Orphan Accounts', active_tab: 'users-orphans', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? } %></li>
+                <% end %>
+                <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'bulk-notices', link_path: main_app.exchanges_bulk_notices_path, display_name: 'Bulk Notices', active_tab: 'bulk_notices', remote: false, pundit_object: HbxProfile, pundit_method: :can_send_secure_message? } %></li>
+                <% if EnrollRegistry.feature_enabled?(:sep_types) %>
+                  <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'manage-sep-types', link_path: main_app.sep_types_dt_exchanges_manage_sep_types_path, data: { turbolinks: false }, display_name: l10n("exchange.manage_sep_types.manage_seps"), active_tab: "manage-sep-types", remote: false, pundit_object: QualifyingLifeEventKind, pundit_method: :can_manage_qles?} %></li>
+                <% end %>
+                <% if EnrollRegistry.feature_enabled?(:data_seeds_ui) && (ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?) %>
+                  <li><%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'manage-data-seeds', link_path: main_app.exchanges_seeds_path, data: { turbolinks: false }, display_name: l10n("exchange.seeds.page_title"), active_tab: "manage-data-seeds", remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs?} %></li>
+                <% end %>
+              </ul>
+            </div>
+            <% if EnrollRegistry.feature_enabled?(:inbox_tab) %>
+              <li class="nav-item pl-1" role="presentation" class="<%= pundit_class HbxProfile, :view_admin_tabs? %>">
+                <%= sanitize(link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" )) do %>
+                  | Inbox
+                  <span class="badge ml-half"><%= @unread_messages %></span>
+                <% end %>
+              </li>
+            <% end %>
+            <% if EnrollRegistry.feature_enabled?(:notices_tab) %>
+              <li class="nav-item pl-1" role="presentation" class="<%= pundit_class HbxProfile, :view_admin_tabs? %>">
+                <%= sanitize(link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" )) do %>
+                  | Notices
+                <% end %>
+              </li>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </nav>
+  </div>
+<% end %>
