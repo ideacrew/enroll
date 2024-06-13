@@ -144,14 +144,14 @@ module FinancialAssistance
             is_required: true
           }
         }
-        if @cfl_service.displayable_field?('applicant', applicant.id, :is_joint_tax_filing)
+        if displayable_applicant_field?(:is_joint_tax_filing)
           hash[:filing_jointly] = human_boolean(applicant.is_joint_tax_filing)
         end
         hash[:dependent] = {
           value: human_boolean(applicant.is_claimed_as_tax_dependent),
           is_required: true
         }
-        if @cfl_service.displayable_field?('applicant', applicant.id, :claimed_as_tax_dependent_by)
+        if displayable_applicant_field?(:claimed_as_tax_dependent_by)
           hash[:dependent_by] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name
         end
         
@@ -165,7 +165,7 @@ module FinancialAssistance
             is_required: true
           }
         }
-        if @cfl_service.displayable_field?('applicant', applicant.id, :incomes_jobs)
+        if displayable_applicant_field?(:incomes_jobs)
           applicant.incomes.jobs.each do |job|
             hash[:employer_name] = job.employer_name
             if job.employer_address.present?
@@ -230,10 +230,12 @@ module FinancialAssistance
             review_benefits_partial: ("is_eligible" if applicant.has_eligible_health_coverage)
           }.compact
         }
+
         if EnrollRegistry[:indian_health_service_question].feature.is_enabled && applicant.indian_tribe_member
           hash[:indian_health_service_eligible] = human_boolean(applicant.health_service_eligible)
           hash[:indian_health_service] = human_boolean(applicant.health_service_through_referral)
         end
+
         if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
           hash[:medicaid_not_eligible] = human_boolean(applicant.has_eligible_medicaid_cubcare)
           hash[:medicaid_cubcare_end_date] = applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : l10n("faa.not_applicable_abbreviation")
@@ -241,12 +243,14 @@ module FinancialAssistance
           hash[:household_income_changed] = human_boolean(applicant.has_household_income_changed)
           hash[:person_medicaid_last_day] = applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : l10n("faa.not_applicable_abbreviation")
         end
+
         if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && applicant.eligible_immigration_status
           hash[:medicaid_chip_ineligible] = human_boolean(applicant.medicaid_chip_ineligible)
           if applicant.medicaid_chip_ineligible
             hash[:immigration_status_changed] = human_boolean(applicant.immigration_status_changed)
           end
         end
+
         if applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
           hash[:has_dependent_with_coverage] = human_boolean(applicant.has_dependent_with_coverage)
           hash[:dependent_job_end_on] = applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : l10n("faa.not_applicable_abbreviation")
@@ -267,38 +271,40 @@ module FinancialAssistance
       def other_questions_hash(applicant)
         hash = {}
         if applicant.is_applying_coverage
-          if @cfl_service.displayable_field?('applicant', applicant.id, :is_ssn_applied)
+          if displayable_applicant_field?(:is_ssn_applied)
             hash[:ssn_apply] = human_boolean(applicant.is_ssn_applied)
           end
-          if @cfl_service.displayable_field?('applicant', applicant.id, :non_ssn_apply_reason)
+          if displayable_applicant_field?(:non_ssn_apply_reason)
             hash[:ssn_reason] = applicant.non_ssn_apply_reason_readable.to_s
           end
         end
+
         hash[:is_pregnant] = human_boolean(applicant.is_pregnant)
-        if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_due_on)
+        if displayable_applicant_field?(:pregnancy_due_on)
           hash[:pregnancy_due_date] = applicant.pregnancy_due_on.to_s
           hash[other_questions_prompt('children_expected')] = applicant.children_expected_count
         end
-        if @cfl_service.displayable_field?('applicant', applicant.id, :is_post_partum_period)
+        if displayable_applicant_field?(:is_post_partum_period)
           hash[:pregnant_last_year] = human_boolean(applicant.is_post_partum_period)
         end
-        if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_end_on)
+        if displayable_applicant_field?(:pregnancy_end_on)
           hash[:pregnancy_end_date] = applicant.pregnancy_end_on.to_s
         end
-        if @cfl_service.displayable_field?('applicant', applicant.id, :is_enrolled_on_medicaid)
+        if displayable_applicant_field?(:is_enrolled_on_medicaid)
           hash[:is_enrolled_on_medicaid] = human_boolean(applicant.is_enrolled_on_medicaid)
         end
+
         if applicant.is_applying_coverage
-          if @cfl_service.displayable_field?('applicant', applicant.id, :is_former_foster_care)
+          if displayable_applicant_field?(:is_former_foster_care)
             hash[:foster_care_at18] = human_boolean(applicant.is_former_foster_care)
           end
-          if @cfl_service.displayable_field?('applicant', applicant.id, :foster_care_us_state)
-            hash[other_questions_prompt('foster_care_state')] = applicant.foster_care_us_state
-            hash[other_questions_prompt('foster_care_age_left')] = applicant.age_left_foster_care
-            hash[other_questions_prompt('foster_care_medicaid')] = human_boolean(applicant.had_medicaid_during_foster_care)
+          if displayable_applicant_field?(:foster_care_us_state)
+            hash[:foster_care_state] = applicant.foster_care_us_state
+            hash[:foster_care_age_left] = applicant.age_left_foster_care
+            hash[:foster_care_medicaid] = human_boolean(applicant.had_medicaid_during_foster_care)
           end
           hash[:is_student] = human_boolean(applicant.is_student)
-          if @cfl_service.displayable_field?('applicant', applicant.id, :student_kind)
+          if displayable_applicant_field?(:student_kind)
             hash[:student_type] = applicant.student_kind
             hash[:student_status_end] = applicant.student_status_end_on
             hash[:student_school_type] = applicant.student_school_kind
