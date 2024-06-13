@@ -134,7 +134,7 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
         element = dependent.alive_status.type_history_elements.last
 
         expect(element.action).to eq 'DMF Determination Request Failure'
-        expect(element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} is not valid: [\"Invalid SSN\"]"
+        expect(element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} is not valid: Invalid SSN"
       end
     end
   end

@@ -12,6 +12,11 @@ module Operations
           include Dry::Monads[:result, :do]
           include ::Operations::Transmittable::TransmittableUtils
 
+          VALID_ELIGIBLITY_STATES = [
+            'health_product_enrollment_status',
+            'dental_product_enrollment_status'
+          ].freeze
+
           # @return [ Cv3Family ] Job successfully completed
           def call(family, transmittable_params)
             @job = transmittable_params[:job]
@@ -49,17 +54,19 @@ module Operations
               family_member = @family.family_members.detect { |fm| fm.hbx_id == aca_member.hbx_id }
 
               # check if member does not have an enrollment
-              unless member_eligible?(aca_member)
+              unless member_has_dmf_determination_eligible_enrollment?(family_member)
                 vh_message = "Family Member with hbx_id #{aca_member.hbx_id} does not have a valid enrollment"
                 update_verification_type_histories(vh_message, [family_member])
                 next vh_message
               end
 
               # check if member is valid (valid_ssn, etc.)
-              valid_member = Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules.new.call(aca_member.person, :alive_status)
-              next if valid_member.success?
+              encrypted_ssn = aca_member&.person&.person_demographics&.encrypted_ssn
+              # using the same Validator used by FDSH for consistency
+              valid_ssn = AcaEntities::Operations::EncryptedSsnValidator.new.call(encrypted_ssn)
+              next if valid_ssn.success?
 
-              vh_message = "Family Member with hbx_id #{aca_member.hbx_id} is not valid: #{valid_member.failure}"
+              vh_message = "Family Member with hbx_id #{aca_member.hbx_id} is not valid: #{valid_ssn.failure}"
               update_verification_type_histories(vh_message, [family_member])
               vh_message
             end.compact
@@ -72,15 +79,14 @@ module Operations
             handle_dmf_failure(message, :build_cv3_family, update_histories: false)
           end
 
-          def member_eligible?(family_member)
+          def member_has_dmf_determination_eligible_enrollment?(family_member)
             # first check if eligibility_determination has family member as a subject
             subjects = @family.eligibility_determination.subjects
             subject = subjects.detect { |sub| sub.hbx_id == family_member.hbx_id }
             return false unless subject.present?
 
             # then check if subject has any of the valid eligibility states
-            item_keys = ['health_product_enrollment_status', 'dental_product_enrollment_status']
-            states = subject&.eligibility_states&.select { |state| item_keys.include?(state.eligibility_item_key) }
+            states = subject&.eligibility_states&.select { |state| VALID_ELIGIBLITY_STATES.include?(state.eligibility_item_key) }
             return false unless states.present?
 
             # last check if valid eligibility states have is_eligible as true
