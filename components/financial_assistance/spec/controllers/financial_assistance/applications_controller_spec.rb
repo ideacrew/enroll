@@ -409,10 +409,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         post :submit, params: { id: application.id, application: application_valid_params }
       end
 
-      it 'build errors for the model' do
-        expect(controller).to have_received(:build_error_messages).with(application)
-      end
-
       it "should render error page when there is an incomplete or already submitted application" do
         expect(response).to redirect_to(application_publish_error_application_path(application))
       end

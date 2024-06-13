@@ -108,29 +108,7 @@ module FinancialAssistance
         @application.assign_attributes(permit_params(params[:application]))
 
         if @application.save
-          if @application.imported?
-            redirect_to application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" }
-            return
-          end
-          if @application.complete?
-            publish_result = determination_request_class.new.call(application_id: @application.id)
-            if publish_result.success?
-              redirect_to wait_for_eligibility_response_application_path(@application)
-            else
-              @application.unsubmit! if @application.may_unsubmit?
-              flash_message = case publish_result.failure
-                              when Dry::Validation::Result
-                                { error: validation_errors_parser(publish_result.failure) }
-                              when Exception
-                                { error: publish_result.failure.message }
-                              else
-                                { error: "Submission Error: #{publish_result.failure}" }
-                              end
-              redirect_to application_publish_error_application_path(@application), flash: flash_message
-            end
-          else
-            redirect_to application_publish_error_application_path(@application), flash: { error: build_error_messages(@model) }
-          end
+          redirect_to submit_and_publish_application_redirect_path[:path], flash: submit_and_publish_application_redirect_path[:flash]
         else
           @application.save!(validate: false)
           flash[:error] = build_error_messages(@application).join(", ")
@@ -568,6 +546,27 @@ module FinancialAssistance
       @applicants_name_by_hbx_id_hash = @applicants.each_with_object({}) do |applicant, hash|
         hash[applicant.person_hbx_id] = applicant.full_name
       end
+    end
+
+    def submit_and_publish_application_redirect_path
+      return { path: application_publish_error_application_path(@application), flash: { error: "Submission Error: Imported Application can't be submitted for Eligibity" } } if @application.imported?
+      return { path: application_publish_error_application_path(@application), flash: { error: build_error_messages(@application) } } unless @application.complete?
+
+      publish_result = determination_request_class.new.call(application_id: @application.id)
+
+      return { path: wait_for_eligibility_response_application_path(@application), flash: nil } if publish_result.success?
+
+      @application.unsubmit! if @application.may_unsubmit?
+
+      flash_message = case publish_result.failure
+                      when Dry::Validation::Result
+                        { error: validation_errors_parser(publish_result.failure) }
+                      when Exception
+                        { error: publish_result.failure.message }
+                      else
+                        { error: "Submission Error: #{publish_result.failure}" }
+                      end
+      { path: application_publish_error_application_path(@application), flash: flash_message }
     end
   end
 end
