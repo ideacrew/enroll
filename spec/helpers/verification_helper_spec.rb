@@ -603,7 +603,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         allow(EnrollRegistry[:enable_call_hub_for_ai_an].feature).to receive(:is_enabled).and_return(true)
 
         allow(helper).to receive(:verification_type_status).and_return status
-        allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
       end
       it "returns admin actions array" do
         person.consumer_role.update_attributes(aasm_state: "#{state}")
