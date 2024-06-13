@@ -1,0 +1,149 @@
+<%= form_for @application, url: {action: "save_preferences"}, method: :put do |f| %>
+  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+    <div class="col-md-9">
+      <div class="">
+        <p class="alert alert-error hide"></p>
+        <div class="row">
+          <div class="col-md-10">
+            <h2 class="fa-darkblue">Your Preferences</h2>
+          </div>
+        </div>
+        <p>Tell us your preferences. When you're finished, select CONTINUE.</p>
+        <p class="memo">* = required field</p>
+        <div class="focus_effect module">
+          <div class="margin-bottom-30">
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-6">
+                To make it easier to determine my eligibility for premium reductions in future years, I agree to allow <short-name-placeholder> to use my income data, including information from tax returns, for the next five years. <short-name-placeholder> will send me a notice, let me make any changes, and I can opt out at any time. *<br>
+              </div>
+              <div class="col-md-3">
+                <%= f.radio_button("is_renewal_authorized", true, class: "radio-yml", id: "eligibility_easier_yes") %>
+                <label class="radio-yml" for="eligibility_easier_yes">I agree</label>
+              </div>
+              <div class='col-md-3'>
+                <%= f.radio_button("is_renewal_authorized", false, class: "radio-yml", id: "eligibility_easier_no") %>
+                <label class="radio-yml" for="eligibility_easier_no">I disagree</label>
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                When it’s time to renew or change coverage, I authorize <%= ::EnrollRegistry[:enroll_app].setting(:short_name).item %> to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility.
+              </div>
+            </div>
+            <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+              <div class="col-md-12">
+                How long would you like your eligibility for premium reductions to be renewed? *
+              </div>
+              <div class="col-md-12">
+                <%= f.radio_button("years_to_renew", 5, class: "radio-yml") %>
+                <label class="radio-yml span-text">5 years</label>
+              </div>
+              <div class="col-md-12">
+                <%= f.radio_button("years_to_renew", 4, class: "radio-yml") %>
+                <label class="radio-yml span-text">4 years</label>
+              </div>
+              <div class="col-md-12">
+                <%= f.radio_button("years_to_renew", 3, class: "radio-yml") %>
+                <label class="radio-yml span-text">3 years</label>
+              </div>
+              <div class="col-md-12">
+                <%= f.radio_button("years_to_renew", 2, class: "radio-yml") %>
+                <label class="radio-yml span-text">2 years</label>
+              </div>
+              <div class="col-md-12">
+                <%= f.radio_button("years_to_renew", 1, class: "radio-yml") %>
+                <label class="radio-yml span-text">1 years</label>
+              </div>
+              <div class="col-md-12">
+                <%= f.radio_button("years_to_renew", 0, class: "radio-yml") %>
+                <label class="radio-yml span-text radio-inline-override label-max-width-renew">None. I understand that this means I won't get cost savings in future years unless I change my mind and tell <%= ::EnrollRegistry[:enroll_app].setting(:short_name).item %>.</label>
+              </div>
+            </div>
+          </div>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:voter_registration_through_hbx) %>
+            <div class="margin-bottom-30 clear mt-4">
+              <h2 class="darkblue">Voter Registration</h2>
+              <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+                <div class="col-md-8">
+                  Would you like to register to vote in <%= aca_state_abbreviation %> or update your current registration? * (A form will be mailed to you)
+                </div>
+                <div class="col-md-2">
+                  <%= f.radio_button("is_requesting_voter_registration_application_in_mail", true, class: "radio-yml", id: "mailed_yes") %>
+                  <label class="radio-yml" for="mailed_yes">Yes</label>
+                </div>
+                <div class="col-md-2">
+                  <%= f.radio_button("is_requesting_voter_registration_application_in_mail", false, class: "radio-yml", id: "mailed_no") %>
+                  <label class="radio-yml" for="mailed_no">No</label>
+                </div>
+              </div>
+              <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+                <div class="col-md-12">
+                  <b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to have requested a voter registration form at this time.<br><br>
+                    You may file a complaint if you believe that someone has interfered with: <br><br>
+                    * Your right to register or not register to vote <br>
+                    * Your right to privacy in deciding whether or not to register to vote <br>
+                    * Your right to choose your own political party or other political choice <br><br>
+
+                    <b>To file a complaint, contact:</b><br>
+                   <%= Settings.contact_center.board_of_elections_entity %> <br>
+                   <%= h(raw(Settings.contact_center.board_of_elections_address)) %> <br>
+                   <%= Settings.contact_center.board_of_elections_email %> <br>
+                   Phone: <%= Settings.contact_center.board_of_elections_phone_number %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:voter_registration_through_ext_url) %>
+            <div class="margin-bottom-30 clear mt-4">
+              <h2 class="darkblue">Voter Registration</h2>
+              <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+                <div class="col-md-12">
+                  If you are not registered to vote where you live now and would like to apply to register to vote, visit: <a href='https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa' target='_blank' rel='noopener noreferrer'>https://www.maine.gov/sos/cec/elec/voter-info/voterguide.html?ref=voteusa</a>.
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="back-link">
+              <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+              <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= financial_assistance.edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" %>
+      <p class="small-left-margin very-small-margin-top faded">
+        <ul class='list-unstyled list-right-section'>
+          <li>
+            <%= h(link_to(financial_assistance.review_and_submit_application_path(@application)) do %>
+              PREVIOUS
+            <% end) %>
+          </li>
+          <li>
+            <a href="#">
+              SAVE &amp; EXIT
+            </a>
+            <br>
+            <br>
+          </li>
+          <li>
+            <p>
+              If you select Save &amp; Exit, you can save your work and continue where you left off the next time you login.
+            </p>
+          </li>
+          <br class="clear">
+        </ul>
+      </p>
+      <div id="help_me_sign_up" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_me_sign_up')" class="btn btn-default btn-block help-me-sign-up" data-target="#help_with_plan_shopping" data-toggle="modal">
+        Help me sign up
+      </div>
+      <%= render partial: './ui-components/v1/modals/help_with_plan'  %>
+    </div>
+  </div>
+<% end %>
+
+<%= render partial: '/financial_assistance/shared/to_previous_modal' %>
