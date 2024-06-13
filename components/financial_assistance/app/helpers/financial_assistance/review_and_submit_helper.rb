@@ -1,85 +1,209 @@
 module FinancialAssistance
+  module RowKeyTranslator
+    def translate_row_keys(hash, map_key)
+      hash.transform_keys { |row_key| 
+        map_value = send(map_key)[row_key]
+        translation_args = map_value.is_a?(Hash) ? map_value[:translation_key] : map_value
+        translation_mapper = map_value.is_a?(Hash) ? map_value[:translation_mapper] : :l10n
+        method(translation_mapper).call(*translation_args)
+      }
+    end
+
+    private
+
+    def personal_info_keys
+      {
+        age: 'age',
+        gender: 'gender',
+        relationship: 'relationship',
+        status: 'status',
+        incarcerated: 'faa.review.personal.incarcerated',
+        needs_coverage: 'faa.review.personal.needs_coverage'
+      }
+    end
+
+    def tax_info_keys
+      {
+        file_in_year: ['faa.tax.file_in_year', assistance_year: @application.assistance_year],
+        filing_jointly: 'faa.tax.filing_jointly',
+        dependent: ['faa.tax.dependent', assistance_year: @application.assistance_year],
+        dependent_by: 'faa.tax.dependent_by'
+      }
+    end
+
+    def income_info_keys
+      {
+        from_employer: ['faa.incomes.from_employer', assistance_year: assistance_year],
+        employer_name: 'employer_name',
+        employer_address_line_1: 'employer_address_line_1',
+        employer_address_line_2: 'employer_address_line_2',
+        city: 'city',
+        state: 'state',
+        zip: 'zip',
+        employer_phone: 'employer_phone',
+        from_self_employment: ['faa.incomes.from_self_employment', assistance_year: assistance_year],
+        unemployment: ['faa.other_incomes.unemployment', assistance_year: assistance_year],
+        alaska_native: 'faa.other_incomes.alaska_native',
+        other_sources: ['faa.other_incomes.other_sources', assistance_year: assistance_year],
+      }
+    end
+
+    def coverage_info_keys
+      {
+        is_enrolled: applicant_currently_enrolled_short_key,
+        is_eligible: applicant_eligibly_enrolled_short_key,
+        indian_health_service_eligible: 'faa.indian_health_service_eligible',
+        indian_health_service: 'faa.indian_health_service',
+        medicaid_not_eligible: 'faa.medicaid_not_eligible',
+        medicaid_cubcare_end_date: 'faa.medicaid_cubcare_end_date',
+        change_eligibility_status: 'faa.change_eligibility_status',
+        household_income_changed: 'faa.household_income_changed',
+        person_medicaid_last_day: 'faa.person_medicaid_last_day',
+        medicaid_chip_ineligible: ['faa.medicaid_chip_ineligible', year: TimeKeeper.date_of_record.year - 5],
+        immigration_status_changed: 'faa.immigration_status_changed',
+        has_dependent_with_coverage: 'faa.has_dependent_with_coverage',
+        dependent_job_end_on: 'faa.dependent_job_end_on'
+      }
+    end
+
+    def other_questions_keys
+      def other_questions_prompt_translation(key)
+        {translation_key: key, :translation_mapper => :other_questions_prompt}
+      end
+
+      {
+        ssn_apply: other_questions_prompt_translation('ssn_apply'),
+        ssn_reason: 'faa.other_ques.ssn_reason',
+        is_pregnant: other_questions_prompt_translation('is_pregnant'),
+        pregnancy_due_date: 'faa.other_ques.pregnancy_due_date',
+        children_expected: other_questions_prompt_translation('children_expected'),
+        pregnant_last_year: other_questions_prompt_translation(FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? 'pregnant_last_year' : 'pregnant_last_60d'),
+        pregnancy_end_date: 'faa.other_ques.pregnancy_end_date',
+        is_enrolled_on_medicaid: other_questions_prompt_translation('is_enrolled_on_medicaid'),
+        foster_care_at18: other_questions_prompt_translation('foster_care_at18'),
+        foster_care_state: other_questions_prompt_translation('foster_care_state'),
+        foster_care_age_left: other_questions_prompt_translation('foster_care_age_left'),
+        foster_care_medicaid: other_questions_prompt_translation('foster_care_medicaid'),
+        is_student: other_questions_prompt_translation('is_student'),
+        student_type: 'faa.other_ques.student_type',
+        student_status_end: 'faa.other_ques.student_status_end',
+        student_school_type: 'faa.other_ques.student_school_type',
+        is_blind: other_questions_prompt_translation('is_blind'),
+        primary_caretaker_question_text: other_questions_prompt_translation('faa.primary_caretaker_question_text'),
+        coverage_caretaker: 'faa.review.coverage.caretaker',
+        daily_living_help: other_questions_prompt_translation('daily_living_help'),
+        help_paying_bills: other_questions_prompt_translation('help_paying_bills'),
+        disability_question: other_questions_prompt_translation('disability_question')
+      }
+    end
+
+    def review_benefits_esi_keys
+      {
+        employer_name: 'hbx_profiles.employer_name',
+        employer_address_line_1: 'employer_address_line_1',
+        employer_address_line_2: 'employer_address_line_2',
+        city: 'city',
+        state: 'state',
+        zip: 'zip',
+        employer_phone: 'employer_phone',
+        esi_employer_ein: 'esi_employer_ein',
+        esi_employee_waiting_period: 'faa.review.income.review_benefits_table.esi.employee_waiting_period',
+        esi_employer_minimum_standard: 'faa.review.income.review_benefits_table.esi.employer_minimum_standard',
+        esi_covered: 'faa.review.income.review_benefits_table.esi.covered',
+        esi_employee_minimum: 'faa.review.income.review_benefits_table.esi.employee_minimum',
+        affordable_question: 'health_plan_meets_mvs_and_affordable_question',
+        type_of_hra: 'faa.question.type_of_hra',
+        max_employer_reimbursement: 'faa.question.max_employer_reimbursement'
+      }
+    end
+  end
+
   module ReviewAndSubmitHelper
+    include RowKeyTranslator
+
     def applicant_summary_hashes(applicant)
       def personal_info_hash(applicant)
-        hash = {l10n('age') => applicant.age_of_the_applicant, l10n('gender') => applicant.gender.humanize}
+        hash = {
+          :age => applicant.age_of_the_applicant, 
+          :gender => applicant.gender.humanize
+        }
         unless @all_relationships.empty?
-          hash[l10n('relationship')] = applicant.relationship_kind_with_primary.humanize
+          hash[:relationship] = applicant.relationship_kind_with_primary.humanize
         end
-        hash[l10n('status')] = applicant.citizen_status.present? ? applicant.format_citizen : nil
-        hash[l10n('faa.review.personal.incarcerated')] = human_boolean(applicant.is_incarcerated)
-        hash[l10n('faa.review.personal.needs_coverage')] = human_boolean(applicant.is_applying_coverage)
+        hash[:status] = applicant.citizen_status.present? ? applicant.format_citizen : nil
+        hash[:incarcerated] = human_boolean(applicant.is_incarcerated)
+        hash[:needs_coverage] = human_boolean(applicant.is_applying_coverage)
 
-        return {title: l10n("personal_information"), rows: hash}
+        return {title: l10n("personal_information"), rows: translate_row_keys(hash, :personal_info_keys)}
       end
 
       def tax_info_hash(applicant)
         hash = {
-          l10n('faa.tax.file_in_year', assistance_year: @application.assistance_year) => {
+          :file_in_year => {
             value: human_boolean(applicant.is_required_to_file_taxes), 
             is_required: true
           }
         }
         if @cfl_service.displayable_field?('applicant', applicant.id, :is_joint_tax_filing)
-          hash[l10n('faa.tax.filing_jointly')] = human_boolean(applicant.is_joint_tax_filing)
+          hash[:filing_jointly] = human_boolean(applicant.is_joint_tax_filing)
         end
-        hash[l10n('faa.tax.dependent', assistance_year: @application.assistance_year)] = {
+        hash[:dependent] = {
           value: human_boolean(applicant.is_claimed_as_tax_dependent),
           is_required: true
         }
         if @cfl_service.displayable_field?('applicant', applicant.id, :claimed_as_tax_dependent_by)
-          hash[l10n('faa.tax.dependent_by')] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name
+          hash[:dependent_by] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name
         end
         
-        return {title: l10n("faa.review.tax_info"), edit_link: go_to_step_application_applicant_path(@application, applicant, 1), rows: hash}
+        return {title: l10n("faa.review.tax_info"), edit_link: go_to_step_application_applicant_path(@application, applicant, 1), rows: translate_row_keys(hash, :tax_info_keys)}
       end
 
       def income_info_hash(applicant)
         hash = {
-          strip_tags(l10n('faa.incomes.from_employer', assistance_year: assistance_year)) => {
+          :from_employer => {
             value: human_boolean(applicant.has_job_income),
             is_required: true
           }
         }
         if @cfl_service.displayable_field?('applicant', applicant.id, :incomes_jobs)
           applicant.incomes.jobs.each do |job|
-            hash[l10n('employer_name')] = job.employer_name
+            hash[:employer_name] = job.employer_name
             if job.employer_address.present?
-              hash[l10n('employer_address_line_1')] = job.employer_address.address_1 #TODO: remove upcase when localized
+              hash[:employer_address_line_1] = job.employer_address.address_1 #TODO: remove upcase when localized
               if job.employer_address.address_2.present?
-                hash[l10n('employer_address_line_2')] = job.employer_address.address_2 #TODO: remove upcase when localized
+                hash[:employer_address_line_2] = job.employer_address.address_2 #TODO: remove upcase when localized
               end
-              hash[l10n('city')] = job.employer_address.city #TODO: remove upcase when localized
-              hash[l10n('state')] = job.employer_address.state #TODO: remove upcase when localized
-              hash[l10n('zip')] = job.employer_address.zip #TODO: remove upcase when localized
+              hash[:city] = job.employer_address.city #TODO: remove upcase when localized
+              hash[:state] = job.employer_address.state #TODO: remove upcase when localized
+              hash[:zip] = job.employer_address.zip #TODO: remove upcase when localized
               if job.employer_phone.present?
-                hash[l10n('employer_phone')] = format_phone(income.employer_phone.full_phone_number) #TODO: remove upcase when localized
+                hash[:employer_phone] = format_phone(income.employer_phone.full_phone_number) #TODO: remove upcase when localized
               end
             end
           end
         end
-        hash[strip_tags(l10n('faa.incomes.from_self_employment', assistance_year: assistance_year))] = {
+        hash[:from_self_employment] = {
           value: human_boolean(applicant.has_self_employment_income), 
           is_required: true
         }
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-          hash[strip_tags(l10n('faa.other_incomes.unemployment', assistance_year: assistance_year))] = {
+          hash[:unemployment] = {
             value: human_boolean(applicant.has_unemployment_income), 
             is_required: true
           }
         end
         if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
-          hash[l10n('faa.other_incomes.alaska_native')] = {
+          hash[:alaska_native] = {
             value: human_boolean(applicant.has_american_indian_alaskan_native_income), 
             is_required: true
           }
         end
-        hash[strip_tags(l10n('faa.other_incomes.other_sources', assistance_year: assistance_year))] = {
+        hash[:other_sources] = {
           value: human_boolean(applicant.has_other_income), 
           is_required: true
         }
 
-        return {title: l10n("faa.evidence_type_income"), edit_link: application_applicant_incomes_path(@application, applicant), rows: hash}
+        return {title: l10n("faa.evidence_type_income"), edit_link: application_applicant_incomes_path(@application, applicant), rows: translate_row_keys(hash, :income_info_keys)}
       end
 
       def deductions_info_hash(applicant)
@@ -97,35 +221,35 @@ module FinancialAssistance
 
       def coverage_info_hash(applicant)
         hash = {
-          applicant_currently_enrolled => {
+          :is_enrolled => {
             value: human_boolean(applicant.has_enrolled_health_coverage),
             review_benefits_partial: ("is_enrolled" if applicant.has_enrolled_health_coverage)
           }.compact,
-          applicant_eligibly_enrolled => {
+          :is_eligible => {
             value: human_boolean(applicant.has_eligible_health_coverage),
             review_benefits_partial: ("is_eligible" if applicant.has_eligible_health_coverage)
           }.compact
         }
         if EnrollRegistry[:indian_health_service_question].feature.is_enabled && applicant.indian_tribe_member
-          hash[l10n("faa.indian_health_service_eligible")] = human_boolean(applicant.health_service_eligible)
-          hash[l10n("faa.indian_health_service")] = human_boolean(applicant.health_service_through_referral)
+          hash[:indian_health_service_eligible] = human_boolean(applicant.health_service_eligible)
+          hash[:indian_health_service] = human_boolean(applicant.health_service_through_referral)
         end
         if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
-          hash[l10n("faa.medicaid_not_eligible")] = human_boolean(applicant.has_eligible_medicaid_cubcare)
-          hash[l10n("faa.medicaid_cubcare_end_date")] = applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : l10n("faa.not_applicable_abbreviation")
-          hash[l10n("faa.change_eligibility_status")] = human_boolean(applicant.has_eligibility_changed)
-          hash[l10n("faa.household_income_changed")] = human_boolean(applicant.has_household_income_changed)
-          hash[l10n("faa.person_medicaid_last_day")] = applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : l10n("faa.not_applicable_abbreviation")
+          hash[:medicaid_not_eligible] = human_boolean(applicant.has_eligible_medicaid_cubcare)
+          hash[:medicaid_cubcare_end_date] = applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : l10n("faa.not_applicable_abbreviation")
+          hash[:change_eligibility_status] = human_boolean(applicant.has_eligibility_changed)
+          hash[:household_income_changed] = human_boolean(applicant.has_household_income_changed)
+          hash[:person_medicaid_last_day] = applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : l10n("faa.not_applicable_abbreviation")
         end
         if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && applicant.eligible_immigration_status
-          hash["#{l10n("faa.medicaid_chip_ineligible")} #{TimeKeeper.date_of_record.year - 5}"] = human_boolean(applicant.medicaid_chip_ineligible)
+          hash[:medicaid_chip_ineligible] = human_boolean(applicant.medicaid_chip_ineligible)
           if applicant.medicaid_chip_ineligible
-            hash[l10n("faa.immigration_status_changed")] = human_boolean(applicant.immigration_status_changed)
+            hash[:immigration_status_changed] = human_boolean(applicant.immigration_status_changed)
           end
         end
         if applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
-          hash[l10n("faa.has_dependent_with_coverage")] = human_boolean(applicant.has_dependent_with_coverage)
-          hash[l10n("faa.dependent_job_end_on")] = applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : l10n("faa.not_applicable_abbreviation")
+          hash[:has_dependent_with_coverage] = human_boolean(applicant.has_dependent_with_coverage)
+          hash[:dependent_job_end_on] = applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : l10n("faa.not_applicable_abbreviation")
         end
 
         # all coverage related questions are required
@@ -137,100 +261,100 @@ module FinancialAssistance
             {value: value, is_required: true}
           end
         }
-        return {title: l10n("health_coverage"), edit_link: application_applicant_benefits_path(@application, applicant), rows: hash}
+        return {title: l10n("health_coverage"), edit_link: application_applicant_benefits_path(@application, applicant), rows: translate_row_keys(hash, :coverage_info_keys)}
       end
 
       def other_questions_hash(applicant)
         hash = {}
         if applicant.is_applying_coverage
           if @cfl_service.displayable_field?('applicant', applicant.id, :is_ssn_applied)
-            hash[other_questions_prompt('ssn_apply')] = human_boolean(applicant.is_ssn_applied)
+            hash[:ssn_apply] = human_boolean(applicant.is_ssn_applied)
           end
           if @cfl_service.displayable_field?('applicant', applicant.id, :non_ssn_apply_reason)
-            hash[l10n("faa.other_ques.ssn_reason")] = applicant.non_ssn_apply_reason_readable.to_s
+            hash[:ssn_reason] = applicant.non_ssn_apply_reason_readable.to_s
           end
         end
-        hash[other_questions_prompt('is_pregnant')] = human_boolean(applicant.is_pregnant)
+        hash[:is_pregnant] = human_boolean(applicant.is_pregnant)
         if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_due_on)
-          hash[l10n("faa.other_ques.pregnancy_due_date")] = applicant.pregnancy_due_on.to_s
+          hash[:pregnancy_due_date] = applicant.pregnancy_due_on.to_s
           hash[other_questions_prompt('children_expected')] = applicant.children_expected_count
         end
         if @cfl_service.displayable_field?('applicant', applicant.id, :is_post_partum_period)
-          hash[other_questions_prompt(FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? 'pregnant_last_year' : 'pregnant_last_60d')] = human_boolean(applicant.is_post_partum_period)
+          hash[:pregnant_last_year] = human_boolean(applicant.is_post_partum_period)
         end
         if @cfl_service.displayable_field?('applicant', applicant.id, :pregnancy_end_on)
-          hash[l10n("faa.other_ques.pregnancy_end_date")] = applicant.pregnancy_end_on.to_s
+          hash[:pregnancy_end_date] = applicant.pregnancy_end_on.to_s
         end
         if @cfl_service.displayable_field?('applicant', applicant.id, :is_enrolled_on_medicaid)
-          hash[other_questions_prompt('is_enrolled_on_medicaid')] = human_boolean(applicant.is_enrolled_on_medicaid)
+          hash[:is_enrolled_on_medicaid] = human_boolean(applicant.is_enrolled_on_medicaid)
         end
         if applicant.is_applying_coverage
           if @cfl_service.displayable_field?('applicant', applicant.id, :is_former_foster_care)
-            hash[other_questions_prompt('foster_care_at18')] = human_boolean(applicant.is_former_foster_care)
+            hash[:foster_care_at18] = human_boolean(applicant.is_former_foster_care)
           end
           if @cfl_service.displayable_field?('applicant', applicant.id, :foster_care_us_state)
             hash[other_questions_prompt('foster_care_state')] = applicant.foster_care_us_state
             hash[other_questions_prompt('foster_care_age_left')] = applicant.age_left_foster_care
             hash[other_questions_prompt('foster_care_medicaid')] = human_boolean(applicant.had_medicaid_during_foster_care)
           end
-          hash[other_questions_prompt('is_student')] = human_boolean(applicant.is_student)
+          hash[:is_student] = human_boolean(applicant.is_student)
           if @cfl_service.displayable_field?('applicant', applicant.id, :student_kind)
-            hash[l10n('faa.other_ques.student_type')] = applicant.student_kind
-            hash[l10n('faa.other_ques.student_status_end')] = applicant.student_status_end_on
-            hash[l10n('faa.other_ques.student_school_type')] = applicant.student_school_kind
+            hash[:student_type] = applicant.student_kind
+            hash[:student_status_end] = applicant.student_status_end_on
+            hash[:student_school_type] = applicant.student_school_kind
           end
-          hash[other_questions_prompt('is_blind')] = human_boolean(applicant.is_self_attested_blind)
+          hash[:is_blind] = human_boolean(applicant.is_self_attested_blind)
           if applicant.age_of_the_applicant >= 19 && applicant.is_applying_coverage
             if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
-              hash[other_questions_prompt('faa.primary_caretaker_question_text')] = human_boolean(applicant.is_primary_caregiver) #TODO: fix new key per other question PR changes
+              hash[:primary_caretaker_question_text] = human_boolean(applicant.is_primary_caregiver) #TODO: fix new key per other question PR changes
             end
             if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question)
-              hash[l10n('faa.review.coverage.caretaker')] = applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact
+              hash[:coverage_caretaker] = applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact
             end
           end
-          hash[other_questions_prompt('daily_living_help')] = human_boolean(applicant.has_daily_living_help)
-          hash[other_questions_prompt('help_paying_bills')] = human_boolean(applicant.need_help_paying_bills)
-          hash[other_questions_prompt('disability_question')] = human_boolean(applicant.is_physically_disabled)
+          hash[:daily_living_help] = human_boolean(applicant.has_daily_living_help)
+          hash[:help_paying_bills] = human_boolean(applicant.need_help_paying_bills)
+          hash[:disability_question] = human_boolean(applicant.is_physically_disabled)
         end
 
-        return {title: l10n('faa.review.other_questions'), edit_link: other_questions_application_applicant_path(@application, applicant), rows: hash}
+        return {title: l10n('faa.review.other_questions'), edit_link: other_questions_application_applicant_path(@application, applicant), rows: translate_row_keys(hash, :other_questions_keys)}
       end
 
       [personal_info_hash(applicant), tax_info_hash(applicant), income_info_hash(applicant), deductions_info_hash(applicant), coverage_info_hash(applicant), other_questions_hash(applicant)]
     end
 
     def review_benefits_esi_hash(benefit)
-      hash = {l10n('hbx_profiles.employer_name') => benefit.employer_name}
+      hash = {:employer_name => benefit.employer_name}
       if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields)
-        hash[l10n('employer_address_line_1')] = benefit.employer_address.address_1
+        hash[:employer_address_line_1] = benefit.employer_address.address_1
         if benefit.employer_address.address_2.present?
-          hash[l10n('employer_address_line_2')] = benefit.employer_address.address_2
+          hash[:employer_address_line_2] = benefit.employer_address.address_2
         end
-        hash[l10n('city')] = benefit.employer_address.city
-        hash[l10n('state')] = benefit.employer_address.state
-        hash[l10n('zip')] = benefit.employer_address.zip
+        hash[:city] = benefit.employer_address.city
+        hash[:state] = benefit.employer_address.state
+        hash[:zip] = benefit.employer_address.zip
       end
 
-      hash[l10n('employer_phone')] = format_phone(benefit&.employer_phone&.full_phone_number)
-      hash[l10n("esi_employer_ein")] = benefit.employer_id
+      hash[:employer_phone] = format_phone(benefit&.employer_phone&.full_phone_number)
+      hash[:esi_employer_ein] = benefit.employer_id
       
       if benefit.insurance_kind == 'employer_sponsored_insurance'
-        hash[l10n('faa.review.income.review_benefits_table.esi.employee_waiting_period')] = human_boolean(benefit.is_esi_waiting_period)
-        hash[l10n('faa.review.income.review_benefits_table.esi.employer_minimum_standard')] = human_boolean(benefit.is_esi_mec_met)
-        hash[l10n('faa.review.income.review_benefits_table.esi.covered')] = benefit.esi_covered
-        hash[l10n('faa.review.income.review_benefits_table.esi.employee_minimum')] = format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency)
+        hash[:esi_employee_waiting_period] = human_boolean(benefit.is_esi_waiting_period)
+        hash[:esi_employer_minimum_standard] = human_boolean(benefit.is_esi_mec_met)
+        hash[:esi_covered] = benefit.esi_covered
+        hash[:esi_employee_minimum] = format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency)
         
         if display_minimum_value_standard_question?(benefit.insurance_kind)
-          hash[l10n("health_plan_meets_mvs_and_affordable_question")] = human_boolean(benefit.health_plan_meets_mvs_and_affordable)
+          hash[:affordable_question] = human_boolean(benefit.health_plan_meets_mvs_and_affordable)
         end
       end
 
       if benefit.insurance_kind == 'health_reimbursement_arrangement'
-        hash[l10n('faa.question.type_of_hra')] = benefit.hra_type
-        hash[l10n('faa.question.max_employer_reimbursement')] = format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency)
+        hash[:type_of_hra] = benefit.hra_type
+        hash[:max_employer_reimbursement] = format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency)
       end
 
-      return hash
+      return translate_row_keys(hash, :review_benefits_esi_keys)
     end
 
     def family_relationships_hash

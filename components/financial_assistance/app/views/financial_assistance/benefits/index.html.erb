@@ -107,7 +107,7 @@
       <% if @applicant.eligible_immigration_status %>
         <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
           <div class="col-md-6 labelforcoverage">
-            <span class="fa-text-color"> <%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</span>
+            <span class="fa-text-color"> <%= l10n("faa.medicaid_chip_ineligible", year: TimeKeeper.date_of_record.year - 5) %> *</span>
           </div>
           <div class="col-md-6 mt11">
             <div class="col-md-3 no-padding">

@@ -219,6 +219,16 @@ module FinancialAssistance
       end
     end
 
+    def applicant_currently_enrolled_short_key
+      if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
+        'has_enrolled_health_coverage_short'
+      elsif FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra).item
+        'has_enrolled_health_coverage_from_hra_short'
+      else
+        ''
+      end
+    end
+
     def applicant_currently_enrolled_key
       if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
         'has_enrolled_health_coverage'
@@ -236,6 +246,19 @@ module FinancialAssistance
         'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in? *'
       elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item
         'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in (including through another person, like a spouse or parent)? *'
+      else
+        ''
+      end
+    end
+
+
+    def applicant_eligibly_enrolled_short_key
+      if FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible).item
+        'has_eligible_health_coverage_short'
+      elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
+        'has_eligible_health_coverage_from_hra_short'
+      elsif FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible_with_hra).item
+        'has_eligible_health_coverage_from_hra_short_min'
       else
         ''
       end
