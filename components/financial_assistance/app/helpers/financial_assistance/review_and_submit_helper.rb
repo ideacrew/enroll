@@ -384,7 +384,7 @@ module FinancialAssistance
     def household_hash
       return unless displayable_application_field?(:parent_living_out_of_home_terms)
 
-      return {title: l10n('faa.review.more_about_your_household'), rows: {l10n('faa.review.more_about_your_household.parent_living_outside') => @application.parent_living_out_of_home_terms}}
+      return {title: l10n('faa.review.more_about_your_household'), rows: {l10n('faa.review.more_about_your_household.parent_living_outside') => human_boolean(@application.parent_living_out_of_home_terms)}}
     end
 
     private
