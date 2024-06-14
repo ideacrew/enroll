@@ -1,3 +1,38 @@
+<% if @bs4 %>
+  <div id="<%= dom_id income %>" class="ai-an-income mt-4">
+    <div class="ai-an-income-show">
+      <div class="d-flex col-sm income-form-row p-0 mb-2">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 mb-1">
+          <% if show_net_amount_for(income) %>
+            <label for="amount-<%= income.id %>" class="required"><%= l10n("faa.other_incomes.net_amount") %></label>
+          <% else %>
+            <label for="amount-<%= income.id %>" class="required"><%= l10n("faa.other_incomes.amount") %></label>
+          <% end %>
+          <input class="fake-disabled-input" id="amount-<%= income.id %>" disabled="true" value="<%= number_to_currency(income.amount) %>">
+        </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <label for="frequency-<%= income.id %>" class="required"><%= l10n("faa.other_incomes.frequency") %></label>
+          <input class="fake-disabled-input" id="frequency-<%= income.id %>" disabled="true" value="<%= frequency_kind_options.invert[income.frequency_kind] %>">
+        </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <label for="start-<%= income.id %>" class="required"><%= l10n("faa.other_incomes.start_on") %></label>
+          <input class="fake-disabled-input" id="start-<%= income.id %>" disabled="true" value="<%= income.start_on %>">
+        </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <label for="end-<%= income.id %>"><%= l10n("faa.other_incomes.end_on") %></label>
+          <input class="fake-disabled-input" id="end-<%= income.id %>" disabled="true" value="<%= income.end_on.present? ? income.end_on : '' %>">
+        </div>
+      </div>
+      <div>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'ai-an-income-delete-<%= dom_id income %>')" id="ai-an-income-delete-<%= dom_id income %>" class="button outline error mr-1 mb-2 ai-an-income-delete"><%= l10n("faa.other_incomes.remove") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'ai-an-income-edit-<%= dom_id income %>')" id="ai-an-income-edit-<%= dom_id income %>" class="button outline mb-2 ai-an-income-edit"><%=l10n("edit")%></a>
+      </div>
+    </div>
+  </div>
+  <div class="edit-ai-an-income-form hidden">
+    <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: income, disabled: false } %>
+  </div>
+<% else %>
 <div id="<%= dom_id income %>" class="ai-an-income row-form-adjustment">
   <div class="focus_effect_module ai-an-income-show">
     <div class="row row-form-wrapper no-buffer row-height">
@@ -32,3 +67,4 @@
     <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: income, disabled: false } %>
   </div>
 </div>
+<% end %>
