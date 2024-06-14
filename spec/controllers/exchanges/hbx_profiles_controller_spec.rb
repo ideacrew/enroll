@@ -1015,7 +1015,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       @params = {:person => {:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('edit_enrollment')
     end
 
@@ -1025,7 +1025,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => person.id, :ssn => valid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('update_enrollment')
     end
 
@@ -1036,14 +1036,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => person1.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('update_enrollment')
     end
 
     it "should return authorization error for Non-Admin users" do
       allow(user).to receive(:has_hbx_staff_role?).and_return false
       sign_in(user)
-      get :update_dob_ssn, xhr: true
+      post :update_dob_ssn, xhr: true
       expect(response).not_to have_http_status(:success)
     end
 
@@ -1053,7 +1053,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(assigns(:dont_update_ssn)).to eq true
     end
 
@@ -1062,7 +1062,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template("update_enrollment")
       expect(response.body).to have_content((/SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN/))
     end
@@ -1073,7 +1073,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(assigns(:dont_update_ssn)).to eq nil
     end
 
@@ -1083,7 +1083,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template("update_enrollment")
       expect(response.body).to have_content(("DOB / SSN Update Successful"))
     end
