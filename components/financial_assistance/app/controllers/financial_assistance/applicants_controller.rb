@@ -3,11 +3,14 @@
 module FinancialAssistance
   # Applicant controller for Financial Assistance
   class ApplicantsController < FinancialAssistance::ApplicationController
+    include ::UIHelpers::WorkflowController
 
     before_action :find, :find_application, :except => [:age_of_applicant] #except the ajax requests
     before_action :find_applicant, only: [:age_of_applicant]
-    before_action :set_cache_headers, only: [:other_questions, :tax_info]
-    before_action :enable_bs4_layout, only: [:edit, :other_questions, :tax_info] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
+    before_action :set_cache_headers, only: [:other_questions, :step]
+    before_action :enable_bs4_layout, only: [:other_questions] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :conditionally_enable_bs4_layout, only: [:save_questions] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
     # This before_action needs to be called after finding the application
@@ -18,7 +21,6 @@ module FinancialAssistance
 
     def new
       authorize @application, :new?
-      @bs4 = true if params[:bs4] == "true"
       @applicant = FinancialAssistance::Forms::Applicant.new(:application_id => params.require(:application_id))
 
       respond_to do |format|
@@ -98,36 +100,43 @@ module FinancialAssistance
       end
     end
 
-    def tax_info
-      authorize @applicant, :step?
-      save_faa_bookmark(request.original_url)
-      set_admin_bookmark_url
-      layout = @bs4 ? 'financial_assistance_progress' : 'financial_assistance_nav'
-      respond_to do |format|
-        format.html { render layout: layout }
-      end
-    end
-
-    def save_tax_info
-      authorize @applicant, :step?
-      @applicant = @application.active_applicants.find(params[:id])
-      @applicant.update_attributes(permit_params(params[:applicant])) if params[:applicant].present?
-
-      if @applicant.save(context: :tax_info)
-        redirect_to application_applicant_incomes_path(@application, @applicant)
-      else
-        @applicant.save(validate: false)
-        flash[:error] = build_error_messages_for_tax_info(@applicant)
-        redirect_to tax_info_application_applicant_path(@application, @applicant)
-      end
-    end
-
+    #rubocop:disable Metrics/AbcSize
     def step
       raise ActionController::UnknownFormat unless request.format.html?
 
       authorize @applicant, :step?
-      redirect_to tax_info_application_applicant_path(@application, @applicant)
+      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
+      set_admin_bookmark_url
+      flash[:error] = nil
+      model_name = @model.class.to_s.split('::').last.downcase
+      model_params = params[model_name]
+      @model.clean_conditional_params(model_params) if model_params.present?
+      @model.assign_attributes(permit_params(model_params)) if model_params.present?
+
+      if params.key?(model_name)
+        if @model.save(context: "step_#{@current_step.to_i}".to_sym)
+          @applicant.reload
+          @application.reload
+          @current_step = @current_step.next_step if @current_step.next_step.present?
+          if params.key? :last_step
+            @model.update_attributes!(workflow: { current_step: 1 })
+            redirect_to application_applicant_incomes_path(@application, @applicant)
+          else
+            @model.update_attributes!(workflow: { current_step: @current_step.to_i })
+            render 'workflow/step', layout: 'financial_assistance_nav'
+          end
+        else
+          # page.current_path
+          @model.assign_attributes(workflow: { current_step: @current_step.to_i })
+          @model.save!(validate: false)
+          flash[:error] = build_error_messages(@model)
+          render 'workflow/step', layout: 'financial_assistance_nav'
+        end
+      else
+        render 'workflow/step', layout: 'financial_assistance_nav'
+      end
     end
+    #rubocop:enable Metrics/AbcSize
 
     def age_of_applicant
       authorize @applicant, :age_of_applicant?
@@ -157,7 +166,6 @@ module FinancialAssistance
     end
 
     def immigration_document_options
-      @bs4 = true if params[:bs4] == "true"
       if params[:target_type] == "FinancialAssistance::Applicant" && params[:target_id].present?
         @target = FinancialAssistance::Applicant.find(params[:target_id])
         authorize @target, :immigration_document_options?
@@ -199,19 +207,18 @@ module FinancialAssistance
     end
 
     def format_date_params(model_params)
-      model_params["pregnancy_due_on"] = parse_date(model_params["pregnancy_due_on"].to_s) if model_params["pregnancy_due_on"].present?
-      model_params["pregnancy_end_on"] = parse_date(model_params["pregnancy_end_on"].to_s) if model_params["pregnancy_end_on"].present?
-      model_params["student_status_end_on"] = parse_date(model_params["student_status_end_on"].to_s) if model_params["student_status_end_on"].present?
+      date_format = @bs4 ? "%Y-%m-%d" : "%m/%d/%Y"
+      model_params["pregnancy_due_on"] = Date.strptime(model_params["pregnancy_due_on"].to_s, date_format) if model_params["pregnancy_due_on"].present?
+      model_params["pregnancy_end_on"] = Date.strptime(model_params["pregnancy_end_on"].to_s, date_format) if model_params["pregnancy_end_on"].present?
+      model_params["student_status_end_on"] = Date.strptime(model_params["student_status_end_on"].to_s, date_format) if model_params["student_status_end_on"].present?
 
-      model_params["person_coverage_end_on"] = parse_date(model_params["person_coverage_end_on"].to_s) if model_params["person_coverage_end_on"].present?
-      model_params["medicaid_cubcare_due_on"] = parse_date(model_params["medicaid_cubcare_due_on"].to_s) if model_params["medicaid_cubcare_due_on"].present?
-      model_params = format_nil_for_blank_date(model_params)
+      model_params["person_coverage_end_on"] = Date.strptime(model_params["person_coverage_end_on"].to_s, date_format) if model_params["person_coverage_end_on"].present?
+      model_params["medicaid_cubcare_due_on"] = Date.strptime(model_params["medicaid_cubcare_due_on"].to_s, date_format) if model_params["medicaid_cubcare_due_on"].present?
+      model_params["medicaid_cubcare_due_on"] = nil if model_params.key?("medicaid_cubcare_due_on") && model_params["medicaid_cubcare_due_on"].blank?
+      model_params["has_eligibility_changed"] = nil if model_params.key?("has_eligibility_changed") && model_params["has_eligibility_changed"].blank? && !model_params["has_eligibility_changed"].nil?
+      model_params["has_household_income_changed"] = nil if model_params.key?("has_household_income_changed") && model_params["has_household_income_changed"].blank? && !model_params["has_household_income_changed"].nil?
 
-      model_params["dependent_job_end_on"] = parse_date(model_params["dependent_job_end_on"].to_s) if model_params["dependent_job_end_on"].present?
-    end
-
-    def build_error_messages_for_tax_info(model)
-      model.valid?(:tax_info) ? nil : model.errors.messages.first[1][0].titleize
+      model_params["dependent_job_end_on"] = Date.strptime(model_params["dependent_job_end_on"].to_s, date_format) if model_params["dependent_job_end_on"].present?
     end
 
     def build_error_messages(model)
@@ -273,11 +280,8 @@ module FinancialAssistance
       params
     end
 
-    def format_nil_for_blank_date(model_params)
-      model_params["medicaid_cubcare_due_on"] = nil if model_params.key?("medicaid_cubcare_due_on") && model_params["medicaid_cubcare_due_on"].blank?
-      model_params["has_eligibility_changed"] = nil if model_params.key?("has_eligibility_changed") && model_params["has_eligibility_changed"].blank? && !model_params["has_eligibility_changed"].nil?
-      model_params["has_household_income_changed"] = nil if model_params.key?("has_household_income_changed") && model_params["has_household_income_changed"].blank? && !model_params["has_household_income_changed"].nil?
-      model_params
+    def conditionally_enable_bs4_layout
+      enable_bs4_layout if params[:bs4] == "true"
     end
 
     def enable_bs4_layout

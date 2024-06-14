@@ -46,7 +46,7 @@ When(/^selects yes they would like help paying for coverage$/) do
   # should be on application year select page now
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    find('.interaction-click-control-continue').click
+    find('a.interaction-click-control-continue').click
     sleep 2
   end
   # should be on checklist page now
@@ -105,7 +105,7 @@ end
 
 Then(/^they should be taken to the applicant's Tax Info page$/) do
   sleep 5
-  expect(page).to have_selector("[data-cuke='tax_info_header']")
+  expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
 end
 
 And(/^they visit the applicant's Job income page$/) do
@@ -671,7 +671,7 @@ Then(/^the consumer will navigate to the Help Paying for Coverage page$/) do
 end
 
 Then(/^the consumer will navigate to the Family Members page$/) do
-  expect(page).to have_selector('h2', text: l10n('family_information').to_s)
+  expect(page).to have_selector('h2', text: "#{l10n('family_information')}")
 end
 
 Then(/^a family with financial application in (.*) state exists$/) do |state|
@@ -732,8 +732,8 @@ Then(/^the (.*) type should display$/) do |income_type|
 end
 
 Then(/^the caretaker questions should show$/) do
-  expect(page).to have_content(l10n("faa.other_ques.primary_caretaker_question_text", subject: l10n("faa.this_person")).split(' *').first)
-  expect(page).to have_content(l10n("faa.review.coverage.caretaker"))
+  expect(page).to have_content(l10n("faa.other_ques.primary_caretaker_question_text", subject: l10n("faa.other_ques.this_person")).split(' *').first)
+  expect(page).to have_content(l10n("faa.primary_caretaker_for_text_review_page"))
 end
 
 Then(/^.+ should see county under Mailing and Home address$/) do
@@ -757,7 +757,7 @@ And(/^user should have feature toggled questions in review$/) do
   # Add more stuff here as you add more conditional questions please, fam
   if EnrollRegistry.feature_enabled?(:financial_assistance) &&
      FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
-    expect(page).to have_content(l10n("faa.other_ques.primary_caretaker_question_text", subject: l10n("faa.this_person")))
+    expect(page).to have_content(l10n("faa.other_ques.primary_caretaker_question_text", subject: l10n("faa.other_ques.this_person")))
   end
 end
 
