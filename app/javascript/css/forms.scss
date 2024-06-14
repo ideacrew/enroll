@@ -74,6 +74,11 @@ select,
   }
 }
 
+input.fake-disabled-input:not([type="submit"]):disabled {
+  background: var(--grey-030);
+  color: var(--default-font-color);
+}
+
 input[type="checkbox"] {
   &:active,
   &:focus {
