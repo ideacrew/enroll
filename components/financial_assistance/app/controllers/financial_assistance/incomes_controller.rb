@@ -6,8 +6,9 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index, :other]
+    before_action :enable_bs4_layout, only: [:other] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-    layout "financial_assistance_nav", only: [:index, :other, :new, :step]
+    layout :resolve_layout
 
     def index
       authorize @applicant, :index?
@@ -23,11 +24,14 @@ module FinancialAssistance
 
     def new
       authorize @applicant, :new?
+
+      @bs4 = true if params[:bs4] == "true"
       render 'other'
     end
 
     def edit
       @income = @applicant.incomes.find params[:id]
+      @bs4 = true if params[:bs4] == "true"
       authorize @income, :edit?
       respond_to do |format|
         format.js { render partial: 'financial_assistance/incomes/other_income_form', locals: { income: income } }
@@ -52,6 +56,7 @@ module FinancialAssistance
     end
 
     def update
+      @bs4 = true if params[:bs4] == "true"
       format_date(params)
       @income = @applicant.incomes.find params[:id]
       authorize @income, :update?
@@ -120,6 +125,22 @@ module FinancialAssistance
       FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
     rescue StandardError
       ''
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
+    end
+
+    def resolve_layout
+      puts "\n\n\n\n\n\n#{action_name}\n\n\n\n\n\n"
+      case action_name
+      when "index", "step", "new"
+        "financial_assistance_nav"
+      when "other"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
+      else
+        "financial_assistance"
+      end
     end
   end
 end

@@ -9,9 +9,10 @@
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
 
-    <%= javascript_pack_tag 'application' %>
-    <%= javascript_include_tag "application" %>
-    <%= stylesheet_pack_tag 'application' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag "application", 'data-turbolinks-track': 'reload' %>
+    <%= yield :head %>
+    <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
 
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
@@ -28,12 +29,13 @@
       <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
     <% end %>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    <% if EnrollRegistry.feature_enabled?(:jquery_migrate) %>
+      <% if EnrollRegistry[:jquery_migrate].setting(:show_warnings).item == true %>
+        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
+      <% else %>
+        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
+      <% end %>
+    <% end %>
 
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
   </head>
@@ -51,12 +53,19 @@
               <% step = content_for?(:step) ? yield(:step).to_i : 1 %>
               <% title = content_for?(:title) ? yield(:title) : "" %>
               <% title_link = content_for?(:title_link) ? yield(:title_link) : nil %>
+              <% subheading = content_for?(:subheading) ? yield(:subheading) : nil %>
+
               <nav class="progress-nav">
                 <% if title_link.present? %>
                   <h3><a href="<%= title_link %>"><i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i> <%= title %></a></h3>
                 <% else %>
                   <h3><%= title %></h3>
                 <% end %>
+
+                <% if subheading.present? %>
+                  <h4><%= subheading %></h4>
+                <% end %>
+                
                 <ul class="progress-wrapper">
                   <%= yield(:nav_options) if content_for?(:nav_options) %>
                 </ul>

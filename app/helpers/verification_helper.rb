@@ -280,7 +280,8 @@ module VerificationHelper
   end
 
   def build_admin_actions_list(v_type, f_member)
-    if f_member.consumer_role.aasm_state == 'unverified' || v_type.type_name == 'Alive Status'
+    rejected_list = EnrollRegistry.feature_enabled?(:enable_call_hub_for_ai_an) ? ['Alive Status', 'American Indian Status'] : ['Alive Status']
+    if f_member.consumer_role.aasm_state == 'unverified' || rejected_list.include?(v_type.type_name)
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
     elsif verification_type_status(v_type, f_member) == 'outstanding'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
