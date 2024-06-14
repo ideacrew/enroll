@@ -297,12 +297,6 @@ ul.list-right-section {
       }
     }
   }
-  hr.subcard-divider {
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-  }
-  hr.subcard-divider:last-child {
-    display: none;
-  }
 }
 
 .badge-lg {
@@ -385,10 +379,6 @@ ul.list-right-section {
 
   .navbar-brand img {
     padding-left: $spacer / 2;
-  }
-
-  .sm-hide {
-    display: none;
   }
 }
 
