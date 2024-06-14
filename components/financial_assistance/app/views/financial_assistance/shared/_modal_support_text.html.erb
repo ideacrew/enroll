@@ -1,52 +1,15 @@
-<% if @bs4 %>
-  <div class="modal" id="<%= (defined? id)? id : (key.is_a?(Array) ? key[0] : key) %>" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="container pt-2 pb-4 modal-content">
-        <div class="modal-header d-flex mb-4 align-items-center">
-          <div class="col-auto px-0">
-            <div class="info-icon icon" alt="Info" aria-hidden="true">&nbsp;</div>
-          </div>
-          <div class="col pl-0">
-            <%= l10n("not_sure") %>
-          </div>
-          <div class="col-auto px-0">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
-            </button>
-          </div>
-        </div>
-        <div class="modal-body">
-          <% if key.is_a?(Array) %>
-            <p><b><%= l10n("#{key[0]}", subject: subject) %></b></p>
-            <% key.drop(1).each do |k| %>
-              <p>
-              <%= l10n("#{k}", subject: subject) %>
-              </p>
-            <% end %>
-          <% else %>
-            <%= l10n("#{key}", application_applicable_year: assistance_year) %>
-          <% end %>
-        </div>
-        <div class="d-flex align-items-center mt-4 justify-content-end">
-          <button type="button" class="btn-primary mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>
-        </div>
+<div class="modal fade" id="<%= (defined? id)? id : key %>" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header support-header">
+         <i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= l10n("#{key}", application_applicable_year: assistance_year) %>
       </div>
     </div>
   </div>
-<% else %>
-  <div class="modal fade" id="<%= (defined? id)? id : key %>" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header support-header">
-          <i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <%= l10n("#{key}", application_applicable_year: assistance_year) %>
-        </div>
-      </div>
-    </div>
-  </div>
-<% end%>
+</div>
