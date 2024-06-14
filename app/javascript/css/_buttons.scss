@@ -61,6 +61,7 @@
   &:disabled {
     border-color: var(--grey-090);
     color: var(--grey-090);
+    cursor: not-allowed;
   }
 }
 
@@ -84,7 +85,7 @@ button.error, .button.error, .btn.error, .btn-error {
   @include ghost-button;
 }
 
-.button-error.outline, .btn-error.outline {
+.button-error.outline, .btn-error.outline, .button.outline.error {
   @include ghost-button(var(--button-error-color), var(--button-error-hover-color), var(--button-error-active-color));
 }
 
