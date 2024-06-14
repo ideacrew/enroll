@@ -1,9 +1,9 @@
 module FinancialAssistance
   module ReviewAndSubmitHelper
     module RowKeyTranslator
-      def translate_row_keys(hash, map_key)
+      def translate_row_keys(hash, map)
         hash.transform_keys { |row_key| 
-          map_value = send(map_key)[row_key]
+          map_value = send(map)[row_key]
           translation_args = map_value.is_a?(Hash) ? map_value[:translation_key] : map_value
           translation_mapper = map_value.is_a?(Hash) ? map_value[:translation_mapper] : :l10n
           method(translation_mapper).call(*translation_args)
@@ -131,37 +131,24 @@ module FinancialAssistance
         hash[:incarcerated] = human_boolean(applicant.is_incarcerated)
         hash[:needs_coverage] = human_boolean(applicant.is_applying_coverage)
 
-        return {title: l10n('personal_information'), rows: translate_row_keys(hash, :personal_info_keys)}
+        return create_section_hash(title: l10n('personal_information'), rows: hash, :map => :personal_info_keys)
       end
 
       def tax_info_hash(applicant)
-        hash = {
-          :file_in_year => {
-            value: human_boolean(applicant.is_required_to_file_taxes), 
-            is_required: true
-          }
-        }
+        hash = {file_in_year: required_value(human_boolean(applicant.is_required_to_file_taxes))}
         if displayable_applicant_field?(applicant, :is_joint_tax_filing)
           hash[:filing_jointly] = human_boolean(applicant.is_joint_tax_filing)
         end
-        hash[:dependent] = {
-          value: human_boolean(applicant.is_claimed_as_tax_dependent),
-          is_required: true
-        }
+        hash[:dependent] = required_value(human_boolean(applicant.is_claimed_as_tax_dependent))
         if displayable_applicant_field?(applicant, :claimed_as_tax_dependent_by)
           hash[:dependent_by] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name
         end
-        
-        return {title: l10n('faa.review.tax_info'), edit_link: go_to_step_application_applicant_path(@application, applicant, 1), rows: translate_row_keys(hash, :tax_info_keys)}
+
+        return create_section_hash(title: l10n('faa.review.tax_info'), edit_link: go_to_step_application_applicant_path(@application, applicant, 1), rows: hash, :map => :tax_info_keys)
       end
 
       def income_info_hash(applicant)
-        hash = {
-          :from_employer => {
-            value: human_boolean(applicant.has_job_income),
-            is_required: true
-          }
-        }
+        hash = {from_employer: required_value(human_boolean(applicant.has_job_income))}
         if displayable_applicant_field?(applicant, :incomes_jobs)
           applicant.incomes.jobs.each do |job|
             hash[:employer_name] = job.employer_name
@@ -179,42 +166,25 @@ module FinancialAssistance
             end
           end
         end
-        hash[:from_self_employment] = {
-          value: human_boolean(applicant.has_self_employment_income), 
-          is_required: true
-        }
+        hash[:from_self_employment] = required_value(human_boolean(applicant.has_self_employment_income))
         if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-          hash[:unemployment] = {
-            value: human_boolean(applicant.has_unemployment_income), 
-            is_required: true
-          }
+          hash[:unemployment] = required_value(human_boolean(applicant.has_unemployment_income))
         end
 
         if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
-          hash[:alaska_native] = {
-            value: human_boolean(applicant.has_american_indian_alaskan_native_income), 
-            is_required: true
-          }
+          hash[:alaska_native] = required_value(human_boolean(applicant.has_american_indian_alaskan_native_income))
         end
 
-        hash[:other_sources] = {
-          value: human_boolean(applicant.has_other_income), 
-          is_required: true
-        }
+        hash[:other_sources] = required_value(human_boolean(applicant.has_other_income))
 
-        return {title: l10n('faa.evidence_type_income'), edit_link: application_applicant_incomes_path(@application, applicant), rows: translate_row_keys(hash, :income_info_keys)}
+        return create_section_hash(title: l10n('faa.evidence_type_income'), edit_link: application_applicant_incomes_path(@application, applicant), rows: hash, :map => :income_info_keys)
       end
 
       def deductions_info_hash(applicant)
         {
           title: l10n('faa.review.income_adjustments'),
           edit_link: application_applicant_deductions_path(@application, applicant),
-          rows: {
-            strip_tags(l10n('faa.deductions.income_adjustments', assistance_year: assistance_year)) => {
-              value: human_boolean(applicant.has_deductions),
-              is_required: true
-            }
-          }
+          rows: {strip_tags(l10n('faa.deductions.income_adjustments', assistance_year: assistance_year)) => required_value(human_boolean(applicant.has_deductions))}
         }
       end
 
@@ -261,10 +231,11 @@ module FinancialAssistance
             value[:is_required] = true
             value
           else
-            {value: value, is_required: true}
+            required_value(value)
           end
         }
-        return {title: l10n('health_coverage'), edit_link: application_applicant_benefits_path(@application, applicant), rows: translate_row_keys(hash, :coverage_info_keys)}
+
+        return create_section_hash(title: l10n('health_coverage'), edit_link: application_applicant_benefits_path(@application, applicant), rows: hash, :map => :coverage_info_keys)
       end
 
       def other_questions_hash(applicant)
@@ -322,7 +293,7 @@ module FinancialAssistance
           hash[:disability_question] = human_boolean(applicant.is_physically_disabled)
         end
 
-        return {title: l10n('faa.review.other_questions'), edit_link: other_questions_application_applicant_path(@application, applicant), rows: translate_row_keys(hash, :other_questions_keys)}
+        return create_section_hash(title: l10n('faa.review.other_questions'), edit_link: other_questions_application_applicant_path(@application, applicant), rows: hash, :map => :other_questions_keys)
       end
 
       [personal_info_hash(applicant), tax_info_hash(applicant), income_info_hash(applicant), deductions_info_hash(applicant), coverage_info_hash(applicant), other_questions_hash(applicant)]
@@ -367,34 +338,44 @@ module FinancialAssistance
 
       hash = @all_relationships.reduce({}) do |hash, relationship|
         if member_name_by_id(relationship.applicant_id).present?
-          relationship_key = l10n('faa.review.your_household.relationship', related_name: member_name_by_id(relationship.applicant_id), relationship: relationship.kind)
+          relationship_key = l10n('faa.review.your_household.relationship', related_name: member_name_by_id(relationship.applicant_id), relationship: relationship.kind.titleize)
           hash.update(relationship_key => member_name_by_id(er.relative_id))
         end
       end
 
-      return {title: l10n('faa.nav.family_relationships'), edit_link: financial_assistance.application_relationships_path(@application), rows: hash} unless hash.empty?
+      return create_section_hash(title: l10n('faa.nav.family_relationships'), edit_link: financial_assistance.application_relationships_path(@application), rows: hash) unless hash.empty?
     end
 
     def preferences_hash
       return unless @application.years_to_renew.present? && displayable_application_field?(:years_to_renew)
 
-      return {title: l10n('faa.review.preferences'), rows: {l10n('faa.review.preferences.eligibility_renewal') => @application.years_to_renew}}
+      return create_section_hash(title: l10n('faa.review.preferences'), rows: {l10n('faa.review.preferences.eligibility_renewal') => @application.years_to_renew})
     end
 
     def household_hash
       return unless displayable_application_field?(:parent_living_out_of_home_terms)
 
-      return {title: l10n('faa.review.more_about_your_household'), rows: {l10n('faa.review.more_about_your_household.parent_living_outside') => human_boolean(@application.parent_living_out_of_home_terms)}}
+      return create_section_hash(title: l10n('faa.review.more_about_your_household'), rows: {l10n('faa.review.more_about_your_household.parent_living_outside') => human_boolean(@application.parent_living_out_of_home_terms)})
     end
 
     private
 
+    # displayable field wrappers
     def displayable_applicant_field?(applicant, attribute)
       @cfl_service.displayable_field?('applicant', applicant.id, attribute)
     end
 
     def displayable_application_field?(attribute)
       @cfl_service.displayable_field?('application', @application.id, attribute)
+    end
+
+    # hash constructor helpers
+    def required_value(value)
+      {value: value, is_required: true}
+    end
+
+    def create_section_hash(title:, edit_link: nil, rows:, map: nil)
+      return {title: title, edit_link: edit_link, rows: map.nil? ? rows : translate_row_keys(rows, map)}
     end
   end
 end
