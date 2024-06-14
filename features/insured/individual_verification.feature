@@ -100,7 +100,7 @@ Scenario: Outstanding verification
     Then Individual should see verification history timestamp
 
   Scenario: Consumer and Admin viewing Alive Status verification type
-    Given the enable_alive_status feature is enabled
+    Given the alive_status feature is enabled
     And a consumer exists
     And the user is RIDP verified
     And the consumer is logged in
