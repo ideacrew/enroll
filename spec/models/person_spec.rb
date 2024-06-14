@@ -997,6 +997,7 @@ describe Person, :dbclean => :after_each do
       context "when the validates_ssn feature flag is disabled" do
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_publish_updated_families).and_return(false)
         end
 
         it "will create a person without errors with an invalid SSN" do
