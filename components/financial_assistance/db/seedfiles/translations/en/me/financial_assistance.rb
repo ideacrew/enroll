@@ -159,6 +159,11 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.immigration_status_changed" => "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)",
   "en.faa.has_dependent_with_coverage" => "Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?*",
   "en.faa.dependent_job_end_on" => "What was the last day this person had coverage through the job?*",
+
+  "en.faa.health_coverage.title" => "Health Coverage for %{applicant}",
+  "en.faa.health_coverage.desc" => "Tell us about other health coverage options for this person. When you're finished, select 'Continue to Next Step'.",
+
+
   "en.faa.question.private_individual_and_family_coverage" => "Marketplace coverage",
   "en.faa.question.acf_refugee_medical_assistance" => "ACF Refugee Medical Assistance",
   "en.faa.question.americorps_health_benefits" => "AmeriCorps health benefits",

@@ -6,6 +6,9 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index]
+    before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
+    layout :resolve_layout
 
     def index
       # Authorizing on applicant since no benefit records may exist on index page
@@ -16,7 +19,7 @@ module FinancialAssistance
       set_admin_bookmark_url
 
       respond_to do |format|
-        format.html { render layout: 'financial_assistance_nav' }
+        format.html
       end
     end
 
@@ -122,6 +125,19 @@ module FinancialAssistance
     def format_date_params(model_params)
       model_params["start_on"] = Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["start_on"].present?
       model_params["end_on"] = Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
+    end
+
+    def resolve_layout
+      case action_name
+      when "index"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
+      else
+        "financial_assistance"
+      end
     end
   end
 end
