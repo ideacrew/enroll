@@ -270,13 +270,13 @@
           </div>
           <% if applicant.no_ssn == '1' && !applicant.is_ssn_applied.nil? %>
             <div class="row row-form-wrapper ptb no-buffer row-height form-content" data-cuke="review_is_ssn_applied">
-              <div class="col-md-6"><%= l10n('faa.other_ques.is_ssn_applied') %></div>
+              <div class="col-md-6"><%= other_questions_prompt('faa.other_ques.ssn_apply') %></div>
               <div class="col-md-6"><%= human_boolean applicant.is_ssn_applied %></div>
             </div>
           <% end %>
           <% if applicant.non_ssn_apply_reason.present? %>
             <div class="row row-form-wrapper ptb no-buffer row-height form-content" data-cuke="review_no_ssn_reason">
-              <div class="col-md-6"><%= l10n('faa.other_ques.why_no_ssn') %></div>
+              <div class="col-md-6"><%= other_questions_prompt('why_no_ssn') %></div>
               <div class="col-md-6"><%= applicant.non_ssn_apply_reason_readable %></div>
             </div>
           <% end %>
@@ -291,7 +291,7 @@
           <% if applicant.age_of_the_applicant >= 19 && applicant.is_applying_coverage %>
             <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.primary_caretaker_question_text") %></div>
+                <div class="col-md-6"><%= other_questions_prompt('primary_caretaker_question_text') %></div>
                 <div class="col-md-6"><%= human_boolean applicant.is_primary_caregiver %></div>
               </div>
             <% end %>

@@ -172,11 +172,11 @@ Given(/^the user answers no to being a primary caregiver$/) do
 end
 
 Then(/^the caregiver relationships should display$/) do
-  expect(page).to have_content(l10n('faa.primary_caretaker_for_text'))
+  expect(page).to have_content(l10n('faa.other_ques.primary_caretaker_for_text', subject: l10n("faa.other_ques.this_person")))
 end
 
 Then(/^the caregiver relationships should not display$/) do
-  expect(page).to_not have_content(l10n('faa.primary_caretaker_for_text'))
+  expect(page).to_not have_content(l10n('faa.other_ques.primary_caretaker_for_text', subject: l10n("faa.other_ques.this_person")))
 end
 
 And(/^the user selects an applicant they are the primary caregiver for$/) do
@@ -267,7 +267,7 @@ Then(/^pregnancy end date question should display$/) do
 end
 
 Then(/^the is this person a student question should display$/) do
-  expect(page).to have_content(l10n('faa.other_ques.is_student'))
+  expect(page).to have_content(l10n('faa.other_ques.is_student', subject: l10n("faa.other_ques.this_person")))
 end
 
 Given(/^the user answers yes to being a student$/) do
