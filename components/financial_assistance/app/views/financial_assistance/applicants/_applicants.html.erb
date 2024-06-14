@@ -11,20 +11,20 @@
 
     <div id="member-<%= @application.primary_applicant.id %>-info-display" class="d-flex flex-row flex-wrap justify-content-between">
       <div>
-        <label for="name"><%= l10n("name")%></label>
-        <input id="name" type="text" value="<%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %>" disabled >
+        <label for="primary-name"><%= l10n("name")%></label>
+        <input id="primary-name" type="text" value="<%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %>" disabled >
       </div>
       <div>
-        <label for="age"><%= l10n("age")%></label>
-        <input id="age" type="text" value="<%= @person.age_on(TimeKeeper.date_of_record) %>" disabled >
+        <label for="primary-age"><%= l10n("age")%></label>
+        <input id="primary-age" type="text" value="<%= @person.age_on(TimeKeeper.date_of_record) %>" disabled >
       </div>
       <div>
-        <label for="gender"><%= l10n("gender")%></label>
-        <input id="gender" type="text" value="<%= "#{@person.gender.humanize}" %>" disabled >
+        <label for="primary-gender"><%= l10n("gender")%></label>
+        <input id="primary-gender" type="text" value="<%= "#{@person.gender.humanize}" %>" disabled >
       </div>
       <div>
-        <label for="relation"><%= l10n("relationship")%></label>
-        <input id="relation" type="text" value="<%= l10n("self").humanize %>" disabled >
+        <label for="primary-relation"><%= l10n("relationship")%></label>
+        <input id="primary-relation" type="text" value="<%= l10n("self").humanize %>" disabled >
       </div>
     </div>
 
