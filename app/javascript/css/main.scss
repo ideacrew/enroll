@@ -506,3 +506,7 @@ ul.plain {
     }
   }
 }
+
+fieldset.disabled, div.disabled {
+  opacity: .4;
+}

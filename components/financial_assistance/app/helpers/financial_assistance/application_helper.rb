@@ -372,10 +372,21 @@ module FinancialAssistance
       @assistance_year = year_selection_enabled ? @application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
     end
 
+    def applicant_faa_nav_options(application, applicant)
+      [
+        {step: 1, label: l10n('faa.nav.tax_info'), link: go_to_step_application_applicant_path(application, applicant, 1), step_complete: applicant.tax_info_complete? },
+        {step: 2, label: l10n('faa.nav.job_income'), link: application_applicant_incomes_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:income) },
+        {step: 3, label: l10n('faa.nav.other_income'), link: other_application_applicant_incomes_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:other_income) },
+        {step: 4, label: l10n('faa.nav.income_adjustments'), link: application_applicant_deductions_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:income_adjustment) },
+        {step: 5, label: l10n('faa.nav.health_coverage'), link: application_applicant_benefits_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:health_coverage) },
+        {step: 6, label: l10n('faa.nav.other_questions'), link: other_questions_application_applicant_path(application, applicant), step_complete: applicant.other_questions_complete? },
+      ]
+    end
+
     def no_applicant_faa_nav_options(application)
       step1_link = (application.present? && application.is_draft?) ? financial_assistance.edit_application_path(application) : "javascript:void(0);"
       links = [
-        {step: 1, label: l10n('faa.nav.family_info', link: step1_link)},
+        {step: 1, label: l10n('faa.nav.family_info'), link: step1_link},
       ]
       relationship_step = {step: 2, label: l10n('faa.nav.family_relationships'), link: "javascript:void(0);"}
       review_step = {step: 2, label: l10n('faa.nav.review'), link: "javascript:void(0);"}
