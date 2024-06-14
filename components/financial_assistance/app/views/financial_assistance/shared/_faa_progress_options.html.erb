@@ -1,0 +1,36 @@
+<% step = (defined? step) ? step.to_i : 1 %>
+
+<% content_for(:step) { step } %>
+<% content_for(:show_exit_button) { "true" } %>
+<% content_for(:show_previous_button) { "false" } %>
+<% content_for(:show_account_button) { EnrollRegistry.feature_enabled?(:back_to_account_all_shop)&.to_s } %>
+<% content_for(:show_help_button) { "true" } %>
+<% content_for(:back_to_account_flag) { "true" } %>
+
+<% if @applicant.present? %>
+  <% content_for(:title) { l10n("faa.left_nav.my_household") } %>
+  <% content_for(:title_link) { edit_application_path(@application) } %>
+  <% content_for(:subheading) { l10n("faa.nav.applicant_subheader") } %>
+  <% content_for(:nav_options) do %>
+    <% applicant_faa_nav_options(@application, @applicant).each do |nav_option| %>
+      <li class="<%= 'complete' if nav_option[:step_complete] %> <%= 'active' if step == nav_option[:step] %>">
+        <span class="circle-progress"></span>
+        <div class="vertical-line-progress"></div>
+        <a href="<%= nav_option[:link] %>"><%= nav_option[:label] %></a>
+      </li>
+    <% end %>
+  <% end %>
+<% else %>
+  <% content_for(:title) { l10n('faa.my_applications') } %>
+  <% content_for(:title_link) { financial_assistance.applications_path } %>
+  <% content_for(:nav_options) do %>
+    <% no_applicant_faa_nav_options(@application).each do |nav_option| %>
+      <li class="<%= 'complete' if step > nav_option[:step] %> <%= 'active' if step == nav_option[:step] %>">
+        <span class="circle-progress"></span>
+        <div class="vertical-line-progress"></div>
+        <a class="<%= 'disabled' unless step > nav_option[:step] or step == nav_option[:step] %>" href="<%= nav_option[:link] %>"><%= nav_option[:label] %></a>
+      </li>
+    <% end %>
+  <% end %>
+<% end %>
+
