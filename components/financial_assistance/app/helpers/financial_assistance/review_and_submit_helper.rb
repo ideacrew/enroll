@@ -311,7 +311,7 @@ module FinancialAssistance
           hash[:is_blind] = human_boolean(applicant.is_self_attested_blind)
           if applicant.age_of_the_applicant >= 19 && applicant.is_applying_coverage
             if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question)
-              hash[:primary_caretaker_question_text] = human_boolean(applicant.is_primary_caregiver) #TODO: fix new key per other question PR changes
+              hash[:primary_caretaker_question_text] = human_boolean(applicant.is_primary_caregiver) 
             end
             if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question)
               hash[:coverage_caretaker] = applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact
