@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+# require "rubygems"
+# require "selenium-webdriver"
 
 class VlpDocument
   VLP_DOCUMENT_KINDS = ["I-327 (Reentry Permit)", "I-551 (Permanent Resident Card)", "I-571 (Refugee Travel Document)", "I-766 (Employment Authorization Card)",
@@ -589,9 +591,8 @@ And(/.+ selects a plan on plan shopping page/) do
 end
 
 When(/^the individual selects a non silver plan on Plan Shopping page$/) do
-  find_all(IvlChoosePlan.select_plan_btn)[0].click
+  step "selects a plan on plan shopping page"
 end
-
 
 And(/^I click confirm on the plan selection page for (.*)$/) do |named_person|
   find('.interaction-choice-control-value-terms-check-thank-you').click
