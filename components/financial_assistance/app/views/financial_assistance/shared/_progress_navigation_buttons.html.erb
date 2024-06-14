@@ -14,7 +14,7 @@
 
 <div class="d-flex align-items-center">
   <% if @application && show_back_to_household_button %>
-    <%= h(link_to_with_noopener_noreferrer("Back to All Household Members", financial_assistance.edit_application_path(@application), class: 'button btn-continue', id: 'btn-continue')) %>
+    <%= h(link_to_with_noopener_noreferrer("Back to All Household Members", financial_assistance.edit_application_path(@application), class: 'button outline mr-2')) %>
   <% end %>
 
   <% unless dont_show_prev_button || @no_previous_button %>

@@ -2,15 +2,18 @@ function stopEditingIncome() {
   $('.driver-question, .instruction-row, .income, .other-income-kind').removeClass('disabled');
   $('a.new-income').removeClass('hide');
   $('a.income-edit').removeClass('disabled');
+  document.getElementById('new-unemployment-income').classList.remove('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
   $('input.interaction-choice-control-value-other-income-kind').prop('disabled', false);
 };
 
 function startEditingIncome(income_kind) {
+  console.log(income_kind);
   $('.driver-question, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + ')').addClass('disabled');
   $('a.new-income').addClass('hide');
   $('a.income-edit').addClass('disabled');
+  document.getElementById('new-unemployment-income').classList.add('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $("a.interaction-click-control-add-more").addClass('hide');
   $('input.interaction-choice-control-value-other-income-kind').prop('disabled', true);
@@ -42,13 +45,15 @@ document.addEventListener("turbolinks:load", function () {
       return 'You have an unsaved income, are you sure you want to proceed?';
     });
 
-    $(document).on('click', 'a[href]:not(.disabled)', function (e) {
+    $('a[href]:not(.disabled)').off('click');
+    $('a[href]:not(.disabled)').on('click', function(e) {
       if (currentlyEditing()) {
         e.preventDefault();
         var self = this;
 
         $('#unsavedIncomeChangesWarning').modal('show');
-        $('.btn.btn-danger').click(function () {
+        $(".btn.btn-danger").off('click');
+        $('.btn.btn-danger').on('click', function(e) {
           if (self != undefined && faWindow.location != undefined) {
             faWindow.location.href = $(self).attr('href');
           };
@@ -94,12 +99,14 @@ document.addEventListener("turbolinks:load", function () {
         // prompt to delete all these dedcutions
         $("#destroyAllJobIncomes").modal();
 
-        $("#destroyAllJobIncomes .modal-cancel-button").click(function (e) {
+        $('#destroyAllJobIncomes .modal-cancel-button"').off('click');
+        $('#destroyAllJobIncomes .modal-cancel-button"').on('click', function(e) {
           $("#destroyAllJobIncomes").modal('hide');
           $('#has_job_income_true').prop('checked', true).trigger('change');
         });
 
-        $("#destroyAllJobIncomes .modal-continue-button").click(function (e) {
+        $('#destroyAllJobIncomes .modal-continue-button"').off('click');
+        $('#destroyAllJobIncomes .modal-continue-button"').on('click', function(e) {
           $("#destroyAllJobIncomes").modal('hide');
           //$(self).prop('checked', false);
 
@@ -124,12 +131,14 @@ document.addEventListener("turbolinks:load", function () {
         // prompt to delete all these dedcutions
         $("#destroyAllAIANIncomes").modal();
 
-        $("#destroyAllAIANIncomes .modal-cancel-button").click(function (e) {
+        $('#destroyAllAIANIncomes .modal-cancel-button"').off('click');
+        $('#destroyAllAIANIncomes .modal-cancel-button"').on('click', function(e) {
           $("#destroyAllAIAN").modal('hide');
           $('#has_american_indian_alaskan_native_income_true').prop('checked', true).trigger('change');
         });
 
-        $("#destroyAllAIANIncomes .modal-continue-button").click(function (e) {
+        $('#destroyAllAIANIncomes .modal-continue-button"').off('click');
+        $('#destroyAllAIANIncomes .modal-continue-button"').on('click', function(e) {
           $("#destroyAllAIANIncomes").modal('hide');
           //$(self).prop('checked', false);
 
@@ -152,15 +161,18 @@ document.addEventListener("turbolinks:load", function () {
       //$('#DestroyExistingJobIncomesWarning').modal('show');
       if ($('.unemployment-incomes-list:not(.other-incomes-list) .unemployment-income').length) {
         e.preventDefault();
+        console.log($("#destroyAllUnemploymentIncomes"));
         // prompt to delete all these dedcutions
-        $("#destroyAllUnemploymentIncomes").modal();
+        $("#destroyAllUnemploymentIncomes").modal('show');
 
-        $("#destroyAllUnemploymentIncomes .modal-cancel-button").click(function (e) {
+        $("#destroyAllUnemploymentIncomes .modal-cancel-button").off('click');
+        $('#destroyAllUnemploymentIncomes .modal-cancel-button').on('click', function(e) {
           $("#destroyAllUnemploymentIncomes").modal('hide');
           $('#has_unemployment_income_true').prop('checked', true).trigger('change');
         });
 
-        $("#destroyAllUnemploymentIncomes .modal-continue-button").click(function (e) {
+        $("#destroyAllUnemploymentIncomes .modal-continue-button").off('click');
+        $('#destroyAllUnemploymentIncomes .modal-continue-button').on('click', function(e) {
           $("#destroyAllUnemploymentIncomes").modal('hide');
           //$(self).prop('checked', false);
 
@@ -185,12 +197,14 @@ document.addEventListener("turbolinks:load", function () {
         // prompt to delete all these dedcutions
         $("#destroyAllSelfEmploymentIncomes").modal();
 
-        $("#destroyAllSelfEmploymentIncomes .modal-cancel-button").click(function (e) {
+        $("#destroyAllSelfEmploymentIncomes .modal-cancel-button").off('click');
+        $('#destroyAllSelfEmploymentIncomes .modal-cancel-button').on('click', function(e) {
           $("#destroyAllSelfEmploymentIncomes").modal('hide');
           $('#has_self_employment_income_true').prop('checked', true).trigger('change');
         });
 
-        $("#destroyAllSelfEmploymentIncomes .modal-continue-button").click(function (e) {
+        $("#destroyAllSelfEmploymentIncomes .modal-continue-button").off('click');
+        $('#destroyAllSelfEmploymentIncomes .modal-continue-button').on('click', function(e) {
           $("#destroyAllSelfEmploymentIncomes").modal('hide');
           //$(self).prop('checked', false);
 
@@ -212,7 +226,9 @@ document.addEventListener("turbolinks:load", function () {
       var incomeEl = $(this).parents('.income');
       incomeEl.find('.display-income').addClass('hidden');
       incomeEl.find('.income-edit-form').removeClass('hidden');
-      $(incomeEl).find('select').selectric();
+      if (!disableSelectric) {
+        $(incomeEl).find('select').selectric();
+      }
       $(incomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
       startEditingIncome($(this).parents('.income').attr('id'));
     });
@@ -224,11 +240,13 @@ document.addEventListener("turbolinks:load", function () {
       e.preventDefault();
       $("#DestroyJobIncomeWarning").modal();
 
-      $("#DestroyJobIncomeWarning .modal-cancel-button").click(function (e) {
+      $("#DestroyJobIncomeWarning .modal-cancel-button").off('click');
+      $('#DestroyJobIncomeWarning .modal-cancel-button').on('click', function(e) {
         $("#DestroyJobIncomeWarning").modal('hide');
       });
 
-      $("#DestroyJobIncomeWarning .modal-continue-button").click(function (e) {
+      $("#DestroyJobIncomeWarning .modal-continue-button").off('click');
+      $('#DestroyJobIncomeWarning .modal-continue-button').on('click', function(e) {
         $("#DestroyJobIncomeWarning").modal('hide');
         $(self).parents('.income').remove();
 
@@ -246,11 +264,13 @@ document.addEventListener("turbolinks:load", function () {
       e.preventDefault();
       $("#DestroySelfEmplyedIncomeWarning").modal();
 
-      $("#DestroySelfEmplyedIncomeWarning .modal-cancel-button").click(function (e) {
+      $("#DestroySelfEmplyedIncomeWarning .modal-cancel-button").off('click');
+      $('#DestroySelfEmplyedIncomeWarning .modal-cancel-button').on('click', function(e) {
         $("#DestroySelfEmplyedIncomeWarning").modal('hide');
       });
 
-      $("#DestroySelfEmplyedIncomeWarning .modal-continue-button").click(function (e) {
+      $("#DestroySelfEmplyedIncomeWarning .modal-continue-button").off('click');
+      $('#DestroySelfEmplyedIncomeWarning .modal-continue-button').on('click', function(e) {
         $("#DestroySelfEmplyedIncomeWarning").modal('hide');
         $(self).parents('.income').remove();
 
@@ -340,7 +360,8 @@ document.addEventListener("turbolinks:load", function () {
     // this index is to ensure duplicate hidden forms aren't saved on submit
     var incomeIndex = 0;
     /* new job incomes */
-    $('a.new-income').click(function (e) {
+    $("a.new-income").off('click');
+    $('a.new-income').on('click', function(e) {
       e.preventDefault();
       startEditingIncome($(this).parents('.income').attr('id'));
       var form = $(this).parents();
@@ -367,7 +388,9 @@ document.addEventListener("turbolinks:load", function () {
         previousForm.remove();
       }
       var length = incomeListEl.find(".income").length;
-      $(clonedForm).find('select').selectric();
+      if (!disableSelectric) {
+        $(clonedForm).find('select').selectric();
+      }
       //$(newIncomeForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
       clonedForm.find('.interaction-click-control-save').addClass("disabled");
@@ -377,7 +400,8 @@ document.addEventListener("turbolinks:load", function () {
     // this index is to ensure duplicate hidden forms aren't saved on submit for unemployment incomes
     var unemploymentIndex = 0;
     /* new unemployment incomes */
-    $('a.new-unemployment-income').click(function (e) {
+    $('a#new-unemployment-income').off('click');
+    $('a#new-unemployment-income').on('click', function(e) {
       e.preventDefault();
       startEditingIncome($(this).parents('.unemployment-income').attr('id'));
       var form = $(this).parents();
@@ -396,14 +420,17 @@ document.addEventListener("turbolinks:load", function () {
         previousForm.remove();
       }
       var length = incomeListEl.find(".unemployment-income").length;
-      $(clonedForm).find('select').selectric();
+      if (!disableSelectric) {
+        $(clonedForm).find('select').selectric();
+      }
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
       clonedForm.find('.interaction-click-control-save').addClass("disabled");
       unemploymentIndex++;
     });
 
     /* new AI/AN incomes */
-    $('a.new-ai-an-income').click(function (e) {
+    $('a.new-ai-an-income').off('click');
+    $('a.new-ai-an-income').on('click', function(e) {
       e.preventDefault();
       startEditingIncome($(this).parents('.ai-an-income').attr('id'));
       var form = $(this).parents();
@@ -415,12 +442,15 @@ document.addEventListener("turbolinks:load", function () {
         .removeClass('hidden')
         .appendTo(incomeListEl);
       var length = incomeListEl.find(".ai-an-income").length;
-      $(clonedForm).find('select').selectric();
+      if (!disableSelectric) {
+        $(clonedForm).find('select').selectric();
+      }
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
       clonedForm.find('.interaction-click-control-save').addClass("disabled");
     });
 
-    $('#has_job_income_true').click(function (e) {
+    $('#has_job_income_true').off('click');
+    $('#has_job_income_true').on('click', function(e) {
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#job_income').children('.new-income-form').length) {
         var newIncomeForm = $('#job_income').children('.new-income-form')
@@ -437,11 +467,14 @@ document.addEventListener("turbolinks:load", function () {
         incomeListEl.children().first().remove();
       }
       var length = incomeListEl.find(".income").length;
-      $(clonedForm).find('select').selectric();
+      if (!disableSelectric) {
+        $(clonedForm).find('select').selectric();
+      }
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
     });
-
-    $('#has_unemployment_income_true').click(function (e) {
+    $('#has_unemployment_income_true').off('click');
+    $('#has_unemployment_income_true').on('click', function(e) {
+      console.log("clicked add unemployment");
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#unemployment_income').children('.new-unemployment-income-form').length) {
         var newIncomeForm = $('#unemployment_income').children('.new-unemployment-income-form')
@@ -457,11 +490,14 @@ document.addEventListener("turbolinks:load", function () {
           .appendTo(incomeListEl);
       }
       var length = incomeListEl.find(".unemployment-income").length;
-      $(clonedForm).find('select').selectric();
+      if (!disableSelectric) {
+        $(clonedForm).find('select').selectric();
+      }
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
     });
 
-    $('#has_american_indian_alaskan_native_income_true').click(function (e) {
+    $("#has_american_indian_alaskan_native_income_true").off('click');
+    $('#has_american_indian_alaskan_native_income_true').on('click', function(e) {
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#ai_an_income').children('.new-ai-an-income-form').length) {
         var newIncomeForm = $('#ai_an_income').children('.new-ai-an-income-form')
@@ -477,11 +513,14 @@ document.addEventListener("turbolinks:load", function () {
           .appendTo(incomeListEl);
       }
       var length = incomeListEl.find(".ai-an-income").length;
-      $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
+      if (!disableSelectric) {
+        $(clonedForm).find('select').selectric();
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
+      }
     });
 
-    $('#has_self_employment_income_true').click(function (e) {
+    $("#has_self_employment_income_true").off('click');
+    $('#has_self_employment_income_true').on('click', function(e) {
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#self_employed_incomes').children('.new-income-form').length) {
         var newIncomeForm = $('#self_employed_incomes').children('.new-income-form')
@@ -497,7 +536,9 @@ document.addEventListener("turbolinks:load", function () {
         incomeListEl.children().first().remove();
       }
       var length = incomeListEl.find(".income").length;
-      $(clonedForm).find('select').selectric();
+      if (!disableSelectric) {
+        $(clonedForm).find('select').selectric();
+      }
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
     });
 
@@ -626,29 +667,33 @@ $(document).on('turbolinks:load', function () {
   //   (e || window.event).returnValue = 'You have an unsaved income, are you sure you want to proceed?'; //Gecko + IE
   //   return 'You have an unsaved income, are you sure you want to proceed?';
   // });
-
-  $('input[name="other_income_kind"]').click(function (e) {
+  $('input[name="other_income_kind"]').off('click');
+  $('input[name="other_income_kind"]').on('click', function(e) {
     var value = e.target.checked;
     self = this;
     if (value) {
-      var newOtherIncomeFormEl = $(this).parents('.other-income-kind').children('.new-other-income-form')
+      var newOtherIncomeFormEl = $(this).parents('.other-income-kind').children('.new-other-income-form').first();
       otherIncomeListEl = $(this).parents('.other-income-kind').find('.other-incomes-list');
       if (newOtherIncomeFormEl.find('select').data('selectric')) newOtherIncomeFormEl.find('select').selectric('destroy');
       var clonedForm = newOtherIncomeFormEl.clone(true, true)
         .removeClass('hidden')
         .appendTo(otherIncomeListEl);
       startEditingIncome($(this).parents('.other-income-kind').attr('id'));
-      $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
+      if (!disableSelectric) {
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
+        $(clonedForm).find('select').selectric();
+      }
     }
     else {
       // prompt to delete all these deductions
       $("#destroyAllOtherIncomesOfKind").modal();
-      $("#destroyAllOtherIncomesOfKind .modal-cancel-button").click(function (e) {
+      $("#destroyAllOtherIncomesOfKind .modal-cancel-button").off('click');
+      $('#destroyAllOtherIncomesOfKind .modal-cancel-button').on('click', function(e) {
         $("#destroyAllOtherIncomesOfKind").modal('hide');
       });
 
-      $("#destroyAllOtherIncomesOfKind .modal-continue-button").click(function (e) {
+      $("#destroyAllOtherIncomesOfKind .modal-continue-button").off('click');
+      $('#destroyAllOtherIncomesOfKind .modal-continue-button').on('click', function(e) {
         $("#destroyAllOtherIncomesOfKind").modal('hide');
         $(self).prop('checked', false);
         $(self).parents('.other-income-kind').find('[class^="interaction-click-control-add-more"]').addClass('hidden');
@@ -680,11 +725,13 @@ $(document).on('turbolinks:load', function () {
     if (other_incomes_exists) {
       e.preventDefault();
       $("#destroyAllOtherIncomes").modal();
-      $("#destroyAllOtherIncomes .modal-cancel-button").click(function (e) {
+      $("#destroyAllOtherIncomes .modal-cancel-button").off('click');
+      $('#destroyAllOtherIncomes .modal-cancel-button').on('click', function(e) {
         $("#destroyAllOtherIncomes").modal('hide');
       });
 
-      $("#destroyAllOtherIncomes .modal-continue-button").click(function (e) {
+      $("#destroyAllOtherIncomes .modal-continue-button").off('click');
+      $('#destroyAllOtherIncomes .modal-continue-button').on('click', function(e) {
         $("#destroyAllOtherIncomes").modal('hide');
 
         document.querySelectorAll(".other_income_kinds .other-income-kind").forEach(function (kind) {
@@ -725,7 +772,9 @@ $(document).on('turbolinks:load', function () {
       previousForm.remove();
     }
     startEditingIncome($(this).parents('.other-income-kind').attr('id'));
-    $(clonedForm).find('select').selectric();
+    if (!disableSelectric) {
+      $(clonedForm).find('select').selectric();
+    }
     $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
     e.stopImmediatePropagation();
     otherIndex++;
@@ -748,11 +797,13 @@ $(document).on('turbolinks:load', function () {
     e.preventDefault();
     $("#destroyOtherIncome").modal();
 
-    $("#destroyOtherIncome .modal-cancel-button").click(function (e) {
+    $("#destroyOtherIncome .modal-cancel-button").off('click');
+    $('#destroyOtherIncome .modal-cancel-button').on('click', function(e) {
       $("#destroyOtherIncome").modal('hide');
     });
 
-    $("#destroyOtherIncome .modal-continue-button").click(function (e) {
+    $("#destroyOtherIncome .modal-continue-button").off('click');
+    $('#destroyOtherIncome .modal-continue-button').on('click', function(e) {
       $("#destroyOtherIncome").modal('hide');
       $(self).parents('.other-income').remove();
       $("a.interaction-click-control-add-more").addClass('hide');
@@ -787,27 +838,35 @@ $(document).on('turbolinks:load', function () {
   });
 
   /* edit existing unemployment income */
-  $('.unemployment-incomes-list').on('click', 'a.unemployment-income-edit:not(.disabled)', function (e) {
+  $('a.unemployment-income-edit:not(.disabled)').off('click');
+  $('a.unemployment-income-edit:not(.disabled)').on('click', function(e) {
     e.preventDefault();
+
     var unemploymentIncomeEl = $(this).parents('.unemployment-income');
+    console.log(unemploymentIncomeEl);
     unemploymentIncomeEl.find('.unemployment-income-show').addClass('hidden');
+    console.log(unemploymentIncomeEl.find('.edit-unemployment-income-form'));
     unemploymentIncomeEl.find('.edit-unemployment-income-form').removeClass('hidden');
+
     startEditingIncome($(this).parents('.unemployment-income-kind').attr('id'));
 
     $(unemploymentIncomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
   });
 
   /* destroy existing unemployment income */
-  $('.unemployment-incomes-list').on('click', 'a.unemployment-income-delete:not(.disabled)', function (e) {
+  $('a.unemployment-income-delete:not(.disabled)').off('click');
+  $('a.unemployment-income-delete:not(.disabled)').on('click', function(e) {
     var self = this;
     e.preventDefault();
     $("#destroyUnemploymentIncome").modal();
 
-    $("#destroyUnemploymentIncome .modal-cancel-button").click(function (e) {
+    $("#destroyUnemploymentIncome .modal-cancel-button").off('click');
+    $('#destroyUnemploymentIncome .modal-cancel-button').on('click', function(e) {
       $("#destroyUnemploymentIncome").modal('hide');
     });
 
-    $("#destroyUnemploymentIncome .modal-continue-button").click(function (e) {
+    $("#destroyUnemploymentIncome .modal-continue-button").off('click');
+    $('#destroyUnemploymentIncome .modal-continue-button').on('click', function(e) {
       $("#destroyUnemploymentIncome").modal('hide');
       $(self).parents('.unemployment-income').remove();
       $("a.interaction-click-control-add-more").addClass('hide');
@@ -859,11 +918,13 @@ $(document).on('turbolinks:load', function () {
     e.preventDefault();
     $("#destroyAIANIncome").modal();
 
-    $("#destroyAIANIncome .modal-cancel-button").click(function (e) {
+    $("#destroyAIANIncome .modal-cancel-button").off('click');
+    $('#destroyAIANIncome .modal-cancel-button').on('click', function(e) {
       $("#destroyAIANIncome").modal('hide');
     });
 
-    $("#destroyAIANIncome .modal-continue-button").click(function (e) {
+    $("#destroyAIANIncome .modal-continue-button").off('click');
+    $('#destroyAIANIncome .modal-continue-button').on('click', function(e) {
       $("#destroyAIANIncome").modal('hide');
       $(self).parents('.ai-an-income').remove();
       $("a.interaction-click-control-add-more").addClass('hide');
