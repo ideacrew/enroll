@@ -135,12 +135,14 @@ module FinancialAssistance
       end
 
       def tax_info_hash(applicant)
+        helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
+
         hash = {file_in_year: required_value(human_boolean(applicant.is_required_to_file_taxes))}
-        if displayable_applicant_field?(applicant, :is_joint_tax_filing)
+        if helper.displayable?(:is_joint_tax_filing)
           hash[:filing_jointly] = human_boolean(applicant.is_joint_tax_filing)
         end
         hash[:dependent] = required_value(human_boolean(applicant.is_claimed_as_tax_dependent))
-        if displayable_applicant_field?(applicant, :claimed_as_tax_dependent_by)
+        if helper.displayable?(:claimed_as_tax_dependent_by)
           hash[:dependent_by] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name
         end
 
@@ -148,8 +150,10 @@ module FinancialAssistance
       end
 
       def income_info_hash(applicant)
+        helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
+
         hash = {from_employer: required_value(human_boolean(applicant.has_job_income))}
-        if displayable_applicant_field?(applicant, :incomes_jobs)
+        if helper.displayable?(:incomes_jobs)
           applicant.incomes.jobs.each do |job|
             hash[:employer_name] = job.employer_name
             if job.employer_address.present?
@@ -239,42 +243,45 @@ module FinancialAssistance
       end
 
       def other_questions_hash(applicant)
+        helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
+
         hash = {}
         if applicant.is_applying_coverage
-          if displayable_applicant_field?(applicant, :is_ssn_applied)
+          if helper.displayable?(:is_ssn_applied)
             hash[:ssn_apply] = human_boolean(applicant.is_ssn_applied)
           end
-          if displayable_applicant_field?(applicant, :non_ssn_apply_reason)
+          if helper.displayable?(:non_ssn_apply_reason)
             hash[:ssn_reason] = applicant.non_ssn_apply_reason_readable.to_s
           end
         end
 
         hash[:is_pregnant] = human_boolean(applicant.is_pregnant)
-        if displayable_applicant_field?(applicant, :pregnancy_due_on)
+        helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
+        if helper.displayable?(:pregnancy_due_on)
           hash[:pregnancy_due_date] = applicant.pregnancy_due_on.to_s
           hash[:children_expected] = applicant.children_expected_count
         end
-        if displayable_applicant_field?(applicant, :is_post_partum_period)
+        if helper.displayable?(:is_post_partum_period)
           hash[:pregnant_last_year] = human_boolean(applicant.is_post_partum_period)
         end
-        if displayable_applicant_field?(applicant, :pregnancy_end_on)
+        if helper.displayable?(:pregnancy_end_on)
           hash[:pregnancy_end_date] = applicant.pregnancy_end_on.to_s
         end
-        if displayable_applicant_field?(applicant, :is_enrolled_on_medicaid)
+        if helper.displayable?(:is_enrolled_on_medicaid)
           hash[:is_enrolled_on_medicaid] = human_boolean(applicant.is_enrolled_on_medicaid)
         end
 
         if applicant.is_applying_coverage
-          if displayable_applicant_field?(applicant, :is_former_foster_care)
+          if helper.displayable?(:is_former_foster_care)
             hash[:foster_care_at18] = human_boolean(applicant.is_former_foster_care)
           end
-          if displayable_applicant_field?(applicant, :foster_care_us_state)
+          if helper.displayable?(:foster_care_us_state)
             hash[:foster_care_state] = applicant.foster_care_us_state
             hash[:foster_care_age_left] = applicant.age_left_foster_care
             hash[:foster_care_medicaid] = human_boolean(applicant.had_medicaid_during_foster_care)
           end
           hash[:is_student] = human_boolean(applicant.is_student)
-          if displayable_applicant_field?(applicant, :student_kind)
+          if helper.displayable?(:student_kind)
             hash[:student_type] = applicant.student_kind
             hash[:student_status_end] = applicant.student_status_end_on
             hash[:student_school_type] = applicant.student_school_kind
@@ -347,26 +354,47 @@ module FinancialAssistance
     end
 
     def preferences_hash
-      return unless @application.years_to_renew.present? && displayable_application_field?(:years_to_renew)
+      return unless @application.years_to_renew.present? && ApplicationDisplayableHelper.new(@cfl_service, @application.id).displayable?(:years_to_renew)
 
       return create_section_hash(title: l10n('faa.review.preferences'), rows: {l10n('faa.review.preferences.eligibility_renewal') => @application.years_to_renew})
     end
 
     def household_hash
-      return unless displayable_application_field?(:parent_living_out_of_home_terms)
+      return unless ApplicationDisplayableHelper.new(@cfl_service, @application.id).displayable?(:parent_living_out_of_home_terms)
 
       return create_section_hash(title: l10n('faa.review.more_about_your_household'), rows: {l10n('faa.review.more_about_your_household.parent_living_outside') => human_boolean(@application.parent_living_out_of_home_terms)})
     end
 
     private
 
-    # displayable field wrappers
-    def displayable_applicant_field?(applicant, attribute)
-      @cfl_service.displayable_field?('applicant', applicant.id, attribute)
+    # displayable field helpers
+    class DisplayableHelper
+      def initialize(service, id)
+        @service = service
+        @id = id
+      end
+
+      def class_name
+        @class.name.demodulize.downcase
+      end
+
+      def displayable?(attribute)
+        @service.displayable_field?(class_name, @id, attribute)
+      end
     end
 
-    def displayable_application_field?(attribute)
-      @cfl_service.displayable_field?('application', @application.id, attribute)
+    class ApplicantDisplayableHelper < DisplayableHelper
+      def initialize(service, id)
+        @class = FinancialAssistance::Applicant
+        super
+      end
+    end
+
+    class ApplicationDisplayableHelper < DisplayableHelper
+      def initialize(service, id)
+        @class = FinancialAssistance::Application
+        super
+      end
     end
 
     # hash constructor helpers
