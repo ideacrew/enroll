@@ -1,15 +1,43 @@
-<div class="modal fade" id="<%= (defined? id)? id : key %>" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header support-header">
-         <i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <%= l10n("#{key}", application_applicable_year: assistance_year) %>
+<% if @bs4 %>
+  <div class="modal fade" id="<%= (defined? id)? id : key %>" tabindex="-1" role="dialog" aria-hidden="true">>
+    <div class="modal-dialog" role="document">
+      <div class="container pt-2 pb-4 modal-content">
+        <div class="d-flex mb-4 align-items-center">
+          <div class="col-auto px-0">
+            <div class="info-icon icon" alt="Info">&nbsp;</div>
+          </div>
+          <div class="col pl-0">
+              <h5 class="modal-title"><%= l10n("faa.other_ques.modal.question_detail") %></h5>
+          </div>
+          <div class="col-auto px-0">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <%= l10n("#{key}", application_applicable_year: assistance_year) %>
+        </div>
+        <div class="d-flex align-items-center mt-4 justify-content-end">
+          <button type="button" class="btn-primary mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
+<% else %>
+  <div class="modal fade" id="<%= (defined? id)? id : key %>" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header support-header">
+          <i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <%= l10n("#{key}", application_applicable_year: assistance_year) %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end%>
