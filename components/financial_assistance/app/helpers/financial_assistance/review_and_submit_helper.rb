@@ -90,7 +90,7 @@ module FinancialAssistance
           student_status_end: 'faa.other_ques.student_status_end',
           student_school_type: 'faa.other_ques.student_school_type',
           is_blind: other_questions_prompt_translation('is_blind'),
-          primary_caretaker_question_text: other_questions_prompt_translation('faa.primary_caretaker_question_text'),
+          primary_caretaker_question_text: other_questions_prompt_translation('faa.other_ques.primary_caretaker_question_text'),
           coverage_caretaker: 'faa.review.coverage.caretaker',
           daily_living_help: other_questions_prompt_translation('daily_living_help'),
           help_paying_bills: other_questions_prompt_translation('help_paying_bills'),

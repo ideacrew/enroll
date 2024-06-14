@@ -1,5 +1,5 @@
 <% unless subsection.nil? || subsection.empty? %>
-  <div class="mb-5">
+  <section class="mb-5">
     <%# Subsection title %>
     <div class="d-flex justify-content-between">
       <div class="align-self-end">
@@ -28,5 +28,5 @@
         <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: value[:review_benefits_partial], applicant: applicant} %>
       <% end %>
     <% end %>
-  </div>
+  </section>
 <% end %>
