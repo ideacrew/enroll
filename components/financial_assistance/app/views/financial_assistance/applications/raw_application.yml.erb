@@ -44,9 +44,9 @@
         Pregnancy due date?:  <%=applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A' %>
         How many children is this person expecting?:  <%=applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A' %>
         <% if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) %>
-        <%= l10n("faa.other_ques.pregnant_last_year") %>: <%= applicant.is_post_partum_period %>
+        <%= l10n("faa.other_ques.pregnant_last_year", subject: l10n("faa.other_ques.this_person")) %>: <%= applicant.is_post_partum_period %>
         <% else %>
-        <%= l10n("faa.other_ques.pregnant_last_60d") %>: <%= applicant.is_post_partum_period %>
+        <%= l10n("faa.other_ques.pregnant_last_60d", subject: l10n("faa.other_ques.this_person")) %>: <%= applicant.is_post_partum_period %>
         <% end %>
         Pregnancy end on date:  <%=applicant.pregnancy_end_on.to_s.present? ? applicant.pregnancy_end_on.to_s : 'N/A' %>
         Was this person on Medicaid during pregnancy?:  <%= applicant.is_enrolled_on_medicaid %>
