@@ -1072,6 +1072,7 @@ class CensusEmployee < CensusMember
   end
 
   def build_hbx_enrollment_for_cobra
+    return if cobra_eligible?
     family = employee_role.person.primary_family
 
     cobra_eligible_enrollments.each do |enrollment|
@@ -1396,8 +1397,8 @@ class CensusEmployee < CensusMember
       transitions from: [:employment_terminated, :cobra_eligible, :cobra_linked, :cobra_terminated], to: :rehired
     end
 
-    event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
-      transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
+    event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => [:build_hbx_enrollment_for_cobra, :record_transition] do
+      transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
       transitions from: :employment_terminated, to: :cobra_eligible
     end
 

@@ -1387,6 +1387,114 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
           expect(assignment).to be_present
         end
       end
+
+    end
+
+    context "cobra with auto renewal enrollments", dbclean: :after_each do
+      include_context "setup expired, active and renewing benefit applications"
+
+      let!(:current_benefit_market_catalog) do
+        ::BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_and_previous_catalog(
+          site,
+          benefit_market,
+          (TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year)
+        )
+        benefit_market.benefit_market_catalogs.where(
+          "application_period.min" => TimeKeeper.date_of_record.beginning_of_year
+        ).first
+      end
+      let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year - 1, 6, 1)}
+
+      let(:coverage_kind) { 'health' }
+      let(:hired_on) { TimeKeeper.date_of_record - 3.years }
+
+      let(:user) { FactoryBot.create(:user)}
+      let(:person) {FactoryBot.create(:person, user: user)}
+
+      let(:shop_family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+      let!(:census_employee) do
+        census_employee = create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: active_benefit_package, hired_on: hired_on,
+                                                                            employee_role_id: employee_role.id)
+        assignment = census_employee.create_benefit_package_assignment(expired_benefit_package, expired_benefit_package.start_on)
+        assignment.is_active = true
+        assignment.save
+        assignment = census_employee.create_benefit_package_assignment(renewal_benefit_package, renewal_benefit_package.start_on)
+        assignment.is_active = true
+        assignment.save
+        census_employee.reload
+      end
+
+      let(:employee_role) { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person) }
+
+      let(:employment_termination_date) { active_benefit_application.start_on + 15.days }
+      let!(:active_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: shop_family.latest_household,
+                          coverage_kind: coverage_kind,
+                          effective_on: active_benefit_application.start_on,
+                          enrollment_kind: 'open_enrollment',
+                          family: shop_family,
+                          kind: "employer_sponsored",
+                          submitted_at: active_benefit_application.start_on - 20.days,
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: active_benefit_package.id,
+                          sponsored_benefit_id: active_sponsored_benefit.id,
+                          employee_role_id: employee_role.id,
+                          benefit_group_assignment_id: census_employee.benefit_package_assignment_on(active_benefit_package.start_on).id,
+                          product_id: active_sponsored_benefit.reference_product.id,
+                          aasm_state: 'coverage_enrolled')
+      end
+
+      let!(:renewing_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: shop_family.latest_household,
+                          coverage_kind: coverage_kind,
+                          effective_on: renewal_benefit_application.start_on,
+                          enrollment_kind: 'open_enrollment',
+                          family: shop_family,
+                          kind: "employer_sponsored",
+                          submitted_at: renewal_benefit_application.start_on - 20.days,
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: renewal_benefit_package.id,
+                          sponsored_benefit_id: renewal_sponsored_benefit.id,
+                          employee_role_id: employee_role.id,
+                          benefit_group_assignment_id: census_employee.benefit_package_assignment_on(renewal_benefit_package.start_on).id,
+                          product_id: renewal_sponsored_benefit.reference_product.id,
+                          aasm_state: 'auto_renewing')
+      end
+
+      let(:employment_termination_date) { active_benefit_application.end_on - 2.months }
+      let(:cobra_begin_date) { employment_termination_date.end_of_month + 1.day }
+
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(active_benefit_application.end_on - 1.month)
+        employee_role.update(census_employee_id: census_employee.id)
+        allow(census_employee).to receive(:employee_record_claimed?).and_return(true)
+        census_employee.employee_role = (employee_role)
+        census_employee.terminate_employment(employment_termination_date)
+        census_employee.reload
+        census_employee.update_for_cobra(cobra_begin_date, user)
+        census_employee.reload
+      end
+
+      after do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
+
+      it 'should create active and auto renewal enrollments when cobra is initiated' do
+        shop_family.reload
+
+        auto_renewing_enrollments = HbxEnrollment.all.where(aasm_state: 'auto_renewing')
+        expect(auto_renewing_enrollments.size).to eq(1)
+        auto_renewing_enrollment = auto_renewing_enrollments.last
+        expect(auto_renewing_enrollment.effective_on).to eq(renewing_enrollment.effective_on)
+
+        active_enrollments = HbxEnrollment.all.where(aasm_state: 'coverage_enrolled')
+        expect(active_enrollments.size).to eq(1)
+        active_enrollment = active_enrollments.last
+        expect(active_enrollment.effective_on).to eq(active_enrollment.effective_on)
+      end
     end
   end
 
