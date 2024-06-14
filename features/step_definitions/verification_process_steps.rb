@@ -44,8 +44,8 @@ And(/^the user is RIDP verified$/) do
   user.person.consumer_role.move_identity_documents_to_verified
 end
 
-Given(/the enable_alive_status feature is enabled/) do
-  allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+Given(/the alive_status feature is enabled/) do
+  allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
 end
 
 And(/^the consumer's Alive Status is moved to outstanding$/) do
