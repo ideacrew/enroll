@@ -315,7 +315,9 @@ $(document).ready(function(){
   $("body").on("change", "#is_pregnant_yes", function(){
     if ($('#is_pregnant_yes').is(':checked')) {
       $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').removeClass('hide');
-      $('#children_expected_count').selectric();
+      if (!disable_selectric) {
+        $('#children_expected_count').selectric();
+      }
       $('#is_post_partum_period_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').addClass('hide');
       $('#medicaid_pregnancy_yes').parents('.row-form-wrapper').addClass('hide');
     };

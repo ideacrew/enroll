@@ -269,13 +269,6 @@
     </div>
     <%= hidden_field_tag :bs4, true %>
   <% end %>
-  <script type="text/javascript">
-    $(document).on("change", "#is_pregnant_yes", function(){
-      if ($('#is_pregnant_yes').is(':checked')) {
-        $('#children_expected_count').selectric("destroy");
-      };
-    });
-  </script>
 <% else %>
   <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row other_questions">
