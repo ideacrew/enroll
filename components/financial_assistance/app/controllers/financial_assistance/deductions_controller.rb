@@ -6,19 +6,20 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index]
+    before_action :enable_bs4_layout, only: [:index, :new]
 
     def index
       authorize @applicant, :index?
 
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance_nav'
+      render layout: resolve_layout
     end
 
     def new
       authorize @applicant, :new?
       @model = @applicant.deductions.build
-      render 'index', layout: 'financial_assistance_nav'
+      render 'index', layout: resolve_layout
     end
 
     def step
@@ -94,6 +95,14 @@ module FinancialAssistance
       FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.find(params[:id])
     rescue StandardError
       ''
+    end
+
+    def resolve_layout
+      return @bs4 ? 'financial_assistance_progress' : 'financial_assistance_nav'
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
   end
 end
