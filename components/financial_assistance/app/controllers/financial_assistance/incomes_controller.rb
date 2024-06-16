@@ -132,7 +132,6 @@ module FinancialAssistance
     end
 
     def resolve_layout
-      puts "\n\n\n\n\n\n#{action_name}\n\n\n\n\n\n"
       case action_name
       when "index", "step", "new"
         "financial_assistance_nav"

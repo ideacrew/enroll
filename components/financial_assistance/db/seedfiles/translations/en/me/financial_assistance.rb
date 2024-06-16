@@ -108,8 +108,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.income.social_security_benefit.disability" => "Social Security - Disability Benefits",
   "en.faa.income.social_security_benefit.retirement" => "Social Security - Retirement Benefits",
   "en.faa.income.social_security_benefit.survivors" => "Social Security - Survivors Benefits",
-  "en.faa.deductions.income_adjustments" => "Does this person have <strong>adjustments to income</strong>?*",
-  "en.faa.deductions.divorce_agreement" => "(from a divorce agreement finalized before January 1, 2019)",
   "en.faa.we_have_your_results" => "We have your results",
   "en.faa.medicaid" => "MaineCare and Cub Care",
   "en.faa.eligible_for_medicaid" => "These people <span>appear to be eligible</span> for ",
@@ -246,10 +244,16 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.all_required_info" => "All required information must entered for each member of your household.",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
-  # Review and Submit Page
+  # Income and Adjustments page
+  "en.faa.deductions" => "Income and Adjustments",
+  "en.faa.deductions.tell_us" => "Tell us about income adjustments for %{applicant_name}, select “Continue to Next Step” when finished.",
+  "en.faa.deductions.income_adjustments" => "Does %{subject} have adjustments to income?",
+  "en.faa.deductions.must_report" => "Income adjustments you must report.",
+  "en.faa.deductions.check_any_boxes" => "Check any boxes that apply and enter details when requested.",
+  "en.faa.deductions.divorce_agreement" => "(from a divorce agreement finalized before January 1, 2019)",
+  # Review and Submit page
   "en.faa.review.review_and_submit" => "Review Your Application",
   "en.faa.review.almost_done" => "You're almost done! Review the application summary below and make sure it's correct. Select the “Edit“ button to go back to any section and make changes. When you’re finished, select “%{continue_text}”.",
-  "en.faa.review.income" => "Income and Adjustments",
   "en.faa.review.income.information_entered" => "The following is information you entered for everyone in this application:",
   "en.faa.review.income.table.types" => "Types",
   "en.faa.review.income.table.frequency" => "Frequency",

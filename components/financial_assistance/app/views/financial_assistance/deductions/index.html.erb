@@ -1,5 +1,75 @@
 <% if @bs4 %>
+  <h1><%= l10n("faa.deductions") %></h2>
+  <% applicant_name = @applicant.first_name.capitalize %>
+  <p><%= l10n("faa.deductions.tell_us", applicant_name: applicant_name) %></p>
 
+  <div class="driver-question row-form-wrapper mb-4">
+    <fieldset class="mb-3">
+      <legend class="weight-n required"><%= l10n("faa.deductions.income_adjustments", subject: applicant_name) %></legend>
+      <% has_deductions = @applicant.has_deductions == true %>
+      <label class="weight-n"><%= radio_button_tag :has_deductions, true, has_deductions %> <%= l10n('yes') %></label>
+      <label class="weight-n"><%= radio_button_tag :has_deductions, false, has_deductions == false %> <%= l10n('no') %></label>
+    </fieldset>
+    <div>
+      <a href="#has_deductions" data-toggle="modal" data-target="#has_deductions"><%= l10n("faa.question.not_sure") %></a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_deductions"} %>
+    </div>
+  </div>
+
+  <div class='deduction-kinds'>
+    <div class="mb-2">
+      <div><%= l10n("faa.deductions.must_report") %></div>
+      <div><%= l10n("faa.deductions.check_any_boxes") %></div>
+    </div>
+    <% FinancialAssistance::Deduction::DEDUCTION_TYPE.each do |deduction_kind, label| %>
+      <% deduction_kind = deduction_kind.to_s %>
+      <div id="<%= deduction_kind %>"class="mb-2 deduction-kind">
+        <label class="weight-n">
+          <div class="d-flex align-items-center">
+            <div class="flex-col mr-1">
+              <%= check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
+            </div>
+            <div class=<%= "flex-col #{deduction_kind}" %>>
+              <% if I18n.exists?("glossary.#{deduction_kind}") %>
+                <%= render partial:"shared/glossary", locals: {key: deduction_kind, term: label } %>
+                <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
+              <% else %>
+                <%= label %> <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
+              <% end %>
+            </div>
+          </div>
+        </label>
+
+        <div class="deductions-list">
+          <% @applicant.deductions.of_kind(deduction_kind).each do |deduction| %>
+
+            <%= render partial: 'deduction', locals: { deduction: deduction } %>
+          <% end %>
+        </div>
+
+        <div class='new-deduction-form hidden <%= deduction_kind %>'>
+          <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
+        </div>
+        <div class="col-md-12 add-more-link-<%=deduction_kind%>" id="add-more-link">
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" id="add_new_deduction_kind" class="<%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>">
+            <span class="fa-icon fa-stack plus-mr" aria-hidden="true">
+              <i class="fa fa-circle-thin fa-stack-2x"></i>
+              <i class="fa fa-plus fa-stack-1x"></i>
+            </span>
+            <b> <%= l10n("add_more") %> </b> <%= FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym] %>
+          </a>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="my-4">
+    <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+      previous_link: other_application_applicant_incomes_path(@application, @applicant),
+      next_link: @applicant.is_applying_coverage ? application_applicant_benefits_path(@application, @applicant) : other_questions_application_applicant_path(@application, @applicant),
+      show_back_to_household_button: true
+    } %>
+  </div>
 <% else %>
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
     <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
@@ -21,7 +91,7 @@
       <!--income adjustment driver question-->
       <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
         <div class="col-md-6 labelforcoverage">
-          <span class="fa-text-color"><%= l10n('faa.deductions.income_adjustments', assistance_year: assistance_year) %></span>
+          <span class="fa-text-color"><%= l10n('faa.deductions.income_adjustments', subject: l10n("faa.other_ques.this_person"), assistance_year: assistance_year) %>*</span>
         </div>
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
