@@ -346,7 +346,7 @@ module FinancialAssistance
       hash = @all_relationships.reduce({}) do |hash, relationship|
         if member_name_by_id(relationship.applicant_id).present?
           relationship_key = l10n('faa.review.your_household.relationship', related_name: member_name_by_id(relationship.applicant_id), relationship: relationship.kind.titleize)
-          hash.update(relationship_key => member_name_by_id(er.relative_id))
+          hash.update(relationship_key => member_name_by_id(relationship.relative_id))
         end
       end
 
