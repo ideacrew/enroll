@@ -274,21 +274,13 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context 'broker logged in' do
       let(:market_kind) { "both" }
       let(:baa_active) { true }
-      let!(:associated_user) {FactoryBot.create(:user, :person => person)}
       let!(:family_member) { family.family_members.first }
+      let(:broker_person) { writing_agent.person}
       let!(:broker_user) {FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role'])}
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
       let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
       let(:broker_agency_staff_role_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
 
-      # let(:broker_agency_account) do
-      #   family.broker_agency_accounts.create!(
-      #     benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-      #     writing_agent_id: writing_agent.id,
-      #     is_active: baa_active,
-      #     start_on: TimeKeeper.date_of_record
-      #   )
-      # end
       let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
       let(:assister)  do
         assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
@@ -310,31 +302,41 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           sign_in(broker_user)
           writing_agent.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)
-          person.create_broker_agency_staff_role(
+          broker_person.create_broker_agency_staff_role(
             benefit_sponsors_broker_agency_profile_id: writing_agent.benefit_sponsors_broker_agency_profile_id
           )
           broker_agency_profile.update_attributes!(primary_broker_role_id: writing_agent.id, market_kind: market_kind)
           writing_agent.approve!
-          # broker_agency_account
         end
 
+        context 'POST #upload for alive status' do
+          let(:alive_status_verification) do
+            type = person.verification_type_by_name('Alive Status')
+            type.update_attributes(validation_status: 'outstanding')
+            type
+          end
+          let(:file) { fixture_file_upload("#{Rails.root}/test/uhic.jpg") }
+          let(:doc_uri) { 'doc_uri' }
+          let(:params) { { person: { consumer_role: consumer_role }, file: [file] } }
 
-        # context 'POST #upload' do
-        #   let!(:bucket_name) { 'id-verification' }
-        #   let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
-        #   let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
+          context 'with valid params' do
+            before do
+              allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+              person.add_new_verification_type("Alive Status")
+              allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
+              allow(controller).to receive(:file_name).and_return("sample-filename")
+              allow(controller).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
+              controller.instance_variable_set(:"@family", family)
+              controller.instance_variable_set(:"@verification_type", alive_status_verification)
+              sign_in broker_user
+            end
 
-        #   context 'with valid params' do
-        #     before do
-        #       allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
-        #     end
-
-        #     it 'uploads a new VerificationDocument' do
-        #       post :upload, params: params
-        #       expect(flash[:notice]).to eq("File Saved")
-        #     end
-        #   end
-        # end
+            it 'uploads a new VerificationDocument' do
+              post :upload, params: params
+              expect(flash[:notice]).to eq("File Saved")
+            end
+          end
+        end
 
         context 'GET #download' do
           context 'with valid params' do
@@ -347,29 +349,74 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
           end
         end
+
+        context 'alive_status download' do
+          let(:alive_status_verification) { person.verification_type_by_name('Alive Status') }
+          let(:vlp_doc) { VlpDocument.new(identifier: "#sample-key") }
+
+          before do
+            allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+            person.add_new_verification_type("Alive Status")
+            alive_status_verification.vlp_documents << vlp_doc
+            alive_status_verification.save!
+          end
+
+          context 'as a broker_user' do
+            before do
+              sign_in(broker_user)
+            end
+
+            context 'when an alive_status does not have an outstanding validation status' do
+              it 'will not download' do
+                get :download, params: { key: "sample-key" }
+
+                expect(flash[:error]).to eq 'File does not exist or you are not authorized to access it.'
+                expect(response).to have_http_status(:redirect)
+              end
+            end
+
+            context 'when an alive_status has an outstanding validation status' do
+              it 'will download successfully' do
+                alive_status_verification.update(validation_status: 'outstanding')
+                get :download, params: { key: "sample-key" }
+
+                expect(flash[:error]).to be_nil
+                expect(response).to have_http_status(:success)
+              end
+            end
+          end
+        end
       end
 
       context 'not hired by family' do
-        before(:each) do
-          sign_in(broker_user)
+        let(:alive_status_verification) do
+          type = person.verification_type_by_name('Alive Status')
+          type.update_attributes(validation_status: 'outstanding')
+          type
+        end
+        let(:file) { fixture_file_upload("#{Rails.root}/test/uhic.jpg") }
+        let(:doc_uri) { 'doc_uri' }
+        let(:params) { { person: { consumer_role: consumer_role }, file: [file] } }
+
+        before do
+          allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+          person.add_new_verification_type("Alive Status")
+          allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
+          allow(controller).to receive(:file_name).and_return("sample-filename")
+          allow(controller).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
+          controller.instance_variable_set(:"@family", family)
+          controller.instance_variable_set(:"@verification_type", alive_status_verification)
+          sign_in broker_user
         end
 
-        # context 'POST #upload' do
-        #   let!(:bucket_name) { 'id-verification' }
-        #   let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
-        #   let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
-
-        #   context 'with valid params' do
-        #     before do
-        #       allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
-        #     end
-
-        #     it 'returns failure' do
-        #       post :upload, params: params
-        #       expect(flash[:error]).to eq("Access not allowed for financial_assistance/applicant_policy.upload?, (Pundit policy)")
-        #     end
-        #   end
-        # end
+        context 'POST #upload' do
+          context 'with valid params' do
+            it 'returns failure' do
+              post :upload, params: params
+              expect(flash[:error]).to eq("Access not allowed for consumer_role_policy.verification_document_upload?, (Pundit policy)")
+            end
+          end
+        end
 
         context 'GET #download' do
           context 'with valid params' do
@@ -398,24 +445,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             sign_in(broker_agency_staff_role_user)
           end
 
-
-          # context 'POST #upload' do
-          #   let!(:bucket_name) { 'id-verification' }
-          #   let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
-          #   let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
-
-          #   context 'with valid params' do
-          #     before do
-          #       allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
-          #     end
-
-          #     it 'uploads a new VerificationDocument' do
-          #       post :upload, params: params
-          #       expect(flash[:notice]).to eq("File Saved")
-          #     end
-          #   end
-          # end
-
           context 'GET #download' do
             context 'with valid params' do
               before do
@@ -436,23 +465,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           before(:each) do
             sign_in(broker_agency_staff_role_user)
           end
-
-          # context 'POST #upload' do
-          #   let!(:bucket_name) { 'id-verification' }
-          #   let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
-          #   let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
-
-          #   context 'with valid params' do
-          #     before do
-          #       allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
-          #     end
-
-          #     it 'returns failure' do
-          #       post :upload, params: params
-          #       expect(flash[:error]).to eq("Access not allowed for financial_assistance/applicant_policy.upload?, (Pundit policy)")
-          #     end
-          #   end
-          # end
 
           context 'GET #download' do
             context 'with valid params' do
