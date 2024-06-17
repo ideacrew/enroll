@@ -29,9 +29,9 @@ module BenefitSponsors
           osse_eligibility = attributes[:organization][:profiles_attributes][0][:osse_eligibility]
           organization.assign_attributes(sanitize_organization_params_for_update(attributes[:organization]))
           organization.update_benefit_sponsorship(organization.employer_profile) if is_employer_profile? && address_changed?(organization.employer_profile)
-          factory_obj.update_representative(attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
           updated = if organization.valid?
                       organization.save!
+                      factory_obj.update_representative(attributes[:staff_roles_attributes][0], organization) if attributes[:staff_roles_attributes].present?
                       update_plan_design_organization(organization)
                     else
                       factory_obj.errors.add(:organization, organization.errors.full_messages)
@@ -47,8 +47,8 @@ module BenefitSponsors
           plan_design_organization.update_attributes!(legal_name: organization.legal_name, dba: organization.dba)
         end
 
-        def update_representative(attributes)
-          handler.update_representative(attributes)
+        def update_representative(attributes, organization)
+          handler.update_representative(attributes, organization)
         end
 
         def self.persist!(factory_obj, attributes)
@@ -326,7 +326,7 @@ module BenefitSponsors
                          })
           end
 
-          def update_representative(_attributes)
+          def update_representative(_attributes, _organization)
             nil # Representative Info not updatable for benefit sponsor
           end
 
@@ -386,9 +386,14 @@ module BenefitSponsors
                          })
           end
 
-          def update_representative(attributes)
+          def update_representative(attributes, organization)
             person = Person.find(attributes[:person_id])
+            profile = organization.general_agency_profile
             person.update_attributes!(attributes.slice(:first_name, :last_name, :dob))
+            person.phones.delete_if { |phone| phone.kind == 'work' }
+            profile.office_locations.each do |office_location|
+              person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
+            end
           end
 
           def add_person_contact_info
@@ -438,10 +443,14 @@ module BenefitSponsors
             Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => BSON::ObjectId.from_string(profile_id))
           end
 
-          def update_representative(attributes)
+          def update_representative(attributes, organization)
             person = Person.find(attributes[:person_id])
+            profile = organization.broker_agency_profile
             person.update_attributes!(attributes.slice(:first_name, :last_name, :dob))
-
+            person.phones.delete_if { |phone| phone.kind == 'work' }
+            profile.office_locations.each do |office_location|
+              person.phones.push(Phone.new(office_location.phone.attributes.except("_id")))
+            end
             can_edit_broker_npn = EnrollRegistry.feature_enabled?(:allow_edit_broker_npn)
             can_edit_broker_email = EnrollRegistry.feature_enabled?(:allow_edit_broker_email)
 
