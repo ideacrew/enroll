@@ -121,7 +121,9 @@
 
                 <div class="d-flex flex-row align-items-center my-3">
                   <%= f.check_box :same_with_primary, {'data-cuke': "lives_with_primary_checkbox"}, "true", "false" %>
-                  <span for="dependent_same_with_primary"><%=l10n("dependent_lives_with_primary_subscriber") %></span>
+                  <label for="dependent_same_with_primary" class="my-0">
+                    <%=l10n("dependent_lives_with_primary_subscriber") %>
+                  </label>
                 </div>
               </div>
             </div>
@@ -152,10 +154,10 @@
             <a href="#" class="btn button outline remove-new-employee-dependent" data-target="#new_employee_dependent_form">
               <%= l10n("cancel") %>
             </a>
-            <a href="#" class="close-1 btn outline-error remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
+            <a href="#" class="close-1 btn outline button-error remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
           <% else %>
             <%= h(link_to l10n("cancel"), insured_family_member_path(dependent, {bs4: @bs4}), :remote => true, class: "btn button outline") %>
-            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button outline-error close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
+            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button-error outline close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
           <% end %>
 
           <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden") do %>
