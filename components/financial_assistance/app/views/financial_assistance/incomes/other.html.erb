@@ -9,11 +9,11 @@
       </legend>
       <div class="focus d-flex align-items-center">
         <label for="has_unemployment_income_true" class="radio has_unemployment_income_true">
-          <%= radio_button_tag("has_unemployment_income", true, @applicant.has_unemployment_income, class: "required", required: true, id: "has_unemployment_income_true") %>
+          <%= radio_button_tag("has_unemployment_income", true, @applicant.has_unemployment_income, class: "required", required: true) %>
           <span class="yes_no_pair"><%= l10n("yes") %></span>
         </label>
         <label for="has_unemployment_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_unemployment_income_false')" class="radio">
-          <%= radio_button_tag("has_unemployment_income", false, @applicant.has_unemployment_income == false, class: "required", required: true, id: "has_unemployment_income_false") %>
+          <%= radio_button_tag("has_unemployment_income", false, @applicant.has_unemployment_income == false, class: "required", required: true) %>
           <span class="yes_no_pair"><%= l10n("no") %></span>
         </label>
       </div>
