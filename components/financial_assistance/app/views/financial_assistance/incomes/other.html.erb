@@ -81,7 +81,7 @@
       </div>
     <% end %>
 
-    <% if true #EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
+    <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
       <fieldset class="driver-question">
         <legend id="has_unemployment_income" class="weight-n required">
           <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
