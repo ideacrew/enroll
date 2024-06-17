@@ -102,7 +102,7 @@ module FinancialAssistance
     end
 
     def save_tax_info
-      authorize @applicant, :save_tax_info?
+      authorize @applicant, :step?
       @applicant = @application.active_applicants.find(params[:id])
       @applicant.update_attributes(permit_params(params[:applicant])) if params[:applicant].present?
 

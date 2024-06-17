@@ -38,7 +38,7 @@ document.addEventListener("turbolinks:load", function() {
     $.ajax({
       type: "GET",
       data:{},
-      url: window.location.href.replace(/step(\/1)?/, 'applicant_is_eligible_for_joint_filing'),
+      url: window.location.href.replace(/tax_info/, 'applicant_is_eligible_for_joint_filing'),
       success: function (has_spouse_relationship) {
         if(has_spouse_relationship == 'true'){
           $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
@@ -406,7 +406,7 @@ $(document).ready(function(){
 
   if($('#is_student_yes').is(':checked')) {
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').removeClass('hide');
-  } else {  
+  } else {
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
   }
 
