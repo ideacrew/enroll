@@ -36,7 +36,7 @@ class IvlIapTaxInformationPage
   end
 
   def self.continue_btn
-    '.interaction-click-control-continue'
+    'input[id="btn-continue"]'
   end
 
   def self.help_me_sign_up_bttn
