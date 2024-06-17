@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 3} %>
   <%= form_for @application, url: {action: "submit"}, method: :put do |f| %>
-    <h1>Submit Your Application</h1>
+    <h1><%= l10n("faa.submit_application_header") %></h1>
     <p><%= l10n('faa.last_step_1') %> <%= l10n('faa.last_step_2') %></p>
     <h2><%= l10n("insured.preferences.agreements") %></h2>
 
