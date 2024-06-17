@@ -11,7 +11,7 @@
   <% content_for(:title) { l10n("faa.left_nav.my_household") } %>
   <% content_for(:title_link) { edit_application_path(@application) } %>
 <% else %>
-  <% content_for(:title) { l10n('faa.my_applications') } %>
+  <% content_for(:title) { l10n('faa.nav.my_applications') } %>
   <% content_for(:title_link) { financial_assistance.applications_path } %>
   <% content_for(:nav_options) do %>
     <% no_applicant_faa_nav_options(@application).each do |nav_option| %>
