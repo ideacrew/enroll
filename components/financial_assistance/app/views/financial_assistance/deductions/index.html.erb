@@ -23,7 +23,7 @@
     </div>
     <% FinancialAssistance::Deduction::DEDUCTION_TYPE.each do |deduction_kind, label| %>
       <% deduction_kind = deduction_kind.to_s %>
-      <div id="<%= deduction_kind %>"class="mb-2 deduction-kind">
+      <div id="<%= deduction_kind %>"class="ml-1 mb-2 deduction-kind">
         <label class="weight-n">
           <div class="d-flex align-items-center">
             <div class="flex-col mr-1">
