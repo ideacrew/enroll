@@ -256,7 +256,6 @@ module FinancialAssistance
         end
 
         hash[:is_pregnant] = human_boolean(applicant.is_pregnant)
-        helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
         if helper.displayable?(:pregnancy_due_on)
           hash[:pregnancy_due_date] = applicant.pregnancy_due_on.to_s
           hash[:children_expected] = applicant.children_expected_count
