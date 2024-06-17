@@ -893,13 +893,11 @@ document.addEventListener('click', function(event) {
     const addButton = event.target;
     addButton.classList.add('d-none');
     const removeButton = addButton.cloneNode(true);
-    console.log(removeButton);
     removeButton.textContent = 'Remove Mailing Address';
     removeButton.id = 'remove_mailing_address';
-    removeButton.classList.add('interaction-click-control-remove-mailing-address');
-    removeButton.classList.remove("d-none", "interaction-click-control-add-mailing-address");
+    removeButton.classList.add('interaction-click-control-remove-mailing-address', 'error');
+    removeButton.classList.remove("d-none", "btn-secondary", "interaction-click-control-add-mailing-address");
     addButton.parentNode.insertBefore(removeButton, addButton);
-    console.log(removeButton);
     document.querySelectorAll(".mailing-div").forEach(el => {
       el.classList.remove('d-none');
       el.classList.add('d-block');
