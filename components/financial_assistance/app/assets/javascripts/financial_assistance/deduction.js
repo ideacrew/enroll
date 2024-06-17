@@ -75,7 +75,9 @@ $(document).on('turbolinks:load', function () {
           .removeClass('hidden')
           .appendTo(deductionListEl);
         startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
-        $(clonedForm).find('select').selectric();
+        if (!disableSelectric) {
+          $(clonedForm).find('select').selectric();
+        }
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
         e.stopImmediatePropagation();
       } else {
@@ -117,7 +119,9 @@ $(document).on('turbolinks:load', function () {
           .removeClass('hidden')
           .appendTo(deductionListEl);
       startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
-      $(clonedForm).find('select').selectric();
+      if (!disableSelectric) {
+        $(clonedForm).find('select').selectric();
+      }
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
       e.stopImmediatePropagation();
     });
