@@ -46,8 +46,3 @@ Variable name:
 
 # Additional Context
 Include any additional context that may be relevant to the peer review process.
-
-# AppScan CodeSweep Failure
-In the event of a failed check on the AppScan CodeSweep step of our GitHub Actions workflow, please review the False Positive protocol outlined here: appscan_codesweep/CODESWEEP_FALSE_POSITIVES_README.MD
-
-Add all required notes to this section if the failure is a suspected false positive.
