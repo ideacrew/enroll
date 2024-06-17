@@ -24,6 +24,7 @@ module FinancialAssistance
 
     def new
       authorize @applicant, :new?
+
       @bs4 = true if params[:bs4] == "true"
       render 'other'
     end
