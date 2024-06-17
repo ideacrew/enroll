@@ -16,9 +16,9 @@
       <% required = kind =='home' ? "address_required" : '' %>
       <div class="address-row <%= div_class %> <%= display_class %>">
         <% if kind == 'home' %>
-          <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_home_address_info")%>
+          <i class="fa fa-info-circle"></i> <%= l10n("insured.primary_home_address_info") %>
         <% elsif kind == 'mailing' %>
-          <div><strong class="mt-4"><%=l10n("insured.enter_mailing_address")%></strong></div>
+          <h4 class="gamma"><%= l10n("insured.consumer_roles.mailing_address") %></h4>
           <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_mailing_address_info")%>
         <% end %>
       </div>
@@ -104,10 +104,10 @@
     <% end %>
   </div>
   <% if f.object.addresses[1].present? %>
-  <button class="form-action btn-secondary <%= pundit_class Family, :updateable?%>" id="remove_mailing_address" data-cuke="remove_mailing_address">Remove Mailing Address</button>
-  <button id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4 d-none">Add Mailing Address</button>
+    <button class="form-action btn-error <%= pundit_class Family, :updateable?%>" id="remove_mailing_address" data-cuke="remove_mailing_address">Remove Mailing Address</button>
+    <button id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4 d-none">Add Mailing Address</button>
   <% else %>
-  <button id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4">Add Mailing Address</button>
+    <button id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-4">Add Mailing Address</button>
   <% end %>
   <div class="mt-2">&nbsp;</div>
 <% else %>
