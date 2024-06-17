@@ -137,7 +137,7 @@ Then(/Individual should click on Individual market for plan shopping/) do
 end
 
 Then(/Individual sees form to enter personal information with checked female gender$/) do
-  expect(find(:css, "#radio_female[value='female']")).to be_checked
+  expect(find(IvlPersonalInformation.female_radiobtn)).to be_checked
 end
 
 Then(/^.+ sees form to enter personal information$/) do
