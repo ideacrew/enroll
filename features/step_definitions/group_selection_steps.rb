@@ -326,6 +326,7 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
 end
 
 And(/(.*) should see the dental radio button/) do |role|
+  #bug logged
   expect(page).to have_css EmployeeChooseCoverage.dental_radio_btn
 end
 

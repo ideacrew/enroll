@@ -369,7 +369,8 @@ class IvlPersonalInformation
     if EnrollRegistry[:bs4_consumer_flow].enabled?
      '.interaction-choice-control-person-addresses-attributes-0-state-24'
     else
-    '.interaction-choice-control-person-addresses-attributes-0-state-9'
+    #'.interaction-choice-control-person-addresses-attributes-0-state-9'
+    '.interaction-choice-control-inputstate-9'
     end
   end
 
@@ -455,5 +456,9 @@ class IvlPersonalInformation
 
   def self.text_checkbox
     '.interaction-choice-control-value-contact-type-text'
+  end
+
+  def self.select_dc_state_coverall
+    '.interaction-choice-control-state-id-home-9'
   end
 end
