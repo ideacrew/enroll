@@ -1,13 +1,12 @@
 
 <% if @bs4 %>
-  <%#= render partial: 'financial_assistance/applications/faa_progress_options', locals: {step: 5} %>
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 5} if @bs4 %>
 
   <div id="health-coverage-page">
     <h1><%= l10n("faa.health_coverage.title", applicant: @applicant.first_name.capitalize) %></h1>
     <p><%= l10n("faa.health_coverage.desc") %></p>
 
-    <div id="has_enrolled_health_coverage_question" class="align-items-center py-4">
+    <div id="has_enrolled_health_coverage_question" class="py-4">
       <%= applicant_currently_enrolled %>
       <div class="focus d-flex mt-3">
         <label class="radio mr-3" for="has_enrolled_health_coverage_true">
@@ -28,15 +27,15 @@
       </div>
     </div>
 
-    <div id="has_eligibility_changed_question" class="align-items-center py-4">
+    <div id="has_eligibility_changed_question" class="pb-4">
       <%= applicant_eligibly_enrolled %>
       <div class="focus d-flex mt-3">
         <label class="radio mr-3" for="has_eligible_health_coverage_true">
-          <input id="has_eligible_health_coverage_true" type="radio" value="true" name="has_eligibility_changed" <%='checked' if @applicant.has_eligibility_changed? %>>
+          <input id="has_eligible_health_coverage_true" type="radio" value="true" name="has_eligible_health_coverage" <%='checked' if @applicant.has_eligibility_changed? %>>
           <%= l10n("yes") %>
         </label>
         <label class="radio mr-3" for="has_eligible_health_coverage_false">
-          <input id="has_eligible_health_coverage_false" type="radio" value="false" name="has_eligibility_changed" <%='checked'if @applicant.has_eligibility_changed? == false %>>
+          <input id="has_eligible_health_coverage_false" type="radio" value="false" name="has_eligible_health_coverage" <%='checked'if @applicant.has_eligibility_changed? == false %>>
           <%= l10n("no") %>
         </label>
       </div>
@@ -50,7 +49,8 @@
     </div>
 
     <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member  %>
-      <div id="ai_an_health_service_eligible_question" class="align-items-center py-4">
+      <div id="ai_an_health_service_eligible_question" class="pb-4">
+        ai_an_health_service_eligible_question
         <%= l10n("faa.indian_health_service_eligible") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="ai_an_health_service_eligible_true">
@@ -64,7 +64,8 @@
         </div>
       </div>
 
-      <div id="ai_an_health_service_through_referral_question" class="align-items-center py-4">
+      <div id="ai_an_health_service_through_referral_question" class="pb-4">
+        ai_an_health_service_through_referral_question
         <%= l10n("faa.indian_health_service") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="ai_an_health_service_through_referral_true">
@@ -80,7 +81,8 @@
     <% end %>
 
     <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
-      <div id="medicaid_chip_ineligible_question" class="align-items-center py-4">
+      <div id="medicaid_chip_ineligible_question" class="pb-4">
+        medicaid_chip_ineligible_question
         <%= l10n("faa.medicaid_chip_ineligible") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="medicaid_chip_ineligible_true">
@@ -94,7 +96,8 @@
         </div>
       </div>
 
-      <div id="immigration_status_changed_question" class="align-items-center py-4">
+      <div id="immigration_status_changed_question" class="pb-4">
+        immigration_status_changed_question
         <%= l10n("faa.immigration_status_changed") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="immigration_status_changed_true">
@@ -108,9 +111,9 @@
         </div>
       </div>
     <% end %>
-    <%# if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
-    <% if true %>
-      <div id="has_eligible_medicaid_cubcare_question" class="align-items-center py-4">
+
+    <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
+      <div id="has_eligible_medicaid_cubcare_question" class="pb-4">
         <%= l10n("faa.medicaid_not_eligible") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="has_eligible_medicaid_cubcare_true">
@@ -122,65 +125,63 @@
             <%= l10n("no") %>
           </label>
         </div>
-
         <a href="#has_eligible_medicaid_cubcare" data-toggle="modal" data-target="#has_eligible_medicaid_cubcare" class="d-block"><%= l10n("not_sure") %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_medicaid_cubcare"} %>
 
-        <div id="denied-medicaid" class="align-items-center py-4">
+        <div id="denied-medicaid" class="py-2">
             <%=l10n("faa.medicaid_cubcare_end_date")%>
             <div class="mr-auto mt-3">
               <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
               <%= date_field :medicaid_cubcare_due_on, {id: "medicaid_cubcare_due_on", class: "date-field col-3 mt-3", placeholder: 'Select End Date'}, :'data-date-max' => "+0" %>
             </div>
         </div>
-      </div>
 
-      <div id="has_eligibility_changed_question" class="align-items-center py-4">
-        <%=l10n("faa.change_eligibility_status")%>
-        <div class="focus d-flex mt-3">
-          <label class="radio mr-3" for="has_eligibility_changed_yes">
-            <input id="has_eligibility_changed_yes" type="radio" value="true" name="has_eligibility_changed" <%='checked' if @applicant.has_eligibility_changed? %>>
-            <%= l10n("yes") %>
-          </label>
-          <label class="radio mr-3" for="has_eligibility_changed_no">
-            <input id="has_eligibility_changed_no" type="radio" value="false" name="has_eligibility_changed" <%='checked'if @applicant.has_eligibility_changed == false %>>
-            <%= l10n("no") %>
-          </label>
-        </div>
+        <div id="eligibility-change-question" class="py-4">
+          <%=l10n("faa.change_eligibility_status")%>
+          <div class="focus d-flex mt-3">
+            <label class="radio mr-3" for="has_eligibility_changed_true">
+              <input id="has_eligibility_changed_true" type="radio" value="true" name="has_eligibility_changed" <%='checked' if @applicant.has_eligibility_changed? %>>
+              <%= l10n("yes") %>
+            </label>
+            <label class="radio mr-3" for="has_eligibility_changed_false">
+              <input id="has_eligibility_changed_false" type="radio" value="false" name="has_eligibility_changed" <%='checked'if @applicant.has_eligibility_changed == false %>>
+              <%= l10n("no") %>
+            </label>
+          </div>
+          <a href="#has_eligibility_changed" data-toggle="modal" data-target="#has_eligibility_changed" class="d-block"><%= l10n("not_sure") %></a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligibility_changed"} %>
 
-        <a href="#has_eligibility_changed" data-toggle="modal" data-target="#has_eligibility_changed" class="d-block"><%= l10n("not_sure") %></a>
-        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligibility_changed"} %>
-
-        <% status = @applicant.has_eligibility_changed == true ? "" : "hide" %>
-        <div id="medicaid-chip-coverage-last-day" class="<%= status %> align-items-center py-4">
+          <% status = @applicant.has_eligibility_changed == true ? "" : "hide" %>
+          <div id="medicaid-chip-coverage-last-day" class="<%= status %> pt-4">
             <%=l10n("faa.person_medicaid_last_day")%>
             <div class="mr-auto mt-3">
               <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
               <%= date_field :person_coverage_end_on, {id: "medicaid-chip-person_coverage_end_on-last-day", class: "date-field col-3 mt-3", placeholder: 'Select End Date'}, :'data-date-max' => "+0" %>
             </div>
-        </div>
-      </div>
+          </div>
 
-      <div id="has_household_income_changed_question" class="align-items-center py-4">
-        <%=l10n("faa.household_income_changed")%>
-        <div class="focus d-flex mt-3">
-          <label class="radio mr-3" for="has_household_income_changed_yes">
-            <input id="has_household_income_changed_yes" type="radio" value="true" name="has_household_income_changed" <%='checked' if @applicant.has_household_income_changed? %>>
-            <%= l10n("yes") %>
-          </label>
-          <label class="radio mr-3" for="has_household_income_changed_no">
-            <input id="has_household_income_changed_no" type="radio" value="false" name="has_household_income_changed" <%='checked'if @applicant.has_household_income_changed == false %>>
-            <%= l10n("no") %>
-          </label>
-        </div>
+          <div id="household-income-size-changed" class="pt-4">
+            <%=l10n("faa.household_income_changed")%>
+            <div class="focus d-flex mt-3">
+              <label class="radio mr-3" for="has_household_income_changed_yes">
+                <input id="has_household_income_changed_yes" type="radio" value="true" name="has_household_income_changed" <%='checked' if @applicant.has_household_income_changed? %>>
+                <%= l10n("yes") %>
+              </label>
+              <label class="radio mr-3" for="has_household_income_changed_no">
+                <input id="has_household_income_changed_no" type="radio" value="false" name="has_household_income_changed" <%='checked'if @applicant.has_household_income_changed == false %>>
+                <%= l10n("no") %>
+              </label>
+            </div>
+            <a href="#has_household_income_changed" data-toggle="modal" data-target="#has_household_income_changed" class="d-block"><%= l10n("not_sure") %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_household_income_changed"} %>
+          </div>
 
-        <a href="#has_household_income_changed" data-toggle="modal" data-target="#has_household_income_changed" class="d-block"><%= l10n("not_sure") %></a>
-        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_household_income_changed"} %>
+        </div>
       </div>
     <% end %>
 
-
-    <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {previous_link: review_and_submit_application_path(@application), show_back_to_household_button: true } %>
+    <%= render partial: 'financial_assistance/shared/progress_navigation_buttons',
+    locals: {previous_link: application_applicant_deductions_path(@application, @applicant), next_link: other_questions_application_applicant_path(@application, @applicant), show_back_to_household_button: true } %>
   </div>
 
 <% else %>
