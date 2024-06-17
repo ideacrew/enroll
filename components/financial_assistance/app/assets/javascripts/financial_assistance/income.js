@@ -696,7 +696,7 @@ $(document).on('turbolinks:load', function () {
       $('#destroyAllOtherIncomesOfKind .modal-continue-button').on('click', function(e) {
         $("#destroyAllOtherIncomesOfKind").modal('hide');
         $(self).prop('checked', false);
-        $(self).parents('.other-income-kind').find('[class^="interaction-click-control-add-more"]').addClass('hidden');
+        $(self).parents('.other-income-kind').find('.add-more-link').addClass('hidden');
 
         $(self).parents('.other-income-kind').find('.other-incomes-list > .other-income').each(function (i, other_income) {
           var url = $(other_income).attr('id').replace('income_', '');
