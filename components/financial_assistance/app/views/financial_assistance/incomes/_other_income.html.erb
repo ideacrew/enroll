@@ -36,9 +36,9 @@
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-edit')" id="other-income-edit" class="other-income-edit button outline mb-2 other-income-edit"><%=l10n("edit")%></a>
       </div>
     </div>
-  </div>
-  <div class="edit-other-income-form hidden">
-    <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: other_income, kind: other_income.kind, disabled: false } %>
+    <div class="edit-other-income-form hidden">
+      <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: other_income, kind: other_income.kind, disabled: false } %>
+    </div>
   </div>
 <% else %>
   <div id="<%= dom_id other_income %>" class="other-income row-form-adjustment">
@@ -79,6 +79,6 @@
 
     <div class="edit-other-income-form hidden">
     <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: other_income, kind: other_income.kind, disabled: false } %>
-  </div>
+    </div>
   </div>
 <% end %>

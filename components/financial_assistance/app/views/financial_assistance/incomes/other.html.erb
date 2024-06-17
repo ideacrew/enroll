@@ -1,5 +1,5 @@
 <% if @bs4 %>
-   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 3} %>
+  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 3} %>
   <h1><%= l10n('faa.nav.other_income') %></h1>
   <p><%= l10n("faa.other_incomes.description", name: @applicant.first_name) %></p>
   <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
