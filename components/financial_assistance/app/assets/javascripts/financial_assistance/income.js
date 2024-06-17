@@ -5,18 +5,17 @@ function stopEditingIncome() {
   document.getElementById('new-unemployment-income').classList.remove('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
-  $('input.interaction-choice-control-value-other-income-kind').prop('disabled', false);
+  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit]")').removeAttr('disabled');
 };
 
 function startEditingIncome(income_kind) {
-  console.log(income_kind);
   $('.driver-question, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + ')').addClass('disabled');
   $('a.new-income').addClass('hide');
   $('a.income-edit').addClass('disabled');
   document.getElementById('new-unemployment-income').classList.add('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $("a.interaction-click-control-add-more").addClass('hide');
-  $('input.interaction-choice-control-value-other-income-kind').prop('disabled', true);
+  $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input, .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]")').prop('disabled', true);
 };
 
 function checkDate(income_id) {
@@ -474,7 +473,6 @@ document.addEventListener("turbolinks:load", function () {
     });
     $('#has_unemployment_income_true').off('click');
     $('#has_unemployment_income_true').on('click', function(e) {
-      console.log("clicked add unemployment");
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#unemployment_income').children('.new-unemployment-income-form').length) {
         var newIncomeForm = $('#unemployment_income').children('.new-unemployment-income-form')
@@ -637,10 +635,12 @@ document.addEventListener("turbolinks:load", function () {
 $(document).on('turbolinks:load', function () {
   function disableSave(form) {
     form.find('.interaction-click-control-save').addClass("disabled");
+    form.find('.interaction-click-control-save').attr('disabled', 'disabled');
   }
 
   function enableSave(form) {
     form.find('.interaction-click-control-save').removeClass('disabled');
+    form.find('.interaction-click-control-save').removeAttr('disabled');
   }
   $(':input[required=""],:input[required]').on('change', function () {
     var form = $(this).closest('form');
@@ -961,10 +961,12 @@ $(document).on('turbolinks:load', function () {
   // disable save button logic
   function disableSave(form) {
     form.find('.interaction-click-control-save').addClass("disabled");
+    form.find('.interaction-click-control-save').attr('disabled', 'disabled');
   }
 
   function enableSave(form) {
     form.find('.interaction-click-control-save').removeClass('disabled');
+    form.find('.interaction-click-control-save').removeAttr('disabled');
   }
 
   $(':input[required]').on('keyup change', function () {

@@ -6,7 +6,7 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index]
-    before_action :enable_bs4_layout, only: [:index, :new, :create, :update] #TODO: remove create and update from this before_action if called from elsewhere and replace with param check
+    before_action :enable_bs4_layout, only: [:index, :new, :create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) #TODO: remove create and update from this before_action if called from elsewhere and replace with param check
 
     def index
       authorize @applicant, :index?

@@ -31,7 +31,7 @@
       </div>
 
       <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 hidden'>
-        <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false, new_form: true } %>
+        <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income') } %>
       </div>
     </div>
   <% end %>

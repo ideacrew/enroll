@@ -33,7 +33,7 @@
         </div>
       </div>
       <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-cancel-<%= income_id %>', 'new-other-income-form')" id="other-income-cancel-<%= income_id %>" class="btn outline other-income-cancel mb-4"><%= l10n("faa.other_incomes.cancel") %></a>
-      <%= f.submit l10n("faa.other_incomes.save"), class: "btn #{'disabled' if disabled } mb-4", :data => { :cuke => "other-income-save-button" } %>
+      <%= f.submit l10n("faa.other_incomes.save"), disabled: disabled ? "disabled" : nil, class: "btn mb-4", :data => { :cuke => "other-income-save-button" } %>
     </div>
   <% end %>
 <% else %>

@@ -27,7 +27,9 @@
   }
   &:disabled {
     background-color: var(--grey-040);
+    border-color: var(--grey-040);
     color: var(--grey-090);
+    pointer-events: none;
   }
 }
 
