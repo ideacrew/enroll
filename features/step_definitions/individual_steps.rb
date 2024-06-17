@@ -118,6 +118,7 @@ end
 
 When(/^\w+ clicks? on continue$/) do
   find(IvlPersonalInformation.continue_btn).click
+  screenshot("create_account")
 end
 
 Then(/^.+ should see heading labeled personal information/) do
@@ -137,7 +138,7 @@ Then(/Individual should click on Individual market for plan shopping/) do
 end
 
 Then(/Individual sees form to enter personal information with checked female gender$/) do
-  expect(find(:css, "#radio_female")).to be_checked
+  expect(find("#radio_female", visible: false)).to be_checked
 end
 
 Then(/^.+ sees form to enter personal information$/) do
