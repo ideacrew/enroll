@@ -198,8 +198,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context "Failed Download" do
         it "fails with an error message" do
-          allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).and_return(nil)
-          allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
+          allow(controller).to receive(:get_document).and_return(nil)
           sign_in user
           get :download, params: { key: "sample-key" }
           expect(flash[:error]).to eq("File does not exist or you are not authorized to access it.")
@@ -208,8 +207,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context "Successful Download" do
         it "downloads a file" do
-          allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:vlp_docs_clean).and_return(true)
-          allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:get_document).with('sample-key').and_return(VlpDocument.new)
+          allow(controller).to receive(:get_document).with('sample-key').and_return(Document.new)
           sign_in user
           get :download, params: { key: "sample-key" }
           expect(flash[:error]).to be_nil
@@ -268,6 +266,208 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
             expect(flash[:error]).to be_nil
             expect(response).to have_http_status(:success)
+          end
+        end
+      end
+    end
+
+    context 'broker logged in' do
+      let(:market_kind) { "both" }
+      let(:baa_active) { true }
+      let!(:associated_user) {FactoryBot.create(:user, :person => person)}
+      let!(:family_member) { family.family_members.first }
+      let!(:broker_user) {FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role'])}
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+      let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+      let(:broker_agency_staff_role_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
+
+      # let(:broker_agency_account) do
+      #   family.broker_agency_accounts.create!(
+      #     benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+      #     writing_agent_id: writing_agent.id,
+      #     is_active: baa_active,
+      #     start_on: TimeKeeper.date_of_record
+      #   )
+      # end
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+      let(:assister)  do
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+        assister.save(validate: false)
+        assister
+      end
+
+      before do
+        session[:person_id] = person.id.to_s
+      end
+
+      context 'hired by family' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+
+          sign_in(broker_user)
+          writing_agent.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)
+          person.create_broker_agency_staff_role(
+            benefit_sponsors_broker_agency_profile_id: writing_agent.benefit_sponsors_broker_agency_profile_id
+          )
+          broker_agency_profile.update_attributes!(primary_broker_role_id: writing_agent.id, market_kind: market_kind)
+          writing_agent.approve!
+          # broker_agency_account
+        end
+
+
+        # context 'POST #upload' do
+        #   let!(:bucket_name) { 'id-verification' }
+        #   let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
+        #   let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
+
+        #   context 'with valid params' do
+        #     before do
+        #       allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
+        #     end
+
+        #     it 'uploads a new VerificationDocument' do
+        #       post :upload, params: params
+        #       expect(flash[:notice]).to eq("File Saved")
+        #     end
+        #   end
+        # end
+
+        context 'GET #download' do
+          context 'with valid params' do
+            it 'downloads the requested verification document' do
+              allow(controller).to receive(:get_document).with('sample-key').and_return(Document.new)
+              sign_in(broker_user)
+              get :download, params: { key: "sample-key" }
+              expect(flash[:error]).to be_nil
+              expect(response.status).to eq(200)
+            end
+          end
+        end
+      end
+
+      context 'not hired by family' do
+        before(:each) do
+          sign_in(broker_user)
+        end
+
+        # context 'POST #upload' do
+        #   let!(:bucket_name) { 'id-verification' }
+        #   let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
+        #   let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
+
+        #   context 'with valid params' do
+        #     before do
+        #       allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
+        #     end
+
+        #     it 'returns failure' do
+        #       post :upload, params: params
+        #       expect(flash[:error]).to eq("Access not allowed for financial_assistance/applicant_policy.upload?, (Pundit policy)")
+        #     end
+        #   end
+        # end
+
+        context 'GET #download' do
+          context 'with valid params' do
+            before do
+              allow(controller).to receive(:get_document).with('sample-key').and_return(Document.new)
+            end
+
+            it 'downloads the requested verification document' do
+              get :download, params: {"key" => "sample-key"}
+              expect(response).to have_http_status(:found)
+              expect(flash[:error]).to eq("Access not allowed for consumer_role_policy.verification_document_download?, (Pundit policy)")
+            end
+          end
+        end
+      end
+
+      context 'broker_agency_staff_role_user logged in' do
+        context 'hired by family' do
+          before(:each) do
+            family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                writing_agent_id: writing_agent.id,
+                                                                                                start_on: Time.now,
+                                                                                                is_active: true)
+            family.reload
+
+            sign_in(broker_agency_staff_role_user)
+          end
+
+
+          # context 'POST #upload' do
+          #   let!(:bucket_name) { 'id-verification' }
+          #   let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
+          #   let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
+
+          #   context 'with valid params' do
+          #     before do
+          #       allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
+          #     end
+
+          #     it 'uploads a new VerificationDocument' do
+          #       post :upload, params: params
+          #       expect(flash[:notice]).to eq("File Saved")
+          #     end
+          #   end
+          # end
+
+          context 'GET #download' do
+            context 'with valid params' do
+              before do
+                allow(controller).to receive(:get_document).with('sample-key').and_return(Document.new)
+              end
+
+              let!(:params) {{"key" => "sample-key"}}
+
+              it 'downloads the requested verification document' do
+                get :download, params: params
+                expect(response).to be_successful
+              end
+            end
+          end
+        end
+
+        context 'not hired by family' do
+          before(:each) do
+            sign_in(broker_agency_staff_role_user)
+          end
+
+          # context 'POST #upload' do
+          #   let!(:bucket_name) { 'id-verification' }
+          #   let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
+          #   let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
+
+          #   context 'with valid params' do
+          #     before do
+          #       allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
+          #     end
+
+          #     it 'returns failure' do
+          #       post :upload, params: params
+          #       expect(flash[:error]).to eq("Access not allowed for financial_assistance/applicant_policy.upload?, (Pundit policy)")
+          #     end
+          #   end
+          # end
+
+          context 'GET #download' do
+            context 'with valid params' do
+              before do
+                allow(controller).to receive(:get_document).with('sample-key').and_return(Document.new)
+              end
+
+              let!(:params) {{"key" => "sample-key"}}
+
+              it 'downloads the requested verification document' do
+                get :download, params: params
+                expect(response).to have_http_status(:found)
+                expect(flash[:error]).to eq("Access not allowed for consumer_role_policy.verification_document_download?, (Pundit policy)")
+              end
+            end
           end
         end
       end
