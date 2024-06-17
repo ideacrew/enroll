@@ -54,15 +54,18 @@
               <% title = content_for?(:title) ? yield(:title) : "" %>
               <% title_link = content_for?(:title_link) ? yield(:title_link) : nil %>
               <% subheading = content_for?(:subheading) ? yield(:subheading) : nil %>
+
               <nav class="progress-nav">
                 <% if title_link.present? %>
                   <h3><a href="<%= title_link %>"><i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i> <%= title %></a></h3>
                 <% else %>
                   <h3><%= title %></h3>
                 <% end %>
+
                 <% if subheading.present? %>
                   <h4><%= subheading %></h4>
                 <% end %>
+                
                 <ul class="progress-wrapper">
                   <%= yield(:nav_options) if content_for?(:nav_options) %>
                 </ul>
