@@ -1,6 +1,7 @@
 <% if @bs4 %>
     <%= deduction_form_for @application, @applicant, deduction do |f| %>
     <% deduction_id = deduction.id %>
+    <% new_form = local_assigns[:new_form].present? ? local_assigns[:new_form] : false %>
     <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{deduction_id}')") : "" %>
     <div>
       <div class="d-flex">
@@ -28,7 +29,7 @@
       </div>
       <div class="d-flex my-2 align-items-center">
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-cancel-<%= deduction_id %>', 'new-other-income-form')" id="income-deduction-cancel-<%= deduction_id %>" class="btn outline other-income-cancel mb-4"><%= l10n("faa.other_incomes.cancel") %></a>
-        <%= f.submit l10n("faa.other_incomes.save"), class: "btn #{'disabled' if disabled } mb-4", :data => { :cuke => "income-adjustments-save-button" } %>
+        <%= f.submit l10n("faa.other_incomes.save"), class: "btn #{'disabled' if new_form } mb-4", :data => { :cuke => "income-adjustments-save-button" } %>
       </div>
     </div>
 

@@ -1,4 +1,5 @@
 <% if @bs4 %>
+  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 4} %>
   <h1><%= l10n("faa.deductions") %></h2>
   <% applicant_name = @applicant.first_name.capitalize %>
   <p><%= l10n("faa.deductions.tell_us", applicant_name: applicant_name) %></p>
