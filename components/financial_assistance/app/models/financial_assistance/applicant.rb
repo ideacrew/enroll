@@ -332,7 +332,7 @@ module FinancialAssistance
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
 
-    validate :presence_of_attr_step_1, on: [:step_1, :submission]
+    validate :presence_of_attr_tax_info, on: [:tax_info, :submission]
 
     validate :presence_of_attr_other_qns, on: :other_qns
     validate :driver_question_responses, on: :submission
@@ -1525,7 +1525,7 @@ module FinancialAssistance
       end
     end
 
-    def presence_of_attr_step_1
+    def presence_of_attr_tax_info
       errors.add(:is_joint_tax_filing, "#{full_name} must answer 'Will this person be filing jointly?'") if is_required_to_file_taxes && is_joint_tax_filing.nil? && (is_spouse_of_primary || (is_primary_applicant && has_spouse))
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
       errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank") if is_required_to_file_taxes.nil?

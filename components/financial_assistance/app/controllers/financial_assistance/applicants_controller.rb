@@ -3,12 +3,12 @@
 module FinancialAssistance
   # Applicant controller for Financial Assistance
   class ApplicantsController < FinancialAssistance::ApplicationController
-    include ::UIHelpers::WorkflowController
+    # include ::UIHelpers::WorkflowController
 
     before_action :find, :find_application, :except => [:age_of_applicant] #except the ajax requests
     before_action :find_applicant, only: [:age_of_applicant]
-    before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
-    before_action :set_cache_headers, only: [:other_questions, :step]
+    # before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
+    before_action :set_cache_headers, only: [:other_questions, :tax_info]
 
     def new
       authorize @application, :new?
@@ -91,41 +91,37 @@ module FinancialAssistance
       end
     end
 
+    def tax_info
+      authorize @applicant, :step?
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+
+      respond_to do |format|
+        format.html { render layout: 'financial_assistance_nav' }
+      end
+    end
+
+    def save_tax_info
+      authorize @applicant, :save_tax_info?
+      @applicant = @application.active_applicants.find(params[:id])
+      @applicant.update_attributes(permit_params(params[:applicant])) if params[:applicant].present?
+
+      if @applicant.save(context: :tax_info)
+        redirect_to application_applicant_incomes_path(@application, @applicant)
+      else
+        @applicant.save(validate: false)
+        flash[:error] = build_error_messages_for_tax_info(@applicant)
+        redirect_to tax_info_application_applicant_path(@application, @applicant)
+      end
+    end
+
     #rubocop:disable Metrics/AbcSize
     def step
       raise ActionController::UnknownFormat unless request.format.html?
 
       authorize @applicant, :step?
-      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
-      set_admin_bookmark_url
-      flash[:error] = nil
-      model_name = @model.class.to_s.split('::').last.downcase
-      model_params = params[model_name]
-      @model.clean_conditional_params(model_params) if model_params.present?
-      @model.assign_attributes(permit_params(model_params)) if model_params.present?
 
-      if params.key?(model_name)
-        if @model.save(context: "step_#{@current_step.to_i}".to_sym)
-          @applicant.reload
-          @application.reload
-          @current_step = @current_step.next_step if @current_step.next_step.present?
-          if params.key? :last_step
-            @model.update_attributes!(workflow: { current_step: 1 })
-            redirect_to application_applicant_incomes_path(@application, @applicant)
-          else
-            @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-            render 'workflow/step', layout: 'financial_assistance_nav'
-          end
-        else
-          # page.current_path
-          @model.assign_attributes(workflow: { current_step: @current_step.to_i })
-          @model.save!(validate: false)
-          flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance_nav'
-        end
-      else
-        render 'workflow/step', layout: 'financial_assistance_nav'
-      end
+      redirect_to tax_info_application_applicant_path(@application, @applicant)
     end
     #rubocop:enable Metrics/AbcSize
 
@@ -207,6 +203,10 @@ module FinancialAssistance
       model_params["has_household_income_changed"] = nil if model_params.key?("has_household_income_changed") && model_params["has_household_income_changed"].blank? && !model_params["has_household_income_changed"].nil?
 
       model_params["dependent_job_end_on"] = Date.strptime(model_params["dependent_job_end_on"].to_s, "%m/%d/%Y") if model_params["dependent_job_end_on"].present?
+    end
+
+    def build_error_messages_for_tax_info(model)
+      model.valid?(:tax_info) ? nil : model.errors.messages.first[1][0].titleize
     end
 
     def build_error_messages(model)
