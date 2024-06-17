@@ -377,12 +377,12 @@ module ApplicationHelper
     case type
     when "notice"
       "info"
-    when "warning", "message" 
+    when "warning", "message"
       "warning"
     when "success"
       "success"
-    else 
-      "severe"
+    else
+      "error"
     end
   end
 
@@ -1109,12 +1109,12 @@ module ApplicationHelper
 
   def ridp_modal_options
     {
-      :driver_license => "Driver's License issued by state or territory", 
-      :school_id => "School identification card", 
-      :military_id => "U.S. military card or draft record", 
-      :passport => "Identification card issued by the federal, state or local government, including a U.S. Passport", 
-      :military_dependent => "Military dependent's identification card", 
-      :native_american => "Native American tribal document", 
+      :driver_license => "Driver's License issued by state or territory",
+      :school_id => "School identification card",
+      :military_id => "U.S. military card or draft record",
+      :passport => "Identification card issued by the federal, state or local government, including a U.S. Passport",
+      :military_dependent => "Military dependent's identification card",
+      :native_american => "Native American tribal document",
       :coast_guard => "U.S. Coast Guard Merchant Mariner card"
     }
   end
