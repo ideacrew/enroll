@@ -21,8 +21,8 @@
         </div>
       </div>
       <div>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit edit-pr"><span class="hide"><%=l10n("edit")%></span></a>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete"></i><span class="hide"><%=l10n("delete")%></span></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete button outline error mr-1 mb-2"><%= l10n("faa.other_incomes.remove") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit button outline mb-2"><%=l10n("edit")%></a>
       </div>
     </div>
     <div class="edit-other-income-form hidden">
