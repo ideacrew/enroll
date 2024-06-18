@@ -12,7 +12,7 @@ class IvlFamilyInformation
   end
 
   def self.continue_btn
-    '#btn-continue, #btn_household_continue'
+    '#btn_household_continue'
   end
 
   def self.edit_icon

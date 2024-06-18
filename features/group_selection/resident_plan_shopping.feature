@@ -1,6 +1,7 @@
 Feature: IVL plan purchase
 
   Scenario: when Resident purchase plan for self & dependent
+    Given bs4_consumer_flow feature is disable
     Given a Resident exists
     And the Resident is logged in
     And Resident has a dependent in child relationship with age less than 26
