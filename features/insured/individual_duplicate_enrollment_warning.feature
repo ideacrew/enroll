@@ -1,6 +1,7 @@
 Feature: Individual market with duplicate enrollments
 
   Background: Individual account creation and enabling duplicate enrollment warning setting
+    Given bs4_consumer_flow feature is disable
     Given an Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     Given the warning duplicate enrollment feature configuration is enabled
@@ -9,12 +10,13 @@ Feature: Individual market with duplicate enrollments
     Then Individual should see a successful sign up message
     When Individual sees Your Information page
     And user registers as an individual
-    And Individual clicks on continue
+    And Individual clicks on the Continue button of the Account Setup page
     Then Individual sees form to enter personal information
     
   Scenario: Individual adds dependent and shops for a plan. Dependent creates account, shops for a plan and sees duplicate enrollment warning
-    When Individual clicks on continue
+    When the individual clicks continue on the personal information page
     And Individual agrees to the privacy agreeement
+    And the person named Patrick Doe is RIDP verified
     And Individual answers the questions of the Identity Verification page and clicks on submit
     And Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
