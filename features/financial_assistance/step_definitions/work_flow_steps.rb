@@ -102,7 +102,7 @@ Given(/^that the user is on the Application Checklist page$/) do
 end
 
 Then(/^the user will navigate to the FAA Household Infor: Family Members page$/) do
-  expect(page).to have_content("#{l10n('family_information')}")
+  expect(page).to have_content('Family Information')
 end
 
 Then(/^the next time the user logs in the user will see Application checklist page$/) do

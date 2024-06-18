@@ -1,6 +1,7 @@
 Feature: Insured Plan Shopping on Individual Assisted market
 
  Background: Individual market setup
+    Given bs4_consumer_flow feature is disable
     Given EnrollRegistry contact_method_via_dropdown feature is enabled
     And the FAA feature configuration is enabled
     And the extended_aptc_individual_agreement_message configuration is enabled
@@ -9,18 +10,18 @@ Feature: Insured Plan Shopping on Individual Assisted market
     Given the user visits the Consumer portal during open enrollment
     When the user creates a Consumer role account
     And the user sees Your Information page
-    And the user registers as an individual
+    And  user registers as an individual
     And the individual clicks on the Continue button of the Account Setup page
     And the individual sees form to enter personal information
-    And the individual clicks on the Continue button of the Account Setup page
+    And the individual clicks continue on the personal information page
     And the individual agrees to the privacy agreeement
-
+   
   Scenario: Should see extended agreement on "Thank You" page for IVL when APTC present and extended agreement message present
+    And the person named Patrick Doe is RIDP verified
     And the individual answers the questions of the Identity Verification page and clicks on submit
     When the individual is on the Help Paying for Coverage page
     And the individual does not apply for assistance and clicks continue
     And the individual clicks on the Continue button of the Household Info page
-    # And the individual enters a SEP
     And taxhousehold info is prepared for aptc user
     And has valid csr 0 benefit package with silver plans
     When the individual clicks the Continue button of the Group Selection page

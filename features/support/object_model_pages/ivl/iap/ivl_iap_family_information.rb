@@ -278,4 +278,9 @@ class IvlIapFamilyInformation
   def self.cancel_btn
     'a[class="btn btn-default remove-new-employee-dependent"]'
   end
+
+  def self.previous_link
+    '.interaction-click-control-previous-step'
+  end
+
 end
