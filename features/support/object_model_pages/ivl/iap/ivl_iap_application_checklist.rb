@@ -12,7 +12,11 @@ class IvlIapApplicationChecklist
   end
 
   def self.continue_btn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else 
     '#btn-continue'
+    end
   end
 
   def self.previous_link

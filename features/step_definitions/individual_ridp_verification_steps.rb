@@ -207,7 +207,7 @@ Then(/^HBX admin should see the dependents form$/) do
 end
 
 And(/^HBX admin click on continue button on household info form$/) do
-  find(IvlIapFamilyInformation.continue_btn).click
+  find_all(IvlIapFamilyInformation.continue_btn)[0].click
 end
 
 And(/^HBX admin clicks continue after approving Identity document$/) do
