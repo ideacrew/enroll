@@ -154,7 +154,7 @@ When(/^all applicants are in Info Completed state$/) do
     find("#is_required_to_file_taxes_no", wait: 10).click
     find("#is_claimed_as_tax_dependent_no", wait: 10).click
     find("#is_joint_tax_filing_no", wait: 10).click if page.all("#is_joint_tax_filing_no").present?
-    find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
+    find('input[id="btn-continue"]').click
 
     find("#has_job_income_false", wait: 10).click
     find("#has_self_employment_income_false", wait: 10).click
