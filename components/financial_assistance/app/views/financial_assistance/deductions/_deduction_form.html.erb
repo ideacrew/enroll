@@ -6,23 +6,23 @@
     <div>
       <div class="d-flex">
         <%= f.hidden_field :deduction_type, value: kind %>
-        <div class="col px-0">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :frequency_kind, l10n("faa.review.income.table.amount"), class: "required" %>
           <div class="faa-amount">
             <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(deduction.amount), required: true %>
           </div>
         </div>
-        <div class="col px-0">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :frequency_kind, l10n("faa.deductions.deduction_form.how_often"), class: "required" %>
           <div class="fa-frequency-kind">
             <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: deduction.frequency_kind), {include_blank: "Choose"}, {:required => true}) %>
           </div>
         </div>
-        <div class="col px-0">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :frequency_kind, l10n("start_date"), class: "required", for: "start_on_#{deduction_id}" %>
           <%= f.date_field :start_on, required: true, id: "start_on_#{deduction_id}", placeholder: "MM/DD/YYYY", onchange: onchange_date %>
         </div>
-        <div class="col px-0">
+        <div class="col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :frequency_kind, l10n("end_date"), class: "required", for: "end_on_#{deduction_id}" %>
           <%= f.date_field :end_on, id: "end_on_#{deduction_id}", placeholder: "MM/DD/YYYY", onchange: onchange_date %>
         </div>

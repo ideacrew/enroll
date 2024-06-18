@@ -3,19 +3,20 @@
     <div class="deduction-show">
       <div class="d-flex col-sm p-0 mb-2">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 mb-1">
-          <label for="amount-<%= deduction.id %>" class="required"><%= l10n("faa.deductions.amount") %></label>
+          <%# TODO: Replace these key strings with Kristin's for Incomes page %>
+          <label for="amount-<%= deduction.id %>" class="required"><%= l10n("faa.review.income.table.amount") %></label>
           <input class="fake-disabled-input" id="amount-<%= deduction.id %>" disabled="true" value="<%= number_to_currency(deduction.amount) %>">
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <label for="frequency-<%= deduction.id %>" class="required"><%= l10n("faa.deductions.frequency") %></label>
+          <label for="frequency-<%= deduction.id %>" class="required"><%= l10n("faa.deductions.deduction_form.how_often") %></label>
           <input class="fake-disabled-input" id="frequency-<%= deduction.id %>" disabled="true" value="<%= frequency_kind_options.invert[deduction.frequency_kind] %>">
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <label for="start-<%= deduction.id %>" class="required"><%= l10n("faa.deductions.start_on") %></label>
+          <label for="start-<%= deduction.id %>" class="required"><%= l10n("start_date") %></label>
           <input class="fake-disabled-input" id="start-<%= deduction.id %>" disabled="true" value="<%= deduction.start_on %>">
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <label for="end-<%= deduction.id %>"><%= l10n("faa.deductions.end_on") %></label>
+          <label for="end-<%= deduction.id %>"><%= l10n("end_date") %></label>
           <input class="fake-disabled-input" id="end-<%= deduction.id %>" disabled="true" value="<%= deduction.end_on.present? ? deduction.end_on : 'N/A' %>">
         </div>
       </div>
