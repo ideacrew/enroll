@@ -80,6 +80,19 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
   end
 
+  context "GET tax_info" do
+    it "should not render tax_info if request is not html" do
+      get :tax_info, params: { application_id: application.id, id: applicant.id }, format: :js
+      expect(response).not_to render_template 'financial_assistance_nav'
+    end
+
+    it "should render if it is html", dbclean: :after_each do
+      get :tax_info, params: { application_id: application.id, id: applicant.id }
+      expect(assigns(:applicant).id).to eq applicant.id
+      expect(response).to render_template(:financial_assistance_nav)
+    end
+  end
+
   context "GET applicant_is_eligible_for_joint_filing" do
     let(:dependent1) { FactoryBot.create(:person) }
     let(:family_member_dependent) { FactoryBot.build(:family_member, person: dependent1, family: family)}
@@ -107,6 +120,39 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     it "should render plain text" do
       get :applicant_is_eligible_for_joint_filing, params: {"application_id" => application.id, "applicant_id" => applicant2.id}, format: :js
       expect(response.status).to be 406
+    end
+  end
+
+  context "POST save_tax_info" do
+    let(:family_member_id2) { BSON::ObjectId.new }
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: TimeKeeper.date_of_record - 40.years,
+                        is_primary_applicant: false,
+                        is_required_to_file_taxes: nil,
+                        is_claimed_as_tax_dependent: nil,
+                        is_self_attested_blind: false,
+                        has_daily_living_help: false,
+                        need_help_paying_bills: false,
+                        family_member_id: family_member_id2)
+    end
+    it "should not render tax_info if request is not html" do
+      post :save_tax_info, params: { application_id: application.id, id: applicant.id }, format: :js
+      expect(response).not_to render_template 'financial_assistance_nav'
+    end
+
+    it "should not redirect to job income page when not passing correct params" do
+      post :save_tax_info, params: { application_id: application.id, id: applicant2.id, applicant: {claimed_as_tax_dependent_by: nil, is_claimed_as_tax_dependent: true} }
+      expect(response.status).to eq 302
+      expect(response.headers['Location']).not_to have_content 'incomes'
+      expect(response.headers['Location']).to have_content 'tax_info'
+    end
+
+    it "should save tax info and redirect to job income page with valid params", dbclean: :after_each do
+      post :save_tax_info, params: { application_id: application.id, id: applicant2.id, applicant: applicant_params }
+      expect(response.status).to eq 302
+      expect(response).to redirect_to(application_applicant_incomes_path(application, applicant2))
     end
   end
 
@@ -613,52 +659,6 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           expect(dependent.addresses.first).to be_nil
         end
       end
-    end
-  end
-
-  context "POST step" do
-    before do
-      controller.instance_variable_set(:@modal, application)
-    end
-
-    it "should render step if no key present in params with modal_name" do
-      post :step, params: { application_id: application.id, id: applicant.id }
-      expect(response).to render_template 'workflow/step'
-    end
-
-    it "should not render step if request is not html" do
-      post :step, params: { application_id: application.id, id: applicant.id }, format: :js
-      expect(response).not_to render_template 'workflow/step'
-    end
-
-    context "when params has application key" do
-      it "When model is saved" do
-        post :step, params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_valid }
-        expect(applicant.save).to eq true
-      end
-
-      it "should redirect to income index when in last step (tax_info)" do
-        post :step, params: { application_id: application.id, id: applicant.id, commit: "CONTINUE", applicant: applicant_params, last_step: true }
-        expect(response.headers['Location']).to have_content 'incomes'
-        expect(response.status).to eq 302
-        expect(response).to redirect_to(application_applicant_incomes_path(application, applicant))
-      end
-
-      it "should not redirect to find_applicant_path when not passing params last step" do
-        post :step, params: { application_id: application.id, id: applicant.id, commit: "CONTINUE", applicant: applicant_params }
-        expect(response.status).to eq 200
-        expect(response).to render_template 'workflow/step'
-      end
-
-      it "should render_template 'workflow/step' when params are invalid" do
-        post :step, params: { application_id: application.id, id: applicant.id, commit: "CONTINUE", applicant: financial_assistance_applicant_invalid}
-        expect(response).to render_template 'workflow/step'
-      end
-    end
-
-    it "should render step if model is not saved" do
-      post :step, params: { application_id: application.id, id: applicant.id }
-      expect(response).to render_template 'workflow/step'
     end
   end
 
