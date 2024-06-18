@@ -7,6 +7,7 @@ Feature: A dedicated page that gives the user access to household member creatio
     And the primary member authorizes system to call EXPERIAN
     And system receives a positive response from the EXPERIAN
     And the user answers all the VERIFY IDENTITY  questions
+    And the person named Patrick Doe is RIDP verified
     When the user clicks on submit button
     And the Experian returns a VERIFIED response
     Then the user will navigate to the Help Paying for Coverage page
