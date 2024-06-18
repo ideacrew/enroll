@@ -9,7 +9,7 @@ Feature: Insured Plan Shopping on Individual market 1
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    And individual clicks on the continue button on the Account Setup page
+    And the individual clicks on the Continue button of the Account Setup page
     And Individual sees form to enter personal information
 
   Scenario: Individual should see immigration details even after changing radio options
