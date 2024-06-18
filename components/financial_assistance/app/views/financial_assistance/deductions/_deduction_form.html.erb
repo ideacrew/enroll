@@ -27,10 +27,10 @@
           <%= f.date_field :end_on, id: "end_on_#{deduction_id}", placeholder: "MM/DD/YYYY", onchange: onchange_date %>
         </div>
       </div>
-      <div class="d-flex my-2 align-items-center">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-cancel-<%= deduction_id %>', 'new-other-income-form')" id="income-deduction-cancel-<%= deduction_id %>" class="btn outline other-income-cancel mb-4"><%= l10n("faa.other_incomes.cancel") %></a>
-        <%= f.submit l10n("faa.other_incomes.save"), class: "btn #{'disabled' if new_form } mb-4", :data => { :cuke => "income-adjustments-save-button" } %>
-      </div>
+    </div>
+    <div class="d-flex my-2 align-items-center">
+      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-cancel-<%= deduction_id %>', 'new-other-income-form')" id="income-deduction-cancel-<%= deduction_id %>" class="btn outline other-income-cancel mb-4 mr-2"><%= l10n("faa.other_incomes.cancel") %></a>
+      <%= f.submit l10n("faa.other_incomes.save"), disabled: new_form.present? && new_form ? "disabled" : nil, class: "btn mb-4", :data => { :cuke => "income-adjustments-save-button" } %>
     </div>
 
     <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>

@@ -28,7 +28,7 @@
         <label class="weight-n">
           <div class="d-flex align-items-center">
             <div class="flex-col mr-1">
-              <%= check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
+              <%= check_box_tag :deduction_kind, deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
             </div>
             <div class=<%= "flex-col #{deduction_kind}" %>>
               <% if I18n.exists?("glossary.#{deduction_kind}") %>

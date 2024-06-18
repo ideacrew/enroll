@@ -1,15 +1,17 @@
 function stopEditingDeduction() {
   $('.driver-question, .instruction-row, .deduction-kind').removeClass('disabled');
-  $('input#deduction_kind').prop('disabled', false);
   $('a.deduction-edit').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
+  $("a#add_new_deduction_kind").removeClass('hide');
+  $('.driver-question input, .instruction-row input, .deduction-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
 };
 
 function startEditingDeduction(deduction_kind) {
   $('.driver-question, .instruction-row, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
-  $('input#deduction_kind').prop('disabled', true);
   $('a.deduction-edit').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
+  $("a#add_new_deduction_kind").addClass('hide');
+  $('.driver-question input, .instruction-row input, .deduction-kind:not(#' + deduction_kind + ') input:not(":input[type=submit], .fake-disabled-input")').prop('disabled', true);
 };
 
 function currentlyEditing() {
