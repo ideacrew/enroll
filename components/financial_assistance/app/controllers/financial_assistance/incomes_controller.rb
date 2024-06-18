@@ -32,7 +32,6 @@ module FinancialAssistance
 
     def edit
       @income = @applicant.incomes.find params[:id]
-      @bs4 = true if params[:bs4] == "true"
       authorize @income, :edit?
       respond_to do |format|
         format.js { render partial: 'financial_assistance/incomes/other_income_form', locals: { income: income } }
