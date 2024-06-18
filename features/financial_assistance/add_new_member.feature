@@ -1,6 +1,7 @@
 Feature: User add's new dependent and submit form after filling required fields
 
   Scenario: Add a dependent with missing relationship.
+    Given bs4_consumer_flow feature is disable
     Given the FAA feature configuration is enabled
     Given the date is within open enrollment
     When that the user is on FAA Household Info: Family Members page

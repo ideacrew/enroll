@@ -1,5 +1,8 @@
 Feature: User should be able to pay for plan
 
+Background:
+    Given bs4_consumer_flow feature is disable
+    
   Scenario Outline: User can see make first payments for enrollments with future effective date
     Given a <site_key> site exists
     Given EnrollRegistry <issuer_pay_now> feature is enabled
