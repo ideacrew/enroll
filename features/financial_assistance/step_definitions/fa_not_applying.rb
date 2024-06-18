@@ -211,7 +211,7 @@ Then(/the user should see the AI AN Details fields/) do
 end
 
 And(/^the user clicks the PREVIOUS link1/) do
-  find('.interaction-click-control-previous').click
+  find(IvlIapFamilyInformation.previous_link).click
 end
 
 Then(/^the user navigates to Help Paying for Coverage page/) do
@@ -226,7 +226,7 @@ Given(/^the user navigates to the "Household Info" page with "yes" selected/) do
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
     sleep 2
-    find('.btn', text: 'CONTINUE').click
+    find(IvlIapApplicationChecklist.continue_btn).click
   end
 end
 
