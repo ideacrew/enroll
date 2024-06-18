@@ -298,7 +298,7 @@ def receipt_page_steps(named_person, &block)
 end
 
 When(/(.+) clicks the previous link/) do |_named_person|
-  find('.interaction-click-control-previous').click
+  find('a[class*="interaction-click-control-previous"]').click
 end
 
 Then(/(.+) should see employee premium and subsidy based on (.+) effective date/) do |named_person, event|
