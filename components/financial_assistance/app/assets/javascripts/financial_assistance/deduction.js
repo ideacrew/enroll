@@ -96,8 +96,6 @@ $(document).on('turbolinks:load', function () {
         $("#destroyAllDeductions .modal-continue-button").click(function(e) {
           $("#destroyAllDeductions").modal('hide');
           stopEditingDeduction();
-          $(self).prop('checked', false);
-          $(self).parents('.deduction-kind').find('.deductions-list > .new-deduction-form').remove();
 
           $(self).parents('.deduction-kind').find('.deductions-list > .deduction').each(function(i, deduction) {
             var url = $(deduction).attr('id').replace('deduction_', 'deductions/');
@@ -105,7 +103,12 @@ $(document).on('turbolinks:load', function () {
 
             $.ajax({
               type: 'DELETE',
-              url: url
+              url: url,
+              success: function() { 
+                $(self).prop('checked', false);
+                $(self).parents('.deduction-kind').find('.deductions-list > .new-deduction-form').remove();
+                $(self).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
+              }
             });
           });
         });
@@ -140,6 +143,7 @@ $(document).on('turbolinks:load', function () {
     });
 
     /* destroy existing deducitons */
+    $('.deduction-kinds').off('click', 'a.deduction-delete:not(.disabled)');
     $('.deduction-kinds').on('click', 'a.deduction-delete:not(.disabled)', function(e) {
       var self = this;
       e.preventDefault();
@@ -151,12 +155,18 @@ $(document).on('turbolinks:load', function () {
 
       $("#destroyDeduction .modal-continue-button").click(function(e) {
         $("#destroyDeduction").modal('hide');
-        $(self).parents('.deduction').remove();
 
         var url = $(self).parents('.deduction').attr('id').replace('deduction_', 'deductions/');
         $.ajax({
           type: 'DELETE',
-          url: url
+          url: url,
+          success: function() {
+            if ($(self).parents('.deductions-list').find('.deduction, .new-deduction-form:not(.hidden)').length == 1) {
+              $(self).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
+              $(self).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
+            }
+            $(self).parents('.deduction').remove();
+          }
         })
       });
     });

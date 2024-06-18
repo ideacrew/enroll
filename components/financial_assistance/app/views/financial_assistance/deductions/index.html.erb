@@ -24,7 +24,7 @@
     </div>
     <% FinancialAssistance::Deduction::DEDUCTION_TYPE.each do |deduction_kind, label| %>
       <% deduction_kind = deduction_kind.to_s %>
-      <div id="<%= deduction_kind %>"class="ml-1 mb-2 deduction-kind">
+      <div id="<%= deduction_kind %>"class="ml-1 my-4 deduction-kind">
         <label class="weight-n">
           <div class="d-flex align-items-center">
             <div class="flex-col mr-1">
@@ -43,7 +43,6 @@
 
         <div class="deductions-list">
           <% @applicant.deductions.of_kind(deduction_kind).each do |deduction| %>
-
             <%= render partial: 'deduction', locals: { deduction: deduction } %>
           <% end %>
         </div>
@@ -51,13 +50,74 @@
         <div class='new-deduction-form hidden <%= deduction_kind %>'>
           <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
         </div>
-        <div class="add-more-link" id="add-more-link-<%=deduction_kind%>">
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" id="add_new_deduction_kind" class="<%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>">
-            <b> <%= l10n("add_more") %> </b> <%= FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym] %>
+        <div class="add-more-link mt-4" id="add-more-link-<%=deduction_kind%>">
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" id="add_new_deduction_kind" class="<%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %> button mb-4">
+            <%= l10n("faa.other_incomes.add", kind: label).titleize %>
           </a>
         </div>
       </div>
     <% end %>
+  </div>
+
+  <!-- Hidden destroy deduction modal -->
+  <div class="modal" id="destroyDeduction" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'deductions-delete')" id="deductions-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to remove this info?<br /><strong>This cannot be undone.</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
+          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden destroy all deductions modal -->
+  <div class="modal" id="destroyAllDeductions" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'all-deductions-delete')" id="all-deductions-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to remove everything you have entered <strong>for <span id='deduction_kind_modal'></span>?
+          <br />
+          This cannot be undone.
+          </strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
+          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden unsaved deduction modal -->
+  <div class="modal" id="unsavedDeductionChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
+        </div>
+        <div class="modal-body">
+          If you leave without saving, you will lose all your changes.<br />
+          <strong>This cannot be undone.</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">STAY ON THIS PAGE</button>
+          <button type="button" class="btn btn-primary">LEAVE WITHOUT SAVING</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="my-4">
