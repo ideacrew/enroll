@@ -1,6 +1,6 @@
-function validateDateWarnings(id) {
-  var startDate = $("#start_on_" + id).datepicker('getDate');
-  var endDate = $("#end_on_" + id).datepicker('getDate');
+function validateDateWarnings(id, use_bs4 = false) {
+  var startDate = use_bs4 ? new Date($("#start_on_" + id).val()) : $("#start_on_" + id).datepicker('getDate');
+  var endDate = use_bs4 ? new Date($("#end_on__" + id).val()) : $("#end_on_" + id).datepicker('getDate');
   var today = new Date();
   var requiresStartDateWarning = startDate > today
   var requiresEndDateWarning = endDate

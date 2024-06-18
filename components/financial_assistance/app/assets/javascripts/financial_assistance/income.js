@@ -5,7 +5,7 @@ function stopEditingIncome() {
   document.getElementById('new-unemployment-income').classList.remove('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
-  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit]")').removeAttr('disabled');
+  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
 };
 
 function startEditingIncome(income_kind) {

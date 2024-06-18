@@ -78,8 +78,9 @@ module FinancialAssistance
 
     def format_date(params)
       return if params[:income].blank?
-      params[:income][:start_on] = Date.strptime(params[:income][:start_on].to_s, "%m/%d/%Y")
-      params[:income][:end_on] = Date.strptime(params[:income][:end_on].to_s, "%m/%d/%Y") if params[:income][:end_on].present?
+      date_format = @bs4 ? "%Y-%m-%d" : "%m/%d/%Y"
+      params[:income][:start_on] = Date.strptime(params[:income][:start_on].to_s, date_format)
+      params[:income][:end_on] = Date.strptime(params[:income][:end_on].to_s, date_format) if params[:income][:end_on].present?
     end
 
     def job_income_type
