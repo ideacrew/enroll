@@ -5,7 +5,7 @@ Given(/^the unemployment income feature is enabled$/) do
 end
 
 Then(/^they visit the other income page via the left nav$/) do
-  click_link 'Other Income'
+  find('.interaction-click-control-other-income').click
 end
 
 Then(/^the user will navigate to the Other Income page for the corresponding applicant$/) do

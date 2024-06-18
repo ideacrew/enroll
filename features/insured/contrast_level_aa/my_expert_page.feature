@@ -2,6 +2,7 @@
 
 Feature: Contrast level AA is enabled - existing consumer visits the my expert page
     Background:
+    Given bs4_consumer_flow feature is disable
     Given the contrast level aa feature is enabled
     And the FAA feature configuration is enabled
     And an IVL Broker Agency exists
@@ -12,10 +13,11 @@ Feature: Contrast level AA is enabled - existing consumer visits the my expert p
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    When Individual clicks on continue
+    When individual clicks on the Continue button of the Account Setup page
     And Individual sees form to enter personal information
-    When Individual clicks on continue
+    When the individual clicks continue on the personal information page
     And Individual agrees to the privacy agreeement
+    And the person named Patrick Doe is RIDP verified
     And Individual answers the questions of the Identity Verification page and clicks on submit
     And Individual has broker assigned to them
     And Individual visits home page
