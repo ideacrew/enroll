@@ -91,7 +91,7 @@
         <div class="col-md-6">
           <h5 class="fa-text-color"><%= l10n("faa.tax_info.claimed_by") %></h5>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 claimed-dependent">
           <%= f.select("claimed_as_tax_dependent_by", options_for_select(claim_eligible_tax_dependents), prompt: l10n("faa.tax_info.none"), required: false, class: "form-control claimed-dependent-dropdown") %>
         </div>
         <div class='col-md-2 left-seprator'>
@@ -114,7 +114,7 @@
     </div>
 
     <%= content_for :submit_button do %>
-      <%= submit_tag l10n("faa.tax_info.continue"), class: "btn btn-lg btn-primary btn-block", id: 'btn-continue' %>
+      <%= submit_tag l10n("faa.tax_info.continue"), class: "btn btn-lg btn-primary btn-block", id: 'btn-continue', disabled: !@applicant.tax_info_complete? %>
     <% end %>
 
     <div class='col-md-3'>

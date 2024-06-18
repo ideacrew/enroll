@@ -52,11 +52,12 @@ When(/^Will this person be claimed as a tax dependent for <system year>\? has a 
 end
 
 Then(/^the CONTINUE will be visibly disabled$/) do
+  # binding.irb
   expect(find('input[id="btn-continue"]')['disabled']).to eq("true")
 end
 
 Then(/^should not be actionable\.$/) do
-  expect(page).to have_selector('.interaction-click-control-continue', visible: false)
+  expect(page).to have_selector('input[id="btn-continue"]', visible: false)
 end
 
 When(/^Will this person file taxes for <system year>\? does not have a nil value stored$/) do
@@ -114,8 +115,7 @@ And(/^the user indicates that the dependent will be claimed as a tax dependent b
   choose('is_required_to_file_taxes_no')
   choose('is_claimed_as_tax_dependent_yes')
   # Click dropdown
-  page.find('.selectric-claimed-dependent-dropdown')
-  page.all('.selectric-claimed-dependent-dropdown')[0].click
+  page.all('.claimed-dependent span.label')[0].click
   # Click primary member
   page.all('li').detect { |li| li.text == application.applicants.first.full_name }.click
 end
