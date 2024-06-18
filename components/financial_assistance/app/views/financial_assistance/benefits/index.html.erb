@@ -1,6 +1,6 @@
 
 <% if @bs4 %>
-  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 5} if @bs4 %>
+  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 5} %>
 
   <div id="health-coverage-page">
     <h1><%= l10n("faa.health_coverage.title", applicant: @applicant.first_name.capitalize) %></h1>
@@ -23,7 +23,7 @@
       <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: applicant_currently_enrolled_key} %>
 
       <div class="benefit-kinds" id="enrolled-benefit-kinds">
-        <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_enrolled", text1: "What type of ", text2: " is this person currently enrolled in? *"} %>
+        <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_enrolled" } %>
       </div>
     </div>
 
@@ -50,7 +50,6 @@
 
     <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member  %>
       <div id="ai_an_health_service_eligible_question" class="pb-4">
-        ai_an_health_service_eligible_question
         <%= l10n("faa.indian_health_service_eligible") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="ai_an_health_service_eligible_true">
@@ -65,7 +64,6 @@
       </div>
 
       <div id="ai_an_health_service_through_referral_question" class="pb-4">
-        ai_an_health_service_through_referral_question
         <%= l10n("faa.indian_health_service") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="ai_an_health_service_through_referral_true">
@@ -82,7 +80,6 @@
 
     <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
       <div id="medicaid_chip_ineligible_question" class="pb-4">
-        medicaid_chip_ineligible_question
         <%= l10n("faa.medicaid_chip_ineligible") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="medicaid_chip_ineligible_true">
@@ -97,7 +94,6 @@
       </div>
 
       <div id="immigration_status_changed_question" class="pb-4">
-        immigration_status_changed_question
         <%= l10n("faa.immigration_status_changed") %>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="immigration_status_changed_true">
@@ -128,15 +124,15 @@
         <a href="#has_eligible_medicaid_cubcare" data-toggle="modal" data-target="#has_eligible_medicaid_cubcare" class="d-block"><%= l10n("not_sure") %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_medicaid_cubcare"} %>
 
-        <div id="denied-medicaid" class="py-2">
+        <div id="denied-medicaid" class="pt-4">
             <%=l10n("faa.medicaid_cubcare_end_date")%>
             <div class="mr-auto mt-3">
               <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
-              <%= date_field :medicaid_cubcare_due_on, {id: "medicaid_cubcare_due_on", class: "date-field col-3 mt-3", placeholder: 'Select End Date'}, :'data-date-max' => "+0" %>
+              <%= date_field :medicaid_cubcare_due_on, {id: "medicaid_cubcare_due_on", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
             </div>
         </div>
 
-        <div id="eligibility-change-question" class="py-4">
+        <div id="eligibility-change-question" class="pt-4">
           <%=l10n("faa.change_eligibility_status")%>
           <div class="focus d-flex mt-3">
             <label class="radio mr-3" for="has_eligibility_changed_true">
@@ -156,7 +152,7 @@
             <%=l10n("faa.person_medicaid_last_day")%>
             <div class="mr-auto mt-3">
               <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
-              <%= date_field :person_coverage_end_on, {id: "medicaid-chip-person_coverage_end_on-last-day", class: "date-field col-3 mt-3", placeholder: 'Select End Date'}, :'data-date-max' => "+0" %>
+              <%= date_field :person_coverage_end_on, {id: "medicaid-chip-person_coverage_end_on-last-day", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
             </div>
           </div>
 
@@ -176,6 +172,33 @@
             <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_household_income_changed"} %>
           </div>
 
+        </div>
+      </div>
+    <% end %>
+
+    <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
+      <div id="has_dependent_with_coverage_question" class="pb-4">
+        <%= l10n("faa.has_dependent_with_coverage") %>
+        <div class="focus d-flex mt-3">
+          <label class="radio mr-3" for="has_dependent_with_coverage_true">
+            <input id="has_dependent_with_coverage_true" type="radio" value="true" name="has_dependent_with_coverage" <%='checked' if @applicant.has_dependent_with_coverage? %>>
+            <%= l10n("yes") %>
+          </label>
+          <label class="radio mr-3" for="has_dependent_with_coverage_false">
+            <input id="has_dependent_with_coverage_false" type="radio" value="false" name="has_dependent_with_coverage" <%='checked'if @applicant.has_dependent_with_coverage? == false %>>
+            <%= l10n("no") %>
+          </label>
+        </div>
+
+        <a href="#has_dependent_with_coverage" data-toggle="modal" data-target="#has_dependent_with_coverage" class="d-block"><%= l10n("not_sure") %></a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_dependent_with_coverage"} %>
+
+        <div id="denied-job-end-on" class="pt-4">
+          <%=l10n("faa.dependent_job_end_on")%>
+          <div class="mr-auto mt-3">
+            <label class="required" for="dependent_job_end_on"><%=l10n("dependent_job_end_on")%></label>
+            <%= date_field :dependent_job_end_on, {id: "dependent_job_end_on", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
+          </div>
         </div>
       </div>
     <% end %>
