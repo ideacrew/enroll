@@ -46,7 +46,7 @@ Then(/Hbx Admin should see a form to enter personal information$/) do
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => "Washington"
   find(IvlPersonalInformation.select_state_dropdown).click
-  find(IvlPersonalInformation.select_dc_state).click
+  find('li[data-index="9"]').click
   fill_in IvlPersonalInformation.zip, :with => "20002"
   # expect(page).to have_css("#home_address_tooltip")
   find('.btn', text: 'CONTINUE').click
