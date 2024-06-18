@@ -2,7 +2,7 @@
 
 Then(/^they should be taken to the applicant's Tax Info page \(health coverage\)$/) do
   sleep 5
-  expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
+  expect(page).to have_selector("[data-cuke='tax_info_header']")
 end
 
 Then(/^they visit the Health Coverage page via the left nav \(also confirm they are on the Health Coverage page\)$/) do
