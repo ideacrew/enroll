@@ -869,6 +869,8 @@ $(document).on('turbolinks:load', function () {
     $('#destroyUnemploymentIncome .modal-continue-button').on('click', function(e) {
       $("#destroyUnemploymentIncome").modal('hide');
       $(self).parents('.unemployment-income').remove();
+              
+      $("div#unemployment_income #add-more-link").addClass('hidden');
       $("a.interaction-click-control-add-more").addClass('hide');
 
       var url = $(self).parents('.unemployment-income').attr('id').replace('financial_assistance_income_', '');
