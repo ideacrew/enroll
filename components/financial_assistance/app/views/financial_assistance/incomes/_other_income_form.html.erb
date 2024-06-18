@@ -9,7 +9,7 @@
         <% if (other_income.kind == "social_security_benefit" || kind == :social_security_benefit) && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
           <div class="mr-auto col-sm col-md-6 col-lg-3 p-0" id="ssi_type">
             <div class="ss_benefit_type">
-              <%= f.label :ssi_type, "#{l10n("Social").upcase} #{l10n("Security").upcase} #{l10n("Benefit").upcase} #{l10n("TYPE").upcase} *", class: "label-color", for: "ssbenefit#{income_id}" %>
+              <%= f.label :ssi_type, "#{l10n("Social").upcase} #{l10n("Security").upcase} #{l10n("Benefit").upcase} #{l10n("TYPE").upcase}", class: "required", for: "ssbenefit#{income_id}" %>
               <%= f.select(:ssi_type, options_for_select(FinancialAssistance::Income::SS_BENEFITS.map {|k, v| [v, k]}, selected: other_income.ssi_type), {prompt: "Choose"}, {disabled: false, required: true, id: "ssbenefit#{income_id}"}) %>
             </div>
           </div>
@@ -20,7 +20,7 @@
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <div class="pr-3">
-            <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "label-color", for: "frequency#{income_id}" %>
+            <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequency#{income_id}" %>
             <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: other_income.frequency_kind), {include_blank: "Choose"}, {disabled: false, id: "frequency#{income_id}", class: "w-100"}) %>
           </div>
         </div>
