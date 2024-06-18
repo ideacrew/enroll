@@ -44,7 +44,7 @@
           <div class="col-md-4">
             <%= income_fields.text_field :city, placeholder: 'CITY *', required: required, value: income.employer_address.try(:city), class: "floatlabel" %>
           </div>
-          <div class="col-md-4 fa-select select-box">
+          <div class="col-md-4 fa-select select-box employer-state">
             <%= income_fields.label :state, 'State *', class: 'label-color' %>
             <%= income_fields.select :state, options_for_select(state_options, selected: income.employer_address.try(:state)), {prompt: 'Choose' }, {:required => required} %>
           </div>
