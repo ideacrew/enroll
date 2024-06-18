@@ -1,9 +1,4 @@
 document.addEventListener("turbolinks:load", function() {
-  $('label.required, legend.required, p.required').each(function() {
-    if ($(this).find('.sr-only').length == 0) {
-      $(this).append('<span class="sr-only sr-required-indicator">*</span>');
-    }
-  });
   $('.step-tabs, .interaction-click-control-my-household').on('click', function(e) {
     //Leave without saving for all side nav items - this gathers all items
     $('.btn.btn-primary').click(function() {
@@ -12,13 +7,8 @@ document.addEventListener("turbolinks:load", function() {
   });
 
   /* attestations */
-  $('#living_outside_yes, #living_outside_no').off('change')
-  $('#living_outside_yes, #living_outside_no').on('change', function(e) {
-    if ($('#living_outside_yes').is(':checked')) {
-      $('#application_attestation_terms').attr('required', true);
-    } else {
-      $('#application_attestation_terms').removeAttr('required');
-    }
+  $('#living_outside_yes, #living_outside_no').change(function(e) {
+    $('#application_attestation_terms').attr('required', e.target.value == 'true');
   });
 
   if ($('#medicaid_pregnancy_yes').length) {
@@ -51,7 +41,7 @@ document.addEventListener("turbolinks:load", function() {
       url: window.location.href.replace(/tax_info/, 'applicant_is_eligible_for_joint_filing'),
       success: function (has_spouse_relationship) {
         if(has_spouse_relationship == 'true'){
-          $('#is_joint_tax_filing_no').parents('.is_joint_tax_filing').removeClass('hide');
+          $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
         }
       }
     });
@@ -90,12 +80,12 @@ document.addEventListener("turbolinks:load", function() {
 
   $("body").on("change", "#is_required_to_file_taxes_no", function(){
     if ($('#is_required_to_file_taxes_no').is(':checked')) {
-      $('#is_joint_tax_filing_no').parents('.is_joint_tax_filing').addClass('hide');
+      $('#is_joint_tax_filing_no').parents('.row-form-wrapper').addClass('hide');
       $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('checked', false)
       $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('required', false);
       $('.filing-as-head-of-household').first().addClass('hide');
     } else{
-      $('.is_claimed_as_tax_dependent').removeClass('hide');
+      $('#is_claimed_as_tax_dependent_no').parents('.row-form-wrapper').removeClass('hide');
     }
   });
 
@@ -107,7 +97,7 @@ document.addEventListener("turbolinks:load", function() {
         $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('required', true);
       }
     } else{
-      $('.is_claimed_as_tax_dependent').addClass('hide');
+      $('#is_claimed_as_tax_dependent_no').parents('.row-form-wrapper').addClass('hide');
     }
   });
 
@@ -126,11 +116,11 @@ document.addEventListener("turbolinks:load", function() {
     }
   });
 
-  $('.claimed_as_tax_dependent_by').addClass('hide');
+  $('#is_claimed_as_tax_dependent_no').parents(".row").next().addClass('hide');
 
   $("body").on("change", "#is_claimed_as_tax_dependent_no", function(){
     if ($('#is_claimed_as_tax_dependent_no').is(':checked')) {
-      $('.claimed_as_tax_dependent_by').addClass('hide');
+      $(this).parents(".row").next().addClass('hide');
     } else{
       $(this).parents(".row").next().next().removeClass('hide');
     }
@@ -138,7 +128,7 @@ document.addEventListener("turbolinks:load", function() {
 
   $("body").on("change", "#is_claimed_as_tax_dependent_yes", function(){
     if ($('#is_claimed_as_tax_dependent_yes').is(':checked')) {
-      $('.claimed_as_tax_dependent_by').removeClass('hide');
+      $(this).parents(".row").next().removeClass('hide');
     } else{
       $(this).parents(".row").next().next().addClass('hide');
     }
@@ -210,36 +200,38 @@ document.addEventListener("turbolinks:load", function() {
 
   // On Load, hide by default if checked
   if ($('#eligibility_easier_yes').is(':checked')) {
-    $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
-    $('#eligibility_easier_yes').parents(".row").next().next().addClass('hide');
+      $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
+      $('#eligibility_easier_yes').parents(".row").next().next().addClass('hide');
   };
 
   $("body").on("change", "#eligibility_easier_yes", function(){
     if ($('#eligibility_easier_yes').is(':checked')) {
-      $('#renewal_years').addClass('hide');
+      $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
+      $('#eligibility_easier_yes').parents(".row").next().next().addClass('hide');
     };
   });
 
   $("body").on("change", "#eligibility_easier_no", function(){
     if ($('#eligibility_easier_no').is(':checked')) {
-      $('#renewal_years').removeClass('hide');
+      $(this).parents(".row").next().removeClass('hide');
+      $(this).parents(".row").next().next().removeClass('hide');
     };
   });
 
   if($('#eligibility_easier_yes').is(':checked')) {
-    $('#renewal_years').addClass('hide');
+    $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
   }
 
   if($('#eligibility_easier_no').is(':checked')) {
-    $('#renewal_years').removeClass('hide');
+    $('#eligibility_easier_no').parents(".row").next().removeClass('hide');
   }
 
 /* Applicant's Tax Info Form Related */
 
-  $('#is_joint_tax_filing_yes').parents('.is_joint_tax_filing').addClass('hide');
+  $('#is_joint_tax_filing_yes').parents('.row-form-wrapper').addClass('hide');
 
   if($('#is_required_to_file_taxes_no').is(':checked')) {
-    $('#is_joint_tax_filing_yes').parents('.is_joint_tax_filing').addClass('hide');
+    $('#is_joint_tax_filing_yes').parents('.row-form-wrapper').addClass('hide');
     $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('checked', false)
     $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').prop('required', false);
     $('.filing-as-head-of-household').first().addClass('hide');
@@ -264,11 +256,11 @@ document.addEventListener("turbolinks:load", function() {
   }
 
   if($('#is_claimed_as_tax_dependent_no').is(':checked')) {
-    $('.claimed_as_tax_dependent_by').addClass('hide');
+    $('#is_claimed_as_tax_dependent_no').parents(".row").next().addClass('hide');
   }
 
   if($('#is_claimed_as_tax_dependent_yes').is(':checked')) {
-    $('.claimed_as_tax_dependent_by').removeClass('hide');
+    $('#is_claimed_as_tax_dependent_yes').parents(".row").next().removeClass('hide');
   }
 
   $("#is_required_to_file_taxes_yes, #is_required_to_file_taxes_no, #is_claimed_as_tax_dependent_yes, #is_claimed_as_tax_dependent_no, #is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no, #is_joint_tax_filing_no, #is_joint_tax_filing_yes").on('change', function() {
@@ -277,7 +269,7 @@ document.addEventListener("turbolinks:load", function() {
         && ($('#is_required_to_file_taxes_yes, #is_required_to_file_taxes_no').is(':checked') && $('#is_claimed_as_tax_dependent_yes, #is_claimed_as_tax_dependent_no').is(':checked'))
         && ($('.hide.filing-as-head-of-household').length > 0
         || (((($('.filing-as-head-of-household').length > 0) && $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').is(':checked')) || ($('.filing-as-head-of-household').length == 0) || $('#is_required_to_file_taxes_no').is(':checked') || $('#is_joint_tax_filing_yes').is(':checked'))))){
-     $('input[type="submit"]#btn-continue').prop('disabled', false)
+     $('#btn-continue').prop('disabled', false)
      //
    }
  });
@@ -289,7 +281,7 @@ $(document).ready(function(){
       && ($('#is_required_to_file_taxes_yes, #is_required_to_file_taxes_no').is(':checked') && $('#is_claimed_as_tax_dependent_yes, #is_claimed_as_tax_dependent_no').is(':checked'))
       && ($('.hide.filing-as-head-of-household').length > 0
       || ((($('.filing-as-head-of-household').length > 0) && $('#is_filing_as_head_of_household_yes, #is_filing_as_head_of_household_no').is(':checked')) || $('.filing-as-head-of-household').length == 0))){
-    $('input[type="submit"]#btn-continue').prop('disabled', false)
+   $('#btn-continue').prop('disabled', false)
  }
 })
 
@@ -324,9 +316,7 @@ $(document).ready(function(){
   $("body").on("change", "#is_pregnant_yes", function(){
     if ($('#is_pregnant_yes').is(':checked')) {
       $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').removeClass('hide');
-      if (!disable_selectric) {
-        $('#children_expected_count').selectric();
-      }
+      $('#children_expected_count').selectric();
       $('#is_post_partum_period_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').addClass('hide');
       $('#medicaid_pregnancy_yes').parents('.row-form-wrapper').addClass('hide');
     };
@@ -556,6 +546,7 @@ $(document).ready(function(){
     living_outside_checked = living_outside_no || (living_outside_yes && attestation_terms)
     signature_valid = (first_name_thank_you == subscriber_first_name) && (last_name_thank_you == subscriber_last_name)
     checks_complete = boxes_checked && living_outside_checked && signature_valid
+
     if(checks_complete){
       $('.interaction-click-control-submit-application').removeClass('disabled');
     } else {
