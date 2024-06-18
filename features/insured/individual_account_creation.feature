@@ -1,6 +1,7 @@
 Feature: UI validations for Email, Username, SSN already in use, and weak Password
 
   Background: New user vists consumer portal
+    Given bs4_consumer_flow feature is disable
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     When Individual visits the Consumer portal during open enrollment
@@ -10,7 +11,7 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    When Individual clicks on continue
+    When the Individual clicks CONTINUE
     And Individual sees form to enter personal information
     Then Individual logs out
     When Individual visits the Consumer portal during open enrollment
@@ -22,7 +23,7 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    When Individual clicks on continue
+    When the Individual clicks CONTINUE
     And Individual sees form to enter personal information
     Then Individual logs out
     When Individual visits the Consumer portal during open enrollment
@@ -34,7 +35,7 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    When Individual clicks on continue
+    When the Individual clicks CONTINUE
     And Individual sees form to enter personal information
     Then Individual logs out
     When Individual visits the Consumer portal during open enrollment
@@ -48,7 +49,7 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     When validate SSN feature is enabled
     When the user registers as an individual with invalid SSN
     When Individual clicks on continue
-    And Individual sees the error message Invalid SSN
+    And Individual should see the error message Invalid Social Security number
 
   Scenario: New user attempts to create account with invalid SSN and validate SSN feature is disabled
     When Individual creates a new HBX account
