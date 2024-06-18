@@ -6,7 +6,7 @@ Given(/^all applicants fill all pages except other questions$/) do
     sleep 1
     find('#is_required_to_file_taxes_no').click
     find('#is_claimed_as_tax_dependent_no').click
-    find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
+    find("#btn-continue").click
     sleep 1
     find('#has_job_income_true').click
     sleep 1
