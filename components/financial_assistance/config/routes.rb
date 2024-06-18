@@ -8,6 +8,10 @@ FinancialAssistance::Engine.routes.draw do
 
   resources :applications, except: feature_flagged_exceptions do
     get :copy, on: :member
+    get :preferences, on: :member
+    put :save_preferences, on: :member
+    get :submit_your_application, on: :member
+    put :submit, on: :member
     put :step, on: :member
     put ':step/:step', on: :member, action: 'step'
     post :step, on: :collection

@@ -1,0 +1,43 @@
+<%# back to household button params %>
+<% show_back_to_household_button = local_assigns[:show_back_to_household_button] ? show_back_to_household_button : false %>
+
+<%# previous button params %>
+<% dont_show_prev_button = local_assigns[:dont_show_prev_button] ? dont_show_prev_button : false %>
+<% previous_link = local_assigns[:previous_link] ? previous_link : '#' %>
+<% previous_style = local_assigns[:previous_style] ? previous_style : "outline" %>
+
+<%# continue button params %>
+<% dont_show_next_button = local_assigns[:dont_show_next_button] ? dont_show_next_button : false %>
+<% next_link = local_assigns[:next_link] ? next_link : "" %>
+<% disable_link = local_assigns[:disable_link] ? disable_link : false %>
+
+
+<div class="d-flex align-items-center">
+  <% if @application && show_back_to_household_button %>
+    <%= h(link_to_with_noopener_noreferrer("Back to All Household Members", financial_assistance.edit_application_path(@application), class: 'button outline mr-2')) %>
+  <% end %>
+
+  <% unless dont_show_prev_button || @no_previous_button %>
+    <a class="back button <%= previous_style %> mr-2" href=<%= previous_link %>><%= l10n("previous_step") %></a>
+  <% end %>
+
+  <% unless dont_show_next_button %>
+    <% if content_for? :submit_button %>
+      <%= yield :submit_button %>
+    <% else %>
+      <% unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
+        <%= h(link_to_with_noopener_noreferrer(l10n("continue_next"), next_link, class: 'button btn-continue', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled))) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+
+<script>
+  // Without this, the user can use the continue button to continue to navigate through the workflow via the enter button.
+  // The original approach with the disabled setting does not prevent keyboard navigation, only use of mouse clicks.
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && event.target.id === 'btn-continue' && event.target.getAttribute('disabled') === 'disabled') {
+      event.preventDefault();
+    }
+  });
+</script>

@@ -434,9 +434,9 @@
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_post_partum_period) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
               <% if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) %>
-                <div class="col-md-6"><%= l10n('faa.other_ques.pregnant_last_year') %></div>
+                <div class="col-md-6"><%= other_questions_prompt('pregnant_last_year') %></div>
               <% else %>
-                <div class="col-md-6"><%= l10n('faa.other_ques.pregnant_last_60d') %></div>
+                <div class="col-md-6"><%= other_questions_prompt('pregnant_last_60d') %></div>
               <% end %>
                 <div class="col-md-6"><%= human_boolean applicant.is_post_partum_period %></div>
               </div>
@@ -483,7 +483,7 @@
               <% end %>
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n('faa.other_ques.is_student') %></div>
+                <div class="col-md-6"><%= other_questions_prompt('is_student') %></div>
                 <div class="col-md-6"><%= human_boolean applicant.is_student %></div>
               </div>
 
@@ -513,7 +513,7 @@
               <% if applicant.age_of_the_applicant >= 19 && applicant.is_applying_coverage %>
                 <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) %>
                   <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                    <div class="col-md-6"><%= l10n("faa.primary_caretaker_question_text") %></div>
+                    <div class="col-md-6"><%= other_questions_prompt('primary_caretaker_question_text') %></div>
                     <div class="col-md-6"><%= human_boolean applicant.is_primary_caregiver %></div>
                   </div>
                 <% end %>
@@ -539,7 +539,7 @@
               </div>
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.other_ques.disability_question") %></div>
+                <div class="col-md-6"><%= other_questions_prompt('disability_question') %></div>
                 <div class="col-md-6"><%= human_boolean applicant.is_physically_disabled %></div>
               </div>
             <% end %>
@@ -639,6 +639,6 @@
   </div>
 
   <div class='col-md-3'>
-    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? financial_assistance.application_relationships_path(@application) : edit_application_path(@application), next_url: go_to_step_application_path(@application, 1), disabled: @application.incomplete_applicants? ? 'true' : false} %>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? financial_assistance.application_relationships_path(@application) : edit_application_path(@application), next_url: preferences_application_path(@application), disabled: @application.incomplete_applicants? ? 'true' : false} %>
   </div>
 </div>

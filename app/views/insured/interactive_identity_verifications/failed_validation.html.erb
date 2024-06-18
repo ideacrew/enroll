@@ -1,0 +1,69 @@
+<% if @bs4 %>
+  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+  <h1><%= l10n("verify_identity") %></h1>
+  <% if @step == 'start' %>
+    <h4>
+      <%= l10n("insured.interactive_identity_verifications.failed_validation.start") %>
+    </h4>
+    <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+  <% else %>
+    <%= render partial: 'notices/shared/unordered_list', locals: { previous: l10n('insured.interactive_identity_verifications.failed_validation.else'), listings: [l10n('insured.interactive_identity_verifications.failed_validation.step_1'), l10n('insured.interactive_identity_verifications.failed_validation.step_2', transaction_id: @verification_transaction_id), l10n('insured.interactive_identity_verifications.failed_validation.step_3')] } %>
+    <% unless @verification_transaction_id.blank? %>
+      <p><%= l10n("insured.interactive_identity_verifications.failed_validation.if_continue") %></p>
+      <p class="mb-4"><%= sanitize(link_to l10n("insured.consumer_roles.upload_ridp_documents.documents_faq"), ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "button outline", target: '_blank', rel: 'noopener noreferrer') %> <%= sanitize(link_to(l10n('insured.interactive_identity_verifications.failed_validation.continue_button'), insured_interactive_identity_verification_path(:id => @verification_transaction_id), :method => :put, :class => "btn-secondary interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?))) %></p>
+    <% end %>
+    <div class="mt-4 mb-4">
+      <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+    </div>
+  <% end %>
+  <%= render partial: 'shared/application_types_list' %>
+  <div class="outstanding-ridp-documents mt-4">
+    <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents', locals: {show_faq_button: @verification_transaction_id.blank?} %>
+  </div>
+  <% if ridp_redirection_link(@person).present? %>
+    <% next_link = ridp_redirection_link(@person) %>
+  <% else %>
+    <% next_link = insured_family_members_path(consumer_role_id: @person.consumer_role.id) %>
+  <% end %>
+  <%= render partial: "shared/progress_navigation_buttons", locals: {next_link: current_user.has_hbx_staff_role? ? help_paying_coverage_insured_consumer_role_index_path : next_link, disable_link: ridp_step_2_disabled(@person, @person.consumer_role.application_verified?, @person.consumer_role.identity_verified?)} %>
+<% else %>
+  <div class="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12">
+          <% if @step == 'start' %>
+            <h4>
+              <%= l10n("insured.interactive_identity_verifications.failed_validation.start") %>
+            </h4>
+            <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+          <% else %>
+            <br>
+            <%= render partial: 'notices/shared/unordered_list', locals: { previous: l10n('insured.interactive_identity_verifications.failed_validation.else'), listings: [l10n('insured.interactive_identity_verifications.failed_validation.step_1'), l10n('insured.interactive_identity_verifications.failed_validation.step_2', transaction_id: @verification_transaction_id), l10n('insured.interactive_identity_verifications.failed_validation.step_3')] } %>
+            <% unless @verification_transaction_id.blank? %>
+              <p>If you are able to resolve the issue with Experian, select CONTINUE APPLICATION.</p>
+              <p><%= sanitize (link_to(l10n('insured.interactive_identity_verifications.failed_validation.override'), insured_interactive_identity_verification_path(:id => @verification_transaction_id), :method => :put, :class => "btn btn-primary btn-small interaction-click-control-override-identity-verification" + pundit_class(Family, :updateable?))) %></p>
+            <% end %>
+            <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
+          <% end %>
+          <div class="btn btn-default hidden" data-target="#help_with_plan_shopping" data-toggle="modal">
+            <%= l10n("help_me_sign_up") %>
+          </div>
+          <br>
+          <%= render partial: 'ui-components/v1/modals/help_with_plan' %>
+          <%= render partial: 'shared/application_types_list' %>
+          <div class="outstanding-ridp-documents">
+            <%= render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents' %>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+          <% if ridp_redirection_link(@person).present? %>
+            <% next_link = ridp_redirection_link(@person) %>
+          <% else %>
+            <% next_link = insured_family_members_path(consumer_role_id: @person.consumer_role.id) %>
+          <% end %>
+          <%= render partial: 'shared/individual_progress', locals: {ridp:true, step: '2', next_link: current_user.has_hbx_staff_role? ? help_paying_coverage_insured_consumer_role_index_path : next_link, identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?} %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

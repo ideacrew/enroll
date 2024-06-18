@@ -40,6 +40,18 @@
     gap: 8px;
   }
 
+  .live-chat-button-bs4 {
+    background-color: var(--tertiary-color, #647F3A);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .live-chat-button-bs4:hover {
+    background-color: var(--tertiary-hover-color);
+  }
+
   /* Footer Text And Icon */
   .cx-widget.cx-theme-dark .cx-branding *, .cx-widget.cx-theme-dark .cx-footer * {
     fill: var(--primary-white);
@@ -66,11 +78,11 @@
       }
     }
   </script>
-  <button class="live-chat-button" type="button" data-cuke="bot-button" onclick="javascript: openQnaBot();">
+  <button class="<% if @bs4 %>live-chat-button-bs4<% else %>live-chat-button<% end %>" type="button" data-cuke="bot-button" onclick="javascript: openQnaBot();">
 <% else %>
-  <button class="live-chat-button" type="button" data-cuke="chat-button" id="chat-button" onclick="customPlugin.command('WebChat.open', getAdvancedConfig());">
+  <button class="<% if @bs4 %>live-chat-button-bs4<% else %>live-chat-button<% end %>" type="button" data-cuke="chat-button" id="chat-button" onclick="customPlugin.command('WebChat.open', getAdvancedConfig());">
 <% end %>
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="transform: scale(-1,1)" xmlns="http://www.w3.org/2000/svg">
     <path d="M13.25 14C12.0074 14 11 15.0074 11 16.25V17.752L11.0079 17.8604C11.3186 19.9866 13.2285 21.009 16.4332 21.009C19.6264 21.009 21.5667 19.9983 21.9855 17.8966L22 17.75V16.25C22 15.0074 20.9926 14 19.75 14H13.25ZM16.5 6C14.567 6 13 7.567 13 9.5C13 11.433 14.567 13 16.5 13C18.433 13 20 11.433 20 9.5C20 7.567 18.433 6 16.5 6Z" fill="white"/>
     <path d="M13.25 14C12.0074 14 11 15.0074 11 16.25V17.752L11.0079 17.8604C11.3186 19.9866 13.2285 21.009 16.4332 21.009C19.6264 21.009 21.5667 19.9983 21.9855 17.8966L22 17.75V16.25C22 15.0074 20.9926 14 19.75 14H13.25ZM13.25 15.5H19.75C20.1642 15.5 20.5 15.8358 20.5 16.25V17.6704C20.2202 18.8708 18.9494 19.509 16.4332 19.509C13.9171 19.509 12.7034 18.8777 12.5 17.6932V16.25C12.5 15.8358 12.8358 15.5 13.25 15.5ZM16.5 6C14.567 6 13 7.567 13 9.5C13 11.433 14.567 13 16.5 13C18.433 13 20 11.433 20 9.5C20 7.567 18.433 6 16.5 6ZM4.25 2C3.00736 2 2 3.00736 2 4.25V7.75C2 8.99264 3.00736 10 4.25 10H5.7049L7.87145 12.1414C8.36253 12.6266 9.15397 12.6219 9.63918 12.1308C9.87036 11.8968 10 11.5812 10 11.2526L10.0006 9.9862C11.1253 9.86155 12 8.90792 12 7.75V4.25C12 3.00736 10.9926 2 9.75 2H4.25ZM16.5 7.5C17.6046 7.5 18.5 8.39543 18.5 9.5C18.5 10.6046 17.6046 11.5 16.5 11.5C15.3954 11.5 14.5 10.6046 14.5 9.5C14.5 8.39543 15.3954 7.5 16.5 7.5ZM4.25 3.5H9.75C10.1642 3.5 10.5 3.83579 10.5 4.25V7.75C10.5 8.16421 10.1642 8.5 9.75 8.5H8.50137L8.5003 10.6539L6.3211 8.5H4.25C3.83579 8.5 3.5 8.16421 3.5 7.75V4.25C3.5 3.83579 3.83579 3.5 4.25 3.5Z" fill="white"/>
   </svg>

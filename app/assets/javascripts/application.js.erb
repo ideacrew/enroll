@@ -599,7 +599,7 @@ $(document).on('turbolinks:load', function () {
   });
 
 
-  $("#person_ssn").focusout(function( event ) {
+  $("#person_ssn:not(.keep-label)").focusout(function( event ) {
     if(!$.isNumeric($(this).val())) {
       $("[for='person_ssn']").css('display', 'none');
       $("[for='person_ssn']").css('opacity', 0);
@@ -851,7 +851,7 @@ Freebies.popover();
 $(document).on('click', '#address_info + span.form-action', function(){
   if ($(this).text() == "Add Mailing Address"){
     $(this).text('Remove Mailing Address');
-    $('.row-form-wrapper.mailing-div').show();
+    $('.mailing-div').show();
     $("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip,  #dependent_addresses_1_city").each(function() {
       $(this).prop('required', true);
     })
@@ -869,6 +869,51 @@ $(document).on('click', '#address_info + span.form-action', function(){
       $("#person_addresses_attributes_1__destroy").val(true);
     } else {
       $("#person_addresses_attributes_0__destroy").val(true);
+    }
+  }
+});
+
+document.addEventListener('click', function(event) {
+  if (event.target.matches('button#add_mailing_address')) {
+    event.preventDefault();
+    const addButton = event.target;
+    addButton.classList.add('d-none');
+    const removeButton = addButton.cloneNode(true);
+    removeButton.textContent = 'Remove Mailing Address';
+    removeButton.id = 'remove_mailing_address';
+    removeButton.classList.add('interaction-click-control-remove-mailing-address', 'error');
+    removeButton.classList.remove("d-none", "btn-secondary", "interaction-click-control-add-mailing-address");
+    addButton.parentNode.insertBefore(removeButton, addButton);
+    document.querySelectorAll(".mailing-div").forEach(el => {
+      el.classList.remove('d-none');
+      el.classList.add('d-block');
+    });
+    document.querySelectorAll("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip, #dependent_addresses_1_city").forEach(function(element) {
+      element.required = true;
+    });
+  }
+});
+
+document.addEventListener('click', function(event) {
+  if (event.target.matches('button#remove_mailing_address')) {
+    event.preventDefault();
+    const removeButton = event.target;
+    removeButton.remove();
+    const addButton = document.getElementById('add_mailing_address');
+    addButton.classList.remove('d-none');
+    document.querySelectorAll(".mailing-div").forEach(el => {
+      el.classList.add('d-none');
+      el.classList.remove('d-block');
+    });
+    document.querySelector(".mailing-div #state_id_mailing").value = "";
+    document.querySelectorAll("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip, #dependent_addresses_1_city").forEach(function(element) {
+      element.required = false;
+    });
+    // Mailing address form may appear before or after home address form
+    if (document.querySelector("#person_addresses_attributes_1__destroy").nextElementSibling.id == "person_addresses_attributes_1_kind" && document.querySelector("#person_addresses_attributes_1__destroy").nextElementSibling.value == "mailing") {
+      document.querySelector("#person_addresses_attributes_1__destroy").value = true;
+    } else {
+      document.querySelector("#person_addresses_attributes_0__destroy").value = true;
     }
   }
 });

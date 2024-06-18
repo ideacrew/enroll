@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!-- extract to helper rather than use the ENV directly -->
+<html lang="en" data-theme="<%= ENV['CLIENT'] %>" data-contrast="<%= EnrollRegistry.feature_enabled?(:contrast_level_aa) %>" data-bs4="<%= @bs4 %>">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => EnrollRegistry[:enroll_app].settings(:favicon_tab_icon).item %>
+
+    <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
+
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag "application", 'data-turbolinks-track': 'reload' %>
+    <%= yield :head %>
+    <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+
+    <%= javascript_pack_tag ENV['CLIENT'] %>
+    <%= stylesheet_pack_tag ENV['CLIENT'] %>
+
+    <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
+      <%= javascript_pack_tag 'contrast_level_aa' %>
+      <%= stylesheet_pack_tag 'contrast_level_aa' %>
+    <% end %>
+
+    <%= action_cable_meta_tag %>
+    <%= csrf_meta_tags %>
+
+    <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
+      <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
+    <% end %>
+
+    <% if EnrollRegistry.feature_enabled?(:jquery_migrate) %>
+      <% if EnrollRegistry[:jquery_migrate].setting(:show_warnings).item == true %>
+        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
+      <% else %>
+        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
+      <% end %>
+    <% end %>
+
+    <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
+  </head>
+  <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm d-flex flex-column justify-content-between min-vh-100">
+    <%= render partial: './ui-components/bs4/v1/navs/header' %>
+    <main class="pb-5 <%= controller_name %> flex-grow-1">
+      <% if aca_security_questions %>
+        <%= render 'users/security_question_responses/modal' %>
+      <% end %>
+
+      <div class="mt-4 mb-4">
+        <div class="container mt-4">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-3 mr-auto p-2 p-md-0 progress-nav-container">
+              <% step = content_for?(:step) ? yield(:step).to_i : 1 %>
+              <% title = content_for?(:title) ? yield(:title) : "" %>
+              <% title_link = content_for?(:title_link) ? yield(:title_link) : nil %>
+              <% subheading = content_for?(:subheading) ? yield(:subheading) : nil %>
+
+              <nav class="progress-nav">
+                <% if title_link.present? %>
+                  <h3><a href="<%= title_link %>"><i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i> <%= title %></a></h3>
+                <% else %>
+                  <h3><%= title %></h3>
+                <% end %>
+
+                <% if subheading.present? %>
+                  <h4><%= subheading %></h4>
+                <% end %>
+                
+                <ul class="progress-wrapper">
+                  <%= yield(:nav_options) if content_for?(:nav_options) %>
+                </ul>
+              </nav>
+              <%= render partial: 'shared/shopping_nav_panel',
+                  locals: { show_exit_button: content_for?(:show_exit_button) ? yield(:show_exit_button) : false,
+                            show_previous_button: content_for?(:show_previous_button) ? yield(:show_previous_button) : false,
+                            show_account_button: content_for?(:show_account_button) ? yield(:show_account_button) : false,
+                            is_complete: content_for?(:is_complete) ? yield(:is_complete) : false,
+                            show_help_button: content_for?(:show_help_button) ? yield(:show_help_button) : false,
+                            back_to_account_flag: content_for?(:back_to_account_flag) ? yield(:back_to_account_flag) : EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-9 pl-4">
+              <%= render_flash use_bs4: @bs4 %>
+              <% if content_for? :content %>
+                <%= yield :content %>
+              <% else %>
+                <%= yield %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <%= render partial: './ui-components/bs4/v1/footers/footer' %>
+  </body>
+  <% if @bs4 %>
+    <script>
+      disableSelectric = true;
+    </script>
+  <% end %>
+ </html>

@@ -371,5 +371,42 @@ module FinancialAssistance
       year_selection_enabled = FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form))
       @assistance_year = year_selection_enabled ? @application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
     end
+
+    def applicant_faa_nav_options(application, applicant)
+      [
+        {step: 1, label: l10n('faa.nav.tax_info'), link: go_to_step_application_applicant_path(application, applicant, 1), step_complete: applicant.tax_info_complete? },
+        {step: 2, label: l10n('faa.nav.job_income'), link: application_applicant_incomes_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:income) },
+        {step: 3, label: l10n('faa.nav.other_income'), link: other_application_applicant_incomes_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:other_income) },
+        {step: 4, label: l10n('faa.nav.income_adjustments'), link: application_applicant_deductions_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:income_adjustment) },
+        {step: 5, label: l10n('faa.nav.health_coverage'), link: application_applicant_benefits_path(application, applicant), step_complete: applicant.embedded_document_section_entry_complete?(:health_coverage) },
+        {step: 6, label: l10n('faa.nav.other_questions'), link: other_questions_application_applicant_path(application, applicant), step_complete: applicant.other_questions_complete? },
+      ]
+    end
+
+    def no_applicant_faa_nav_options(application)
+      step1_link = (application.present? && application.is_draft?) ? financial_assistance.edit_application_path(application) : "javascript:void(0);"
+      links = [
+        {step: 1, label: l10n('faa.nav.family_info'), link: step1_link},
+      ]
+      relationship_step = {step: 2, label: l10n('faa.nav.family_relationships'), link: "javascript:void(0);"}
+      review_step = {step: 2, label: l10n('faa.nav.review'), link: "javascript:void(0);"}
+      if application && application.incomplete_applicants?
+        relationship_step[:link] = nil
+      elsif application && application.applicants.count > 1 && application.is_draft?
+        relationship_step[:link] = financial_assistance.application_relationships_path(application)
+      end
+
+      if application.applicants.count > 1
+        links << relationship_step
+        review_step[:step] = 3
+      end
+
+      review_step[:link] = financial_assistance.review_and_submit_application_path(application) if application.present? && application.ready_for_attestation? && application.is_draft?
+      links << review_step
+    end
+
+    def other_questions_prompt(key, use_applicant_name = false)
+      l10n("faa.other_ques.#{key}", subject: use_applicant_name ? @applicant.first_name.capitalize : l10n("faa.other_ques.this_person"))
+    end
   end
 end

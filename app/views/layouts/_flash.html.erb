@@ -1,10 +1,24 @@
-<div class="row flash module">
-  <div class="alert alert-<%= type %>" style="width: 100%; margin-top: 0px !important;">
-    <div class="row">
-      <div class="col-xs-12" style="width: 100%; max-width: 1170px; margin: auto;">
-        <a class="close" data-dismiss="alert" href="#">×</a>
+<% if @bs4 %>
+  <div class="container mb-0 px-0">
+    <div class="alert alert-<%= type %> d-flex flash" role="alert">
+      <div class="pl-1">
+        <div class="<%= type %>-icon icon" alt=<%= type %>>&nbsp;</div>
+      </div>
+      <div class="col my-1 mr-auto p-0 align-self-center">
         <%= raw message %>
+      </div>
+      <a class="close-icon icon pr-1 align-self-start" alt="Close" href="#">&nbsp;<span class="sr-only">Close</span></a>
+    </div>
+  </div>
+<% else %>
+  <div class="row flash module">
+    <div class="alert alert-<%= type %>" style="width: 100%; margin-top: 0px !important;">
+      <div class="container">
+        <div class="col-xs-12" style="width: 100%; max-width: 1170px; margin: auto;">
+          <a class="close" data-dismiss="alert" href="#">×</a>
+          <%= raw message %>
+        </div>
       </div>
     </div>
   </div>
-</div>
+<% end %>

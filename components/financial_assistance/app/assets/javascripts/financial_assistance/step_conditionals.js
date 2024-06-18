@@ -171,32 +171,27 @@ document.addEventListener("turbolinks:load", function() {
 
   /* Submit Application Form Related */
 
-  $('#living_outside_yes').parents(".row").next().addClass('hide');
-  $('#living_outside_yes').parents(".row").next().next().addClass('hide');
+  $('#attestation_terms').addClass('hide');
 
   $("body").on("change", "#living_outside_no", function(){
     if ($('#living_outside_no').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
-      $(this).parents(".row").next().next().addClass('hide');
+      $("#attestation_terms").addClass('hide');
     };
   });
 
   $("body").on("change", "#living_outside_yes", function(){
     if ($('#living_outside_yes').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
-      $(this).parents(".row").next().next().removeClass('hide');
+      $("#attestation_terms").removeClass('hide');
     };
   });
 
   // On Load, hide by default if checked no
   if($('#living_outside_no').is(':checked')) {
-    $('#living_outside_no').parents(".row").next().addClass('hide');
-    $('#living_outside_no').parents(".row").next().next().addClass('hide');
+    $("#attestation_terms").addClass('hide');
   }
 
   if($('#living_outside_yes').is(':checked')) {
-    $('#living_outside_yes').parents(".row").next().removeClass('hide');
-    $('#living_outside_yes').parents(".row").next().next().removeClass('hide');
+    $("#attestation_terms").removeClass('hide');
   }
   /* Submit Application Form Related */
 

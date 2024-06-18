@@ -1540,22 +1540,22 @@ module FinancialAssistance
       # Nil or "" means unanswered, true/or false boolean will be passed through
       elsif is_post_partum_period.nil? || is_post_partum_period == ""
         if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year)
-          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_year')}' should be answered")
+          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_year', subject: l10n('faa.other_ques.this_person'))}' should be answered")
         else
           # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
-          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_60d')}' should be answered")
+          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_60d', subject: l10n('faa.other_ques.this_person'))}' should be answered")
         end
       end
       # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
       if is_post_partum_period.present?
         # Enrolled on medicaid must check if nil
         is_enrolled_on_medicaid_not_answered = is_enrolled_on_medicaid.nil? && is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
-        errors.add(:is_enrolled_on_medicaid, "'#{l10n('faa.other_ques.is_enrolled_on_medicaid')}' #{l10n('faa.errors.should_be_answered')}") if is_enrolled_on_medicaid_not_answered
+        errors.add(:is_enrolled_on_medicaid, "'#{l10n('faa.other_ques.is_enrolled_on_medicaid', subject: l10n('faa.other_ques.this_person'))}' #{l10n('faa.errors.should_be_answered')}") if is_enrolled_on_medicaid_not_answered
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 
       if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && age_of_applicant >= 19 && is_applying_coverage == true && is_primary_caregiver.nil?
-        errors.add(:is_primary_caregiver, "'#{l10n('faa.primary_caretaker_question_text')}' should be answered")
+        errors.add(:is_primary_caregiver, "'#{l10n('faa.other_ques.primary_caretaker_question_text', subject: l10n('faa.other_ques.this_person'))}' should be answered")
       end
 
       return unless is_applying_coverage
@@ -1570,12 +1570,12 @@ module FinancialAssistance
       end
 
       if is_student && FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions)
-        errors.add(:student_kind, "' #{l10n('faa.other_ques.is_student')}' should be answered") if student_kind.blank?
+        errors.add(:student_kind, "' #{l10n('faa.other_ques.is_student', subject: l10n('faa.other_ques.this_person'))}' should be answered") if student_kind.blank?
         errors.add(:student_status_end_on, "' Student status end on date?'  should be answered") if student_status_end_on.blank?
         errors.add(:student_school_kind, "' What type of school do you go to?' should be answered") if student_school_kind.blank?
       end
 
-      errors.add(:is_student, "' #{l10n('faa.other_ques.is_student')}' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
+      errors.add(:is_student, "' #{l10n('faa.other_ques.is_student', subject: l10n('faa.other_ques.this_person'))}' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
       # TODO: Decide if these validations should be ended?
       # errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 

@@ -1,4 +1,294 @@
-<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+<% if @bs4 %>
+   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 3} %>
+  <h1><%= l10n('faa.nav.other_income') %></h1>
+  <p><%= l10n("faa.other_incomes.description", name: @applicant.first_name) %></p>
+  <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
+    <fieldset class="driver-question">
+      <legend id="has_unemployment_income" class="weight-n required">
+        <%= l10n('faa.other_incomes.unemployment_question', name: @applicant.first_name) %>
+      </legend>
+      <div class="focus d-flex align-items-center">
+        <label for="has_unemployment_income_true" class="radio has_unemployment_income_true">
+          <%= radio_button_tag("has_unemployment_income", true, @applicant.has_unemployment_income, class: "required", required: true, id: "has_unemployment_income_true") %>
+          <span class="yes_no_pair"><%= l10n("yes") %></span>
+        </label>
+        <label for="has_unemployment_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_unemployment_income_false')" class="radio">
+          <%= radio_button_tag("has_unemployment_income", false, @applicant.has_unemployment_income == false, class: "required", required: true, id: "has_unemployment_income_false") %>
+          <span class="yes_no_pair"><%= l10n("no") %></span>
+        </label>
+      </div>
+    </fieldset>
+    <a href="#has_unemployment_income" data-toggle="modal" data-target="#has_unemployment_income"><%= l10n("faa.question.not_sure")%></a>
+    <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_unemployment_income"} %>
+    <div id="unemployment_income" class="my-4 <%= 'hidden' unless @applicant.incomes.unemployment.any? %>">
+      <div class="unemployment-incomes-list mb-5">
+        <% @applicant.incomes.unemployment.each do |income| %>
+          <%= render partial: 'financial_assistance/incomes/unemployment_income', locals: { income: income } %>
+        <% end %>
+      </div>
+      <div>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income button mb-4'><%= l10n("faa.other_incomes.add", kind: "Unemployment") %></a>
+      </div>
+
+      <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 hidden'>
+        <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false, new_form: true } %>
+      </div>
+    </div>
+  <% end %>
+  <fieldset class="driver-question my-4">
+    <legend id="has_unemployment_income" class="weight-n required">
+      <%= l10n('faa.other_incomes.other_income_question', name: @applicant.first_name) %>
+    </legend>
+    <div class="d-flex align-items-center focus">
+      <label for="has_other_income_true" class="radio has_unemployment_income_true">
+        <%= radio_button_tag("has_other_income", true, @applicant.has_other_income, class: "radio", required: true, id: "has_other_income_true") %>
+        <span class="yes_no_pair"><%= l10n("yes") %></span>
+      </label>
+      <label for="has_other_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_other_income_false')" class="radio">
+        <%= radio_button_tag("has_other_income", false, @applicant.has_other_income == false, class: "required", required: true, id: "has_other_income_false") %>
+        <span class="yes_no_pair"><%= l10n("no") %></span>
+      </label>
+    </div>
+  </fieldset>
+  <a href="#has_other_income" data-toggle="modal" data-target="#has_other_income"><%= l10n("faa.question.not_sure")%></a>
+  <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_other_income"} %>
+
+  <div class='other_income_kinds my-4'>
+    <div class="instruction-row">
+      <p class="bold"><%= l10n("faa.other_incomes.other_income_subtitle") %></p>
+      <p class="mt-0"><%= l10n("faa.other_incomes.other_income_description") %></p>
+      <p><b><%= l10n("faa.note") %></b> <%= l10n("faa.other_incomes.other_income_note") %></p>
+    </div>
+    <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
+      <div id="<%= other_income_kind %>" class="other-income-kind my-4">
+        <label for="<%= "other-income-checkbox-#{other_income_kind}" %>" class="weight-n">
+          <div class="d-flex pr-3 align-items-center mb-2 option">
+            <span class="mr-2"><%= check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, data: {checking: false},class: "other-income-checkbox-#{other_income_kind}",id: "other-income-checkbox-#{other_income_kind}" %></span>
+            <%= label %> <%= l10n('faa.deductions.divorce_agreement') if other_income_kind == :alimony_and_maintenance && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
+          </div>
+        </label>
+        <div class="other-incomes-list">
+          <% @applicant.incomes.of_kind(other_income_kind).each do |other_income| %>
+            <%= render partial: 'other_income', locals: { other_income: other_income } %>
+          <% end %>
+        </div>
+        <div class="add-more-link mt-4" id="add-more-link-<%=other_income_kind%>">
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_other_income_kind')" id="add_new_other_income_kind" class='<%= 'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? %> button mb-4'><%= l10n("faa.other_incomes.add", kind: label) %></a>
+        </div>
+        <div id="new-other-income-form" class='new-other-income-form hidden <%= other_income_kind %>'>
+          <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true, new_form: true} %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if true #EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
+      <fieldset class="driver-question">
+        <legend id="has_unemployment_income" class="weight-n required">
+          <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
+        </legend>
+        <div class="d-flex align-items-center focus">
+          <label for="has_american_indian_alaskan_native_income_true" class="radio has_american_indian_alaskan_native_income_true">
+            <%= radio_button_tag("has_american_indian_alaskan_native_income", true, @applicant.has_american_indian_alaskan_native_income, class: "required", required: true, id: "has_american_indian_alaskan_native_income_true") %>
+            <span class="yes_no_pair"><%= l10n("yes") %></span>
+          </label>
+          <label for="has_american_indian_alaskan_native_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_american_indian_alaskan_native_income_false')" class="radio">
+            <%= radio_button_tag("has_american_indian_alaskan_native_income", false, @applicant.has_american_indian_alaskan_native_income == false, class: "required", required: true, id: "has_american_indian_alaskan_native_income_false") %>
+            <span class="yes_no_pair"><%= l10n("no") %></span>
+          </label>
+        </div>
+      </fieldset>
+      <a href="#has_ai_an_income" data-toggle="modal" data-target="#has_ai_an_income" class="mb-4"><%= l10n("faa.question.not_sure")%></a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_ai_an_income"} %>
+
+      <div id="ai_an_income" class="mt-4">
+        <div class="ai-an-incomes-list mb-4">
+          <% @applicant.incomes.american_indian_and_alaskan_native.each do |income| %>
+            <%= render partial: 'financial_assistance/incomes/ai_an_income', locals: { income: income } %>
+          <% end %>
+        </div>
+
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-income')" id="new-ai-income" class='new-ai-an-income button my-4'><%= l10n("faa.other_incomes.add", kind: "American Indian/Alaskan Native") %></a>
+
+        <div class='new-ai-an-income-form hidden'>
+          <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>
+        </div>
+      </div>
+    <% end %>
+
+    <div id='income-error-popup'></div>
+
+    <!-- Hidden unsaved other income modal -->
+    <div class="modal" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+            <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.unaved") %></h4>
+          </div>
+          <div class="modal-body">
+            <p><%= l10n("faa.other_incomes.leave_warning") %></p>
+            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn outline" data-dismiss="modal"><%= l10n("faa.other_incomes.stay") %></button>
+            <button type="button" class="btn error"><%= l10n("faa.other_incomes.leave") %></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden destroy other income modal -->
+  <div class="modal" id="destroyOtherIncome" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-delete')" id="other-income-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("faa.other_incomes.sure_remove") %></p>
+          <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destroy all Exsting Other Incomes of a certain kind  -->
+  <div class="modal" id="destroyAllOtherIncomesOfKind" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'all-other-income-delete')" id="all-other-income-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destroy all Exsting Other Incomes of a certain kind  -->
+  <div class="modal" id="destroyAllOtherIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-existing-income-delete')" id="other-existing-income-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden destroy unemployment income modal -->
+  <div class="modal" id="destroyUnemploymentIncome" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-delete')" id="unemployment-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destroy all Exsting Unemployment Incomes (modal) -->
+  <div class="modal" id="destroyAllUnemploymentIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden destroy AI/AN income modal -->
+  <div class="modal" id="destroyAIANIncome" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'ai-delete')" id="ai-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destroy all Exsting AI/AN Incomes (modal) -->
+  <div class="modal" id="destroyAllAIANIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.confirm_deletion") %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.other_incomes.cannot_be_undone") %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button"><%= l10n("faa.other_incomes.dont_remove") %></button>
+          <button type="button" class="btn btn-primary modal-continue-button"><%= l10n("faa.other_incomes.remove") %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+      previous_link: application_applicant_incomes_path(@application, @applicant),
+      next_link: application_applicant_deductions_path(@application, @applicant),
+      show_back_to_household_button: true
+    } %>
+  </div>
+
+<%= render partial: '/financial_assistance/shared/to_previous_modal' %>
+<% else %>
+  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
   <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
     <div class="row">
       <div class="col-md-10">
@@ -110,7 +400,7 @@
                 <i class="fa fa-plus fa-stack-1x"></i>
               </span>
               <b> <%= l10n("add_more") %> </b> <%= label %>
-            </a>          
+            </a>
           </div>
           <div id="new-other-income-form" class='new-other-income-form hidden <%= other_income_kind %>'>
             <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true, new_form: true} %>
@@ -335,3 +625,5 @@
 </div>
 
 <%= render partial: '/financial_assistance/shared/to_previous_modal' %>
+
+<% end %>

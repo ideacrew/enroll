@@ -3,12 +3,12 @@
 module FinancialAssistance
   # Applicant controller for Financial Assistance
   class ApplicantsController < FinancialAssistance::ApplicationController
-    # include ::UIHelpers::WorkflowController
 
     before_action :find, :find_application, :except => [:age_of_applicant] #except the ajax requests
     before_action :find_applicant, only: [:age_of_applicant]
-    # before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
     before_action :set_cache_headers, only: [:other_questions, :tax_info]
+    before_action :enable_bs4_layout, only: [:edit, :other_questions] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :conditionally_enable_bs4_layout, only: [:save_questions] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     def new
       authorize @application, :new?
@@ -73,7 +73,7 @@ module FinancialAssistance
       @applicant = @application.active_applicants.find(params[:id])
 
       respond_to do |format|
-        format.html { render layout: 'financial_assistance_nav' }
+        format.html { render layout: @bs4 ? 'financial_assistance_progress' : 'financial_assistance_nav' }
       end
     end
 
@@ -192,17 +192,18 @@ module FinancialAssistance
     end
 
     def format_date_params(model_params)
-      model_params["pregnancy_due_on"] = Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
-      model_params["pregnancy_end_on"] = Date.strptime(model_params["pregnancy_end_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_end_on"].present?
-      model_params["student_status_end_on"] = Date.strptime(model_params["student_status_end_on"].to_s, "%m/%d/%Y") if model_params["student_status_end_on"].present?
+      date_format = @bs4 ? "%Y-%m-%d" : "%m/%d/%Y"
+      model_params["pregnancy_due_on"] = Date.strptime(model_params["pregnancy_due_on"].to_s, date_format) if model_params["pregnancy_due_on"].present?
+      model_params["pregnancy_end_on"] = Date.strptime(model_params["pregnancy_end_on"].to_s, date_format) if model_params["pregnancy_end_on"].present?
+      model_params["student_status_end_on"] = Date.strptime(model_params["student_status_end_on"].to_s, date_format) if model_params["student_status_end_on"].present?
 
-      model_params["person_coverage_end_on"] = Date.strptime(model_params["person_coverage_end_on"].to_s, "%m/%d/%Y") if model_params["person_coverage_end_on"].present?
-      model_params["medicaid_cubcare_due_on"] = Date.strptime(model_params["medicaid_cubcare_due_on"].to_s, "%m/%d/%Y") if model_params["medicaid_cubcare_due_on"].present?
+      model_params["person_coverage_end_on"] = Date.strptime(model_params["person_coverage_end_on"].to_s, date_format) if model_params["person_coverage_end_on"].present?
+      model_params["medicaid_cubcare_due_on"] = Date.strptime(model_params["medicaid_cubcare_due_on"].to_s, date_format) if model_params["medicaid_cubcare_due_on"].present?
       model_params["medicaid_cubcare_due_on"] = nil if model_params.key?("medicaid_cubcare_due_on") && model_params["medicaid_cubcare_due_on"].blank?
       model_params["has_eligibility_changed"] = nil if model_params.key?("has_eligibility_changed") && model_params["has_eligibility_changed"].blank? && !model_params["has_eligibility_changed"].nil?
       model_params["has_household_income_changed"] = nil if model_params.key?("has_household_income_changed") && model_params["has_household_income_changed"].blank? && !model_params["has_household_income_changed"].nil?
 
-      model_params["dependent_job_end_on"] = Date.strptime(model_params["dependent_job_end_on"].to_s, "%m/%d/%Y") if model_params["dependent_job_end_on"].present?
+      model_params["dependent_job_end_on"] = Date.strptime(model_params["dependent_job_end_on"].to_s, date_format) if model_params["dependent_job_end_on"].present?
     end
 
     def build_error_messages_for_tax_info(model)
@@ -266,6 +267,14 @@ module FinancialAssistance
       address_hash = params.find {|key| key.is_a?(Hash) && key[:addresses_attributes]}
       address_hash[:addresses_attributes] << :county if EnrollRegistry.feature_enabled?(:display_county) && address_hash.present?
       params
+    end
+
+    def conditionally_enable_bs4_layout
+      enable_bs4_layout if params[:bs4] == "true"
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
   end
 end
