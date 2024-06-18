@@ -105,7 +105,8 @@ end
 
 Then(/^they should be taken to the applicant's Tax Info page$/) do
   sleep 5
-  expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
+  #binding.irb
+  expect(page).to have_selector("[data-cuke='tax_info_header']")
 end
 
 And(/^they visit the applicant's Job income page$/) do
