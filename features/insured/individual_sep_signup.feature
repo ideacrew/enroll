@@ -1,5 +1,6 @@
 Feature: Insured Plan Shopping on Individual market
   Background:
+    Given bs4_consumer_flow feature is disable
     Given the FAA feature configuration is enabled
     Given individual Qualifying life events are present
     Given Individual has not signed up as an HBX user
@@ -8,11 +9,12 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    And Individual clicks on continue
+    And the individual clicks on the Continue button of the Account Setup page
     And Individual sees form to enter personal information
 
  Scenario: New insured user purchases on individual market thru qualifying life event
-    When Individual clicks on continue
+    When the individual clicks continue on the personal information page
+    And the person named Patrick Doe is RIDP verified
     And Individual agrees to the privacy agreeement
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
@@ -30,7 +32,8 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should land on Home page
     
   Scenario: New insured user selects none of the situations listed in qle carousel
-    When Individual clicks on continue
+    When the individual clicks continue on the personal information page
+    And the person named Patrick Doe is RIDP verified
     And Individual agrees to the privacy agreeement
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
@@ -41,7 +44,8 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should land on Home page
   
   Scenario: New insured user selects qle
-    When Individual clicks on continue
+    When the individual clicks continue on the personal information page
+    And the person named Patrick Doe is RIDP verified
     And Individual agrees to the privacy agreeement
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page

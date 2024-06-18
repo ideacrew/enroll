@@ -5,6 +5,7 @@ Feature: Help Paying for Coverage
   consumer shall not be able see or access Help Paying for Coverage page.
 
   Background:
+    Given bs4_consumer_flow feature is disable
     Given the user is applying for a CONSUMER role
     And the primary member has filled mandatory information required
     And the primary member authorizes system to call EXPERIAN
@@ -13,6 +14,7 @@ Feature: Help Paying for Coverage
   Scenario: FAA Feature Is Disabled - Consumer will redirect to Family members page
     Given the FAA feature configuration is disabled
     And the user answers all the VERIFY IDENTITY  questions
+    And the person named Patrick Doe is RIDP verified
     When the user clicks on submit button
     And the Experian returns a VERIFIED response
     Then the consumer will navigate to the Family Members page
@@ -25,6 +27,7 @@ Feature: Help Paying for Coverage
   Scenario: FAA Feature Is Enabled - Consumer will redirect to Help Paying for Coverage page
     Given the FAA feature configuration is enabled
     And the user answers all the VERIFY IDENTITY  questions
+    And the person named Patrick Doe is RIDP verified
     When the user clicks on submit button
     And the Experian returns a VERIFIED response
     Then the consumer will navigate to the Help Paying for Coverage page
