@@ -3,7 +3,7 @@
 </div>
 
 <div class="col-md-8 col-sm-2 form-group-lg white-background right">
- <% if applicant.workflow.present? %>
+ <% if applicant.applicant_validation_complete? %>
     <%= link_to financial_assistance.go_to_step_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-default" do %>
       <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
       EDIT INCOME & COVERAGE INFO
