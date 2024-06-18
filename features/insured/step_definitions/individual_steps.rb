@@ -126,12 +126,15 @@ Then(/^.+ enter personal information with american indian alaska native status w
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_yes_radiobtn).click
-  find(IvlPersonalInformation.tribe_state_dropdown).click
-  find("#tribal-state-container .selectric-items li", text: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item).click
-  tribe_codes = find_all('input.tribe_codes')
-  tribe_codes.first.click unless tribe_codes.empty?
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+    find(IvlPersonalInformation.tribe_state_dropdown).click
+    find("#tribal-state-container .selectric-items li", text: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item).click
+    tribe_codes = find_all('input.tribe_codes')
+    tribe_codes.first.click unless tribe_codes.empty?
+  else
+
+  end
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  #find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => "Washington"
@@ -146,13 +149,16 @@ Then(/^.+ enter personal information with american indian alaska native status w
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_yes_radiobtn).click
-  find(IvlPersonalInformation.tribe_state_dropdown).click
-  find("#tribal-state-container .selectric-items li", text: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item).click
-  tribe_codes = find_all('input.tribe_codes')
-  tribe_codes.last.click unless tribe_codes.empty?
-  fill_in IvlPersonalInformation.tribal_name, :with => "testTribeName" unless tribe_codes.empty?
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+    find(IvlPersonalInformation.tribe_state_dropdown).click
+    find("#tribal-state-container .selectric-items li", text: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item).click
+    tribe_codes = find_all('input.tribe_codes')
+    tribe_codes.last.click unless tribe_codes.empty?
+    fill_in IvlPersonalInformation.tribal_name, :with => "testTribeName" unless tribe_codes.empty?
+  else
+
+  end
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  #find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => "Washington"
@@ -185,4 +191,13 @@ end
 
 And(/^the user clicks the deleted messages button$/) do
   find(".interaction-click-control-deleted").click
+end
+
+When(/^bs4_consumer_flow feature is enabled$/) do
+  allow(EnrollRegistry[:bs4_consumer_flow].feature).to receive(:is_enabled).and_return(true)
+  enable_feature :contrast_level_aa
+end
+
+When(/^bs4_consumer_flow feature is disable$/) do
+  disable_feature :bs4_consumer_flow
 end
