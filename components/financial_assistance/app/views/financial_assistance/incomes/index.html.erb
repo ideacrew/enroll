@@ -1,212 +1,431 @@
-<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
-  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
-    <div class="row">
-      <div class="col-md-10">
-        <div class="title-icon">
-          <span class="fa-icon fa-stack fa-sm suitcase">
-            <i class="fa fa-suitcase fa-stack-2x"></i>
-            <i class="fa fa-usd fa-stack-1x fa-inverse col-white"></i>
-          </span>
-        </div>
-        <h2 class="fa-darkblue">
-          Job Income for <%= @applicant.first_name.capitalize %>
-        </h2>
+<% if @bs4 %>
+  <%= render partial: 'financial_assistance/shared/faa_progress_options', locals: {step: 2} %>
+  <div>
+    <div>
+      <h1 class="fa-darkblue">
+        <%= l10n("faa.incomes.job_income") %>
+      </h1>
+      <%= l10n('faa.incomes.job_income_message', subject: @applicant.first_name) %>
+    </div>
+    <div class="mb-3 mt-3 income-padding driver-question">
+      <div class='labelforcoverage'>
+        <span class="fa-text-color required"><%= l10n('faa.incomes.income_from_employer', subject: @applicant.first_name) %></span>
+      </div>
+      <fieldset>
+        <legend id="job_income_value" class='income-padding focus'>
+          <div class='d-inline-flex'>
+            <%= radio_button_tag("has_job_income", true, @applicant.has_job_income, class: "radio-yml mt-auto" ) %>
+            <label class="radio-yml" for="has_job_income_true"><%= l10n("yes") %></label>
+          </div>
+          <div class='pl-4 d-inline-flex'>
+            <%= radio_button_tag("has_job_income", false, @applicant.has_job_income == false, class: "radio-yml mt-auto" )%>
+            <label class="radio-yml" for="has_job_income_false"><%= l10n("no") %></label>
+          </div>
+        </legend>
+      </fieldset>
+      <div class='left-seprator'>
+        <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income"><%= l10n("not_sure") %></a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: ["has_job_income_header", "has_job_income_section_one", "has_job_income_section_two", "has_job_income_section_three", "has_job_income_section_four"], subject: @applicant.first_name, id: "has_job_income" } %>
       </div>
     </div>
-    <p class="subtext">Answer questions for this person. When you're finished, select CONTINUE.</p>
-    <p class="subtext"><%= l10n("faa.note") %> <%= l10n('faa.incomes.income_note', income_kind: l10n('faa.job_income').downcase, subject: l10n('faa.other_ques.this_person'), end_date_field_label: l10n("to")) %></p> <%# TODO: Alec needs to update this with his translation key for Job Income %>
-    <br>
-
-    <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
-      <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color"><%= l10n('faa.incomes.from_employer', assistance_year: assistance_year) %>*</span>
-      </div>
-      <div class='col-md-6 mt11'>
-        <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_job_income", true, @applicant.has_job_income, class: "radio-yml" ) %>
-          <label class="radio-yml" for="has_job_income_yes">Yes</label>
-        </div>
-        <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_job_income", false, @applicant.has_job_income == false, class: "radio-yml" )%>
-          <label class="radio-yml" for="has_job_income_no">No</label>
-        </div>
-        <div class='col-md-6 left-seprator'>
-          <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income">Not sure?</a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_job_income"} %>
-        </div>
-      </div>
-    </div>
-    <br>
-
-    <div id="job_income">
-      <div class="incomes-list">
+    <div id="job_income" class="my-4 <%= 'hidden' unless @applicant.incomes.jobs.any? %>">
+      <div class="incomes-list pl-0 mb-3">
         <% @applicant.incomes.jobs.each do |income| %>
-          <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income } %>
+          <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income }%>
         <% end %>
       </div>
-
-         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-income')" id='new-income' class='new-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Job Income </a>
-
-      <div id="hidden-income-form" class='new-income-form hidden'>
+      <div class="add-more-link mt-3">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-income')" id="new-income" class='<%= 'hidden' unless @applicant.incomes.jobs.present? %> new-income new-income-job button mb-4'><%= l10n("faa.other_incomes.add", kind: "") %></a>
+      </div>
+      <div id='new-income-form' class='new-income-form my-4 hidden'>
         <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build, new_form: true } %>
       </div>
-    </div> <br>
-
-    <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
-      <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color"><%= l10n('faa.incomes.from_self_employment', assistance_year: assistance_year) %>*</span>
-      </div>
-      <div class='col-md-6 mt11'>
-        <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_self_employment_income", true, @applicant.has_self_employment_income, class: "radio-yml" ) %>
-          <label class="radio-yml" for="has_self_employment_income_yes">Yes</label>
-        </div>
-        <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_self_employment_income", false, @applicant.has_self_employment_income == false, class: "radio-yml" )%>
-          <label class="radio-yml" for="has_self_employment_income_no">No</label>
-        </div>
-        <div class='col-md-6 left-seprator'>
-          <a href="#has_self_employment_income" data-toggle="modal" data-target="#has_self_employment_income">Not sure?</a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_self_employment_income"} %>
-        </div>
-      </div>
     </div>
 
-    </br>
-    <div id="self_employed_incomes">
-      <div class="self-employed-incomes-list incomes-list">
+    <div class="mb-3 mt-5 income-padding driver-question">
+      <div class='labelforcoverage'>
+        <span class="fa-text-color required"><%= l10n('faa.incomes.income_from_self', subject: @applicant.first_name) %></span>
+      </div>
+      <fieldset>
+        <legend id="self_employment_income_value" class='income-padding mt11 focus'>
+          <div class='d-inline-flex'>
+            <%= radio_button_tag("has_self_employment_income", true, @applicant.has_self_employment_income, class: "radio-yml mt-auto" ) %>
+            <label class="radio-yml" for="has_self_employment_income_true"><%= l10n("yes") %></label>
+          </div>
+          <div class='pl-4 d-inline-flex'>
+            <%= radio_button_tag("has_self_employment_income", false, @applicant.has_self_employment_income == false, class: "radio-yml mt-auto" )%>
+            <label class="radio-yml" for="has_self_employment_income_false"><%= l10n("no") %></label>
+          </div>
+        </legend>
+      </fieldset>
+      <div class='left-seprator'>
+        <a href="#has_self_employment_income" data-toggle="modal" data-target="#has_self_employment_income"><%= l10n("not_sure") %></a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_self_employment_income"} %>
+      </div>
+    </div>
+    <div id="self_employed_incomes" class="my-4 <%= 'hidden' unless @applicant.incomes.self_employment.any? %>">
+      <div class="self-employed-incomes-list incomes-list pl-0 mb-3">
         <% @applicant.incomes.self_employment.each do |income| %>
-          <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: income } %>
+          <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: income }%>
         <% end %>
       </div>
-
-      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-self-income')" id='new-self-income' class="new-income"> <span class="fa-icon fa-stack plus-mr" aria-hidden='true'><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b>Add Another </b> Self-Employed Income </a>
-
-      <div id="hidden-income-form" class='new-income-form hidden'>
-        <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build, new_form: true} %>
+      <div class="add-more-link mt-3">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income', 'new-income-form')" id="self-employed-income" class='<%= 'hidden' unless @applicant.incomes.self_employment.present? %> new-income new-income-self-employed button mb-4'><%= l10n("faa.other_incomes.add", kind: "Self-Employed") %></a>
       </div>
-    </div>
-    </br>
-
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="back-link">
-        <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
-        </div>
+      <div id='new-self-employed-income-form' class='new-income-form my-4 hidden'>
+        <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build, new_form: true } %>
       </div>
     </div>
 
     <div id='income-error-popup'></div>
 
-    <!-- Hidden unsaved income modal -->
-    <div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <%= render partial: 'financial_assistance/shared/end_date_warning' %>
+
+    <!-- Hidden unsaved benefits modal -->
+    <div class="modal fade" id="unsavedBenefitChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="p-1">
             <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-            <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
+            <h3 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.unsaved") %></h3>
           </div>
           <div class="modal-body">
-            If you leave without saving, you will lose all your changes.<br />
-            <strong>This cannot be undone.</strong>
+            <%= l10n("faa.other_incomes.leave_warning") %>
+          </div>
+          <div class="pl-3">
+            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">STAY ON THIS PAGE</button>
-            <button type="button" class="btn btn-primary">LEAVE WITHOUT SAVING</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("faa.other_incomes.stay") %></button>
+            <button type="button" class="btn btn-primary"><%= l10n("faa.other_incomes.leave") %></button>
           </div>
         </div>
       </div>
     </div>
 
-
     <!-- Hidden job income delete modal -->
-    <div class="modal fade" id="DestroyJobIncomeWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal" id="DestroyJobIncomeWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-            <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove?</h4>
+          <div class="alert d-flex" role="alert">
+            <div class="pr-2 pl-2 pt-1">
+              <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+            </div>
+            <div class="mt-1 mb-1">
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.incomes.confirm_deletion") %></h4>
+            </div>
+            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           </div>
-          <div class="modal-body">
-            Are you sure you want to remove all job income(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+          <div class="pl-3">
+            <%= l10n("faa.incomes.remove_all") %>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-            <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <div class="pl-3 pt-3 pb-3">
+            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+          </div>
+          <div class="pr-3 pt-3 pb-3 align-self-end">
+            <button type="button" class="mr-2 btn btn-default outline modal-cancel-button"><%= l10n("cancel") %></button>
+            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.incomes.confirm_deletion") %></button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Hidden Self Employed Income delete modal -->
-    <div class="modal fade" id="DestroySelfEmplyedIncomeWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal" id="DestroySelfEmplyedIncomeWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-            <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove?</h4>
+          <div class="alert d-flex" role="alert">
+            <div class="pr-2 pl-2 pt-1">
+              <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+            </div>
+            <div class="mt-1 mb-1">
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.incomes.confirm_deletion") %></h4>
+            </div>
+            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           </div>
-          <div class="modal-body">
-            Are you sure you want to remove all self employment incomes(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+          <div class="pl-3">
+            <%= l10n("faa.incomes.remove_all") %>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-            <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <div class="pl-3 pt-3 pb-3">
+            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+          </div>
+          <div class="pr-3 pt-3 pb-3 align-self-end">
+            <button type="button" class="mr-2 btn btn-default outline modal-cancel-button"><%= l10n("cancel") %></button>
+            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.incomes.confirm_deletion") %></button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Destroy all Exsting Job Incomes (modal) -->
-    <div class="modal fade" id="destroyAllJobIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal" id="destroyAllJobIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-            <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove?</h4>
+          <div class="alert d-flex" role="alert">
+            <div class="pr-2 pl-2 pt-1">
+              <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+            </div>
+            <div class="mt-1 mb-1">
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.incomes.confirm_deletion") %></h4>
+            </div>
+            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           </div>
-          <div class="modal-body">
-            Are you sure you want to remove all job income(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+          <div class="pl-3">
+            <%= l10n("faa.incomes.remove_all") %>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-            <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <div class="pl-3 pt-3 pb-3">
+            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+          </div>
+          <div class="pr-3 pt-3 pb-3 align-self-end">
+            <button type="button" class="mr-2 btn btn-default outline modal-cancel-button"><%= l10n("cancel") %></button>
+            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.incomes.confirm_deletion") %></button>
           </div>
         </div>
       </div>
     </div>
-
     <!-- Destroy all Exsting Self Employment Incomes (modal) -->
-    <div class="modal fade" id="destroyAllSelfEmploymentIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal" id="destroyAllSelfEmploymentIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Permanently Remove?</h4>
+          <div class="alert d-flex" role="alert">
+            <div class="pr-2 pl-2 pt-1">
+              <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+            </div>
+            <div class="mt-1 mb-1">
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.incomes.confirm_deletion") %></h4>
+            </div>
+            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           </div>
-          <div class="modal-body">
-            Are you sure you want to remove all self employment incomes(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+          <div class="pl-3">
+            <%= l10n("faa.incomes.remove_all") %>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
-            <button type="button" class="btn btn-danger modal-continue-button">CONTINUE & REMOVE</button>
+          <div class="pl-3 pt-3 pb-3">
+            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+          </div>
+          <div class="pr-3 pt-3 pb-3 align-self-end">
+            <button type="button" class="mr-2 btn btn-default outline modal-cancel-button"><%= l10n("cancel") %></button>
+            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.incomes.confirm_deletion") %></button>
           </div>
         </div>
       </div>
     </div>
+    <br>
+    <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+      previous_link: tax_info_application_applicant_path(@application, @applicant),
+      next_link: other_application_applicant_incomes_path(@application, @applicant),
+      show_back_to_household_button: true
+    } %>  
+  </div>
+<% else %>
+  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
+      <div class="row">
+        <div class="col-md-10">
+          <div class="title-icon">
+            <span class="fa-icon fa-stack fa-sm suitcase">
+              <i class="fa fa-suitcase fa-stack-2x"></i>
+              <i class="fa fa-usd fa-stack-1x fa-inverse col-white"></i>
+            </span>
+          </div>
+          <h2 class="fa-darkblue">
+            Job Income for <%= @applicant.first_name.capitalize %>
+          </h2>
+        </div>
+      </div>
+      <p class="subtext">Answer questions for this person. When you're finished, select CONTINUE.</p>
+      <p class="subtext"><%= l10n('faa.incomes.job_income_note') %></p>
+      <br>
+
+      <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
+        <div class='col-md-6 labelforcoverage'>
+          <span class="fa-text-color"><%= l10n('faa.incomes.from_employer', assistance_year: assistance_year) %></span>
+        </div>
+        <div class='col-md-6 mt11'>
+          <div class='col-md-3 no-padding'>
+            <%= radio_button_tag("has_job_income", true, @applicant.has_job_income, class: "radio-yml" ) %>
+            <label class="radio-yml" for="has_job_income_yes">Yes</label>
+          </div>
+          <div class='col-md-3 no-padding'>
+            <%= radio_button_tag("has_job_income", false, @applicant.has_job_income == false, class: "radio-yml" )%>
+            <label class="radio-yml" for="has_job_income_no">No</label>
+          </div>
+          <div class='col-md-6 left-seprator'>
+            <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income">Not sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_job_income"} %>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div id="job_income">
+        <div class="incomes-list">
+          <% @applicant.incomes.jobs.each do |income| %>
+            <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income } %>
+          <% end %>
+        </div>
+
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-income')" id='new-income' class='new-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Job Income </a>
+
+        <div id="hidden-income-form" class='new-income-form hidden'>
+          <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build, new_form: true } %>
+        </div>
+      </div> <br>
+
+      <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
+        <div class='col-md-6 labelforcoverage'>
+          <span class="fa-text-color"><%= l10n('faa.incomes.from_self_employment', assistance_year: assistance_year) %></span>
+        </div>
+        <div class='col-md-6 mt11'>
+          <div class='col-md-3 no-padding'>
+            <%= radio_button_tag("has_self_employment_income", true, @applicant.has_self_employment_income, class: "radio-yml" ) %>
+            <label class="radio-yml" for="has_self_employment_income_yes">Yes</label>
+          </div>
+          <div class='col-md-3 no-padding'>
+            <%= radio_button_tag("has_self_employment_income", false, @applicant.has_self_employment_income == false, class: "radio-yml" )%>
+            <label class="radio-yml" for="has_self_employment_income_no">No</label>
+          </div>
+          <div class='col-md-6 left-seprator'>
+            <a href="#has_self_employment_income" data-toggle="modal" data-target="#has_self_employment_income">Not sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_self_employment_income"} %>
+          </div>
+        </div>
+      </div>
+
+      <br>
+      <div id="self_employed_incomes">
+        <div class="self-employed-incomes-list incomes-list">
+          <% @applicant.incomes.self_employment.each do |income| %>
+            <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: income } %>
+          <% end %>
+        </div>
+
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-self-income')" id='new-self-income' class="new-income"> <span class="fa-icon fa-stack plus-mr" aria-hidden='true'><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b>Add Another </b> Self-Employed Income </a>
+
+        <div id="hidden-income-form" class='new-income-form hidden'>
+          <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build, new_form: true} %>
+        </div>
+      </div>
+      <br>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="back-link">
+          <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+            <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+          </div>
+        </div>
+      </div>
+
+      <div id='income-error-popup'></div>
+
+      <!-- Hidden unsaved income modal -->
+      <div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+              <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
+            </div>
+            <div class="modal-body">
+              If you leave without saving, you will lose all your changes.<br />
+              <strong>This cannot be undone.</strong>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">STAY ON THIS PAGE</button>
+              <button type="button" class="btn btn-primary">LEAVE WITHOUT SAVING</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
+      <!-- Hidden job income delete modal -->
+      <div class="modal fade" id="DestroyJobIncomeWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+              <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove?</h4>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to remove all job income(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
+              <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden Self Employed Income delete modal -->
+      <div class="modal fade" id="DestroySelfEmplyedIncomeWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+              <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove?</h4>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to remove all self employment incomes(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
+              <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Destroy all Exsting Job Incomes (modal) -->
+      <div class="modal fade" id="destroyAllJobIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+              <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove?</h4>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to remove all job income(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
+              <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Destroy all Exsting Self Employment Incomes (modal) -->
+      <div class="modal fade" id="destroyAllSelfEmploymentIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Permanently Remove?</h4>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to remove all self employment incomes(s)? <strong>You can’t undo this action if you select CONTINUE & REMOVE.</strong>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
+              <button type="button" class="btn btn-danger modal-continue-button">CONTINUE & REMOVE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+
+    <div class='col-md-3'>
+      <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+        previous_url: go_to_step_application_applicant_path(@application, @applicant, 1),
+        next_url:  other_application_applicant_incomes_path(@application, @applicant)
+      } %>
+    </div>
   </div>
 
-
-
-  <div class='col-md-3'>
-    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: go_to_step_application_applicant_path(@application, @applicant, 1),
-      next_url:  other_application_applicant_incomes_path(@application, @applicant)
-    } %>
-  </div>
-</div>
-
-<%= render partial: '/financial_assistance/shared/to_previous_modal' %>
+  <%= render partial: '/financial_assistance/shared/to_previous_modal' %>
+<% end %>

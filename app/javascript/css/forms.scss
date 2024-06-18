@@ -226,6 +226,14 @@ input[type='date']:invalid::-webkit-datetime-edit {
   overflow: hidden;
 }
 
+.income-padding {
+  padding-right: 50%;
+}
+
+.income-field {
+  width: 50%;
+}
+
 .btn-file input[type=file] {
   position: absolute;
   top: 0;
