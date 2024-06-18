@@ -10,7 +10,7 @@ end
 
 When(/^.+ visits the Consumer portal during open enrollment$/) do
   visit "/"
-  find(HomePage.consumer_family_portal_btn, wait: 10).click
+  find(HomePage.consumer_family_portal_btn).click
   FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
@@ -99,9 +99,7 @@ Then(/^Individual sees the error message (.*)$/) do |error_message|
 end
 
 Then(/^Individual should see the error message Invalid Social Security number$/) do
-  #waiting for ajax request to complete before checking the error message
-  wait_for_ajax
-  expect(page.find("#person_ssn")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
+  expect(page.find("input[class='required floatlabel form-control interaction-field-control-person-ssn active-floatlabel']")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
 end
 
 Then(/^Individual should not see the error message (.*)$/) do |error_message|
@@ -109,20 +107,11 @@ Then(/^Individual should not see the error message (.*)$/) do |error_message|
 end
 
 When(/^validate SSN feature is (.*)$/) do |feature|
-  allow(EnrollRegistry[:ssn_ui_validation].feature).to receive(:is_enabled).and_return(true)
   if feature == "enabled"
     stub_const('Forms::ConsumerCandidate::SSN_REGEX', /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
   else
     stub_const('Forms::ConsumerCandidate::SSN_REGEX', /\A\d{9}\z/)
   end
-end
-
-Given(/^sensor_tobacco_carrier_usage feature is enabled$/) do
-  allow(EnrollRegistry[:ssn_ui_validation].feature).to receive(:is_enabled).and_return(true)
-end
-
-Then(/consumer should not see tobacco use question/) do
-  expect(page).not_to have_selector('.tobacco_user_container')
 end
 
 And(/the user will have to accept alert pop up for missing field$/) do
@@ -165,28 +154,27 @@ Then(/^.+ sees form to enter personal information$/) do
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  #find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
+  find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
-
+  
   if EnrollRegistry[:bs4_consumer_flow].enabled?
     fill_in IvlPersonalInformation.city, with: 'Augusta'
     find(IvlPersonalInformation.select_me_state).click
     fill_in IvlPersonalInformation.zip, with: '04330'
-    fill_in IvlPersonalInformation.mobile_phone, :with => "22075555555"
   else
-    fill_in IvlPersonalInformation.city, with: personal_information[:city]
-    find_all(IvlPersonalInformation.select_state_dropdown).first.click
-    fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
-    find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
-    fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
-  end
+  fill_in IvlPersonalInformation.city, with: personal_information[:city]
+  find_all(IvlPersonalInformation.select_state_dropdown).first.click
+  fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+end
+  find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
+  fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 30
 end
 
 Then(/the continue button has data disabled attribute$/) do
-  find('button.interaction-click-control-continue', visible: false)['data-disable-with']
+  continue_button = find('button.interaction-click-control-continue', visible: false)['data-disable-with']
   #expect(continue_button).to eql(l10n("please_wait")) inside a haml file data diasbled with attribute
 end
 
@@ -424,7 +412,7 @@ end
 
 Then(/^.+ agrees to the privacy agreeement/) do
   wait_for_ajax
-  #expect(page).to have_content IvlAuthorizationAndConsent.authorization_and_consent_text
+  expect(page).to have_content IvlAuthorizationAndConsent.authorization_and_consent_text
   find_all(IvlAuthorizationAndConsent.continue_btn)[0].click
 end
 
@@ -438,18 +426,8 @@ Then(/^Individual should be on verification page/) do
 end
 
 When(/^.+ clicks on the Continue button of the Family Information page$/) do
-  find_all(IvlIapFamilyInformation.continue_btn)[1].click unless EnrollRegistry[:bs4_consumer_flow].enabled?
-  find(IvlIapFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
   sleep 10
-end
-
-When(/^Individual navigates to Sep Page$/) do
-  find_all(IvlIapFamilyInformation.continue_btn)[0].click
-end
-
-When(/^Individual clicks on the continue button$/) do
-  wait_for_ajax
-  find_all('.interaction-click-control-continue')[0].click
 end
 
 Then(/^.+ answers the questions of the Identity Verification page and clicks on submit/) do
@@ -460,23 +438,12 @@ Then(/^.+ answers the questions of the Identity Verification page and clicks on 
   screenshot("identify_verification")
   find(IvlVerifyIdentity.submit_btn).click
   screenshot("override")
-  if EnrollRegistry[:bs4_consumer_flow].enabled?
-    find_all(IvlVerifyIdentity.continue_application_btn)[1].click
-  else
-    sleep 2
-    find(IvlVerifyIdentity.continue_application_btn).click
-  end
+  find(IvlVerifyIdentity.continue_application_btn).click
 end
 
 Then(/^.+ is on the Help Paying for Coverage page/) do
   expect(page).to have_content IvlIapHelpPayingForCoverage.your_application_for_premium_reductions_text
-  if EnrollRegistry[:mainecare_cubcare_glossary].enabled?
-    expect(find('.weight-n.required')).to_not be(nil)
-    expect(page).to have_css('.glossary', text: 'Cub Care')
-    find('span[data-title="Cub Care"]').click
-    expect(page).to have_content(IvlIapHelpPayingForCoverage.cubcare_glossary_text)
-    find('div[class="mt-4 mb-4"]').click
-  end
+  expect(find('.pb-1')).to_not be(nil) if EnrollRegistry[:mainecare_cubcare_glossary].enabled?
 end
 
 Then(/^.+ does not apply for assistance and clicks continue/) do
@@ -485,6 +452,7 @@ Then(/^.+ does not apply for assistance and clicks continue/) do
 end
 
 Then(/\w+ should see the dependents form/) do
+  #expect(page).to have_content('Add Member')
   expect(page).to have_content('Add New Person')
   # screenshot("dependents")
 end
@@ -505,6 +473,7 @@ And(/Individual clicks on add member button/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
+  # screenshot("add_member")
   all(:css, ".mz").last.click
 end
 
@@ -573,14 +542,7 @@ When(/Individual enters the password$/) do
 end
 
 Then(/Individual does not see the error on tooltip indicating a password longer than 20 characters$/) do
-  unless EnrollRegistry[:bs4_consumer_flow].enabled?
-    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(false)
-    script = "return document.querySelector('.longer').getAttribute('data-icon');"
-    data_icon_value = page.execute_script(script)
-    wait_for_ajax
-    sleep 15
-    expect(data_icon_value).to eq('check')
-  end
+  expect(find(".longer")[:class]).not_to include("fa-times")
 end
 
 Then(/^Individual should see the password tooltip with text minimum characters (.+)$/) do |length|
@@ -620,7 +582,6 @@ end
 
 When(/^the individual clicks the Continue button of the Group Selection page$/) do
   expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
-  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
 end
 
@@ -644,20 +605,7 @@ end
 
 And(/.+ selects a plan on plan shopping page/) do
   screenshot("plan_shopping")
-  wait_for_ajax(3, 2)
-  expect(page).to have_content "Choose Plan"
-  sleep 5
-  continue_btn = find_all(EmployeePersonalInformation.continue_btn)
-  if continue_btn.any? && !continue_btn.first&.disabled?
-    find(EmployeePersonalInformation.continue_btn).click
-    wait_for_ajax(3, 2)
-  end
-  plan_rows = find_all('div.plan-row', wait: 5)
-  if plan_rows.any?
-    plan_rows[0].find('.plan-select').click
-  else
-    find_all(IvlChoosePlan.select_plan_btn, wait: 5)[0].click
-  end
+  find_all(IvlChoosePlan.select_plan_btn)[0].click
 end
 
 When(/^the individual selects a non silver plan on Plan Shopping page$/) do
@@ -684,8 +632,8 @@ end
 
 And(/^Individual clicks on purchase button on confirmation page$/) do
   find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
-  fill_in IvlConfirmYourPlanSelection.first_name, :with => "Patrick"
-  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Doe"
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => "John"
+  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Smith"
   find(IvlConfirmYourPlanSelection.confirm_btn).click
 end
 
@@ -717,15 +665,12 @@ Then(/^Individual clicks on Add New Person$/) do
 end
 
 And(/^Admin updates the address to Non DC Address$/) do
-  sleep 2
   find(IvlHomepage.manage_family_btn).click
-  sleep 2
   find(IvlManageFamilyPage.personal_tab).click
   find(AdminHomepage.remove_mailing_address).click
   find(EmployeeFamilyInformation.save_btn).click
-  find('select[name="person[addresses_attributes][0][state]"]').click
+  find(IvlPersonalInformation.select_state_dropdown).click
   find(AdminHomepage.non_dc_state).click
-  sleep 2
   fill_in IvlPersonalInformation.zip, with: '30043'
   find(EmployeeFamilyInformation.save_btn).click
   find(EmployeeHomepage.my_dc_health_link).click
@@ -837,7 +782,7 @@ end
 
 And(/^.+ clicks? on the Continue button of the Account Setup page$/i) do
   wait_for_ajax
-  find(IvlPersonalInformation.continue_btn_2, wait: 10).click
+  find(IvlPersonalInformation.continue_btn_2, wait: 5).click
 end
 
 Then(/^.+ sees the Verify Identity Consent page/)  do
@@ -986,7 +931,6 @@ Then(/^\w+ continues$/) do
 end
 
 Then(/^\w+ continues again$/) do
-  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
 end
 
@@ -1121,13 +1065,11 @@ And(/has valid csr 0 benefit package with silver plans/) do
 end
 
 And(/the individual sets APTC amount/) do
-  find('.interaction-field-control-elected-aptc').set("")
   fill_in IvlChoosePlan.aptc_monthly_amount, :with => "50.00"
   screenshot("aptc_setamount")
 end
 
 Then(/the individual clicks the Reset button/) do
-  sleep 5
   find_all(IvlChoosePlan.reset_btn).first.click
 end
 
@@ -1153,10 +1095,9 @@ Then(/the individual should see the elected APTC amount and click on the Confirm
   wait_for_ajax
   expect(page).to have_content '$50.00'
   find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
-  fill_in IvlConfirmYourPlanSelection.first_name, :with => "Patrick"
-  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Doe"
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => (@u.find :first_name)
+  fill_in IvlConfirmYourPlanSelection.last_name, :with => (@u.find :last_name)
   screenshot("aptc_purchase")
-  sleep 2
   find(IvlConfirmYourPlanSelection.confirm_btn).click
 end
 
@@ -1306,11 +1247,7 @@ end
 
 Then(/^Individual should see confirmation and continue$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
-  find('#sep_continue').click
-end
-
-Then(/^Individual should see successful sep message$/) do
-  expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
+  click_button "Continue"
 end
 
 When(/^Individual clicks on Make Changes from Actions tab$/) do
@@ -1341,9 +1278,7 @@ When(/Individual clicks on Go To My Account button$/) do
 end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
-  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
-  find(IvlChooseCoverage.continue_btn).click unless page.has_content?('Choose Plan')
 end
 
 And(/Individual clicks the Back to My Account button$/) do
@@ -1425,12 +1360,6 @@ Given(/^the warning duplicate enrollment feature configuration is enabled$/) do
   allow(EnrollRegistry[:existing_coverage_warning].feature).to receive(:is_enabled).and_return(true)
 end
 
-Given(/^the temporary_configuration_enable_multi_tax_household_feature feature is disabled$/) do
-  # This is not a long term solution, but it is a quick fix to get the tests passing. This feature should be disabled for DC, but the tests
-  # using this step definition are having environment leakage issues. This should be fixed in the future.
-  allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
-end
-
 And(/Dependent sees Your Information page$/) do
   expect(page).to have_content YourInformation.your_information_text
   find(YourInformation.continue_btn).click
@@ -1442,11 +1371,10 @@ And(/Individual should see Duplicate Enrollment warning in the Confirmation page
 end
 
 And(/^Primary member logs back in$/) do
-  wait_for_ajax
-  find('.interaction-click-control-sign-in').click
+  find(CreateAccount.sign_in_link).click
   fill_in SignIn.username, :with => "testflow@test.com"
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
-  find('.interaction-click-control-sign-in').click
+  find(SignIn.sign_in_btn).click
 end
 When(/Individual creates an HBX account with SSN already in use$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow123"

@@ -4,7 +4,11 @@
 class IvlEnrollmentSubmitted
 
   def self.how_to_pay_btn
-    'span.btn-default' unless EnrollRegistry[:bs4_consumer_flow].enabled?
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    'span.btn-default'
+    end
   end
 
   def self.enrollment_submitted_text
@@ -12,11 +16,19 @@ class IvlEnrollmentSubmitted
   end
 
   def self.pay_now_btn
-    '.interaction-click-control-pay-now' unless EnrollRegistry[:bs4_consumer_flow].enabled?
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else 
+    '.interaction-click-control-pay-now'
+    end
   end
 
   def self.go_back_btn
-    '.interaction-click-control-go-back' unless EnrollRegistry[:bs4_consumer_flow].enabled?
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    '.interaction-click-control-go-back'
+    end
   end
 
   def self.print_btn

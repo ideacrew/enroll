@@ -8,19 +8,11 @@ class IvlIapFamilyInformation
   end
 
   def self.continue_btn
-    if EnrollRegistry[:bs4_consumer_flow].enabled?
-      '.interaction-click-control-continue-to-next-step'
-    else
-      '#btn-continue'
-    end
+    '#btn-continue'
   end
 
   def self.add_income_and_coverage_info_btn
-    if EnrollRegistry[:bs4_consumer_flow].enabled?
-      '.interaction-click-control-add-income---coverage-info'
-    else
-      'a[class="btn btn-default add interaction-click-control-add-income---coverage-info"]'
-    end
+    'a[class="btn btn-default add interaction-click-control-add-income---coverage-info"]'
   end
 
   def self.new_person_first_name
@@ -288,11 +280,7 @@ class IvlIapFamilyInformation
   end
 
   def self.previous_link
-    if EnrollRegistry[:bs4_consumer_flow].enabled?
-      '.interaction-click-control-previous-step'
-    else
-      '.interaction-click-control-previous'
-    end
+    '.interaction-click-control-previous-step'
   end
 
 end

@@ -28,20 +28,16 @@ Then(/^(.*) clicks continue from qle$/) do |_name|
 end
 
 Then(/(.*) clicks Back to my account button$/) do |_name|
-  find('.btn.btn-primary.interaction-click-control-back-to-my-account').click
-end
-
-And(/^Patrick Doe clicks on back to my account button$/) do
   find('.interaction-click-control-back-to-my-account').click
 end
 
 Then(/(.*) should land on Home page and should see Shop for Plans Banner$/) do |_name|
   sleep 2
-  expect(page).to have_content(/You are eligible to enroll or change coverage/)
+  expect(page).to have_content(/You are eligible to enroll or change coverage through/)
 end
 
 When(/(.*) click the "(.*?)" in qle carousel/) do |_name, qle_event|
-  expect(page).to have_content(qle_event, wait: 15)
+  expect(page).to have_content(qle_event, wait: 10)
   click_link qle_event.to_s
 end
 
@@ -122,10 +118,6 @@ Then(/Individual clicks no and clicks continue/) do
   end
 end
 
-Given(/is your health coverage expanded question is disable/) do
-  disable_feature :is_your_health_coverage_ending_expanded_question
-end
-
 Given(/is your health coverage expanded question is enabled/) do
   enable_feature :is_your_health_coverage_ending_expanded_question
 end
@@ -139,6 +131,8 @@ Then(/^.+ enter personal information with american indian alaska native status w
     find("#tribal-state-container .selectric-items li", text: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item).click
     tribe_codes = find_all('input.tribe_codes')
     tribe_codes.first.click unless tribe_codes.empty?
+  else
+
   end
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
@@ -161,6 +155,8 @@ Then(/^.+ enter personal information with american indian alaska native status w
     tribe_codes = find_all('input.tribe_codes')
     tribe_codes.last.click unless tribe_codes.empty?
     fill_in IvlPersonalInformation.tribal_name, :with => "testTribeName" unless tribe_codes.empty?
+  else
+
   end
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
@@ -204,17 +200,4 @@ end
 
 When(/^bs4_consumer_flow feature is disable$/) do
   disable_feature :bs4_consumer_flow
-end
-
-When(/^choose_shopping_method feature is disabled$/) do
-  disable_feature :choose_shopping_method
-end
-
-When(/^choose_shopping_method feature is enabled$/) do
-  allow(EnrollRegistry[:choose_shopping_method].feature).to receive(:is_enabled).and_return(true)
-  enable_feature :choose_shopping_method
-end
-
-When(/^send_extra_fields_to_checkbook feature is disabled$/) do
-  disable_feature :send_extra_fields_to_checkbook
 end

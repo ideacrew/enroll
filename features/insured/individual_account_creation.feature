@@ -2,7 +2,6 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
 
   Background: New user vists consumer portal
     Given bs4_consumer_flow feature is disable
-    Given the temporary_configuration_enable_multi_tax_household_feature feature is disabled
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     When Individual visits the Consumer portal during open enrollment
@@ -49,6 +48,7 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     And Individual sees Your Information page
     When validate SSN feature is enabled
     When the user registers as an individual with invalid SSN
+    When Individual clicks on continue
     And Individual should see the error message Invalid Social Security number
 
   Scenario: New user attempts to create account with invalid SSN and validate SSN feature is disabled
@@ -57,15 +57,18 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     And Individual sees Your Information page
     When validate SSN feature is disabled
     When the user registers as an individual with invalid SSN
+    When Individual clicks on continue
     And Individual should not see the error message Invalid SSN
 
   Scenario: Strong password feature is enabled
     Given the strong password length feature is enabled
+    When Individual visits the Consumer portal during open enrollment
     When Individual creates a new HBX account with a weak password
     Then Individual should see a minimum password length of 12
 
   Scenario: Strong password feature is disabled
     Given the strong password length feature is disabled
+    When Individual visits the Consumer portal during open enrollment
     When Individual creates a new HBX account with a weak password
     Then Individual should see a minimum password length of 8
 
@@ -85,5 +88,5 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual female gender
-    When the Individual clicks CONTINUE
+    When Individual clicks on continue
     Then Individual sees form to enter personal information with checked female gender

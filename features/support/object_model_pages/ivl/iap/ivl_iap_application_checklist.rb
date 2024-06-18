@@ -13,9 +13,9 @@ class IvlIapApplicationChecklist
 
   def self.continue_btn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-      '.interaction-click-control-continue-to-next-step'
-    else
-      '#btn-continue'
+
+    else 
+    '#btn-continue'
     end
   end
 
@@ -33,9 +33,5 @@ class IvlIapApplicationChecklist
 
   def self.log_out_btn
     'a[class="header-text interaction-click-control-logout"]'
-  end
-
-  def self.begin_application_btn
-    '.interaction-click-control-begin-application'
   end
 end
