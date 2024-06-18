@@ -386,9 +386,7 @@ module FinancialAssistance
       case action_name
       when "step", "eligibility_response_error", "application_publish_error", "preferences"
         "financial_assistance_progress"
-      when "edit"
-        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
-      when "submit_your_application"
+      when "edit", "submit_your_application", "review_and_submit"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
       when "application_year_selection", "application_checklist"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
