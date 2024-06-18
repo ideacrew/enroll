@@ -51,12 +51,8 @@
         <div class='new-deduction-form hidden <%= deduction_kind %>'>
           <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
         </div>
-        <div class="col-md-12 add-more-link-<%=deduction_kind%>" id="add-more-link">
+        <div class="add-more-link" id="add-more-link-<%=deduction_kind%>">
           <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" id="add_new_deduction_kind" class="<%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>">
-            <span class="fa-icon fa-stack plus-mr" aria-hidden="true">
-              <i class="fa fa-circle-thin fa-stack-2x"></i>
-              <i class="fa fa-plus fa-stack-1x"></i>
-            </span>
             <b> <%= l10n("add_more") %> </b> <%= FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym] %>
           </a>
         </div>
@@ -157,7 +153,7 @@
             <div class='new-deduction-form hidden <%= deduction_kind %>'>
               <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
             </div>
-            <div class="col-md-12 add-more-link-<%=deduction_kind%>" id="add-more-link">
+            <div class="col-md-12 add-more-link" id="add-more-link-<%=deduction_kind%>">
               <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" id="add_new_deduction_kind" class="<%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>">
                 <span class="fa-icon fa-stack plus-mr" aria-hidden="true">
                   <i class="fa fa-circle-thin fa-stack-2x"></i>
