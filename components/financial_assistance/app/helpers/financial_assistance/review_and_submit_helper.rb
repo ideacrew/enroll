@@ -373,7 +373,6 @@ module FinancialAssistance
         @id = id
       end
 
-
       def displayable?(attribute)
         @service.displayable_field?(@class.name.demodulize.downcase, @id, attribute)
       end
