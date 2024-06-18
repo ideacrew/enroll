@@ -200,6 +200,7 @@ $(document).on('turbolinks:load', function () {
     });
 
     /* cancel benefit edits */
+    $('.deduction-kinds').off('click', 'a.deduction-cancel');
     $('.deduction-kinds').on('click', 'a.deduction-cancel', function(e) {
       e.preventDefault();
       stopEditingDeduction();

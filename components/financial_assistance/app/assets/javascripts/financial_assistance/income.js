@@ -819,6 +819,7 @@ $(document).on('turbolinks:load', function () {
   });
 
   /* cancel other income edits */
+  $('.other-incomes-list').off('click', 'a.other-income-cancel');
   $('.other-incomes-list').on('click', 'a.other-income-cancel', function (e) {
     e.preventDefault();
     stopEditingIncome();
@@ -829,7 +830,7 @@ $(document).on('turbolinks:load', function () {
       otherIncomeEl.find('.other-income-show').removeClass('hidden');
       otherIncomeEl.find('.edit-other-income-form').remove();
     } else {
-      if (!$(this).parents('.other-incomes-list > div.other-income').length) {
+      if (!$(this).parents('.other-incomes-list').find('div.other-income').length) {
         $(this).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
       }
       $(this).parents('.new-other-income-form').remove();
