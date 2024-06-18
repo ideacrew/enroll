@@ -1,5 +1,6 @@
  Feature: SHOP Qualifying life of event kind based on eligibity dates
   Background:
+    Given bs4_consumer_flow feature is disable
     Given both shop and fehb market configurations are enabled
     Given all market kinds are enabled for user to select
     Given all announcements are enabled for user to select

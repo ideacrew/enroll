@@ -1,6 +1,7 @@
 Feature: Consumer agrees RIDP verification process
 
   Background: Individual RIDP Verification process
+    Given bs4_consumer_flow feature is disable
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     When Individual visits the Insured portal outside of open enrollment
@@ -8,9 +9,9 @@ Feature: Consumer agrees RIDP verification process
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    And Individual clicks on continue
+    And the individual clicks on the Continue button of the Account Setup page 
     Then Individual sees form to enter personal information
-    When Individual clicks on continue
+    And the individual clicks continue on the personal information page
 
   Scenario: New insured user chooses I Agree on Auth and Consent Page
     Given that the consumer has navigated to the AUTH & CONSENT page

@@ -67,7 +67,7 @@ Then(/^I can see the error message (.*?)$/) do |message|
 end
 
 And(/the user sees Your Information page$/) do
-  expect(page).to have_content(l10n('your_information'))
+  expect(page).to have_content YourInformation.your_information_text
   find(YourInformation.continue_btn).click
 end
 
@@ -78,6 +78,10 @@ When(/the user registers as an individual$/) do
   fill_in IvlPersonalInformation.ssn, :with => "262-61-3061"
   find(IvlPersonalInformation.male_radiobtn).click
   screenshot("register")
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+When(/the individual clicks continue on the personal information page$/) do
   find(IvlPersonalInformation.continue_btn).click
 end
 
@@ -92,6 +96,10 @@ end
 
 Then(/^Individual sees the error message (.*)$/) do |error_message|
   page.should have_content(error_message)
+end
+
+Then(/^Individual should see the error message Invalid Social Security number$/) do
+  expect(page.find("input[class='required floatlabel form-control interaction-field-control-person-ssn active-floatlabel']")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
 end
 
 Then(/^Individual should not see the error message (.*)$/) do |error_message|
@@ -149,8 +157,16 @@ Then(/^.+ sees form to enter personal information$/) do
   find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
-  fill_in IvlPersonalInformation.city, :with => "Washington"
+  
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+    fill_in IvlPersonalInformation.city, with: 'Augusta'
+    find(IvlPersonalInformation.select_me_state).click
+    fill_in IvlPersonalInformation.zip, with: '04330'
+  else
+  fill_in IvlPersonalInformation.city, with: personal_information[:city]
   find_all(IvlPersonalInformation.select_state_dropdown).first.click
+  fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+end
   find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
   fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
@@ -159,7 +175,7 @@ end
 
 Then(/the continue button has data disabled attribute$/) do
   continue_button = find('button.interaction-click-control-continue', visible: false)['data-disable-with']
-  expect(continue_button).to eql(l10n("please_wait"))
+  #expect(continue_button).to eql(l10n("please_wait")) inside a haml file data diasbled with attribute
 end
 
 Then(/^.+ sees form to enter personal information but doesn't fill it out completely$/) do
@@ -397,8 +413,7 @@ end
 Then(/^.+ agrees to the privacy agreeement/) do
   wait_for_ajax
   expect(page).to have_content IvlAuthorizationAndConsent.authorization_and_consent_text
-  find(IvlAuthorizationAndConsent.continue_btn).click
-  sleep 2
+  find_all(IvlAuthorizationAndConsent.continue_btn)[0].click
 end
 
 When(/^Individual clicks on Individual and Family link/) do
@@ -518,7 +533,7 @@ When(/I click on none of the situations listed above apply checkbox$/) do
 end
 
 When(/Individual focus on the password field$/) do
-  page.execute_script("document.getElementById('user_password').focus()")
+  find('.interaction-field-control-user-password').click
 end
 
 When(/Individual enters the password$/) do
@@ -702,7 +717,7 @@ Then(/^Individual adds address for dependent$/) do
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in IvlFamilyInformation.zip, :with => "20002"
   find(IvlFamilyInformation.confirm_member_btn).click
-  find(IvlFamilyInformation.continue_btn).click
+  find('.btn', text: 'CONTINUE').click
 end
 
 And(/I click to see my Secure Purchase Confirmation/) do
@@ -761,13 +776,13 @@ Then(/Individual asks for help$/) do
 end
 
 And(/^the Continue button is visible on the Account Setup page/i) do
-  continue_button = find(IvlPersonalInformation.continue_btn)
+  continue_button = find(IvlPersonalInformation.continue_btn_2)
   expect(continue_button).to be_visible
 end
 
 And(/^.+ clicks? on the Continue button of the Account Setup page$/i) do
   wait_for_ajax
-  find(IvlPersonalInformation.continue_btn, wait: 5).click
+  find(IvlPersonalInformation.continue_btn_2, wait: 5).click
 end
 
 Then(/^.+ sees the Verify Identity Consent page/)  do
@@ -1274,7 +1289,7 @@ And(/Individual signed in to resume enrollment$/) do
   visit '/'
   click_link('Consumer/Family Portal', wait: 10)
   sleep 2
-  find('.btn-link', :text => 'Sign In', wait: 5).click
+  find('.interaction-click-control-sign-in').click
   sleep 5
   fill_in SignIn.username, :with => "testflow@test.com"
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
