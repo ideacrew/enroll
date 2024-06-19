@@ -80,6 +80,10 @@ $(document).on('turbolinks:load', function () {
         }
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
         e.stopImmediatePropagation();
+      } else if (!$(self).parents('.deduction-kind').find('.deductions-list > .deduction').length) {
+        console.log("null reset");
+        $(self).parents('.deduction-kind').find('.new-deduction-form').addClass('hidden');
+        stopEditingDeduction();
       } else {
         e.preventDefault();
         // prompt to delete all these dedcutions
@@ -194,7 +198,9 @@ $(document).on('turbolinks:load', function () {
             $(deduction).remove();
             $.ajax({
               type: 'DELETE',
-              url: url
+              url: url,
+              success: function() {
+              }
             });
           });
         });
