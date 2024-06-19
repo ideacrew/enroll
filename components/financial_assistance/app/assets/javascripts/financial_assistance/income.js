@@ -14,7 +14,7 @@ function startEditingIncome(income_kind) {
   $('a.new-income').addClass('hide');
   $("a[class*='income-edit']").addClass('disabled');
   $('#new-unemployment-income').attr('disabled', true);
-  $('#' + income_kind + '').find('.add_new_other_income_kind').attr('disabled', true);
+  $('.add_new_other_income_kind').attr('disabled', true);
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $("a.interaction-click-control-add-more").addClass('hide');
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input, .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);

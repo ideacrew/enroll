@@ -31,9 +31,9 @@
           <%= f.date_field :end_on, placeholder: "MM/DD/YYYY", id: "end_on_#{income_id}", onchange: onchange_date, class: "w-100" %>
         </div>
       </div>
-      <div class="d-flex">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-cancel-<%= income_id %>', 'new-other-income-form')" id="other-income-cancel-<%= income_id %>" class="btn outline other-income-cancel mb-4 mr-1"><%= l10n("faa.other_incomes.cancel") %></a>
-        <%= f.submit l10n("faa.other_incomes.save"), disabled: disabled.present? && disabled ? "disabled" : nil, class: "btn mb-4", :data => { :cuke => "other-income-save-button" } %>
+      <div class="d-flex mb-2">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-cancel-<%= income_id %>', 'new-other-income-form')" id="other-income-cancel-<%= income_id %>" class="btn outline other-income-cancel mr-1"><%= l10n("faa.other_incomes.cancel") %></a>
+        <%= f.submit l10n("faa.other_incomes.save"), disabled: disabled.present? && disabled ? "disabled" : nil, class: "btn", :data => { :cuke => "other-income-save-button" } %>
       </div>
     </div>
   <% end %>

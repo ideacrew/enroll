@@ -23,7 +23,7 @@
           <%= f.date_field :end_on, placeholder: "MM/DD/YYYY", id: "end_on_#{income_id}", onchange: onchange_date, class: "w-100" %>
         </div>
       </div>
-      <div class="d-flex">
+      <div class="d-flex mb-2">
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-cancel-<%= income_id %>')" id="unemployment-cancel-<%= income_id %>" class="btn outline mr-1 unemployment-income-cancel"><%= l10n("faa.other_incomes.cancel") %></a>
         <%= f.submit l10n("faa.other_incomes.save"), class: "btn btn-save", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
       </div>
