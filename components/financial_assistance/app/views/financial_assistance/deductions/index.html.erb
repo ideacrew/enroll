@@ -50,8 +50,8 @@
         <div class='new-deduction-form hidden <%= deduction_kind %>'>
           <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
         </div>
-        <div class="add-more-link mt-4" id="add-more-link-<%=deduction_kind%>">
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" id="add_new_deduction_kind" class="<%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %> button mb-4">
+        <div class="add-more-link mt-4 <%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>" id="add-more-link-<%=deduction_kind%>">
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" id="add_new_deduction_kind" class="button mb-4">
             <%= l10n("faa.other_incomes.add", kind: label).titleize %>
           </a>
         </div>
