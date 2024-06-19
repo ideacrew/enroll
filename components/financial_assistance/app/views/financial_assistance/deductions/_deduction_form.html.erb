@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="d-flex my-2 align-items-center">
-      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-cancel-<%= deduction_id %>')" id="income-deduction-cancel-<%= deduction_id %>" class="btn outline deduction-cancel mb-4 mr-2"><%= l10n("faa.other_incomes.cancel") %></a>
+      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-cancel-<%= deduction_id %>')" id="income-deduction-cancel-<%= deduction_id %>" class="btn outline deduction-cancel mb-4 mr-1"><%= l10n("faa.other_incomes.cancel") %></a>
       <%= f.submit l10n("faa.other_incomes.save"), disabled: new_form.present? && new_form ? "disabled" : nil, class: "btn mb-4", :data => { :cuke => "income-adjustments-save-button" } %>
     </div>
 

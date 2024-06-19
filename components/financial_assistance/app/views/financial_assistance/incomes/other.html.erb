@@ -72,8 +72,8 @@
             <%= render partial: 'other_income', locals: { other_income: other_income } %>
           <% end %>
         </div>
-        <div class="add-more-link mt-4" id="add-more-link-<%=other_income_kind%>">
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_other_income_kind')" id="add_new_other_income_kind" class='<%= 'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? %> button mb-4'><%= l10n("faa.other_incomes.add", kind: label) %></a>
+        <div class="add-more-link mt-4 <%= 'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? %>" id="add-more-link-<%=other_income_kind%>">
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_other_income_kind')" id="add_new_other_income_kind" class='button mb-4'><%= l10n("faa.other_incomes.add", kind: label).titleize %></a>
         </div>
         <div id="new-other-income-form" class='new-other-income-form hidden <%= other_income_kind %>'>
           <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true, new_form: true} %>
