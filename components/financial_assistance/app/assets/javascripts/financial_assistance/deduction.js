@@ -33,7 +33,7 @@ function deleteDeductions(kind) {
 
     if (responses.every(function(response) { return response[1] == 'success'; })) {
       $(kind).find('input[type="checkbox"]').prop('checked', false);
-      $(kind).find('[class^="interaction-click-control-add-more]').addClass('hidden');
+      $(kind).find('[class^="interaction-click-control-add-more"]').addClass('hidden');
       $(kind).find('.add-more-link').addClass('hidden');
     }
   });
@@ -90,7 +90,7 @@ $(document).on('turbolinks:load', function () {
     $('.deduction-kinds').on('click', 'input[type="checkbox"]', function(e) {
       var value = e.target.checked,
           self = this;
-      if (value) {
+      if (value) { // checked deduction kind
         var newDeductionFormEl = $(this).parents('.deduction-kind').children('.new-deduction-form'),
             deductionListEl = $(this).parents('.deduction-kind').find('.deductions-list');
         if (newDeductionFormEl.find('select').data('selectric')) newDeductionFormEl.find('select').selectric('destroy');
@@ -103,10 +103,10 @@ $(document).on('turbolinks:load', function () {
         }
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
         e.stopImmediatePropagation();
-      } else if (!$(self).parents('.deduction-kind').find('.deductions-list > .deduction').length) {
+      } else if (!$(self).parents('.deduction-kind').find('.deductions-list > .deduction').length) { // unchecking deduction kind with no created deductions
         $(self).parents('.deduction-kind').find('.new-deduction-form').addClass('hidden');
         stopEditingDeduction();
-      } else {
+      } else { // unchecking deduction kind with created deductions
         e.preventDefault();
         // prompt to delete all these dedcutions
         $("#destroyAllDeductions").modal();
