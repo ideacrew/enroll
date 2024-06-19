@@ -189,6 +189,7 @@ $(document).on('turbolinks:load', function () {
           //$(self).prop('checked', false);
 
           $('.deductions-list > .deduction').each(function(i, deduction) {
+            $(deduction).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
             var url = $(deduction).attr('id').replace('deduction_', 'deductions/');
             $(deduction).remove();
             $.ajax({
