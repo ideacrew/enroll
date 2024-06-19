@@ -21,13 +21,13 @@
     <a href="#has_unemployment_income" data-toggle="modal" data-target="#has_unemployment_income"><%= l10n("faa.question.not_sure")%></a>
     <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_unemployment_income"} %>
     <div id="unemployment_income" class="my-4 <%= 'hidden' unless @applicant.incomes.unemployment.any? %>">
-      <div class="unemployment-incomes-list mb-5">
+      <div class="unemployment-incomes-list mb-4">
         <% @applicant.incomes.unemployment.each do |income| %>
           <%= render partial: 'financial_assistance/incomes/unemployment_income', locals: { income: income } %>
         <% end %>
       </div>
       <div>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income button mb-4'><%= l10n("faa.other_incomes.add", kind: "Unemployment") %></a>
+        <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income button mb-4'><%= l10n("faa.other_incomes.add", kind: "Unemployment") %></button>
       </div>
 
       <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 hidden'>

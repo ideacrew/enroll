@@ -2,7 +2,7 @@ function stopEditingIncome() {
   $('.driver-question, .instruction-row, .income, .other-income-kind').removeClass('disabled');
   $('a.new-income').removeClass('hide');
   $("a[class*='income-edit']").removeClass('disabled');
-  document.getElementById('new-unemployment-income').classList.remove('disabled');
+  $('#new-unemployment-income').removeAttr('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
   $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
@@ -12,10 +12,10 @@ function startEditingIncome(income_kind) {
   $('.driver-question, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + ')').addClass('disabled');
   $('a.new-income').addClass('hide');
   $("a[class*='income-edit']").addClass('disabled');
-  document.getElementById('new-unemployment-income').classList.add('disabled');
+  $('#new-unemployment-income').attr('disabled', true);
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $("a.interaction-click-control-add-more").addClass('hide');
-  $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input, .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]")').prop('disabled', true);
+  $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input, .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
 };
 
 function checkDate(income_id) {
@@ -429,8 +429,8 @@ document.addEventListener("turbolinks:load", function () {
     // this index is to ensure duplicate hidden forms aren't saved on submit for unemployment incomes
     var unemploymentIndex = 0;
     /* new unemployment incomes */
-    $('a#new-unemployment-income').off('click');
-    $('a#new-unemployment-income').on('click', function(e) {
+    $('#new-unemployment-income').off('click');
+    $('#new-unemployment-income').on('click', function(e) {
       e.preventDefault();
       startEditingIncome($(this).parents('.unemployment-income').attr('id'));
       var form = $(this).parents();

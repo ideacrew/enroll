@@ -1,4 +1,4 @@
 stopEditingDeduction();
 
-$("<%= id %>").closest(".deduction-kind").find('.add-more-link#add-more-link-<%= @deduction.kind %>').removeClass("hidden");
+$("<%= id %>").closest(".deduction-kind").find('#add-more-link-<%= @deduction.kind %>').removeClass("hidden");
 $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'deduction', locals: { deduction: @deduction }) %>");
