@@ -86,7 +86,7 @@ $(document).on('turbolinks:load', function () {
         $("#destroyAllDeductions").modal();
         var deduction_kind_name = $(this).val().replace(/_/g, ' ');
         deduction_kind_name = deduction_kind_name.charAt(0).toUpperCase() + deduction_kind_name.slice(1);
-        $('#deduction_kind_modal').text(deduction_kind_name);
+        $('#deduction_kind_modal').html("for <b>" + deduction_kind_name + "</b>");
         $("#destroyAllDeductions .modal-cancel-button").click(function(e) {
           $("#destroyAllDeductions").modal('hide');
         });

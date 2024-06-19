@@ -65,14 +65,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'deductions-delete')" id="deductions-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n('faa.deductions.destroy_modal.permanently_remove') %></h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove this info?<br /><strong>This cannot be undone.</strong>
+          <p><%= l10n('faa.deductions.destroy_modal.permanently_remove_warning') %></p>
+          <strong><%= l10n('faa.edit.remove_warning') %></strong>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn secondary modal-cancel-button" data-dismiss="modal"><%= l10n("faa.edit.do_not_remove") %></button>
+          <button type="button" class="btn primary modal-continue-button"><%= l10n("faa.edit.remove") %></button>
         </div>
       </div>
     </div>
@@ -84,17 +85,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'all-deductions-delete')" id="all-deductions-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n('faa.deductions.destroy_modal.permanently_remove') %></h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove everything you have entered <strong>for <span id='deduction_kind_modal'></span>?
-          <br />
-          This cannot be undone.
-          </strong>
+          <p><%= l10n('faa.deductions.destroy_all_modal_warning') %><span id='deduction_kind_modal'></span></p>
+          <strong><%= l10n('faa.edit.remove_warning') %></strong>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
-          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+          <button type="button" class="btn secondary modal-cancel-button" data-dismiss="modal"><%= l10n('faa.edit.do_not_remove') %></button>
+          <button type="button" class="btn primary modal-continue-button"><%= l10n("faa.edit.remove") %></button>
         </div>
       </div>
     </div>
@@ -106,15 +105,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-          <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n('faa.edit.unsaved') %></h4>
         </div>
         <div class="modal-body">
-          If you leave without saving, you will lose all your changes.<br />
-          <strong>This cannot be undone.</strong>
+          <p><%= l10n('faa.edit.leave_warning') %></p>
+          <strong><%= l10n('faa.edit.remove_warning') %></strong>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">STAY ON THIS PAGE</button>
-          <button type="button" class="btn btn-primary">LEAVE WITHOUT SAVING</button>
+          <button type="button" class="btn secondary" data-dismiss="modal"><%= l10n('faa.edit.stay') %></button>
+          <button type="button" class="btn primary"><%= l10n('faa.edit.leave') %></button>
         </div>
       </div>
     </div>
