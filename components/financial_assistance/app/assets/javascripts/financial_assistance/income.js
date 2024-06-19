@@ -345,7 +345,7 @@ document.addEventListener("turbolinks:load", function () {
         if (!$(this).parents('.other-incomes-list').find('div.other-income').length) {
           $(this).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
         } else {
-          $(this).parents('.other-income-kind').find('a#add_new_other-income_kind').parent('div.add-more-link').removeClass("hidden");
+          $(this).parents('.other-income-kind').find('.add_new_other_income_kind').parent('div.add-more-link').removeClass("hidden");
         }
 
         $(this).parents('.new-other-income-form').remove();
@@ -769,7 +769,6 @@ $(document).on('turbolinks:load', function () {
   // this index is to ensure duplicate hidden forms aren't saved on submit
   var otherIndex = 0;
   $(document).on('click', ".add_new_other_income_kind", function (e) {
-    $(this).parents('div.add-more-link').addClass("hidden");
     var newOtherIncomeFormEl = $(this).parents('.other-income-kind').children('.new-other-income-form'),
       otherIncomeListEl = $(this).parents('.other-income-kind').find('.other-incomes-list');
     if (newOtherIncomeFormEl.find('select').data('selectric')) newOtherIncomeFormEl.find('select').selectric('destroy');

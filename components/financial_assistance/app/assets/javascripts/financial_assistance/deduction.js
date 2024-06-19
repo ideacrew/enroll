@@ -1,6 +1,7 @@
 function stopEditingDeduction() {
   $('.driver-question, .instruction-row, .deduction-kind').removeClass('disabled');
   $('a.deduction-edit').removeClass('disabled');
+  $('.add_new_deduction_kind').removeAttr('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $('.driver-question input, .instruction-row input, .deduction-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
 };
@@ -8,6 +9,7 @@ function stopEditingDeduction() {
 function startEditingDeduction(deduction_kind) {
   $('.driver-question, .instruction-row, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
   $('a.deduction-edit').addClass('disabled');
+  $('.add_new_deduction_kind').attr('disabled', true);
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $('.driver-question input, .instruction-row input, .deduction-kind:not(#' + deduction_kind + ') input:not(":input[type=submit], .fake-disabled-input")').attr('disabled', true);
 };
@@ -126,8 +128,7 @@ $(document).on('turbolinks:load', function () {
       }
     });
 
-    $(document).on('click', "#add_new_deduction_kind", function(e) {
-      $(this).parents('div.add-more-link').addClass("hidden");
+    $(document).on('click', ".add_new_deduction_kind", function(e) {
       var newDeductionFormEl = $(this).closest('.deduction-kind').children('.new-deduction-form'),
           deductionListEl = $(this).closest('.deduction-kind').find('.deductions-list');
       if (newDeductionFormEl.find('select').data('selectric')) newDeductionFormEl.find('select').selectric('destroy');
@@ -148,7 +149,6 @@ $(document).on('turbolinks:load', function () {
       var deductionEl = $(this).parents('.deduction');
       deductionEl.find('.deduction-show').addClass('hidden');
       deductionEl.find('.edit-deduction-form').removeClass('hidden');
-      $(this).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
       startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
 
       $(deductionEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
@@ -215,14 +215,14 @@ $(document).on('turbolinks:load', function () {
 
       var benefitEl = $(this).parents('.deduction');
       if (benefitEl.length) {
-        $(this).closest('.deduction-kind').find('a#add_new_deduction_kind').parent('div.add-more-link').removeClass("hidden");
+        $(this).closest('.deduction-kind').find('.add_new_deduction_kind').parent('div.add-more-link').removeClass("hidden");
         benefitEl.find('.deduction-show').removeClass('hidden');
         benefitEl.find('.edit-deduction-form').addClass('hidden');
       } else {
         if (!$(this).parents('.deductions-list').find('div.deduction').length) {
           $(this).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
         } else {
-          $(this).parents('.deduction-kind').find('a#add_new_deduction_kind').parent('div.add-more-link').removeClass("hidden");
+          $(this).parents('.deduction-kind').find('.add_new_deduction_kind').parent('div.add-more-link').removeClass("hidden");
         }
 
         $(this).parents('.new-deduction-form').remove();

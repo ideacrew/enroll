@@ -2,8 +2,7 @@
   <div id="<%= dom_id deduction %>" class="deduction mb-4">
     <div class="deduction-show">
       <div class="d-flex col-sm p-0 mb-2">
-        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 mb-1">
-          <%# TODO: Replace these key strings with Kristin's for Incomes page %>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <label for="amount-<%= deduction.id %>" class="required"><%= l10n("faa.review.income.table.amount") %></label>
           <input class="fake-disabled-input" id="amount-<%= deduction.id %>" disabled="true" value="<%= number_to_currency(deduction.amount) %>">
         </div>
@@ -20,9 +19,9 @@
           <input class="fake-disabled-input" id="end-<%= deduction.id %>" disabled="true" value="<%= deduction.end_on.present? ? deduction.end_on : 'N/A' %>">
         </div>
       </div>
-      <div class="d-flex">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete button outline error mr-1 mb-2"><%= l10n("faa.edit.remove") %></a>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit btn outline mb-2"><%=l10n("edit")%></a>
+      <div class="d-flex mb-2">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete button outline error mr-1"><%= l10n("faa.edit.remove") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit btn outline"><%=l10n("edit")%></a>
       </div>
     </div>
     <div class="edit-deduction-form hidden">
