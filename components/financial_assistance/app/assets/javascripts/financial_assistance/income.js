@@ -818,16 +818,15 @@ $(document).on('turbolinks:load', function () {
       $("#destroyOtherIncome").modal('hide');
 
       var url = $(self).parents('.other-income').attr('id').replace('financial_assistance_income_', '');
-      console.log(url);
       $.ajax({
         type: 'DELETE',
         url: url,
         dataType: 'script',
         success: function() {
-          console.log("success");
           if ($(self).parents('.other-incomes-list').find('.other-income, .new-other-income-form:not(.hidden)').length == 1) {
             $(self).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
             $(self).parents('.other-income-kind').find('.add-more-link').addClass('hidden');
+            $(self).parents('.other-income-kind').find("a.interaction-click-control-add-more").addClass('hide');
           }
           $(self).parents('.other-income').remove();
         }
@@ -859,9 +858,7 @@ $(document).on('turbolinks:load', function () {
     e.preventDefault();
 
     var unemploymentIncomeEl = $(this).parents('.unemployment-income');
-    console.log(unemploymentIncomeEl);
     unemploymentIncomeEl.find('.unemployment-income-show').addClass('hidden');
-    console.log(unemploymentIncomeEl.find('.edit-unemployment-income-form'));
     unemploymentIncomeEl.find('.edit-unemployment-income-form').removeClass('hidden');
 
     startEditingIncome($(this).parents('.unemployment-income-kind').attr('id'));
@@ -884,18 +881,20 @@ $(document).on('turbolinks:load', function () {
     $("#destroyUnemploymentIncome .modal-continue-button").off('click');
     $('#destroyUnemploymentIncome .modal-continue-button').on('click', function(e) {
       $("#destroyUnemploymentIncome").modal('hide');
-      $(self).parents('.unemployment-income').remove();
-              
-      $(".add-more-link").addClass('hidden');
-      $("a.interaction-click-control-add-more").addClass('hide');
 
       var url = $(self).parents('.unemployment-income').attr('id').replace('financial_assistance_income_', '');
-      console.log(url);
       $.ajax({
         type: 'DELETE',
         url: url,
         dataType: 'script',
-      })
+        success: function() {
+          if ($(self).parents('.unemployment-incomes-list').find('.unemployment-income, .new-unemployment-income-form:not(.hidden)').length == 1) {
+            $("#add-more-link-unemployment").addClass('hidden');
+            $("a.interaction-click-control-add-more").addClass('hide');
+          }
+          $(self).parents('.unemployment-income').remove();
+        }
+      });
     });
   });
 
@@ -948,7 +947,6 @@ $(document).on('turbolinks:load', function () {
       $("a.interaction-click-control-add-more").addClass('hide');
 
       var url = $(self).parents('.ai-an-income').attr('id').replace('financial_assistance_income_', '');
-      console.log(url);
       $.ajax({
         type: 'DELETE',
         url: url,
