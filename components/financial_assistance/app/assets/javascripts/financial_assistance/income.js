@@ -719,6 +719,7 @@ $(document).on('turbolinks:load', function () {
       }
     } else if (!$(self).parents('.other-income-kind').find('.other-incomes-list > .other-income').length) { // unchecked deduction kind with no created deductions
       $(self).parents('.other-income-kind').find('.other-incomes-list').empty();
+      $(self).parents('.other-income-kind').find('.add-more-link').addClass('hidden');
       stopEditingIncome();
     } else { // unchecked deduction kind with created deductions
       // prompt to delete all these deductions
