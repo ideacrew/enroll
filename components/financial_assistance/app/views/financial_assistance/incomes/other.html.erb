@@ -7,7 +7,7 @@
       <legend id="has_unemployment_income" class="weight-n required">
         <%= l10n('faa.other_incomes.unemployment_question', name: @applicant.first_name) %>
       </legend>
-      <div class="focus d-flex align-items-center">
+      <div class="focus d-flex align-items-center mx-1">
         <label for="has_unemployment_income_true" class="radio has_unemployment_income_true">
           <%= radio_button_tag("has_unemployment_income", true, @applicant.has_unemployment_income, class: "required", required: true) %>
           <span class="yes_no_pair"><%= l10n("yes") %></span>
@@ -39,7 +39,7 @@
     <legend id="has_unemployment_income" class="weight-n required">
       <%= l10n('faa.other_incomes.other_income_question', name: @applicant.first_name) %>
     </legend>
-    <div class="d-flex align-items-center focus">
+    <div class="d-flex align-items-center focus mx-1">
       <label for="has_other_income_true" class="radio has_unemployment_income_true">
         <%= radio_button_tag("has_other_income", true, @applicant.has_other_income, class: "radio", required: true, id: "has_other_income_true") %>
         <span class="yes_no_pair"><%= l10n("yes") %></span>
@@ -86,7 +86,7 @@
         <legend id="has_unemployment_income" class="weight-n required">
           <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
         </legend>
-        <div class="d-flex align-items-center focus">
+        <div class="d-flex align-items-center focus mx-1">
           <label for="has_american_indian_alaskan_native_income_true" class="radio has_american_indian_alaskan_native_income_true">
             <%= radio_button_tag("has_american_indian_alaskan_native_income", true, @applicant.has_american_indian_alaskan_native_income, class: "required", required: true, id: "has_american_indian_alaskan_native_income_true") %>
             <span class="yes_no_pair"><%= l10n("yes") %></span>

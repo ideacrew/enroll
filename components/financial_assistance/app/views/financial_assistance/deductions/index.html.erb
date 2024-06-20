@@ -8,8 +8,10 @@
     <fieldset class="mb-3">
       <legend class="weight-n required"><%= l10n("faa.deductions.income_adjustments", subject: applicant_name) %></legend>
       <% has_deductions = @applicant.has_deductions == true %>
-      <label class="weight-n"><%= radio_button_tag :has_deductions, true, has_deductions %> <%= l10n('yes') %></label>
-      <label class="weight-n"><%= radio_button_tag :has_deductions, false, has_deductions == false %> <%= l10n('no') %></label>
+      <div class="d-flex align-items-center focus mx-1">
+        <label class="weight-n"><%= radio_button_tag :has_deductions, true, has_deductions %> <%= l10n('yes') %></label>
+        <label class="weight-n"><%= radio_button_tag :has_deductions, false, has_deductions == false %> <%= l10n('no') %></label>
+      </div>
     </fieldset>
     <div>
       <a href="#has_deductions" data-toggle="modal" data-target="#has_deductions"><%= l10n("faa.question.not_sure") %></a>
@@ -24,7 +26,7 @@
     </div>
     <% FinancialAssistance::Deduction::DEDUCTION_TYPE.each do |deduction_kind, label| %>
       <% deduction_kind = deduction_kind.to_s %>
-      <div id="<%= deduction_kind %>"class="ml-1 my-4 deduction-kind">
+      <div id="<%= deduction_kind %>"class="my-4 deduction-kind">
         <label class="weight-n">
           <div class="d-flex align-items-center mx-1">
             <div class="flex-col mr-1">
@@ -51,7 +53,7 @@
           <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
         </div>
         <div class="add-more-link mt-4 mx-1 <%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>" id="add-more-link-<%=deduction_kind%>">
-          <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" class="button mb-4 add_new_deduction_kind">
+          <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" class="button add_new_deduction_kind">
             <%= l10n("faa.other_incomes.add", kind: label).titleize %>
           </button>
         </div>
