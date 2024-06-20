@@ -4,9 +4,9 @@ module FinancialAssistance
   class RelationshipsController < FinancialAssistance::ApplicationController
     before_action :find_application
     before_action :set_cache_headers, only: [:index]
-    before_action :enable_bs4_layout, only: [:index]
+    before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-    layout 'financial_assistance_progress'
+    layout :resolve_layout
 
     def index
       authorize @application, :index?
@@ -42,6 +42,14 @@ module FinancialAssistance
 
     def enable_bs4_layout
       @bs4 = true
+    end
+
+    def resolve_layout
+      case action_name
+      when "index"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
+      else
+        'financial_assistance_nav'
     end
   end
 end
