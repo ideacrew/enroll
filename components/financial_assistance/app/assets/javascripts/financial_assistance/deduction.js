@@ -179,6 +179,7 @@ $(document).on('turbolinks:load', function () {
           success: function() {
             if ($(self).parents('.deductions-list').find('.deduction, .new-deduction-form:not(.hidden)').length == 1) {
               $(self).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
+              $("a.interaction-click-control-add-more").addClass('hide');
               $(self).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
             }
             $(self).parents('.deduction').remove();
