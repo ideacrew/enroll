@@ -356,14 +356,14 @@ document.addEventListener("turbolinks:load", function () {
       e.preventDefault();
       stopEditingIncome();
 
-      var unemploymentIncomeEl = $(this).parents('#unemployment-income');
+      var unemploymentIncomeEl = $(this).parents('.unemployment-income');
       if (unemploymentIncomeEl.length) { // canceling edit of existing income
         unemploymentIncomeEl.find('.unemployment-income-show').removeClass('hidden');
         unemploymentIncomeEl.find('.edit-unemployment-income-form').addClass('hidden');
       } else { // canceling edit of new income
-        if (!$(this).parents('.unemployment-incomes-list').find('#unempoyment-income').length) { // no other existing incomes
-          $(this).parents('#unemployment-income').find('#add-more-link-unemployment').addClass('hidden');
-          $(this).parents('#unemployment-income').find("a.interaction-click-control-add-more").addClass('hide')
+        if (!$('.unemployment-incomes-list').find('.unemployment-income').length) { // no other existing incomes
+          $("#add-more-link-unemployment").addClass('hidden');
+          $("a.interaction-click-control-add-more").addClass('hide');
 
           $('#has_unemployment_income_false').prop('checked', true).trigger('change');
         }
@@ -894,11 +894,12 @@ $(document).on('turbolinks:load', function () {
         url: url,
         dataType: 'script',
         success: function() {
-          if ($(self).parents('.unemployment-incomes-list').find('.unemployment-income, .new-unemployment-income-form:not(.hidden)').length == 1) {
+          $(self).parents('.unemployment-income').remove();
+          if (!$('.unemployment-incomes-list').find('.unemployment-income').length) { // no other existing incomes
             $("#add-more-link-unemployment").addClass('hidden');
             $("a.interaction-click-control-add-more").addClass('hide');
+            $('#has_unemployment_income_false').prop('checked', true).trigger('change');
           }
-          $(self).parents('.unemployment-income').remove();
         }
       });
     });
