@@ -8,7 +8,7 @@ class IvlIapIncomeAdjustmentsPage
   end
 
   def self.income_adjustments_no_radiobtn
-    'has_deductions_false'
+    '#has_deductions_false'
   end
 
   def self.not_sure_has_deductions

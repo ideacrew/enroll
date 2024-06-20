@@ -1,6 +1,7 @@
 Feature: Start a new Financial Assistance Application and fills out Other Income form
 
   Background: User logs in and visits applicant's other income page
+    Given bs4_consumer_flow feature is disable
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists

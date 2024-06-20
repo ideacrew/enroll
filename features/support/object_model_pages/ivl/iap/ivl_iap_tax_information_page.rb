@@ -8,7 +8,11 @@ class IvlIapTaxInformationPage
   end
 
   def self.file_taxes_no_radiobtn
-    'is_required_to_file_taxes_no'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '.interaction-choice-control-value-is-required-to-file-taxes-no'
+    else
+      'is_required_to_file_taxes_no'
+    end
   end
 
   def self.not_sure_file_taxes_link
@@ -20,7 +24,11 @@ class IvlIapTaxInformationPage
   end
 
   def self.claimed_as_tax_dependent_no_radiobtn
-    'is_claimed_as_tax_dependent_no'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '.interaction-choice-control-value-is-claimed-as-tax-dependent-no'
+    else
+      'is_claimed_as_tax_dependent_no'
+    end
   end
 
   def self.not_sure_claimed_as_dependent_link

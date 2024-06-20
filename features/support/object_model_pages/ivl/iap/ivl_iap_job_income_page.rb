@@ -8,7 +8,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.has_job_income_no_radiobtn
-    'has_job_income_false'
+    '#has_job_income_false'
   end
 
   def self.not_sure_has_job_income_link
@@ -104,7 +104,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.has_self_employee_income_no_radiobtn
-    'has_self_employment_income_false'
+    '#has_self_employment_income_false'
   end
 
   def self.self_employee_income_amount
