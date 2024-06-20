@@ -30,7 +30,7 @@
         <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income button mb-4'><%= l10n("faa.other_incomes.add", kind: "Unemployment") %></button>
       </div>
 
-      <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 hidden'>
+      <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 mx-1 hidden'>
         <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income') } %>
       </div>
     </div>
@@ -62,7 +62,7 @@
     <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
       <div id="<%= other_income_kind %>" class="other-income-kind my-4">
         <label for="<%= "other-income-checkbox-#{other_income_kind}" %>" class="weight-n">
-          <div class="d-flex pr-3 align-items-center mb-2 option">
+          <div class="d-flex pr-3 align-items-center mb-2 mx-1 option">
             <span class="mr-2"><%= check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, data: {checking: false},class: "other-income-checkbox-#{other_income_kind}",id: "other-income-checkbox-#{other_income_kind}" %></span>
             <%= label %> <%= l10n('faa.deductions.divorce_agreement') if other_income_kind == :alimony_and_maintenance && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
           </div>
@@ -72,7 +72,7 @@
             <%= render partial: 'other_income', locals: { other_income: other_income } %>
           <% end %>
         </div>
-        <div class="add-more-link mt-4 <%= 'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? %>" id="add-more-link-<%=other_income_kind%>">
+        <div class="add-more-link mt-4 mx-1 <%= 'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? %>" id="add-more-link-<%=other_income_kind%>">
           <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_other_income_kind')" class='add_new_other_income_kind button mb-4'><%= l10n("faa.other_incomes.add", kind: label).titleize %></button>
         </div>
         <div id="new-other-income-form" class='new-other-income-form hidden <%= other_income_kind %>'>
