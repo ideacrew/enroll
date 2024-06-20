@@ -119,7 +119,7 @@
     </div>
   </div>
 
-  <div class="my-4">
+  <div class="my-4" id="nav-buttons">
     <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
       previous_link: other_application_applicant_incomes_path(@application, @applicant),
       next_link: @applicant.is_applying_coverage ? application_applicant_benefits_path(@application, @applicant) : other_questions_application_applicant_path(@application, @applicant),

@@ -25,7 +25,7 @@
     outline-offset: 2px;
     color: $color;
   }
-  &:disabled {
+  &:disabled, &.disabled {
     background-color: var(--grey-040);
     border-color: var(--grey-040);
     color: var(--grey-090);
@@ -60,8 +60,9 @@
     outline-offset: 2px;
     color: $hover;
   }
-  &:disabled {
-    border-color: var(--grey-090);
+  &:disabled, &.disabled {
+    background-color: var(--grey-040);
+    border-color: var(--grey-040);
     color: var(--grey-090);
     cursor: not-allowed;
   }

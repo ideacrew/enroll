@@ -4,6 +4,7 @@ function stopEditingIncome() {
   $("a[class*='income-edit']").removeClass('disabled');
   $('#new-unemployment-income').removeAttr('disabled');
   $('.add_new_other_income_kind').removeAttr('disabled');
+  $('#nav-buttons a').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
   $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
@@ -15,6 +16,7 @@ function startEditingIncome(income_kind) {
   $("a[class*='income-edit']").addClass('disabled');
   $('#new-unemployment-income').attr('disabled', true);
   $('.add_new_other_income_kind').attr('disabled', true);
+  $('#nav-buttons a').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $("a.interaction-click-control-add-more").addClass('hide');
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input, .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
