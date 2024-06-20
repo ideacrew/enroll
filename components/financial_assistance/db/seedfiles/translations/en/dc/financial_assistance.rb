@@ -89,6 +89,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_incomes.frequency" => "Frequency",
   "en.faa.other_incomes.start_date" => "Start Date",
   "en.faa.other_incomes.end_date" => "End Date",
+  "en.faa.other_incomes.social_security_benefit_type" => "Social Security Benefit Type",
   "en.faa.other_incomes.cancel" => "Cancel",
   "en.faa.other_incomes.save" => "Save",
   "en.faa.other_incomes.add" => "Add Additional %{kind} Income",

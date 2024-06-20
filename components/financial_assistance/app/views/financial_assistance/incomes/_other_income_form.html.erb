@@ -4,12 +4,12 @@
     <% income_id = other_income.id %>
     <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}', true)") : "" %>
     <div class="my-4">
-      <div class="d-flex col-sm income-form-row p-0 mb-2">
+      <div class="d-flex row income-form-row p-0 m-0 mb-2">
         <%= f.hidden_field :kind, value: kind %>
         <% if (other_income.kind == "social_security_benefit" || kind == :social_security_benefit) && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
-          <div class="mr-auto col-sm col-md-6 col-lg-3 p-0" id="ssi_type">
+          <div class="col-12 p-0" id="ssi_type">
             <div class="ss_benefit_type">
-              <%= f.label :ssi_type, "#{l10n("Social").upcase} #{l10n("Security").upcase} #{l10n("Benefit").upcase} #{l10n("TYPE").upcase}", class: "required", for: "ssbenefit#{income_id}" %>
+              <%= f.label :ssi_type, l10n("faa.other_incomes.social_security_benefit_type"), class: "required", for: "ssbenefit#{income_id}" %>
               <%= f.select(:ssi_type, options_for_select(FinancialAssistance::Income::SS_BENEFITS.map {|k, v| [v, k]}, selected: other_income.ssi_type), {prompt: "Choose"}, {disabled: false, required: true, id: "ssbenefit#{income_id}"}) %>
             </div>
           </div>
