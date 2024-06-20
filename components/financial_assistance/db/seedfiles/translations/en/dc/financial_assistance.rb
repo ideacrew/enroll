@@ -240,9 +240,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.deductions.check_any_boxes" => "Check any boxes that apply and enter details when requested.",
   "en.faa.deductions.divorce_agreement" => "(from a divorce agreement finalized before January 1, 2019)",
   "en.faa.deductions.deduction_form.how_often" => "How Often",
-  "en.faa.deductions.destroy_modal.permanently_remove" => "Permanently Remove This Info?",
-  "en.faa.deductions.destroy_modal.permanently_remove_warning" => "Are you sure you want to remove this info?",
-  "en.faa.deductions.destroy_all_modal_warning" => "Are you sure you want to remove everything you have entered?",
   # Review and Submit page
   "en.faa.review.review_and_submit" => "Review Your Application",
   "en.faa.review.almost_done" => "You're almost done! Review the application summary below and make sure it's correct. Select the “Edit“ button to go back to any section and make changes. When you’re finished, select “%{continue_text}”.",
