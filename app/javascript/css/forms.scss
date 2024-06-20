@@ -53,11 +53,6 @@ label.required:after, legend.required:after, dt.required:after {
   font-weight: 600;
 }
 
-label.fa-required:after, legend.fa-required:after {
-  @extend label.required:after;
-  color: var(--enrollment-status-red);
-}
-
 input:not([type="submit"]),
 select,
 .input {
