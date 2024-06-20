@@ -1,7 +1,6 @@
 function stopEditingIncome() {
-  $('.driver-question, .instruction-row, .income, .other-income-kind, .unemployment-income').removeClass('disabled');
+  $('.driver-question, .instruction-row, .income > div, .other-income-kind > div, .unemployment-income > div').removeClass('disabled');
   $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
-  $('.income a, .other-income-kind a, .unemployment-income a, .unemployment-income a').removeClass('disabled');
   
   $('a.new-income').removeClass('hide');
   $('#new-unemployment-income').removeAttr('disabled');
@@ -14,11 +13,11 @@ function stopEditingIncome() {
 };
 
 function startEditingIncome(income_kind) {
-  // disable driver questions, instructions, and other incomes
-  $('.driver-question, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + '), .unemployment-income:not(#' + income_kind + ')').addClass('disabled');
+  // disable all divs not directly owned by the income kind which don't have link or button, as links and buttons have their own disabled class applied separately
+  $('.driver-question, .instruction-row, .income:not(#' + income_kind + ') > div:not(:has(a, button)), .other-income-kind:not(#' + income_kind + ') > div:not(:has(a, button)), .unemployment-income:not(#' + income_kind + ') > div:not(:has(a, button))').addClass('disabled');
+  // disable inputs not owned by the income kind
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input:not(":input[type=submit]"), .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]"), .unemployment-income:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
-  $('.income:not(#' + income_kind + ') a, .other-income-kind:not(#' + income_kind + ') a, .unemployment-income:not(#' + income_kind + ')  a').addClass('disabled');
-
+  
   // disable "Add New" income buttons
   $('a.new-income').addClass('hide');
   $('#new-unemployment-income').attr('disabled', true);

@@ -62,12 +62,14 @@
     </div>
     <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
       <div id="<%= other_income_kind %>" class="other-income-kind my-4">
-        <label for="<%= "other-income-checkbox-#{other_income_kind}" %>" class="weight-n">
-          <div class="d-flex pr-3 align-items-center mb-2 mx-1 option">
-            <span class="mr-2"><%= check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, data: {checking: false},class: "other-income-checkbox-#{other_income_kind}",id: "other-income-checkbox-#{other_income_kind}" %></span>
-            <%= label %> <%= l10n('faa.deductions.divorce_agreement') if other_income_kind == :alimony_and_maintenance && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
-          </div>
-        </label>
+        <div>
+          <label for="<%= "other-income-checkbox-#{other_income_kind}" %>" class="weight-n">
+            <div class="d-flex pr-3 align-items-center mb-2 mx-1 option">
+              <span class="mr-2"><%= check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, data: {checking: false},class: "other-income-checkbox-#{other_income_kind}",id: "other-income-checkbox-#{other_income_kind}" %></span>
+              <%= label %> <%= l10n('faa.deductions.divorce_agreement') if other_income_kind == :alimony_and_maintenance && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
+            </div>
+          </label>
+        </div>
         <div class="other-incomes-list">
           <% @applicant.incomes.of_kind(other_income_kind).each do |other_income| %>
             <%= render partial: 'other_income', locals: { other_income: other_income } %>
