@@ -20,7 +20,7 @@
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 pr-4">
           <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequency#{income_id}" %>
-          <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: other_income.frequency_kind), {include_blank: "Choose"}, {disabled: false, id: "frequency#{income_id}", class: "w-100"}) %>
+          <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: other_income.frequency_kind), {include_blank: "Choose"}, {disabled: false, required: true, id: "frequency#{income_id}", class: "w-100"}) %>
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 pr-4">
           <%= f.label :start_on, l10n("start_date"), class: "required", for: "start_on_#{income_id}" %>

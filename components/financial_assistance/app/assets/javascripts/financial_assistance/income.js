@@ -1,7 +1,7 @@
 function stopEditingIncome() {
-  $('.driver-question, .instruction-row, .income, .other-income-kind').removeClass('disabled');
-  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
-  $('.income a, .other-income-kind a, .unemployment-income a').removeClass('disabled');
+  $('.driver-question, .instruction-row, .income, .other-income-kind, .unemployment-income').removeClass('disabled');
+  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
+  $('.income a, .other-income-kind a, .unemployment-income a, .unemployment-income a').removeClass('disabled');
   
   $('a.new-income').removeClass('hide');
   $('#new-unemployment-income').removeAttr('disabled');
@@ -15,15 +15,10 @@ function stopEditingIncome() {
 };
 
 function startEditingIncome(income_kind) {
-  function selectorsForIncomes(descendant = '') {
-    const types = ["income", "other-income-kind", "unemployment-income"];
-    return types.map(type => '.' + type + ':not(#' + income_kind + ') ' + descendant).join();
-  }
-
   // disable driver questions, instructions, and other incomes
-  $('.driver-question, .instruction-row, ' + selectorsForIncomes()).addClass('disabled');
-  $('.driver-question input, .instruction-row input, ' + selectorsForIncomes('input:not(":input[type=submit]")')).attr('disabled', true);
-  $(selectorsForIncomes('a')).addClass('disabled');
+  $('.driver-question, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + '), .unemployment-income:not(#' + income_kind + ')').addClass('disabled');
+  $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input:not(":input[type=submit]"), .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]"), .unemployment-income:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
+  $('.income:not(#' + income_kind + ') a, .other-income-kind:not(#' + income_kind + ') a, .unemployment-income:not(#' + income_kind + ')  a').addClass('disabled');
 
   // disable "Add New" income buttons
   $('a.new-income').addClass('hide');
@@ -55,12 +50,12 @@ function currentlyEditing() {
 };
 
 function deleteIncomes(kind) {
-  const requests = $(kind).find('.other-incomes-list > .other-income').map(function(_, deduction) {
+  const requests = $(kind).find('.other-incomes-list > .other-income').map(function(_, income) {
     return $.ajax({
       type: 'DELETE',
-      url: $(deduction).attr('id').replace('other_income_', ''),
+      url: $(income).attr('id').replace('other_income_', ''),
       success: function() {
-        $(deduction).remove();
+        $(income).remove();
       }
     });
   });
@@ -221,10 +216,14 @@ document.addEventListener("turbolinks:load", function () {
 
           $('#unemployment_income').find('.unemployment-incomes-list > .unemployment-income').each(function (i, unemployment_income) {
             var url = $(unemployment_income).attr('id').replace('income_', '');
-            $(unemployment_income).remove();
             $.ajax({
               type: 'DELETE',
-              url: url
+              url: url,
+              success: function() {
+                $(unemployment_income).remove();
+                $("#add-more-link-unemployment").addClass('hidden');
+                $("a.interaction-click-control-add-more").addClass('hide');
+              }
             });
           });
         });
