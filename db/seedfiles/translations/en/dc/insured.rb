@@ -573,7 +573,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.ssn_configuration_warning' => "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at %{site_phone_number}.",
   :'en.insured.match_person.ssn_dob_name_error' => "This Social Security Number, Date-of-Birth and Name are invalid in our records. Please verify the entry, and if correct, contact the %{contact_center_name} at %{contact_center_phone_number}.",
   :'en.insured.out_of_state_error_message' => "Address is out of state or the supported area, please review your application details to update your address",
-    :'en.insured.active_enrollment_warning' => "Your enrollment has been submitted and cannot be changed by clicking the back button. To make any changes, continue to your account.",
   :'en.enrollment.details.header' => 'Enrollment Detail',
   :'en.enrollment.members.header' => 'Enrollment Member Detail',
   :'en.enrollment.effective_on' => 'Effective Date: ',

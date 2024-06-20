@@ -45,9 +45,8 @@ When(/(.*) clicks browser back button/) do |_name|
   @browser.execute_script('window.history.back()')
 end
 
-Then(/(.*) should redirect to receipt page and should see a flash message/) do |_name|
+Then(/(.*) should redirect to receipt page/) do |_name|
   expect(page).to have_content("Enrollment Submitted")
-  expect(page).to have_content(l10n("insured.active_enrollment_warning"))
 end
 
 Then(/(.*) should see family members page and clicks continue/) do |_name|
