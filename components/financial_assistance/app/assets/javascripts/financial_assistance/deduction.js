@@ -217,18 +217,14 @@ $(document).on('turbolinks:load', function () {
       e.preventDefault();
       stopEditingDeduction();
 
-      var benefitEl = $(this).parents('.deduction');
-      if (benefitEl.length) {
-        $(this).closest('.deduction-kind').find('.add_new_deduction_kind').parent('div.add-more-link').removeClass("hidden");
-        benefitEl.find('.deduction-show').removeClass('hidden');
-        benefitEl.find('.edit-deduction-form').addClass('hidden');
-      } else {
-        if (!$(this).parents('.deductions-list').find('div.deduction').length) {
+      var deductionEl = $(this).parents('.deduction');
+      if (deductionEl.length) { // canceling edit of existing deduction
+        deductionEl.find('.deduction-show').removeClass('hidden');
+        deductionEl.find('.edit-deduction-form').addClass('hidden');
+      } else { // canceling edit of new deduction
+        if (!$(this).parents('.deductions-list').find('.deduction').length) { // the kind for the canceled new deduction has no existing deductions
           $(this).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
-        } else {
-          $(this).parents('.deduction-kind').find('.add_new_deduction_kind').parent('div.add-more-link').removeClass("hidden");
         }
-
         $(this).parents('.new-deduction-form').remove();
       }
     });

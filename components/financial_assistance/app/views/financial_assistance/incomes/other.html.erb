@@ -27,6 +27,7 @@
         <% end %>
       </div>
       <div>
+      <div class="<%= 'hidden' unless @applicant.incomes.unemployment.present? %>" id="add-more-link-unemployment">
         <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income button mb-4'><%= l10n("faa.other_incomes.add", kind: "Unemployment") %></button>
       </div>
 

@@ -339,17 +339,13 @@ document.addEventListener("turbolinks:load", function () {
       stopEditingDeduction();
 
       var incomeEl = $(this).parents('.other-income');
-      if (incomeEl.length) {
-        $(this).closest('.other-income-kind').find('.add_new_other_income_kind').parent('div.add-more-link').removeClass("hidden");
+      if (incomeEl.length) { // canceling edit of existing income
         incomeEl.find('.other-income-show').removeClass('hidden');
         incomeEl.find('.edit-other-income-form').addClass('hidden');
-      } else {
-        if (!$(this).parents('.other-incomes-list').find('div.other-income').length) {
+      } else { // canceling edit of new income
+        if (!$(this).parents('.other-incomes-list').find('.other-income').length) { // the kind for the canceled new income has no existing incomes
           $(this).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
-        } else {
-          $(this).parents('.other-income-kind').find('.add_new_other_income_kind').parent('div.add-more-link').removeClass("hidden");
         }
-
         $(this).parents('.new-other-income-form').remove();
       }
     });
@@ -846,15 +842,12 @@ $(document).on('turbolinks:load', function () {
     stopEditingIncome();
 
     var otherIncomeEl = $(this).parents('.other-income');
-    if (otherIncomeEl.length) {
-      $(this).closest('.other-income-kind').find('.add_new_other_income_kind').parent('div.add-more-link').removeClass("hidden");
+    if (otherIncomeEl.length) { // canceling edit of existing income
       otherIncomeEl.find('.other-income-show').removeClass('hidden');
       otherIncomeEl.find('.edit-other-income-form').addClass('hidden');
-    } else {
-      if (!$(this).parents('.other-incomes-list').find('div.other-income').length) {
+    } else { // canceling edit of new income
+      if (!$(this).parents('.other-incomes-list').find('.other-income').length) { // the kind for the canceled new income has no existing incomes
         $(this).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
-      } else {
-        $(this).parents('.other-income-kind').find('.add_new_other_income_kind').parent('div.add-more-link').removeClass("hidden");
       }
       $(this).parents('.new-other-income-form').remove();
     }
