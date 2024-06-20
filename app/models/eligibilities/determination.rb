@@ -23,7 +23,7 @@ module Eligibilities
     def serializable_cv_hash
       subjects_hash = subjects.collect do |subject|
         Hash[
-          URI(subject.gid),
+          URI(subject.gid).to_s,
           subject.serializable_cv_hash
         ]
       end.reduce(:merge)

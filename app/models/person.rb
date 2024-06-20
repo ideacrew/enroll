@@ -1391,7 +1391,58 @@ class Person
     Operations::People::BuildDemographicsGroup.new.call(self)
   end
 
+  # Returns a list of all active role names for the person.
+  # This method caches the result to avoid recalculating the active roles on subsequent calls.
+  #
+  # @return [Array<String>] An array of strings representing the active roles.
+  def all_active_role_names
+    return @all_active_role_names if defined?(@all_active_role_names)
+
+    @all_active_role_names = role_names_based_on_status_of_roles
+  end
+
   private
+
+  # Determines the active roles based on specific conditions for each role.
+  # It utilizes a hash where each key is a role (localized string) and its value is a boolean
+  # indicating whether the role is active or not. Only roles with true conditions are kept.
+  #
+  # @return [Array<String>] An array of strings representing the active roles.
+  def role_names_based_on_status_of_roles
+    {
+      l10n('user_roles.assister') => assister_role.present?,
+      l10n('user_roles.broker') => active_broker_role?,
+      l10n('user_roles.broker_agency_staff') => has_active_broker_staff_role?,
+      l10n('user_roles.consumer') => active_consumer_role?,
+      l10n('user_roles.csr') => csr_role.present?,
+      l10n('user_roles.employee') => has_active_employee_role?,
+      l10n('user_roles.employer_staff') => has_active_employer_staff_role?,
+      l10n('user_roles.general_agency_staff') => has_active_general_agency_staff_role?,
+      l10n('user_roles.hbx_staff') => hbx_staff_role.present?,
+      l10n('user_roles.resident') => active_resident_role?
+    }.select { |_role, condition| condition }.keys
+  end
+
+  # Checks if the resident role is active.
+  #
+  # @return [Boolean] True if the resident role is present and active, false otherwise.
+  def active_resident_role?
+    resident_role.present? && is_resident_role_active?
+  end
+
+  # Checks if the consumer role is active.
+  #
+  # @return [Boolean] True if the consumer role is present and active, false otherwise.
+  def active_consumer_role?
+    consumer_role.present? && is_consumer_role_active?
+  end
+
+  # Checks if the broker role is active.
+  #
+  # @return [Boolean] True if the broker role is present and active, false otherwise.
+  def active_broker_role?
+    broker_role&.active?
+  end
 
   def assign(collection, association)
     collection.each do |attributes|

@@ -118,6 +118,7 @@ end
 
 When(/^\w+ clicks? on continue$/) do
   find(IvlPersonalInformation.continue_btn).click
+  screenshot("create_account")
 end
 
 Then(/^.+ should see heading labeled personal information/) do
@@ -134,6 +135,10 @@ Then(/Individual should click on Individual market for plan shopping/) do
   wait_for_ajax
   expect(page).to have_button("CONTINUE", visible: false)
   find('.btn', text: 'CONTINUE').click
+end
+
+Then(/Individual sees form to enter personal information with checked female gender$/) do
+  expect(find("#radio_female", visible: false)).to be_checked
 end
 
 Then(/^.+ sees form to enter personal information$/) do

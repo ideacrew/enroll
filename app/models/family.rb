@@ -27,6 +27,9 @@ class Family
   include GlobalID::Identification
   include EventSource::Command
 
+  # transmittable subject
+  include Transmittable::Subject
+
   IMMEDIATE_FAMILY = %w[self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner].freeze
 
   field :version, type: Integer, default: 1

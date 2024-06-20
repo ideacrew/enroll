@@ -711,7 +711,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
         describe "pending verification type updates" do
           before do
-            allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+            allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
           end
 
           it "updates validation status to pending for unverified consumers" do
@@ -996,7 +996,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
       shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
         before do
-          allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
           allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
           person.ssn = nil unless ssn
           person.us_citizen = citizen
@@ -1100,7 +1100,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => "hbx" })}
 
     before do
-      allow(EnrollRegistry[:enable_alive_status].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should move Citizenship verification type to pending state" do
