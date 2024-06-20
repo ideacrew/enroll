@@ -336,15 +336,17 @@ document.addEventListener("turbolinks:load", function () {
 
     $(document).on('click', 'a.other-income-cancel', function (e) {
       e.preventDefault();
-      stopEditingDeduction();
+      stopEditingIncome();
 
-      var incomeEl = $(this).parents('.other-income');
-      if (incomeEl.length) { // canceling edit of existing income
-        incomeEl.find('.other-income-show').removeClass('hidden');
-        incomeEl.find('.edit-other-income-form').addClass('hidden');
+      var otherIncomeEl = $(this).parents('.other-income');
+      if (otherIncomeEl.length) { // canceling edit of existing income
+        otherIncomeEl.find('.other-income-show').removeClass('hidden');
+        otherIncomeEl.find('.edit-other-income-form').addClass('hidden');
       } else { // canceling edit of new income
         if (!$(this).parents('.other-incomes-list').find('.other-income').length) { // the kind for the canceled new income has no existing incomes
           $(this).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
+          $(this).parents('.other-income-kind').find('.add-more-link').addClass('hidden');
+          $(this).parents('.other-income-kind').find("a.interaction-click-control-add-more").addClass('hide');
         }
         $(this).parents('.new-other-income-form').remove();
       }
@@ -352,20 +354,22 @@ document.addEventListener("turbolinks:load", function () {
 
     $(document).on('click', 'a.unemployment-income-cancel', function (e) {
       e.preventDefault();
-
-      if ($(this).parents('.new-unemployment-income-form').length) {
-        $(this).parents('.new-unemployment-income-form').addClass('hidden');
-      } else {
-        var incomeEl = $(this).parents('.income');
-      }
-
-      if (document.querySelectorAll('.unemployment-incomes-list:not(.other-incomes-list) .unemployment-income').length == 0) {
-        document.getElementById('has_unemployment_income_false').click();
-      }
-
       stopEditingIncome();
 
-      /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
+      var unemploymentIncomeEl = $(this).parents('#unemployment-income');
+      if (unemploymentIncomeEl.length) { // canceling edit of existing income
+        unemploymentIncomeEl.find('.unemployment-income-show').removeClass('hidden');
+        unemploymentIncomeEl.find('.edit-unemployment-income-form').addClass('hidden');
+      } else { // canceling edit of new income
+        if (!$(this).parents('.unemployment-incomes-list').find('#unempoyment-income').length) { // no other existing incomes
+          $(this).parents('#unemployment-income').find('#add-more-link-unemployment').addClass('hidden');
+          $(this).parents('#unemployment-income').find("a.interaction-click-control-add-more").addClass('hide')
+
+          $('#has_unemployment_income_false').prop('checked', true).trigger('change');
+        }
+
+        $(this).parents('.new-unmployment-income-form').remove();
+      }
     });
 
     $(document).on('click', 'a.ai-an-income-cancel', function (e) {
@@ -847,6 +851,8 @@ $(document).on('turbolinks:load', function () {
     } else { // canceling edit of new income
       if (!$(this).parents('.other-incomes-list').find('.other-income').length) { // the kind for the canceled new income has no existing incomes
         $(this).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
+        $(this).parents('.other-income-kind').find('.add-more-link').addClass('hidden');
+        $(this).parents('.other-income-kind').find("a.interaction-click-control-add-more").addClass('hide');
       }
       $(this).parents('.new-other-income-form').remove();
     }
