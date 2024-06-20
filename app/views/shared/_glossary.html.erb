@@ -7,30 +7,19 @@
 <span class="glossary"
       tabindex="0"
       data-toggle="popover"
+      data-animation="false"
       data-placement="auto top"
       data-trigger="click focus"
-      data-boundary="window"
-      data-fallbackPlacement="flip"
-      data-html="true"
       data-content="<%= t('glossary.' + key) %>"
       data-title="<%= term_display %>">
-  <button data-dismiss='modal'
-    type='button'
-    class='close'
-    aria-label='Close'
-    onclick="$('.glossary').popover('hide');">
-  </button>
   <%= term_display %>
 </span>
 
 <script>
-$(document).click(function(e){
-  if (e.target.className == 'glossary') {
-    e.preventDefault();
-    $('.glossary').not($(e.target)).popover('hide');
-  }
-  else if (!$(e.target).parents('.popover').length) {
-    $('.glossary').popover('hide');
-  }
-});
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+$('[data-toggle="popover"]').popover({
+  trigger: 'focus'
+})
 </script>
