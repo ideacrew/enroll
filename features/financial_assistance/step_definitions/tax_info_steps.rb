@@ -52,7 +52,6 @@ When(/^Will this person be claimed as a tax dependent for <system year>\? has a 
 end
 
 Then(/^the CONTINUE will be visibly disabled$/) do
-  # binding.irb
   expect(find('input[id="btn-continue"]')['disabled']).to eq("true")
 end
 
