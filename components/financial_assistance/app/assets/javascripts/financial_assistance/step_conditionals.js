@@ -200,30 +200,28 @@ document.addEventListener("turbolinks:load", function() {
 
   // On Load, hide by default if checked
   if ($('#eligibility_easier_yes').is(':checked')) {
-      $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
-      $('#eligibility_easier_yes').parents(".row").next().next().addClass('hide');
+    $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
+    $('#eligibility_easier_yes').parents(".row").next().next().addClass('hide');
   };
 
   $("body").on("change", "#eligibility_easier_yes", function(){
     if ($('#eligibility_easier_yes').is(':checked')) {
-      $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
-      $('#eligibility_easier_yes').parents(".row").next().next().addClass('hide');
+      $('#renewal_years').addClass('hide');
     };
   });
 
   $("body").on("change", "#eligibility_easier_no", function(){
     if ($('#eligibility_easier_no').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
-      $(this).parents(".row").next().next().removeClass('hide');
+      $('#renewal_years').removeClass('hide');
     };
   });
 
   if($('#eligibility_easier_yes').is(':checked')) {
-    $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
+    $('#renewal_years').addClass('hide');
   }
 
   if($('#eligibility_easier_no').is(':checked')) {
-    $('#eligibility_easier_no').parents(".row").next().removeClass('hide');
+    $('#renewal_years').removeClass('hide');
   }
 
 /* Applicant's Tax Info Form Related */
