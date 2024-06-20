@@ -510,3 +510,7 @@ ul.plain {
 fieldset.disabled, div.disabled {
   opacity: .4;
 }
+
+a.disabled {
+  pointer-events: none;
+}

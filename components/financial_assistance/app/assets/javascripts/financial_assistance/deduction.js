@@ -1,5 +1,5 @@
 function stopEditingDeduction() {
-  $('.driver-question, .instruction-row, .deduction-kind').removeClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind').removeClass('disabled');
   $('a.deduction-edit').removeClass('disabled');
   $('.add_new_deduction_kind').removeAttr('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
@@ -8,7 +8,7 @@ function stopEditingDeduction() {
 };
 
 function startEditingDeduction(deduction_kind) {
-  $('.driver-question, .instruction-row, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
   $('a.deduction-edit').addClass('disabled');
   $('.add_new_deduction_kind').attr('disabled', true);
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
