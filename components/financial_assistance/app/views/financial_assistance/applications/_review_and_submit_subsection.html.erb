@@ -17,10 +17,10 @@
     <hr class="my-1">
     <%# Summary rows %>
     <dl>
-      <% subsection[:rows].each do |(key_string, value)| %>
+      <% subsection[:rows].each do |(term_string, value)| %>
         <div class="d-flex justify-content-between align-items-center">
           <div class="col-8 px-0">
-            <dt class=<%= "required" if value.is_a?(Hash) && value[:is_required].present? ? value[:is_required] : false %>><%= key_string %></dt>
+            <dt class=<%= "required" if value.is_a?(Hash) && value[:is_required].present? ? value[:is_required] : false %>><%= term_string %></dt>
           </div>
           <dd class=""><%= value.is_a?(Hash) && value[:value].present? ? value[:value] : value %></dd>
         </div>
