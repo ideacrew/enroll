@@ -55,7 +55,7 @@ function deleteIncomes(kind) {
     if (responses.every(function(response) { return response[1] == 'success'; })) {
       $(kind).find('input[type="checkbox"]').prop('checked', false);
       $(kind).find('[class^="interaction-click-control-add-more"]').addClass('hidden');
-      $(self).parents('.other-income-kind').find('.new-other-income-form').addClass('hidden'); // needed?
+      $(kind).find('.new-other-income-form').addClass('hidden');
       $(kind).find('.add-more-link').addClass('hidden');
     }
   });

@@ -38,6 +38,7 @@ function deleteDeductions(kind) {
     if (responses.every(function(response) { return response[1] == 'success'; })) {
       $(kind).find('input[type="checkbox"]').prop('checked', false);
       $(kind).find('[class^="interaction-click-control-add-more"]').addClass('hidden');
+      $(kind).find('.new-deduction-form').addClass('hidden');
       $(kind).find('.add-more-link').addClass('hidden');
     }
   });
@@ -109,6 +110,7 @@ $(document).on('turbolinks:load', function () {
         e.stopImmediatePropagation();
       } else if (!$(self).parents('.deduction-kind').find('.deductions-list > .deduction').length) { // unchecking deduction kind with no created deductions
         $(self).parents('.deduction-kind').find('.new-deduction-form').addClass('hidden');
+        $(self).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
         stopEditingDeduction();
       } else { // unchecking deduction kind with created deductions
         e.preventDefault();
