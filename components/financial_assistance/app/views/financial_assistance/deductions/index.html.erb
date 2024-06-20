@@ -112,7 +112,7 @@
           <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
         </div>
         <div class="d-flex align-items-center mt-4 justify-content-end">
-          <button type="button" class="btn outline modal-cancel-button" data-dismiss="modal"><%= l10n('faa.edit.do_not_remove') %></button>
+          <button type="button" class="btn outline modal-cancel-button mr-1" data-dismiss="modal"><%= l10n('faa.edit.do_not_remove') %></button>
           <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.remove") %></button>
         </div>
       </div>
@@ -141,8 +141,8 @@
           <strong><%= l10n('faa.edit.remove_warning') %></strong>
         </div>
         <div class="d-flex align-items-center mt-4 justify-content-end">
-          <button type="button" class="btn secondary mr-1" data-dismiss="modal"><%= l10n('faa.edit.stay') %></button>
-          <button type="button" class="btn primary"><%= l10n('faa.edit.leave') %></button>
+          <button type="button" class="btn outline mr-1" data-dismiss="modal"><%= l10n('faa.edit.stay') %></button>
+          <button type="button" id="leave" class="btn error"><%= l10n('faa.edit.leave') %></button>
         </div>
       </div>
     </div>

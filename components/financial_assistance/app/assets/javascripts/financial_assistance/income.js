@@ -89,16 +89,13 @@ document.addEventListener("turbolinks:load", function () {
         var self = this;
 
         $('#unsavedIncomeChangesWarning').modal('show');
-        $(".btn.btn-danger").off('click');
-        $('.btn.btn-danger').on('click', function(e) {
-          if (self != undefined && faWindow.location != undefined) {
-            faWindow.location.href = $(self).attr('href');
-          };
+        $('button#leave').click(function() {
+          window.location.href = $(self).attr('href');
         });
 
         return false;
       } else
-        return true;
+      return true;
     });
 
     /* Saving Responses to  Job Income & Self Employment Driver Questions */

@@ -79,7 +79,7 @@ $(document).on('turbolinks:load', function () {
         var self = this;
 
         $('#unsavedDeductionChangesWarning').modal('show');
-        $('.btn.btn-danger').click(function() {
+        $('button#leave').click(function() {
           window.location.href = $(self).attr('href');
         });
 
