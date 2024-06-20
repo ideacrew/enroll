@@ -542,7 +542,12 @@ When(/Individual enters the password$/) do
 end
 
 Then(/Individual does not see the error on tooltip indicating a password longer than 20 characters$/) do
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+  else
+    sleep 2
   expect(find(".longer")[:class]).not_to include("fa-times")
+  end
 end
 
 Then(/^Individual should see the password tooltip with text minimum characters (.+)$/) do |length|

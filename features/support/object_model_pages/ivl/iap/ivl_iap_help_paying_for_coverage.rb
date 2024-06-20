@@ -4,7 +4,11 @@
 class IvlIapHelpPayingForCoverage
 
   def self.yes_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+     ''
+    else
     'label[for="radio1"] span'
+    end
   end
 
   def self.no_radiobtn

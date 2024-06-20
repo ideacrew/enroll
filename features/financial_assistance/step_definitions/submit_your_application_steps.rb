@@ -10,19 +10,26 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
   end
 
   visit help_paying_coverage_insured_consumer_role_index_path
-  find('button.interaction-click-control-continue')
-  choose('radio1', allow_label_click: true)
-  find('button.interaction-click-control-continue').click
+  
+  find(IvlIapHelpPayingForCoverage.yes_radiobtn).click
+  sleep 2
+  find(IvlIapApplicationChecklist.continue_btn).click
+  sleep 2
+  find(IvlIapApplicationChecklist.continue_btn).click
 
   # should be on application year select page
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      find(IvlIapApplicationChecklist.begin_application_btn).click
+    else
     find('.interaction-click-control-continue').click
     sleep 2
+    end
   end
 
   # should be on checklist page now
-  find('a.interaction-click-control-continue').click
+  #find('a.interaction-click-control-continue').click
 end
 
 And(/^the user visits the portal outside OE$/) do
