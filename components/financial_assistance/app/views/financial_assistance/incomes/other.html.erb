@@ -4,11 +4,11 @@
   <p><%= l10n("faa.other_incomes.description", name: @applicant.first_name) %></p>
   <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
     <fieldset class="driver-question">
-      <legend id="has_unemployment_income" class="weight-n required">
+      <legend class="weight-n required">
         <%= l10n('faa.other_incomes.unemployment_question', name: @applicant.first_name) %>
       </legend>
       <div class="focus d-flex align-items-center mx-1">
-        <label for="has_unemployment_income_true" class="radio has_unemployment_income_true">
+        <label for="has_unemployment_income_true" class="radio">
           <%= radio_button_tag("has_unemployment_income", true, @applicant.has_unemployment_income, class: "required", required: true) %>
           <span class="yes_no_pair"><%= l10n("yes") %></span>
         </label>
@@ -35,17 +35,18 @@
       </div>
     </div>
   <% end %>
+
   <fieldset class="driver-question my-4">
-    <legend id="has_unemployment_income" class="weight-n required">
+    <legend class="weight-n required">
       <%= l10n('faa.other_incomes.other_income_question', name: @applicant.first_name) %>
     </legend>
     <div class="d-flex align-items-center focus mx-1">
-      <label for="has_other_income_true" class="radio has_unemployment_income_true">
-        <%= radio_button_tag("has_other_income", true, @applicant.has_other_income, class: "radio", required: true, id: "has_other_income_true") %>
+      <label for="has_other_income_true" class="radio">
+        <%= radio_button_tag("has_other_income", true, @applicant.has_other_income, class: "radio", required: true) %>
         <span class="yes_no_pair"><%= l10n("yes") %></span>
       </label>
       <label for="has_other_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_other_income_false')" class="radio">
-        <%= radio_button_tag("has_other_income", false, @applicant.has_other_income == false, class: "required", required: true, id: "has_other_income_false") %>
+        <%= radio_button_tag("has_other_income", false, @applicant.has_other_income == false, class: "required", required: true) %>
         <span class="yes_no_pair"><%= l10n("no") %></span>
       </label>
     </div>
@@ -80,59 +81,59 @@
         </div>
       </div>
     <% end %>
+  </div>
 
-    <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
-      <fieldset class="driver-question">
-        <legend id="has_unemployment_income" class="weight-n required">
-          <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
-        </legend>
-        <div class="d-flex align-items-center focus mx-1">
-          <label for="has_american_indian_alaskan_native_income_true" class="radio has_american_indian_alaskan_native_income_true">
-            <%= radio_button_tag("has_american_indian_alaskan_native_income", true, @applicant.has_american_indian_alaskan_native_income, class: "required", required: true, id: "has_american_indian_alaskan_native_income_true") %>
-            <span class="yes_no_pair"><%= l10n("yes") %></span>
-          </label>
-          <label for="has_american_indian_alaskan_native_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_american_indian_alaskan_native_income_false')" class="radio">
-            <%= radio_button_tag("has_american_indian_alaskan_native_income", false, @applicant.has_american_indian_alaskan_native_income == false, class: "required", required: true, id: "has_american_indian_alaskan_native_income_false") %>
-            <span class="yes_no_pair"><%= l10n("no") %></span>
-          </label>
-        </div>
-      </fieldset>
-      <a href="#has_ai_an_income" data-toggle="modal" data-target="#has_ai_an_income" class="mb-4"><%= l10n("faa.question.not_sure")%></a>
-      <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_ai_an_income"} %>
-
-      <div id="ai_an_income" class="mt-4">
-        <div class="ai-an-incomes-list mb-4">
-          <% @applicant.incomes.american_indian_and_alaskan_native.each do |income| %>
-            <%= render partial: 'financial_assistance/incomes/ai_an_income', locals: { income: income } %>
-          <% end %>
-        </div>
-
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-income')" id="new-ai-income" class='new-ai-an-income button my-4'><%= l10n("faa.other_incomes.add", kind: "American Indian/Alaskan Native") %></a>
-
-        <div class='new-ai-an-income-form hidden'>
-          <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>
-        </div>
+  <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
+    <fieldset class="driver-question">
+      <legend class="weight-n required">
+        <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
+      </legend>
+      <div class="d-flex align-items-center focus mx-1">
+        <label for="has_american_indian_alaskan_native_income_true" class="radio has_american_indian_alaskan_native_income_true">
+          <%= radio_button_tag("has_american_indian_alaskan_native_income", true, @applicant.has_american_indian_alaskan_native_income, class: "required", required: true) %>
+          <span class="yes_no_pair"><%= l10n("yes") %></span>
+        </label>
+        <label for="has_american_indian_alaskan_native_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_american_indian_alaskan_native_income_false')" class="radio">
+          <%= radio_button_tag("has_american_indian_alaskan_native_income", false, @applicant.has_american_indian_alaskan_native_income == false, class: "required", required: true) %>
+          <span class="yes_no_pair"><%= l10n("no") %></span>
+        </label>
       </div>
-    <% end %>
+    </fieldset>
+    <a href="#has_ai_an_income" data-toggle="modal" data-target="#has_ai_an_income" class="mb-4"><%= l10n("faa.question.not_sure")%></a>
+    <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_ai_an_income"} %>
 
-    <div id='income-error-popup'></div>
+    <div id="ai_an_income" class="mt-4">
+      <div class="ai-an-incomes-list mb-4">
+        <% @applicant.incomes.american_indian_and_alaskan_native.each do |income| %>
+          <%= render partial: 'financial_assistance/incomes/ai_an_income', locals: { income: income } %>
+        <% end %>
+      </div>
 
-    <!-- Hidden unsaved other income modal -->
-    <div class="modal" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-            <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.unaved") %></h4>
-          </div>
-          <div class="modal-body">
-            <p><%= l10n("faa.edit.leave_warning") %></p>
-            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn outline" data-dismiss="modal"><%= l10n("faa.edit.stay") %></button>
-            <button type="button" class="btn error"><%= l10n("faa.edit.leave") %></button>
-          </div>
+      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-income')" id="new-ai-income" class='new-ai-an-income button my-4'><%= l10n("faa.other_incomes.add", kind: "American Indian/Alaskan Native") %></a>
+
+      <div class='new-ai-an-income-form hidden'>
+        <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>
+      </div>
+    </div>
+  <% end %>
+
+  <div id='income-error-popup'></div>
+
+  <!-- Hidden unsaved other income modal -->
+  <div class="modal" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.unaved") %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("faa.edit.leave_warning") %></p>
+          <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn outline" data-dismiss="modal"><%= l10n("faa.edit.stay") %></button>
+          <button type="button" class="btn error"><%= l10n("faa.edit.leave") %></button>
         </div>
       </div>
     </div>

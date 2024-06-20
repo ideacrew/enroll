@@ -32,7 +32,7 @@
         </div>
       </div>
       <div class="d-flex mb-2 mx-1">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-cancel-<%= income_id %>', 'new-other-income-form')" id="other-income-cancel-<%= income_id %>" class="btn outline other-income-cancel mr-1"><%= l10n("faa.other_incomes.cancel") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-cancel-<%= income_id %>', 'new-other-income-form')" id="other-income-cancel-<%= income_id %>" class="button outline other-income-cancel mr-1"><%= l10n("faa.other_incomes.cancel") %></a>
         <%= f.submit l10n("faa.other_incomes.save"), disabled: disabled.present? && disabled ? "disabled" : nil, class: "btn", :data => { :cuke => "other-income-save-button" } %>
       </div>
     </div>

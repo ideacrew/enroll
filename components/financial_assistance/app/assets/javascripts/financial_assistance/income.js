@@ -7,8 +7,7 @@ function stopEditingIncome() {
   $('#new-unemployment-income').removeAttr('disabled');
   $('.add_new_other_income_kind').removeAttr('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
-
-  $("a[class*='income-edit']").removeClass('disabled');
+  $("a[class*='income-edit'], a[class*='income-delete']").removeClass('disabled');
 
   $('#nav-buttons a').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
@@ -26,10 +25,10 @@ function startEditingIncome(income_kind) {
   $('.add_new_other_income_kind').attr('disabled', true);
   $("a.interaction-click-control-add-more").addClass('hide'); // legacy
 
-  // disable all income edit buttons
-  $("a[class*='income-edit']").addClass('disabled');
+  // disable all income edit and edit buttons on created incomes
+  $("a[class*='income-edit'], a[class*='income-delete']").addClass('disabled');
 
-    // disable nav
+  // disable nav
   $('#nav-buttons a').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled'); // legacy
 };
@@ -772,6 +771,7 @@ $(document).on('turbolinks:load', function () {
       $("#destroyAllOtherIncomes .modal-cancel-button").off('click');
       $('#destroyAllOtherIncomes .modal-cancel-button').on('click', function(e) {
         $("#destroyAllOtherIncomes").modal('hide');
+        $('#has_other_income_true').prop('checked', true).trigger('change')
       });
 
       $("#destroyAllOtherIncomes .modal-continue-button").off('click');
@@ -843,7 +843,7 @@ $(document).on('turbolinks:load', function () {
         url: url,
         dataType: 'script',
         success: function() {
-          if ($(self).parents('.other-incomes-list').find('.other-income, .new-other-income-form:not(.hidden)').length == 1) {
+          if ($(self).parents('.other-incomes-list').find('.other-income').length == 1) {
             $(self).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
             $(self).parents('.other-income-kind').find('.add-more-link').addClass('hidden');
             $(self).parents('.other-income-kind').find("a.interaction-click-control-add-more").addClass('hide');
