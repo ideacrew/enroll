@@ -1,5 +1,5 @@
 function stopEditingDeduction() {
-  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind').removeClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind > div').removeClass('disabled');
   $('a.deduction-edit, a.deduction-delete').removeClass('disabled');
   $('.add_new_deduction_kind').removeAttr('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
@@ -8,7 +8,7 @@ function stopEditingDeduction() {
 };
 
 function startEditingDeduction(deduction_kind) {
-  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind:not(#' + deduction_kind + ') > div:not(:has(a, button))').addClass('disabled');
   $('a.deduction-edit, a.deduction-delete').addClass('disabled');
   $('.add_new_deduction_kind').attr('disabled', true);
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
@@ -183,7 +183,7 @@ $(document).on('turbolinks:load', function () {
           type: 'DELETE',
           url: url,
           success: function() {
-            if ($(self).parents('.deductions-list').find('.deduction').length == 1) { // reset form if this is the last deduction for the kind
+            if ($(self).parents('.deductions-list').find('.deduction').length == 1) { // reset kind if this is the last deduction for the kind
               resetDeductionKind(self);
             }
             $(self).parents('.deduction').remove();

@@ -27,21 +27,23 @@
     <% FinancialAssistance::Deduction::DEDUCTION_TYPE.each do |deduction_kind, label| %>
       <% deduction_kind = deduction_kind.to_s %>
       <div id="<%= deduction_kind %>"class="my-4 deduction-kind">
-        <label class="weight-n">
-          <div class="d-flex align-items-center mx-1">
-            <div class="flex-col mr-1">
-              <%= check_box_tag :deduction_kind, deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
+        <div>
+          <label class="weight-n">
+            <div class="d-flex align-items-center mx-1">
+              <div class="flex-col mr-1">
+                <%= check_box_tag :deduction_kind, deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
+              </div>
+              <div class=<%= "flex-col #{deduction_kind}" %>>
+                <% if I18n.exists?("glossary.#{deduction_kind}") %>
+                  <%= render partial:"shared/glossary", locals: {key: deduction_kind, term: label } %>
+                  <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
+                <% else %>
+                  <%= label %> <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
+                <% end %>
+              </div>
             </div>
-            <div class=<%= "flex-col #{deduction_kind}" %>>
-              <% if I18n.exists?("glossary.#{deduction_kind}") %>
-                <%= render partial:"shared/glossary", locals: {key: deduction_kind, term: label } %>
-                <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
-              <% else %>
-                <%= label %> <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
-              <% end %>
-            </div>
-          </div>
-        </label>
+          </label>
+        </div>
 
         <div class="deductions-list">
           <% @applicant.deductions.of_kind(deduction_kind).each do |deduction| %>

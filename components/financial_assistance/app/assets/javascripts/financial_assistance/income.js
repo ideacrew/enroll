@@ -1,5 +1,5 @@
 function stopEditingIncome() {
-  $('.driver-question, .instruction-row, .income > div, .other-income-kind > div, .unemployment-income > div').removeClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .income > div, .other-income-kind > div, .unemployment-income > div').removeClass('disabled');
   $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
   
   $('a.new-income').removeClass('hide');
@@ -14,7 +14,7 @@ function stopEditingIncome() {
 
 function startEditingIncome(income_kind) {
   // disable all divs not directly owned by the income kind which don't have link or button, as links and buttons have their own disabled class applied separately
-  $('.driver-question, .instruction-row, .income:not(#' + income_kind + ') > div:not(:has(a, button)), .other-income-kind:not(#' + income_kind + ') > div:not(:has(a, button)), .unemployment-income:not(#' + income_kind + ') > div:not(:has(a, button))').addClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .income:not(#' + income_kind + ') > div:not(:has(a, button)), .other-income-kind:not(#' + income_kind + ') > div:not(:has(a, button)), .unemployment-income:not(#' + income_kind + ') > div:not(:has(a, button))').addClass('disabled');
   // disable inputs not owned by the income kind
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input:not(":input[type=submit]"), .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]"), .unemployment-income:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
   
