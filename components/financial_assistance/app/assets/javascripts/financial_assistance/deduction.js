@@ -42,7 +42,13 @@ function deleteDeductions(kind) {
       $(kind).find('.add-more-link').addClass('hidden');
     }
   });
-}
+};
+
+function resetDeductionKind(el) {
+  $(el).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
+  $("a.interaction-click-control-add-more").addClass('hide');
+  $(el).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
+};
 
 $(document).on('turbolinks:load', function () {
   if ($('.deduction-kinds').length) {
@@ -177,10 +183,8 @@ $(document).on('turbolinks:load', function () {
           type: 'DELETE',
           url: url,
           success: function() {
-            if ($(self).parents('.deductions-list').find('.deduction, .new-deduction-form:not(.hidden)').length == 1) {
-              $(self).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
-              $("a.interaction-click-control-add-more").addClass('hide');
-              $(self).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
+            if ($(self).parents('.deductions-list').find('.deduction, .new-deduction-form:not(.hidden)').length == 1) { // reset form if this is the last deduction and there is not an open new deduction form
+              resetDeductionKind(self);
             }
             $(self).parents('.deduction').remove();
           }
@@ -224,7 +228,7 @@ $(document).on('turbolinks:load', function () {
         deductionEl.find('.edit-deduction-form').addClass('hidden');
       } else { // canceling edit of new deduction
         if (!$(this).parents('.deductions-list').find('.deduction').length) { // the kind for the canceled new deduction has no existing deductions
-          $(this).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
+          resetDeductionKind(this);
         }
         $(this).parents('.new-deduction-form').remove();
       }

@@ -1,25 +1,42 @@
 function stopEditingIncome() {
   $('.driver-question, .instruction-row, .income, .other-income-kind').removeClass('disabled');
+  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
+  $('.income a, .other-income-kind a, .unemployment-income a').removeClass('disabled');
+  
   $('a.new-income').removeClass('hide');
-  $("a[class*='income-edit']").removeClass('disabled');
   $('#new-unemployment-income').removeAttr('disabled');
   $('.add_new_other_income_kind').removeAttr('disabled');
+  $("a.interaction-click-control-add-more").removeClass('hide');
+
+  $("a[class*='income-edit']").removeClass('disabled');
+
   $('#nav-buttons a').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
-  $("a.interaction-click-control-add-more").removeClass('hide');
-  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
 };
 
 function startEditingIncome(income_kind) {
-  $('.driver-question, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + ')').addClass('disabled');
+  function selectorsForIncomes(descendant = '') {
+    const types = ["income", "other-income-kind", "unemployment-income"];
+    return types.map(type => '.' + type + ':not(#' + income_kind + ') ' + descendant).join();
+  }
+
+  // disable driver questions, instructions, and other incomes
+  $('.driver-question, .instruction-row, ' + selectorsForIncomes()).addClass('disabled');
+  $('.driver-question input, .instruction-row input, ' + selectorsForIncomes('input:not(":input[type=submit]")')).attr('disabled', true);
+  $(selectorsForIncomes('a')).addClass('disabled');
+
+  // disable "Add New" income buttons
   $('a.new-income').addClass('hide');
-  $("a[class*='income-edit']").addClass('disabled');
   $('#new-unemployment-income').attr('disabled', true);
   $('.add_new_other_income_kind').attr('disabled', true);
+  $("a.interaction-click-control-add-more").addClass('hide'); // legacy
+
+  // disable all income edit buttons
+  $("a[class*='income-edit']").addClass('disabled');
+
+    // disable nav
   $('#nav-buttons a').addClass('disabled');
-  $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
-  $("a.interaction-click-control-add-more").addClass('hide');
-  $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input, .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
+  $('.col-md-3 > .interaction-click-control-continue').addClass('disabled'); // legacy
 };
 
 function checkDate(income_id) {
@@ -31,10 +48,10 @@ function checkDate(income_id) {
     $("#end_on_" + income_id)[0].value = ""
     window.event.preventDefault()
   }
-}
+};
 
 function currentlyEditing() {
-  return $('.interaction-click-control-continue').hasClass('disabled');
+  return $('.interaction-click-control-continue').hasClass('disabled') || $('#nav-buttons a').hasClass('disabled');
 };
 
 function deleteIncomes(kind) {
@@ -59,7 +76,7 @@ function deleteIncomes(kind) {
       $(kind).find('.add-more-link').addClass('hidden');
     }
   });
-}
+};
 
 document.addEventListener("turbolinks:load", function () {
   var faWindow = $('.incomes');
@@ -867,7 +884,7 @@ $(document).on('turbolinks:load', function () {
     unemploymentIncomeEl.find('.unemployment-income-show').addClass('hidden');
     unemploymentIncomeEl.find('.edit-unemployment-income-form').removeClass('hidden');
 
-    startEditingIncome($(this).parents('.unemployment-income-kind').attr('id'));
+    startEditingIncome($(this).parents('.unemployment-income').attr('id'));
 
     $(unemploymentIncomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
   });
