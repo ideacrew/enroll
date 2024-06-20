@@ -28,7 +28,7 @@ module Operations
             valid_cv3_family = yield validate_cv3_family(cv3_family)
 
             yield validate_all_family_members(valid_cv3_family)
-            result = yield confirm_transmittable_payload(cv3_family)
+            result = yield confirm_transmittable_payload(valid_cv3_family)
 
             Success(result)
           end
@@ -93,8 +93,8 @@ module Operations
             states.any?(&:is_eligible?)
           end
 
-          def confirm_transmittable_payload(cv3_family)
-            payload = { family_hash: cv3_family.to_h, job_id: @job.job_id }
+          def confirm_transmittable_payload(valid_cv3_family)
+            payload = { family_hash: valid_cv3_family.to_h, job_id: @job.job_id }
 
             @transaction.json_payload = payload
             @transaction.save
