@@ -6,6 +6,9 @@ class ExceptionsController < ApplicationController
   skip_before_action :require_login, unless: :authentication_not_required?
   skip_before_action :authenticate_user_from_token!
   skip_before_action :authenticate_me!
+  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
+  layout :resolve_layout
 
   # for i18L
   skip_before_action :set_locale
@@ -21,6 +24,15 @@ class ExceptionsController < ApplicationController
   end
 
   private
+
+  def enable_bs4_layout
+    @bs4 = true
+  end
+
+  def resolve_layout
+    return "application" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    "bootstrap_4"
+  end
 
   # recover the exception code from the request
   # @return [Integer] the exception code
