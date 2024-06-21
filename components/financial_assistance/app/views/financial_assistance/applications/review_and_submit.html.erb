@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <%# Left Nav %>
-  <%= render partial: 'faa_progress_options', locals: {step: @application.applicants.count > 1 ? 3 : 2} %>
+  <%= render partial: 'financial_assistance/shared/faa_progress_options', locals: {step: @application.applicants.count > 1 ? 3 : 2} %>
 
   <%# Main Content (right) %>
   <div>
@@ -393,7 +393,7 @@
                   </div>
 
                   <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                    <div class="col-md-6"><%= l10n('faa.deductions.income_adjustments', assistance_year: assistance_year) %>*
+                    <div class="col-md-6"><%= l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: assistance_year) %>*
                     </div>
                     <div class="col-md-6"><%= human_boolean applicant.has_deductions %></div>
                   </div>
