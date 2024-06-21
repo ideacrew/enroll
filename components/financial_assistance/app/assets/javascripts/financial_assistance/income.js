@@ -451,7 +451,9 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $(this).parents('#self_employed_incomes').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      const clonedForm = generateNewForm(newIncomeForm, incomeListEl); // remove for Alec
+      var clonedForm = newIncomeForm.clone(true, true)
+        .removeClass('hidden')
+        .appendTo(incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
         incomeListEl.children().first().remove();
       }
@@ -528,9 +530,11 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $('#job_income').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      const clonedForm = generateNewForm(newIncomeForm, incomeListEl);
+      var clonedForm = newIncomeForm.clone(true, true)
+        .removeClass('hidden')
+        .appendTo(incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
-        incomeListEl.children().first().remove();  // remove for Alec
+        incomeListEl.children().first().remove();
       }
       var length = incomeListEl.find(".income").length;
       if (!disableSelectric) {
@@ -590,7 +594,9 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $('#self_employed_incomes').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      const clonedForm = generateNewForm(newIncomeForm, incomeListEl); // remove for alec
+      var clonedForm = newIncomeForm.clone(true, true)
+        .removeClass('hidden')
+        .appendTo(incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-self-income-form') {
         incomeListEl.children().first().remove();
       }
@@ -704,7 +710,6 @@ $(document).on('turbolinks:load', function () {
     form.find('.interaction-click-control-save').removeAttr('disabled');
   }
   $(':input[required=""],:input[required]').on('change', function () {
-    console.log('required input changed');
     var form = $(this).closest('form');
     if (validateForm(form)) {
       enableSave(form)
@@ -1024,7 +1029,6 @@ $(document).on('turbolinks:load', function () {
   }
 
   $(':input[required]').on('keyup change', function () {
-    console.log('required input changed');
     var form = $(this).closest('form');
     if (validateForm(form)) {
       enableSave(form)
