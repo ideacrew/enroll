@@ -3,23 +3,25 @@
   <h1><%= l10n('faa.nav.other_income') %></h1>
   <p><%= l10n("faa.other_incomes.description", name: @applicant.first_name) %></p>
   <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
-    <fieldset class="driver-question">
-      <legend class="weight-n required">
-        <%= l10n('faa.other_incomes.unemployment_question', name: @applicant.first_name) %>
-      </legend>
-      <div class="focus d-flex align-items-center mx-1">
-        <label for="has_unemployment_income_true" class="radio">
-          <%= radio_button_tag("has_unemployment_income", true, @applicant.has_unemployment_income, class: "required", required: true) %>
-          <span class="yes_no_pair"><%= l10n("yes") %></span>
-        </label>
-        <label for="has_unemployment_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_unemployment_income_false')" class="radio">
-          <%= radio_button_tag("has_unemployment_income", false, @applicant.has_unemployment_income == false, class: "required", required: true) %>
-          <span class="yes_no_pair"><%= l10n("no") %></span>
-        </label>
-      </div>
-    </fieldset>
-    <a href="#has_unemployment_income" data-toggle="modal" data-target="#has_unemployment_income"><%= l10n("faa.question.not_sure")%></a>
-    <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_unemployment_income"} %>
+    <div class="driver-question">
+      <fieldset>
+        <legend class="weight-n required">
+          <%= l10n('faa.other_incomes.unemployment_question', name: @applicant.first_name) %>
+        </legend>
+        <div class="focus d-flex align-items-center mx-1">
+          <label for="has_unemployment_income_true" class="radio">
+            <%= radio_button_tag("has_unemployment_income", true, @applicant.has_unemployment_income, class: "required", required: true) %>
+            <span class="yes_no_pair"><%= l10n("yes") %></span>
+          </label>
+          <label for="has_unemployment_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_unemployment_income_false')" class="radio">
+            <%= radio_button_tag("has_unemployment_income", false, @applicant.has_unemployment_income == false, class: "required", required: true) %>
+            <span class="yes_no_pair"><%= l10n("no") %></span>
+          </label>
+        </div>
+      </fieldset>
+      <a href="#has_unemployment_income" data-toggle="modal" data-target="#has_unemployment_income"><%= l10n("faa.question.not_sure")%></a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_unemployment_income"} %>
+    </div>
     <div id="unemployment_income" class="my-4 <%= 'hidden' unless @applicant.incomes.unemployment.any? %>">
       <div class="unemployment-incomes-list mb-4">
         <% @applicant.incomes.unemployment.each do |income| %>
@@ -35,24 +37,25 @@
     </div>
   <% end %>
 
-  <fieldset class="driver-question my-4">
-    <legend class="weight-n required">
-      <%= l10n('faa.other_incomes.other_income_question', name: @applicant.first_name) %>
-    </legend>
-    <div class="d-flex align-items-center focus mx-1">
-      <label for="has_other_income_true" class="radio">
-        <%= radio_button_tag("has_other_income", true, @applicant.has_other_income, class: "radio", required: true) %>
-        <span class="yes_no_pair"><%= l10n("yes") %></span>
-      </label>
-      <label for="has_other_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_other_income_false')" class="radio">
-        <%= radio_button_tag("has_other_income", false, @applicant.has_other_income == false, class: "required", required: true) %>
-        <span class="yes_no_pair"><%= l10n("no") %></span>
-      </label>
-    </div>
-  </fieldset>
-  <a href="#has_other_income" data-toggle="modal" data-target="#has_other_income"><%= l10n("faa.question.not_sure")%></a>
-  <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_other_income"} %>
-
+  <div class="driver-question">
+    <fieldset class="my-4">
+      <legend class="weight-n required">
+        <%= l10n('faa.other_incomes.other_income_question', name: @applicant.first_name) %>
+      </legend>
+      <div class="d-flex align-items-center focus mx-1">
+        <label for="has_other_income_true" class="radio">
+          <%= radio_button_tag("has_other_income", true, @applicant.has_other_income, class: "radio", required: true) %>
+          <span class="yes_no_pair"><%= l10n("yes") %></span>
+        </label>
+        <label for="has_other_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_other_income_false')" class="radio">
+          <%= radio_button_tag("has_other_income", false, @applicant.has_other_income == false, class: "required", required: true) %>
+          <span class="yes_no_pair"><%= l10n("no") %></span>
+        </label>
+      </div>
+    </fieldset>
+    <a href="#has_other_income" data-toggle="modal" data-target="#has_other_income"><%= l10n("faa.question.not_sure")%></a>
+    <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_other_income"} %>
+  <div>
   <div class='other_income_kinds my-4'>
     <div class="instruction-row">
       <p class="bold"><%= l10n("faa.other_incomes.other_income_subtitle") %></p>
@@ -83,24 +86,25 @@
   </div>
 
   <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
-    <fieldset class="driver-question my-4">
-      <legend class="weight-n required">
-        <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
-      </legend>
-      <div class="d-flex align-items-center focus mx-1">
-        <label for="has_american_indian_alaskan_native_income_true" class="radio has_american_indian_alaskan_native_income_true">
-          <%= radio_button_tag("has_american_indian_alaskan_native_income", true, @applicant.has_american_indian_alaskan_native_income, class: "required", required: true) %>
-          <span class="yes_no_pair"><%= l10n("yes") %></span>
-        </label>
-        <label for="has_american_indian_alaskan_native_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_american_indian_alaskan_native_income_false')" class="radio">
-          <%= radio_button_tag("has_american_indian_alaskan_native_income", false, @applicant.has_american_indian_alaskan_native_income == false, class: "required", required: true) %>
-          <span class="yes_no_pair"><%= l10n("no") %></span>
-        </label>
-      </div>
-    </fieldset>
-    <a href="#has_ai_an_income" data-toggle="modal" data-target="#has_ai_an_income" class="mb-4"><%= l10n("faa.question.not_sure")%></a>
-    <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_ai_an_income"} %>
-
+    <div class="driver-question">>
+      <fieldset class="driver-question my-4">
+        <legend class="weight-n required">
+          <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
+        </legend>
+        <div class="d-flex align-items-center focus mx-1">
+          <label for="has_american_indian_alaskan_native_income_true" class="radio has_american_indian_alaskan_native_income_true">
+            <%= radio_button_tag("has_american_indian_alaskan_native_income", true, @applicant.has_american_indian_alaskan_native_income, class: "required", required: true) %>
+            <span class="yes_no_pair"><%= l10n("yes") %></span>
+          </label>
+          <label for="has_american_indian_alaskan_native_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_american_indian_alaskan_native_income_false')" class="radio">
+            <%= radio_button_tag("has_american_indian_alaskan_native_income", false, @applicant.has_american_indian_alaskan_native_income == false, class: "required", required: true) %>
+            <span class="yes_no_pair"><%= l10n("no") %></span>
+          </label>
+        </div>
+      </fieldset>
+      <a href="#has_ai_an_income" data-toggle="modal" data-target="#has_ai_an_income" class="mb-4"><%= l10n("faa.question.not_sure")%></a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_ai_an_income"} %>
+    </div>
     <div id="ai_an_income" class="mt-4">
       <div class="ai-an-incomes-list mb-4">
         <% @applicant.incomes.american_indian_and_alaskan_native.each do |income| %>

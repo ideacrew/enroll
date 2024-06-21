@@ -507,7 +507,7 @@ ul.plain {
   }
 }
 
-fieldset.disabled, div.disabled *:not(:has(*)):not(button, a) {
+div.disabled *:not(:has(*)):not(button, a.button) {
   opacity: .4;
 }
 
