@@ -1,85 +1,94 @@
-<div class="border_bottom border-sides form-content">
-  <div class="row ptb no-buffer row-height">
-    <div class="col-md-6">Employer Name</div>
-    <div class="col-md-6"><%= benefit.employer_name %></div>
-  </div>
-  <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
+<% if @bs4 %>
+  <% review_benefits_esi_hash(benefit).each do |key, value| %>
+    <tr>
+      <td class="col-6"><%= key %></td>
+      <td class="col-6"><%= value %></td>
+    </tr>
+  <% end %>
+<% else %>
+  <div class="border_bottom border-sides form-content">
     <div class="row ptb no-buffer row-height">
-      <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
-      <div class="col-md-6"><%= benefit.employer_address.address_1 %></div>
+      <div class="col-md-6">Employer Name</div>
+      <div class="col-md-6"><%= benefit.employer_name %></div>
     </div>
-
-    <% if benefit.employer_address.address_2.present? %>
+    <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
       <div class="row ptb no-buffer row-height">
-        <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
-        <div class="col-md-6"><%= benefit.employer_address.address_2 %></div>
+        <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
+        <div class="col-md-6"><%= benefit.employer_address.address_1 %></div>
+      </div>
+
+      <% if benefit.employer_address.address_2.present? %>
+        <div class="row ptb no-buffer row-height">
+          <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
+          <div class="col-md-6"><%= benefit.employer_address.address_2 %></div>
+        </div>
+      <% end %>
+
+      <div class="row ptb no-buffer row-height">
+        <div class="col-md-6">CITY</div>
+        <div class="col-md-6"><%= benefit.employer_address.city %></div>
+      </div>
+
+      <div class="row ptb no-buffer row-height">
+        <div class="col-md-6">STATE</div>
+        <div class="col-md-6"><%= benefit.employer_address.state %></div>
+      </div>
+
+      <div class="row ptb no-buffer row-height">
+        <div class="col-md-6">ZIP</div>
+        <div class="col-md-6"><%= benefit.employer_address.zip %></div>
       </div>
     <% end %>
 
     <div class="row ptb no-buffer row-height">
-      <div class="col-md-6">CITY</div>
-      <div class="col-md-6"><%= benefit.employer_address.city %></div>
+      <div class="col-md-6">EMPLOYER PHONE</div>
+      <div class="col-md-6"><%= format_phone(benefit&.employer_phone&.full_phone_number) %></div>
     </div>
 
     <div class="row ptb no-buffer row-height">
-      <div class="col-md-6">STATE</div>
-      <div class="col-md-6"><%= benefit.employer_address.state %></div>
+      <div class="col-md-6"><%= l10n("esi_employer_ein") %></div>
+      <div class="col-md-6"><%= benefit.employer_id %></div>
     </div>
 
-    <div class="row ptb no-buffer row-height">
-      <div class="col-md-6">ZIP</div>
-      <div class="col-md-6"><%= benefit.employer_address.zip %></div>
-    </div>
-  <% end %>
-
-  <div class="row ptb no-buffer row-height">
-    <div class="col-md-6">EMPLOYER PHONE</div>
-    <div class="col-md-6"><%= format_phone(benefit&.employer_phone&.full_phone_number) %></div>
-  </div>
-
-  <div class="row ptb no-buffer row-height">
-    <div class="col-md-6"><%= l10n("esi_employer_ein") %></div>
-    <div class="col-md-6"><%= benefit.employer_id %></div>
-  </div>
-
-  <% if benefit.insurance_kind == 'employer_sponsored_insurance' %>
-    <div class="row ptb no-buffer row-height">
-      <div class="col-md-6">Is the employee currently in a waiting period and eligible to enroll in the next 3 months?</div>
-      <div class="col-md-6"><%= human_boolean(benefit.is_esi_waiting_period) %></div>
-    </div>
-
-    <div class="row ptb no-buffer row-height">
-      <div class="col-md-6">Does this employer offer a health plan that meets the minimum value standard?</div>
-      <div class="col-md-6"><%= human_boolean(benefit.is_esi_mec_met) %></div>
-    </div>
-
-    <div class="row ptb no-buffer row-height">
-      <div class="col-md-6">Who can be covered?</div>
-      <div class="col-md-6"><%= benefit.esi_covered %></div>
-    </div>
-
-    <div class="row ptb no-buffer row-height border_bottom">
-      <div class="col-md-6">How much would the employee only pay for the lowest cost minimum value standard plan?</div>
-      <div class="col-md-6"><%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %></div>
-    </div>
-
-    <% if display_minimum_value_standard_question?(benefit.insurance_kind) %>
+    <% if benefit.insurance_kind == 'employer_sponsored_insurance' %>
       <div class="row ptb no-buffer row-height">
-        <div class="col-md-6"><%= l10n("health_plan_meets_mvs_and_affordable_question") %></div>
-        <div class="col-md-6"><%= human_boolean(benefit.health_plan_meets_mvs_and_affordable) %></div>
+        <div class="col-md-6">Is the employee currently in a waiting period and eligible to enroll in the next 3 months?</div>
+        <div class="col-md-6"><%= human_boolean(benefit.is_esi_waiting_period) %></div>
+      </div>
+
+      <div class="row ptb no-buffer row-height">
+        <div class="col-md-6">Does this employer offer a health plan that meets the minimum value standard?</div>
+        <div class="col-md-6"><%= human_boolean(benefit.is_esi_mec_met) %></div>
+      </div>
+
+      <div class="row ptb no-buffer row-height">
+        <div class="col-md-6">Who can be covered?</div>
+        <div class="col-md-6"><%= benefit.esi_covered %></div>
+      </div>
+
+      <div class="row ptb no-buffer row-height border_bottom">
+        <div class="col-md-6">How much would the employee only pay for the lowest cost minimum value standard plan?</div>
+        <div class="col-md-6"><%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %></div>
+      </div>
+
+      <% if display_minimum_value_standard_question?(benefit.insurance_kind) %>
+        <div class="row ptb no-buffer row-height">
+          <div class="col-md-6"><%= l10n("health_plan_meets_mvs_and_affordable_question") %></div>
+          <div class="col-md-6"><%= human_boolean(benefit.health_plan_meets_mvs_and_affordable) %></div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% if benefit.insurance_kind == 'health_reimbursement_arrangement' %>
+      <div class="row ptb no-buffer row-height">
+        <div class="col-md-6"><%= l10n("faa.question.type_of_hra") %> *</div>
+        <div class="col-md-6"><%= benefit.hra_type %></div>
+      </div>
+
+      <div class="row ptb no-buffer row-height border_bottom">
+        <div class="col-md-6"><%= l10n("faa.question.max_employer_reimbursement") %></div>
+        <div class="col-md-6"><%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %></div>
       </div>
     <% end %>
-  <% end %>
-
-  <% if benefit.insurance_kind == 'health_reimbursement_arrangement' %>
-    <div class="row ptb no-buffer row-height">
-      <div class="col-md-6"><%= l10n("faa.question.type_of_hra") %> *</div>
-      <div class="col-md-6"><%= benefit.hra_type %></div>
-    </div>
-
-    <div class="row ptb no-buffer row-height border_bottom">
-      <div class="col-md-6"><%= l10n("faa.question.max_employer_reimbursement") %></div>
-      <div class="col-md-6"><%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %></div>
-    </div>
-  <% end %>
-</div>
+  </div>
+<% end %>
