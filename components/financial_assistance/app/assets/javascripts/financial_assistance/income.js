@@ -1,6 +1,6 @@
 function stopEditingIncome() {
-  $('.driver-question, .driver-question a, .instruction-row, .income > div, .other-income-kind > div, .unemployment-income > div').removeClass('disabled');
-  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .income, .other-income-kind, .unemployment-income').removeClass('disabled');
+  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(".fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
   
   $('a.new-income').removeClass('hide');
   $('#new-unemployment-income, #new-ai-an-income, .add_new_other_income_kind').removeAttr('disabled');
@@ -13,7 +13,7 @@ function stopEditingIncome() {
 
 function startEditingIncome(income_kind) {
   // disable all divs not directly owned by the income kind which don't have link or button, as links and buttons have their own disabled class applied separately
-  $('.driver-question, .driver-question a, .instruction-row, .income:not(#' + income_kind + ') > div:not(:has(a, button)), .other-income-kind:not(#' + income_kind + ') > div:not(:has(a, button)), .unemployment-income:not(#' + income_kind + ') > div:not(:has(a, button))').addClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + '), .unemployment-income:not(#' + income_kind + ')').addClass('disabled');
   // disable inputs not owned by the income kind
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input:not(":input[type=submit]"), .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]"), .unemployment-income:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
   
@@ -67,6 +67,32 @@ function deleteIncomes(kind) {
       $(kind).find('.add-more-link').addClass('hidden');
     }
   });
+};
+
+/**
+ * Clone, strip of dummy attributes, unhide, and append a new income form to the income list.
+ * Each income type owns a permananently-hidden new income form which is used here to display the new income form.
+ * To prevent Multiple Form Label accessibility errors, the dummy form owns its own unique dummy id to tie to labels,
+ * which is processed here to remove the dummy suffix from all (defined & DOM-generated) attributes.
+ * @param {JQuery} newIncomeFormEl The dummy form to process.
+ * @param {JQuery} incomeListEl The income list to append the cloned form to.
+ * @return {JQuery} The processed new income form.
+ */
+function generateNewForm(newIncomeFormEl, incomeListEl) {
+  const clonedForm = newIncomeFormEl.clone(true, true);
+  const attrs = ['id', 'class', 'for'];
+  attrs.forEach(function(attr) {
+    const els = clonedForm.find('[' + attr + '*="dummy"]');
+    $(els).each(function() {
+      const dummyAttr = $(this).attr(attr);
+      $(this).attr(attr, dummyAttr.replace('dummy', ''));
+    });
+  });
+  clonedForm
+  .removeClass('hidden')
+  .appendTo(incomeListEl);
+
+  return clonedForm;
 };
 
 document.addEventListener("turbolinks:load", function () {
@@ -425,9 +451,7 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $(this).parents('#self_employed_incomes').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
+      const clonedForm = generateNewForm(newIncomeForm, incomeListEl); // remove for Alec
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
         incomeListEl.children().first().remove();
       }
@@ -457,9 +481,7 @@ document.addEventListener("turbolinks:load", function () {
       var incomeListEl = $(this).parents('#unemployment_income').find('.unemployment-incomes-list');
 
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
+      const clonedForm = generateNewForm(newIncomeForm, incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
         incomeListEl.children().first().remove();
       }
@@ -486,9 +508,7 @@ document.addEventListener("turbolinks:load", function () {
       var incomeListEl = $(this).parents('#ai_an_income').find('.ai-an-incomes-list');
 
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
+      const clonedForm = generateNewForm(newIncomeForm, incomeListEl);
       var length = incomeListEl.find(".ai-an-income").length;
       if (!disableSelectric) {
         $(clonedForm).find('select').selectric();
@@ -508,11 +528,9 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $('#job_income').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
+      const clonedForm = generateNewForm(newIncomeForm, incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
-        incomeListEl.children().first().remove();
+        incomeListEl.children().first().remove();  // remove for Alec
       }
       var length = incomeListEl.find(".income").length;
       if (!disableSelectric) {
@@ -532,9 +550,7 @@ document.addEventListener("turbolinks:load", function () {
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
       if (!$('.unemployment-incomes-list').children('.new-unemployment-income-form').length) {
-        var clonedForm = newIncomeForm.clone(true, true)
-          .removeClass('hidden')
-          .appendTo(incomeListEl);
+        var clonedForm = generateNewForm(newIncomeForm, incomeListEl);
       }
       var length = incomeListEl.find(".unemployment-income").length;
       if (!disableSelectric) {
@@ -555,9 +571,7 @@ document.addEventListener("turbolinks:load", function () {
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
       if (!$('.ai-an-incomes-list').children('.new-ai-an-income-form').length) {
-        var clonedForm = newIncomeForm.clone(true, true)
-          .removeClass('hidden')
-          .appendTo(incomeListEl);
+        var clonedForm = generateNewForm(newIncomeForm, incomeListEl);
       }
       var length = incomeListEl.find(".ai-an-income").length;
       if (!disableSelectric) {
@@ -576,9 +590,7 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $('#self_employed_incomes').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
+      const clonedForm = generateNewForm(newIncomeForm, incomeListEl); // remove for alec
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-self-income-form') {
         incomeListEl.children().first().remove();
       }
@@ -692,6 +704,7 @@ $(document).on('turbolinks:load', function () {
     form.find('.interaction-click-control-save').removeAttr('disabled');
   }
   $(':input[required=""],:input[required]').on('change', function () {
+    console.log('required input changed');
     var form = $(this).closest('form');
     if (validateForm(form)) {
       enableSave(form)
@@ -724,9 +737,7 @@ $(document).on('turbolinks:load', function () {
       var newOtherIncomeFormEl = $(this).parents('.other-income-kind').children('.new-other-income-form').first();
       otherIncomeListEl = $(this).parents('.other-income-kind').find('.other-incomes-list');
       if (newOtherIncomeFormEl.find('select').data('selectric')) newOtherIncomeFormEl.find('select').selectric('destroy');
-      var clonedForm = newOtherIncomeFormEl.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(otherIncomeListEl);
+      const clonedForm = generateNewForm(newOtherIncomeFormEl, otherIncomeListEl);
       startEditingIncome($(this).parents('.other-income-kind').attr('id'));
       if (!disableSelectric) {
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110" });
@@ -791,9 +802,7 @@ $(document).on('turbolinks:load', function () {
     var newOtherIncomeFormEl = $(this).parents('.other-income-kind').children('.new-other-income-form'),
       otherIncomeListEl = $(this).parents('.other-income-kind').find('.other-incomes-list');
     if (newOtherIncomeFormEl.find('select').data('selectric')) newOtherIncomeFormEl.find('select').selectric('destroy');
-    var clonedForm = newOtherIncomeFormEl.clone(true, true)
-      .removeClass('hidden')
-      .appendTo(otherIncomeListEl);
+    const clonedForm = generateNewForm(newOtherIncomeFormEl, otherIncomeListEl);
     if (otherIncomeListEl.children().length > 1 && otherIncomeListEl.children().first().attr('id') === 'hidden-other-income-form') {
       incomeListEl.children().first().remove();
     }
@@ -1015,6 +1024,7 @@ $(document).on('turbolinks:load', function () {
   }
 
   $(':input[required]').on('keyup change', function () {
+    console.log('required input changed');
     var form = $(this).closest('form');
     if (validateForm(form)) {
       enableSave(form)

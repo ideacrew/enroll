@@ -507,10 +507,11 @@ ul.plain {
   }
 }
 
-fieldset.disabled, div.disabled {
+fieldset.disabled, div.disabled *:not(:has(*)):not(button, a) {
   opacity: .4;
 }
 
 a.disabled {
   pointer-events: none;
+  cursor: not-allowed;
 }

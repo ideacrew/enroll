@@ -1,14 +1,14 @@
 function stopEditingDeduction() {
-  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind > div').removeClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind').removeClass('disabled');
   $('a.deduction-edit, a.deduction-delete').removeClass('disabled');
   $('.add_new_deduction_kind').removeAttr('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $('#nav-buttons a').removeClass('disabled');
-  $('.driver-question input, .instruction-row input, .deduction-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
+  $('.driver-question input, .instruction-row input, .deduction-kind input:not(".fake-disabled-input")').removeAttr('disabled');
 };
 
 function startEditingDeduction(deduction_kind) {
-  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind:not(#' + deduction_kind + ') > div:not(:has(a, button))').addClass('disabled');
+  $('.driver-question, .driver-question a, .instruction-row, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
   $('a.deduction-edit, a.deduction-delete').addClass('disabled');
   $('.add_new_deduction_kind').attr('disabled', true);
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
@@ -48,6 +48,32 @@ function resetDeductionKind(el) {
   $(el).parents('.deduction-kind').find('.add-more-link').addClass('hidden');
   $("a.interaction-click-control-add-more").addClass('hide');
   $(el).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
+};
+
+/**
+ * Clone, strip of dummy attributes, unhide, and append a new deduction form to the deduction list.
+ * Each deduction type owns a permananently-hidden new deduction form which is used here to display the new deduction form.
+ * To prevent Multiple Form Label accessibility errors, the dummy form owns its own unique dummy id to tie to labels,
+ * which is processed here to remove the dummy suffix from all (defined & DOM-generated) attributes.
+ * @param {JQuery} newDeductionFormEl The dummy form to process.
+ * @param {JQuery} deductionListEl The deduction list to append the cloned form to.
+ * @return {JQuery} The processed new deduction form.
+ */
+function generateNewForm(newDeductionFormEl, deductionListEl) {
+  const clonedForm = newDeductionFormEl.clone(true, true);
+  const attrs = ['id', 'class', 'for'];
+  attrs.forEach(function(attr) {
+    const els = clonedForm.find('[' + attr + '*="dummy"]');
+    $(els).each(function() {
+      const dummyAttr = $(this).attr(attr);
+      $(this).attr(attr, dummyAttr.replace('dummy', ''));
+    });
+  });
+  clonedForm
+  .removeClass('hidden')
+  .appendTo(deductionListEl);
+
+  return clonedForm;
 };
 
 $(document).on('turbolinks:load', function () {
@@ -105,9 +131,7 @@ $(document).on('turbolinks:load', function () {
         var newDeductionFormEl = $(this).parents('.deduction-kind').children('.new-deduction-form'),
             deductionListEl = $(this).parents('.deduction-kind').find('.deductions-list');
         if (newDeductionFormEl.find('select').data('selectric')) newDeductionFormEl.find('select').selectric('destroy');
-        var clonedForm = newDeductionFormEl.clone(true, true)
-          .removeClass('hidden')
-          .appendTo(deductionListEl);
+        const clonedForm = generateNewForm(newDeductionFormEl, deductionListEl);
         startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
         if (!disableSelectric) {
           $(clonedForm).find('select').selectric();
@@ -142,9 +166,7 @@ $(document).on('turbolinks:load', function () {
       var newDeductionFormEl = $(this).closest('.deduction-kind').children('.new-deduction-form'),
           deductionListEl = $(this).closest('.deduction-kind').find('.deductions-list');
       if (newDeductionFormEl.find('select').data('selectric')) newDeductionFormEl.find('select').selectric('destroy');
-      var clonedForm = newDeductionFormEl.clone(true, true)
-          .removeClass('hidden')
-          .appendTo(deductionListEl);
+      const clonedForm = generateNewForm(newDeductionFormEl, deductionListEl);
       startEditingDeduction($(this).parents('.deduction-kind').attr('id'));
       if (!disableSelectric) {
         $(clonedForm).find('select').selectric();

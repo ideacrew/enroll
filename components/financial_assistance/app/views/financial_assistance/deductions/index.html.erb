@@ -33,7 +33,7 @@
               <div class="flex-col mr-1">
                 <%= check_box_tag :deduction_kind, deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
               </div>
-              <div class=<%= "flex-col #{deduction_kind}" %>>
+              <div class="flex-col <%= deduction_kind %>">
                 <% if I18n.exists?("glossary.#{deduction_kind}") %>
                   <%= render partial:"shared/glossary", locals: {key: deduction_kind, term: label } %>
                   <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>

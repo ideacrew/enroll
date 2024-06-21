@@ -30,7 +30,7 @@
         <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income button'><%= l10n("faa.other_incomes.add", kind: "Unemployment") %></button>
       </div>
       <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 mx-1 hidden'>
-        <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income') } %>
+        <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), new_form: true} %>
       </div>
     </div>
   <% end %>
@@ -62,12 +62,10 @@
     <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
       <div id="<%= other_income_kind %>" class="other-income-kind my-4">
         <div>
-          <label for="<%= "other-income-checkbox-#{other_income_kind}" %>" class="weight-n">
-            <div class="d-flex pr-3 align-items-center mb-2 mx-1 option">
-              <span class="mr-2"><%= check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, data: {checking: false},class: "other-income-checkbox-#{other_income_kind}",id: "other-income-checkbox-#{other_income_kind}" %></span>
-              <%= label %> <%= l10n('faa.deductions.divorce_agreement') if other_income_kind == :alimony_and_maintenance && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
-            </div>
-          </label>
+          <div class="d-flex pr-3 align-items-center mb-2 mx-1 option">
+            <span class="mr-2"><%= check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, data: {checking: false},class: "other-income-checkbox-#{other_income_kind}",id: "other-income-checkbox-#{other_income_kind}" %></span>
+            <label class="weight-n" for="<%= "other-income-checkbox-#{other_income_kind}" %>"><%= label %> <%= l10n('faa.deductions.divorce_agreement') if other_income_kind == :alimony_and_maintenance && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %></label>
+          </div>
         </div>
         <div class="other-incomes-list">
           <% @applicant.incomes.of_kind(other_income_kind).each do |other_income| %>
@@ -85,7 +83,7 @@
   </div>
 
   <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
-    <fieldset class="driver-question">
+    <fieldset class="driver-question my-4">
       <legend class="weight-n required">
         <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
       </legend>
@@ -113,7 +111,7 @@
         <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-an-income')" id="new-ai-an-income" class="button"><%= l10n("faa.other_incomes.add", kind: "American Indian/Alaskan Native") %></button>
       </div>
       <div class='new-ai-an-income-form hidden'>
-        <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>
+        <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), new_form: true } %>
       </div>
     </div>
   <% end %>
@@ -339,7 +337,7 @@
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Unemployment Income </a>
 
         <div id='new-unemployment-income-form' class='new-unemployment-income-form hidden'>
-          <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false, new_form: true } %>
+          <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income') } %>
         </div>
       </div> <br>
     <% end %>
@@ -442,7 +440,7 @@
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-an-income')" id="new-ai-an-income"> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> American Indian/Alaskan Native Income </a>
 
         <div class='new-ai-an-income-form hidden'>
-          <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>
+          <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native') } %>
         </div>
       </div> <br>
     <% end %>
