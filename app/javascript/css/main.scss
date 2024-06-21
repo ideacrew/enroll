@@ -290,7 +290,7 @@ ul.list-right-section {
     width: 100%;
 
     &.subcard-divider {
-      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      border-top: 1px solid var(--grey-030);
 
       &:last-child {
         display: none;

@@ -11,7 +11,7 @@
   </p>
   <p>
     <b><%= l10n("faa.mc_continue_bold") %></b>
-    <%= l10n("faa.mc_continue_application") %>
+    <%= l10n("faa.mc_continue_application", continue_text: l10n('continue_next')) %>
   </p>
 <% else %>
 <div class="er-medicaid mt-2">
@@ -24,7 +24,7 @@
             </p>
             <p>
               <b><%= l10n("faa.mc_continue_bold") %></b>
-              <%= l10n("faa.mc_continue_application") %>
+              <%= l10n("faa.mc_continue_application", continue_text: l10n('continue').upcase) %>
             </p>
         </div>
     </div>

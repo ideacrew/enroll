@@ -15,7 +15,7 @@
     <!--is enrolled driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class="col-md-6 labelforcoverage">
-        <span class="fa-text-color"><%= applicant_currently_enrolled%></span>
+        <span class="fa-text-color"><%= applicant_currently_enrolled %> *</span>
       </div>
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
@@ -40,7 +40,7 @@
     <!--is eligible driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
       <div class="col-md-6 labelforcoverage">
-        <span class="fa-text-color"><%= applicant_eligibly_enrolled%></span>
+        <span class="fa-text-color"><%= applicant_eligibly_enrolled %> *</span>
       </div>
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
@@ -107,7 +107,7 @@
       <% if @applicant.eligible_immigration_status %>
         <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
           <div class="col-md-6 labelforcoverage">
-            <span class="fa-text-color"> <%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</span>
+            <span class="fa-text-color"> <%= l10n("faa.medicaid_chip_ineligible", year: TimeKeeper.date_of_record.year - 5) %> *</span>
           </div>
           <div class="col-md-6 mt11">
             <div class="col-md-3 no-padding">
@@ -147,7 +147,7 @@
     <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
         <div class="col-md-6 labelforcoverage">
-          <span class="fa-text-color"><%=l10n("faa.medicaid_not_eligible")%> </span>
+          <span class="fa-text-color"><%=l10n("faa.medicaid_not_eligible") %> *</span>
         </div>
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
@@ -167,7 +167,7 @@
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-medicaid'>
         <div class="col-md-10 labelforcoverage">
-          <span class="fa-text-color"><%=l10n("faa.medicaid_cubcare_end_date")%></span>
+          <span class="fa-text-color"><%=l10n("faa.medicaid_cubcare_end_date")%> *</span>
 
           <%= text_field_tag("medicaid_cubcare_due_on", @applicant.medicaid_cubcare_due_on, class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;', :'data-date-max' => "+0") %>
         </div>
@@ -175,7 +175,7 @@
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id="eligibility-change-question">
         <div class="col-md-6 labelforcoverage">
-          <span class="fa-text-color"><%=l10n("faa.change_eligibility_status")%></span>
+          <span class="fa-text-color"><%=l10n("faa.change_eligibility_status")%> *</span>
         </div>
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
@@ -216,7 +216,7 @@
       <% status = @applicant.has_eligibility_changed == true ? "" : "hide" %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements <%= status %>" id="medicaid-chip-coverage-last-day">
         <div class="col-md-10 labelforcoverage">
-          <span class="fa-text-color"><%=l10n("faa.person_medicaid_last_day")%></span>
+          <span class="fa-text-color"><%=l10n("faa.person_medicaid_last_day")%> *</span>
           <%= text_field_tag("person_coverage_end_on", @applicant.person_coverage_end_on ,class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;') %>
         </div>
       </div>
@@ -225,7 +225,7 @@
     <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
         <div class="col-md-6 labelforcoverage">
-          <span class="fa-text-color"><%=l10n("faa.has_dependent_with_coverage")%></span>
+          <span class="fa-text-color"><%=l10n("faa.has_dependent_with_coverage")%>*</span>
         </div>
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
@@ -245,7 +245,7 @@
 
       <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-job-end-on'>
         <div class="col-md-10 labelforcoverage">
-          <span class="fa-text-color"><%=l10n("faa.dependent_job_end_on")%></span>
+          <span class="fa-text-color"><%=l10n("faa.dependent_job_end_on")%>*</span>
           <%= text_field_tag("dependent_job_end_on", @applicant.dependent_job_end_on, class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;') %>
         </div>
       </div>
