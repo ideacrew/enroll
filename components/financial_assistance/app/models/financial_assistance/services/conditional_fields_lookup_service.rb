@@ -9,7 +9,7 @@ module FinancialAssistance
 
       def displayable_field?(class_name, bson_id, attribute)
         return false unless class_name.present?
-        class_name.downcase!
+        class_name = class_name.downcase
         return true if driver_que?(class_name, attribute)
         @factory = factory_klass.new(class_name, bson_id, attribute)
         @factory.conditionally_displayable?
