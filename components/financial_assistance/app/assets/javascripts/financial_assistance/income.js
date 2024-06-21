@@ -1,19 +1,24 @@
 function stopEditingIncome() {
+  // remove disabled style from drivers, instructions, and other income kinds
   $('.driver-question, .driver-question a, .instruction-row, .income, .other-income-kind, .unemployment-income').removeClass('disabled');
-  $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(".fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
+  // enable inputs on drivers, instructions, and income kinds - except for submit (save) buttons as this would enable the submit button in the dummy forms, and fake-disabled-inputs as they should never be enabled
+  $('.driver-question input, .instruction-row input, .income input:not(":input[type=submit], .fake-disabled-input"), .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
   
+    // enable "Add New" income buttons
   $('a.new-income').removeClass('hide');
   $('#new-unemployment-income, #new-ai-an-income, .add_new_other_income_kind').removeAttr('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
-  $("a[class*='income-edit'], a[class*='income-delete']").removeClass('disabled');
+  $("a[class*='income-edit'], a[class*='income-delete']").removeClass('disabled'); // legacy
 
+  // enable nav
   $('#nav-buttons a').removeClass('disabled');
-  $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
+  $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled'); // legacy
 };
 
 function startEditingIncome(income_kind) {
-  // apply disabled style/attr to drivers, instructions, and other income kinds not being edited
+  // apply disabled style to drivers, instructions, and other income kinds not being edited
   $('.driver-question, .driver-question a, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + '), .unemployment-income:not(#' + income_kind + ')').addClass('disabled');
+  // disable inputs on drivers, instructions, and other income kinds not being edited - except for submit (save) buttons as some form types require them to be enabled on edit/create
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input:not(":input[type=submit]"), .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]"), .unemployment-income:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
   
   // disable "Add New" income buttons

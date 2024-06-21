@@ -4,7 +4,7 @@ function stopEditingDeduction() {
   $('.add_new_deduction_kind').removeAttr('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $('#nav-buttons a').removeClass('disabled');
-  $('.driver-question input, .instruction-row input, .deduction-kind input:not(".fake-disabled-input")').removeAttr('disabled');
+  $('.driver-question input, .instruction-row input, .deduction-kind input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
 };
 
 function startEditingDeduction(deduction_kind) {
@@ -13,7 +13,7 @@ function startEditingDeduction(deduction_kind) {
   $('.add_new_deduction_kind').attr('disabled', true);
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $('#nav-buttons a').addClass('disabled');
-  $('.driver-question input, .instruction-row input, .deduction-kind:not(#' + deduction_kind + ') input:not(":input[type=submit], .fake-disabled-input")').attr('disabled', true);
+  $('.driver-question input, .instruction-row input, .deduction-kind:not(#' + deduction_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
 };
 
 function currentlyEditing() {
