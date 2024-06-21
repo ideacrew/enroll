@@ -178,14 +178,14 @@
             </div>
 
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6"><%= applicant_currently_enrolled.gsub(' *','')%></div>
+              <div class="col-md-6"><%= applicant_currently_enrolled %></div>
               <div class="col-md-6"><%= human_boolean applicant.has_enrolled_health_coverage %></div>
             </div>
             <div class="row ptb no-buffer row-height form-content">
               <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
             </div>
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-6"><%= applicant_eligibly_enrolled.gsub(' *','')%>
+              <div class="col-md-6"><%= applicant_eligibly_enrolled %>
               </div>
               <div class="col-md-6"><%= human_boolean applicant.has_eligible_health_coverage %></div>
             </div>
@@ -207,7 +207,7 @@
 
             <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && applicant.eligible_immigration_status %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</div>
+                <div class="col-md-6"><%= l10n("faa.medicaid_chip_ineligible", year: TimeKeeper.date_of_record.year - 5) %> *</div>
                 <div class="col-md-6"><%= human_boolean applicant.medicaid_chip_ineligible %></div>
               </div>
               <% if applicant.medicaid_chip_ineligible %>
@@ -220,19 +220,19 @@
 
             <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.medicaid_not_eligible") %>
+                  <div class="col-md-6"><%= l10n("faa.medicaid_not_eligible") %> *
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_eligible_medicaid_cubcare %></div>
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.medicaid_cubcare_end_date") %>
+                  <div class="col-md-6"><%= l10n("faa.medicaid_cubcare_end_date") %> *
                   </div>
                   <div class="col-md-6"><%= applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : 'N/A' %></div>
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.change_eligibility_status") %>
+                  <div class="col-md-6"><%= l10n("faa.change_eligibility_status") %> *
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_eligibility_changed %></div>
                 </div>
@@ -244,7 +244,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.person_medicaid_last_day") %></div>
+                  <div class="col-md-6"><%= l10n("faa.person_medicaid_last_day") %> *</div>
                   <div class="col-md-6"><%=  applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : 'N/A' %></div>
                 </div>
               </div>
@@ -252,13 +252,13 @@
 
             <% if applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.has_dependent_with_coverage") %>
+                <div class="col-md-6"><%= l10n("faa.has_dependent_with_coverage") %>*
                 </div>
                 <div class="col-md-6"><%= human_boolean applicant.has_dependent_with_coverage %></div>
               </div>
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.dependent_job_end_on") %>
+                <div class="col-md-6"><%= l10n("faa.dependent_job_end_on") %>*
                 </div>
                 <div class="col-md-6"><%= applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : 'N/A'%></div>
               </div>
@@ -297,7 +297,7 @@
             <% end %>
             <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6"><%= l10n("faa.primary_caretaker_for_text_review_page") %></div>
+                <div class="col-md-6"><%= l10n("faa.review.coverage.caretaker") %></div>
                 <div class="col-md-6"><%= applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact %></div>
               </div>
             <% end %>
