@@ -57,7 +57,7 @@
     <div class="instruction-row">
       <p class="bold"><%= l10n("faa.other_incomes.other_income_subtitle") %></p>
       <p class="mt-0"><%= l10n("faa.other_incomes.other_income_description") %></p>
-      <p><b><%= l10n("faa.note") %></b> <span><%= l10n("faa.other_incomes.other_income_note", income_kind: l10n('income'), name: @applicant.first_name), end_date_field_label: l10n('end_date') %></span></p>
+      <p><b><%= l10n("faa.note") %></b> <span><%= l10n("faa.other_incomes.other_income_note", income_kind: l10n('income'), name: @applicant.first_name, end_date_field_label: l10n('end_date')) %></span></p>
     </div>
     <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
       <div id="<%= other_income_kind %>" class="other-income-kind my-4">
