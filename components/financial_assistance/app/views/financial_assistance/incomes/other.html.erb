@@ -309,7 +309,7 @@
     <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
       <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
         <div class='col-md-6 labelforcoverage'>
-          <span class="fa-text-color"><%= l10n('faa.other_incomes.unemployment', assistance_year: assistance_year) %></span>
+          <span class="fa-text-color"><%= l10n('faa.other_incomes.unemployment', assistance_year: assistance_year) %>*</span>
         </div>
         <div class='col-md-6 mt11'>
           <div class='col-md-3 no-padding'>
@@ -344,7 +344,7 @@
 
     <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color"><%= l10n('faa.other_incomes.other_sources', assistance_year: assistance_year) %></span>
+        <span class="fa-text-color"><%= l10n('faa.other_incomes.other_sources', assistance_year: assistance_year) %>*</span>
       </div>
       <div class='col-md-6 mt11'>
         <div class='col-md-3 no-padding'>
