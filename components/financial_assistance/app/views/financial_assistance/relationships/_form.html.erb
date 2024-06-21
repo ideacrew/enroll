@@ -1,39 +1,25 @@
 <% if @bs4 %>
-  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 2} %>
+  <%= render partial: 'financial_assistance/applications/faa_progress_options', locals: {step: 2} %>
   <h1><%= l10n("family_relationships") %></h1>
   <p>
     <%= l10n("household_relationships") %>
-    <b>
+    <b> 
       <%= l10n("continue_to_next_step") %>
     </b>
   </p>
-  <%= form_tag application_relationships_path(@application), remote: form_remote do %>
-    <% @all_relationships.each do |er| %>
-      <div class="d-flex justify-items-between my-4 align-items-center" id="<%= "#{er[:applicant] }_#{er[:relative]}" %>">
-        <span><%= @application.applicants.find(er[:applicant]).first_name %> <%= l10n("faa.review.your_household.is") %></span>
-        <div class="mx-3">
-          <label for='<%= "#{er[:applicant] }_#{er[:relative]}_relationship" %>' class="sr-only"><%= l10n("faa.review.your_household.relationship_label") %></label>
-          <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: "selected_relationship #{'border-danger' if er[:error]}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "#{er[:applicant] }_#{er[:relative]}_relationship" %>
-        </div>
-        <span><%= l10n("faa.review.your_household.of") %> <%= @application.applicants.find(er[:relative]).first_name %></span>
+  <% @all_relationships.each do |er| %>
+    <h2><%= @application.applicants.find(er[:applicant]).full_name %></h2>
+    <%= form_for @application do |f| %>
+      <div>
+        <h3>
+          <label class="required" for="relationships-<%= er[:applicant] %>"><%= l10n("relationship_to_primary") %></label>
+        </h3>
+        <%= f.select :relationships, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), {:prompt => 'Select Option', required: true }, { "class": "focus input-field #{'invalid-relation' if er[:relation] == 'none'}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "relationships-#{er[:applicant]}" } %>
       </div>
+      <br>
     <% end %>
   <% end %>
-  <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_and_submit_application_path(@application), disable_link: @missing_relationships.any?} %>
-  <script>
-    $(function() {
-      if(<%= @missing_relationships.any? || @all_relationships.detect{|applicant| applicant[:error]} %>){
-        $('#btn-continue', '#continue_button').attr('disabled', true);
-        $('#btn-continue', '#continue_button').addClass('disabled');
-        $('#btn-continue').addClass('disabled');
-
-      } else {
-        $('#btn-continue', '#continue_button').removeAttr('disabled');
-        $('#btn-continue', "#continue_button").removeClass('disabled');
-        $('#btn-continue').removeClass('disabled');
-      }
-    });
-  </script>
+  <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_application_path(@application)} %>
 <% else %>
 <h1 class="darkblue">Family Relationships</h1>
 <p>We need to understand how members of your household are related. Select the relationship for each person listed
@@ -72,18 +58,14 @@
     <% end %>
 <% end %>
 <%= submit_tag "", class: "" , :style => "display: none;" %>
-<script>
+<% end %>
+
+<script >
   $(function() {
     if(<%= missing_relationships.present? %>){
-      $('#btn-continue', '#continue_button').attr('disabled', true);
-      $('#btn-continue', '#continue_button').addClass('disabled');
       $('#btn-continue').addClass('disabled');
-
     } else {
-      $('#btn-continue', '#continue_button').removeAttr('disabled');
-      $('#btn-continue', "#continue_button").removeClass('disabled');
       $('#btn-continue').removeClass('disabled');
     }
   });
 </script>
-<% end %>
