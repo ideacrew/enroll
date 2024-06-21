@@ -14,9 +14,9 @@
           </div>
           <div class="col-md-6"><%= v == true ? "Yes" : v == false ? "No" : v.nil? ? "N/A" : v %></div>
         </div>
-        <% if income_coverage[0] == "HEALTH COVERAGE" && k.include?("enrolled") && k == applicant_currently_enrolled.gsub(" *", "") && applicant.has_enrolled_health_coverage  %>
+        <% if income_coverage[0] == "HEALTH COVERAGE" && k.include?("enrolled") && k == applicant_currently_enrolled && applicant.has_enrolled_health_coverage  %>
             <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
-        <% elsif income_coverage[0]== "HEALTH COVERAGE" && k == applicant_eligibly_enrolled.gsub(" *", "") && applicant.has_eligible_health_coverage %>
+        <% elsif income_coverage[0]== "HEALTH COVERAGE" && k == applicant_eligibly_enrolled && applicant.has_eligible_health_coverage %>
             <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_eligible', applicant: applicant} %>
         <% end %>
     <% end %>
