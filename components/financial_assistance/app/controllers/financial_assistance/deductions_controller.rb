@@ -6,7 +6,8 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index]
-    before_action :enable_bs4_layout, only: [:index, :new, :create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) #TODO: remove create and update from this before_action if called from elsewhere and replace with param check
+    before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :conditionally_enable_bs4_layout, only: [:new, :create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     def index
       authorize @applicant, :index?
@@ -96,6 +97,14 @@ module FinancialAssistance
       FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.find(params[:id])
     rescue StandardError
       ''
+    end
+
+    def conditionally_enable_bs4_layout
+      enable_bs4_layout if params[:bs4] == "true"
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
 
     def resolve_layout

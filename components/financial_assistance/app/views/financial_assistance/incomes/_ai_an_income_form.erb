@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <%= income_form_for @application, @applicant, income do |f| %>
-    <%= hidden_field_tag 'bs4', true %>
+    <%= hidden_field_tag :bs4, true %>
     <div class="my-4">
       <% income_id = income.id %>
       <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
