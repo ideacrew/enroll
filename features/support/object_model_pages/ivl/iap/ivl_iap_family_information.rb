@@ -12,7 +12,11 @@ class IvlIapFamilyInformation
   end
 
   def self.add_income_and_coverage_info_btn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+     '.interaction-click-control-add-income---coverage-info'
+    else
     'a[class="btn btn-default add interaction-click-control-add-income---coverage-info"]'
+    end
   end
 
   def self.new_person_first_name

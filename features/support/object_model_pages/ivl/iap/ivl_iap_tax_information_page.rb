@@ -11,7 +11,7 @@ class IvlIapTaxInformationPage
     if EnrollRegistry[:bs4_consumer_flow].enabled?
       '.interaction-choice-control-value-is-required-to-file-taxes-no'
     else
-      'is_required_to_file_taxes_no'
+      '#is_required_to_file_taxes_no'
     end
   end
 
@@ -27,7 +27,7 @@ class IvlIapTaxInformationPage
     if EnrollRegistry[:bs4_consumer_flow].enabled?
       '.interaction-choice-control-value-is-claimed-as-tax-dependent-no'
     else
-      'is_claimed_as_tax_dependent_no'
+      '#is_claimed_as_tax_dependent_no'
     end
   end
 

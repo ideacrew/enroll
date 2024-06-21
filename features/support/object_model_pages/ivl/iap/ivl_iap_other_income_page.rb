@@ -4,11 +4,19 @@
 class IvlIapOtherIncomePage
 
   def self.has_unemployment_income_yes_radiobtn
-    'has_unemployment_income_true'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+    
+    else
+      'has_unemployment_income_true'
+    end
   end
 
   def self.has_unemployment_income_no_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
     '#has_unemployment_income_false'
+    end
   end
 
   def self.not_sure_has_unemployment_link
@@ -64,11 +72,19 @@ class IvlIapOtherIncomePage
   end
 
   def self.has_other_income_yes_radiobtn
-    'has_other_income_true'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    '#has_other_income_true'
+    end
   end
 
   def self.has_other_income_no_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
     '#has_other_income_false'
+    end
   end
 
   def self.not_sure_has_other_income_link
