@@ -1,21 +1,50 @@
-<% insurance_kinds = FinancialAssistance::Benefit.valid_insurance_kinds %>
-<% insurance_kinds.each do |insurance_kind| %>
-  <% benefits = applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind) %>
-  <% if benefits.present? %>
-    <div class="row ptb no-buffer row-height form-heading row-form-wrapper text-bold verti-line-trans">
-      <div class="col-md-6">TYPE</div>
-      <div class="col-md-6">DATES</div>
-    </div>
+<% if @bs4 %>
+  <% insurance_kinds = FinancialAssistance::Benefit.valid_insurance_kinds %>
+  <% insurance_kinds.each do |insurance_kind| %>
+    <% benefits = applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind) %>
+    <% if benefits.present? %>
+      <table>
+        <thead>
+          <tr>
+            <th><%= l10n("faa.review.income.review_benefits_table.coverage_types") %></th>
+            <th><%= l10n("faa.review.income.table.dates") %></th>
+          </tr>
+        </thead>
+        <tbody>
+        <% benefits.each do |benefit| %>
+          <tr>
+            <% term = benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
+            <td class="col-6"><b><%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></b></td>
+            <td class="col-6"><%= start_to_end_dates(benefit) %></td>
+            <% if display_esi_fields?(benefit.insurance_kind, kind) %>
+              <%= render partial: 'financial_assistance/applications/review_esi_benefit', locals: {benefit: benefit} %>
+            <% end %>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
   <% end %>
+<% else %>
+  <% insurance_kinds = FinancialAssistance::Benefit.valid_insurance_kinds %>
+  <% insurance_kinds.each do |insurance_kind| %>
+    <% benefits = applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind) %>
+    <% if benefits.present? %>
+      <div class="row ptb no-buffer row-height form-heading row-form-wrapper text-bold verti-line-trans">
+        <div class="col-md-6">TYPE</div>
+        <div class="col-md-6">DATES</div>
+      </div>
+    <% end %>
 
-  <% benefits.each do |benefit| %>
-    <div class="row ptb no-buffer row-height row-benefit-form-wrapper verti-line">
-      <% term = benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
-      <div class="col-md-6 form-heading"><%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></div>
-      <div class="col-md-6 form-content"><%= start_to_end_dates(benefit) %></div>
-    </div>
-    <% if display_esi_fields?(benefit.insurance_kind, kind) %>
-      <%= render partial: 'financial_assistance/applications/review_esi_benefit', locals: {benefit: benefit} %>
+    <% benefits.each do |benefit| %>
+      <div class="row ptb no-buffer row-height row-benefit-form-wrapper verti-line">
+        <% term = benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
+        <div class="col-md-6 form-heading"><%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></div>
+        <div class="col-md-6 form-content"><%= start_to_end_dates(benefit) %></div>
+      </div>
+      <% if display_esi_fields?(benefit.insurance_kind, kind) %>
+        <%= render partial: 'financial_assistance/applications/review_esi_benefit', locals: {benefit: benefit} %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
