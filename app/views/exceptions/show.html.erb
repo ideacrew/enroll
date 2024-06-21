@@ -1,3 +1,17 @@
+<% if @bs4 %>
+  <div class="d-flex full-height justify-content-center align-items-center text-center">
+    <div>
+      <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+      <%= sanitize_html(l10n(
+            "exceptions.show",
+            contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
+            contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s,
+            contact_center_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item,
+            login_url: root_url
+          )) %>
+    </div>
+  </div>
+<% else %>
 <div class='container'>
   <div class='row'>
     <div class='col-md-12'>
@@ -8,9 +22,10 @@
             contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
             contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s,
             contact_center_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item,
-            login_url: root_url 
+            login_url: root_url
           )) %>
       </span>
     </div>
   </div>
 </div>
+<% end %>
