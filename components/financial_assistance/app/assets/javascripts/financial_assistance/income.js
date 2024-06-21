@@ -4,6 +4,7 @@ function stopEditingIncome() {
   
   $('a.new-income').removeClass('hide');
   $('#new-unemployment-income').removeAttr('disabled');
+  $('#new-ai-an-income').removeAttr('disabled');
   $('.add_new_other_income_kind').removeAttr('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
   $("a[class*='income-edit'], a[class*='income-delete']").removeClass('disabled');
@@ -21,6 +22,7 @@ function startEditingIncome(income_kind) {
   // disable "Add New" income buttons
   $('a.new-income').addClass('hide');
   $('#new-unemployment-income').attr('disabled', true);
+  $('#new-ai-an-income').attr('disabled', true);
   $('.add_new_other_income_kind').attr('disabled', true);
   $("a.interaction-click-control-add-more").addClass('hide'); // legacy
 
@@ -165,23 +167,28 @@ document.addEventListener("turbolinks:load", function () {
         // prompt to delete all these dedcutions
         $("#destroyAllAIANIncomes").modal();
 
-        $('#destroyAllAIANIncomes .modal-cancel-button"').off('click');
-        $('#destroyAllAIANIncomes .modal-cancel-button"').on('click', function(e) {
+        $('#destroyAllAIANIncomes .modal-cancel-button').off('click');
+        $('#destroyAllAIANIncomes .modal-cancel-button').on('click', function(e) {
           $("#destroyAllAIAN").modal('hide');
           $('#has_american_indian_alaskan_native_income_true').prop('checked', true).trigger('change');
         });
 
-        $('#destroyAllAIANIncomes .modal-continue-button"').off('click');
-        $('#destroyAllAIANIncomes .modal-continue-button"').on('click', function(e) {
+        $('#destroyAllAIANIncomes .modal-continue-button').off('click');
+        $('#destroyAllAIANIncomes .modal-continue-button').on('click', function(e) {
           $("#destroyAllAIANIncomes").modal('hide');
           //$(self).prop('checked', false);
 
           $('#ai_an_income').find('.ai-an-incomes-list > .ai-an-income').each(function (i, ai_an_income) {
-            var url = $(ai_an_income).attr('id').replace('income_', 'incomes/');
+            var url = $(ai_an_income).attr('id').replace('financial_assistance_income_', '');
             $(ai_an_income).remove();
             $.ajax({
               type: 'DELETE',
-              url: url
+              url: url,
+              success: function() {
+                $(ai_an_income).remove();
+                $("#add-more-link-ai").addClass('hidden');
+                $("a.interaction-click-control-add-more").addClass('hide');
+              }
             });
           });
         });
@@ -385,20 +392,21 @@ document.addEventListener("turbolinks:load", function () {
 
     $(document).on('click', 'a.ai-an-income-cancel', function (e) {
       e.preventDefault();
-
-      if ($(this).parents('.new-ai-an-income-form').length) {
-        $(this).parents('.new-ai-an-income-form').addClass('hidden');
-      } else {
-        var incomeEl = $(this).parents('.income');
-      }
-
-      if (document.querySelectorAll('.ai-an-incomes-list:not(.other-incomes-list) .ai-an-income').length == 0) {
-        document.getElementById('has_american_indian_alaskan_native_income_false').click();
-      }
-
       stopEditingIncome();
 
-      /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
+      var aiAnIncomeEl = $(this).parents('ai-an-income');
+      if (aiAnIncomeEl.length) { // canceling edit of existing income
+        aiAnIncomeEl.find('.ai-an-income-show').removeClass('hidden');
+        aiAnIncomeEl.find('.edit-ai-an-income-form').addClass('hidden');
+      } else { // canceling edit of new income
+        if (!$('.ai-an-incomes-list').find('.ai-an-income').length) { // no other existing incomes
+          $("#add-more-link-ai").addClass('hidden');
+          $("a.interaction-click-control-add-more").addClass('hide');
+          $('#has_american_indian_alaskan_native_income_false').prop('checked', true).trigger('change');
+        }
+
+        $(this).parents('.new-ai-an-income-form').remove();
+      }
     });
 
     // this index is to ensure duplicate hidden forms aren't saved on submit
@@ -473,8 +481,8 @@ document.addEventListener("turbolinks:load", function () {
     });
 
     /* new AI/AN incomes */
-    $('a.new-ai-an-income').off('click');
-    $('a.new-ai-an-income').on('click', function(e) {
+    $('#new-ai-an-income').off('click');
+    $('#new-ai-an-income').on('click', function(e) {
       e.preventDefault();
       startEditingIncome($(this).parents('.ai-an-income').attr('id'));
       var form = $(this).parents();
@@ -962,14 +970,20 @@ $(document).on('turbolinks:load', function () {
     $("#destroyAIANIncome .modal-continue-button").off('click');
     $('#destroyAIANIncome .modal-continue-button').on('click', function(e) {
       $("#destroyAIANIncome").modal('hide');
-      $(self).parents('.ai-an-income').remove();
-      $("a.interaction-click-control-add-more").addClass('hide');
 
       var url = $(self).parents('.ai-an-income').attr('id').replace('financial_assistance_income_', '');
       $.ajax({
         type: 'DELETE',
         url: url,
         dataType: 'script',
+        success: function() {
+          $(self).parents('.ai-an-income').remove();
+          if (!$('.ai-an-incomes-list').find('.ai-an-income').length) { // no other existing incomes
+            $("#add-more-link-ai").addClass('hidden');
+            $("a.interaction-click-control-add-more").addClass('hide');
+            $('#has_american_indian_alaskan_native_income_false').prop('checked', true).trigger('change');
+          }
+        }
       })
     });
   });

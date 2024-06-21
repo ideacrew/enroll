@@ -29,7 +29,6 @@
       <div class="mx-1 <%= 'hidden' unless @applicant.incomes.unemployment.present? %>" id="add-more-link-unemployment">
         <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income button'><%= l10n("faa.other_incomes.add", kind: "Unemployment") %></button>
       </div>
-
       <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 mx-1 hidden'>
         <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income') } %>
       </div>
@@ -76,7 +75,7 @@
           <% end %>
         </div>
         <div class="add-more-link mt-4 mx-1 <%= 'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? %>" id="add-more-link-<%=other_income_kind%>">
-          <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_other_income_kind')" class='add_new_other_income_kind button'><%= l10n("faa.other_incomes.add", kind: label).titleize %></button>
+          <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_other_income_kind')" class='add_new_other_income_kind button'><%= l10n("faa.other_incomes.add", kind: label.chomp(' income')).titleize %></button>
         </div>
         <div id="new-other-income-form" class='new-other-income-form hidden <%= other_income_kind %>'>
           <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true, new_form: true} %>
@@ -110,9 +109,9 @@
           <%= render partial: 'financial_assistance/incomes/ai_an_income', locals: { income: income } %>
         <% end %>
       </div>
-
-      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-income')" id="new-ai-income" class='new-ai-an-income button mt-4'><%= l10n("faa.other_incomes.add", kind: "American Indian/Alaskan Native") %></a>
-
+      <div class="mt-4 mx-1 <%= 'hidden' unless @applicant.incomes.american_indian_and_alaskan_native.present? %>" id="add-more-link-ai">
+        <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-an-income')" id="new-ai-an-income" class="button"><%= l10n("faa.other_incomes.add", kind: "American Indian/Alaskan Native") %></button>
+      </div>
       <div class='new-ai-an-income-form hidden'>
         <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>
       </div>
@@ -275,7 +274,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn outline modal-cancel-button"><%= l10n("faa.edit.do_not_remove") %></button>
-          <button type="button" class="btn errro modal-continue-button"><%= l10n("faa.edit.remove") %></button>
+          <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.remove") %></button>
         </div>
       </div>
     </div>
@@ -337,7 +336,7 @@
           <% end %>
         </div>
 
-           <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Unemployment Income </a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Unemployment Income </a>
 
         <div id='new-unemployment-income-form' class='new-unemployment-income-form hidden'>
           <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false, new_form: true } %>
@@ -440,7 +439,7 @@
           <% end %>
         </div>
 
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-income')" id="new-ai-income" class='new-ai-an-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> American Indian/Alaskan Native Income </a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-an-income')" id="new-ai-an-income"> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> American Indian/Alaskan Native Income </a>
 
         <div class='new-ai-an-income-form hidden'>
           <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>

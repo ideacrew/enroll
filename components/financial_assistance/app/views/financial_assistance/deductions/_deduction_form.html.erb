@@ -1,5 +1,6 @@
 <% if @bs4 %>
-    <%= deduction_form_for @application, @applicant, deduction do |f| %>
+  <%= deduction_form_for @application, @applicant, deduction do |f| %>
+    <%= hidden_field_tag :bs4, true %>
     <% deduction_id = deduction.id %>
     <% new_form = local_assigns[:new_form].present? ? local_assigns[:new_form] : false %>
     <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{deduction_id}')") : "" %>

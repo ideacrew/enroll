@@ -1,32 +1,32 @@
 <% if @bs4 %>
   <%= income_form_for @application, @applicant, income do |f| %>
-    <%= hidden_field_tag 'bs4', @bs4 %>
+    <%= hidden_field_tag 'bs4', true %>
     <div class="my-4">
       <% income_id = income.id %>
       <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
       <%= f.hidden_field :kind, value: 'american_indian_and_alaskan_native' %>
-      <div class="d-flex col-sm income-form-row p-0 mb-2">
+      <div class="d-flex col-sm p-0 mb-2">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :amount, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{income_id}" %>
           <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true, id: "amount#{income_id}" %>
         </div>
-        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <div class="pr-3">
-            <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequecy#{income_id}" %>
-            <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), { include_blank: "Choose" }, { :disabled => false, :required => true, class: "w-100", id: "frequecy#{income_id}" }) %>
-          </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 pr-4">
+          <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequecy#{income_id}" %>
+          <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), { include_blank: "Choose" }, { :disabled => false, :required => true, class: "w-100", id: "frequecy#{income_id}" }) %>
         </div>
-        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <%= f.label :start_on, l10n("faa.other_incomes.start_on"), class: "required", for: "start_on_#{income_id}" %>
-          <%= f.text_field :start_on, placeholder: 'MM/DD/YYYY', required: true, id: "start_on_#{income_id}", onchange: onchange_date %>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 pr-4">
+          <%= f.label :start_on, l10n("start_date"), class: "required", for: "start_on_#{income_id}" %>
+          <%= f.date_field :start_on, required: true, id: "start_on_#{income_id}", placeholder: "MM/DD/YYYY", onchange: onchange_date, class: "w-100" %>
         </div>
-        <div class="col-sm col-md-6 col-lg-3 p-0">
-          <%= f.label :end_on, l10n("faa.other_incomes.end_on"), class: "required", for: "end_on_#{income_id}" %>
-          <%= f.text_field :end_on, placeholder: 'MM/DD/YYYY', id: "end_on_#{income_id}", onchange: onchange_date %>
+        <div class="col-sm col-md-6 col-lg-3 p-0 pr-4">
+          <%= f.label :end_on, l10n("end_date"), for: "end_on_#{income_id}" %>
+          <%= f.date_field :end_on, id: "end_on_#{income_id}", placeholder: "MM/DD/YYYY", onchange: onchange_date, class: "w-100" %>
         </div>
       </div>
-      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'ai-an-income-cancel-<%= income_id %>')" id="ai-an-income-cancel-<%= income_id %>" class="btn btn-default ai-an-income-cancel"><%= l10n("faa.other_incomes.cancel") %></a>
-      <%= f.submit l10n("faa.other_incomes.save"), class: "btn btn-save", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+      <div class="d-flex mb-2 align-items-center mx-1">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'ai-an-income-cancel-<%= income_id %>')" id="ai-an-income-cancel-<%= income_id %>" class="btn outline ai-an-income-cancel mr-1"><%= l10n("faa.other_incomes.cancel") %></a>
+        <%= f.submit l10n("faa.other_incomes.save"), class: "btn btn-save", :data => { :cuke => "income-adjustments-save-button" }, onclick: "checkDate('#{income_id}')" %>
+      </div>
     </div>
     <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
       <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>

@@ -1,13 +1,13 @@
 <% if @bs4 %>
   <%= income_form_for @application, @applicant, income do |f| %>
-    <%= hidden_field_tag :bs4, @bs4 %>
+    <%= hidden_field_tag :bs4, true %>
     <div class="my-4">
       <% income_id = income.id %>
       <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
       <%= f.hidden_field :kind, value: 'unemployment_income' %>
-      <div class="d-flex col-sm income-form-row p-0 mb-2">
+      <div class="d-flex col-sm p-0 mb-2">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <%= f.label :frequency_kind, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{income_id}" %>
+          <%= f.label :amount, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{income_id}" %>
           <%= f.text_field :amount, placeholder: '$', value: number_to_currency(income.amount), required: true, id: "amount#{income_id}" %>
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 pr-4">
