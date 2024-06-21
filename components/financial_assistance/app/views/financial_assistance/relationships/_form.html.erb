@@ -1,3 +1,26 @@
+<% if @bs4 %>
+  <%= render partial: 'financial_assistance/applications/faa_progress_options', locals: {step: 2} %>
+  <h1><%= l10n("family_relationships") %></h1>
+  <p>
+    <%= l10n("household_relationships") %>
+    <b> 
+      <%= l10n("continue_to_next_step") %>
+    </b>
+  </p>
+  <% @all_relationships.each do |er| %>
+    <h2><%= @application.applicants.find(er[:applicant]).full_name %></h2>
+    <%= form_for @application do |f| %>
+      <div>
+        <h3>
+          <label class="required" for="relationships-<%= er[:applicant] %>"><%= l10n("relationship_to_primary") %></label>
+        </h3>
+        <%= f.select :relationships, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), {:prompt => 'Select Option', required: true }, { "class": "focus input-field #{'invalid-relation' if er[:relation] == 'none'}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "relationships-#{er[:applicant]}" } %>
+      </div>
+      <br>
+    <% end %>
+  <% end %>
+  <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_application_path(@application)} %>
+<% else %>
 <h1 class="darkblue">Family Relationships</h1>
 <p>We need to understand how members of your household are related. Select the relationship for each person listed
   below. Then select CONTINUE.</p>
@@ -35,6 +58,7 @@
     <% end %>
 <% end %>
 <%= submit_tag "", class: "" , :style => "display: none;" %>
+<% end %>
 
 <script >
   $(function() {
