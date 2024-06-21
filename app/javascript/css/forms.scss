@@ -232,3 +232,9 @@ input[type='date']:invalid::-webkit-datetime-edit {
   cursor: inherit;
   display: block;
 }
+
+.sr-required-indicator {
+  margin-left: 0.25ch;
+  color: var(--enrollment-status-red);
+  font-weight: 600;
+}
