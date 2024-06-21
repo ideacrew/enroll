@@ -12,9 +12,8 @@ function stopEditingIncome() {
 };
 
 function startEditingIncome(income_kind) {
-  // disable all divs not directly owned by the income kind which don't have link or button, as links and buttons have their own disabled class applied separately
+  // apply disabled style/attr to drivers, instructions, and other income kinds not being edited
   $('.driver-question, .driver-question a, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + '), .unemployment-income:not(#' + income_kind + ')').addClass('disabled');
-  // disable inputs not owned by the income kind
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input:not(":input[type=submit]"), .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]"), .unemployment-income:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
   
   // disable "Add New" income buttons
