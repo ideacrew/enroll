@@ -1,9 +1,16 @@
+function getDateFieldDate(id) {
+  const dateValue = $(id).val(); 
+  return dateValue ? new Date(dateValue) : null;
+};
+
 function validateDateWarnings(id, use_bs4 = false) {
-  var startDate = use_bs4 ? new Date($("#start_on_" + id).val()) : $("#start_on_" + id).datepicker('getDate');
-  var endDate = use_bs4 ? new Date($("#end_on__" + id).val()) : $("#end_on_" + id).datepicker('getDate');
+  const startDateId = "#start_on_" + id;
+  const endDateId = ("#end_on_" + id);
+  var startDate = use_bs4 ? getDateFieldDate(startDateId) : $(startDateId).datepicker('getDate');
+  var endDate = use_bs4 ? getDateFieldDate(endDateId) : $(endDateId).datepicker('getDate');
   var today = new Date();
   var requiresStartDateWarning = startDate > today
-  var requiresEndDateWarning = endDate
+  var requiresEndDateWarning = endDate != undefined
   var warning_div = $("#date_warning_message_" + id);
   var startDateWarning = $("#start_date_warning_" + id)
   var endDateWarning = $("#end_date_warning_" + id)
