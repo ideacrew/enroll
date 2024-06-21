@@ -81,3 +81,11 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     When Individual focus on the password field
     When Individual enters the password
     Then Individual does not see the error on tooltip indicating a password longer than 20 characters
+
+  Scenario: New user creates account with female gender
+    When Individual creates a new HBX account
+    Then Individual should see a successful sign up message
+    And Individual sees Your Information page
+    When user registers as an individual female gender
+    When Individual clicks on continue
+    Then Individual sees form to enter personal information with checked female gender

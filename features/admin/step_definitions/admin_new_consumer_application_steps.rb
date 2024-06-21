@@ -44,6 +44,16 @@ When(/^user registers as an individual$/) do
   find(IvlPersonalInformation.continue_btn).click
 end
 
+When(/^user registers as an individual female gender$/) do
+  fill_in IvlPersonalInformation.first_name, with: "John"
+  fill_in IvlPersonalInformation.last_name, with: "Smith"
+  fill_in IvlPersonalInformation.dob, with: "11/11/1991"
+  fill_in IvlPersonalInformation.ssn, with: '212-31-3131'
+  find(IvlPersonalInformation.female_radiobtn).click
+  find(IvlPersonalInformation.need_coverage_yes).click
+  find(IvlPersonalInformation.continue_btn).click
+end
+
 When(/^the Individual selects “I Disagree”$/) do
   find(:xpath, '//label[@for="agreement_disagree"]').click
 end

@@ -137,6 +137,24 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
         expect(element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} is not valid: Invalid SSN"
       end
     end
+
+    context 'parsing cv3_family after being published' do
+      it "should be able to be parsed from JSON and validate with AcaEntities::Operations::CreateFamily" do
+        # everyone subject is made eligible for enrollment
+        all_member_ids = family.family_members.map(&:hbx_id)
+        change_member_eligibility[all_member_ids]
+        described_class.new.call(family, transmittable_params)
+        transaction.reload
+
+        # we will convert this to json and then parse with JSON to simulate FDSH handling the event
+        payload = transaction.json_payload[:family_hash]
+        json_payload = payload.to_json
+        parsed_payload = JSON.parse(json_payload, symbolize_names: true)
+        valid_payload = AcaEntities::Operations::CreateFamily.new.call(parsed_payload)
+
+        expect(valid_payload).to be_success
+      end
+    end
   end
 
   context "failure" do

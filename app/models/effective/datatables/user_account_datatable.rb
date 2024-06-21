@@ -10,7 +10,7 @@ module Effective
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.person.hbx_id if row.person.present?}, :filter => false, :sortable => false
         table_column :email, :label => 'USER EMAIL', :proc => Proc.new { |row| row.email }, :filter => false, :sortable => false
         table_column :status, :label => 'Status', :proc => Proc.new { |row| status(row) }, :filter => false, :sortable => false
-        table_column :role_type, :label => 'Role Type', :proc => Proc.new { |row| row.roles.join(', ') }, :filter => false, :sortable => false
+        table_column :role_type, :label => 'Role Type', :proc => proc { |row| all_roles(row) }, :filter => false, :sortable => false
         table_column :permission, :label => 'Permission level', :proc => Proc.new { |row| permission_type(row) }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
                                dropdown = []
@@ -73,6 +73,14 @@ module Effective
       def authorized?(current_user, _controller, _action, _resource)
         return nil unless current_user
         HbxProfilePolicy.new(current_user, nil).can_access_user_account_tab?
+      end
+
+      # Concatenates all active role names of a given user into a single comma-separated string.
+      #
+      # @param user [User] The user whose active roles are to be concatenated.
+      # @return [String] A comma-separated string of all active role names for the user.
+      def all_roles(user)
+        user.all_active_role_names.join(', ')
       end
     end
   end

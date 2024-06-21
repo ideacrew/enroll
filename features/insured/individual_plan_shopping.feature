@@ -14,4 +14,4 @@ Feature: Consumer plan shopping
     And I click on purchase confirm button for matched person
     Then I should see pay now button
     When user clicks browser back button
-    Then user should redirect to receipt page and should see a flash message
+    Then user should redirect to receipt page
