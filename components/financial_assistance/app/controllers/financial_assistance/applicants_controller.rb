@@ -7,7 +7,7 @@ module FinancialAssistance
     before_action :find, :find_application, :except => [:age_of_applicant] #except the ajax requests
     before_action :find_applicant, only: [:age_of_applicant]
     before_action :set_cache_headers, only: [:other_questions, :tax_info]
-    before_action :enable_bs4_layout, only: [:edit, :other_questions] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:edit, :other_questions, :tax_info] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     before_action :conditionally_enable_bs4_layout, only: [:save_questions] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     def new
@@ -95,9 +95,9 @@ module FinancialAssistance
       authorize @applicant, :step?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-
+      layout = @bs4 ? 'financial_assistance_progress' : 'financial_assistance_nav'
       respond_to do |format|
-        format.html { render layout: 'financial_assistance_nav' }
+        format.html { render layout: layout }
       end
     end
 
