@@ -50,6 +50,7 @@ module FinancialAssistance
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
       else
         'financial_assistance_nav'
+      end
     end
   end
 end
