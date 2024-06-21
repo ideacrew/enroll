@@ -97,7 +97,7 @@ jobs:
       - name: Add git HEAD info to docker image
         run: |
           git show --quiet HEAD > release.txt
-          git show --quiet HEAD > public/release.txt
+          echo -e "current branch: $(git rev-parse --abbrev-ref HEAD)\n\n$(git show --quiet HEAD)" > public/release.txt
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
