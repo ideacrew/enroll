@@ -734,7 +734,7 @@ end
 
 Then(/^the caretaker questions should show$/) do
   expect(page).to have_content(l10n("faa.other_ques.primary_caretaker_question_text", subject: l10n("faa.other_ques.this_person")).split(' *').first)
-  expect(page).to have_content(l10n("faa.primary_caretaker_for_text_review_page"))
+  expect(page).to have_content(l10n("faa.review.coverage.caretaker"))
 end
 
 Then(/^.+ should see county under Mailing and Home address$/) do
