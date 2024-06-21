@@ -3,9 +3,7 @@ function stopEditingIncome() {
   $('.driver-question input, .instruction-row input, .income input, .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
   
   $('a.new-income').removeClass('hide');
-  $('#new-unemployment-income').removeAttr('disabled');
-  $('#new-ai-an-income').removeAttr('disabled');
-  $('.add_new_other_income_kind').removeAttr('disabled');
+  $('#new-unemployment-income, #new-ai-an-income, .add_new_other_income_kind').removeAttr('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
   $("a[class*='income-edit'], a[class*='income-delete']").removeClass('disabled');
 
@@ -21,9 +19,7 @@ function startEditingIncome(income_kind) {
   
   // disable "Add New" income buttons
   $('a.new-income').addClass('hide');
-  $('#new-unemployment-income').attr('disabled', true);
-  $('#new-ai-an-income').attr('disabled', true);
-  $('.add_new_other_income_kind').attr('disabled', true);
+  $('#new-unemployment-income, #new-ai-an-income, .add_new_other_income_kind').attr('disabled', true);
   $("a.interaction-click-control-add-more").addClass('hide'); // legacy
 
   // disable all income edit and edit buttons on created incomes
