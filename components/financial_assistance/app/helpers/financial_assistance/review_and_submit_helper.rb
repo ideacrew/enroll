@@ -188,7 +188,7 @@ module FinancialAssistance
         {
           title: l10n('faa.review.income_adjustments'),
           edit_link: application_applicant_deductions_path(@application, applicant),
-          rows: {strip_tags(l10n('faa.deductions.income_adjustments', assistance_year: assistance_year)) => required_value(human_boolean(applicant.has_deductions))}
+          rows: {l10n('faa.deductions.income_adjustments', assistance_year: assistance_year) => required_value(human_boolean(applicant.has_deductions))}
         }
       end
 
