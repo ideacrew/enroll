@@ -288,7 +288,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.cancel" => "Cancel",
   "en.faa.income_temporary_message" => "<ul><li><strong>Start Date: </strong>If this is income you currently have, you must enter the date you began receiving this income in the 'From' field, or 1/1/%{current_year} (if the income started before this year). Do not enter a date in the future (for example, 1/1/%{next_year}) unless this is income that has not started but you expect to have in the future.</li><li><strong>End Date: </strong>Leave the 'To' field empty, unless you expect your income to end on a certain date (for example, if you have a seasonal job). Do not enter the last day of the year unless you know that you will not have this income the following year.</li></ul>",
   "en.faa.start_date_warning" => "<strong>Start Date:</strong> This is a required field. If you began receiving this income before this year, enter January 1 of the current year or the income start date. Only enter a future start date if you don't receive this income right now, but expect to receive it in the future.",
-  "en.faa.end_date_warning" => "<strong>End Date:</strong> Leave the 'To' field blank unless your income will end on a specific date (e.g. the date your seasonal job ends). Only enter the last day of the current year if you won't have this income next year.",
+  "en.faa.end_date_warning" => "<strong>End Date:</strong> Leave the %{end_date_field_label} field blank unless your income will end on a specific date (e.g. the date your seasonal job ends). Only enter the last day of the current year if you won't have this income next year.",
   "en.faa.not_applicable_abbreviation" => "N/A",
   # Transfer History
   "en.faa.transfer_history.column_header.transfer_id" => "Transfer Id",
