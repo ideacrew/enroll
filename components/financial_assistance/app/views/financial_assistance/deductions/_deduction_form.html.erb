@@ -28,7 +28,6 @@
       <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-cancel-<%= deduction_id %>')" id="income-deduction-cancel-<%= deduction_id %>" class="btn outline deduction-cancel mr-1"><%= l10n("faa.other_incomes.cancel") %></a>
       <%= f.submit l10n("faa.other_incomes.save"), disabled: new_form.present? && new_form ? "disabled" : nil, class: "button", :data => { :cuke => "income-adjustments-save-button" } %>
     </div>
-
     <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
       <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: deduction_id } %>
     <% end %>
