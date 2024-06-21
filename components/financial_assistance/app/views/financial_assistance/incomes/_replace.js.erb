@@ -12,6 +12,7 @@ stopEditingIncome();
   $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'ai_an_income', locals: { income: @income }) %>");
 <% else %>
 	// handle other income here!
-	$("<%= id %>").closest(".other-income-kind").find('#add-more-link-<%= @income.kind %>').removeClass("hidden");
+  $("<%= id %>").closest(".other-income-kind").find('.add-more-link-<%= @income.kind %> > a').removeClass("hidden"); // legacy
+	$("<%= id %>").closest(".other-income-kind").find('#add-more-link-<%= @income.kind %>').removeClass("hidden"); // bs4
 	$("<%= id %>").replaceWith("<%= escape_javascript render(partial: 'other_income', locals: { other_income: @income, kind: @income.kind}) %>");
 <% end %>
