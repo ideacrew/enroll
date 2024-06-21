@@ -1,126 +1,224 @@
-<%= form_for @applicant, url: {action: "save_tax_info"}, method: :put do |f| %>
-  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
-    <div class="col-md-9">
-      <p class="alert alert-error hide"></p>
-      <div class="row">
-        <div class="col-md-10">
-          <div class="title-icon">
-            <span class="fa-icon fa-stack suitcase">
-              <i class="fa fa-pencil-square-o fa-2x"></i>
-            </span>
+<% if @bs4 %>
+  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 1} %>
+  <%= form_for @applicant, url: {action: "save_tax_info"}, method: :put do |f| %>
+    <h1 data-cuke="tax_info_header"><%= l10n("faa.tax_info.header", person: @applicant.first_name) %></h1>
+    <p><%= l10n("faa.tax_info.subheader") %></p>
+    <fieldset>
+      <legend id="is_required_to_file_taxes" class="weight-n required">
+        <%= l10n("faa.tax_info.question1", year: assistance_year) %>
+      </legend>
+      <div class="focus d-flex align-items-center">
+        <label for="is_required_to_file_taxes_yes" class="radio">
+          <%= f.radio_button("is_required_to_file_taxes", true, class: "radio-yml require", id: "is_required_to_file_taxes_yes") %>
+          <span class="yes_no_pair"><%= l10n("yes") %></span>
+        </label>
+        <label for="is_required_to_file_taxes_no" class="radio">
+          <%= f.radio_button("is_required_to_file_taxes", false, class: "radio-yml require", id: "is_required_to_file_taxes_no") %>
+          <span class="yes_no_pair"><%= l10n("no") %></span>
+        </label>
+      </div>
+    </fieldset>
+    <a href="#is_required_to_file_taxes" data-toggle="modal" data-target="#is_required_to_file_taxes"><%= l10n("faa.question.not_sure")%></a>
+
+    <div class="my-4 hide is_joint_tax_filing">
+      <fieldset>
+        <legend id="is_joint_tax_filing" class="weight-n required">
+          <%= l10n("faa.tax_info.question2") %>
+        </legend>
+        <div class="focus d-flex align-items-center">
+          <label for="is_joint_tax_filing_yes" class="radio">
+            <%= f.radio_button("is_joint_tax_filing", true, class: "radio-yml", id: "is_joint_tax_filing_yes") %>
+            <span class="yes_no_pair"><%= l10n("yes") %></span>
+          </label>
+          <label for="is_joint_tax_filing_no" class="radio">
+            <%= f.radio_button("is_joint_tax_filing", true, class: "radio-yml", id: "is_joint_tax_filing_no") %>
+            <span class="yes_no_pair"><%= l10n("no") %></span>
+          </label>
+        </div>
+
+      </fieldset>
+      <a href="#is_joint_tax_filing" data-toggle="modal" data-target="#is_joint_tax_filing"><%= l10n("faa.question.not_sure")%></a>
+    </div>
+
+    <div class="my-4 hide filing-as-head-of-household">
+      <fieldset>
+        <legend id="is_filing_as_head_of_household" class="weight-n required">
+          <%= l10n("faa.tax_info.question3") %>
+        </legend>
+        <div class="focus d-flex align-items-center">
+          <label for="is_filing_as_head_of_household_yes" class="radio">
+            <%= f.radio_button("is_filing_as_head_of_household", true, class: "radio-yml", id: "is_filing_as_head_of_household_yes") %>
+            <span class="yes_no_pair"><%= l10n("yes") %></span>
+          </label>
+          <label for="is_filing_as_head_of_household_no" class="radio">
+            <%= f.radio_button("is_filing_as_head_of_household", true, class: "radio-yml", id: "is_filing_as_head_of_household_no") %>
+            <span class="yes_no_pair"><%= l10n("no") %></span>
+          </label>
+        </div>
+      </fieldset>
+      <a href="#is_filing_as_head_of_household" data-toggle="modal" data-target="#is_filing_as_head_of_household"><%= l10n("faa.question.not_sure")%></a>
+    </div>
+
+    <div class="my-4 is_claimed_as_tax_dependent">
+      <fieldset>
+        <legend id="is_claimed_as_tax_dependent" class="weight-n required">
+          <%= l10n("faa.tax_info.question4", year: assistance_year) %>
+        </legend>
+        <div class="focus d-flex align-items-center">
+          <label for="is_claimed_as_tax_dependent_yes" class="radio">
+            <%= f.radio_button("is_claimed_as_tax_dependent", true, class: "radio-yml", id: "is_claimed_as_tax_dependent_yes") %>
+            <span class="yes_no_pair"><%= l10n("yes") %></span>
+          </label>
+          <label for="is_claimed_as_tax_dependent_no" class="radio">
+            <%= f.radio_button("is_claimed_as_tax_dependent", false, class: "radio-yml", id: "is_claimed_as_tax_dependent_no") %>
+            <span class="yes_no_pair"><%= l10n("no") %></span>
+          </label>
+        </div>
+      </fieldset>
+      <a href="#is_claimed_as_tax_dependent" data-toggle="modal" data-target="#is_claimed_as_tax_dependent"><%= l10n("faa.question.not_sure")%></a>
+    </div>
+
+    <div class="my-4 claimed_as_tax_dependent_by hide">
+      <label class="weight-n required" for="applicant_claimed_as_tax_dependent_by"><%= l10n("faa.tax_info.claimed_by") %></label>
+      <p class="b m-0 p-0">Person</p>
+      <%= f.select("claimed_as_tax_dependent_by", options_for_select(claim_eligible_tax_dependents), prompt: l10n("faa.tax_info.none"), required: false, class: "claimed-dependent-dropdown") %>
+      <p><a href="#claimed_as_tax_dependent_by" data-toggle="modal" data-target="#claimed_as_tax_dependent_by"><%= l10n("faa.question.not_sure")%></a></p>
+      <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "claimed_as_tax_dependent_by"} %>
+    </div>
+
+    <div class="mt-4">
+      <% content_for :submit_button do %>
+        <%= submit_tag l10n("faa.tax_info.continue"), class: "btn", id: 'btn-continue', disabled: !@applicant.tax_info_complete? %>
+      <% end %>
+      <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+        previous_link: edit_application_path(@application, @applicant), show_back_to_household_button: true } %>
+    </div>
+  <% end %>
+<% else %>
+  <%= form_for @applicant, url: {action: "save_tax_info"}, method: :put do |f| %>
+    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+      <div class="col-md-9">
+        <p class="alert alert-error hide"></p>
+        <div class="row">
+          <div class="col-md-10">
+            <div class="title-icon">
+              <span class="fa-icon fa-stack suitcase">
+                <i class="fa fa-pencil-square-o fa-2x"></i>
+              </span>
+            </div>
+            <h2 class="fa-darkblue" data-cuke="tax_info_header"><%= l10n("faa.tax_info.header", person: @applicant.first_name) %></h2>
           </div>
-          <h2 class="fa-darkblue" data-cuke="tax_info_header"><%= l10n("faa.tax_info.header", person: @applicant.first_name) %></h2>
         </div>
-      </div>
-      <p><%= l10n("faa.tax_info.subheader") %></p>
-      <p class="memo"><%= l10n('faa.question.required_indicator') %></p>
+        <p><%= l10n("faa.tax_info.subheader") %></p>
+        <p class="memo"><%= l10n('faa.question.required_indicator') %></p>
 
-      <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-        <div class="col-md-6">
-          <h5 class="fa-text-color"><%= l10n("faa.tax_info.question1", year: assistance_year) %> *</h5>
-        </div>
-        <div class="col-md-2">
-          <%= f.radio_button("is_required_to_file_taxes", true, class: "radio-yml", id: "is_required_to_file_taxes_yes") %>
-          <label class="radio-yml" for="is_required_to_file_taxes_yes"><%= l10n('yes') %></label>
-        </div>
+        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+          <div class="col-md-6">
+            <h5 class="fa-text-color"><%= l10n("faa.tax_info.question1", year: assistance_year) %> *</h5>
+          </div>
+          <div class="col-md-2">
+            <%= f.radio_button("is_required_to_file_taxes", true, class: "radio-yml", id: "is_required_to_file_taxes_yes") %>
+            <label class="radio-yml" for="is_required_to_file_taxes_yes"><%= l10n('yes') %></label>
+          </div>
 
-        <div class="col-md-2">
-          <%= f.radio_button("is_required_to_file_taxes", false, class: "radio-yml", id: "is_required_to_file_taxes_no") %>
-          <label class="radio-yml" for="is_required_to_file_taxes_no"><%= l10n('no') %></label>
-        </div>
+          <div class="col-md-2">
+            <%= f.radio_button("is_required_to_file_taxes", false, class: "radio-yml", id: "is_required_to_file_taxes_no") %>
+            <label class="radio-yml" for="is_required_to_file_taxes_no"><%= l10n('no') %></label>
+          </div>
 
-        <div class='col-md-2 left-seprator'>
-          <a href="#is_required_to_file_taxes" data-toggle="modal" data-target="#is_required_to_file_taxes"><%= l10n('faa.question.not_sure') %></a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_required_to_file_taxes"} %>
-        </div>
-      </div>
-      <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements hide">
-        <div class="col-md-6">
-          <h5 class="fa-text-color"><%= l10n("faa.tax_info.question2") %> *</h5>
-        </div>
-        <div class="col-md-2">
-          <%= f.radio_button("is_joint_tax_filing", true, class: "radio-yml", id: "is_joint_tax_filing_yes") %>
-          <label class="radio-yml" for="is_joint_tax_filing_yes"><%= l10n('yes') %></label>
-        </div>
-
-        <div class="col-md-2">
-          <%= f.radio_button("is_joint_tax_filing", false, class: "radio-yml", id: "is_joint_tax_filing_no") %>
-          <label class="radio-yml" for="is_joint_tax_filing_no"><%= l10n('no') %></label>
-        </div>
-
-        <div class='col-md-2 left-seprator'>
-          <a href="#is_joint_tax_filing" data-toggle="modal" data-target="#is_joint_tax_filing"><%= l10n('faa.question.not_sure') %></a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_joint_tax_filing"} %>
-        </div>
-      </div>
-      <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements hide filing-as-head-of-household">
-        <div class="col-md-6">
-          <h5 class="fa-text-color"><%= l10n("faa.tax_info.question3") %> *</h5>
-        </div>
-        <div class="col-md-2">
-          <%= f.radio_button("is_filing_as_head_of_household", true, class: "radio-yml", id: "is_filing_as_head_of_household_yes") %>
-          <label class="radio-yml" for="is_filing_as_head_of_household_yes"><%= l10n('yes') %></label>
-        </div>
-        <div class="col-md-2">
-          <%= f.radio_button("is_filing_as_head_of_household", false, class: "radio-yml", id: "is_filing_as_head_of_household_no") %>
-          <label class="radio-yml" for="is_filing_as_head_of_household_no"><%= l10n('no') %></label>
-        </div>
-        <div class='col-md-2 left-seprator'>
-          <a href="#is_filing_as_head_of_household" data-toggle="modal" data-target="#is_filing_as_head_of_household"><%= l10n('faa.question.not_sure') %></a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_filing_as_head_of_household"} %>
-        </div>
-      </div>
-      <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
-        <div class="col-md-6">
-          <h5 class="fa-text-color"><%= l10n("faa.tax_info.question4", year: assistance_year) %> *</h5>
-        </div>
-        <div class="col-md-2">
-          <%= f.radio_button("is_claimed_as_tax_dependent", true, class: "radio-yml", id: "is_claimed_as_tax_dependent_yes") %>
-          <label class="radio-yml" for="is_claimed_as_tax_dependent_yes"><%= l10n('yes') %></label>
-        </div>
-        <div class="col-md-2">
-          <%= f.radio_button("is_claimed_as_tax_dependent", false, class: "radio-yml", id: "is_claimed_as_tax_dependent_no") %>
-          <label class="radio-yml" for="is_claimed_as_tax_dependent_no"><%= l10n('no') %></label>
-        </div>
-        <div class='col-md-2 left-seprator'>
-          <a href="#is_claimed_as_tax_dependent" data-toggle="modal" data-target="#is_claimed_as_tax_dependent"><%= l10n('faa.question.not_sure') %></a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_claimed_as_tax_dependent"} %>
-        </div>
-      </div>
-      <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements hide">
-        <div class="col-md-6">
-          <h5 class="fa-text-color"><%= l10n("faa.tax_info.claimed_by") %></h5>
-        </div>
-        <div class="col-md-4 claimed-dependent">
-          <%= f.select("claimed_as_tax_dependent_by", options_for_select(claim_eligible_tax_dependents), prompt: l10n("faa.tax_info.none"), required: false, class: "form-control claimed-dependent-dropdown") %>
-        </div>
-        <div class='col-md-2 left-seprator'>
-          <a href="#claimed_as_tax_dependent_by" data-toggle="modal" data-target="#claimed_as_tax_dependent_by"><%= l10n('faa.question.not_sure') %></a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "claimed_as_tax_dependent_by"} %>
-        </div>
-      </div>
-
-      <br>
-      <br>
-      <div class="row">
-        <div class="col-xs-12">
-          <div class="back-link">
-            <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-            <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= financial_assistance.edit_application_path(@application) %>"> <b><%= l10n("faa.tax_info.back") %></b> </a> <span><%= l10n("faa.tax_info.back_paranthetical") %></span>
+          <div class='col-md-2 left-seprator'>
+            <a href="#is_required_to_file_taxes" data-toggle="modal" data-target="#is_required_to_file_taxes"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_required_to_file_taxes"} %>
           </div>
         </div>
+        <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements is_joint_tax_filing hide">
+          <div class="col-md-6">
+            <h5 class="fa-text-color"><%= l10n("faa.tax_info.question2") %> *</h5>
+          </div>
+          <div class="col-md-2">
+            <%= f.radio_button("is_joint_tax_filing", true, class: "radio-yml", id: "is_joint_tax_filing_yes") %>
+            <label class="radio-yml" for="is_joint_tax_filing_yes"><%= l10n('yes') %></label>
+          </div>
+
+          <div class="col-md-2">
+            <%= f.radio_button("is_joint_tax_filing", false, class: "radio-yml", id: "is_joint_tax_filing_no") %>
+            <label class="radio-yml" for="is_joint_tax_filing_no"><%= l10n('no') %></label>
+          </div>
+
+          <div class='col-md-2 left-seprator'>
+            <a href="#is_joint_tax_filing" data-toggle="modal" data-target="#is_joint_tax_filing"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_joint_tax_filing"} %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements hide filing-as-head-of-household">
+          <div class="col-md-6">
+            <h5 class="fa-text-color"><%= l10n("faa.tax_info.question3") %> *</h5>
+          </div>
+          <div class="col-md-2">
+            <%= f.radio_button("is_filing_as_head_of_household", true, class: "radio-yml", id: "is_filing_as_head_of_household_yes") %>
+            <label class="radio-yml" for="is_filing_as_head_of_household_yes"><%= l10n('yes') %></label>
+          </div>
+          <div class="col-md-2">
+            <%= f.radio_button("is_filing_as_head_of_household", false, class: "radio-yml", id: "is_filing_as_head_of_household_no") %>
+            <label class="radio-yml" for="is_filing_as_head_of_household_no"><%= l10n('no') %></label>
+          </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#is_filing_as_head_of_household" data-toggle="modal" data-target="#is_filing_as_head_of_household"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_filing_as_head_of_household"} %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements is_claimed_as_tax_dependent">
+          <div class="col-md-6">
+            <h5 class="fa-text-color"><%= l10n("faa.tax_info.question4", year: assistance_year) %> *</h5>
+          </div>
+          <div class="col-md-2">
+            <%= f.radio_button("is_claimed_as_tax_dependent", true, class: "radio-yml", id: "is_claimed_as_tax_dependent_yes") %>
+            <label class="radio-yml" for="is_claimed_as_tax_dependent_yes"><%= l10n('yes') %></label>
+          </div>
+          <div class="col-md-2">
+            <%= f.radio_button("is_claimed_as_tax_dependent", false, class: "radio-yml", id: "is_claimed_as_tax_dependent_no") %>
+            <label class="radio-yml" for="is_claimed_as_tax_dependent_no"><%= l10n('no') %></label>
+          </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#is_claimed_as_tax_dependent" data-toggle="modal" data-target="#is_claimed_as_tax_dependent"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_claimed_as_tax_dependent"} %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper radio-align no-buffer row-height fa-align-elements hide claimed_as_tax_dependent_by">
+          <div class="col-md-6">
+            <h5 class="fa-text-color"><%= l10n("faa.tax_info.claimed_by") %></h5>
+          </div>
+          <div class="col-md-4 claimed-dependent">
+            <%= f.select("claimed_as_tax_dependent_by", options_for_select(claim_eligible_tax_dependents), prompt: l10n("faa.tax_info.none"), required: false, class: "form-control claimed-dependent-dropdown") %>
+          </div>
+          <div class='col-md-2 left-seprator'>
+            <a href="#claimed_as_tax_dependent_by" data-toggle="modal" data-target="#claimed_as_tax_dependent_by"><%= l10n('faa.question.not_sure') %></a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "claimed_as_tax_dependent_by"} %>
+          </div>
+        </div>
+
+        <br>
+        <br>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="back-link">
+              <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+              <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= financial_assistance.edit_application_path(@application) %>"> <b><%= l10n("faa.tax_info.back") %></b> </a> <span><%= l10n("faa.tax_info.back_paranthetical") %></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <%= content_for :submit_button do %>
+        <%= submit_tag l10n("faa.tax_info.continue"), class: "btn btn-lg btn-primary btn-block", id: 'btn-continue', disabled: !@applicant.tax_info_complete? %>
+      <% end %>
+
+      <div class='col-md-3'>
+        <%= render partial: 'financial_assistance/shared/right_nav', locals: { previous_url: edit_application_path(@application, @applicant) } %>
       </div>
 
     </div>
-
-    <%= content_for :submit_button do %>
-      <%= submit_tag l10n("faa.tax_info.continue"), class: "btn btn-lg btn-primary btn-block", id: 'btn-continue', disabled: !@applicant.tax_info_complete? %>
-    <% end %>
-
-    <div class='col-md-3'>
-      <%= render partial: 'financial_assistance/shared/right_nav', locals: { previous_url: edit_application_path(@application, @applicant) } %>
-    </div>
-
-  </div>
+  <% end %>
+  <%= render partial: '/financial_assistance/shared/to_previous_modal' %>
 <% end %>
-<%= render partial: '/financial_assistance/shared/to_previous_modal' %>
