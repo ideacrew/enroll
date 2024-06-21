@@ -396,6 +396,14 @@ module FinancialAssistance
       @assistance_year = year_selection_enabled ? @application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
     end
 
+    def renewal_year_select_options
+      options = []
+      (1..5).reverse_each do |year|
+        options << ["#{year.to_s} #{l10n('insured.preferences.renewal_year_option')}", year]
+      end
+      options << [l10n('insured.preferences.renewal_year_none', site_short_name: site_short_name), 0]
+    end
+
     def applicant_faa_nav_options(application, applicant)
       [
         {step: 1, label: l10n('faa.nav.tax_info'), link: go_to_step_application_applicant_path(application, applicant, 1), step_complete: applicant.tax_info_complete? },

@@ -9,18 +9,19 @@ Given(/^that the user is on FAA Household Info: Family Members page$/) do
   end
   visit root_path
   click_link 'Assisted Consumer/Family Portal'
-  click_link 'Continue'
+  find('a[class*="interaction-click-control-continue"]').click
   sleep 2
   # Security Questions
   step 'the user answers all the VERIFY IDENTITY  questions'
+  step "the consumer is RIDP verified"
   click_button 'Submit'
-  click_link 'Continue Application'
+  find_all(IvlVerifyIdentity.continue_application_btn)[0].click
   page.all('label').detect { |l| l.text == 'Yes' }.click
   click_button 'CONTINUE'
   # should be on application year select page
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    click_link 'Continue'
+    find(IvlIapHelpPayingForCoverage.continue_btn).click
     sleep 2
   end
   click_link 'Continue'
@@ -154,7 +155,7 @@ When(/^all applicants are in Info Completed state$/) do
     find("#is_required_to_file_taxes_no", wait: 10).click
     find("#is_claimed_as_tax_dependent_no", wait: 10).click
     find("#is_joint_tax_filing_no", wait: 10).click if page.all("#is_joint_tax_filing_no").present?
-    find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
+    find('input[id="btn-continue"]').click
 
     find("#has_job_income_false", wait: 10).click
     find("#has_self_employment_income_false", wait: 10).click

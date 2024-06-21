@@ -8,9 +8,9 @@ Feature: Consumer disagrees RIDP verification process
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    And Individual clicks on continue
+    And the individual clicks on the Continue button of the Account Setup page
     Then Individual sees form to enter personal information
-    When Individual clicks on continue
+    And the individual clicks continue on the personal information page
 
   Scenario: User chooses I Disagree on Auth and Consent Page and directed to document upload and see Identity and application as outstanding
     Given that the consumer has “Disagreed” to AUTH & CONSENT
