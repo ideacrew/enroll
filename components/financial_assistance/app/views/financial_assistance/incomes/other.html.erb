@@ -55,7 +55,7 @@
     </fieldset>
     <a href="#has_other_income" data-toggle="modal" data-target="#has_other_income"><%= l10n("faa.question.not_sure")%></a>
     <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_other_income"} %>
-  <div>
+  </div>
   <div class='other_income_kinds my-4'>
     <div class="instruction-row">
       <p class="bold"><%= l10n("faa.other_incomes.other_income_subtitle") %></p>
@@ -86,7 +86,7 @@
   </div>
 
   <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) && (@applicant.indian_tribe_member) %>
-    <div class="driver-question">>
+    <div class="driver-question">
       <fieldset class="driver-question my-4">
         <legend class="weight-n required">
           <%= l10n('faa.other_incomes.na_question', name: @applicant.first_name) %>
