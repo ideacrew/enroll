@@ -19,14 +19,12 @@
     <dl>
       <% subsection[:rows].each do |(term_string, value)| %>
         <div class="d-flex justify-content-between align-items-center">
-          <div class="col-8 px-0">
-            <dt class=<%= "required" if value.is_a?(Hash) && value[:is_required].present? ? value[:is_required] : false %>><%= term_string %></dt>
-          </div>
-          <dd class=""><%= value.is_a?(Hash) && value[:value].present? ? value[:value] : value %></dd>
+          <dt class="col-8 px-0 <%= "required" if value.is_a?(Hash) && value[:is_required].present? ? value[:is_required] : false %>"><%= term_string %></dt>
+          <dd><%= value.is_a?(Hash) && value[:value].present? ? value[:value] : value %></dd>
         </div>
         <%# Review Benefits partial for Health Coverage subsection %>
         <% if value.is_a?(Hash) && value[:review_benefits_partial].present? %>
-          <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: value[:review_benefits_partial], applicant: applicant} %>
+          <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
         <% end %>
       <% end %>
     </dl>
