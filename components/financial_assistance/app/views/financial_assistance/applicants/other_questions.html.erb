@@ -267,7 +267,6 @@
 
       <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "submit"} %>
     </div>
-    <%= hidden_field_tag :bs4, true %>
   <% end %>
 <% else %>
   <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
