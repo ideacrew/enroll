@@ -893,8 +893,8 @@ $(document).on('turbolinks:load', function () {
   });
 
   /* edit existing unemployment income */
-  $('a.unemployment-income-edit:not(.disabled)').off('click');
-  $('a.unemployment-income-edit:not(.disabled)').on('click', function(e) {
+  $('.unemployment-incomes-list').off('click', 'a.unemployment-income-edit:not(.disabled)');
+  $('.unemployment-incomes-list').on('click', 'a.unemployment-income-edit:not(.disabled)', function(e) {
     e.preventDefault();
 
     var unemploymentIncomeEl = $(this).parents('.unemployment-income');
@@ -907,8 +907,8 @@ $(document).on('turbolinks:load', function () {
   });
 
   /* destroy existing unemployment income */
-  $('a.unemployment-income-delete:not(.disabled)').off('click');
-  $('a.unemployment-income-delete:not(.disabled)').on('click', function(e) {
+  $('.unemployment-incomes-list').off('click', 'a.unemployment-income-delete:not(.disabled)');
+  $('.unemployment-incomes-list').on('click', 'a.unemployment-income-delete:not(.disabled)', function(e) {
     var self = this;
     e.preventDefault();
     $("#destroyUnemploymentIncome").modal();
