@@ -31,7 +31,7 @@
       <div class="mx-1 <%= 'hidden' unless @applicant.incomes.unemployment.present? %>" id="add-more-link-unemployment">
         <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income button'><%= l10n("faa.other_incomes.add", kind: "Unemployment") %></button>
       </div>
-      <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 mx-1 hidden'>
+      <div id='new-unemployment-income-form' class='new-unemployment-income-form my-4 hidden'>
         <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), new_form: true} %>
       </div>
     </div>

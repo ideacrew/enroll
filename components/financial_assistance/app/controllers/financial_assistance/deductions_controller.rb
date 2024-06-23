@@ -7,7 +7,7 @@ module FinancialAssistance
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index]
     before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-    before_action :conditionally_enable_bs4_layout, only: [:new, :create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :conditionally_enable_bs4_layout, only: [:create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     def index
       authorize @applicant, :index?
@@ -68,15 +68,13 @@ module FinancialAssistance
 
     def format_date(params)
       return if params[:deduction].blank?
-      date_format = @bs4 ? "%Y-%m-%d" : "%m/%d/%Y"
-      params[:deduction][:start_on] = Date.strptime(params[:deduction][:start_on].to_s, date_format)
-      params[:deduction][:end_on] = Date.strptime(params[:deduction][:end_on].to_s, date_format) if params[:deduction][:end_on].present?
+      params[:deduction][:start_on] = format_date_string(params[:deduction][:start_on].to_s)
+      params[:deduction][:end_on] = format_date_string(params[:deduction][:end_on].to_s, date_format) if params[:deduction][:end_on].present?
     end
 
-    # this might not be needed anymore as forms (with dates) have come out of the YAML. Refactor and Replace with the method above.
-    def format_date_params(model_params)
-      model_params["start_on"] = Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
-      model_params["end_on"] = Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
+    def format_date_string(string)
+      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+      Date.strptime(string, date_format)
     end
 
     def build_error_messages(model)
@@ -109,10 +107,6 @@ module FinancialAssistance
 
     def resolve_layout
       return @bs4 ? 'financial_assistance_progress' : 'financial_assistance_nav'
-    end
-
-    def enable_bs4_layout
-      @bs4 = true
     end
   end
 end

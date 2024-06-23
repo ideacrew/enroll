@@ -7,7 +7,7 @@ module FinancialAssistance
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index, :other]
     before_action :enable_bs4_layout, only: [:other] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-    before_action :conditionally_enable_bs4_layout, only: [:new, :create, :edit, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :conditionally_enable_bs4_layout, only: [:create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     layout :resolve_layout
 
@@ -78,9 +78,13 @@ module FinancialAssistance
 
     def format_date(params)
       return if params[:income].blank?
-      date_format = @bs4 ? "%Y-%m-%d" : "%m/%d/%Y"
-      params[:income][:start_on] = Date.strptime(params[:income][:start_on].to_s, date_format)
-      params[:income][:end_on] = Date.strptime(params[:income][:end_on].to_s, date_format) if params[:income][:end_on].present?
+      params[:income][:start_on] = format_date_string(params[:income][:start_on].to_s)
+      params[:income][:end_on] = format_date_string(params[:income][:end_on].to_s) if params[:income][:end_on].present?
+    end
+
+    def format_date_string(string)
+      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+      Date.strptime(string, date_format)
     end
 
     def job_income_type
