@@ -10,7 +10,7 @@ function validateDateWarnings(id, use_bs4 = false) {
   var endDate = use_bs4 ? getDateFieldDate(endDateId) : $(endDateId).datepicker('getDate');
   var today = new Date();
   var requiresStartDateWarning = startDate > today
-  var requiresEndDateWarning = endDate != undefined
+  var requiresEndDateWarning = endDate
   var warning_div = $("#date_warning_message_" + id);
   var startDateWarning = $("#start_date_warning_" + id)
   var endDateWarning = $("#end_date_warning_" + id)

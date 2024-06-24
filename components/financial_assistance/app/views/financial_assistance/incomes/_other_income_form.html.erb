@@ -39,6 +39,10 @@
       </div>
     </div>
   <% end %>
+
+  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+    <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
+  <% end %>
 <% else %>
 
 <%= income_form_for @application, @applicant, other_income do |f| %>
