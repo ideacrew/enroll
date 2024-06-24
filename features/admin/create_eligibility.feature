@@ -10,7 +10,7 @@ Feature: Create Eligibility
     And Hbx Admin clicks Actions button
     And Hbx Admin clicks on Create Eligibility
     And Hbx Admin select CSR 100
-    And Hbx Admin select tax group 1
+    And Hbx Admin select tax group one
     And Hbx Admin click Continue To Tax Group Details
     And Hbx Admin choose Effective Date
     And Hbx Admin set Expected Contribution
@@ -26,7 +26,7 @@ Feature: Create Eligibility
     And Hbx Admin clicks Actions button
     And Hbx Admin clicks on Create Eligibility
     And Hbx Admin select CSR 100
-    And Hbx Admin select tax group 1
+    And Hbx Admin select tax group one
     And Hbx Admin click Continue To Tax Group Details
     And Hbx Admin choose Effective Date
     And Hbx Admin set Expected Contribution

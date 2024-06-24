@@ -13,8 +13,8 @@ And(/^Hbx Admin select CSR 100$/) do
   find(:css, '.select_person_csr select').find(:option, '100').select_option
 end
 
-And(/^Hbx Admin select tax group 1$/) do
-  find(:css, '.select_person_tax_group select').find(:option, '1').select_option
+And(/^Hbx Admin select tax group one$/) do
+  find(:css, 'td.select_person_tax_group select').find(:option, '1').select_option
 end
 
 And(/^Hbx Admin click Continue To Tax Group Details$/) do
