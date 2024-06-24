@@ -17,7 +17,7 @@ function startEditingDeduction(deduction_kind) {
 };
 
 function currentlyEditing() {
-  return $('.interaction-click-control-continue').hasClass('disabled') || $('#nav-buttons a').hasClass('disabled');;
+  return $('.interaction-click-control-continue').hasClass('disabled') || $('#nav-buttons a').hasClass('disabled');
 };
 
 function deleteDeductions(kind) {
