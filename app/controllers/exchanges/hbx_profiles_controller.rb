@@ -765,11 +765,11 @@ class Exchanges::HbxProfilesController < ApplicationController
                                                                        :tax_households => {}
                                                                      ).to_h
                                                                    })
-      if result.success?
-        @result = { success: true, message: 'THH & Eligibility created successfully' }
-      else
-        @result =  { success: false, error: result.failure }
-      end
+      @result = if result.success?
+                  { success: true, message: 'THH & Eligibility created successfully' }
+                else
+                  { success: false, error: result.failure }
+                end
     else
       @element_to_replace_id = params[:person][:family_actions_id]
       family = Person.find(params[:person][:person_id]).primary_family
