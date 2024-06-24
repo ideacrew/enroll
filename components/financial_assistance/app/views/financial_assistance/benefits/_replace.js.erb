@@ -1,5 +1,7 @@
 stopEditingBenefit();
  $("<%= id %>").closest(".benefit-kind").find('#add_new_insurance_kind').removeClass("hidden");
+ $("#add_new_benefit_kind_<%= @benefit_kind %>").removeClass("hidden");
+
 <% if display_esi_fields?(@benefit.insurance_kind, @benefit.kind) %>
     $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'esi_benefit', locals: { benefit: @benefit, insurance_kind: @benefit_insurance_kind, kind: @benefit_kind }) %>");
 <% else %>

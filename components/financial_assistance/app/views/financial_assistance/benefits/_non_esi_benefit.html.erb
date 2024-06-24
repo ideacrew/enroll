@@ -1,22 +1,46 @@
-<div id="<%= dom_id benefit %>" class="benefit row-form-adjustment">
-  <div class="focus_effect_module benefit-show">
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class="col-md-5 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">FROM</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
-        </div>
-        <div class="col-md-5 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">TO</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
-        </div>
-        <div class="col-md-2 no-pd form-group-lg class-fa-household fa-adjustment">
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-edit-<%= dom_id benefit %>')" id="non-esi-edit-<%= dom_id benefit %>" class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-delete-<%= dom_id benefit %>')" id="non-esi-delete-<%= dom_id benefit%>"class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
-        </div>
+<% if @bs4 %>
+  <div id="<%= dom_id benefit %>" class="benefit">
+    <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="non_esi_benefit">
+      <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titlecase %></h2>
+      <dl class="parent">
+        <dt>FROM</dt>
+        <dd><%= benefit.start_on %>
+        <% if benefit.end_on %>
+          <dt>To</dt>
+          <dd><%= benefit.end_on %>
+        <% end %>
+      </dl>
+      <div class="mt-4">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-edit-<%= dom_id benefit %>')" id="non-esi-edit-<%= dom_id benefit %>" class="btn btn-error outline edit-benefit" data-kind="<%= benefit.kind %>">Edit</a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-delete-<%= dom_id benefit %>')" id="non-esi-delete-<%= dom_id benefit%>" class="btn btn-error delete-benefit" data-kind="<%= benefit.kind %>">Delete</a>
       </div>
-  </div>
+    </div>
 
-  <div class="edit-benefit-form hidden">
-    <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
+    <div class="edit-benefit-form hidden">
+      <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind, edit: true} %>
+    </div>
   </div>
-</div>
+<% else %>
+  <div id="<%= dom_id benefit %>" class="benefit row-form-adjustment">
+    <div class="focus_effect_module benefit-show">
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class="col-md-5 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">FROM</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+          </div>
+          <div class="col-md-5 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">TO</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+          </div>
+          <div class="col-md-2 no-pd form-group-lg class-fa-household fa-adjustment">
+            <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-edit-<%= dom_id benefit %>')" id="non-esi-edit-<%= dom_id benefit %>" class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
+            <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-delete-<%= dom_id benefit %>')" id="non-esi-delete-<%= dom_id benefit%>"class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
+          </div>
+        </div>
+    </div>
+
+    <div class="edit-benefit-form hidden">
+      <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
+    </div>
+  </div>
+<% end %>

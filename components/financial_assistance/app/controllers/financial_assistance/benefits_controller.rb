@@ -6,7 +6,7 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index]
-    before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:index, :create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     layout :resolve_layout
 
@@ -88,8 +88,9 @@ module FinancialAssistance
     private
 
     def format_date(params)
-      params[:benefit][:start_on] = Date.strptime(params[:benefit][:start_on].to_s, "%m/%d/%Y")
-      params[:benefit][:end_on] = Date.strptime(params[:benefit][:end_on].to_s, "%m/%d/%Y") if params[:benefit][:end_on].present?
+      date_format = params[:benefit][:start_on].match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+      params[:benefit][:start_on] = Date.strptime(params[:benefit][:start_on].to_s, date_format)
+      params[:benefit][:end_on] = Date.strptime(params[:benefit][:end_on].to_s, date_format) if params[:benefit][:end_on].present?
     end
 
     def update_employer_contact(_model, params)

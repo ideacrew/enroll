@@ -1,48 +1,29 @@
 <% if @bs4 %>
 
-<section id="add_health_coverage_card" class="my-4 p-3 border rounded bg-white">
-  <div class="d-flex flex-row justify-content-between align-items-center">
-    <h3><%= l10n("faa.health_coverage.coverage_title", number:"1") %></h3>
-    <a id="remove_income_type" class="btn outline button-error" href="#" data-target=""><%= l10n('faa.health_coverage.remove_income_type') %></a>
-  </div>
-
-  <div class="my-4">
-    <label class="required" for="other_coverage_type"><%=l10n("faa.health_coverage.health_cov_type")%></label>
-
-    <%# maybe move this to a helper? %>
-    <% insurance_kind_options = [] %>
-    <% insurance_kinds.each do |insurance_kind| %>
-      <% eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
-      <% term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
-      <% if I18n.exists?("glossary."+insurance_kind) %>
-          <% hr_kind = render partial:'shared/glossary', locals: {key: insurance_kind, term: l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) } %>
-      <% else %>
-          <% hr_kind = l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-      <% end %>
-      <% insurance_kind_options << [ hr_kind, insurance_kind ] %>
+<div class="benefits-list <%= kind %> mb-4">
+  <% @applicant.benefits.where(kind: kind).each do |benefit| %>
+    <% if display_esi_fields?(benefit.insurance_kind, kind) %>
+      <%= render partial: 'esi_benefit', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: kind } %>
+    <% else %>
+      <%= render partial: 'non_esi_benefit', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: kind } %>
     <% end %>
+  <% end %>
+</div>
 
-    <%= select_tag :insurance_kinds_select, options_for_select(insurance_kind_options), required:true, class: "focus col-12" %>
-  </div>
+<div id="new-benefit-form-<%= kind %>" class='new-benefit-form my-4 p-3 border rounded bg-white <%= 'hidden' if @applicant.benefits.where(kind: kind).any? %>'>
+  <%= label_tag :insurance_kind, l10n("faa.health_coverage.health_cov_type"), class:"required", for: "insurance_kind_#{kind}" %>
+  <%= select_tag :insurance_kind, options_for_select(insurance_kind_select_options(kind)), required:true, prompt: l10n("faa.health_coverage.health_cov_type"), class: "insurance-kind w-100", id: "insurance_kind_#{kind}", data: {kind: kind} %>
+  <a tabindex="0" id="new-benefit-form-<%= kind %>_cancel" class="btn btn-error outline benefit-cancel-before-form mt-4 <%= 'hidden' unless @applicant.benefits.where(kind: kind).any? %>" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
+</div>
 
-  <div class="d-flex flex-column">
-    <%= l10n("faa.health_coverage.coverage_period_question") %>
+<div id="new-benefit-esi-form-<%= kind %>" class='hidden esi'>
+  <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, kind: kind, insurance_kind: "", edit: false} %>
+</div>
+<div id="new-benefit-non-esi-form-<%= kind %>" class='hidden non-esi'>
+  <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: @applicant.benefits.build, kind: kind, insurance_kind: "", edit: false} %>
+</div>
 
-    <div class="d-flex mt-3">
-      <div class="d-flex flex-column mr-3">
-        <label class="required" for="coverage_date_start"><%=l10n("start_date")%></label>
-        <%= date_field :coverage_date_start, {id: "coverage_date_start", class: "date-field col-3 mt-3"} %>
-      </div>
-
-      <div class="d-flex flex-column">
-        <label for="coverage_date_end"><%=l10n("end_date")%></label>
-        <%= date_field :coverage_date_end, {id: "coverage_date_end", class: "date-field col-3 mt-3"} %>
-      </div>
-    </div>
-  </div>
-</section>
-
-<button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_insurance_kind')" id="add_new_insurance_kind" class="button secondary">
+<button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_insurance_kind')" id="add_new_benefit_kind_<%= kind %>" class="button secondary add_new_benefit_kind <%= 'hidden' unless @applicant.benefits.where(kind: kind).any? %>" data-kind="<%= kind %>">
   <%= l10n("faa.health_coverage.add_cov_type") %>
 </button>
 
