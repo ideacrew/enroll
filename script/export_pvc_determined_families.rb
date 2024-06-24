@@ -3,7 +3,7 @@
 # This script generates a CSV report with information about families with renewal determined applications for the assistance_year with no SSN applicants.
 
 # To run this for specific year
-# bundle exec rails runner script/export_pvc_families.rb assistance_year='2024'
+# bundle exec rails runner script/export_pvc_determination_families.rb assistance_year='2024'
 
 assistance_year = ENV['assistance_year'] || TimeKeeper.date_of_record.year
 csr_list = [02, 04, 05, 06].freeze
