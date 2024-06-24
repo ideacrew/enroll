@@ -1,176 +1,243 @@
-<div id="<%= dom_id benefit %>" class="benefit">
-  <div class="focus_effect_module benefit-show">
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-10 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">EMPLOYER NAME</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_name %></span>
-      </div>
-       <div class="col-md-2 no-pd form-group-lg class-fa-household fa-adjustment">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-edit-<%= dom_id benefit %>')" id="esi-edit-<%= dom_id benefit %>"class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-delete-<%= dom_id benefit %>')" id="esi-delete-<%= dom_id benefit %>"class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
+<% if @bs4 %>
+  <div id="<%= dom_id benefit %>" class="benefit">
+    <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="esi_benefit">
+      <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titlecase %></h2>
+      <h3><%= benefit.employer_name %></h3>
+      <dl class="parent mb-4">
+        <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
+          <dt>EMPLOYER ADDRESSS LINE 1</dt>
+          <dd><%= benefit.employer_address.try(:address_1) %>
+          <dt>EMPLOYER ADDRESSS LINE 2</dt>
+          <dd><%= benefit.employer_address.try(:address_2) %>
+          <dt>CITY</dt>
+          <dd><%= benefit.employer_address.try(:city) %>
+          <dt>STATE</dt>
+          <dd><%= benefit.employer_address.try(:state) %>
+          <dt>ZIP</dt>
+          <dd><%= benefit.employer_address.try(:zip) %>
+        <% end %>
+        <dt>EMPLOYER PHONE</dt>
+        <dd><%= benefit.employer_phone.try(:full_phone_number) %>
+        <dt>EMPLOYER IDENTIFICATION NUMBER</dt>
+        <dd><%= benefit.employer_id %>
+      </dl>
+      <dl class="parent">
+        <% unless insurance_kind == 'health_reimbursement_arrangement' %>
+          <dt>In a waiting period and eligible to enroll in the next 3 months</dt>
+          <dd><%= benefit.is_esi_waiting_period ? l10n("yes") : l10n("no") %>
+          <dt>Employer offers a health plan that meets the minimum value standard</dt>
+          <dd><%= benefit.is_esi_mec_met ? l10n("yes") : l10n("no") %>
+          <dt>Covered</dt>
+          <dd><%= benefit.esi_covered&.titleize %></dd>
+          <dt>FROM</dt>
+          <dd><%= benefit.start_on %>
+          <% if benefit.end_on %>
+            <dt>To</dt>
+            <dd><%= benefit.end_on %>
+          <% end %>
+          <dt>How much the employee only would pay for the lowest cost minimum value standard plan?
+        <% else %>
+          <dt>Type of HRA</dt>
+          <dd><%= benefit.hra_type %>
+          <dt>FROM</dt>
+          <dd><%= benefit.start_on %>
+          <% if benefit.end_on %>
+            <dt>To</dt>
+            <dd><%= benefit.end_on %>
+          <% end %>
+          <dt>What's the maximum self-only amount of reimbursement offered by this employer?</dt>
+        <% end %>
+        <dd><%= benefit.employee_cost %>, <%= benefit.employee_cost_frequency %></dd>
+        <% if display_minimum_value_standard_question?(insurance_kind) %>
+          <dt><%= l10n("health_plan_meets_mvs_and_affordable_question") %></dt>
+          <dd><%= benefit.health_plan_meets_mvs_and_affordable ? l10n("yes") : l10n("no") %>
+        <% end %>
+      </dl>
+      <div class="mt-4">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-edit-<%= dom_id benefit %>')" id="esi-edit-<%= dom_id benefit %>" class="btn btn-error outline edit-benefit" data-kind="<%= benefit.kind %>">Edit</a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-delete-<%= dom_id benefit %>')" id="esi-delete-<%= dom_id benefit%>" class="btn btn-error delete-benefit" data-kind="<%= benefit.kind %>">Delete</a>
       </div>
     </div>
-    <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">EMPLOYER ADDRESSS LINE 1</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:address_1) %></span>
-        </div>
-        <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">EMPLOYER ADDRESSS LINE 2</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:address_2) %></span>
-        </div>
-      </div>
 
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">CITY</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:city) %></span>
-        </div>
-        <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">STATE</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:state) %></span>
-        </div>
-        <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">ZIP</label>
-          <span class="field_value zip floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:zip) %></span>
-        </div>
-      </div>
-    <% end %>
-
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">EMPLOYER PHONE</label>
-        <span class="field_value phone_number floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_phone.try(:full_phone_number) %></span>
-      </div>
-      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel" data-cuke="benefit_esi_ein_label">EMPLOYER IDENTIFICATION NUMBER <%= "*" unless EnrollRegistry[:skip_employer_id_validation].enabled? %></label>
-        <span class="field_value fien_field floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_id %></span>
-      </div>
+    <div class="edit-benefit-form hidden">
+      <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
     </div>
-
-    <% unless insurance_kind == 'health_reimbursement_arrangement' %>
-      <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
-        <div class='col-md-6 labelforcoverage'>
-          <span class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *</span>
+  </div>
+<% else %>
+  <div id="<%= dom_id benefit %>" class="benefit">
+    <div class="focus_effect_module benefit-show">
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-10 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">EMPLOYER NAME</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_name %></span>
         </div>
-        <div class='col-md-6'>
-          <div class='col-md-4'>
-            <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml", onclick: 'return false;') %>
-            <label class="radio-yml" for="is_esi_waiting_period_yes">Yes</label>
+        <div class="col-md-2 no-pd form-group-lg class-fa-household fa-adjustment">
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-edit-<%= dom_id benefit %>')" id="esi-edit-<%= dom_id benefit %>"class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-delete-<%= dom_id benefit %>')" id="esi-delete-<%= dom_id benefit %>"class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
+        </div>
+      </div>
+      <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">EMPLOYER ADDRESSS LINE 1</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:address_1) %></span>
           </div>
-          <div class='col-md-4'>
-            <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", false, !benefit.is_esi_waiting_period ,class: "radio-yml", onclick: 'return false;')%>
-            <label class="radio-yml" for="is_esi_waiting_period_no">No</label>
+          <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">EMPLOYER ADDRESSS LINE 2</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:address_2) %></span>
           </div>
-          <div class='col-md-4'>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">CITY</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:city) %></span>
+          </div>
+          <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">STATE</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:state) %></span>
+          </div>
+          <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">ZIP</label>
+            <span class="field_value zip floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:zip) %></span>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">EMPLOYER PHONE</label>
+          <span class="field_value phone_number floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_phone.try(:full_phone_number) %></span>
+        </div>
+        <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel" data-cuke="benefit_esi_ein_label">EMPLOYER IDENTIFICATION NUMBER <%= "*" unless EnrollRegistry[:skip_employer_id_validation].enabled? %></label>
+          <span class="field_value fien_field floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_id %></span>
+        </div>
+      </div>
+
+      <% unless insurance_kind == 'health_reimbursement_arrangement' %>
+        <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
+          <div class='col-md-6 labelforcoverage'>
+            <span class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *</span>
+          </div>
+          <div class='col-md-6'>
+            <div class='col-md-4'>
+              <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml", onclick: 'return false;') %>
+              <label class="radio-yml" for="is_esi_waiting_period_yes">Yes</label>
+            </div>
+            <div class='col-md-4'>
+              <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", false, !benefit.is_esi_waiting_period ,class: "radio-yml", onclick: 'return false;')%>
+              <label class="radio-yml" for="is_esi_waiting_period_no">No</label>
+            </div>
+            <div class='col-md-4'>
+              <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
+          <div class='col-md-6 labelforcoverage'>
+            <span class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard ? *</span>
+          </div>
+          <div class='col-md-6'>
+            <div class='col-md-4'>
+              <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml", onclick: 'return false;') %>
+              <label class="radio-yml" for="is_esi_mec_met_yes">Yes</label>
+            </div>
+            <div class='col-md-4'>
+              <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", false, !benefit.is_esi_mec_met, class: "radio-yml", onclick: 'return false;')%>
+              <label class="radio-yml" for="is_esi_mec_met_no">No</label>
+            </div>
+            <div class='col-md-4'>
+              <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">Who Can be Covered? *</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.esi_covered&.titleize %></span>
+          </div>
+          <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">FROM</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit&.start_on %></span>
+          </div>
+          <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel">TO</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit&.end_on %></span>
+          </div>
+        </div>
+
+        <div class="row row-form-wrapper radio-align no-buffer">
+          <div class='col-md-9 labelforcoverage'>
+            <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan ? *</span>
+          </div>
+          <div class='col-md-3 not-sure-margin'>
             <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
           </div>
         </div>
-      </div>
+      <% end %>
 
-      <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
-        <div class='col-md-6 labelforcoverage'>
-          <span class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard ? *</span>
-        </div>
-        <div class='col-md-6'>
-          <div class='col-md-4'>
-            <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml", onclick: 'return false;') %>
-            <label class="radio-yml" for="is_esi_mec_met_yes">Yes</label>
+      <% if insurance_kind == 'health_reimbursement_arrangement'%>
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel"><%= l10n("faa.question.type_of_hra") %> *</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.hra_type %></span>
           </div>
-          <div class='col-md-4'>
-            <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", false, !benefit.is_esi_mec_met, class: "radio-yml", onclick: 'return false;')%>
-            <label class="radio-yml" for="is_esi_mec_met_no">No</label>
+          <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel"><%= l10n("from").upcase %></label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
           </div>
-          <div class='col-md-4'>
-            <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
+          <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel"><%= l10n("to").upcase %></label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
           </div>
         </div>
-      </div>
 
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">Who Can be Covered? *</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.esi_covered&.titleize %></span>
+        <div class="row row-form-wrapper radio-align no-buffer">
+          <div class='col-md-9 labelforcoverage'>
+            <span class="fa-text-color"><%= l10n("faa.question.max_employer_reimbursement") %></span>
+          </div>
+          <div class='col-md-2 not-sure-margin'>
+            <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit" class="interaction-click-control-not-sure? benefit-support-modal"><%= l10n("faa.question.not_sure") %>?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "hra_benefit"} %>
+          </div>
         </div>
-        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">FROM</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit&.start_on %></span>
-        </div>
-        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel">TO</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit&.end_on %></span>
-        </div>
-      </div>
+      <% end %>
 
       <div class="row row-form-wrapper radio-align no-buffer">
-        <div class='col-md-9 labelforcoverage'>
-          <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan ? *</span>
-        </div>
-        <div class='col-md-3 not-sure-margin'>
-          <a href="#" data-toggle="modal" data-target="#">Not sure?</a>
-        </div>
-      </div>
-    <% end %>
-
-    <% if insurance_kind == 'health_reimbursement_arrangement'%>
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel"><%= l10n("faa.question.type_of_hra") %> *</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.hra_type %></span>
+        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">AMOUNT *</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employee_cost %></span>
         </div>
         <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel"><%= l10n("from").upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
-        </div>
-        <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
-          <label class="static_label label-floatlabel"><%= l10n("to").upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+          <label class="static_label label-floatlabel">How Often *</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employee_cost_frequency %></span>
         </div>
       </div>
 
-      <div class="row row-form-wrapper radio-align no-buffer">
-        <div class='col-md-9 labelforcoverage'>
-          <span class="fa-text-color"><%= l10n("faa.question.max_employer_reimbursement") %></span>
+      <% if display_minimum_value_standard_question?(insurance_kind) %>
+        <div class="row row-form-wrapper radio-align no-buffer fa-align-elements" data-cuke="meets_mvs_and_affordable">
+          <div class='col-md-8 labelforcoverage'>
+            <span class="fa-text-color"><%= l10n("health_plan_meets_mvs_and_affordable_question") %> *</span>
+          </div>
+          <div class='col-md-4'>
+            <div class='col-md-4'>
+              <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", true, benefit.health_plan_meets_mvs_and_affordable,class: "radio-yml", onclick: 'return false;') %>
+              <label class="radio-yml" for="health_plan_meets_mvs_and_affordable_yes" required="required">Yes</label>
+            </div>
+            <div class='col-md-4'>
+              <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", false, !benefit.health_plan_meets_mvs_and_affordable, class: "radio-yml", onclick: 'return false;')%>
+              <label class="radio-yml" for="health_plan_meets_mvs_and_affordable_no">No</label>
+            </div>
+          </div>
         </div>
-        <div class='col-md-2 not-sure-margin'>
-          <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit" class="interaction-click-control-not-sure? benefit-support-modal"><%= l10n("faa.question.not_sure") %>?</a>
-          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "hra_benefit"} %>
-        </div>
-      </div>
-    <% end %>
-
-    <div class="row row-form-wrapper radio-align no-buffer">
-      <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">AMOUNT *</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employee_cost %></span>
-      </div>
-      <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">How Often *</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employee_cost_frequency %></span>
-      </div>
+      <% end %>
     </div>
 
-    <% if display_minimum_value_standard_question?(insurance_kind) %>
-      <div class="row row-form-wrapper radio-align no-buffer fa-align-elements" data-cuke="meets_mvs_and_affordable">
-        <div class='col-md-8 labelforcoverage'>
-          <span class="fa-text-color"><%= l10n("health_plan_meets_mvs_and_affordable_question") %> *</span>
-        </div>
-        <div class='col-md-4'>
-          <div class='col-md-4'>
-            <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", true, benefit.health_plan_meets_mvs_and_affordable,class: "radio-yml", onclick: 'return false;') %>
-            <label class="radio-yml" for="health_plan_meets_mvs_and_affordable_yes" required="required">Yes</label>
-          </div>
-          <div class='col-md-4'>
-            <%= radio_button_tag("health_plan_meets_mvs_and_affordable_#{benefit.id}", false, !benefit.health_plan_meets_mvs_and_affordable, class: "radio-yml", onclick: 'return false;')%>
-            <label class="radio-yml" for="health_plan_meets_mvs_and_affordable_no">No</label>
-          </div>
-        </div>
-      </div>
-    <% end %>
+    <div class="edit-benefit-form hidden">
+      <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
+    </div>
   </div>
-
-  <div class="edit-benefit-form hidden">
-    <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
-  </div>
-</div>
+<% end %>
