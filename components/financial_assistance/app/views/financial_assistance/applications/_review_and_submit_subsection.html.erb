@@ -24,7 +24,7 @@
         </div>
         <%# Review Benefits partial for Health Coverage subsection %>
         <% if value.is_a?(Hash) && value[:review_benefits_partial].present? %>
-          <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
+          <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: value[:review_benefits_partial], applicant: applicant} %>
         <% end %>
       <% end %>
     </dl>
