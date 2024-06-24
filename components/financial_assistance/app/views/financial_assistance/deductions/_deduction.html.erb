@@ -19,7 +19,7 @@
           <input class="fake-disabled-input" id="end-<%= deduction.id %>" disabled="true" value="<%= deduction.end_on.present? ? deduction.end_on : 'N/A' %>">
         </div>
       </div>
-      <div class="d-flex mb-2 mx-1">
+      <div class="d-flex mb-2">
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete button outline error mr-1"><%= l10n("faa.edit.remove") %></a>
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit button outline"><%=l10n("edit")%></a>
       </div>

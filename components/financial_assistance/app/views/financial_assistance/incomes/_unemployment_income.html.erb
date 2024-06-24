@@ -23,7 +23,7 @@
           <input class="fake-disabled-input" id="end-<%= income.id %>" disabled="true" value="<%= income.end_on.present? ? income.end_on : 'N/A' %>">
         </div>
       </div>
-      <div class="d-flex mb-2 mx-1">
+      <div class="d-flex mb-2">
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-income-delete-<%= dom_id income %>')" id="unemployment-income-delete-<%= dom_id income %>" class="button outline error mr-1 unemployment-income-delete"><%= l10n("faa.edit.remove") %></a>
         <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-income-edit-<%= dom_id income %>')" id="unemployment-income-edit-<%= dom_id income %>" class="button outline unemployment-income-edit"><%=l10n("edit")%></a>
       </div>

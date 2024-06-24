@@ -8,7 +8,7 @@
     <fieldset class="mb-3">
       <legend class="weight-n required"><%= l10n("faa.deductions.income_adjustments", subject: applicant_name) %></legend>
       <% has_deductions = @applicant.has_deductions == true %>
-      <div class="d-flex align-items-center focus mx-1">
+      <div class="d-flex align-items-center focus">
         <label class="weight-n"><%= radio_button_tag :has_deductions, true, has_deductions %><span><%= l10n('yes') %></span></label>
         <label class="weight-n"><%= radio_button_tag :has_deductions, false, has_deductions == false %><span><%= l10n('no') %></span></label>
       </div>
@@ -29,7 +29,7 @@
       <div id="<%= deduction_kind %>"class="my-4 deduction-kind">
         <div>
           <label class="weight-n">
-            <div class="d-flex align-items-center mx-1">
+            <div class="d-flex align-items-center">
               <div class="flex-col mr-1">
                 <%= check_box_tag :deduction_kind, deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
               </div>
@@ -54,7 +54,7 @@
         <div class='new-deduction-form hidden <%= deduction_kind %>'>
           <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
         </div>
-        <div class="add-more-link mt-4 mx-1 <%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>" id="add-more-link-<%=deduction_kind%>">
+        <div class="add-more-link mt-4 <%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>" id="add-more-link-<%=deduction_kind%>">
           <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" class="button add_new_deduction_kind">
             <%= l10n("faa.other_incomes.add", kind: label).titleize %>
           </button>
