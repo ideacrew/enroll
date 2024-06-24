@@ -16,7 +16,11 @@ And(/Individual has broker assigned to them/) do
 end
 
 And(/^Individual clicks on the Help Me Sign Up link?/) do
-  find("#help_with_plan_shopping_btn").click
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+  else
+  find('.interaction-click-control-help-me-sign-up').click
+  end
 end
 
 And(/^Individual clicks on the Get Help Signing Up button?/) do
