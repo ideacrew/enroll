@@ -15,7 +15,7 @@ Feature: Create Eligibility
     And Hbx Admin choose Effective Date
     And Hbx Admin set Expected Contribution
     And Hbx Admin click Save Changes
-    Then Hbx Admin see successful massage
+    Then Hbx Admin see successful message
 
   Scenario:
     Given a consumer exists without coverage
@@ -31,4 +31,4 @@ Feature: Create Eligibility
     And Hbx Admin choose Effective Date
     And Hbx Admin set Expected Contribution
     And Hbx Admin click Save Changes
-    Then Hbx Admin see error massage
+    Then Hbx Admin see error message

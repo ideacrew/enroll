@@ -33,11 +33,11 @@ When(/^Hbx Admin click Save Changes$/) do
   find_button('Save Changes').click
 end
 
-Then(/^Hbx Admin see successful massage$/) do
+Then(/^Hbx Admin see successful message$/) do
   expect(page).to have_content("THH & Eligibility created successfully")
 end
 
-Then(/^Hbx Admin see error massage$/) do
+Then(/^Hbx Admin see error message$/) do
   expect(page).to have_content("Error: The Create Eligibility tool cannot be used because the consumer is not applying for coverage.")
 end
 
