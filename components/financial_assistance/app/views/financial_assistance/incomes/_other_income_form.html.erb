@@ -38,10 +38,10 @@
         <%= f.submit l10n("faa.other_incomes.save"), disabled: disabled.present? && disabled ? "disabled" : nil, class: "button", :data => { :cuke => "other-income-save-button" } %>
       </div>
     </div>
-  <% end %>
 
-  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
-    <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
+    <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+      <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
+    <% end %>
   <% end %>
 <% else %>
 

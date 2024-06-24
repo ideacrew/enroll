@@ -30,10 +30,10 @@
         <%= f.submit l10n("faa.other_incomes.save"), class: "button btn-save", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
       </div>
     </div>
-  <% end %>
-  
-  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
-    <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income.id } %>
+
+    <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+      <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income.id } %>
+    <% end %>
   <% end %>
 <% else %>
   <%= income_form_for @application, @applicant, income do |f| %>
