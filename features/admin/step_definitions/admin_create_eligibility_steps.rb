@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 Given(/^a consumer exists without coverage$/) do
   user :with_consumer_role
   user.primary_family.family_members.find(&:is_primary_applicant).update_attributes!(is_coverage_applicant: false)
 end
-
 
 When(/^Hbx Admin clicks on Create Eligibility$/) do
   find_link('Create Eligibility').click
