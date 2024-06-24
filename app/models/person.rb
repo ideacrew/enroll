@@ -482,7 +482,7 @@ class Person
         'events.private.person_saved',
         headers: {
           after_updated_at: updated_at,
-          before_updated_at: changed_attributes[:updated_at]
+          before_updated_at: changed_attributes.deep_symbolize_keys[:updated_at]
         },
         attributes: {
           after_save_version: to_hash,
