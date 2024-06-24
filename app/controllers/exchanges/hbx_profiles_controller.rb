@@ -756,7 +756,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       @element_to_replace_id = params[:tax_household_group][:family_actions_id]
       family = Person.find(params[:tax_household_group][:person_id]).primary_family
-      ::Operations::TaxHouseholdGroups::CreateEligibility.new.call({
+      result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call({
                                                                      family: family,
                                                                      th_group_info: params.require(:tax_household_group).permit(
                                                                        :person_id,
@@ -765,12 +765,17 @@ class Exchanges::HbxProfilesController < ApplicationController
                                                                        :tax_households => {}
                                                                      ).to_h
                                                                    })
+      if result.success?
+        @result = { success: true, message: 'THH & Eligibility created successfully' }
+      else
+        @result =  { success: false, error: result.failure }
+      end
     else
       @element_to_replace_id = params[:person][:family_actions_id]
       family = Person.find(params[:person][:person_id]).primary_family
       family.active_household.create_new_tax_household(params[:person])
+      @result = { success: true, message: 'THH & Eligibility created successfully' }
     end
-
     respond_to :js
   end
 

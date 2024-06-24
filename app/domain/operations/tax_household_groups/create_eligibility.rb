@@ -24,6 +24,7 @@ module Operations
       def validate(params)
         return Failure('Invalid params. family should be an instance of family') unless params[:family].is_a?(Family)
         return Failure('Missing th_group_info') unless params[:th_group_info]
+        return Failure('The Create Eligibility tool cannot be used because the consumer is not applying for coverage.') unless params[:family].family_members.find { |member| member.is_primary_applicant }.is_coverage_applicant
 
         Success(params)
       end
@@ -51,6 +52,7 @@ module Operations
         return Success() unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
 
         ::Operations::Individual::OnNewDetermination.new.call({family: @family.reload, year: @effective_date.year})
+        Success()
       end
     end
   end
