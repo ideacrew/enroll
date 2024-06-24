@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div id="<%= dom_id other_income %>" class="other-income mt-4">
     <div class="other-income-show">
-      <div class="d-flex col-sm income-form-row p-0 mb-2">
+      <div class="d-flex row income-form-row p-0 m-0 mb-2">
         <% if other_income.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
           <div class="mr-auto col-sm col-md-6 col-lg-3 p-0" id="ssi_type">
             <div class="ss_benefit_type">

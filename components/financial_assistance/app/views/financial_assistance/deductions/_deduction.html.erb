@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div id="<%= dom_id deduction %>" class="deduction mb-4">
     <div class="deduction-show">
-      <div class="d-flex col-sm p-0 mb-2">
+      <div class="d-flex row p-0 m-0 mb-2">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <label for="amount-<%= deduction.id %>" class="required"><%= l10n("faa.review.income.table.amount") %></label>
           <input class="fake-disabled-input" id="amount-<%= deduction.id %>" disabled="true" value="<%= number_to_currency(deduction.amount) %>">

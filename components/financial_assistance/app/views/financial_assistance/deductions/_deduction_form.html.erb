@@ -5,7 +5,7 @@
     <% deduction_id = deduction.id %>
     <% dummy_deduction_id = "#{deduction_id}#{new_form ? 'dummy' : ''}" # needed to prevent Multiple Form Label accessibility error %>
     <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{deduction_id}', true)") : "" %>
-    <div class="d-flex col-sm p-0 mb-2">
+    <div class="d-flex row p-0 m-0 mb-2">
       <%= f.hidden_field :deduction_type, value: kind %>
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :amount, l10n("faa.review.income.table.amount"), class: "required", for: "amount#{dummy_deduction_id}" %>
@@ -28,7 +28,7 @@
       <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-cancel-<%= deduction_id %>')" id="income-deduction-cancel-<%= deduction_id %>" class="btn outline deduction-cancel mr-1"><%= l10n("faa.other_incomes.cancel") %></a>
       <%= f.submit l10n("faa.other_incomes.save"), disabled: new_form.present? && new_form ? "disabled" : nil, class: "button", :data => { :cuke => "income-adjustments-save-button" } %>
     </div>
-    
+
     <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
       <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: deduction_id } %>
     <% end %>

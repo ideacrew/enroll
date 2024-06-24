@@ -7,7 +7,7 @@
       <% dummy_income_id = "#{income_id}#{new_form ? 'dummy' : ''}" # needed to prevent Multiple Form Label accessibility error %>
       <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}', true)") : "" %>
       <%= f.hidden_field :kind, value: 'unemployment_income' %>
-      <div class="d-flex col-sm p-0 mb-2">
+      <div class="d-flex row p-0 m-0 mb-2">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :amount, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{dummy_income_id}" %>
           <%= f.text_field :amount, placeholder: '$', value: number_to_currency(income.amount), required: true, id: "amount#{dummy_income_id}" %>
