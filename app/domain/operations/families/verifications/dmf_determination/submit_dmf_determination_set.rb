@@ -50,7 +50,7 @@ module Operations
                 publish({ family_hbx_id: family.hbx_assigned_id, job_id: job.job_id })
 
                 count += 1
-                dmf_logger.info("********************************* published #{count} families *********************************") if count % 100 == 0
+                dmf_logger.info("********************************* published #{count} families for job with job_id #{job.job_id} *********************************") if count % 100 == 0
               else
                 dmf_logger.error("Family with id #{family.id} is missing hbx_assigned_id -- unable to proceed with dmf determination")
               end
