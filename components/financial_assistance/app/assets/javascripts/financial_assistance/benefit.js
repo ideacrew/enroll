@@ -27,7 +27,7 @@ function afterDestroyHide(selector_id, kind){
 // disable and lower the opacity of the form except pertinent sections
 function startEditing(parentContainer) {
   $('#nav-buttons a').addClass('disabled');
-  $('.driver-question, .instruction-row').addClass('disabled');
+  $('.driver-question, .instruction-row, .add_new_benefit_kind').addClass('disabled');
   $(parentContainer).removeClass("disabled");
   $(parentContainer).find('.benefit').addClass("disabled");
   $(parentContainer).find('.active').removeClass("disabled");
@@ -41,7 +41,7 @@ function startEditing(parentContainer) {
 function stopEditing() {
   $('.disabled a').removeAttr('tabindex');
   $('.disabled input:not(input[type=submit]), .disabled a').removeAttr('disabled');
-  $('.driver-question, .instruction-row, .disabled a, .benefits-list, #nav-buttons a, .benefit').removeClass('disabled');
+  $('.driver-question, .instruction-row, .disabled a, .benefits-list, #nav-buttons a, .benefit, .add_new_benefit_kind').removeClass('disabled');
 };
 
 // in order to make sure the input ids/labels are unique, we need to add a random string to the end
@@ -62,7 +62,7 @@ function makeInputIdsUnique(formId, clonedForm) {
     var newFor = currentFor.split("|")[0] + "|"+ newFormId;
     label.setAttribute('for', newFor);
   });
-  clonedForm.querySelectorAll('input').forEach(function(input) {
+  clonedForm.querySelectorAll('input, select').forEach(function(input) {
     var currentId = input.getAttribute('id');
     if (currentId === null) {
       return;
@@ -122,26 +122,26 @@ document.addEventListener("turbolinks:load", function() {
       // make the inputs of the selected kind required
       if (selected.value !== "health_reimbursement_arrangement") {
         clonedForm.querySelector('.non-hra-questions').classList.remove('hidden');
-        clonedForm.querySelector('.non-hra-questions input, non-hra-questions select').forEach(function(input) {
-          var label = $('label[for='+input.id+']')
-          if ((label && label.hasClass('required')) || input.classList.contains('required')) {
+        clonedForm.querySelectorAll('.non-hra-questions input, non-hra-questions select').forEach(function(input) {
+          var label = clonedForm.querySelector("label[for='" + input.id + "']")
+          if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
             input.setAttribute('required', true);
           }
         });
         clonedForm.querySelector('.hra-questions').classList.add('hidden');
-        clonedForm.querySelector('.hra-questions input, .hra-questions select').forEach(function(input) {
+        clonedForm.querySelectorAll('.hra-questions input, .hra-questions select').forEach(function(input) {
           input.removeAttribute('required');
         });
       } else {
         clonedForm.querySelector('.hra-questions').classList.remove('hidden');
-        clonedForm.querySelector('.hra-questions input, hra-questions select').forEach(function(input) {
-          var label = $('label[for='+input.id+']')
-          if ((label && label.hasClass('required')) || input.classList.contains('required')) {
+        clonedForm.querySelectorAll('.hra-questions input, hra-questions select').forEach(function(input) {
+          var label = clonedForm.querySelector("label[for='" + input.id + "']")
+          if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
             input.setAttribute('required', true);
           }
         });
         clonedForm.querySelector('.non-hra-questions').classList.add('hidden');
-        clonedForm.querySelector('.non-hra-questions input, .non-hra-questions select').forEach(function(input) {
+        clonedForm.querySelectorAll('.non-hra-questions input, .non-hra-questions select').forEach(function(input) {
           input.removeAttribute('required');
         });
       }
@@ -149,15 +149,15 @@ document.addEventListener("turbolinks:load", function() {
       // show mvsq if msqv is true
       if (mvsq === "true") {
         clonedForm.querySelector('.mvsq-questions').classList.remove('hidden');
-        clonedForm.querySelector('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
-          var label = $('label[for='+input.id+']')
-          if ((label && label.hasClass('required')) || input.classList.contains('required')) {
+        clonedForm.querySelectorAll('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
+          var label = clonedForm.querySelector("label[for='" + input.id + "']")
+          if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
             input.setAttribute('required', true);
           }
         });
       } else {
         clonedForm.querySelector('.mvsq-questions').classList.add('hidden');
-        clonedForm.querySelector('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
+        clonedForm.querySelectorAll('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
           input.removeAttribute('required');
         });
       }

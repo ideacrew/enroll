@@ -3,16 +3,16 @@
     <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="non_esi_benefit">
       <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titlecase %></h2>
       <dl class="parent">
-        <dt>FROM</dt>
+        <dt><%= l10n("faa.health_coverage.from") %></dt>
         <dd><%= benefit.start_on %>
         <% if benefit.end_on %>
-          <dt>To</dt>
+          <dt><%= l10n("faa.health_coverage.to") %></dt>
           <dd><%= benefit.end_on %>
         <% end %>
       </dl>
       <div class="mt-4">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-edit-<%= dom_id benefit %>')" id="non-esi-edit-<%= dom_id benefit %>" class="btn btn-error outline edit-benefit" data-kind="<%= benefit.kind %>">Edit</a>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-delete-<%= dom_id benefit %>')" id="non-esi-delete-<%= dom_id benefit%>" class="btn btn-error delete-benefit" data-kind="<%= benefit.kind %>">Delete</a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-edit-<%= dom_id benefit %>')" id="non-esi-edit-<%= dom_id benefit %>" class="btn btn-error outline edit-benefit" data-kind="<%= benefit.kind %>"><%= l10n("en.faa.health_coverage.edit") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-delete-<%= dom_id benefit %>')" id="non-esi-delete-<%= dom_id benefit%>" class="btn btn-error delete-benefit" data-kind="<%= benefit.kind %>"><%= l10n("en.faa.health_coverage.delete") %></a>
       </div>
     </div>
 

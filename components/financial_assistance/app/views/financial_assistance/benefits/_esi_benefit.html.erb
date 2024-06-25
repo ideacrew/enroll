@@ -5,47 +5,47 @@
       <h3><%= benefit.employer_name %></h3>
       <dl class="parent mb-4">
         <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
-          <dt>EMPLOYER ADDRESSS LINE 1</dt>
+          <dt><%= l10n("faa.health_coverage.esi.employer_address1") %></dt>
           <dd><%= benefit.employer_address.try(:address_1) %>
-          <dt>EMPLOYER ADDRESSS LINE 2</dt>
+          <dt><%= l10n("faa.health_coverage.esi.employer_address2") %></dt>
           <dd><%= benefit.employer_address.try(:address_2) %>
-          <dt>CITY</dt>
+          <dt><%= l10n("faa.health_coverage.esi.employer_city") %></dt>
           <dd><%= benefit.employer_address.try(:city) %>
-          <dt>STATE</dt>
+          <dt><%= l10n("faa.health_coverage.esi.employer_state") %></dt>
           <dd><%= benefit.employer_address.try(:state) %>
-          <dt>ZIP</dt>
+          <dt><%= l10n("faa.health_coverage.esi.employer_zip") %></dt>
           <dd><%= benefit.employer_address.try(:zip) %>
         <% end %>
-        <dt>EMPLOYER PHONE</dt>
+        <dt><%= l10n("faa.health_coverage.esi.employer_phone") %></dt>
         <dd><%= benefit.employer_phone.try(:full_phone_number) %>
-        <dt>EMPLOYER IDENTIFICATION NUMBER</dt>
+        <dt><%= l10n("faa.health_coverage.esi.employer_id") %></dt>
         <dd><%= benefit.employer_id %>
       </dl>
       <dl class="parent">
         <% unless insurance_kind == 'health_reimbursement_arrangement' %>
-          <dt>In a waiting period and eligible to enroll in the next 3 months</dt>
+          <dt><%= l10n("faa.health_coverage.esi.waiting_label") %></dt>
           <dd><%= benefit.is_esi_waiting_period ? l10n("yes") : l10n("no") %>
-          <dt>Employer offers a health plan that meets the minimum value standard</dt>
+          <dt><%= l10n("faa.health_coverage.esi.waiting_label") %></dt>
           <dd><%= benefit.is_esi_mec_met ? l10n("yes") : l10n("no") %>
-          <dt>Covered</dt>
+          <dt><%= l10n("faa.health_coverage.esi.covered") %></dt>
           <dd><%= benefit.esi_covered&.titleize %></dd>
-          <dt>FROM</dt>
+          <dt><%= l10n("start_on") %></dt>
           <dd><%= benefit.start_on %>
           <% if benefit.end_on %>
-            <dt>To</dt>
+            <dt><%= l10n("end_on") %></dt>
             <dd><%= benefit.end_on %>
           <% end %>
-          <dt>How much the employee only would pay for the lowest cost minimum value standard plan?
+          <dt><%= l10n("faa.health_coverage.esi.mvs_amount_question") %></dt>
         <% else %>
-          <dt>Type of HRA</dt>
+          <dt><%= l10n("faa.health_coverage.esi.type_of_hra") %></dt>
           <dd><%= benefit.hra_type %>
-          <dt>FROM</dt>
+          <dt><%= l10n("start_on") %></dt>
           <dd><%= benefit.start_on %>
           <% if benefit.end_on %>
-            <dt>To</dt>
+            <dt><%= l10n("end_on") %></dt>
             <dd><%= benefit.end_on %>
           <% end %>
-          <dt>What's the maximum self-only amount of reimbursement offered by this employer?</dt>
+          <dt><%= l10n("faa.health_coverage.esi.hra_max_question") %></dt>
         <% end %>
         <dd><%= benefit.employee_cost %>, <%= benefit.employee_cost_frequency %></dd>
         <% if display_minimum_value_standard_question?(insurance_kind) %>
@@ -54,8 +54,8 @@
         <% end %>
       </dl>
       <div class="mt-4">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-edit-<%= dom_id benefit %>')" id="esi-edit-<%= dom_id benefit %>" class="btn btn-error outline edit-benefit" data-kind="<%= benefit.kind %>">Edit</a>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-delete-<%= dom_id benefit %>')" id="esi-delete-<%= dom_id benefit%>" class="btn btn-error delete-benefit" data-kind="<%= benefit.kind %>">Delete</a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-edit-<%= dom_id benefit %>')" id="esi-edit-<%= dom_id benefit %>" class="btn btn-error outline edit-benefit" data-kind="<%= benefit.kind %>"><%= l10n("faa.health_coverage.edit") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-delete-<%= dom_id benefit %>')" id="esi-delete-<%= dom_id benefit%>" class="btn btn-error delete-benefit" data-kind="<%= benefit.kind %>"><%= l10n("faa.health_coverage.delete") %></a>
       </div>
     </div>
 

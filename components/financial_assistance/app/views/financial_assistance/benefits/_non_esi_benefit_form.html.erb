@@ -24,7 +24,7 @@
         <% else %>
           <a tabindex="0" id="non_esi_cancel_<%= kind %>|<%= form_id %>" class="btn btn-error outline benefit-form-cancel mr-2" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
         <% end %>
-        <%= f.submit 'Save', class: 'btn btn-save' %>
+        <%= f.submit l10n("faa.health_coverage.save"), class: 'btn btn-save' %>
       </div>
     </div>
   <% end %>
