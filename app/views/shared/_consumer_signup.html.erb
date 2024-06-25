@@ -14,7 +14,7 @@
   <% end %>
 <% end %>
 <% content_for(:show_exit_button) { (!@no_save_button && step < 6).to_s } %>
-<% content_for(:show_previous_button) { (!@no_previous_button && ![6].include?(step)).to_s } %>
+<% content_for(:show_previous_button) { (!@no_previous_button && ![1,6].include?(step)).to_s } %>
 <% content_for(:show_account_button) { step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
 <% content_for(:is_complete) { step == 6 } %>
 <% content_for(:show_help_button) { show_help_button } %>
