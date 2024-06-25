@@ -19,8 +19,8 @@
     <fieldset class="mb-4">
       <legend><%= l10n("faa.choose_a_plan_year") %></legend>
       <div class="focus">
-        <label><%= f.radio_button :assistance_year, oe_year, checked: true, id: 'renewal_assistance_year' %> <%= l10n("faa.assitance_year_option1", year: oe_year) %></label>
-        <label><%= f.radio_button :assistance_year, current_year, checked: false, id: 'current_assistance_year' %> <%= l10n("faa.assitance_year_option2", year: current_year) %></label>
+        <label class="weight-n"><%= f.radio_button :assistance_year, oe_year, checked: true, id: 'renewal_assistance_year' %> <%= l10n("faa.assitance_year_option1", year: oe_year) %></label>
+        <label class="weight-n"><%= f.radio_button :assistance_year, current_year, checked: false, id: 'current_assistance_year' %> <%= l10n("faa.assitance_year_option2", year: current_year) %></label>
       </div>
     </fieldset>
     <% content_for :submit_button do %>

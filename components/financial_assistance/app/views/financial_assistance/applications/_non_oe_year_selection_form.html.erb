@@ -9,8 +9,8 @@
     <fieldset class="mb-4">
       <legend><%= l10n("faa.choose_a_plan_year") %></legend>
       <div class="focus">
-        <label><%= f.radio_button :assistance_year, calendar_year %> <%= calendar_year %></label>
-        <label><%= f.radio_button :assistance_year, previous_year %> <%= previous_year %></label>
+        <label class="weight-n"><%= f.radio_button :assistance_year, calendar_year %> <%= calendar_year %></label>
+        <label class="weight-n"><%= f.radio_button :assistance_year, previous_year %> <%= previous_year %></label>
       </div>
     </fieldset>
     <% content_for :submit_button do %>
