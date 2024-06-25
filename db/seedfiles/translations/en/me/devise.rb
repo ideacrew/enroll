@@ -30,5 +30,4 @@ DEVISE_TRANSLATIONS = {
   :'en.devise.requirement6' => "Must contain at least one number",
   :'en.devise.requirement7' => "Must contain at least one character that isn’t a number or letter",
   :'en.devise.requirement8' => "Email must be in the following format",
-  :'en.devise.email_username' => "You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it."
 }
