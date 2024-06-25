@@ -17,7 +17,6 @@
               <%= f.hidden_field :referer, value: request.env["HTTP_REFERER"] %>
               <div class="form-group">
                 <%= f.label :email_or_username, for: 'email_or_username', class:'required' %>
-                <small class="text-muted"><%= l10n("devise.email_username") %></small>
                 <%= f.text_field :oim_id, class: "form-control", id: 'email_or_username', required: true, data: {action: "focus->signup#emailTooltip click->signup#emailTooltip focusout->signup#validateEmail", toggle: "tooltip", placement: "right", trigger: 'click', title: l10n("devise.registrations.new.email_username"), target: 'signup.usernameField' } %>
               </div>
               <div class="form-group">
