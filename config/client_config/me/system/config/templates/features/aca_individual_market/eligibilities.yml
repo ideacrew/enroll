@@ -132,7 +132,7 @@ registry:
           - key: :evidence_ref
             item: 'gid://enroll_app/Person'
       - key: :alive_status
-        is_enabled: true
+        is_enabled: <%= ENV['ENABLE_ALIVE_STATUS'] || false %>
         settings:
           - key: :subject_ref
             item: 'gid://enroll_app/Family::FamilyMember'
