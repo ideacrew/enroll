@@ -100,7 +100,11 @@ class ApplicationPolicy # rubocop:disable Metrics/ClassLength
     consumer_role = primary.consumer_role
     return false if consumer_role.blank?
 
-    consumer_role.identity_verified?
+    return true if consumer_role.identity_verified?
+
+    return false if primary.user.blank?
+
+    primary.user.identity_verified?
   end
 
   # Checks if the current user is a primary family member who has verified their identity and is an active associated individual market family broker staff.
