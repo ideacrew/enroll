@@ -46,7 +46,7 @@ module Operations
         if (is_any_member_applying_for_coverage && primary_person.consumer_role.present?) || values[:is_migrating]
           BuildDetermination.new.call(subjects: subjects, effective_date: values[:effective_date], family: family)
         else
-          Failure("The Create Eligibility tool cannot be used because the consumer is not applying for coverage.")
+          Failure("Person don't have consumer role or is not applying for coverage")
         end
       end
 
