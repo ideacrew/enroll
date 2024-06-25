@@ -776,6 +776,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       family.active_household.create_new_tax_household(params[:person])
       @result = { success: true, message: l10n('eligibility.created') }
     end
+
     respond_to :js
   end
 
