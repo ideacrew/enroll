@@ -11,11 +11,11 @@
         <% if dependent.errors.any? %>
           <div class="alert alert-error">
             <h4>
-              <%= "Correct the following to add this family member:" %>
+              <%= l10n("insured.consumer_roles.dependent_error.header") %>
             </h4>
             <ul>
               <% dependent.errors.full_messages.each do |msg| %>
-                <% msg = (msg == "Gender can't be blank" && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? "Sex can't be blank" : msg %>
+                <% msg = (msg == l10n("insured.consumer_roles.dependent_error.gender") && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? l10n("insured.consumer_roles.dependent_error.sex") : msg %>
                 <li> <%= msg %> </li>
               <% end %>
             </ul>
@@ -135,7 +135,7 @@
             </div>
 
             <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
-              <% if has_active_consumer_dependent?(@person,@dependent) %>
+              <% if has_active_consumer_dependent?(@person, @dependent) %>
                   <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
               <% elsif @person.has_active_employee_role? %>
                 <%= render 'shared/address_fields_for_dependent', f: f %>
