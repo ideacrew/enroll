@@ -85,6 +85,7 @@ RSpec.describe ::Operations::TaxHouseholdGroups::CreateEligibility, dbclean: :af
       primary_fm.update_attributes(is_coverage_applicant: false)
       result = subject.call(params)
       expect(result.failure?).to eq true
+      expect(result.failure).to eq "The Create Eligibility tool cannot be used because the consumer is not applying for coverage."
     end
   end
 
