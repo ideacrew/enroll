@@ -66,6 +66,15 @@ function controllerName() {
 function actionName() {
   const body = document.body;
   return body.dataset.action;
+  indicateRequiredFields();
+});
+
+function indicateRequiredFields() {
+  $('label.required, legend.required').each(function() {
+    if ($(this).find('.sr-only').length == 0) {
+      $(this).append('<span class="sr-only sr-required-indicator">*</span>');
+    }
+  });
 }
 
 function applyJQDatePickerSetup(ele) {
