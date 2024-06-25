@@ -94,7 +94,7 @@ module BenefitSponsors
           @q = params.permit(:q)[:q]
 
           respond_to do |format|
-            format.js {}
+            format.js
           end
         end
 
@@ -154,7 +154,7 @@ module BenefitSponsors
           authorize @broker_agency_profile
 
           respond_to do |format|
-            format.js {}
+            format.js
           end
         end
 
