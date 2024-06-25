@@ -766,7 +766,7 @@ class Exchanges::HbxProfilesController < ApplicationController
                                                                      ).to_h
                                                                    })
       @result = if result.success?
-                  { success: true, message: 'THH & Eligibility created successfully' }
+                  { success: true, message: l10n('eligibility.created') }
                 else
                   { success: false, error: result.failure }
                 end
@@ -774,8 +774,9 @@ class Exchanges::HbxProfilesController < ApplicationController
       @element_to_replace_id = params[:person][:family_actions_id]
       family = Person.find(params[:person][:person_id]).primary_family
       family.active_household.create_new_tax_household(params[:person])
-      @result = { success: true, message: 'THH & Eligibility created successfully' }
+      @result = { success: true, message: l10n('eligibility.created') }
     end
+
     respond_to :js
   end
 
