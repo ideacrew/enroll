@@ -5,11 +5,11 @@ module Subscribers
   class PrivateFamilySubscriber
     include EventSource::Logging
     include ::EventSource::Subscriber[amqp: 'enroll.private']
-    subscribe(:on_person_saved) do |delivery_info, _metadata, response|
+    subscribe(:on_person_saved) do |delivery_info, metadata, response|
       subscriber_logger = subscriber_logger_for(:on_private_person_saved)
       payload = JSON.parse(response, symbolize_names: true)
 
-      pre_process_message(subscriber_logger, payload)
+      pre_process_message(subscriber_logger, payload, metadata.headers)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -18,11 +18,11 @@ module Subscribers
       ack(delivery_info.delivery_tag)
     end
 
-    subscribe(:on_family_member_created) do |delivery_info, _metadata, response|
+    subscribe(:on_family_member_created) do |delivery_info, metadata, response|
       subscriber_logger = subscriber_logger_for(:on_private_family_member_created)
       payload = JSON.parse(response, symbolize_names: true)
 
-      pre_process_message(subscriber_logger, payload)
+      pre_process_message(subscriber_logger, payload, metadata.headers)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -31,7 +31,9 @@ module Subscribers
       ack(delivery_info.delivery_tag)
     end
 
-    def pre_process_message(subscriber_logger, payload)
+    def pre_process_message(subscriber_logger, payload, published_headers)
+      subscriber_logger.info "-" * 100
+      subscriber_logger.info "PrivateFamilySubscriber, published_headers: #{published_headers}"
       subscriber_logger.info "PrivateFamilySubscriber, response: #{payload}"
     end
 
