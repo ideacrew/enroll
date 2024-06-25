@@ -80,25 +80,37 @@ RSpec.describe ::Operations::TaxHouseholdGroups::CreateEligibility, dbclean: :af
       result = subject.call(params)
       expect(result.failure?).to eq true
     end
-
-    it 'should return error message' do
-      family.family_members.each do |fm|
-        fm.person.consumer_role.update_attributes!(is_applying_coverage: false)
-      end
-      result = subject.call(params)
-      expect(result.failure?).to eq true
-      expect(result.failure).to eq "The Create Eligibility tool cannot be used because the consumer is not applying for coverage."
-    end
   end
 
   describe 'valid params' do
-
-
     it 'should create grants' do
       subject.call(params)
       eligibility_determination = family.reload.eligibility_determination
 
       expect(eligibility_determination.grants.size).to eq 2
+    end
+
+    describe 'family members' do
+      it 'all do not apply to coverage should return an error message' do
+        family.family_members.each do |fm|
+          fm.person.consumer_role.update_attributes!(is_applying_coverage: false)
+        end
+        result = subject.call(params)
+        expect(result.failure?).to eq true
+        expect(result.failure).to eq "The Create Eligibility tool cannot be used because the consumer is not applying for coverage."
+      end
+
+      it 'some inactive and applied to coverage other do not apply to coverage should return an error message' do
+        family.family_members[2].update_attributes!(is_active: false)
+        family.family_members.select(&:is_active).each do |fm|
+          fm.person.consumer_role.update_attributes!(is_applying_coverage: false)
+        end
+
+        result = subject.call(params)
+        expect(result.failure?).to eq true
+        expect(result.failure).to eq "The Create Eligibility tool cannot be used because the consumer is not applying for coverage."
+      end
+
     end
   end
 end
