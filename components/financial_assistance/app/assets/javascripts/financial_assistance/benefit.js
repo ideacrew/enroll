@@ -29,82 +29,20 @@ function startEditing(parentContainer) {
   $('#nav-buttons a').addClass('disabled');
   $('.driver-question, .instruction-row').addClass('disabled');
   $(parentContainer).removeClass("disabled");
-  $(parentContainer).find('.benefit:not(.active)').addClass("disabled");
-  $('.driver-question input:not(input[type=submit]), .instruction-row a').attr('disabled', true);
-  $(parentContainer).find('input:not([type=submit]').removeAttr('disabled');
+  $(parentContainer).find('.benefit').addClass("disabled");
+  $(parentContainer).find('.active').removeClass("disabled");
+  $('.driver-question input:not(input[type=submit]), .disabled a').attr('disabled', true);
+  $(parentContainer).find('.active input:not([type=submit])').removeAttr('disabled');
   $('.disabled a').attr('tabindex', -1);
+  $('.disabled a').addClass('disabled');
 };
 
 // re-enable and raise the opacity of the form post editing
 function stopEditing() {
   $('.disabled a').removeAttr('tabindex');
-  $('.driver-question, .instruction-row, .instruction-row a, .benefits-list, #nav-buttons a').removeClass('disabled');
-  $('.driver-question input:not(":input[type=submit]').removeAttr('disabled');
+  $('.disabled input:not(input[type=submit]), .disabled a').removeAttr('disabled');
+  $('.driver-question, .instruction-row, .disabled a, .benefits-list, #nav-buttons a, .benefit').removeClass('disabled');
 };
-
-// add the new benefit form fields once the insurance kind is selected
-var benefitHandler = function getBenefitFields(event) {
-  // get the benefit form for the proper esi kind
-  // clone it and append it to the benefit list
-  // set the insurance_kind to the insuranceKind
-  // and display it
-  var select = event.target;
-  var selected = select.options[select.selectedIndex];
-  const kind = select.dataset.kind;
-  const esi = selected.dataset.esi;
-  const mvsq = selected.dataset.mvsq;
-  const benefitList = document.querySelector('.benefits-list.' + kind);
-
-  var benefitForm = esi == "true" ? document.getElementById('new-benefit-esi-form-' + kind) : document.getElementById('new-benefit-non-esi-form-' + kind);
-
-  var clonedForm = benefitForm.cloneNode(true);
-
-  // do all the esi specific hiding and showing
-  if (esi == "true") {
-    //show mvsq if msqv is true
-    // show hra questions if hra is the selected insurance kind
-    // show non-hra questions if non-hra is the selected insurance kind
-  }
-  document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
-  clonedForm.querySelector('.insurance-kind-label').innerHTML = selected.innerHTML;
-  clonedForm.querySelector('#benefit_insurance_kind').value = selected.value;
-  clonedForm.removeAttribute('id');
-  clonedForm.classList.remove('hidden');
-  clonedForm.classList.add(selected.value);
-  clonedForm.classList.add('benefit');
-  clonedForm.classList.add('active');
-  let formId = clonedForm.querySelector('.benefit-form-container').id
-
-  makeInputIdsUnique(formId, clonedForm)
-
-  select.closest(".new-benefit-form").classList.add('hidden');
-  benefitList.appendChild(clonedForm);
-  startEditing(select.closest(".driver-question"));
-}
-
-// show the field to select the insurance kind when the add new benefit button is clicked
-var addBenefitHandler = function addBenefit(event) {
-  if (event.type === 'keydown' && event.key !== 'Enter') {
-    return;
-  }
-  var button = event.target;
-  var kind = button.dataset.kind;
-  button.classList.add('hidden');
-  document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
-  document.getElementById('new-benefit-form-' + kind).querySelectorAll('.benefit-cancel-before-form').classList.remove('hidden')
-}
-
-// hide the select insurance kind field when the cancel button is clicked
-var cancelBeforeFormHandler = function cancelBenefitBeforeForm(event) {
-  if (event.type === 'keydown' && event.key !== 'Enter') {
-    return;
-  }
-  var button = event.target;
-  var kind = button.dataset.kind;
-  var container = document.getElementById('new-benefit-form-' + kind);
-  container.classList.add('hidden');
-  document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
-}
 
 // in order to make sure the input ids/labels are unique, we need to add a random string to the end
 // so we don't get WAVE errors
@@ -146,20 +84,118 @@ document.addEventListener("turbolinks:load", function() {
     $('#has_eligible_health_coverage_true').prop('checked', true).trigger('change');
   }
 
-  // add event listeners to various things
-  const insuranceKindSelects = document.querySelectorAll('select.insurance-kind');
-  insuranceKindSelects.forEach(function(select) {
-    select.addEventListener('change', benefitHandler);
+  // add the new benefit form fields once the insurance kind is selected
+  $('.benefit-kinds').off('change', 'select.insurance-kind');
+  $('.benefit-kinds').on('change', 'select.insurance-kind', function(event) {
+    // get the benefit form for the proper esi kind
+    // clone it and append it to the benefit list
+    // set the insurance_kind to the insuranceKind
+    // and display it
+
+    var select = event.target;
+    var selected = select.options[select.selectedIndex];
+    if (selected.value !== "") {
+    const kind = select.dataset.kind;
+    const esi = selected.dataset.esi;
+    const mvsq = selected.dataset.mvsq;
+    const benefitList = document.querySelector('.benefits-list.' + kind);
+    var benefitForm = esi == "true" ? document.getElementById('new-benefit-esi-form-' + kind) : document.getElementById('new-benefit-non-esi-form-' + kind);
+    var clonedForm = benefitForm.cloneNode(true);
+    document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
+    clonedForm.querySelector('.insurance-kind-label').innerHTML = selected.innerHTML;
+    clonedForm.querySelector('#benefit_insurance_kind').value = selected.value;
+    clonedForm.removeAttribute('id');
+    console.log(select.value)
+    clonedForm.classList.remove('hidden');
+    clonedForm.classList.add(selected.value);
+    clonedForm.classList.add('benefit');
+    clonedForm.classList.add('active');
+    $(clonedForm).find('input').removeAttr('disabled');
+    let formId = clonedForm.querySelector('.benefit-form-container').id
+    makeInputIdsUnique(formId, clonedForm)
+
+    // do all the esi specific hiding and showing
+    if (esi == "true") {
+      // show non-hra questions if non-hra is the selected insurance kind
+      // show hra questions if hra is the selected insurance kind
+      // make the inputs of the non-selected kind non-reqquired
+      // make the inputs of the selected kind required
+      if (selected.value !== "health_reimbursement_arrangement") {
+        clonedForm.querySelector('.non-hra-questions').classList.remove('hidden');
+        clonedForm.querySelector('.non-hra-questions input, non-hra-questions select').forEach(function(input) {
+          var label = $('label[for='+input.id+']')
+          if ((label && label.hasClass('required')) || input.classList.contains('required')) {
+            input.setAttribute('required', true);
+          }
+        });
+        clonedForm.querySelector('.hra-questions').classList.add('hidden');
+        clonedForm.querySelector('.hra-questions input, .hra-questions select').forEach(function(input) {
+          input.removeAttribute('required');
+        });
+      } else {
+        clonedForm.querySelector('.hra-questions').classList.remove('hidden');
+        clonedForm.querySelector('.hra-questions input, hra-questions select').forEach(function(input) {
+          var label = $('label[for='+input.id+']')
+          if ((label && label.hasClass('required')) || input.classList.contains('required')) {
+            input.setAttribute('required', true);
+          }
+        });
+        clonedForm.querySelector('.non-hra-questions').classList.add('hidden');
+        clonedForm.querySelector('.non-hra-questions input, .non-hra-questions select').forEach(function(input) {
+          input.removeAttribute('required');
+        });
+      }
+
+      // show mvsq if msqv is true
+      if (mvsq === "true") {
+        clonedForm.querySelector('.mvsq-questions').classList.remove('hidden');
+        clonedForm.querySelector('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
+          var label = $('label[for='+input.id+']')
+          if ((label && label.hasClass('required')) || input.classList.contains('required')) {
+            input.setAttribute('required', true);
+          }
+        });
+      } else {
+        clonedForm.querySelector('.mvsq-questions').classList.add('hidden');
+        clonedForm.querySelector('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
+          input.removeAttribute('required');
+        });
+      }
+    }
+
+    select.closest(".new-benefit-form").classList.add('hidden');
+    benefitList.appendChild(clonedForm);
+    startEditing(select.closest(".driver-question"));} else {
+      console.log(selected)
+      console.log(select.value)
+    }
   });
 
-  const addMoreBenefits = document.querySelectorAll('button.add_new_benefit_kind');
-  addMoreBenefits.forEach(function(button) {
-    button.addEventListener('click keydown', addBenefitHandler);
+  // show the field to select the insurance kind when the add new benefit button is clicked
+  $('.benefit-kinds').off('click keydown', 'button.add_new_benefit_kind');
+  $('.benefit-kinds').on('click keydown', 'button.add_new_benefit_kind', function(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+    var button = event.target;
+    var kind = button.dataset.kind;
+    button.classList.add('hidden');
+    document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
+    //document.getElementById('new-benefit-form-' + kind).querySelectorAll('.benefit-cancel-before-form').classList.remove('hidden')
   });
 
-  const cancelBeforeFormButtons = document.querySelectorAll('.benefit-cancel-before-form');
-  cancelBeforeFormButtons.forEach(function(button) {
-    button.addEventListener('click keydown', cancelBeforeFormHandler);
+  // hide the select insurance kind field when the cancel button is clicked
+  $('.benefit-kinds').off('click keydown', '.benefit-cancel-before-form');
+  $('.benefit-kinds').on('click keydown', '.benefit-cancel-before-form', function(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+    var button = event.target;
+    var kind = button.dataset.kind;
+    var container = document.getElementById('new-benefit-form-' + kind);
+    container.classList.add('hidden');
+    document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
+    stopEditing()
   });
 
   // remove the benefit form when the cancel button is clicked

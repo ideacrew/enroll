@@ -505,10 +505,11 @@ ul.plain {
 
 div.disabled *:not(:has(*)):not(button, a.button) {
   opacity: .4;
-  a {
-    pointer-events: none;
-    cursor: not-allowed;
-  }
+}
+
+a.disabled {
+  pointer-events: none;
+  cursor: not-allowed;
 }
 
 a.disabled {

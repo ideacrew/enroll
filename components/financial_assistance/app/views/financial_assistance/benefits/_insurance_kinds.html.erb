@@ -13,7 +13,40 @@
 <div id="new-benefit-form-<%= kind %>" class='new-benefit-form my-4 p-3 border rounded bg-white <%= 'hidden' if @applicant.benefits.where(kind: kind).any? %>'>
   <%= label_tag :insurance_kind, l10n("faa.health_coverage.health_cov_type"), class:"required", for: "insurance_kind_#{kind}" %>
   <%= select_tag :insurance_kind, options_for_select(insurance_kind_select_options(kind)), required:true, prompt: l10n("faa.health_coverage.health_cov_type"), class: "insurance-kind w-100", id: "insurance_kind_#{kind}", data: {kind: kind} %>
+  <a href="#health_cov_type_<%= kind %>" data-toggle="modal" data-target="#health_cov_type_<%= kind %>" class="d-block my-2"><%= l10n("not_sure") %></a>
   <a tabindex="0" id="new-benefit-form-<%= kind %>_cancel" class="btn btn-error outline benefit-cancel-before-form mt-4 <%= 'hidden' unless @applicant.benefits.where(kind: kind).any? %>" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
+  <div class="modal" id="health_cov_type_<%= kind %>" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="container pt-2 pb-4 modal-content">
+        <div class="d-flex mb-4 align-items-center">
+          <div class="col-auto px-0">
+            <div class="info-icon icon" alt="Info">&nbsp;</div>
+          </div>
+          <div class="col pl-0">
+              <h5 class="modal-title">Health Care Types</h5>
+          </div>
+          <div class="col-auto px-0">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <% FinancialAssistance::Benefit.valid_insurance_kinds.each do |insurance_kind| %>
+            <% eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
+            <% term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
+            <p class="bold mb-0 pb-0"><%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
+            <% if I18n.exists?("glossary."+insurance_kind) %>
+              <p class="mt-0 pt-0"><%= t('glossary.' + insurance_kind) %></p>
+            <% end %>
+          <% end %>
+        </div>
+        <div class="d-flex align-items-center mt-4 justify-content-end">
+          <button type="button" class="btn-primary mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="new-benefit-esi-form-<%= kind %>" class='hidden esi'>
