@@ -1,7 +1,7 @@
 Feature: Create Eligibility
   User should have the role of an admin
 
-#  @flaky
+  @flaky
   Scenario:
     Given a consumer exists
     Given all permissions are present
@@ -18,7 +18,7 @@ Feature: Create Eligibility
     And Hbx Admin click Save Changes
     Then Hbx Admin see successful message
 
-#  @flaky
+  @flaky
   Scenario:
     Given a consumer exists without coverage
     Given all permissions are present
