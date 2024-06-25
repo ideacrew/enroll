@@ -85,7 +85,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.consumer_roles.ridp_agreement.requirement2' => "If you do not want to continue with identity verification through Experian, you can apply by completing and sending us a paper application with proof of your identity. For a list of acceptable identity documents see the Documents Needed for Verification Information Sheet",
   :'en.insured.consumer_roles.ridp_agreement.requirement_link_text' => "here",
   :'en.insured.consumer_roles.ridp_agreement.ridp_agreement_alert_msg' => "Please contact %{site_short_name} at %{contact_center_phone_number} for more info",
-  :'en.insured.consumer_roles.upload_ridp_documents.header' => "Verify Identity",
   :'en.insured.consumer_roles.upload_ridp_documents.ridp_h139_info' => "Allowing Experian to verify your identity is the fastest way to continue your application. If you change your mind and want to use Experian, go back to the previous page.",
   :'en.insured.consumer_roles.upload_ridp_documents.ridp_options_to_verify' => "If you cannot or do not want to verify your identity online using Experian, you need to upload document(s) proving your identity. The  %{site_long_name} team will need to review and approve what you upload before you can continue. This can take 3-5 business days.",
   :'en.insured.consumer_roles.upload_ridp_documents.in_person' => "Apply in person",
