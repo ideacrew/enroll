@@ -93,6 +93,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.incomes.job_end_date_note' => "Note, for job income %{subject} currently receives, do not enter an end date into the “End Date” field, only enter an end date if the job income has ended.",
   'en.faa.incomes.job_income_note' => "Note: For job income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the job income ended.",
   "en.faa.incomes.from_employer" => "Does this person have income from an employer",
+  "en.faa.incomes.from_employer_question" => "Does %{subject} have income from an employer?",
   "en.faa.incomes.from_self_employment" => "Does this person have self-employment income?",
   "en.faa.other_incomes.unemployment" => "Does this person receive unemployment compensation, or have they received it this year?",
   "en.faa.other_incomes.other_sources" => "Does this person have income from other sources?",
