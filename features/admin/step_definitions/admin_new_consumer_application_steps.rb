@@ -35,7 +35,7 @@ Then(/^Admin continues to families home page$/) do
 end
 
 When(/^user registers as an individual$/) do
-  fill_in IvlPersonalInformation.first_name, with: "John"
+  fill_in IvlPersonalInformation.first_name, with: "John", wait: 5
   fill_in IvlPersonalInformation.last_name, with: "Smith"
   fill_in IvlPersonalInformation.dob, with: "11/11/1991"
   fill_in IvlPersonalInformation.ssn, with: '212-31-3131'

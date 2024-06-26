@@ -776,6 +776,7 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
     let(:family) { consumer_role.person.primary_family }
     before :each do
+      allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
       family.update_attributes!(:e_case_id => parser.integrated_case_id)
     end
 

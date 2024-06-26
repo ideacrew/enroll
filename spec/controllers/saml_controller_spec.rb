@@ -31,6 +31,7 @@ RSpec.describe SamlController do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:notify_address_changed).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_publish_updated_families).and_return(true)
           hbx_staff_role
         end
 

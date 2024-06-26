@@ -103,10 +103,7 @@ class ApplicationPolicy
     primary = family&.primary_person
     return false if primary.blank?
 
-    consumer_role = primary.consumer_role
-    return false if consumer_role.blank?
-
-    consumer_role.identity_verified?
+    RemoteIdentityProofingStatus.is_complete_for_person?(primary)
   end
 
   # Checks if the current user is a primary family member who has verified their identity and is an active associated individual market family broker staff.
