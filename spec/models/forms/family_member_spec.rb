@@ -433,6 +433,7 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
         subject { Forms::FamilyMember.new(person_properties.merge({family_id: demo_family.id, relationship: :child_under_26, is_consumer_role: 'true' })) }
 
         before do
+          allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
           allow(Family).to receive(:find).and_return(demo_family)
         end
 
