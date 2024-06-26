@@ -6,15 +6,11 @@ function stopEditingIncome() {
   $('.driver-question input, .instruction-row input, .income input:not(":input[type=submit], .fake-disabled-input"), .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
   
   // enable "Add New" income buttons
-  $('a.new-income').removeClass('hide');
-  $('a.new-income').removeClass('disabled');
-  $('#new-unemployment-income, #new-ai-an-income, .add_new_other_income_kind').removeAttr('disabled');
+  $('#new-unemployment-income, #new-ai-an-income, .new-income, .add_new_other_income_kind').removeAttr('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
   $("a[class*='income-edit'], a[class*='income-delete']").removeClass('disabled'); // legacy
   $('#self-employed-income').removeClass('disabled');
-  $('#self-employed-income').removeClass('hidden');
-  $('a.income-edit').removeClass('disabled');
-  $('a.income-delete').removeClass('disabled');
+  $('a.new-income').removeClass('disabled');
   $('a.self-employed-income-delete').removeClass('disabled');
 
   // enable nav
@@ -31,12 +27,10 @@ function startEditingIncome(income_kind) {
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input:not(":input[type=submit]"), .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]"), .unemployment-income:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
     
   // disable "Add New" income buttons
-  $('a.new-income').addClass('disabled');
-  $('a.new-income').addClass('hide');
   $('#self-employed-income').addClass('disabled');
-  $('#new-unemployment-income, #new-ai-an-income, .add_new_other_income_kind').attr('disabled', true);
+  $('a.new-income').addClass('disabled');
+  $('#new-unemployment-income, #new-ai-an-income, .new-income, .add_new_other_income_kind').attr('disabled', true);
   $("a.interaction-click-control-add-more").addClass('hide'); // legacy
-
 
   // disable all income edit and edit buttons on created incomes
   $("a[class*='income-edit'], a[class*='income-delete']").addClass('disabled');
