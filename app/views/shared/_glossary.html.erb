@@ -16,10 +16,11 @@
 </span>
 
 <script>
-$(function () {
-  $('[data-toggle="popover"]').popover()
-})
-$('[data-toggle="popover"]').popover({
-  trigger: 'focus'
-})
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  })
+  $('[data-toggle="popover"]').popover({
+    trigger: 'focus',
+    template: '<div class="popover <%= 'p-2' if @bs4 %>"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+  })
 </script>
