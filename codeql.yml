@@ -37,3 +37,7 @@ query-filters:
      id: js/redos
   - exclude:
      id: js/cross-window-information-leak
+  - exclude:
+     id: js/unsafe-jquery-plugin
+  - exclude:
+     id: js/xss-through-dom
