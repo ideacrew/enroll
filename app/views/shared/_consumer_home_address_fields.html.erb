@@ -13,7 +13,6 @@
           <% display_class="d-none" %>
         <% end %>
       <% end %>
-      <% required = kind =='home' ? "address_required" : '' %>
       <div class="address-row <%= div_class %> <%= display_class %>">
         <% if kind == 'home' %>
           <i class="fa fa-info-circle"></i> <%= l10n("insured.primary_home_address_info") %>
@@ -29,8 +28,8 @@
               <span><%= address.hidden_field :kind, value: address.object.kind %>
               <%= address.hidden_field :_destroy %></span>
 
-              <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "#{'required' if required.present?}" %>
-              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} full-width", required: required.present? %>
+              <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "required" %>
+              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "address_required full-width", required: true %>
             </div>
           </div>
           <div class="mr col-sm col-md-6 p-0">
@@ -44,8 +43,8 @@
           <div class="d-flex mb-md-4 row col-sm">
             <div class="d-flex col-sm col-md-6 pl-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
-                <%= address.label :city, class: "#{'required' if required.present?}" %>
-                <%= address.text_field :city, placeholder: "City", class: "#{required} full-width", required: required.present? %>
+                <%= address.label :city, class: "required" %>
+                <%= address.text_field :city, placeholder: "City", class: "address_required full-width", required: true %>
               </div>
               <div class="col-sm col-md-6 pr-0">
                 <%= address.label :state, class: "required" %>
