@@ -31,3 +31,7 @@ query-filters:
      id: rb/reflected-xss
   - exclude:
      id: rb/regexp-injection
+  - exclude:
+     id: js/incomplete-sanitization
+  - exclude:
+     id: js/redos
