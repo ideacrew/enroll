@@ -4,6 +4,10 @@ require 'rails_helper'
 
 # spec for testing Operations::People::BuildDemographicsGroup
 describe Operations::People::BuildDemographicsGroup, dbclean: :after_each do
+  before do
+    allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+  end
+
   context 'a user without a consumer_role' do
     let(:person) { FactoryBot.create(:person, :with_broker_role) }
 
