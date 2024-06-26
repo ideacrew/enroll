@@ -4,15 +4,14 @@
   <% term_display = term %>
 <% end %>
 
-<span class="glossary"
-      tabindex="0"
+<span tabindex="0"
       data-toggle="popover"
       data-animation="false"
       data-placement="auto top"
       data-trigger="click focus"
       data-content="<%= t('glossary.' + key) %>"
       data-title="<%= term_display %>">
-  <%= term_display %>
+  <span class="glossary"><%= term_display %></span>
 </span>
 
 <script>
