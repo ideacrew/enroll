@@ -70,7 +70,7 @@ module Operations
             event = build_event(payload)
             event.success.publish
 
-            Success("Successfully published dmf determination payload for job with job_id #{@job.job_id}")
+            Success("Successfully published dmf determination payload")
           end
 
           def dmf_logger
