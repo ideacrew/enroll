@@ -5,5 +5,5 @@
 <% elsif @income.kind == 'american_indian_and_alaskan_native' %>
 <%= render partial: 'replace', locals: { id: ".ai-an-incomes-list .new-ai-an-income-form" } %>
 <% else %>
-  <%= render partial: 'replace', locals: { id: ".other-incomes-list .new-other-income-form" } %>
+  <%= render partial: 'replace', locals: { id: ".other-incomes-list .new-other-income-form:not(.hidden)" } %>
 <% end %>
