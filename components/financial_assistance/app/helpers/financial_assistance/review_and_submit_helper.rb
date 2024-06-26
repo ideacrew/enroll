@@ -90,7 +90,7 @@ module FinancialAssistance
           student_status_end: 'faa.other_ques.student_status_end',
           student_school_type: 'faa.other_ques.student_school_type',
           is_blind: other_questions_prompt_translation('is_blind'),
-          primary_caretaker_question_text: other_questions_prompt_translation('faa.other_ques.primary_caretaker_question_text'),
+          primary_caretaker_question_text: other_questions_prompt_translation('primary_caretaker_question_text'),
           coverage_caretaker: 'faa.review.coverage.caretaker',
           daily_living_help: other_questions_prompt_translation('daily_living_help'),
           help_paying_bills: other_questions_prompt_translation('help_paying_bills'),
@@ -185,11 +185,8 @@ module FinancialAssistance
       end
 
       def deductions_info_hash(applicant)
-        {
-          title: l10n('faa.review.income_adjustments'),
-          edit_link: application_applicant_deductions_path(@application, applicant),
-          rows: {l10n('faa.deductions.income_adjustments', assistance_year: assistance_year) => required_value(human_boolean(applicant.has_deductions))}
-        }
+        row = {l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: assistance_year) => required_value(human_boolean(applicant.has_deductions))}
+        create_section_hash(title: l10n('faa.review.income_adjustments'), edit_link: application_applicant_deductions_path(@application, applicant), rows: row)
       end
 
       def coverage_info_hash(applicant)
