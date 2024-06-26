@@ -44,7 +44,8 @@ module Operations
 
           def submit_for_dmf_determination(families)
             count = 0
-            logger.info("dmf determination started for job with job_id #{@job.job_id}, at #{DateTime.now}")
+            dmf_logger.info("dmf determination started for job with job_id #{@job.job_id}, at #{DateTime.now}")
+
             families.each do |family|
               if family.hbx_assigned_id.present?
                 publish({ family_hbx_id: family.hbx_assigned_id, job_id: @job.job_id })

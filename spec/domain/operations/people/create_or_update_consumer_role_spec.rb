@@ -37,9 +37,6 @@ RSpec.describe ::Operations::People::CreateOrUpdateConsumerRole, dbclean: :after
       end
 
       it 'should create demographics_group and alive_status after creating consumer role' do
-        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:alive_status).and_return(true)
-
         subject.call(params: params)
         demographics_group = applicant_person.demographics_group
 
