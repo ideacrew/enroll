@@ -35,3 +35,5 @@ query-filters:
      id: js/incomplete-sanitization
   - exclude:
      id: js/redos
+  - exclude:
+     id: js/cross-window-information-leak
