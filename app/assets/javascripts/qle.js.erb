@@ -9,7 +9,7 @@ var QLE = ( function( window, undefined ) {
   function qle_question(url){
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), bs4: $("#bs4").val()},
       url: "/insured/families/" + url
     });
   }
@@ -41,7 +41,7 @@ var QLE = ( function( window, undefined ) {
 } )( window );
 
 $(function () {
-	function check_qle_date() {
+	function validate_qle_date_input() {
 		var date_value = $('#qle_date').val();
 		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
 		return true;
@@ -52,14 +52,15 @@ $(function () {
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
+    $('#qle-nav').removeClass('hidden');
     var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
 
-  function get_qle_date() {
+  function check_qle_date() {
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), bs4: $("#bs4").val()},
       url: "/insured/families/check_qle_date.js"
     });
   }
@@ -90,6 +91,14 @@ $(function () {
       dateFormat: 'mm/dd/yy',
       defaultDate: cdate
 		});
+
+    $(".sep-date #qle_date").on("change", function(){
+      if ($(".sep-date #qle_date").val()) {
+        $('#qle_submit').removeAttr('disabled');
+      } else {
+        $('#qle_submit').attr('disabled', 'disabled');
+      }
+    });
   }
 
   $(document).on('click', 'a.qle-menu-item', function() {
@@ -105,8 +114,10 @@ $(function () {
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
-    $('#qle_reason .special_qle_reasons').addClass('hidden');
+    $('#qle_reason > *').addClass('hidden');
     $('#qle-date-chose').show();
+    $('.sep-date #qle_submit').attr('disabled', 'disabled');
+    $('#qle-nav').addClass('hidden');
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
       $('#qle-date-chose').addClass('hidden');
@@ -162,6 +173,11 @@ $(function () {
 		$('#qle_flow_info #qle-menu').show();
 	});
 
+  $('.sep-modal.modal').on('hide.bs.modal', function() {
+    init_qle_message();
+		$('#qle-details').addClass('hidden');
+  });
+
   $(document).on('click', '#qle-details-for-existing-sep .close-popup, #qle-details-for-existing-sep .cancel', function() {
     //init_qle_message();
     //$('.seps-panel').removeClass('hidden');
@@ -173,6 +189,10 @@ $(function () {
   // Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keydown', function(e) {
     var code = e.keyCode || e.which;
+    if ($("#qle-nav").length > 0) {
+      return false;
+    }
+
     if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
       e.preventDefault();
       $("#qle_submit").click();
@@ -187,11 +207,12 @@ $(function () {
 	/* QLE Date Validator */
   $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
-    if(check_qle_date()) {
+    if(validate_qle_date_input()) {
       $('#qle_date').removeClass('input-error');
 
+      $('#date-nav').addClass('hidden');
       if(QLE.check_qle_reason()){
-        get_qle_date();
+        check_qle_date();
       }
     } else {
       $('#qle_date').addClass('input-error');
@@ -203,7 +224,7 @@ $(function () {
     var not_expected_response = ( health_message ) ? 'no' : 'yes';
 
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
-      get_qle_date();
+      check_qle_date();
     } else {
       $('#qle_reason').hide();
       var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
@@ -243,6 +264,14 @@ $(function () {
     }
   });
 
+  $(document).on('change', '#effective_on_kind', function(e) {
+    if ($('#effective_on_kind').find(":selected").val()){
+      $('#qle_success_submit').removeAttr('disabled');
+    } else {
+      $('#qle_success_submit').attr('disabled', 'disabled');
+    }
+  });
+
   $(document).on('submit', '.qle-detail-for-existing-kind', function(e) {
     if($('#qle_date').val() == ''){
       $('#qle_effective_on_kind_alert-4').removeClass('hidden');
@@ -259,5 +288,9 @@ $(function () {
         $("#no_qle_checkbox").prop("checked",false)
       });
     }
+  });
+
+  $(document).on('click', '#shop-link', function() {
+		$('#qle_success_submit').trigger('click');
   });
 });

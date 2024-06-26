@@ -1,77 +1,128 @@
-<div class='module hidden' id="qle-details">
-  <div class="hbx-enrollment-panel panel panel-default module">
-    <div class="panel-heading">
-      <div class="vertically-aligned-row">
-        <h3 class="no-buffer"><%= l10n("insured.report_life_changes").to_s.upcase %></h3>
-        <div class="text-right">
-          <a class="close-popup" href="javascript:void(0);">
-            <i aria-hidden="true" class="fas fa-times"><span class="hide"><%=l10n("close")%></span></i>
-          </a>
+<% if @bs4 %>
+  <div class="hidden" id="qle-details">
+    <h2> <%= l10n("insured.qle_detail.event_details") %> </h2>
+    <h3 class="qle-details-title"></h3>
+    <div class="hidden qle-label"></div>
+    <div>
+      <div class="col px-0">
+        <div id='qle-date-chose' class="sep-date">
+          <div class="mb-2" onkeydown="handleButtonKeyDown(event, 'qle_submit')">
+            <label class="weight-n" for="qle_date"><%= l10n("insured.qle_detail.event_date") %></label>
+            <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", required: true %>
+          </div>
+          <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+            <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit", disable_link: true} %>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <div class="panel-body no-vertical-padding">
-      <div class="row">
-        <% url, http_method = '/insured/family_members', :get %>
-        <% if action_name == 'find_sep'%>
-        <% url, http_method = record_sep_insured_families_path, :post %>
-        <% end %>
-        <div class="alert alert-danger hidden" id='qle_effective_on_kind_alert-4' role="alert">Please Select Effective Date</div>
-        <%= form_tag url, method: http_method, class: 'input-no-pd qle-detail-for-existing-kind', id: 'qle_form' do %>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-          <div id='qle-date-chose'>
-            <h4 class="qle-details-title alternate-header text-center">I got married</h4>
-            <p class='qle-label text-center'>Enter the date of the event.</p>
-            <div class="vertically-aligned-row">
-              <div class="form-inline text-center">
-                <div class="form-group">
-                  <%= text_field_tag 'qle_date', '', placeholder: "mm/dd/yyyy",
-                      class: "required date-picker qle-date-picker form-control", required: true %>
-                </div>
-                <div class="form-group">
-                  <%= link_to l10n('.continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit' %>
-                </div>
+        <div id="qle_reason"></div>
+        <div id="qle_message">
+          <div class="success-info hidden">
+            <%= hidden_field_tag 'change_plan' %>
+            <%= hidden_field_tag 'qle_id' %>
+            <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
+            <%= hidden_field_tag 'resident_role_id', @person.try(:resident_role).try(:id) %>
+            <%= hidden_field_tag 'bs4', true %>
+            <div class="alert alert-success d-flex align-items-center justify-content-start" role="alert">
+              <div class="success-icon icon align-self-start">&nbsp;</div>
+              <div class="col px-0 py-1">
+                <p class="mb-1"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></p>
+                <a id="shop-link" href="#"><%= l10n("insured.shop_for_plans") %></a>
               </div>
             </div>
-          </div>
-          <div id="qle_reason">
-          </div>
-          <div id="qle_message">
-            <div class="success-info hidden">
-              <%= hidden_field_tag 'change_plan' %>
-              <%= hidden_field_tag 'qle_id' %>
-              <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
-              <%= hidden_field_tag 'resident_role_id', @person.try(:resident_role).try(:id) %>
-              <div class="alert alert-success no-buffer" role="alert">
-                <strong id="qle-input-info"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></strong><br>
-              </div>
-              <div class="effective_on_kinds">
-              </div>
-              <div class="spec_reasons">
-              </div>
-              <div class="text-center <%= pundit_class Family,:updateable? %>">
-                <%= submit_tag l10n('.continue'), id: 'sep_continue', class: 'btn btn-primary', data: { disable_with: false }, onkeydown: "handleButtonKeyDown(event, 'sep_continue')"  %>
-                <br/>
-                <br/>
-              </div>
+            <div class="effective_on_kinds"></div>
+            <div class="spec_reasons"></div>
+            <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+              <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "submit", button_id: "qle_success_submit"} %>
             </div>
-            <div class="error-info hidden">
-              <h3 class="qle-details-title darkblue"><%= l10n("insured.change_tax_credits_or_cost_sharing_reductions") %></h3>
-              <div class="alert alert-danger" role="alert">
-                <p class="error-text">
-                  <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
-                </p>
-              </div>
-              <br/>
+          </div>
+          <div class="error-info hidden">
+            <div class="error-text">
+              <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
+            </div>
+            <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+              <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", disable_link: true} %>
             </div>
           </div>
         </div>
-        <% end %>
       </div>
     </div>
   </div>
-</div>
+<% else %>
+  <div class='module hidden' id="qle-details">
+    <div class="hbx-enrollment-panel panel panel-default module">
+      <div class="panel-heading">
+        <div class="vertically-aligned-row">
+          <h3 class="no-buffer"><%= l10n("insured.report_life_changes").to_s.upcase %></h3>
+          <div class="text-right">
+            <a class="close-popup" href="javascript:void(0);">
+              <i aria-hidden="true" class="fas fa-times"><span class="hide"><%=l10n("close")%></span></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-body no-vertical-padding">
+        <div class="row">
+          <% url, http_method = '/insured/family_members', :get %>
+          <% if action_name == 'find_sep'%>
+          <% url, http_method = record_sep_insured_families_path, :post %>
+          <% end %>
+          <div class="alert alert-danger hidden" id='qle_effective_on_kind_alert-4' role="alert">Please Select Effective Date</div>
+          <%= form_tag url, method: http_method, class: 'input-no-pd qle-detail-for-existing-kind', id: 'qle_form' do %>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div id='qle-date-chose'>
+              <h4 class="qle-details-title alternate-header text-center">I got married</h4>
+              <p class='qle-label text-center'>Enter the date of the event.</p>
+              <div class="vertically-aligned-row">
+                <div class="form-inline text-center">
+                  <div class="form-group">
+                    <%= text_field_tag 'qle_date', '', placeholder: "mm/dd/yyyy",
+                        class: "required date-picker qle-date-picker form-control", required: true %>
+                  </div>
+                  <div class="form-group">
+                    <%= link_to l10n('.continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit' %>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="qle_reason">
+            </div>
+            <div id="qle_message">
+              <div class="success-info hidden">
+                <%= hidden_field_tag 'change_plan' %>
+                <%= hidden_field_tag 'qle_id' %>
+                <%= hidden_field_tag 'employee_role_id', @employee_role.try(:id) || @employee_role_id || "None" %>
+                <%= hidden_field_tag 'resident_role_id', @person.try(:resident_role).try(:id) %>
+                <div class="alert alert-success no-buffer" role="alert">
+                  <strong id="qle-input-info"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></strong><br>
+                </div>
+                <div class="effective_on_kinds">
+                </div>
+                <div class="spec_reasons">
+                </div>
+                <div class="text-center <%= pundit_class Family,:updateable? %>">
+                  <%= submit_tag l10n('.continue'), id: 'sep_continue', class: 'btn btn-primary', data: { disable_with: false }, onkeydown: "handleButtonKeyDown(event, 'sep_continue')"  %>
+                  <br/>
+                  <br/>
+                </div>
+              </div>
+              <div class="error-info hidden">
+                <h3 class="qle-details-title darkblue"><%= l10n("insured.change_tax_credits_or_cost_sharing_reductions") %></h3>
+                <div class="alert alert-danger" role="alert">
+                  <p class="error-text">
+                    <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
+                  </p>
+                </div>
+                <br/>
+              </div>
+            </div>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
 <script>
 $(document).on('turbolinks:load', function () {
   QLE.initialize();
