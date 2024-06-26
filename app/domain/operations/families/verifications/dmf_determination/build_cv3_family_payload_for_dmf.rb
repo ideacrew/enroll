@@ -53,9 +53,6 @@ module Operations
             invalid_persons = aca_family.family_members.map do |aca_member|
               family_member = @family.family_members.detect { |fm| fm.hbx_id == aca_member.hbx_id }
 
-              # check if member has alive_status VF type + demographics_group
-              
-
               # check if member does not have an enrollment
               unless member_has_dmf_determination_eligible_enrollment?(family_member)
                 vh_message = "Family Member with hbx_id #{aca_member.hbx_id} does not have a valid enrollment"

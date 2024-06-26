@@ -227,6 +227,9 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     let(:person_params) { { "dob" => "1985-10-01", "first_name" => "martin","gender" => "male","last_name" => "york","middle_name" => "","name_sfx" => "","ssn" => "345274083","user_id" => "xyz" } }
     let(:person_user) { FactoryBot.create(:user) }
     before(:each) do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:alive_status).and_return(true)
+
       sign_in person_user
       post :create, params: { person: person_params }
     end

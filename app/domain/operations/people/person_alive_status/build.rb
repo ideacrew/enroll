@@ -39,7 +39,7 @@ module Operations
         #
         # @param person [Person] The person to migrate.
         # @return [Dry::Monads::Result] A result object.
-        def build_and_save_alive_status(person)
+        def create_alive_status(person)
           payload = build_demographics_group_payload
           person.create_demographics_group(payload) unless person&.demographics_group && person&.demographics_group&.alive_status
 
