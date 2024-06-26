@@ -11,7 +11,7 @@
       <% if @qualifying_life_events %>
         <ul>
           <% @qualifying_life_events.each_with_index do |qle, index| %>
-            <li class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generator(qle, index) %></li>
+            <li class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generater(qle, index) %></li>
           <% end %>
         </ul>
       <% end %>
@@ -29,7 +29,7 @@
       </div>
     <% end %>
   </div>
-
+  
   <%# Main Content (right): Modal %>
   <div class="sep-modal modal fade" id="outside-open-enrollment" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -54,17 +54,11 @@
         </div>
         <div class="d-flex align-items-center mt-4 justify-content-end">
           <button type="button" class="btn outline mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>
-          <%= h(link_to l10n('back_to_my_account_title'), family_account_path, class: 'btn btn-primary') %>
+          <%= link_to l10n('back_to_my_account_title'), family_account_path, class: 'btn btn-primary' %>
         </div>
       </div>
     </div>
   </div>
-  <script>
-    $(".qle-menu-item ").tooltip({
-      // need to define template to add 'show' class to override the tooltip's default 'fade' class which sets opacity: 0
-      template: '<div class="tooltip show" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
-    });
-  </script>
 <% else %>
   <div class="container">
     <div class="row">

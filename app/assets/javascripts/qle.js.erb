@@ -1,5 +1,3 @@
-var bs4 = document.documentElement.dataset.bs4 == "true";
-
 var QLE = ( function( window, undefined ) {
   function initialize() {
     $(document).on('change', 'input[type=radio][name=reason]', function() {
@@ -84,6 +82,7 @@ $(function () {
     }else{
       var dateMax = pre_days + 'd';
     }
+    var cur_qle_title = $('.qle-details-title').html();
     $(target).val('');
     $(target).datepicker('destroy');
     $(target).datepicker({
@@ -93,42 +92,31 @@ $(function () {
       defaultDate: cdate
 		});
 
-    if (bs4) {
-      $("#qle_date").on("change", function(){
-        if ($("#qle_date").val()) {
-          $('#qle_submit').removeAttr('disabled');
-        } else {
-          $('#qle_submit').attr('disabled', 'disabled');
-        }
-      });
-    }
+    $(".sep-date #qle_date").on("change", function(){
+      if ($(".sep-date #qle_date").val()) {
+        $('#qle_submit').removeAttr('disabled');
+      } else {
+        $('#qle_submit').attr('disabled', 'disabled');
+      }
+    });
   }
 
-  function set_details_title(event_element) {
-    const title = $(event_element).data('title');
-    var header = document.createElement("h3");
-    if($(event_element).data('reason') == 'covid-19') {
-      var underlined_title = $(document.createElement("u")).text(title);
-      $('.qle-details-title-container').html($(header).html(underlined_title));
-      $('.qle-details-title').html(underlined_title); // legacy
-    } else {
-      $('.qle-details-title-container').html($(header).text(title));
-      $('.qle-details-title').html(title); // legacy
-    }
-  };
-
-  $(document).on('click', 'a.qle-menu-item', function(e) {
-    e.preventDefault();
+  $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
 
-    set_details_title(this);
+    if($(this).data('reason') == 'covid-19'){
+      $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
+    } else {
+      $('.qle-details-title').html($(this).data('title'));
+    }
 
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
     $('#qle_reason > *').addClass('hidden');
     $('#qle-date-chose').show();
+    $('.sep-date #qle_submit').attr('disabled', 'disabled');
     $('#qle-nav').addClass('hidden');
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
@@ -151,24 +139,22 @@ $(function () {
 
     $('#qle-details').removeClass('hidden');
     $('#qle-details-for-existing-sep').addClass('hidden');
-    if (bs4) {
-      $('#qle_submit').attr('disabled', 'disabled');
-      $("#qle-details").get(0).scrollIntoView({behavior: 'smooth'});
-      $('.tooltip').remove();
-    }
   });
 
 
   $(document).on('click', 'a.existing-sep-item', function() {
     $('#choose_flow').modal('hide');
-    $('.modal-backdrop').remove();
     //window.scrollTo(0, 0);
     $('html,body').animate({scrollTop: 0});
     init_qle_message();
     $('.seps-panel').addClass('hidden');
     $('#no_qle_checkbox').parent().addClass('hidden');
     $('#qle_flow_info #qle-menu').hide();
-    set_details_title(this);
+    if($(this).data('reason') == 'covid-19'){
+      $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
+    } else {
+      $('.qle-details-title').html($(this).data('title'));
+    }
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
@@ -200,28 +186,13 @@ $(function () {
     //$('#qle_flow_info #qle-menu').show();
   });
 
-  // Disable form submit on Enter - the user must manually use the Continue button to submit
-  $(document).on('keydown', '#qle_form', function(e) {
-    if (bs4 && e.key == 'Enter') {
-      e.preventDefault();
-      return;
-    }
-  });
-
-  // Override above `#qle_form` listener to allow default Enter behavior for buttons and links within the form
-  $(document).on('keydown', '#qle_form a, #qle_form button', function(e) {
-    if (bs4) {
-      e.stopImmediatePropagation();
-      return;
-    }
-  });
-
   // Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keydown', function(e) {
-    if (bs4) {
-      return;
-    }
     var code = e.keyCode || e.which;
+    if ($("#qle-nav").length > 0) {
+      return false;
+    }
+
     if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
       e.preventDefault();
       $("#qle_submit").click();
@@ -239,6 +210,7 @@ $(function () {
     if(validate_qle_date_input()) {
       $('#qle_date').removeClass('input-error');
 
+      $('#date-nav').addClass('hidden');
       if(QLE.check_qle_reason()){
         check_qle_date();
       }

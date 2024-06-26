@@ -1,15 +1,14 @@
 <% if @bs4 %>
   <div class="hidden" id="qle-details">
     <h2> <%= l10n("insured.qle_detail.event_details") %> </h2>
-    <div class="qle-details-title-container"></div>
+    <h3 class="qle-details-title"></h3>
+    <div class="hidden qle-label"></div>
     <div>
       <div class="col px-0">
-        <div id='qle-date-chose'>
+        <div id='qle-date-chose' class="sep-date">
           <div class="mb-2" onkeydown="handleButtonKeyDown(event, 'qle_submit')">
-            <label class="weight-n">
-              <p class='qle-label'><%= l10n("insured.qle_detail.event_date") %></p>
-              <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
-            </label>
+            <label class="weight-n" for="qle_date"><%= l10n("insured.qle_detail.event_date") %></label>
+            <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", required: true %>
           </div>
           <div class="mt-4 <%= pundit_class Family,:updateable? %>">
             <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit", disable_link: true} %>
@@ -27,6 +26,7 @@
               <div class="success-icon icon align-self-start">&nbsp;</div>
               <div class="col px-0 py-1">
                 <p class="mb-1"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></p>
+                <a id="shop-link" href="#"><%= l10n("insured.shop_for_plans") %></a>
               </div>
             </div>
             <div class="effective_on_kinds"></div>
@@ -36,13 +36,8 @@
             </div>
           </div>
           <div class="error-info hidden">
-            <div class="alert alert-warning d-flex align-items-start">
-              <div class="pl-1">
-                <div class="warning-icon icon" alt="info">&nbsp;</div>
-              </div>
-              <div class="error-text p-0 align-self-center">
-                <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
-              </div>
+            <div class="error-text">
+              <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
             </div>
             <div class="mt-4 <%= pundit_class Family,:updateable? %>">
               <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", disable_link: true} %>
