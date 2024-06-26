@@ -64,15 +64,32 @@ module Operations
           ::Operations::People::Find.new.call(person_hbx_id: params[:person_hbx_id])
         end
 
+        # Builds the payload for the demographics group.
+        #
+        # @return [Hash] The payload.
+        def build_demographics_group_payload
+          { alive_status: { is_deceased: false, date_of_death: nil }}
+        end
+
         # Migrates the person.
         #
         # @param person [Person] The person to migrate.
         # @return [Dry::Monads::Result] A result object.
         def migrate(person)
-          build_alive_status = Build.new.call(person)
-          return Failure(build_alive_status.failure) if build_alive_status.failure?
+          return Failure("Person does not have consumer role") unless person.consumer_role.present?
+
+          payload = build_demographics_group_payload
+          person.create_demographics_group(payload) unless person.demographics_group.present? && person.demographics_group.alive_status.present?
+
+          return Success(person) unless person.ssn.present? && person.verification_types.alive_status_type.empty?
+
+          person.add_new_verification_type("Alive Status")
+          person.verification_types.where(type_name: "Alive Status").first.save!
+          person.families.each(&:update_family_document_status!)
 
           Success(person)
+        rescue StandardError => e
+          Failure(e.inspect)
         end
 
         # Builds the family determination.

@@ -52,10 +52,10 @@ module Operations
                 count += 1
                 dmf_logger.info("********************************* published #{count} families for job with job_id #{@job.job_id} *********************************") if count % 100 == 0
               else
-                dmf_logger.error("Family with id #{family.id} is missing hbx_assigned_id -- unable to proceed with dmf determination")
+                dmf_logger.error("Family with id #{family.id} is missing hbx_assigned_id -- unable to proceed with dmf determination, job_id: #{@job.job_id}")
               end
             rescue StandardError => e
-              dmf_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}")
+              dmf_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}, job_id: #{@job.job_id}")
             end
 
             Success("Published all dmf-eligible family hbx_ids for job with job_id #{@job.job_id}")
