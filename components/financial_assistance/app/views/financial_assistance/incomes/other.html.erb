@@ -6,7 +6,7 @@
     <div class="driver-question">
       <fieldset>
         <legend class="weight-n required">
-          <span><%= l10n('faa.other_incomes.unemployment_question', name: @applicant.first_name) %></span>
+          <%= l10n('faa.other_incomes.unemployment_question', name: @applicant.first_name) %>
         </legend>
         <div class="focus d-flex align-items-center">
           <label for="has_unemployment_income_true" class="radio">
@@ -40,7 +40,7 @@
   <div class="driver-question">
     <fieldset class="my-4">
       <legend class="weight-n required">
-        <span><%= l10n('faa.other_incomes.other_income_question', name: @applicant.first_name) %></span>
+        <%= l10n('faa.other_incomes.other_income_question', name: @applicant.first_name) %>
       </legend>
       <div class="d-flex align-items-center focus">
         <label for="has_other_income_true" class="radio">

@@ -4,22 +4,22 @@
       <div class="d-flex row income-form-row p-0 m-0 mb-2">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <% if show_net_amount_for(income) %>
-            <label for="amount-<%= income.id %>" class="required"><span><%= l10n("faa.other_incomes.net_amount") %></span></label>
+            <label for="amount-<%= income.id %>" class="required"><%= l10n("faa.other_incomes.net_amount") %></label>
           <% else %>
-            <label for="amount-<%= income.id %>" class="required"><span><%= l10n("faa.other_incomes.amount") %></span></label>
+            <label for="amount-<%= income.id %>" class="required"><%= l10n("faa.other_incomes.amount") %></label>
           <% end %>
           <input class="fake-disabled-input" id="amount-<%= income.id %>" disabled="true" value="<%= number_to_currency(income.amount) %>">
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <label for="frequency-<%= income.id %>" class="required"><span><%= l10n("faa.other_incomes.frequency") %></span></label>
+          <label for="frequency-<%= income.id %>" class="required"><%= l10n("faa.other_incomes.frequency") %></label>
           <input class="fake-disabled-input" id="frequency-<%= income.id %>" disabled="true" value="<%= frequency_kind_options.invert[income.frequency_kind] %>">
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <label for="start-<%= income.id %>" class="required"><span><%= l10n("start_date") %></span></label>
+          <label for="start-<%= income.id %>" class="required"><%= l10n("start_date") %></label>
           <input class="fake-disabled-input" id="start-<%= income.id %>" disabled="true" value="<%= income.start_on %>">
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <label for="end-<%= income.id %>"><span><%= l10n("end_date") %></span></label>
+          <label for="end-<%= income.id %>"><%= l10n("end_date") %></label>
           <input class="fake-disabled-input" id="end-<%= income.id %>" disabled="true" value="<%= income.end_on.present? ? income.end_on : 'N/A' %>">
         </div>
       </div>

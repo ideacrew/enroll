@@ -6,12 +6,11 @@
 
   <div class="driver-question row-form-wrapper mb-4">
     <fieldset class="mb-3">
-      <legend class="weight-n required">
-        <span><%= l10n("faa.deductions.income_adjustments", subject: applicant_name) %></span>
-      </legend>
+      <legend class="weight-n required"><%= l10n("faa.deductions.income_adjustments", subject: applicant_name) %></legend>
+      <% has_deductions = @applicant.has_deductions == true %>
       <div class="d-flex align-items-center focus">
-        <label class="weight-n"><%= radio_button_tag :has_deductions, true, @applicant.has_deductions %><span><%= l10n('yes') %></span></label>
-        <label class="weight-n"><%= radio_button_tag :has_deductions, false, @applicant.has_deductions == false %><span><%= l10n('no') %></span></label>
+        <label class="weight-n"><%= radio_button_tag :has_deductions, true, has_deductions %><span><%= l10n('yes') %></span></label>
+        <label class="weight-n"><%= radio_button_tag :has_deductions, false, has_deductions == false %><span><%= l10n('no') %></span></label>
       </div>
     </fieldset>
     <div>
@@ -245,7 +244,7 @@
               <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind, new_form: true} %>
             </div>
             <div class="col-md-12 add-more-link" id="add-more-link-<%=deduction_kind%>">
-              <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" class="add_new_deduction_kind <%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>">
+              <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_deduction_kind')" id="add_new_deduction_kind" class="<%= 'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? %>">
                 <span class="fa-icon fa-stack plus-mr" aria-hidden="true">
                   <i class="fa fa-circle-thin fa-stack-2x"></i>
                   <i class="fa fa-plus fa-stack-1x"></i>
