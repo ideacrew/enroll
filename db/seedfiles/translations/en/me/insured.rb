@@ -339,7 +339,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.upload_new_notice' => "Upload New Notice",
   :'en.upload_file' => "Upload File",
   :'en.uploaded_notices' => "Uploaded Notices",
-  :'en.insured.verification_information' => "We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.",
+  :'en.insured.verification_information_old' => "We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.",
+  :'en.insured.verification_information' => "We verify the information you provide us using electronic data sources, like the Federal Data Services Hub and the IRS. If the data sources do not match the information you gave us, defined as a data matching inconsistency (DMI), your verification status will be 'Outstanding' and you will need to provide documents to prove what you told us. You will receive reminder notices on what documents you must submit to verify the information. If you do not provide documentation or resolve your DMI, your coverage could end or you could lose financial assistance such as APTC and CSR.",
   :'en.date_of_birth' => "Date Of Birth",
   :'en.social_security' => "Social Security",
   :'en.relationship' => "Relationship",
@@ -601,5 +602,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.',
   :'en.insured.general_agency_index_disabled_warning' => 'The General Agency Index is Disabled',
   :'en.insured.employer_datatable_disabled_warning' => 'The Employer Data Table is Disabled',
-  :'en.insured.plan_shopping.thankyou.agreement_terms_conditions' => 'You must complete Agreement and Terms and Conditions sections to continue.'
+  :'en.insured.plan_shopping.thankyou.agreement_terms_conditions' => 'You must complete Agreement and Terms and Conditions sections to continue.',
+  :'en.eligibility.created' => 'THH & Eligibility created successfully.'
 }.freeze
