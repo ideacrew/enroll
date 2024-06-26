@@ -1,36 +1,39 @@
 <% if @bs4 %>
   <%= income_form_for @application, @applicant, income do |f| %>
-    <%= hidden_field_tag 'bs4', @bs4 %>
+    <%= hidden_field_tag :bs4, true %>
     <div class="my-4">
       <% income_id = income.id %>
-      <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
+      <% new_form = local_assigns[:new_form].present? ? local_assigns[:new_form] : false %>
+      <% dummy_income_id = "#{income_id}#{new_form ? 'dummy' : ''}" # needed to prevent Multiple Form Label accessibility error %>
+      <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}', true)") : "" %>
       <%= f.hidden_field :kind, value: 'unemployment_income' %>
-      <div class="d-flex col-sm income-form-row p-0 mb-2">
+      <div class="d-flex row p-0 m-0 mb-2">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <%= f.label :frequency_kind, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{income_id}" %>
-          <%= f.text_field :amount, placeholder: '$', value: number_to_currency(income.amount), required: true, id: "amount#{income_id}" %>
+          <%= f.label :amount, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{dummy_income_id}" %>
+          <%= f.text_field :amount, placeholder: '$', value: number_to_currency(income.amount), required: true, id: "amount#{dummy_income_id}" %>
         </div>
-        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <div class="pr-3">
-            <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequecy#{income_id}" %>
-            <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), { include_blank: "Choose" }, { :disabled => false, :required => true, class: "w-100", id: "frequecy#{income_id}" }) %>
-          </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 pr-4">
+          <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequecy#{dummy_income_id}" %>
+          <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), { include_blank: "Choose" }, { :disabled => false, :required => true, class: "w-100", id: "frequecy#{dummy_income_id}" }) %>
         </div>
-        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <%= f.label :start_on, l10n("faa.other_incomes.start_date"), class: "required", for: "start_on_#{income_id}" %>
-          <%= f.text_field :start_on, placeholder: 'MM/DD/YYYY', required: true, id: "start_on_#{income_id}", onchange: onchange_date %>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 pr-4">
+          <%= f.label :start_on, l10n("start_date"), class: "required", for: "start_on_#{dummy_income_id}" %>
+          <%= f.date_field :start_on, placeholder: "MM/DD/YYYY", required: true, id: "start_on_#{dummy_income_id}", onchange: onchange_date, class: "w-100" %>
         </div>
-        <div class="col-sm col-md-6 col-lg-3 p-0">
-          <%= f.label :end_on, l10n("faa.other_incomes.end_date"), class: "required", for: "end_on_#{income_id}" %>
-          <%= f.text_field :end_on, placeholder: 'MM/DD/YYYY', id: "end_on_#{income_id}", onchange: onchange_date %>
+        <div class="col-sm col-md-6 col-lg-3 p-0 pr-4">
+          <%= f.label :end_on, l10n("end_date"), for: "end_on_#{dummy_income_id}" %>
+          <%= f.date_field :end_on, placeholder: "MM/DD/YYYY", id: "end_on_#{dummy_income_id}", onchange: onchange_date, class: "w-100" %>
         </div>
       </div>
-      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-cancel-<%= income_id %>')" id="unemployment-cancel-<%= income_id %>" class="btn btn-default unemployment-income-cancel"><%= l10n("faa.other_incomes.cancel") %></a>
-      <%= f.submit l10n("faa.other_incomes.save"), class: "btn btn-save", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+      <div class="d-flex mb-2">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-cancel-<%= income_id %>')" id="unemployment-cancel-<%= income_id %>" class="button outline mr-2 unemployment-income-cancel"><%= l10n("faa.other_incomes.cancel") %></a>
+        <%= f.submit l10n("faa.other_incomes.save"), class: "button btn-save", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+      </div>
     </div>
-  <% end %>
-  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
-    <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income.id } %>
+
+    <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+      <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income.id } %>
+    <% end %>
   <% end %>
 <% else %>
   <%= income_form_for @application, @applicant, income do |f| %>
@@ -61,7 +64,7 @@
       <div class="row">
         <div class="col-md-3 pull-right">
           <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-cancel-<%= income_id %>')" id="unemployment-cancel-<%= income_id %>" class="btn btn-default unemployment-income-cancel">Cancel</a>
-          <%= f.submit 'Save', class: "btn btn-save #{'disabled' if disabled }", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+          <%= f.submit 'Save', class: "btn btn-save", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
         </div>
       </div>
     </div>
