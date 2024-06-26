@@ -74,7 +74,7 @@
 
   <div class="mt-md-4">
     <% group_selection_url = main_app.new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
-    <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: group_selection_url } %>
+    <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: group_selection_url, disable_link: @application.incomplete_applicants? } %>
   </div>
 
 <% else %>
