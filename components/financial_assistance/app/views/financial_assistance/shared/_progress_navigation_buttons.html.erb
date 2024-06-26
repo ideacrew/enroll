@@ -26,7 +26,7 @@
       <%= yield :submit_button %>
     <% else %>
       <% unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
-        <%= h(link_to_with_noopener_noreferrer(l10n("continue_next"), next_link, class: 'button btn-continue', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled))) %>
+        <%= h(link_to_with_noopener_noreferrer(l10n("continue_next"), next_link, class: 'button btn-continue', id: 'btn-continue', disabled: disable_link)) %>
       <% end %>
     <% end %>
   <% end %>
