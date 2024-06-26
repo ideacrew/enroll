@@ -7,6 +7,7 @@ module FinancialAssistance
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index, :other]
     before_action :enable_bs4_layout, only: [:other] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :conditionally_enable_bs4_layout, only: [:create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     layout :resolve_layout
 
@@ -24,14 +25,11 @@ module FinancialAssistance
 
     def new
       authorize @applicant, :new?
-
-      @bs4 = true if params[:bs4] == "true"
       render 'other'
     end
 
     def edit
       @income = @applicant.incomes.find params[:id]
-      @bs4 = true if params[:bs4] == "true"
       authorize @income, :edit?
       respond_to do |format|
         format.js { render partial: 'financial_assistance/incomes/other_income_form', locals: { income: income } }
@@ -56,7 +54,6 @@ module FinancialAssistance
     end
 
     def update
-      @bs4 = true if params[:bs4] == "true"
       format_date(params)
       @income = @applicant.incomes.find params[:id]
       authorize @income, :update?
@@ -81,8 +78,13 @@ module FinancialAssistance
 
     def format_date(params)
       return if params[:income].blank?
-      params[:income][:start_on] = Date.strptime(params[:income][:start_on].to_s, "%m/%d/%Y")
-      params[:income][:end_on] = Date.strptime(params[:income][:end_on].to_s, "%m/%d/%Y") if params[:income][:end_on].present?
+      params[:income][:start_on] = format_date_string(params[:income][:start_on].to_s)
+      params[:income][:end_on] = format_date_string(params[:income][:end_on].to_s) if params[:income][:end_on].present?
+    end
+
+    def format_date_string(string)
+      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+      Date.strptime(string, date_format)
     end
 
     def job_income_type
@@ -127,12 +129,15 @@ module FinancialAssistance
       ''
     end
 
+    def conditionally_enable_bs4_layout
+      enable_bs4_layout if params[:bs4] == "true"
+    end
+
     def enable_bs4_layout
       @bs4 = true
     end
 
     def resolve_layout
-      puts "\n\n\n\n\n\n#{action_name}\n\n\n\n\n\n"
       case action_name
       when "index", "step", "new"
         "financial_assistance_nav"
