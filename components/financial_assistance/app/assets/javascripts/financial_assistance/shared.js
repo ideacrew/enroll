@@ -19,24 +19,3 @@ function validateDateWarnings(id, use_bs4 = false) {
   if (requiresStartDateWarning) warning_div.add(startDateWarning).removeClass('hidden');
   if (requiresEndDateWarning) warning_div.add(endDateWarning).removeClass('hidden');
 };
-
-function validateEndDateWarningModal(id, use_bs4 = false) {
-  const endDateId = ("#end_on_" + id);
-  var endDate = use_bs4 ? getDateFieldDate(endDateId) : $(endDateId).datepicker('getDate');
-  var warning_div = $("#date_warning_message_" + id);
-  var endDateWarning = $("#end_date_warning_" + id);
-
-  warning_div.add(endDateWarning).addClass('hidden');
-  if (endDate != undefined) warning_div.add(endDateWarning).removeClass('hidden');
-}
-
-
-function showEndDateWarning(id, use_bs4 = false) {
-  const endDateId = ("#end_on_" + id);
-  var endDate = use_bs4 ? getDateFieldDate(endDateId) : $(endDateId).datepicker('getDate');
-  var warning_div = $("#date_warning_message_" + id);
-  var endDateWarning = $("#end_date_warning_" + id);
-
-  warning_div.add(endDateWarning).addClass('hidden');
-  if (endDate != undefined) warning_div.add(endDateWarning).removeClass('hidden');
-}

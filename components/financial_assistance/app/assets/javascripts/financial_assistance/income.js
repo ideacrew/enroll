@@ -389,15 +389,11 @@ document.addEventListener("turbolinks:load", function () {
       var incomeType = incomeList ? incomeList.parentNode.id : null;
       if (incomeType == 'job_income') {
         if (document.querySelectorAll('.incomes-list:not(.self-employed-incomes-list) .income').length == 0) {
-          radio = document.getElementById('has_job_income_false');
-          radio.click();
-          radio.checked = true;
+          document.getElementById('has_job_income_false').click();
         }
       } else if (incomeType == 'self_employed_incomes') {
         if (document.querySelectorAll('.self-employed-incomes-list .income').length == 0) {
-          radio = document.getElementById('has_self_employment_income_false');
-          radio.click();
-          radio.checked = true;
+          document.getElementById('has_self_employment_income_false').click();
         }
       }
 

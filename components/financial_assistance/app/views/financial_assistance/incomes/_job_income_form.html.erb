@@ -3,7 +3,6 @@
     <%= hidden_field_tag :bs4, true %>
     <% income_id = income.id %>
     <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}', true)") : "" %>
-    <% onchange_enddate = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateEndDateWarningModal('#{income_id}', false)") : "" %>
     <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
     <div class="alert alert-info d-flex" role="alert">
       <div class="pl-2 pt-2 pr-1">
