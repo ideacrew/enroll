@@ -52,7 +52,7 @@
 
       <% if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %>
         <div class="tobacco_user_container">
-          <label class=""><%= l10n("insured.group_selection.is_tobacco_user") %> *</label>
+          <label class="required"><%= l10n("insured.group_selection.is_tobacco_user") %></label>
           <% member = @latest_enrollment.hbx_enrollment_members.where(applicant_id: family_member.id).first if @latest_enrollment %>
           <div class="n-radio-group d-flex align-items-center mt-2 mb-2">
             <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_Y_<%= index %>')" class="n-radio-row mr-3">
