@@ -1,66 +1,119 @@
-<div class="special_qle_reasons hidden">
-  <h4><%= l10n("insured.indicate_following_circumstances_apply_to_you") %>: </h4> <br/>
-  <div class = 'moving_radio_btn'>
-    <div class="n-radio-group">
-      <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
-    	  <label class="n-radio vertically-aligned-row" for="reason_accept">
-          <%= radio_button_tag :reason, "",  true, id: 'reason_accept', class: "n-radio zip-check" %>
-    	    <span class = "n-radio"></span>
-    	    <span id="date-change"></span>
-    	  </label>
+<% if @bs4 %>
+  <div class="special_qle_reasons hidden">
+    <label class="weight-n mb-2"><%= l10n("insured.indicate_following_circumstances_apply_to_you") %>: </label>
+    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
+      <label class="weight-n" for="reason_accept">
+        <%= radio_button_tag :reason, "", true, id: 'reason_accept', class: "zip-check" %>
+        <span><%= l10n('insured.qle_detail.special_reason.move', qle_start_date: @qle_date_calc, qle_date: @qle_date) %></span>
+      </label>
+    </div>
+    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
+      <label class="weight-n" for="reason_accept1">
+        <%= radio_button_tag :reason, "I was living outside the US or in a US territory", false, id: 'reason_accept1' %>
+        <%= l10n("insured.living_outside_the_US_or_in_US_territory") %>
+      </label>
+    </div>
+    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept2')" class="n-radio-row">
+      <label class="weight-n" for="reason_accept2">
+        <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "zip-check"%>
+        <span><%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= h(link_to(l10n("insured.qle_detail.special_reason.move.calculator"), 'http://www.healthcare.gov/lower-costs', target: :_blank, rel: "noopener noreferrer")) if individual_market_is_enabled? %></span>
+      </label>
+    </div>
+    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_reject')" class="n-radio-row">
+      <label class="weight-n" for="reason_reject">
+        <%= radio_button_tag :reason, "None of the Above", false, id:'reason_reject' %>
+        <%= l10n("none_of_the_above") %>
+      </label>
+    </div>
+    <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+      <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit_reason"} %>
+    </div>
+  </div>
+    <div class="hidden zip_compare">
+      <label class="weight-n mb-2"><%= l10n("insured.qle_detail.special_reason.move.enter_zip") %></label>
+      <div class="flex-column col-6">
+        <div onkeydown="handleButtonKeyDown(event, 'qle_zip_compare')">
+          <label><%= l10n("insured.qle_detail.special_reason.move.old_zip") %></label>
+          <input class="old_zip_code required zip"/>
+        </div>
+        <div onkeydown="handleButtonKeyDown(event, 'qle_zip_compare')">
+          <label><%= l10n("insured.qle_detail.special_reason.move.new_zip") %></label>
+          <input class="new_zip_code required zip"/>
+        </div>
+        <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+          <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_zip_compare"} %>
+        </div>
       </div>
-      <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
-        <label class="n-radio" for="reason_accept1">
-          <%= radio_button_tag :reason, "I was living outside the US or in a US territory", false, id: 'reason_accept1', class: "n-radio" %>
-          <span class="n-radio"></span>
-          <span><%= l10n("insured.living_outside_the_US_or_in_US_territory") %></span>
-        </label>
-      </div>
-      <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept2')" class="n-radio-row">
-        <label class="n-radio vertically-aligned-row" for="reason_accept2">
-          <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "n-radio zip-check"%>
-          <span class="n-radio"></span>
-          <span>
-            <%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= h(link_to("(Use the calculator to see if you qualify)", 'http://www.healthcare.gov/lower-costs', target: :_blank, rel: "noopener noreferrer")) if individual_market_is_enabled? %>
-          </span>
-        </label>
-      </div>
-      <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_reject')" class="n-radio-row">
-        <label class="n-radio" for="reason_reject">
-          <%= radio_button_tag :reason, "None of the Above", false, id:'reason_reject', class: "n-radio" %>
-          <span class="n-radio"></span>
-          <span><%= l10n("none_of_the_above") %></span>
-        </label>
-      </div>
-      <div class="center">
-        <%= link_to l10n('continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit_reason' %>
+  </div>
+  <script>
+    $(document).ready(function() {
+      $.inputMasks();
+    });
+  </script>
+<% else %>
+  <div class="special_qle_reasons hidden">
+    <h4><%= l10n("insured.indicate_following_circumstances_apply_to_you") %>: </h4> <br/>
+    <div class = 'moving_radio_btn'>
+      <div class="n-radio-group">
+        <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
+          <label class="n-radio vertically-aligned-row" for="reason_accept">
+            <%= radio_button_tag :reason, "",  true, id: 'reason_accept', class: "n-radio zip-check" %>
+            <span class = "n-radio"></span>
+            <span><%= l10n('insured.qle_detail.special_reason.move', qle_start_date: @qle_date_calc, qle_date: @qle_date) %></span>
+          </label>
+        </div>
+        <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
+          <label class="n-radio" for="reason_accept1">
+            <%= radio_button_tag :reason, "I was living outside the US or in a US territory", false, id: 'reason_accept1', class: "n-radio" %>
+            <span class="n-radio"></span>
+            <span><%= l10n("insured.living_outside_the_US_or_in_US_territory") %></span>
+          </label>
+        </div>
+        <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept2')" class="n-radio-row">
+          <label class="n-radio vertically-aligned-row" for="reason_accept2">
+            <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "n-radio zip-check"%>
+            <span class="n-radio"></span>
+            <span>
+              <%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= h(link_to("(Use the calculator to see if you qualify)", 'http://www.healthcare.gov/lower-costs', target: :_blank, rel: "noopener noreferrer")) if individual_market_is_enabled? %>
+            </span>
+          </label>
+        </div>
+        <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_reject')" class="n-radio-row">
+          <label class="n-radio" for="reason_reject">
+            <%= radio_button_tag :reason, "None of the Above", false, id:'reason_reject', class: "n-radio" %>
+            <span class="n-radio"></span>
+            <span><%= l10n("none_of_the_above") %></span>
+          </label>
+        </div>
+        <div class="center">
+          <%= link_to l10n('continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit_reason' %>
+        </div>
       </div>
     </div>
   </div>
-</div>
+  <div class="zip_compare hidden form-group" style="padding: 2%">
+    <p><strong>Enter your old zipcode and your new zipcode.</strong></p>
+    <div style="display: flex; flex-direction: column; width: 50%">
+      <div>
+        <label>Old Zip Code</label>
+        <input class="form-control old_zip_code number required zip" />
+      </div>
+      
+      <div>
+        <label>New Zip Code</label>
+        <input class="form-control new_zip_code number required zip" />
+      </div>
+    </div>
 
-<div class="zip_compare hidden form-group" style="padding: 2%">
-  <p><strong>Enter your old zipcode and your new zipcode.</strong></p>
-  <div style="display: flex; flex-direction: column; width: 50%">
     <div>
-      <label>Old Zip Code</label>
-      <input class="form-control old_zip_code number required zip" />
-    </div>
-
-    <div>
-      <label>New Zip Code</label>
-      <input class="form-control new_zip_code number required zip" />
+      <%= link_to l10n('continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_zip_compare' %>
     </div>
   </div>
-
-  <div>
-    <%= link_to l10n('continue').to_s.upcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_zip_compare' %>
-  </div>
-</div>
+<% end %>
 
 <script type="text/javascript">
   <% if EnrollRegistry[:enroll_app].setting(:sep_moved_out_zip_compare).item %>
-    $('#qle_submit_reason').on('click keydown', function(event) {
+    $('#qle_submit_reason').on('click', function(event) {
       if (event.type === 'click' || (event.type === 'keydown' && event.keyCode === 13)) {
         if ($("input:radio[name=reason]:checked").hasClass('zip-check')) {
           $('.special_qle_reasons').addClass('hidden');
@@ -73,6 +126,13 @@
   <% end %>
 
   $('#qle_zip_compare').on('click', function() {
+    function handleFailure() {
+      $('#qle_reason').hide();
+      var errorNoticeAction = "<%= l10n('insured.qle_detail.error_text_not_eligible', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item) %>";
+      $("#qle-details .error-text").html(errorNoticeAction);
+      $('#qle-details .error-info').removeClass('hidden');
+    }
+
     $.ajax({
       type: "GET",
       data:{old_zip: $('.old_zip_code').val(), new_zip: $('.new_zip_code').val()},
@@ -81,16 +141,17 @@
         if (response.is_approved) {
           $.ajax({
             type: "GET",
-            data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
+            data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), bs4: $("#bs4").val()},
             url: "/insured/families/check_qle_date.js"
           });
         } else {
-          $('#qle_reason').hide();
-          var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
-          $("#qle-details .error-text").html(errorNoticeAction);
-          $('#qle-details .error-info').removeClass('hidden');
+          handleFailure();
         }
-      }
+      },
+      error: handleFailure
     });
-  })
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  });
 </script>
