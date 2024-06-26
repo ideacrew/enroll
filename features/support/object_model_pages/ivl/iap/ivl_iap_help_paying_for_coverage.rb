@@ -5,7 +5,7 @@ class IvlIapHelpPayingForCoverage
 
   def self.yes_radiobtn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     ''
+     '.interaction-choice-control-value-radio1'
     else
     'label[for="radio1"] span'
     end
@@ -20,7 +20,11 @@ class IvlIapHelpPayingForCoverage
   end
 
   def self.continue_btn
-    '#btn-continue'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '.interaction-click-control-continue-to-next-step'
+     else
+      '#btn-continue'
+     end
   end
 
   def self.your_application_for_premium_reductions_text

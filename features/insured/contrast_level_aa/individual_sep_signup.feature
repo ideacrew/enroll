@@ -1,6 +1,6 @@
 Feature: Contrast level AA is enabled - Insured Plan Shopping on Individual market
   Background:
-    Given bs4_consumer_flow feature is disable
+    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     And the FAA feature configuration is enabled
     Given individual Qualifying life events are present

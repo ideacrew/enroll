@@ -2,7 +2,7 @@
 Feature: Customers go to Messages to view inbox and deleted messages
 
   Background: Set up features
-    Given bs4_consumer_flow feature is disable
+    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     Given EnrollRegistry medicaid_tax_credits_link feature is enabled
     And EnrollRegistry contact_email_header_footer_feature feature is enabled

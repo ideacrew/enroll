@@ -1,7 +1,7 @@
 Feature: Contrast level AA is enabled - Insured Plan Shopping on Individual market
 
   Background:
-    Given bs4_consumer_flow feature is disable
+    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     Given Individual has not signed up as an HBX user
     And the FAA feature configuration is enabled

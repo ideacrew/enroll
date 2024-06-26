@@ -1,6 +1,6 @@
 Feature: Contrast level AA is enabled - Insured Plan Shopping with SEP
   Background:
-    Given bs4_consumer_flow feature is disable
+    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     Given the FAA feature configuration is enabled
     Given individual Qualifying life events are present

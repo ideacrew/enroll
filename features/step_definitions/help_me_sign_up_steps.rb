@@ -29,7 +29,13 @@ end
 
 And(/^Individual clicks on the Help from an Expert link?/) do
   path = benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path
+  binding.irb
   find("a[href='#{path}']").click
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+  else
+    
+  end
 end
 
 And(/^Individual selects a broker?/) do

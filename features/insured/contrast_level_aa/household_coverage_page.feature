@@ -1,7 +1,7 @@
 Feature: Contrast level AA is enabled - Household Coverage Selection Page
 
  Background: Individual market setup
-    Given bs4_consumer_flow feature is disable
+    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     And EnrollRegistry contact_method_via_dropdown feature is enabled
     And the FAA feature configuration is enabled
