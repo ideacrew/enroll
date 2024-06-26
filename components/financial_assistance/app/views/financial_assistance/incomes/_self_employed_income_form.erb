@@ -7,7 +7,7 @@
           <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
         </div>
         <div class="mt-1 pl-0 pr-2 pt-1">
-          <p class="subtext"><%= l10n('faa.incomes.job_end_date_note', subject: @applicant.first_name) %></p>
+          <p class="subtext"><%= l10n('faa.incomes.job_end_date_note', subject: @applicant.first_name, income_type: "self-employment") %></p>
         </div>
       </div>
       <% income_id = income.id %>
