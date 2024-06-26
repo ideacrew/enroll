@@ -1058,7 +1058,7 @@ module ApplicationHelper
     return true if user.has_employee_role?
     return true unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
 
-    user.has_consumer_role? && user.consumer_identity_verified?
+    user.has_consumer_role? && RemoteIdentityProofingStatus.is_complete_for_person?(user.person)
   end
 
   # @method insured_role_exists?(user)
@@ -1080,7 +1080,7 @@ module ApplicationHelper
     if EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
       user.has_consumer_role?
     else
-      user.has_consumer_role? && user.consumer_identity_verified?
+      user.has_consumer_role? && RemoteIdentityProofingStatus.is_complete_for_person?(user.person)
     end
   end
 

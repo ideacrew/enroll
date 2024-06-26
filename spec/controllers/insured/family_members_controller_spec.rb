@@ -303,6 +303,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       before :each do
+        allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
         sign_in(user)
         post :create, params: { dependent: dependent_properties }, format: :js
       end
