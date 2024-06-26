@@ -190,7 +190,7 @@ $(function () {
   $('#qle_form').on('keydown', function(e) {
     var code = e.keyCode || e.which;
     if ($("#qle-nav").length > 0) {
-      return true;
+      return false;
     }
 
     if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
