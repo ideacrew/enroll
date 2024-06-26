@@ -143,6 +143,7 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
   let(:required_params) { { family: family, effective_date: effective_date } }
 
   before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
     [
       :financial_assistance,
       :'gid://enroll_app/Family',
@@ -151,7 +152,7 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
       :health_product_enrollment_status,
       :dental_product_enrollment_status
     ].each do |feature_key|
-      EnrollRegistry[feature_key].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(feature_key).and_return(true)
     end
   end
 
@@ -197,6 +198,9 @@ RSpec.describe ::Operations::Eligibilities::BuildFamilyDetermination,
       result = subject.call(required_params)
       expect(result.success?).to be_falsey
       expect(result.success).not_to be_a(Eligibilities::Determination)
+      expect(result.failure).to eq(
+        "Determination cannot be built as None of the family members are applying for coverage or Primary person's Consumer Role is missing."
+      )
     end
   end
 
