@@ -51,6 +51,7 @@ module Operations
         return Success() unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
 
         ::Operations::Individual::OnNewDetermination.new.call({family: @family.reload, year: @effective_date.year})
+        Success()
       end
     end
   end

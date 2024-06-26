@@ -271,7 +271,7 @@ Given(/^Hbx Admin exists$/) do
                             can_complete_resident_application: true, can_add_sep: true, can_view_username_and_email: true, can_view_application_types: true,
                             view_personal_info_page: true, can_access_outstanding_verification_sub_tab: true, can_access_identity_verification_sub_tab: true,
                             can_access_accept_reject_paper_application_documents: true, can_delete_identity_application_documents: true,
-                            can_access_accept_reject_identity_documents: true, can_edit_aptc: true, can_drop_enrollment_members: true)
+                            can_access_accept_reject_identity_documents: true, can_edit_aptc: true, can_drop_enrollment_members: true, can_add_pdc: true)
 
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
