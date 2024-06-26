@@ -454,6 +454,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
 
     before do
+      allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
       helper.build_consumer_role(person,family)
     end
 

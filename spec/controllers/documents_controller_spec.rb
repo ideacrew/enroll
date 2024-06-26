@@ -222,6 +222,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:alive_status).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_publish_updated_families).and_return(true)
         consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
         consumer_person.consumer_role.vlp_documents = []
         consumer_person.save!

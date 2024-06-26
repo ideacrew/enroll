@@ -329,7 +329,6 @@ class Insured::PlanShoppingsController < ApplicationController
   def check_enrollment_state
     return if @hbx_enrollment.shopping?
 
-    flash[:notice] = l10n("insured.active_enrollment_warning")
     redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
   end
 

@@ -60,13 +60,13 @@
 
     <div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
       <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio">
-        <%= f.radio_button :gender, "male", class: "required floatlabel", id: "radio_male", checked: true %>
+        <%= f.radio_button :gender, "male", class: "required floatlabel", id: "radio_male", checked: ["male", nil].include?(@person.gender) %>
         <label for="radio_male"><span>MALE</span></label>
       </div>
     </div>
     <div class="col-lg-1 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
       <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio">
-        <%= f.radio_button :gender, "female", class: "required floatlabel", id: "radio_female", checked: false %>
+        <%= f.radio_button :gender, "female", class: "required floatlabel", id: "radio_female", checked: @person.gender == 'female' %>
         <label for="radio_female"><span>FEMALE</span></label>
       </div>
     </div>
