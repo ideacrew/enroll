@@ -26,6 +26,8 @@ RSpec.describe Operations::People::TransformApplicantToMember, dbclean: :after_e
 
     context 'success' do
       before do
+        allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+
         @result = described_class.new.call(params)
       end
 
