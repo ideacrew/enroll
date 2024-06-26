@@ -10,6 +10,9 @@ class Insured::PlanShoppingsController < ApplicationController
   include Config::AcaHelper
   include L10nHelper
 
+  layout 'progress', only: [:show, :plans] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :set_bs4_layout, only: [:show, :plans] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
   before_action :find_hbx_enrollment
   before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
@@ -699,5 +702,9 @@ class Insured::PlanShoppingsController < ApplicationController
 
     flash[:error] = l10n("insured.out_of_state_error_message")
     redirect_to family_account_path
+  end
+
+  def set_bs4_layout
+    @bs4 = true
   end
 end

@@ -1,27 +1,41 @@
-<div class="module shopping-data">
-  <% if EnrollRegistry.feature_enabled?(:go_to_plan_compare_link) && @coverage_kind == 'health' %>
-    <%= link_to l10n("go_to_plan_compare") , "", class: "btn green-background fifteen-px-bottom-margin", data: {toggle: "modal", target: "#plan_match_redirection"} %>
-    <br>
-  <% end %>
-  <div class="pull-left">
-    <span class="ttu lg twelve">Coverage For:</span>
-    &nbsp;
-    <strong><%= plan_shopping_dependent_text(@hbx_enrollment) %></strong>
-    &nbsp;&nbsp;
-    <% if (['shop','employer_sponsored','fehb'].include?(@market_kind)) && @coverage_kind == 'health' %>
-    Employer: &nbsp;
-    <strong><%= @hbx_enrollment.try(:benefit_sponsorship).try(:organization).try(:legal_name) %></strong>
-    &nbsp;&nbsp;
-    <% end %>
-    <span class="ttu lg twelve" data-cuke="plan-count">Plans:</span>
-    &nbsp;
-    <% products = (['shop','employer_sponsored','fehb'].include?(@market_kind)) ? @member_groups : @plans %>
-    <strong id='plans-count'><%= products_count(products)%></strong>
-    &nbsp;&nbsp;
-    <span class="ttu lg twelve">Effective Date:</span>
-    &nbsp;
-    <strong id='effective_date'><%= @hbx_enrollment.effective_on %></strong>
+<% if @bs4 %>
+  <div class="row">
+    <div class="col-3">
+      <div>Coverage For: </div>
+      <div class="<%= 'hidden' unless (['shop','employer_sponsored','fehb'].include?(@market_kind)) && @coverage_kind == 'health' %>">Employer: </div>
+      <div>Available Plans: </div>
+      <div>Coverage Start Date:</div>
+    </div>
+    <div class="col-4">
+      <div><%= plan_shopping_dependent_text(@hbx_enrollment) %></div>
+      <div class="<%= 'hidden' unless (['shop','employer_sponsored','fehb'].include?(@market_kind)) && @coverage_kind == 'health' %>">
+        <%= @hbx_enrollment.try(:benefit_sponsorship).try(:organization).try(:legal_name) %>
+      </div>
+      <div id="plans-count"><%= products_count((['shop','employer_sponsored','fehb'].include?(@market_kind)) ? @member_groups : @plans )%></div>
+      <div id="effective_date"><%= @hbx_enrollment.effective_on %></div>
+    </div>
   </div>
-  <br/>
-</div>
-
+<% else %>
+  <div class="module shopping-data">
+    <% if EnrollRegistry.feature_enabled?(:go_to_plan_compare_link) && @coverage_kind == 'health' %>
+      <%= link_to l10n("go_to_plan_compare") , "", class: "btn green-background fifteen-px-bottom-margin", data: {toggle: "modal", target: "#plan_match_redirection"} %>
+      <br>
+    <% end %>
+    <div class="pull-left">
+      <span class="ttu lg twelve">Coverage For:</span>
+      <strong><%= plan_shopping_dependent_text(@hbx_enrollment) %></strong>
+      <% if (['shop','employer_sponsored','fehb'].include?(@market_kind)) && @coverage_kind == 'health' %>
+      Employer: &nbsp;
+      <strong><%= @hbx_enrollment.try(:benefit_sponsorship).try(:organization).try(:legal_name) %></strong>
+      <% end %>
+      <span class="ttu lg twelve" data-cuke="plan-count">Plans:</span>
+      <% products = (['shop','employer_sponsored','fehb'].include?(@market_kind)) ? @member_groups : @plans %>
+      <strong id='plans-count'><%= products_count(products)%></strong>
+      &nbsp;&nbsp;
+      <span class="ttu lg twelve">Effective Date:</span>
+      &nbsp;
+      <strong id='effective_date'><%= @hbx_enrollment.effective_on %></strong>
+    </div>
+    <br/>
+  </div>
+<% end %>

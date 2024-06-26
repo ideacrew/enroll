@@ -3,7 +3,7 @@
   <%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :household_info, nav_options: plan_shopping_progress_hash } %>
 
   <%# Main Content (right) %>
-  <div id="choose-coverag-page">
+  <div id="choose-coverage-page">
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <%= hidden_field_tag(:ivl_effective_on, @ivl_effective_on) %>
       <%= hidden_field_tag(:shop_effective_on, @shop_effective_on) %>

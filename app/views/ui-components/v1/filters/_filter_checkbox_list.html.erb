@@ -1,0 +1,19 @@
+
+<div class="col-3 p-0">
+  <h5 class="border-bottom"><%= category.titleize %></h5>
+  <ul id="<%= category.underscore.gsub(" ","-") %>-filter-list" class="list-unstyled">
+    <% checkbox_list.each do |option| %>
+      <li class="d-flex flex-row align-items-center my-3">
+          <%= check_box_tag "option", option, false,
+          { id: "option-#{option}",
+          class: "option-selection-filter checkbox-custom",
+          onclick: category == 'Sort By' ? "filterBy(this)" : "filterOnCheckboxList(this)",
+          data: { option: option, category: category.titleize.delete(" ") } } %>
+
+          <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_'"#{option}"'_title_info') %>">
+            <%= l10n("#{option}".titleize) %>
+          </span>
+      </li>
+    <% end %>
+  </ul>
+</div>

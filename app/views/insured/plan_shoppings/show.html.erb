@@ -1,124 +1,51 @@
-<% content_for :horizontal_status do %>
-  <%= render partial: 'insured/families/horizontal_status.html.erb', locals: { step: 2 } %>
-<% end %>
+
+<%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :choose_plan, nav_options: plan_shopping_progress_hash } %>
 
 <div id="message_form"></div>
 
-<div class="container" id="plan_shoppings_show_form">
-  <div class="select_plan_wrapper">
-    <div class="row">
-      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-        <div class="ct-1">
-          <h1 class="heading-text"><%= l10n("insured.plan_shoppings.show.title") %></h1>
-          <% if @coverage_kind == "health" %>
-            <h4 class="switch-header"><%= l10n("insured.plan_shoppings.show.health_title.content") %></h4>
-          <% else %>
-            <h4 class="switch-header"><%= l10n("insured.plan_shoppings.show.dental_title.content") %></h4>
-          <% end %>
-          <h4 class="switch-header">
-            <% if @market_kind == "shop" && EnrollRegistry.feature_enabled?(:display_cost_warning_message) %>
-              <% if @hbx_enrollment.sponsored_benefit.single_plan_type? %>
-                <strong><%= l10n("insured.plan_shoppings.final_cost_change") %></strong>
-              <% end %>
-              <% if display_plan_cost_warning(@benefit_group) %>
-                <b><%= l10n("insured.plan_shoppings.final_cost_change") %></b>
-              <% end %>
-            <% end %>
-          </h4>
-          <div class="row no-buffer">
-            <%= render "shared/plan_shoppings/more_plan_details" %>
-          </div>
-          <p class="pull-right">
-            <% if @market_kind == "individual" || @market_kind == 'coverall' %>
-              <a class="btn btn-default ivl-compare-selected-plans-link d-none" href="javascript:void(0);" data-cuke="ivl-compare-selected-plans-link"
-              data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
-                <%= l10n("compare_plans").to_s.upcase %>
-              </a>
-            <% end %>
-            <% if @market_kind == "shop" || @market_kind == 'fehb' %>
-              <a class="btn btn-default compare-selected-plans-link d-none" href="javascript:void(0);"
-              data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
-                <%= l10n("compare_plans").to_s.upcase %>
-              </a>
-            <% end %>
-          </p>
-          <div id="plan-summary"></div>
-          <div id="all-plans" class="all-filters-row">
-            <%= render partial: './ui-components/v1/filters/plan_filters' %>
-            <div class="col-lg-9 col-md-9 co-sm-9 col-xs-12 pr-0" id="planContainer">
-              <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
-                <button class="btn btn-default pull-right hidden" id="compareBtn" onclick="compareResults()" data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
-                  <%= l10n("compare_plans").to_s.upcase %>
-                </button>
-              <% end %>
-              <br>
-              <div class="sort-area mt-1 mb-1">
-                <span class="mr-1">
-                  <strong><%= l10n("sort_by") %></strong>
-                </span>
-                <div class="btn-group" id="sort_by" role="group">
-                  <a class="btn btn-default" id="plan_name_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'plan_name_filter')" data-sort-by="plan-name" onclick="filterBy(this)">
-                    <%= l10n("plan_name") %>
-                  </a>
-                  <a class="btn btn-default" id="premium_amount_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'premium_amount_filter')" data-sort-by="plan-metal-premium" onclick="filterBy(this)">
-                    <%= l10n("premium_amount") %>
-                  </a>
-                  <a class="btn btn-default" id="deductible_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'deductible_filter')" data-sort-by="plan-metal-deductible" onclick="filterBy(this)">
-                    <%= l10n("deductible") %>
-                  </a>
-                  <a class="btn btn-default" id="carrier_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'carrier_filter')" data-sort-by="plan-carrier" onclick="filterBy(this)">
-                    <%= l10n("carrier") %>
-                  </a>
-                </div>
-              </div>
-              <% if @market_kind == 'individual' || @market_kind == 'coverall' %>
-                <div id="ivl_plans">
-                  <h3>
-                    <%= l10n("loading") %>
-                  </h3>
-                </div>
-              <% end %>
-              <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
-                <div id="plans">
-                  <%= render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan %>
-                </div>
-                <div id="filteredPlans" data-enrollments="<%= json_for_plan_shopping_member_groups(@member_groups) %>"></div>
-              <% end %>
-            </div>
-          </div>
-        </div>
-        <div class="no-buffer">
-          <p class="pull-right">
-            <a class="btn btn-default compare-selected-plans-link" href="javascript:void(0);" style="display: none;" data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
-              <%= l10n("compare_plans").to_s.upcase %>
-            </a>
-          </p>
-        </div>
+<div class="select_plan_wrapper" id="plan_shoppings_show_form">
+  <h1><%= l10n("insured.plan_shoppings.show.title") %></h1>
+  <p><%= @coverage_kind == "health" ? l10n("insured.plan_shoppings.show.health_title.content") : l10n("insured.plan_shoppings.show.dental_title.content")%></p>
+
+  <%= render "shared/plan_shoppings/more_plan_details" %>
+
+  <div id="plan-summary"></div>
+
+  <div id="all-plans" class="all-filters-row">
+    <details close id="plan-filter-container" class="my-3">
+      <summary data-open="Close Filters" data-close="Show Filters"></summary>
+      <div class="mt-3">
+        <%= render partial: './ui-components/v1/filters/plan_filters' %>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <% if @change_plan.blank? && @market_kind == "individual" %>
-          <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
-            <%= render partial: 'shared/individual_progress', locals: { step: '4' } %>
-          <% else %>
-            <%= render partial: 'shared/sep_progress', locals: { step: '5' } %>
-          <% end %>
-        <% elsif @change_plan.blank? && @market_kind == "coverall" %>
-          <%= render partial: 'shared/resident_progress', locals: { step: '4' } %>
-        <% elsif @change_plan.blank? %>
-          <%= render partial: 'shared/signup_progress', locals: { step: '5' } %>
-        <% elsif @change_plan == "change_by_qle" %>
-          <%= render partial: 'shared/qle_progress', locals: { step: '2', show_button: 'true' } %>
-        <% elsif @change_plan == "change_plan" %>
-          <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
-            <%= render partial: 'shared/sep_shop_for_plans_progress', locals: { step: '2' } %>
-          <% else %>
-            <%= render partial: 'shared/shop_for_plans_progress', locals: { step: '1', show_waive: true } %>
-          <% end %>
-        <% end %>
-      </div>
+    </details>
+
+    <hr />
+
+    <div class="d-flex justify-content-between">
+      <h2>Plan Results</h2>
+      <% if @market_kind == "individual" || @market_kind == 'coverall' %>
+        <button class="button button-primary ivl-compare-selected-plans-link d-none" data-cuke="ivl-compare-selected-plans-link"
+          data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+          <%= l10n("compare_plans") %>
+        </button>
+      <% end %>
+    </div>
+
+    <div id="planContainer" class="my-3" >
+      <% if @market_kind == 'individual' || @market_kind == 'coverall' %>
+        <div id="ivl_plans">
+          <h3><%= l10n("loading") %></h3>
+        </div>
+      <% end %>
+
+      <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
+        <div id="plans"><%= render partial: "ui-components/v1/cards/plan_details", collection: @member_groups, as: :plan %></div>
+        <div id="filteredPlans" data-enrollments="<%= json_for_plan_shopping_member_groups(@member_groups) %>"></div>
+      <% end %>
     </div>
   </div>
 </div>
+
 
 <%# Modals %>
 <%= render "ui-components/v1/modals/detail_modal" %>
@@ -142,6 +69,28 @@
 </div>
 <%= render partial: "ui-components/v1/modals/waive_confirmation_during_shopping", locals: { enrollment: @hbx_enrollment } if @hbx_enrollment.is_shop? %>
 <%= render partial: "ui-components/v1/modals/help_with_plan", locals: { enrollment: @hbx_enrollment } %>
+
+
+<style>
+  details#plan-filter-container > summary {
+    list-style-type: none;
+    font-weight: bold;
+    text-size: 18px;
+  }
+
+  details#plan-filter-container > summary::-webkit-details-marker, details > summary::marker  {
+    display: none;
+  }
+
+  details#plan-filter-container[open] summary::after {
+    content: attr(data-open) url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 13L9.29289 8.70711C9.68342 8.31658 10.3166 8.31658 10.7071 8.70711L15 13' stroke='%23323130' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+  }
+
+  details#plan-filter-container:not([open]) summary::after {
+    content: attr(data-close) url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 8L10.7071 12.2929C10.3166 12.6834 9.68342 12.6834 9.29289 12.2929L5 8' stroke='%23323130' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+  }
+</style>
+
 
 <script>
   var marketKind = "<%= @hbx_enrollment.is_shop? ? 'shop' : @hbx_enrollment.kind %>";
@@ -206,6 +155,7 @@
     }
 
     function filterBy(element) {
+      debugger;
       filterType = element.dataset.sortBy;
       resetPlanTileSelection();
       clearAll()

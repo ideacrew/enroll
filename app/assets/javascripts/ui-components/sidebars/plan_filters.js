@@ -29,6 +29,10 @@ function filterPlanNetwork(element) {
   processValues(element)
 }
 
+function filterOnCheckboxList(element) {
+  processValues(element);
+}
+
 function filterPlanCarriers(element) {
   filterParams.selectedCarrier = element.value
 }
@@ -61,27 +65,27 @@ function processValues(element) {
   if (element.checked) {
     var dataType = element.dataset.category;
 
-    if (dataType == "planMetalLevel") {
+    if (dataType == "MetalLevel") {
       filterParams.selectedMetalLevels.push(element.dataset.planMetalLevel)
     }
-    if (dataType == "planType") {
+    if (dataType == "PlanType") {
       filterParams.selectedPlanTypes.push(element.dataset.planType)
     }
-    if (dataType == "planNetwork") {
+    if (dataType == "Network") {
       filterParams.selectedPlanNetworks.push(element.dataset.planNetwork)
     }
   } else if (!element.checked) {
     var dataType = element.dataset.category;
 
-    if (dataType == "planMetalLevel") {
+    if (dataType == "MetalLevel") {
       index = filterParams.selectedMetalLevels.indexOf(element.dataset.planMetalLevel)
       removeItems(filterParams.selectedMetalLevels,index)
     }
-    if (dataType == "planType") {
+    if (dataType == "PlanType") {
       index = filterParams.selectedPlanTypes.indexOf(element.dataset.planType)
       removeItems(filterParams.selectedPlanTypes,index)
     }
-    if (dataType == "planNetwork") {
+    if (dataType == "Network") {
       index = filterParams.selectedPlanNetworks.indexOf(element.dataset.planNetwork)
       removeItems(filterParams.selectedPlanNetworks,index)
     }
