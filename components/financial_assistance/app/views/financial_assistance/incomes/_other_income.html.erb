@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div id="<%= dom_id other_income %>" class="other-income mt-4">
     <div class="other-income-show">
-      <div class="d-flex col-sm income-form-row p-0 mb-2">
+      <div class="d-flex row income-form-row p-0 m-0 mb-2">
         <% if other_income.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
           <div class="mr-auto col-sm col-md-6 col-lg-3 p-0" id="ssi_type">
             <div class="ss_benefit_type">
@@ -10,7 +10,7 @@
             </div>
           </div>
         <% end %>
-        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 mb-1">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <% if show_net_amount_for(other_income) %>
             <label for="amount-<%= other_income.id %>" class="required"><%= l10n("faa.other_incomes.net_amount") %></label>
           <% else %>
@@ -31,14 +31,14 @@
           <input class="fake-disabled-input" id="end-<%= other_income.id %>" disabled="true" value="<%= other_income.end_on.present? ? other_income.end_on : 'N/A' %>">
         </div>
       </div>
-      <div>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-delete-<%= dom_id other_income %>')" id="other-income-delete-<%= dom_id other_income %>" class="other-income-delete button outline error mr-1 mb-2"><%= l10n("faa.other_incomes.remove") %></a>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-edit')" id="other-income-edit" class="other-income-edit button outline mb-2 other-income-edit"><%=l10n("edit")%></a>
+      <div class="d-flex mb-2">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-delete-<%= dom_id other_income %>')" id="other-income-delete-<%= dom_id other_income %>" class="other-income-delete button outline error mr-2"><%= l10n("faa.edit.remove") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-edit')" id="other-income-edit" class="other-income-edit button outline"><%=l10n("edit")%></a>
       </div>
     </div>
-  </div>
-  <div class="edit-other-income-form hidden">
-    <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: other_income, kind: other_income.kind, disabled: false } %>
+    <div class="edit-other-income-form hidden">
+      <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: other_income, kind: other_income.kind, disabled: false } %>
+    </div>
   </div>
 <% else %>
   <div id="<%= dom_id other_income %>" class="other-income row-form-adjustment">
@@ -79,6 +79,6 @@
 
     <div class="edit-other-income-form hidden">
     <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: other_income, kind: other_income.kind, disabled: false } %>
-  </div>
+    </div>
   </div>
 <% end %>
