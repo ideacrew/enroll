@@ -1,30 +1,62 @@
-<div id="<%= dom_id deduction %>" class="deduction row-form-adjustment">
-  <div class="focus_effect_module deduction-show">
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">AMOUNT *</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= number_to_currency(deduction.amount) %></span>
+<% if @bs4 %>
+  <div id="<%= dom_id deduction %>" class="deduction mb-4">
+    <div class="deduction-show">
+      <div class="d-flex row p-0 m-0 mb-2">
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <label for="amount-<%= deduction.id %>" class="required"><%= l10n("faa.review.income.table.amount") %></label>
+          <input class="fake-disabled-input" id="amount-<%= deduction.id %>" disabled="true" value="<%= number_to_currency(deduction.amount) %>">
+        </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <label for="frequency-<%= deduction.id %>" class="required"><%= l10n("faa.deductions.deduction_form.how_often") %></label>
+          <input class="fake-disabled-input" id="frequency-<%= deduction.id %>" disabled="true" value="<%= frequency_kind_options.invert[deduction.frequency_kind] %>">
+        </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <label for="start-<%= deduction.id %>" class="required"><%= l10n("start_date") %></label>
+          <input class="fake-disabled-input" id="start-<%= deduction.id %>" disabled="true" value="<%= deduction.start_on %>">
+        </div>
+        <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
+          <label for="end-<%= deduction.id %>"><%= l10n("end_date") %></label>
+          <input class="fake-disabled-input" id="end-<%= deduction.id %>" disabled="true" value="<%= deduction.end_on.present? ? deduction.end_on : 'N/A' %>">
+        </div>
       </div>
-      <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">HOW OFTEN *</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%=  frequency_kind_options.invert[deduction.frequency_kind] %></span>
-      </div>
-      <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">START *</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= deduction.start_on %></span>
-      </div>
-      <div class="col-md-2  no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">END</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= deduction.end_on %></span>
-      </div>
-      <div class="col-md-1 no-pd form-group-lg class-fa-household fa-adjustment">
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
+      <div class="d-flex mb-2">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete button outline error mr-2"><%= l10n("faa.edit.remove") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit button outline"><%=l10n("edit")%></a>
       </div>
     </div>
+    <div class="edit-deduction-form hidden">
+      <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: deduction, kind: deduction.kind } %>
+    </div>
   </div>
+<% else %>
+  <div id="<%= dom_id deduction %>" class="deduction row-form-adjustment">
+    <div class="focus_effect_module deduction-show">
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">AMOUNT *</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= number_to_currency(deduction.amount) %></span>
+        </div>
+        <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">HOW OFTEN *</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%=  frequency_kind_options.invert[deduction.frequency_kind] %></span>
+        </div>
+        <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">START *</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= deduction.start_on %></span>
+        </div>
+        <div class="col-md-2  no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">END</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= deduction.end_on %></span>
+        </div>
+        <div class="col-md-1 no-pd form-group-lg class-fa-household fa-adjustment">
+            <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
+            <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
+        </div>
+      </div>
+    </div>
 
-  <div class="edit-deduction-form hidden">
-    <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: deduction, kind: deduction.kind} %>
+    <div class="edit-deduction-form hidden">
+      <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: deduction, kind: deduction.kind} %>
+    </div>
   </div>
-</div>
+<% end %>
