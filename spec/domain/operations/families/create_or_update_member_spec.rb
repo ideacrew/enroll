@@ -29,6 +29,8 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
   context '#create member' do
     context 'success' do
       before do
+        allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
+
         @result = subject.call(params)
         family.reload
         @person = Person.by_hbx_id(applicant_params[:person_hbx_id]).first
