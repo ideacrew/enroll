@@ -136,10 +136,6 @@ module FinancialAssistance
       @bs4 = true
     end
 
-    def conditionally_enable_bs4_layout
-      enable_bs4_layout if params[:bs4] == "true"
-    end
-
     def resolve_layout
       case action_name
       when "step", "new"

@@ -7,21 +7,21 @@
       </h1>
       <%= l10n('faa.incomes.job_income_message', subject: @applicant.first_name) %>
     </div>
-    <div class="mb-3 mt-3 income-padding driver-question">
-      <div class='labelforcoverage'>
-        <span class="fa-text-color required"><%= l10n('faa.incomes.from_employer_question', subject: @applicant.first_name) %></span>
-      </div>
+    <div class="mb-3 mt-3 driver-question">
       <fieldset>
-        <legend id="job_income_value" class='income-padding focus'>
-          <div class='d-inline-flex'>
-            <%= radio_button_tag("has_job_income", true, @applicant.has_job_income, class: "radio-yml mt-auto" ) %>
-            <label class="radio-yml" for="has_job_income_true"><%= l10n("yes") %></label>
-          </div>
-          <div class='pl-4 d-inline-flex'>
-            <%= radio_button_tag("has_job_income", false, @applicant.has_job_income == false, class: "radio-yml mt-auto" )%>
-            <label class="radio-yml" for="has_job_income_false"><%= l10n("no") %></label>
-          </div>
+        <legend id="job_income_value" class="labelforcoverage fa-text-color weight-n required">
+          <%= l10n('faa.incomes.from_employer_question', subject: @applicant.first_name) %></span>
         </legend>
+        <div class="d-flex align-items-center focus">
+          <label for="has_job_income_true" class="radio">
+            <%= radio_button_tag("has_job_income", true, @applicant.has_job_income, class: "radio", required: true) %>
+            <span class="yes_no_pair"><%= l10n("yes") %></span>
+          </label>
+          <label for="has_job_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_job_income_false')" class="radio">
+            <%= radio_button_tag("has_job_income", false, @applicant.has_job_income == false, class: "required", required: true) %>
+            <span class="yes_no_pair"><%= l10n("no") %></span>
+          </label>
+        </div>   
       </fieldset>
       <div class='left-seprator'>
         <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income"><%= l10n("not_sure") %></a>
@@ -42,21 +42,21 @@
       </div>
     </div>
 
-    <div class="mb-3 mt-5 income-padding driver-question">
-      <div class='labelforcoverage'>
-        <span class="fa-text-color required"><%= l10n('faa.incomes.income_from_self', subject: @applicant.first_name) %></span>
-      </div>
+    <div class="mb-3 mt-5 driver-question">
       <fieldset>
-        <legend id="self_employment_income_value" class='income-padding mt11 focus'>
-          <div class='d-inline-flex'>
-            <%= radio_button_tag("has_self_employment_income", true, @applicant.has_self_employment_income, class: "radio-yml mt-auto" ) %>
-            <label class="radio-yml" for="has_self_employment_income_true"><%= l10n("yes") %></label>
-          </div>
-          <div class='pl-4 d-inline-flex'>
-            <%= radio_button_tag("has_self_employment_income", false, @applicant.has_self_employment_income == false, class: "radio-yml mt-auto" )%>
-            <label class="radio-yml" for="has_self_employment_income_false"><%= l10n("no") %></label>
-          </div>
+        <legend class="labelforcoverage fa-text-color weight-n required">
+          <%= l10n('faa.incomes.income_from_self', subject: @applicant.first_name) %>
         </legend>
+        <div class="d-flex align-items-center focus">
+          <label for="has_self_employment_income_true" class="radio">
+            <%= radio_button_tag("has_self_employment_income", true, @applicant.has_self_employment_income, class: "radio", required: true) %>
+            <span class="yes_no_pair"><%= l10n("yes") %></span>
+          </label>
+          <label for="has_self_employment_income_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'has_self_employment_income_false')" class="radio">
+            <%= radio_button_tag("has_self_employment_income", false, @applicant.has_self_employment_income == false, class: "required", required: true) %>
+            <span class="yes_no_pair"><%= l10n("no") %></span>
+          </label>
+        </div>        
       </fieldset>
       <div class='left-seprator'>
         <a href="#has_self_employment_income" data-toggle="modal" data-target="#has_self_employment_income"><%= l10n("not_sure") %></a>

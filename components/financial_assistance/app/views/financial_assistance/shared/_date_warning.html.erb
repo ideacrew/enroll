@@ -12,7 +12,7 @@
         </li>
         <li id=<%="end_date_warning_#{form_object_id}"%> class="hidden" data-cuke="end-date-warning">
           <b><%= l10n("faa.incomes.end_date_header") %></b>
-          <%= l10n("faa.incomes.end_date_reminder", end_date_field_label: l10n('end_date')) %>
+          <%= l10n("faa.incomes.end_date_warning", end_date_field_label: l10n('end_date')) %>
         </li>
       </ul>
     </div>
@@ -28,7 +28,8 @@
             <%= l10n('faa.start_date_warning', start_date_field_label: l10n('from'), current_year: current_year, next_year: next_year) %>
           </li>
           <li id=<%="end_date_warning_#{form_object_id}"%> class="hidden" data-cuke="end-date-warning">
-            <%= l10n('faa.end_date_warning', end_date_field_label: l10n('to')) %>
+            <b><%= l10n("faa.incomes.end_date_header") %></b>
+            <%= l10n('faa.incomes.end_date_warning', end_date_field_label: l10n('to')) %>
           </li>
         </ul>
       </div>

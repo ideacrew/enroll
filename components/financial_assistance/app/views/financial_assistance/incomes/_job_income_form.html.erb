@@ -3,28 +3,30 @@
     <%= hidden_field_tag :bs4, true %>
     <% income_id = income.id %>
     <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}', true)") : "" %>
+    <% new_form = local_assigns[:new_form].present? ? local_assigns[:new_form] : false %>
+    <% dummy_income_id = "#{income_id}#{new_form ? 'dummy' : ''}" # needed to prevent Multiple Form Label accessibility error %>
     <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
     <div class="alert alert-info d-flex" role="alert">
       <div class="pl-2 pt-2 pr-1">
         <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
       </div>
       <div class="mt-1 pl-0 pr-2 pt-1">
-        <p class="subtext"><%= l10n('faa.incomes.job_end_date_note', subject: @applicant.first_name, income_type: "job") %></p>
+        <p class="subtext"><%= l10n('faa.note') %> <%= l10n('faa.incomes.income_note', subject: @applicant.first_name, income_kind: "self-employment income", end_date_field_label: l10n('end_date')) %></p>
       </div>
     </div>
     <div class="focus_effect_module row-edit-border pl-3 pr-3 mb-1">
       <div class="pb-1 row row-form-wrapper no-buffer row-height">
         <div class="income-field pr-3">
-          <%= f.label :employer_name, l10n("faa.incomes.employer"), class: "required", for: "employer_name#{income_id}" %>
-          <%= f.text_field :employer_name, required: true, id: "employer_name#{income_id}", class: "w-100" %>
+          <%= f.label :employer_name, l10n("faa.incomes.employer"), class: "required", for: "employer_name#{dummy_income_id}" %>
+          <%= f.text_field :employer_name, required: true, id: "employer_name#{dummy_income_id}", class: "w-100" %>
         </div>
         <div class="income-field">
           <%= f.fields_for :employer_phone do |phone_fields| %>
             <%= phone_fields.hidden_field :kind, value: "work" %>
             <div class="row row-form-wrapper no-buffer row-height">
               <div class="col-md-12">
-              <%= f.label :full_phone_number, l10n("faa.incomes.employer_phone"), class: "required", for: "income_full_phone_number_#{income_id}" %>
-              <%= phone_fields.text_field :full_phone_number, placeholder: "000-000-0000", required: true, value: income.employer_phone.try(:full_phone_number), class: "w-100 phone_number", id: "income_full_phone_number_#{income_id}"%>
+              <%= f.label :full_phone_number, l10n("faa.incomes.employer_phone"), class: "required", for: "income_full_phone_number_#{dummy_income_id}" %>
+              <%= phone_fields.text_field :full_phone_number, placeholder: "000-000-0000", required: true, value: income.employer_phone.try(:full_phone_number), class: "w-100 phone_number", id: "income_full_phone_number_#{dummy_income_id}"%>
               </div>
             </div>
           <% end %>
@@ -33,20 +35,20 @@
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="d-flex col-sm income-form-row p-0 mb-2">
           <div class="income-field pr-3">
-            <%= f.label :amount, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{income_id}" %>
-            <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true, id: "amount#{income_id}", class: "w-100" %>
+            <%= f.label :amount, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{dummy_income_id}" %>
+            <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true, id: "amount#{dummy_income_id}", class: "w-100" %>
           </div>
           <div class="income-field pr-3">
-            <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequency#{income_id}" %>
-            <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), { include_blank: "Choose" }, { :disabled => false, :required => true, class: "w-100", id: "frequency#{income_id}" }) %>
+            <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequency#{dummy_income_id}" %>
+            <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), { include_blank: "Choose" }, { :disabled => false, :required => true, class: "w-100", id: "frequency#{dummy_income_id}" }) %>
           </div>
           <div class="income-field pr-3">
-            <%= f.label :start_on, l10n("faa.other_incomes.start_date"), class: "required", for: "start_on_#{income_id}" %>
-            <%= f.date_field :start_on, placeholder: 'MM/DD/YYYY', required: true, id: "start_on_#{income_id}", onchange: onchange_date, class: "w-100" %>
+            <%= f.label :start_on, l10n("faa.other_incomes.start_date"), class: "required", for: "start_on_#{dummy_income_id}" %>
+            <%= f.date_field :start_on, placeholder: 'MM/DD/YYYY', required: true, id: "start_on_#{dummy_income_id}", onchange: onchange_date, class: "w-100" %>
           </div>
           <div class="income-field">
-            <%= f.label :end_on, l10n("faa.other_incomes.end_date"), for: "end_on_#{income_id}" %>
-            <%= f.date_field :end_on, placeholder: 'MM/DD/YYYY', id: "end_on_#{income_id}", onchange: onchange_date, class: "w-100 end-on-field" %>
+            <%= f.label :end_on, l10n("faa.other_incomes.end_date"), for: "end_on_#{dummy_income_id}" %>
+            <%= f.date_field :end_on, placeholder: 'MM/DD/YYYY', id: "end_on_#{dummy_income_id}", onchange: onchange_date, class: "w-100 end-on-field" %>
           </div>
         </div>
       </div>

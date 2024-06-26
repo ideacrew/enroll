@@ -16,7 +16,7 @@
       </div>
       <div class="modal-body">
         <b><%= l10n("faa.incomes.end_date_header") %></b>
-        <%= l10n("faa.incomes.end_date_reminder")  %>
+        <%= l10n("faa.incomes.end_date_warning", end_date_field_label: l10n('end_date')) %>
       </div>
         <div class="d-flex align-items-center mt-4 justify-content-end">
           <button type="button" class="btn-primary mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>

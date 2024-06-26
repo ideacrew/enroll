@@ -34,8 +34,6 @@ function startEditingIncome(income_kind) {
 
   // disable all income edit and edit buttons on created incomes
   $("a[class*='income-edit'], a[class*='income-delete']").addClass('disabled');
-  $('a.income-edit').addClass('disabled');
-  $('a.income-delete').addClass('disabled');
   $('a.self-employed-income-delete').addClass('disabled');
 
   // disable nav
@@ -389,11 +387,13 @@ document.addEventListener("turbolinks:load", function () {
       var incomeType = incomeList ? incomeList.parentNode.id : null;
       if (incomeType == 'job_income') {
         if (document.querySelectorAll('.incomes-list:not(.self-employed-incomes-list) .income').length == 0) {
-          document.getElementById('has_job_income_false').click();
+          $('a.new-income').addClass('hidden');
+          $('#has_job_income_false').prop('checked', true).trigger('change');
         }
       } else if (incomeType == 'self_employed_incomes') {
         if (document.querySelectorAll('.self-employed-incomes-list .income').length == 0) {
-          document.getElementById('has_self_employment_income_false').click();
+          $('a.new-income-self-employed').addClass('hidden');
+          $('#has_self_employment_income_false').prop('checked', true).trigger('change');
         }
       }
 
@@ -479,9 +479,7 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $(this).parents('#self_employed_incomes').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
+      var clonedForm = generateNewForm(newIncomeForm, incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
         incomeListEl.children().first().remove();
       }
@@ -549,6 +547,7 @@ document.addEventListener("turbolinks:load", function () {
 
     $('#has_job_income_true').off('click');
     $('#has_job_income_true').on('click', function(e) {
+      $('a.new-income-job').removeClass('hidden');
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#job_income').children('.new-income-form').length) {
         var newIncomeForm = $('#job_income').children('.new-income-form')
@@ -558,9 +557,7 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $('#job_income').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
+      var clonedForm = generateNewForm(newIncomeForm, incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
         incomeListEl.children().first().remove();
       }
@@ -614,6 +611,7 @@ document.addEventListener("turbolinks:load", function () {
 
     $("#has_self_employment_income_true").off('click');
     $('#has_self_employment_income_true').on('click', function(e) {
+      $('a.new-income-self-employed').removeClass('hidden');
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#self_employed_incomes').children('.new-income-form').length) {
         var newIncomeForm = $('#self_employed_incomes').children('.new-income-form')
@@ -622,13 +620,10 @@ document.addEventListener("turbolinks:load", function () {
         var incomeListEl = $('#self_employed_incomes').find('.incomes-list');
       }
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
-      var clonedForm = newIncomeForm.clone(true, true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
+        var clonedForm = generateNewForm(newIncomeForm, incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-self-income-form') {
         incomeListEl.children().first().remove();
       }
-      var length = incomeListEl.find(".income").length;
       if (!disableSelectric) {
         $(clonedForm).find('select').selectric();
       }
