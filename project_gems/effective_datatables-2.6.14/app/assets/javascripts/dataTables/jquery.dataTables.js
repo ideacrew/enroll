@@ -1532,7 +1532,6 @@
   var _stripHtml = function ( d ) {
     return d
       .replace( _re_html, '' ) // Complete tags
-      .replace(/<script/i, ''); // Safety for incomplete script tag
   };
   
   
@@ -6196,7 +6195,7 @@
     {
       var col = columns[i];
       var asSorting = col.asSorting;
-      var sTitle = col.ariaTitle || col.sTitle.replace( /<.*?>/g, "" );
+      var sTitle = col.ariaTitle || col.sTitle.replace( /<|>/g, "" );
       var th = col.nTh;
   
       // IE7 is throwing an error when setting these properties with jQuery's
