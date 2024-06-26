@@ -6,7 +6,7 @@
         <label class="n-radio vertically-aligned-row" for="reason_accept">
           <%= radio_button_tag :reason, "",  true, id: 'reason_accept', class: "n-radio" %>
           <span class = "n-radio"></span>
-          <span id="date-change"></span>
+          <span><%= l10n('insured.qle_detail.special_reason.move', qle_start_date: @qle_date_calc, qle_date: @qle_date) %></span>
         </label>
       </div>
       <div class="n-radio-row">
