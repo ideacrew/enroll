@@ -24,6 +24,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
 -li- It’s printed in red on all naturalization certificates issued since September 27, 1906.",
   :'en.insured.passport_number' => "Passport Number",
   :'en.insured.passport_number_req' => "When entering a Passport Number, include all numbers and letters. Do not enter any other characters or spaces. -li- The Passport Number that you enter must have between 6 and 12 numbers and letters.",
+  :'en.insured.consumer_roles.error_prompt' => "You need to correct the following errors:",
   :'en.insured.consumer_roles.docs_shared.sevis_id' => "SEVIS ID",
   :'en.insured.consumer_roles.docs_shared.sevis_id_req' => "When entering a SEVIS ID, only include the numbers. Do not enter the 'N' or any other characters or letters. For example: If your SEVIS ID is 'N1234567891' then please enter '1234567891'. -li- The SEVIS ID entered must have 10 digits. \
 -li- How to find the SEVIS ID: On the DS-2019, the number is on the top right hand side of the page in the box above the barcode.",
