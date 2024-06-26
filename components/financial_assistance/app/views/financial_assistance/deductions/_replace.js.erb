@@ -1,4 +1,5 @@
 stopEditingDeduction();
 
-$("<%= id %>").closest(".deduction-kind").find('#add_new_deduction_kind').removeClass("hidden");
+$("<%= id %>").closest(".deduction-kind").find('#add_new_deduction_kind').removeClass("hidden"); // legacy
+$("<%= id %>").closest(".deduction-kind").find('#add-more-link-<%= @deduction.kind %>').removeClass("hidden"); //bs4
 $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'deduction', locals: { deduction: @deduction }) %>");
