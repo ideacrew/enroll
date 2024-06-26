@@ -16,6 +16,8 @@ disable-default-queries: true
 packs:
   ruby:
     - codeql/ruby-queries
+  javascript:
+    - codeql/javascript-queries
 query-filters:
   - exclude:
      id: rb/csrf-protection-disabled
