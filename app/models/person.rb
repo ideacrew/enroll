@@ -1388,6 +1388,7 @@ class Person
   # 4.) Operations::People::CreateOrUpdateConsumerRole -> create_consumer_role
   #   - used when the legacy ::FinancialAssistance::Operations::Families::CreateOrUpdateMember propagates an applicant to a family_member
   def build_demographics_group
+    return unless EnrollRegistry.feature_enabled?(:alive_status)
     Operations::People::BuildDemographicsGroup.new.call(self)
   end
 

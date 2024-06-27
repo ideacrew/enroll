@@ -27,7 +27,6 @@ module BenefitSponsors
           "5" => "employer_profile.plan_years.start_on"
         }.freeze
 
-        # DC-specific endpoint (used only by employers)
         def index
           # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
           authorize BenefitSponsors::Organizations::BrokerAgencyProfile
@@ -40,10 +39,8 @@ module BenefitSponsors
           set_flash_by_announcement
           @provider = current_user.person
           @id = params[:id]
-          respond_to :html
         end
 
-        # DC-specific endpoint
         def staff_index
           # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
           authorize BenefitSponsors::Organizations::BrokerAgencyProfile
@@ -89,7 +86,6 @@ module BenefitSponsors
           end
 
           @draw = dt_query.draw
-          respond_to :json
         end
 
         def family_index
@@ -97,7 +93,9 @@ module BenefitSponsors
           authorize @broker_agency_profile
           @q = params.permit(:q)[:q]
 
-          respond_to :js
+          respond_to do |format|
+            format.js
+          end
         end
 
         def commission_statements
@@ -116,11 +114,11 @@ module BenefitSponsors
           documents = @broker_agency_profile.documents
           @statements = get_commission_statements(documents) if documents
           collect_and_sort_commission_statements
-          respond_to :js
+          respond_to do |format|
+            format.js
+          end
         end
 
-        # Possibly only an MA endpoint -- Dom 05/09/2024
-        # Revisit for MIME type validations at a later date
         def show_commission_statement
           authorize @broker_agency_profile
 
@@ -131,8 +129,6 @@ module BenefitSponsors
           send_data Aws::S3Storage.find(@commission_statement.identifier), options
         end
 
-        # Possibly only an MA endpoint -- Dom 05/09/2024
-        # Revisit for MIME type validations at a later date
         def download_commission_statement
           authorize @broker_agency_profile
 
@@ -142,7 +138,6 @@ module BenefitSponsors
           send_data Aws::S3Storage.find(@commission_statement.identifier), options
         end
 
-        # DC-specific endpoint
         def general_agency_index
           @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           authorize @broker_agency_profile
@@ -158,7 +153,9 @@ module BenefitSponsors
           @broker_provider = @broker_agency_profile.primary_broker_role.person
           authorize @broker_agency_profile
 
-          respond_to :js
+          respond_to do |format|
+            format.js
+          end
         end
 
         def inbox
@@ -177,10 +174,8 @@ module BenefitSponsors
           @folder = (params[:folder] || 'Inbox').capitalize
 
           @provider = (current_user.person._id.to_s == provider_id) ? current_user.person : @broker_agency_provider
-          respond_to :js
         end
 
-        # DC-specific endpoint
         # no auth required for this action: it is used to send an email for prospective brokers, which can be non-users
         # may want to consider implementing some sort of rate limitation on this endpoint to prevent it from being abused
         def email_guide

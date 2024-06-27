@@ -26,6 +26,7 @@ module Operations
       end
 
       def build_demographics_group(person)
+        return unless EnrollRegistry.feature_enabled?(:alive_status)
         person.demographics_group = DemographicsGroup.new if person.demographics_group.blank?
         build_alive_status(person.demographics_group)
 

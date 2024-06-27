@@ -1502,7 +1502,18 @@ class Family
     end
   end
 
-private
+  # Checks if none of the active family members are applying for coverage.
+  #
+  # This method iterates through all active family members and returns true if none
+  # of them are applying for coverage, otherwise false.
+  #
+  # @return [Boolean] true if no active family member is applying for coverage, false otherwise.
+  def none_applying_coverage?
+    active_family_members.none?(&:is_applying_coverage)
+  end
+
+  private
+
   def build_household
     if households.size == 0
       irs_group = initialize_irs_group
