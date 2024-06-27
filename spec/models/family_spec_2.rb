@@ -382,4 +382,85 @@ RSpec.describe Family, dbclean: :around_each do
       end
     end
   end
+
+  describe '#none_applying_coverage?' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+    let(:spouse_person) do
+      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+      person.ensure_relationship_with(per, 'spouse')
+      per
+    end
+
+    let(:child_person) do
+      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+      person.ensure_relationship_with(per, 'child')
+      per
+    end
+
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:spouse_member) { FactoryBot.create(:family_member, family: family, person: spouse_person, is_active: spouse_member_active) }
+    let(:child_member) { FactoryBot.create(:family_member, family: family, person: child_person, is_active: child_member_active) }
+
+    let(:params) do
+      { family: spouse_member.family, th_group_info: {} }
+    end
+
+    context 'with:
+      - primary is not applying for coverage and the member is active
+      - spouse is not applying for coverage and the member is active
+      - child is not applying for coverage and the member is active
+    ' do
+
+      let(:spouse_member_active) { true }
+      let(:child_member_active) { true }
+
+      before do
+        spouse_member.person.consumer_role.update_attributes(is_applying_coverage: false)
+        child_member.person.consumer_role.update_attributes(is_applying_coverage: false)
+        person.consumer_role.update_attributes(is_applying_coverage: false)
+      end
+
+      it 'returns true' do
+        expect(family.none_applying_coverage?).to eq(true)
+      end
+    end
+
+    context 'with:
+      - primary is not applying for coverage and the member is active
+      - spouse is applying for coverage and the member is not active
+      - child is applying for coverage and the member is active
+    ' do
+
+      let(:spouse_member_active) { false }
+      let(:child_member_active) { true }
+
+      before do
+        child_member
+        person.consumer_role.update_attributes(is_applying_coverage: false)
+      end
+
+      it 'returns false' do
+        expect(family.none_applying_coverage?).to eq(false)
+      end
+    end
+
+    context 'with:
+      - primary is applying for coverage and the member is active
+      - spouse is applying for coverage and the member is active
+      - child is applying for coverage and the member is active
+    ' do
+
+      let(:spouse_member_active) { true }
+      let(:child_member_active) { true }
+
+      before do
+        child_member
+      end
+
+      it 'returns false' do
+        expect(family.none_applying_coverage?).to eq(false)
+      end
+    end
+  end
 end

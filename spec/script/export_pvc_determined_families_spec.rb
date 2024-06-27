@@ -161,25 +161,27 @@ describe 'export_rrv_families' do
 
   let(:field_names) do
     [
-        "Primary Person Hbx ID",
-        "Applicant Person Hbx ID",
-        "Most recent Determined #{assistance_year} Application Hbx ID",
-        "Is SSN Present",
-        "Non ESI Evidence Title",
-        "Workflow Transition From State",
-        "Workflow Transition To State",
-        "Verification History Action",
-        "Verification History Update Reason",
-        "Verification History Updated By",
-        "Response Created At",
-        "PVC Determination"
-        ]
+      "Primary Person Hbx ID",
+      "Applicant Person Hbx ID",
+      "Most recent Determined #{date.year} Application Hbx ID",
+      "Is SSN Present",
+      "Non ESI Evidence Title",
+      "Workflow Transition At",
+      "Workflow Transition From State",
+      "Workflow Transition To State",
+      "Verification History Date of Action",
+      "Verification History Action",
+      "Verification History Update Reason",
+      "Verification History Updated By",
+      "Response Created At",
+      "PVC Determination"
+      ]
   end
 
   before :each do
     application.non_primary_applicants.each{|applicant| application.ensure_relationship_with_primary(applicant, applicant.relationship) }
     invoke_export_pvc_determined_families_report
-    @file_content = CSV.read("#{Rails.root}/export_pvc_determined_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
+    @file_content = CSV.read("#{Rails.root}/export_pvc_determined_families_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%H:%M:%S')}.csv")
   end
 
   it 'should add data to the file' do
@@ -191,7 +193,7 @@ describe 'export_rrv_families' do
   end
 
   after :each do
-    FileUtils.rm_rf("#{Rails.root}/export_pvc_determined_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv")
+    FileUtils.rm_rf("#{Rails.root}/export_pvc_determined_families_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%H:%M:%S')}.csv")
   end
 end
 

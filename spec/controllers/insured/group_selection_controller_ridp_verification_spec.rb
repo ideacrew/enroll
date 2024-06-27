@@ -95,6 +95,32 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
   describe "GET #new" do
     context 'with:
       - individual market family
+      - legacy-verified RIDP
+    ' do
+
+      let(:params) do
+        {
+          person_id: person.id,
+          consumer_role_id: consumer_role.id,
+          change_plan: 'change_plan',
+          shop_for_plans: 'shop_for_plans'
+        }
+      end
+
+      let(:logged_in_user) { user }
+
+      before :each do
+        user.update_attributes!(:identity_final_decision_code => "acc")
+      end
+
+      it 'does not redirect to root_path with a flash message' do
+        get :new, params: params, session: session_params
+        expect(response).not_to redirect_to root_path
+      end
+    end
+
+    context 'with:
+      - individual market family
       - unverified RIDP
     ' do
 

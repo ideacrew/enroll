@@ -270,7 +270,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def ridp_agreement
     set_current_person
     consumer = @person.consumer_role
-    if @person.completed_identity_verification? || consumer.identity_verified?
+    if RemoteIdentityProofingStatus.is_complete_for_consumer_role?(consumer)
       consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
       consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
       redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : consumer_redirection_path
