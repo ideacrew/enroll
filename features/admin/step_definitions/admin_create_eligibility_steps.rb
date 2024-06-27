@@ -40,5 +40,3 @@ end
 Then(/^Hbx Admin see error message$/) do
   expect(page).to have_content("Error: The Create Eligibility tool cannot be used because the consumer is not applying for coverage.")
 end
-
-
