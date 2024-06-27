@@ -169,6 +169,14 @@ dt {
   padding-right: 1ch;
 }
 
+dl.parent.weight-n {
+  dt {
+    font-weight: 400;
+    color: var(--default-font-color);
+    padding-right: 2ch;
+  }
+}
+
 .progress-nav {
   background-color: var(--grey-000);
   border: 1px solid var(--grey-050);

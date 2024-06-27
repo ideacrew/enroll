@@ -14,7 +14,7 @@ table {
       line-height: 24px;
       font-weight: 600;
 
-      &.w-256px{
+      &.w-256px {
         width: 256px;
       }
     }
@@ -41,7 +41,8 @@ table {
     }
   }
 
-  td, th{
+  td,
+  th {
     &.numeric {
       text-align: right;
     }
