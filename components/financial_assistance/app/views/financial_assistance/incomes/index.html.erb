@@ -81,23 +81,30 @@
 
     <%= render partial: 'financial_assistance/shared/end_date_warning' %>
 
-    <!-- Hidden unsaved benefits modal -->
-    <div class="modal fade" id="unsavedBenefitChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <!-- Hidden unsaved income modal -->
+    <div class="modal" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="p-1">
-            <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
-            <h3 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.other_incomes.unsaved") %></h3>
+        <div class="container pt-2 pb-4 modal-content">
+          <div class="d-flex mb-4 align-items-center">
+            <div class="col-auto px-0 mr-1">
+              <div class="warning-icon icon" alt="Info">&nbsp;</div>
+            </div>
+            <div class="col pl-0">
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n('faa.edit.unsaved') %></h4>
+            </div>
+            <div class="col-auto px-0">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+              </button>
+            </div>
           </div>
           <div class="modal-body">
-            <%= l10n("faa.other_incomes.leave_warning") %>
+            <p><%= l10n('faa.edit.leave_warning') %></p>
+            <strong><%= l10n('faa.edit.remove_warning') %></strong>
           </div>
-          <div class="pl-3">
-            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("faa.other_incomes.stay") %></button>
-            <button type="button" class="btn btn-primary"><%= l10n("faa.other_incomes.leave") %></button>
+          <div class="d-flex align-items-center mt-4 justify-content-end">
+            <button type="button" class="btn outline mr-1" data-dismiss="modal"><%= l10n('faa.edit.stay') %></button>
+            <button type="button" id="leave" class="btn error"><%= l10n('faa.edit.leave') %></button>
           </div>
         </div>
       </div>
@@ -210,11 +217,13 @@
       </div>
     </div>
     <br>
+    <div class="mt-4" id="nav-buttons">
     <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
       previous_link: tax_info_application_applicant_path(@application, @applicant),
       next_link: other_application_applicant_incomes_path(@application, @applicant),
       show_back_to_household_button: true
     } %>  
+    </div>
   </div>
 <% else %>
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
