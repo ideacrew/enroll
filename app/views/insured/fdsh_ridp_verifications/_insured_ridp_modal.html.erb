@@ -35,8 +35,10 @@
                 <button type="button" class="btn outline mr-2" data-dismiss="modal"> <%= l10n("insured.consumer_roles.upload_ridp_documents.cancel") %> </button>
                 <button tabindex="-1" type="button" class="focus-btn btn-default btn-file" id="select_upload_identity">
                   <i class="fa fa-upload" aria-hidden="true"></i>
-                  <%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %>
-                  <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, id:"upload-identity", tabindex:"0", onkeydown:"handleButtonKeyDown(event, 'upload_identity')"  %>
+                  <label>
+                    <%= l10n("insured.consumer_roles.upload_ridp_documents.select_file") %>
+                    <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, id:"upload-identity", tabindex:"0", onkeydown:"handleButtonKeyDown(event, 'upload_identity')"  %>
+                  </label>
                 </button>
               </div>
               <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
