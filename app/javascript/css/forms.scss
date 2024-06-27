@@ -46,11 +46,13 @@ label, legend {
   color: var(--text-secondary);
 }
 
-button label {
-  display: inline;
-  margin-bottom: 0ch;
-  line-height: 20px;
-  color: white;
+button, .btn {
+  label {
+    display: inline;
+    margin-bottom: 0ch;
+    line-height: 20px;
+    color: white;
+  }
 }
 
 label.required:after, legend.required:after, dt.required:after {
