@@ -216,14 +216,15 @@
         </div>
       </div>
     </div>
-    <br>
-    <div class="mt-4" id="nav-buttons">
-    <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
-      previous_link: tax_info_application_applicant_path(@application, @applicant),
-      next_link: other_application_applicant_incomes_path(@application, @applicant),
-      show_back_to_household_button: true
-    } %>  
-    </div>
+    <p>
+      <div class="mt-4" id="nav-buttons">
+        <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+        previous_link: tax_info_application_applicant_path(@application, @applicant),
+        next_link: other_application_applicant_incomes_path(@application, @applicant),
+        show_back_to_household_button: true
+        } %>  
+      </div>
+    </p>
   </div>
 <% else %>
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
