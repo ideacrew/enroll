@@ -22,7 +22,8 @@
           <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_mailing_address_info")%>
         <% end %>
       </div>
-      <div class="address-row <%= div_class %> <%= display_class %>"> <%# mailing address div fields should default to unrequired because it is hidden - required attrs are added in JS on show %>
+      <div class="address-row <%= div_class %> <%= display_class %>">
+      <%# mailing-div inputs should default to unrequired because the mailing-div is hidden by default; required attrs on the fields are added in application.js on show %>
         <div class="d-flex mb-md-2 row col-sm">
           <div class="col-sm col-md-6 p-0">
             <div class="col-md-12 pl-0">
