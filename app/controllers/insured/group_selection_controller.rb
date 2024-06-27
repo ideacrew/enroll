@@ -275,7 +275,7 @@ class Insured::GroupSelectionController < ApplicationController
   def ridp_verified?(market_kind, family)
     return true if market_kind != HbxEnrollment::INDIVIDUAL_KIND
     return true if family != current_user.person&.primary_family
-    return true if family&.primary_person&.consumer_role&.identity_verified?
+    return true if RemoteIdentityProofingStatus.is_complete_for_person?(family&.primary_person)
 
     flash[:error] = 'You must verify your identity before shopping for insurance.'
 

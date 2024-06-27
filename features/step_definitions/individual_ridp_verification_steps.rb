@@ -22,7 +22,7 @@ Given(/^that the consumer has “Disagreed” to AUTH & CONSENT$/) do
 end
 
 And(/^the consumer is on the DOCUMENT UPLOAD page$/) do
-	expect(page).to have_content('Identity')
+  expect(page).to have_content('Identity', wait: 10)
 	expect(page).to have_content('Application')
 end
 
@@ -87,8 +87,8 @@ And(/^an uploaded application in VERIFIED status is present$/) do
   find(AdminHomepage.identity_ver_btn, wait: 5).click
   sleep 2
   find('td.sorting_1 a[class^="interaction-click-control"]').click
-  expect(page).to have_content('Application')
-  within('#Application') do
+  expect(page).to have_content('Application', wait: 5)
+  within('#Application', wait: 10) do
     find('.label', :text => 'Action').click
     find('li', :text => 'Verify').click
   end
@@ -104,8 +104,8 @@ And(/^an uploaded Identity verification in VERIFIED status is present$/) do
   find(AdminHomepage.families_dropown, wait: 5).click
   find(AdminHomepage.identity_ver_btn, wait: 5).click
   find('td.sorting_1 a[class^="interaction-click-control"]').click
-  expect(page).to have_content('Identity')
-  within('#Identity') do
+  expect(page).to have_content('Identity', wait: 5)
+  within('#Identity', wait: 5) do
     find('.label', :text => 'Action').click
     find('li', :text => 'Verify').click
   end
@@ -173,7 +173,7 @@ When(/^an uploaded Identity verification in VERIFIED status is present on failed
   find('td.sorting_1 a[class^="interaction-click-control"]').click
   sleep 2
   expect(page).to have_content('Identity')
-  within('#Identity') do
+  within('#Identity', wait: 5) do
     find('.label', :text => 'Action').click
     find('li', :text => 'Verify').click
   end
@@ -190,8 +190,8 @@ When(/^an uploaded application in VERIFIED status is present on failed experian 
   find('.interaction-click-control-identity-verification', wait: 5).click
   find('td.sorting_1 a[class^="interaction-click-control"]').click
   sleep 2
-  expect(page).to have_content('Application')
-  within('#Application') do
+  expect(page).to have_content('Application', wait: 5)
+  within('#Application', wait: 5) do
     find('.label', :text => 'Action').click
     find('li', :text => 'Verify').click
   end
