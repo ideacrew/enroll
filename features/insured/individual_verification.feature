@@ -30,6 +30,7 @@ Scenario: Outstanding verification
     And the user is RIDP verified
     And the consumer is logged in
     And EnrollRegistry location_residency_verification_type feature is enabled
+    And the show_new_documents_tab_text feature is enabled
     And consumer has outstanding verification and unverified enrollments
     When the consumer visits verification page
     Then consumer should see Verification Due date label
@@ -38,6 +39,7 @@ Scenario: Outstanding verification
 
   Scenario: Consumer is fully_verified should see verification types
     Given a consumer exists
+    And the show_new_documents_tab_text feature is enabled
     And the user is RIDP verified
     And the consumer is logged in
     When the consumer is completely verified
@@ -47,6 +49,7 @@ Scenario: Outstanding verification
 
   Scenario: Consumer is from Curam and is fully verified and shows verification types as verified
     Given a consumer exists
+    And the show_new_documents_tab_text feature is enabled
     And the user is RIDP verified
     And the consumer is logged in
     When the consumer is completely verified from curam

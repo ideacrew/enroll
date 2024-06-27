@@ -48,6 +48,10 @@ Given(/the alive_status feature is enabled/) do
   allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
 end
 
+Given(/the show_new_documents_tab_text feature is enabled/) do
+  allow(EnrollRegistry[:show_new_documents_tab_text].feature).to receive(:is_enabled).and_return(true)
+end
+
 And(/^the consumer's Alive Status is moved to outstanding$/) do
   alive_status = user.person.verification_type_by_name('Alive Status')
   alive_status.update(validation_status: 'outstanding')
@@ -68,7 +72,7 @@ Then(/^the selectric class is visible$/) do
 end
 
 When(/^the consumer should see documents verification page$/) do
-  expect(page).to have_content('We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.')
+  expect(page).to have_content("We verify the information you provide us using electronic data sources, like the Federal Data Services Hub and the IRS.")
   expect(page).to have_content "Documents We Accept"
   expect(page).to have_content('Social Security Number')
 end
