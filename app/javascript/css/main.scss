@@ -177,6 +177,14 @@ dl.parent.weight-n {
   }
 }
 
+dl.parent.weight-n {
+  dt {
+    font-weight: 400;
+    color: var(--default-font-color);
+    padding-right: 2ch;
+  }
+}
+
 #personal_info {
   input:not([type='checkbox']):not([type='radio']),
   select,
