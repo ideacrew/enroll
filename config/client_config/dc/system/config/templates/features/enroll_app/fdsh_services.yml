@@ -54,3 +54,4 @@ registry:
         is_enabled: <%= ENV['SEND_CLOSE_CASE_REQUEST_IS_ENABLED'] || false %>
       - key: :show_new_documents_tab_text
         is_enabled: <%= ENV['SHOW_NEW_DOCUMENTS_TAB_TEXT'] || false %>
+      
