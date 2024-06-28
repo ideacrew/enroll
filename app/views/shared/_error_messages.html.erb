@@ -8,7 +8,7 @@
         			<div class="<%= type %>-icon icon" alt=<%= type %>>&nbsp;</div>
       			</div>
 				<div class="mt-2 p-0 align-self-center">
-					<label class="weight-n">You need to correct the following errors:</label>
+					<p><%= l10n('insured.consumer_roles.error_prompt') %></p>
 					<ul class="list-unstyled">
 						<% object.errors.each do |attr, msg| %>
 							<% if attr == :base %>
