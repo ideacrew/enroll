@@ -141,9 +141,9 @@ module FinancialAssistance
       when "step", "new"
         "financial_assistance_nav"
       when "index", "other"
-        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
       else
-        "financial_assistance"
+        "financial_assistance_nav"
       end
     end
   end
