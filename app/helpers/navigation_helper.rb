@@ -31,7 +31,7 @@ module NavigationHelper
 
   def local_assigned_boolean(local, default)
     return default unless local
-    local == "true" || local == true
+    local == "true"
   end
 
   def special_enrollment_period_hash
