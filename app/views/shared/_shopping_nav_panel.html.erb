@@ -32,7 +32,7 @@
 
       <% if show_exit_button %>
         <li>
-          <a href="#">
+          <a href=<%= main_app.destroy_user_session_path %>>
             <%= l10n("save_and_exit") %>
           </a>
         </li>
