@@ -480,7 +480,9 @@ class Person
   end
 
   def generate_person_saved_event
+    # return unless self.families.first.primary_person == self
     if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
+      embedded_changed_attributes = {changed_person_attributes: changed_attributes, changed_address_attributes: changed_address_attributes, changed_phone_attributes: changed_phone_attributes, changed_email_attributes: changed_email_attributes, changed_relationship_attributes: changed_relationship_attributes}
       event(
         'events.private.person_saved',
         headers: {
@@ -489,7 +491,7 @@ class Person
         },
         attributes: {
           after_save_version: to_hash,
-          changed_attributes: changed_attributes
+          changed_attributes: embedded_changed_attributes
         }
       ).success&.publish
     else
@@ -634,13 +636,19 @@ class Person
       rel.relative_id.to_s == person.id.to_s
     end
     if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+      Rails.logger.info {"642 #{existing_relationship.inspect}"}
+      l_relationship = existing_relationship
+      l_relationship.kind = relationship
+      save!
+      Rails.logger.info {"643 #{existing_relationship.inspect}"}
     elsif id != person.id
       self.person_relationships << PersonRelationship.new({
                                                             :kind => relationship,
                                                             :relative_id => person.id
                                                           })
+                                                        
     end
+    self.person_relationships.build()
   end
 
   def add_work_email(email)
@@ -1406,6 +1414,34 @@ class Person
   end
 
   private
+
+  def changed_address_attributes
+     addresses.collect do |address|
+      address.changed_attributes.merge!({:kind => address.kind})
+    end
+  end
+
+  def changed_phone_attributes
+    phones.collect do |phone|
+      phone.changed_attributes.merge!({:kind => phone.kind})
+    end
+  end
+
+  def changed_email_attributes
+    
+    emails.collect do |email|
+      email.changed_attributes.merge!({:kind => email.kind})
+    end
+  end
+
+  def changed_relationship_attributes
+    Rails.logger.info {"14339  #{self.full_name} #{self.changed_attributes}"}
+    Rails.logger.info {"1433 #{self.full_name}"}
+    person_relationships.collect do |person_relationship|
+      Rails.logger.info {"1433 #{person_relationship.changed_attributes}"}
+      person_relationship.changed_attributes.merge!({:relative_id => person_relationship.relative_id})
+    end
+  end
 
   # Determines the active roles based on specific conditions for each role.
   # It utilizes a hash where each key is a role (localized string) and its value is a boolean
