@@ -1,10 +1,10 @@
 <% if @bs4 %>
-  <% back_to_account_flag = local_assigned_boolean(local_assigns[:back_to_account_flag], EnrollRegistry.feature_enabled?(:back_to_account_all_shop)) %>
-  <% is_complete = local_assigned_boolean(local_assigns[:is_complete], false) %>
-  <% show_previous_button = local_assigned_boolean(local_assigns[:show_previous_button], true) %>
-  <% show_account_button = local_assigned_boolean(local_assigns[:show_account_button], back_to_account_flag) %>
-  <% show_help_button = local_assigned_boolean(local_assigns[:show_help_button], !is_complete) %>
-  <% show_exit_button = local_assigned_boolean(local_assigns[:show_exit_button], !is_complete) %>
+  <% back_to_account_flag = (defined? back_to_account_flag) ? back_to_account_flag : EnrollRegistry.feature_enabled?(:back_to_account_all_shop) %>
+  <% is_complete = (defined? is_complete) ? is_complete : false %>
+  <% show_previous_button = (defined? show_previous_button) ? show_previous_button : true %>
+  <% show_account_button = (defined? show_account_button) ? show_account_button : back_to_account_flag %>
+  <% show_help_button = (defined? show_help_button) ? show_help_button : !is_complete %>
+  <% show_exit_button = (defined? show_exit_button) ? show_exit_button : !is_complete %>
 
   <% continue_to_account_text ||= l10n("insured.plan_shoppings.receipt.go_to_my_account") %>
   <% to_account_text = is_complete ? continue_to_account_text : l10n("back_to_my_account") %>
@@ -25,7 +25,7 @@
       <% if show_help_button && back_to_account_flag %>
         <li>
           <a data-target="#help_with_plan_shopping" data-toggle="modal" id="help_me_sign_up" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_me_sign_up')">
-            <%= l10n("help_sign_up") %>
+            <%= l10n("get_help_sign_up") %>
           </a>
         </li>
       <% end %>
@@ -49,7 +49,7 @@
 
       <% if show_help_button && !back_to_account_flag %>
         <div class="btn outline" data-target="#help_with_plan_shopping" id="help_with_plan_shopping_btn" data-toggle="modal" style="width: 100%;" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_with_plan_shopping_btn')">
-          <%= l10n("help_sign_up") %>
+          <%= l10n("get_help_sign_up") %>
         </div>
       <% end %>
     </ul>
