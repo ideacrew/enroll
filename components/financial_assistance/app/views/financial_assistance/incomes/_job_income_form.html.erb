@@ -34,13 +34,15 @@
       </div>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="d-flex col-sm income-form-row p-0 mb-2">
+        <div class="d-flex w-100 pr-3">
           <div class="income-field pr-3">
             <%= f.label :amount, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{dummy_income_id}" %>
             <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true, id: "amount#{dummy_income_id}", class: "w-100" %>
           </div>
-          <div class="income-field pr-3">
+          <div class="income-field">
             <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequency#{dummy_income_id}" %>
             <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), { include_blank: "Choose" }, { :disabled => false, :required => true, class: "w-100", id: "frequency#{dummy_income_id}" }) %>
+          </div>
           </div>
           <div class="income-field pr-3">
             <%= f.label :start_on, l10n("faa.other_incomes.start_date"), class: "required", for: "start_on_#{dummy_income_id}" %>
