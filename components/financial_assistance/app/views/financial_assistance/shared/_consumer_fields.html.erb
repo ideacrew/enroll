@@ -6,7 +6,7 @@
 
     <div class="mb-4">
       <fieldset>
-        <legend id="us_citizen_value" class="weight-n"><%= l10n("insured.us_citizen") %> *</legend>
+        <legend id="us_citizen_value" class="weight-n required"><%= l10n("insured.us_citizen") %></legend>
         <div class="d-flex align-items-center">
           <label for="us_citizen_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'us_citizen_true')" class="radio">
             <%= f.radio_button :us_citizen, true, class: "required", id: 'us_citizen_true' %>
@@ -24,7 +24,7 @@
 
     <div class="<%= 'hidden_field' unless show_naturalized_citizen_container(f.object) %> mb-4" id="naturalized_citizen_container">
       <fieldset>
-        <legend id="naturalized_citizen_value" class="weight-n"><%= l10n("insured.consumer_roles.naturalized_question") %> *</legend>
+        <legend id="naturalized_citizen_value" class="weight-n required"><%= l10n("insured.consumer_roles.naturalized_question") %></legend>
         <div class="d-flex align-items-center">
           <label for="naturalized_citizen_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'naturalized_citizen_true')" class="radio">
             <%= f.radio_button :naturalized_citizen, true, class: "required", id: 'naturalized_citizen_true' %>
@@ -94,7 +94,7 @@
     <div class="consumer_fields_for_applying_coverage">
       <div class="mb-4">
         <fieldset>
-          <legend id="is_incarcerated_value" class="weight-n"><%= l10n("insured.incarcerated") %> *</legend>
+          <legend id="is_incarcerated_value" class="weight-n required"><%= l10n("insured.incarcerated") %></legend>
           <div class="d-flex align-items-center">
             <label for="is_incarcerated_true" tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_incarcerated_true')" class="radio">
               <%= f.radio_button :is_incarcerated, true, class: "required", id: 'is_incarcerated_true' %>
