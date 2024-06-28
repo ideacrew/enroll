@@ -4,13 +4,22 @@
       <div class="d-flex justify-content-center">
         <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
       </div>
-      <%= sanitize_html(l10n(
-            "exceptions.show",
-            contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
-            contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s,
-            contact_center_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item,
-            login_url: root_url
-          )) %>
+      <div class="d-flex full-height justify-content-center align-items-center text-center">
+        <div>
+          <div class="d-flex justify-content-center">
+            <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+          </div>
+          <h1><%= l10n("exceptions.unable_to_process") %></h1>
+          <p>
+            <%= l10n("exceptions.please_call", contact_center_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item) %>
+            <% contact_center_short_number = EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>
+            <a href="tel:<%= contact_center_short_number %>">
+              <%= "#{contact_center_short_number} (TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item})" %>
+            </a>
+          </p>
+          <a href=<%= root_url %> class='btn btn-primary'><%= l10n("exceptions.go_to_my_account") %></a> 
+        </div>
+      </div>
     </div>
   </div>
 <% else %>
@@ -18,14 +27,15 @@
   <div class='row'>
     <div class='col-md-12'>
       <span>
-      <i class="glyphicon glyphicon-warning-sign fa-5x"></i>
-          <%= sanitize_html(l10n(
-            "exceptions.show",
-            contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
-            contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s,
-            contact_center_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item,
-            login_url: root_url
-          )) %>
+        <i class="glyphicon glyphicon-warning-sign fa-5x"></i>
+        <h1><%= l10n("exceptions.unable_to_process") %></h1>
+        <p>
+          <u>
+            <%= l10n("exceptions.please_call", contact_center_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item) %>
+            <%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} (TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item})" %>
+          </u>
+        </p>
+        <a href=<%= root_url %> class='btn btn-primary'><%= l10n("exceptions.go_to_my_account") %></a> 
       </span>
     </div>
   </div>
