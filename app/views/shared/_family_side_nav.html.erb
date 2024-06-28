@@ -3,7 +3,7 @@
   <nav class="portal-nav">
     <ul id="">
       <li>
-        <a href="<%= main_app.family_account_path(tab: 'home') %>" class="<%= 'active' if action_name == "home" %>"><%= "Home" %></a>
+        <a href="<%= main_app.family_account_path(tab: 'home') %>" class="<%= 'active' if action_name == "home" %>"><%= l10n("layout.header.home") %></a>
       </li>
       <% if EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
         <li>
@@ -20,7 +20,7 @@
       <% if display_documents_tab?(@family_members, @person) %>
         <li>
           <div class="d-flex">
-            <%= link_to "Verifications", main_app.verification_insured_families_path(tab: 'verification'), class: "#{'active' if action_name == 'verification'}" %>
+            <%= link_to l10n("Verifications"), main_app.verification_insured_families_path(tab: 'verification'), class: "#{'active' if action_name == 'verification'}" %>
 
             <% if true #enrollment_group_unverified?(@person) %>
               <div role="alert" class="verifications-warning-icon icon d-inline-block mt-1" alt="warning" aria-hidden="true">&nbsp;</div>
