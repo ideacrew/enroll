@@ -24,6 +24,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
 -li- It’s printed in red on all naturalization certificates issued since September 27, 1906.",
   :'en.insured.passport_number' => "Passport Number",
   :'en.insured.passport_number_req' => "When entering a Passport Number, include all numbers and letters. Do not enter any other characters or spaces. -li- The Passport Number that you enter must have between 6 and 12 numbers and letters.",
+  :'en.insured.consumer_roles.error_prompt' => "You need to correct the following errors:",
   :'en.insured.consumer_roles.docs_shared.sevis_id' => "SEVIS ID",
   :'en.insured.consumer_roles.docs_shared.sevis_id_req' => "When entering a SEVIS ID, only include the numbers. Do not enter the 'N' or any other characters or letters. For example: If your SEVIS ID is 'N1234567891' then please enter '1234567891'. -li- The SEVIS ID entered must have 10 digits. \
 -li- How to find the SEVIS ID: On the DS-2019, the number is on the top right hand side of the page in the box above the barcode.",
@@ -79,7 +80,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.consumer_roles.ridp_agreement.requirement1' => "We are required by federal law to verify your identity before you continue with your application.",
   :'en.insured.consumer_roles.ridp_agreement.requirement2' => "If you do not want to continue with identity verification through Experian, you can apply by completing and sending us a paper application with proof of your identity. For a list of acceptable identity documents see the Documents Needed for Verification Information Sheet",
   :'en.insured.consumer_roles.ridp_agreement.requirement_link_text' => "here",
-  :'en.insured.consumer_roles.upload_ridp_documents.header' => "Verify Identity",
   :'en.insured.consumer_roles.upload_ridp_documents.ridp_h139_info' => "Allowing Experian to verify your identity is the fastest way to continue your application. If you change your mind and want to use Experian, go back to the previous page.",
   :'en.insured.consumer_roles.upload_ridp_documents.ridp_options_to_verify' => "If you cannot or do not want to verify your identity online using Experian, you need to upload document(s) proving your identity. The  %{site_long_name} team will need to review and approve what you upload before you can continue. This can take 3-5 business days.",
   :'en.insured.consumer_roles.upload_ridp_documents.in_person' => "Apply in person",
