@@ -436,6 +436,14 @@ When(/^.+ clicks on the Continue button of the Family Information page$/) do
   sleep 10
 end
 
+When(/^Individual navigates to Sep Page$/) do
+  find_all(IvlIapFamilyInformation.continue_btn)[0].click
+end
+
+When(/^Individual clicks on the continue button$/) do
+  find_all('.interaction-click-control-continue')[0].click
+end
+
 Then(/^.+ answers the questions of the Identity Verification page and clicks on submit/) do
   sleep 10
   expect(page).to have_content IvlVerifyIdentity.verify_identity_text
@@ -1265,6 +1273,11 @@ end
 
 Then(/^Individual should see confirmation and continue$/) do
   find_all('.interaction-click-control-continue')[0].click
+  expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
+  find_all('.interaction-click-control-continue')[0].click
+end
+
+Then(/^Individual should see successful sep message$/) do
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
 end
 

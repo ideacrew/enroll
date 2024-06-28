@@ -28,7 +28,7 @@ Then(/^(.*) clicks continue from qle$/) do |_name|
 end
 
 Then(/(.*) clicks Back to my account button$/) do |_name|
-  find('.interaction-click-control-back-to-my-account').click
+  find('.btn.btn-primary.interaction-click-control-back-to-my-account').click
 end
 
 Then(/(.*) should land on Home page and should see Shop for Plans Banner$/) do |_name|
@@ -116,6 +116,10 @@ Then(/Individual clicks no and clicks continue/) do
   within '#qle_reason' do
     find('#qle_submit_reason').click
   end
+end
+
+Given(/is your health coverage expanded question is disable/) do
+  disable_feature :is_your_health_coverage_ending_expanded_question
 end
 
 Given(/is your health coverage expanded question is enabled/) do
