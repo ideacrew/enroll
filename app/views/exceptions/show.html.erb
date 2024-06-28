@@ -29,13 +29,15 @@
       <span>
         <i class="glyphicon glyphicon-warning-sign fa-5x"></i>
         <h1><%= l10n("exceptions.unable_to_process") %></h1>
+        <br>
         <p>
           <u>
             <%= l10n("exceptions.please_call", contact_center_name: EnrollRegistry[:enroll_app].setting(:contact_center_name).item) %>
             <%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} (TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item})" %>
           </u>
         </p>
-        <a href=<%= root_url %> class='btn btn-primary'><%= l10n("exceptions.go_to_my_account") %></a> 
+        <br>
+        <a href=<%= "foo" %> class='btn btn-primary'><%= l10n("exceptions.go_to_my_account") %></a> 
       </span>
     </div>
   </div>
