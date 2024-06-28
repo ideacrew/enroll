@@ -46,6 +46,15 @@ label, legend {
   color: var(--text-secondary);
 }
 
+button, .btn {
+  label {
+    display: inline;
+    margin-bottom: 0ch;
+    line-height: 20px;
+    color: var(--gray-000);
+  }
+}
+
 label.required:after, legend.required:after, dt.required:after {
   content: '*';
   margin-left: 0.25ch;
