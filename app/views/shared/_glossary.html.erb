@@ -4,22 +4,23 @@
   <% term_display = term %>
 <% end %>
 
-<span class="glossary"
-      tabindex="0"
+<span tabindex="0"
+      class='<%= "glossary" unless @bs4 %>'
       data-toggle="popover"
       data-animation="false"
       data-placement="auto top"
       data-trigger="click focus"
       data-content="<%= t('glossary.' + key) %>"
       data-title="<%= term_display %>">
-  <%= term_display %>
+    <span class='<%= "glossary" if @bs4 %>'><%= term_display %></span>
 </span>
 
 <script>
-$(function () {
-  $('[data-toggle="popover"]').popover()
-})
-$('[data-toggle="popover"]').popover({
-  trigger: 'focus'
-})
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  })
+  $('[data-toggle="popover"]').popover({
+    trigger: 'focus',
+    template: '<div class="popover <%= 'p-2' if @bs4 %>"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+  })
 </script>
