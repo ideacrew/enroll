@@ -6,7 +6,7 @@
       <legend id="indian_tribe_member_value" class="weight-n required">
         <%= l10n("insured.tribe_member_pt1") %>
         <%= render partial:"shared/glossary", locals: {key: "american_indian", term: "American Indian" } %>
-        <%= l10n("or") %>
+        <%= l10n("or").downcase %>
         <%= render partial:"shared/glossary", locals: {key: "alaska_native", term: "Alaska Native" } %>
         <%= l10n("insured.tribe_member_pt2") %>
       </legend>
