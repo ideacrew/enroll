@@ -39,8 +39,10 @@
                   <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
                     <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
                       <i class="fa fa-upload" aria-hidden="true"></i>
-                      <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
-                      <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, value: "Upload Documents" %>
+                      <label>
+                        <%= l10n("insured.consumer_roles.upload_ridp_documents.upload_documents") %>
+                        <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, value: "Upload Documents"  %>
+                      </label>
                     </span>
                     <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
                   <% end %>
