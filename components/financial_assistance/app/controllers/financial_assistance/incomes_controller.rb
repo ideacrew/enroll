@@ -6,8 +6,8 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index, :other]
-    before_action :enable_bs4_layout, only: [:other, :index, :create] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-    before_action :conditionally_enable_bs4_layout, only: [:new, :create, :edit, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:other, :index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :conditionally_enable_bs4_layout, only: [:create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     layout :resolve_layout
 

@@ -70,7 +70,7 @@
         <% end %>
       </div>
       <div class="add-more-link mt-3">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income', 'new-income-form')" id="self-employed-income" class='<%= 'hidden' unless @applicant.incomes.self_employment.present? %> new-income new-income-self-employed button mb-4'><%= l10n("faa.other_incomes.add", kind: "Self-Employed") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income', 'new-income-form')" id="self-employed-income" class='<%= 'hidden' unless @applicant.incomes.self_employment.present? %> new-income new-income-self-employed button mb-4'><%= l10n("faa.other_incomes.add", kind: l10n("faa.incomes.self_employed_income")) %></a>
       </div>
       <div id='new-self-employed-income-form' class='new-income-form my-4 hidden'>
         <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build, new_form: true } %>

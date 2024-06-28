@@ -1,33 +1,31 @@
 <% if @bs4 %>
   <div id="<%= dom_id income %>" class="income my-4">
     <div class="display-income">
-      <div class="focus_effect_module">
-        <div class="d-flex col-sm income-form-row p-0 mb-2">
-          <div class="w-100 pr-3">
-            <label class="static_label label-floatlabel required" for="name-<%= income.amount %>" ><%= l10n("faa.other_incomes.amount") %></label>
-            <input class="fake-disabled-input w-100" id="name-<%= income.amount %>" disabled="true" value="<%= number_to_currency(income.amount) %>">
-          </div>
-
-          <div class="w-100 pr-3">
-            <label class="static_label label-floatlabel required" for="name-<%= frequency_kind_options.invert[income.frequency_kind] %>-<%=income.id%>"><%= l10n("faa.other_incomes.frequency") %></label>
-            <input class="fake-disabled-input w-100" id="name-<%= frequency_kind_options.invert[income.frequency_kind] %>-<%=income.id%>" disabled="true" value="<%= frequency_kind_options.invert[income.frequency_kind] %>">
-          </div>
-
-          <div class="w-100 pr-3">
-            <label class="static_label label-floatlabel required" for="name-<%= income.start_on %>"><%= l10n("faa.other_incomes.start_date") %></label>
-            <input class="fake-disabled-input w-100" id="name-<%= income.start_on %>" disabled="true" value="<%= income.start_on %>">
-          </div>
-
-          <div class="w-100">
-            <label class="static_label label-floatlabel" for="name-<%= income.end_on %>"><%= l10n("faa.other_incomes.end_date") %></label>
-            <input class="fake-disabled-input w-100 end-on-field" id="name-<%= income.end_on %>" disabled="true" value="<%= income.end_on %>">
-          </div>
+      <div class="d-flex col-sm income-form-row p-0 mb-2">
+        <div class="w-100 pr-4">
+          <label class="required" for="name-<%= income.amount %>" ><%= l10n("faa.other_incomes.amount") %></label>
+          <input class="fake-disabled-input w-100" id="name-<%= income.amount %>" disabled="true" value="<%= number_to_currency(income.amount) %>">
         </div>
 
-        <div class="mt-3 pb-2">
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income-delete-<%= dom_id income %>')" id="self-employed-income-delete-<%= dom_id income %>" class="button outline error mr-1 mb-2 self-employed-income-delete"><%= l10n("faa.other_incomes.remove") %></a>
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income-edit-<%= dom_id income %>')" id="self-employed-income-edit-<%= dom_id income %>" class="button mb-2 income-edit"><%=l10n("edit")%></a>
+        <div class="w-100 pr-4">
+          <label class="required" for="name-<%= frequency_kind_options.invert[income.frequency_kind] %>-<%=income.id%>"><%= l10n("faa.other_incomes.frequency") %></label>
+          <input class="fake-disabled-input w-100" id="name-<%= frequency_kind_options.invert[income.frequency_kind] %>-<%=income.id%>" disabled="true" value="<%= frequency_kind_options.invert[income.frequency_kind] %>">
         </div>
+
+        <div class="w-100 pr-4">
+          <label class="required" for="name-<%= income.start_on %>"><%= l10n("faa.other_incomes.start_date") %></label>
+          <input class="fake-disabled-input w-100" id="name-<%= income.start_on %>" disabled="true" value="<%= income.start_on %>">
+        </div>
+
+        <div class="w-100">
+          <label for="name-<%= income.end_on %>"><%= l10n("faa.other_incomes.end_date") %></label>
+          <input class="fake-disabled-input w-100 end-on-field" id="name-<%= income.end_on %>" disabled="true" value="<%= income.end_on %>">
+        </div>
+      </div>
+
+      <div class="mt-3 pb-2">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income-delete-<%= dom_id income %>')" id="self-employed-income-delete-<%= dom_id income %>" class="button outline error mr-1 mb-2 self-employed-income-delete"><%= l10n("faa.other_incomes.remove") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income-edit-<%= dom_id income %>')" id="self-employed-income-edit-<%= dom_id income %>" class="button mb-2 income-edit"><%=l10n("edit")%></a>
       </div>
     </div>
       <div class="income-edit-form hidden">

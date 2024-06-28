@@ -9,9 +9,6 @@ function stopEditingIncome() {
   $('#new-unemployment-income, #new-ai-an-income, .new-income, .add_new_other_income_kind').removeAttr('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
   $("a[class*='income-edit'], a[class*='income-delete']").removeClass('disabled'); // legacy
-  $('#self-employed-income').removeClass('disabled');
-  $('a.new-income').removeClass('disabled');
-  $('a.self-employed-income-delete').removeClass('disabled');
 
   // enable nav
   $('#nav-buttons a').removeClass('disabled');
@@ -27,14 +24,11 @@ function startEditingIncome(income_kind) {
   $('.driver-question input, .instruction-row input, .income:not(#' + income_kind + ') input:not(":input[type=submit]"), .other-income-kind:not(#' + income_kind + ') input:not(":input[type=submit]"), .unemployment-income:not(#' + income_kind + ') input:not(":input[type=submit]")').attr('disabled', true);
     
   // disable "Add New" income buttons
-  $('#self-employed-income').addClass('disabled');
-  $('a.new-income').addClass('disabled');
   $('#new-unemployment-income, #new-ai-an-income, .new-income, .add_new_other_income_kind').attr('disabled', true);
   $("a.interaction-click-control-add-more").addClass('hide'); // legacy
 
   // disable all income edit and edit buttons on created incomes
   $("a[class*='income-edit'], a[class*='income-delete']").addClass('disabled');
-  $('a.self-employed-income-delete').addClass('disabled');
 
   // disable nav
   $('#nav-buttons a').addClass('disabled');

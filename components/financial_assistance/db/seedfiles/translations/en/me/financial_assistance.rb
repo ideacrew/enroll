@@ -75,6 +75,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.edit.remove" => "Remove",
   'en.faa.edit.sure_remove' => "Are you sure you want to remove everything you have entered for this income?",
   'en.faa.incomes.job_income' => 'Job Income',
+  'en.faa.incomes.self_employed_income' => 'Self-Employed',
   'en.faa.incomes.employer' => 'Employer Name',
   'en.faa.incomes.employer_phone' => 'Phone Number',
   'en.faa.incomes.remove_all' => 'Are you sure you want to remove all job income(s)?',

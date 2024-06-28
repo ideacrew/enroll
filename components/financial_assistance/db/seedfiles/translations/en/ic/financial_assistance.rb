@@ -81,6 +81,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   'en.faa.incomes.note_self_employment_income_field' => "self-employment income",
   'en.faa.incomes.note_job_income' => "job income",
   'en.faa.incomes.job_income' => 'Job Income',
+  'en.faa.incomes.self_employed_income' => 'Self-Employed',
   'en.faa.incomes.employer' => 'Employer Name',
   'en.faa.incomes.employer_phone' => 'Phone Number',
   'en.faa.incomes.remove_all' => 'Are you sure you want to remove all job income(s)?',

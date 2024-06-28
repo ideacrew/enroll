@@ -293,6 +293,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.incomes.job_income_note" => "Note: For job income this person currently receives, do not enter an end date into the ‘To’ field. Only enter an end date if the job income ended.",
   "en.faa.incomes.from_employer" => "Does this person have income from an employer (wages, tips, bonuses, etc.) in %{assistance_year}?",
   "en.faa.incomes.job_income" => 'Job Income',
+  "en.faa.incomes.self_employed_income" => 'Self-Employed',
   "en.faa.incomes.employer" => 'Employer Name',
   "en.faa.incomes.employer_phone" => 'Phone Number',
   "en.faa.incomes.remove_all" => 'Are you sure you want to remove all job income(s)?',
