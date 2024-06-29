@@ -31,9 +31,13 @@ Then(/(.*) clicks Back to my account button$/) do |_name|
   find('.btn.btn-primary.interaction-click-control-back-to-my-account').click
 end
 
+And(/^Patrick Doe clicks on back to my account button$/) do
+  find('.interaction-click-control-back-to-my-account').click
+end
+
 Then(/(.*) should land on Home page and should see Shop for Plans Banner$/) do |_name|
   sleep 2
-  expect(page).to have_content(/You are eligible to enroll or change coverage through/)
+  expect(page).to have_content(/You are eligible to enroll or change coverage/)
 end
 
 When(/(.*) click the "(.*?)" in qle carousel/) do |_name, qle_event|
