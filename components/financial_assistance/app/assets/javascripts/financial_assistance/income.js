@@ -381,12 +381,12 @@ document.addEventListener("turbolinks:load", function () {
       var incomeType = incomeList ? incomeList.parentNode.id : null;
       if (incomeType == 'job_income') {
         if (document.querySelectorAll('.incomes-list:not(.self-employed-incomes-list) .income').length == 0) {
-          $('a.new-income').addClass('hidden');
+          $('.new-income').addClass('hidden');
           $('#has_job_income_false').prop('checked', true).trigger('change');
         }
       } else if (incomeType == 'self_employed_incomes') {
         if (document.querySelectorAll('.self-employed-incomes-list .income').length == 0) {
-          $('a.new-income-self-employed').addClass('hidden');
+          $('.new-income-self-employed').addClass('hidden');
           $('#has_self_employment_income_false').prop('checked', true).trigger('change');
         }
       }
@@ -456,8 +456,8 @@ document.addEventListener("turbolinks:load", function () {
     // this index is to ensure duplicate hidden forms aren't saved on submit
     var incomeIndex = 0;
     /* new job incomes */
-    $("a.new-income").off('click');
-    $('a.new-income').on('click', function(e) {
+    $(".new-income").off('click');
+    $('.new-income').on('click', function(e) {
       e.preventDefault();
       startEditingIncome($(this).parents('.income').attr('id'));
       var form = $(this).parents();
@@ -541,7 +541,7 @@ document.addEventListener("turbolinks:load", function () {
 
     $('#has_job_income_true').off('click');
     $('#has_job_income_true').on('click', function(e) {
-      $('a.new-income-job').removeClass('hidden');
+      $('.new-income-job').removeClass('hidden');
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#job_income').children('.new-income-form').length) {
         var newIncomeForm = $('#job_income').children('.new-income-form')
@@ -605,7 +605,7 @@ document.addEventListener("turbolinks:load", function () {
 
     $("#has_self_employment_income_true").off('click');
     $('#has_self_employment_income_true').on('click', function(e) {
-      $('a.new-income-self-employed').removeClass('hidden');
+      $('.new-income-self-employed').removeClass('hidden');
       startEditingIncome($(this).parents('.income').attr('id'));
       if ($('#self_employed_incomes').children('.new-income-form').length) {
         var newIncomeForm = $('#self_employed_incomes').children('.new-income-form')

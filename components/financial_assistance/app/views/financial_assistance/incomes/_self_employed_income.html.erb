@@ -3,22 +3,30 @@
     <div class="display-income">
       <div class="d-flex col-sm income-form-row p-0 mb-2">
         <div class="w-100 pr-4">
-          <label class="required" for="name-<%= income.amount %>" ><%= l10n("faa.other_incomes.amount") %></label>
+          <label class="required" for="name-<%= income.amount %>" >
+            <span><%= l10n("faa.other_incomes.amount") %></span>
+          </label>
           <input class="fake-disabled-input w-100" id="name-<%= income.amount %>" disabled="true" value="<%= number_to_currency(income.amount) %>">
         </div>
 
         <div class="w-100 pr-4">
-          <label class="required" for="name-<%= frequency_kind_options.invert[income.frequency_kind] %>-<%=income.id%>"><%= l10n("faa.other_incomes.frequency") %></label>
+          <label class="required" for="name-<%= frequency_kind_options.invert[income.frequency_kind] %>-<%=income.id%>">
+            <span><%= l10n("faa.other_incomes.frequency") %></span>
+          </label>
           <input class="fake-disabled-input w-100" id="name-<%= frequency_kind_options.invert[income.frequency_kind] %>-<%=income.id%>" disabled="true" value="<%= frequency_kind_options.invert[income.frequency_kind] %>">
         </div>
 
         <div class="w-100 pr-4">
-          <label class="required" for="name-<%= income.start_on %>"><%= l10n("faa.other_incomes.start_date") %></label>
+          <label class="required" for="name-<%= income.start_on %>">
+            <span><%= l10n("faa.other_incomes.start_date") %></span>
+          </label>
           <input class="fake-disabled-input w-100" id="name-<%= income.start_on %>" disabled="true" value="<%= income.start_on %>">
         </div>
 
         <div class="w-100">
-          <label for="name-<%= income.end_on %>"><%= l10n("faa.other_incomes.end_date") %></label>
+          <label for="name-<%= income.end_on %>">
+            <span><%= l10n("faa.other_incomes.end_date") %></span>
+          </label>
           <input class="fake-disabled-input w-100 end-on-field" id="name-<%= income.end_on %>" disabled="true" value="<%= income.end_on %>">
         </div>
       </div>

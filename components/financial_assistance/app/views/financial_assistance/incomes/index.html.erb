@@ -10,7 +10,9 @@
     <div class="mb-3 mt-3 driver-question">
       <fieldset>
         <legend id="job_income_value" class="labelforcoverage fa-text-color weight-n required">
-          <%= l10n('faa.incomes.from_employer_question', subject: @applicant.first_name) %></span>
+          <span>
+            <%= l10n('faa.incomes.from_employer_question', subject: @applicant.first_name) %>
+          </span>
         </legend>
         <div class="d-flex align-items-center focus">
           <label for="has_job_income_true" class="radio">
@@ -35,7 +37,7 @@
         <% end %>
       </div>
       <div class="add-more-link mt-3">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-income')" id="new-income" class='<%= 'hidden' unless @applicant.incomes.jobs.present? %> new-income new-income-job button mb-4'><%= l10n("faa.other_incomes.add", kind: "") %></a>
+        <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-income')" id="new-income" class='<%= 'hidden' unless @applicant.incomes.jobs.present? %> new-income new-income-job button mb-4'><%= l10n("faa.other_incomes.add", kind: "") %></a>
       </div>
       <div id='new-income-form' class='new-income-form my-4 hidden'>
         <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build, new_form: true } %>
@@ -45,7 +47,9 @@
     <div class="mb-3 mt-5 driver-question">
       <fieldset>
         <legend class="labelforcoverage fa-text-color weight-n required">
-          <%= l10n('faa.incomes.income_from_self', subject: @applicant.first_name) %>
+          <span>
+            <%= l10n('faa.incomes.income_from_self', subject: @applicant.first_name) %>
+          </span>
         </legend>
         <div class="d-flex align-items-center focus">
           <label for="has_self_employment_income_true" class="radio">
@@ -70,7 +74,7 @@
         <% end %>
       </div>
       <div class="add-more-link mt-3">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income', 'new-income-form')" id="self-employed-income" class='<%= 'hidden' unless @applicant.incomes.self_employment.present? %> new-income new-income-self-employed button mb-4'><%= l10n("faa.other_incomes.add", kind: l10n("faa.incomes.self_employed_income")) %></a>
+        <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income', 'new-income-form')" id="self-employed-income" class='<%= 'hidden' unless @applicant.incomes.self_employment.present? %> new-income new-income-self-employed button mb-4'><%= l10n("faa.other_incomes.add", kind: l10n("faa.incomes.self_employed_income")) %></a>
       </div>
       <div id='new-self-employed-income-form' class='new-income-form my-4 hidden'>
         <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build, new_form: true } %>
@@ -273,7 +277,7 @@
           <% end %>
         </div>
 
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-income')" id='new-income' class='new-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Job Income </a>
+        <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-income')" id='new-income' class='new-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Job Income </a>
 
         <div id="hidden-income-form" class='new-income-form hidden'>
           <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build, new_form: true } %>
@@ -308,7 +312,7 @@
           <% end %>
         </div>
 
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-self-income')" id='new-self-income' class="new-income"> <span class="fa-icon fa-stack plus-mr" aria-hidden='true'><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b>Add Another </b> Self-Employed Income </a>
+        <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-self-income')" id='new-self-income' class="new-income"> <span class="fa-icon fa-stack plus-mr" aria-hidden='true'><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b>Add Another </b> Self-Employed Income </a>
 
         <div id="hidden-income-form" class='new-income-form hidden'>
           <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build, new_form: true} %>
