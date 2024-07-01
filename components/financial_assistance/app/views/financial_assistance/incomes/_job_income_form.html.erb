@@ -1,78 +1,151 @@
-<%= income_form_for @application, @applicant, income do |f| %>
-  <% income_id = income.id %>
-  <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
-  <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
-  <div class="focus_effect_module row-edit-border">
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-12">
-        <%= f.text_field :employer_name, placeholder: 'EMPLOYER NAME *', required: true, class: "floatlabel" %>
+<% if @bs4 %>
+  <%= income_form_for @application, @applicant, income do |f| %>
+    <%= hidden_field_tag :bs4, true %>
+    <% income_id = income.id %>
+    <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}', true)") : "" %>
+    <% new_form = local_assigns[:new_form].present? ? local_assigns[:new_form] : false %>
+    <% dummy_income_id = "#{income_id}#{new_form ? 'dummy' : ''}" # needed to prevent Multiple Form Label accessibility error %>
+    <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
+    <div class="alert alert-info d-flex" role="alert">
+      <div class="pl-2 pt-2 pr-1">
+        <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
+      </div>
+      <div class="mt-1 pl-0 pr-2 pt-1">
+        <p class="subtext"><%= l10n('faa.note') %> <%= l10n('faa.incomes.income_note', subject: @applicant.first_name, income_kind: "job income", end_date_field_label: l10n('end_date')) %></p>
       </div>
     </div>
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-3">
-        <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
-        <div class="faa-amount">
-          <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true %>
+    <div class="my-4">
+      <div class="d-flex col-sm income-form-row p-0 mb-2">
+        <div class="w-100 col px-0 pr-4">
+          <%= f.label :employer_name, l10n("faa.incomes.employer"), class: "required", for: "employer_name#{dummy_income_id}" %>
+          <%= f.text_field :employer_name, required: true, id: "employer_name#{dummy_income_id}", class: "w-100" %>
+        </div>
+        <div class="w-100 col px-0">
+          <%= f.fields_for :employer_phone do |phone_fields| %>
+            <%= phone_fields.hidden_field :kind, value: "work" %>
+            <div class="row">
+              <div class="col-md-12">
+              <%= f.label :full_phone_number, l10n("faa.incomes.employer_phone"), class: "required", for: "income_full_phone_number_#{dummy_income_id}" %>
+              <%= phone_fields.text_field :full_phone_number, placeholder: "(000) 000-0000", required: true, value: income.employer_phone.try(:full_phone_number), class: "w-100 phone_number", id: "income_full_phone_number_#{dummy_income_id}"%>
+              </div>
+            </div>
+          <% end %>
         </div>
       </div>
-      <div class="col-md-3 fa-select select-box">
-        <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
-        <div class="fa-frequency-kind">
-          <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {prompt: 'Choose' }, {:required => true} %>
+      <div class="d-flex col-sm income-form-row p-0 mb-2">
+        <div class="w-100 col px-0 pr-4">
+          <%= f.label :amount, l10n("faa.other_incomes.amount"), class: "required", for: "amount#{dummy_income_id}" %>
+          <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true, id: "amount#{dummy_income_id}", class: "w-100" %>
         </div>
-      </div>
-      <div class="col-md-3">
-        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
-      </div>
-      <div class="col-md-3 overflow-hidden">
-        <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
+        <div class="w-100 col px-0 pr-4">
+          <%= f.label :frequency_kind, l10n("faa.other_incomes.frequency"), class: "required", for: "frequency#{dummy_income_id}" %>
+          <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), { include_blank: "Choose" }, { :disabled => false, :required => true, class: "w-100", id: "frequency#{dummy_income_id}" }) %>
+        </div>
+        <div class="w-100 col px-0 pr-4">
+          <%= f.label :start_on, l10n("faa.other_incomes.start_date"), class: "required", for: "start_on_#{dummy_income_id}" %>
+          <%= f.date_field :start_on, placeholder: 'MM/DD/YYYY', required: true, id: "start_on_#{dummy_income_id}", onchange: onchange_date, class: "w-100" %>
+        </div>
+        <div class="w-100 col px-0">
+          <%= f.label :end_on, l10n("faa.other_incomes.end_date"), for: "end_on_#{dummy_income_id}" %>
+          <%= f.date_field :end_on, placeholder: 'MM/DD/YYYY', id: "end_on_#{dummy_income_id}", onchange: onchange_date, class: "w-100 end-on-field" %>
+        </div>
       </div>
     </div>
-    <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
-      <%= f.fields_for :employer_address do |income_fields| %>
-        <%= income_fields.hidden_field :kind, value: 'work' %>
-        <% required = EnrollRegistry[:skip_employer_address_validation].enabled? ? false : true %>
-        <div class="row row-form-wrapper no-buffer row-height">
-          <div class="col-md-6">
-            <%= income_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: income.employer_address.try(:address_1), required: required, class: "floatlabel ph-width" %>
-          </div>
-          <div class="col-md-6">
-            <%= income_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2 (APT, UNIT, ETC.)', value: income.employer_address.try(:address_2), class: "floatlabel ph-width" %>
+
+    <div class="row mb-2">
+      <div class="pull-right mt-1 mb-2 pl-3">
+        <a tabindex="0" onkeydown="handleCancelButtonKeyDown(event, 'income-cancel-<%= income_id %>', 'hidden-income-form')" id="income-cancel-<%= income_id %>" class="button btn-default outline income-cancel">Cancel</a>
+        <%= f.submit l10n("faa.other_incomes.save"), class: 'button btn-save ml-1', :data => { :cuke => "job-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+      </div>
+    </div>
+
+    <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+      <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= income_form_for @application, @applicant, income do |f| %>
+    <% income_id = income.id %>
+    <% onchange_date = FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? ? (raw "validateDateWarnings('#{income_id}')") : "" %>
+    <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
+    <div class="focus_effect_module row-edit-border">
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-12">
+          <%= f.text_field :employer_name, placeholder: 'EMPLOYER NAME *', required: true, class: "floatlabel" %>
+        </div>
+      </div>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-3">
+          <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
+          <div class="faa-amount">
+            <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(income.amount), required: true %>
           </div>
         </div>
+        <div class="col-md-3 fa-select select-box">
+          <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
+          <div class="fa-frequency-kind">
+            <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), {prompt: 'Choose' }, {:required => true} %>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
+        </div>
+        <div class="col-md-3 overflow-hidden">
+          <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{income_id}", class: "datepicker-js floatlabel", onchange: onchange_date %>
+        </div>
+      </div>
+      <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
+        <%= f.fields_for :employer_address do |income_fields| %>
+          <%= income_fields.hidden_field :kind, value: 'work' %>
+          <% required = EnrollRegistry[:skip_employer_address_validation].enabled? ? false : true %>
+          <div class="row row-form-wrapper no-buffer row-height">
+            <div class="col-md-6">
+              <%= income_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: income.employer_address.try(:address_1), required: required, class: "floatlabel ph-width" %>
+            </div>
+            <div class="col-md-6">
+              <%= income_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2 (APT, UNIT, ETC.)', value: income.employer_address.try(:address_2), class: "floatlabel ph-width" %>
+            </div>
+          </div>
+          <div class="row row-form-wrapper no-buffer row-height">
+            <div class="col-md-4">
+              <%= income_fields.text_field :city, placeholder: 'CITY *', required: required, value: income.employer_address.try(:city), class: "floatlabel" %>
+            </div>
+            <div class="col-md-4 fa-select select-box employer-state">
+              <%= income_fields.label :state, 'State *', class: 'label-color' %>
+              <%= income_fields.select :state, options_for_select(state_options, selected: income.employer_address.try(:state)), {prompt: 'Choose' }, {:required => required} %>
+            </div>
+            <div class="col-md-4">
+              <%= income_fields.text_field :zip, placeholder: 'ZIP *', required: required, value: income.employer_address.try(:zip), class: "floatlabel" %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+
+      <%= f.fields_for :employer_phone do |phone_fields| %>
+        <%= phone_fields.hidden_field :kind, value: "work" %>
         <div class="row row-form-wrapper no-buffer row-height">
-          <div class="col-md-4">
-            <%= income_fields.text_field :city, placeholder: 'CITY *', required: required, value: income.employer_address.try(:city), class: "floatlabel" %>
-          </div>
-          <div class="col-md-4 fa-select select-box employer-state">
-            <%= income_fields.label :state, 'State *', class: 'label-color' %>
-            <%= income_fields.select :state, options_for_select(state_options, selected: income.employer_address.try(:state)), {prompt: 'Choose' }, {:required => required} %>
-          </div>
-          <div class="col-md-4">
-            <%= income_fields.text_field :zip, placeholder: 'ZIP *', required: required, value: income.employer_address.try(:zip), class: "floatlabel" %>
+          <div class="col-md-12">
+            <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: income.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
           </div>
         </div>
       <% end %>
-    <% end %>
-
-    <%= f.fields_for :employer_phone do |phone_fields| %>
-      <%= phone_fields.hidden_field :kind, value: "work" %>
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class="col-md-12">
-          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: income.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
-        </div>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="row">
-    <div class="col-md-3 pull-right mt-1 mb-1">
-      <a tabindex="0" onkeydown="handleCancelButtonKeyDown(event, 'income-cancel-<%= income_id %>', 'hidden-income-form')" id="income-cancel-<%= income_id %>" class="btn btn-default income-cancel">Cancel</a>
-      <%= f.submit 'Save', class: 'btn btn-save', :data => { :cuke => "job-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
     </div>
-  </div>
 
-  <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
-    <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
+    <div class="row">
+      <div class="col-md-3 pull-right mt-1 mb-1">
+        <a tabindex="0" onkeydown="handleCancelButtonKeyDown(event, 'income-cancel-<%= income_id %>', 'hidden-income-form')" id="income-cancel-<%= income_id %>" class="btn btn-default income-cancel">Cancel</a>
+        <%= f.submit 'Save', class: 'btn btn-save', :data => { :cuke => "job-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+      </div>
+    </div>
+
+    <% if FinancialAssistanceRegistry[:income_and_deduction_date_warning].enabled? %>
+      <%= render partial: 'financial_assistance/shared/date_warning', locals: { form_object_id: income_id } %>
+    <% end %>
   <% end %>
 <% end %>
+
+<script>
+  $(document).ready( function() {
+    $.inputMasks();
+  } );
+</script>
