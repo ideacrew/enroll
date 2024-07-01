@@ -578,6 +578,7 @@ jobs:
       - name: print cucumber errors on summary
         if: failure()
         run: |
+          cat output.txt
           echo "Cucumber ${{ matrix.group }}/${{ strategy.job-total }}" >> $GITHUB_STEP_SUMMARY
           cat output.txt  | sed -n '/Failing Scenarios/,$p'  >> $GITHUB_STEP_SUMMARY
       - name: copy coverage report
