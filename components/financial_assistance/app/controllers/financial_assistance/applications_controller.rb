@@ -6,7 +6,7 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
-    before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :edit, :eligibility_results, :review_and_submit, :submit_your_application, :wait_for_eligibility_response, :preferences] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :edit, :eligibility_results, :review_and_submit, :review, :submit_your_application, :wait_for_eligibility_response, :preferences] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -383,7 +383,8 @@ module FinancialAssistance
 
     def resolve_layout
       case action_name
-      when "edit", "submit_your_application", "preferences", "review_and_submit", "step", "eligibility_response_error", "application_publish_error"
+      # TODO: update review step to use correct (homepage?) layout
+      when "edit", "submit_your_application", "preferences", "review_and_submit", "review", "step", "eligibility_response_error", "application_publish_error"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
       when "application_year_selection", "application_checklist"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
