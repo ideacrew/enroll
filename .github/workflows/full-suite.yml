@@ -574,7 +574,7 @@ jobs:
           COVERAGE: 'true'
           WD_VERSION: "124.0.6367.207"
           WD_CHROME_PATH: ${{ github.workspace }}/chrome-linux64/chrome
-        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} | tee output.txt
+        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} > output.txt
       - name: print cucumber errors on summary
         if: failure()
         run: |
