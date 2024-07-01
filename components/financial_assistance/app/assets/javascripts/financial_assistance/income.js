@@ -846,14 +846,12 @@ document.addEventListener('turbolinks:load', function () {
         var length = incomeListEl.find('.ai-an-income').length;
         if (!disableSelectric) {
           $(clonedForm).find('select').selectric();
-          $(clonedForm)
-            .find('.datepicker-js')
-            .datepicker({
-              dateFormat: 'mm/dd/yy',
-              changeMonth: true,
-              changeYear: true,
-              yearRange: '-110:+110',
-            });
+          $(clonedForm).find('.datepicker-js').datepicker({
+            dateFormat: 'mm/dd/yy',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: '-110:+110',
+          });
         }
       }
     );
