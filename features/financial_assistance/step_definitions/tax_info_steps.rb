@@ -17,7 +17,7 @@ Given(/^that the user is on the FAA Household Info page$/) do
   # should be on application year select page now
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    find('a.interaction-click-control-continue').click
+    find('.interaction-click-control-continue').click
     sleep 2
   end
 
