@@ -3,6 +3,7 @@ stopEditingIncome();
 <% if @income.kind == 'wages_and_salaries' %>
   $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'job_income', locals: { income: @income }) %>");
 <% elsif @income.kind == 'self_employed_income' || @income.kind == 'net_self_employment'%>
+  $("<%= id %>").closest(".income-kind").find('.add-more-link-<%= @income.kind %>').removeClass("hidden");
   $('<%= id %>').replaceWith("<%= escape_javascript render(partial: 'self_employed_income', locals: { income: @income }) %>");
 <% elsif @income.kind == 'unemployment_income' %>
   $("<%= id %>").closest("#unemployment_income").find('#add-more-link-unemployment').removeClass("hidden");
