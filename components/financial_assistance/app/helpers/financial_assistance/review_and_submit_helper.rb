@@ -124,7 +124,7 @@ module FinancialAssistance
     def applicant_summary_hashes(applicant, can_edit)
       def personal_info_hash(applicant)
         hash = {age: applicant.age_of_the_applicant, gender: applicant.gender.humanize}
-        unless @all_relationships.empty?
+        if @all_relationships.present?
           hash[:relationship] = applicant.relationship_kind_with_primary.humanize
         end
         hash[:status] = applicant.citizen_status.present? ? applicant.format_citizen : nil

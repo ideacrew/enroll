@@ -18,7 +18,7 @@ module FinancialAssistance
     require 'securerandom'
 
     before_action :check_eligibility, only: [:copy]
-    before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
+    before_action :init_cfl_service, only: [:review_and_submit, :review, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
     layout :resolve_layout
