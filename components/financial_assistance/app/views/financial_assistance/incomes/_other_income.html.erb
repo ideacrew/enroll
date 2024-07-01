@@ -5,7 +5,7 @@
         <% if other_income.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
           <div class="mr-auto col-sm col-md-6 col-lg-3 p-0" id="ssi_type">
             <div class="ss_benefit_type">
-              <%= f.label :ssi_type, "#{l10n("Social").upcase} #{l10n("Security").upcase} #{l10n("Benefit").upcase} #{l10n("TYPE").upcase} *", class: "label-color", for: "ssbenefit#{income_id}" %>
+              <%= f.label :ssi_type, l10n("faa.other_incomes.social_security_benefit_type"), class: "label-color required", for: "ssbenefit#{income_id}" %>
               <input class="fake-disabled-input" id="ssbenefit<%='income_id'%>" disabled="true" value="<%= FinancialAssistance::Income::SS_BENEFITS[other_income.ssi_type&.to_sym] %>">
             </div>
           </div>
