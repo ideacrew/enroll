@@ -41,7 +41,7 @@ class IvlPersonalInformation
   end
 
   def self.dob
-    'jq_datepicker_ignore_person[dob]'
+    'DATE OF BIRTH'
   end
 
   def self.ssn
