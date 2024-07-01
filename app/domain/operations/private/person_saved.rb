@@ -21,17 +21,22 @@ module Operations
         # before_person    = yield construct_before_person(cv3_families, values[:changed_attributes], values[:after_save_version])
         # payload          = yield construct_publish_payload(values[:family], values[:family_member_id], before_person)
         # publish_payload(payload, headers)
-        Success()
+        Success(publish_result)
       end
 
       private
 
-      # Here we might want to return a Failure monad if there are no changes.
+      def validate(headers, params)
+        Rails.logger.info { params }
+        return Failure('Missing after save version') if params[:after_save_version].blank?
+        Success(params)
+      end
+
       def construct_and_publish_cv_family_events(headers, person, values)
-        return Failure('No changed attributes') if values[:changed_attributes].blank?
         person.families.each do |family|
           payload = construct_before_and_after_cv3_family(family, headers, person, values)
-           # event('events.families.created_or_updated', attributes: payload, headers: headers).success.publish
+          return payload if payload.failure?
+          event('events.families.created_or_updated', attributes: payload.success, headers: headers)&.success&.publish
         end
       end
 
@@ -45,62 +50,30 @@ module Operations
         cv3_family = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
         if cv3_family.success?
           before_save_cv3_family = cv3_family.success.deep_dup
-          # merge values[:changed_attributes]
           before_family_member = before_save_cv3_family[:family_members].detect do |family_member|
             family_member[:person][:hbx_id] == values[:after_save_version][:hbx_id]
            end
            
-           before_person_saved = ::Operations::BeforePersonSaved.new.call(values[:changed_attributes], before_family_member)
-          #  binding.irb
+           before_person_saved = ::Operations::CreateBeforePersonSaved.new.call(values[:changed_attributes], before_family_member)
            if before_person_saved.success?
-            # Rails.logger.info { "Before Save CV3 Family Constructed #{before_save_cv3_family}"}
-              return {before_save_cv3_family: before_save_cv3_family, after_save_cv3_family: cv3_family.success}
+              return Success({before_save_cv3_family: before_save_cv3_family, after_save_cv3_family: cv3_family.success})
            else
             Rails.logger.info { "Before Save CV3 Family failed for family: #{values[:after_save_version][:hbx_id]} #{before_save.failure} #{}"}
-            return Failure("Failed to construct before save cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]}")
+            return Success({before_save_cv3_family: {}, after_save_cv3_family: cv3_family.success})
            end                
         else
-          Failure("Failed to construct cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]}")
+          Rails.logger.error { "Failed to construct cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to #{cv3_family.failure}" }
+          return Failure("Failed to construct cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to #{cv3_family.failure}")
         end
+      rescue StandardError => e
+        Rails.logger.error {"Error constructing cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}"}
+        Failure("Error constructing cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}" )
       end
-
-
-
-      # def construct_cv3_family(after_save_version)
-
-      #   person = Person.where(hbx_id: after_save_version[:hbx_id]).first
-
-      #   return Failure('Person not found') if person.blank?
-
-      #   family = person.primary_family
-      #   Operations::Transformers::FamilyTo::Cv3Family.new.call(family, true)
-      #   #! if they are part of more than one family, are we publishing twice?
-      #   families = person.families.collect do |family|
-      #     Operations::Transformers::FamilyTo::Cv3Family.new.call(family, true)
-
-      #   end
-      # end
-
-      # def construct_before_person(cv3_families, changed_attributes, after_save_version)
-      #   # binding.irb
-      #   # construct cv3 family, find family member by hbx id and update the family member with the changed attributes
-      #   # Do we loop through the changed attributes
-      #   # find_family
-      #   cv3_families.each do |cv3_family|
-         
-      #     return Failure('Person not found') if person.blank?
-      #     person.merge!(changed_attributes)
-      #     Success("Before Person Constructed")
-      #   end
-      # end
-
 
       def find_person(after_save_version)
         ::Operations::People::Find.new.call({ person_hbx_id: after_save_version[:hbx_id] })
       end
 
-      # Any failure caused here should not impact the next steps.
-      # For the same reason we will always return a Success.
       def publish_person_saved_event(person)
         cv_person = ::Operations::Transformers::PersonTo::Cv3Person.new.call(person)
 
@@ -119,17 +92,8 @@ module Operations
 
         Success(msg)
       rescue StandardError => e
-        Rails.logger.error { "Unable to generate events.person_saved event due to error: #{e}, backtrace: #{e.backtrace}" }
-        Success("Unable to generate events.person_saved event due to error: #{e}, backtrace: #{e.backtrace}")
-      end
-
-      def validate(headers, params)
-        Rails.logger.info {"1277 #{params[:changed_attributes].inspect}"}
-        # return Failure('Missing before and after updated at') if headers.blank?
-        return Failure('Missing after save version') if params[:after_save_version].blank?
-        # return Failure('No Changed Attributes') if params[:changed_attributes].blank?
-
-        Success(params)
+        Rails.logger.error { "Unable to generate events.person_saved event due to error: #{e.message}, backtrace: #{e.backtrace.join("\n")}" }
+        Success("Unable to generate events.person_saved event due to error: #{e.message}, backtrace: #{e.backtrace.join("\n")}")
       end
     end
   end

@@ -480,9 +480,16 @@ class Person
   end
 
   def generate_person_saved_event
-    # return unless self.families.first.primary_person == self
-    if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
-      embedded_changed_attributes = {changed_person_attributes: changed_attributes, changed_address_attributes: changed_address_attributes, changed_phone_attributes: changed_phone_attributes, changed_email_attributes: changed_email_attributes, changed_relationship_attributes: changed_relationship_attributes}
+    return if self.families.first.primary_person != self
+    if true
+      # TODO: Refactor to capture embedded changed attributes in Person object changed_attributes
+      embedded_changed_attributes = {
+                                      changed_person_attributes: changed_attributes, 
+                                      changed_address_attributes: changed_address_attributes, 
+                                      changed_phone_attributes: changed_phone_attributes, 
+                                      changed_email_attributes: changed_email_attributes, 
+                                      changed_relationship_attributes: changed_relationship_attributes
+                                    }
       event(
         'events.private.person_saved',
         headers: {
@@ -642,13 +649,9 @@ class Person
       save!
       Rails.logger.info {"643 #{existing_relationship.inspect}"}
     elsif id != person.id
-      self.person_relationships << PersonRelationship.new({
-                                                            :kind => relationship,
-                                                            :relative_id => person.id
-                                                          })
-                                                        
+      self.person_relationships.build(kind: relationship, relative_id: person.id)   
+      save!
     end
-    self.person_relationships.build()
   end
 
   def add_work_email(email)
@@ -1417,29 +1420,29 @@ class Person
 
   def changed_address_attributes
      addresses.collect do |address|
-      address.changed_attributes.merge!({:kind => address.kind})
+      address_changed_attributes = address.changed_attributes
+      address_changed_attributes.merge!({:kind => address.kind})
     end
   end
 
   def changed_phone_attributes
     phones.collect do |phone|
-      phone.changed_attributes.merge!({:kind => phone.kind})
+      phone_changed_attributes = phone.changed_attributes
+      phone_changed_attributes.merge!({:kind => phone.kind})
     end
   end
 
   def changed_email_attributes
-    
     emails.collect do |email|
-      email.changed_attributes.merge!({:kind => email.kind})
+      email_changed_attributes = email.changed_attributes
+      email_changed_attributes.merge!({:kind => email.kind})
     end
   end
 
   def changed_relationship_attributes
-    Rails.logger.info {"14339  #{self.full_name} #{self.changed_attributes}"}
-    Rails.logger.info {"1433 #{self.full_name}"}
     person_relationships.collect do |person_relationship|
-      Rails.logger.info {"1433 #{person_relationship.changed_attributes}"}
-      person_relationship.changed_attributes.merge!({:relative_id => person_relationship.relative_id})
+      person_relationship_changed_attributes = person_relationship.changed_attributes
+      person_relationship_changed_attributes.merge!({:relative_id => person_relationship.relative_id})
     end
   end
 
