@@ -64,7 +64,6 @@ var Freebies = ( function( window, undefined ) {
   }
 
 	function selectric() {
-    console.log("selectric disableSelectric ", disableSelectric )
 		if (!disableSelectric) {
 			$("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select, .no-selectric').selectric();
 		}
