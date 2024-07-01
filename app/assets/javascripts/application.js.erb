@@ -48,7 +48,7 @@
 
 var disableSelectric = false;
 
-$(document).on('page:load turbolinks:load', function () {
+$(document).on('ready', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
   Responsive.setSizeListeners();
