@@ -575,6 +575,12 @@ jobs:
           WD_VERSION: "124.0.6367.207"
           WD_CHROME_PATH: ${{ github.workspace }}/chrome-linux64/chrome
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+      - name: print cucumber errors on summary
+        if: failure()
+        run: |
+          echo $? > output.txt
+          echo "Cucumber ${{ matrix.group }}/${{ strategy.job-total }}"
+          cat output.txt  | sed -n '/Failing Scenarios/,$p'  >> $GITHUB_STEP_SUMMARY
       - name: copy coverage report
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
