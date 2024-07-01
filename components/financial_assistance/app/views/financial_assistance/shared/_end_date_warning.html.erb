@@ -1,0 +1,26 @@
+  <div class="modal end-on-warning" id="end_date_warning_modal" tabindex="-1" role="dialog" aria-hidden="true">>
+    <div class="modal-dialog" role="document">
+      <div class="container pt-2 pb-4 modal-content">
+        <div class="d-flex mb-4 align-items-center">
+        <div class="pr-2 pl-2 pt-1">
+          <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+        </div>
+        <div class="col pl-0">
+            <h2 class="modal-title pt-1"><%= l10n("faa.warning") %></h5>
+        </div>
+        <div class="col-auto px-0">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <b><%= l10n("faa.incomes.end_date_header") %></b>
+        <%= l10n("faa.incomes.end_date_warning", end_date_field_label: l10n('end_date')) %>
+      </div>
+        <div class="d-flex align-items-center mt-4 justify-content-end">
+          <button type="button" class="btn-primary mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>
+        </div>
+      </div>
+    </div>
+  </div>
