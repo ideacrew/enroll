@@ -4,7 +4,6 @@ function stopEditingIncome() {
   $('.driver-question, .driver-question a, .instruction-row, .income, .other-income-kind, .unemployment-income').removeClass('disabled');
   // enable inputs on drivers, instructions, and income kinds - except for submit (save) buttons as this would enable the submit button in the dummy forms, and fake-disabled-inputs as they should never be enabled
   $('.driver-question input, .instruction-row input, .income input:not(":input[type=submit], .fake-disabled-input"), .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")').removeAttr('disabled');
-
   // enable "Add New" income buttons
   $('#new-unemployment-income, #new-ai-an-income, .new-income, .add_new_other_income_kind').removeAttr('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
