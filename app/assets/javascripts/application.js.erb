@@ -48,11 +48,24 @@
 
 var disableSelectric = false;
 
-$(document).on('ready', function () {
+$(document).on('page:load turbolinks:load', function () {
+  if (controllerName() !== 'families' && actionName() !== 'verification'){
+    disableSelectric = true
+  }
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
   Responsive.setSizeListeners();
 });
+
+function controllerName() {
+  const body = document.body;
+  return body.dataset.controller;
+}
+
+function actionName() {
+  const body = document.body;
+  return body.dataset.action;
+}
 
 function applyJQDatePickerSetup(ele) {
 
