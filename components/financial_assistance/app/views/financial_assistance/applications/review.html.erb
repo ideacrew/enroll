@@ -7,6 +7,11 @@
 
     <%= link_to "Back to All Applications", applications_path, class: "btn btn-primary" %>
 
+    <dl class="d-flex">
+      <dt class="mr-4">Application ID:</dt>
+      <dd><%= @application.hbx_id %></dd>
+    </dl>
+
     <%# Income and Deductions table %>
     <% if income_and_deductions_for_any(@application).present? %>
       <section>
