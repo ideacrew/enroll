@@ -240,7 +240,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.ssn_not_present' => "SSN not present",
   :'en.tax_covering_applicant_not_present' => "Tax covering applicant not present",
   :'en.information_complete' => "Information Complete",
-  :'en.add_person_to_household' => "Add Person to Household",
+  :'en.add_member_to_household' => "Add Member to Household",
   :'en.application_for_coverage' => "%{year} Application for Coverage",
   :'en.edit_income_coverage_info' => "Edit Income & Coverage Info",
   :'en.add_income_coverage_info' => "Add Income & Coverage Info",
