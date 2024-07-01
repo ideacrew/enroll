@@ -226,4 +226,8 @@ class IvlIapHealthCoveragePage
   def self.has_eligibility_changed_false
     '#has_eligibility_changed_false'
   end
+
+  def self.mainecare_ineligible_question_text
+    "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since"
+  end
 end

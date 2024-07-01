@@ -84,6 +84,7 @@ Then(/^the medicare have glossary link$/) do
 end
 
 Then(/^the medicare have glossary content$/) do
+  #bug logged
   find(IvlIapHealthCoveragePage.medicare_glossary_link).click
   expect(page).to have_content 'A federal health insurance program for people who are 65 or older'
 end
@@ -174,7 +175,7 @@ Then(/they should see the Indian Healthcare question/) do
 end
 
 Then(/they should see the MaineCare ineligible question/) do
-  expect(page).to have_content l10n("faa.medicaid_chip_ineligible")
+  expect(page).to have_content(IvlIapHealthCoveragePage.mainecare_ineligible_question_text)
 end
 
 Then(/they clicks yes for MaineCare ineligible/) do

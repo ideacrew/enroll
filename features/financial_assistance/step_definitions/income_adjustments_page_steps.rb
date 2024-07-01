@@ -92,6 +92,7 @@ Then(/^the health_savings_account have glossary link$/) do
 end
 
 Then(/^the health_savings_account have glossary content$/) do
+  #bug logged
   find(IvlIapIncomeAdjustmentsPage.health_savings_account_glossary_link).click
   expect(page).to have_content 'If you have a High Deductible Health Plan, you may be eligible for a Health Savings Account'
 end
