@@ -6,7 +6,7 @@ module FinancialAssistance
 
     before_action :find_application_and_applicant
     before_action :set_cache_headers, only: [:index, :other]
-    before_action :enable_bs4_layout, only: [:other] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:other, :index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     before_action :conditionally_enable_bs4_layout, only: [:create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     layout :resolve_layout
@@ -57,7 +57,6 @@ module FinancialAssistance
       format_date(params)
       @income = @applicant.incomes.find params[:id]
       authorize @income, :update?
-
       if @income.update_attributes permit_params(params[:income])
         render :update
       else
@@ -139,12 +138,12 @@ module FinancialAssistance
 
     def resolve_layout
       case action_name
-      when "index", "step", "new"
+      when "step", "new"
         "financial_assistance_nav"
-      when "other"
-        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
+      when "index", "other"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
       else
-        "financial_assistance"
+        "financial_assistance_nav"
       end
     end
   end
