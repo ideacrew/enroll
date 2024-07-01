@@ -3,6 +3,7 @@
 Feature: Start a new Financial Assistance Application and fills out the job and self employed income forms
 
   Background: User logs in and visits applicant's Job income page
+    Given bs4_consumer_flow feature is disable
     Given EnrollRegistry crm_update_family_save feature is disabled
     Given EnrollRegistry crm_publish_primary_subscriber feature is disabled
     Given a consumer, with a family, exists

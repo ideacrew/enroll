@@ -147,8 +147,7 @@ Then(/^Family Relationships left section WILL display$/) do
   if EnrollRegistry[:bs4_consumer_flow].enabled?
   expect(page).to have_content('FAMILY RELATIONSHIPS')
   else
-    expect(page).to have_content('FAMILY RELATIONSHIPS')
-    #expect(page).to have_content('Family Relationships') will update once bug fixed with review your application page 
+    expect(page).to have_content('Family Relationships')
   end
 end
 
