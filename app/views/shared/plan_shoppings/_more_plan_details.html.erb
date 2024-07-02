@@ -1,3 +1,15 @@
+<% if @bs4 %>
+  <a class="back btn outline my-2" href="#"><%= l10n("previous_step") %></a>
+  <dl class="parent mt-2">
+    <dt>Coverage For:</dt>
+    <dd><%= plan_shopping_dependent_text(@hbx_enrollment) %></dd>
+    <dt>Available Plans:</dt>
+    <% products = (['shop','employer_sponsored','fehb'].include?(@market_kind)) ? @member_groups : @plans %>
+    <dd id='plans-count'><%= products_count(products)%></dd>
+    <dt>Coverage Start Date:</dt>
+    <dd><%= @hbx_enrollment.effective_on %></dd>
+  </dl>
+<% else %>
 <div class="module shopping-data">
   <% if EnrollRegistry.feature_enabled?(:go_to_plan_compare_link) && @coverage_kind == 'health' %>
     <%= link_to l10n("go_to_plan_compare") , "", class: "btn green-background fifteen-px-bottom-margin", data: {toggle: "modal", target: "#plan_match_redirection"} %>
@@ -24,4 +36,4 @@
   </div>
   <br/>
 </div>
-
+<% end %>

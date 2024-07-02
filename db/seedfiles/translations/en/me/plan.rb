@@ -44,6 +44,13 @@ PLAN_TRANSLATIONS = {
   'en.plans.issuer.pay_now.collecting_info' => "The information that %{carrier_name} collects and maintains as a result of your visit to its website is different from the information that %{site_short_name} collects and maintains.",
   'en.plans.issuer.pay_now.exchange_disclaimer_for_auth' => "%{site_short_name} cannot help you with any information regarding this website, including your username or password or other technical issues.",
   'en.plans.issuer.pay_now.exchange_disclaimer' => "By linking to this private business, %{site_short_name} is not endorsing its products, services, or privacy and security policies. We recommend you review the business's information collection policy or terms and conditions to fully understand what information is collected by %{carrier_name}.",
-  'en.plans.issuer.pay_now.please_note' => '<b>Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.</b>'
+  'en.plans.issuer.pay_now.please_note' => '<b>Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.</b>',
 
+  'en.plans.plan_shopping.receipt.title' => 'Enrollment Submitted',
+  'en.plans.plan_shopping.receipt.description1' => 'Your enrollment has been submitted as of %{date_time}.',
+  'en.plans.plan_shopping.receipt.important' => 'Important',
+  'en.plans.plan_shopping.receipt.pay_now_important' => 'You must pay your first month’s premium directly to %{carrier_name} to activate your coverage. Select PAY NOW to make your first premium payment online. To learn about other payment options, select ‘How to Pay’.',
+  'en.plans.plan_shopping.receipt.not_pay_now_important' => 'You must pay your first month’s premium directly to your carrier for your coverage to take effect. Select ‘How to Pay’ to learn more.',
+  'en.plans.plan_shopping.receipt.how_to_pay.title' => 'How to Pay',
+  'en.plans.plan_shopping.receipt.how_to_pay.title' => 'How to Pay'
 }

@@ -13,7 +13,7 @@
           <% if osse_eligible %>
             <th class="text-right" colspan="2" scope="colgroup"><%=l10n("premium_discount") %></th>
           <% end %>
-          <th class="text-right"><%= l10n("APTC_amount") %> <span><i tabindex="0" class='fa fa-question-circle' data-toggle="tooltip" title="<%= l10n('APTC_amount_title_info') %>"><span class="hide"><%=l10n("info")%></span></i></span></th>
+          <th class="text-right"><%= render partial:"shared/glossary", locals: {key: "aptc_amount_title_info", term: "APTC amount" } %></th>
           <th class="text-right" width="80"><%= l10n("you_pay") %></th>
         </tr>
       </thead>

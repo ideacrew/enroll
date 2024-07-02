@@ -166,7 +166,7 @@ dt {
 dt {
   font-weight: 600;
   color: var(--text-secondary);
-  padding-right: 1ch;
+  padding-right: 2ch;
 }
 
 dl.parent.weight-n {
@@ -566,4 +566,9 @@ a.disabled {
   &.active {
     @extend .font-weight-bold;
   }
+}
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
 }
