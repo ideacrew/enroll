@@ -87,6 +87,19 @@
       </section>
     <% end %>
 
+    <%# Household & Preferences summary %>
+    <% if @application.applicants.count > 1 && !family_relationships_hash.nil? %>
+      <section>
+        <div class="mb-4">
+          <h2><%= l10n("faa.review.your_household")%></h2>
+        </div>
+
+        <%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: family_relationships_hash} %>
+      </section>
+    <% end %>
+    <section><%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: preferences_hash} %></section>
+    <section><%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: household_hash} %></section>
+
     <%= link_to l10n("homepage.applications.detail.back"), applications_path, class: "btn btn-primary mt-2" %>
   </div>
 <% else %>
