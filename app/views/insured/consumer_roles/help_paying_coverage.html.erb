@@ -1,6 +1,6 @@
 <%= form_tag(help_paying_coverage_response_insured_consumer_role_index_path, method: :get) do %>
   <% if @bs4 %>
-    <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+    <%= render partial: 'shared/progress_side_nav', locals: {nav: sign_up_nav_options(1)} %>
     <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
     <% if @person.mec_check_response == "Success" %>
       <div id="mec-check-response">

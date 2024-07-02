@@ -313,6 +313,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.covered' => "Covered",
   :'en.insured.plan_contact_info' => "Plan Contact Info",
   :'en.make_changes' => "Make Changes",
+  :'en.verifications' => "Verifications",
   :'en.terminate_plan' => "Terminate Plan",
   :'en.view_details' => "View Details",
   :'en.insured.primary_applicant' => "Primary Applicant",
