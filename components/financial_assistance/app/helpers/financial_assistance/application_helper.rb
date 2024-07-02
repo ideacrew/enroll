@@ -404,6 +404,25 @@ module FinancialAssistance
       options << [l10n('insured.preferences.renewal_year_none', site_short_name: site_short_name), 0]
     end
 
+    def faa_nav_options(step, application, applicant)
+      nav = {}
+
+      nav[:nav_options] = applicant.present? ? applicant_faa_nav_options(application, applicant) : no_applicant_faa_nav_options(application)
+      nav[:links] = true
+      nav[:step] = step
+      nav[:title] = l10n("faa.left_nav.my_household")
+      nav[:title_link] = edit_application_path(application)
+      nav[:subheading] = l10n("faa.nav.applicant_subheader")
+
+      nav[:show_help_button] = true
+      nav[:show_exit_button] = true
+      nav[:show_previous_button] = false
+      nav[:show_account_button] = EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
+      nav[:back_to_account_flag] == true
+
+      nav
+    end
+
     def applicant_faa_nav_options(application, applicant)
       [
         {step: 1, label: l10n('faa.nav.tax_info'), link: go_to_step_application_applicant_path(application, applicant, 1), step_complete: applicant.tax_info_complete? },
