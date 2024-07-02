@@ -2,7 +2,7 @@
 
 module Operations
   module Private
-    # This class is to publish before and after save cv3 family payloads
+    # This class publishes before and after save cv3 family payloads
     class PersonSaved
       include Dry::Monads[:result, :do]
       include EventSource::Command
@@ -28,7 +28,6 @@ module Operations
         
         person.families.each do |family|
           payload = construct_before_and_after_cv3_family(family, headers, person, values)
-          Rails.logger.info { "Payload: #{payload}" }
           return payload if payload.failure?
           event('events.families.created_or_updated', attributes: payload.success, headers: headers)&.success&.publish
         end
@@ -76,7 +75,6 @@ module Operations
                   "Event 'event.person_saved' failed to publish"
                 end
               end
-              Rails.logger.info {"84 #{msg}"}
         Success(msg)
       rescue StandardError => e
         Rails.logger.error { "Unable to generate events.person_saved event due to error: #{e.message}, backtrace: #{e.backtrace.join("\n")}" }

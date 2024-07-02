@@ -8,7 +8,7 @@ module Subscribers
     subscribe(:on_person_saved) do |delivery_info, metadata, response|
       subscriber_logger = subscriber_logger_for(:on_private_person_saved)
       payload = JSON.parse(response, symbolize_names: true)
-   
+
       pre_process_message(subscriber_logger, payload, metadata.headers)
       process_person_saved(metadata.headers, payload)
 
@@ -45,9 +45,7 @@ module Subscribers
     end
 
     def process_person_saved(headers, payload)
-      Rails.logger.info "1222"
       ::Operations::Private::PersonSaved.new.call(headers: headers, params: payload)
-      # Rails.logger.info "#{::Operations::Private::PersonSaved.new.call(headers, payload).value}"
     end
   end
 end

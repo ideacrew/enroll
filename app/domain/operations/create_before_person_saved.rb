@@ -52,7 +52,6 @@ module Operations
 
     def build_before_addresses_saved(person, changed_address_attributes)
       changed_address_attributes.each do |address|
-        Rails.logger.info { "58 #{address[:kind]}" }
         if address.keys.present?
           person[:addresses].detect { |new_address| new_address[:kind] == address[:kind] }&.merge!(address)
         end
