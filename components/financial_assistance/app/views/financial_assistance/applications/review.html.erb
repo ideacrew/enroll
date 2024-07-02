@@ -4,17 +4,17 @@
   <%# Main Content (right) %>
   <div>
     <ul class="breadcrumbs">
-      <li>Home</li>
-      <li>Applications</li>
-      <li>Application Detail</li>
+      <li><%= l10n('layout.header.home') %></li>
+      <li><%= l10n('homepage.applications') %></li>
+      <li><%= l10n('homepage.applications.detail') %></li>
     </ul>
 
-    <h1>Application Details<%#= l10n("faa.review.review_and_submit") %></h2>
+    <h1><%= l10n('homepage.applications.detail') %></h2>
 
-    <%= link_to "Back to All Applications", applications_path, class: "btn btn-primary mt-2 mb-3" %>
+    <%= link_to l10n('homepage.applications.detail.back'), applications_path, class: "btn btn-primary mt-2 mb-3" %>
 
     <dl class="d-flex">
-      <dt class="mr-4">Application ID:</dt>
+      <dt class="mr-4"><%= l10n('homepage.applications.detail.id') %></dt>
       <dd><%= @application.hbx_id %></dd>
     </dl>
 
@@ -86,7 +86,7 @@
       </section>
     <% end %>
 
-    <%= link_to "Back to All Applications", applications_path, class: "btn btn-primary" %>
+    <%= link_to l10n("homepage.applications.detail.back"), applications_path, class: "btn btn-primary mt-2" %>
   </div>
 <% else %>
   <div class="container">
