@@ -332,15 +332,13 @@ var ApplicantValidations = (function(window, undefined) {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
     if (!document.getElementById('dependent_ul') && immigration_field) {
-      return (
-        document.getElementById('person_us_citizen_false').checked ||
-        document.getElementById('person_naturalized_citizen_true').checked
-      );
+      var us_citizen = document.getElementById('person_us_citizen_false') || document.getElementById('us_citizen_false');
+      var naturalized_citizen = document.getElementById('person_naturalized_citizen_true') || document.getElementById('naturalized_citizen_true');
+      return ( us_citizen.checked || naturalized_citizen.checked );
     } else if (immigration_field) {
-      return (
-        document.getElementById('applicant_us_citizen_false').checked ||
-        document.getElementById('applicant_naturalized_citizen_true').checked
-      );
+      var us_citizen = document.getElementById('dependent_us_citizen_false') || document.getElementById('us_citizen_false');
+      var naturalized_citizen = document.getElementById('dependent_naturalized_citizen_true') || document.getElementById('naturalized_citizen_true');
+      return ( us_citizen.checked || naturalized_citizen.checked );
     }
   }
 
