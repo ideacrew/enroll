@@ -52,12 +52,11 @@ $(document).on('page:load turbolinks:load', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
   Responsive.setSizeListeners();
-//  if (controllerName() === 'families' && actionName() === 'verification'){
-//    $(document).find('.selectric').forEach(element => {
-//      element.removeEventListener('turbolinks:load');
-//    });
-//  }
-
+  if (controllerName() === 'families' && actionName() === 'verification'){
+    $(document).find('.verification-update-reason .selectric, .return-for-def-reason .selectric').forEach(element => {
+      element.removeEventListener('turbolinks:load');
+    });
+  }
 });
 
 function controllerName() {
