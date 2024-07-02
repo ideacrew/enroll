@@ -84,9 +84,10 @@ SHARED_TRANSLATIONS = {
     "en.is_incarcerated" => "<b>Are you currently incarcerated? </b> <br> <br> Select 'yes' if any of the following situations apply: <br> <ul> <li> You're serving a term in prison or jail </li> <li> You're currently staying in a halfway house </li> </ul> <br> Select 'no' if: <ul> <li> You're on probation, parole, or home confinement </li> <li> You're being held in jail or prison, but haven't been convicted of a crime <br> (in other words, charges are pending)",
 
     "en.previous_step" => "Previous Step",
-    "en.save_and_exit" => "Log Out",
+    "en.save_and_exit" => "Save & Exit",
     "en.help_sign_up" => "Help Me Sign Up",
     "en.get_help_sign_up" => "Get Help Signing Up",
+    "en.close" => "Close",
     # event log
     "en.event_log.eligibility" => "Eligibility",
     "en.event_log.outcome" => "Outcome",
