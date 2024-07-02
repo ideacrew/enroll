@@ -1,6 +1,7 @@
 <% if @bs4 %>
   <%= render partial: 'shared/progress_side_nav', locals: {nav: sign_up_nav_options(1)} %>
-  <h1><%= l10n('insured.interactive_identity_verifications.service_unavailable.try_again_later') %></h1>
+  <h1><%= l10n("verify_identity") %></h1>
+  <p><strong><%= l10n('insured.interactive_identity_verifications.service_unavailable.try_again_later') %></strong></p>
   <div class="mt-4 mb-4">
     <%= render partial: 'insured/interactive_identity_verifications/options_to_verify_identity' %>
     <%= render partial: 'shared/application_types_list' %>

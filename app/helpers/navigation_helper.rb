@@ -105,7 +105,7 @@ module NavigationHelper
   def individual_nav_options
     [
       {step: 1, page_key: :personal_info, display_label: l10n('personal_information')},
-      {step: 2, page_key: :verify_identity, display_label: l10n('insured.consumer_roles.upload_ridp_documents.header')},
+      {step: 2, page_key: :verify_identity, display_label: l10n('verify_identity')},
       {step: 3, page_key: :household_info, display_label: l10n('household_info')},
       {step: 4, page_key: :choose_plan, display_label: l10n('choose_plan')},
       {step: 5, page_key: :review, display_label: l10n('confirm_selection')},
