@@ -70,11 +70,36 @@ module NavigationHelper
     end
   end
 
-  def sign_up_nav_options
-    [
+  def plan_shopping_nav_options(step, nav_options)
+    nav = {}
+
+    nav[:nav_options] = nav_options
+    nav[:links] = false
+    nav[:step] = step
+    nav[:title] = l10n('insured.enroll_in_coverage')
+
+    nav
+  end
+
+  def sign_up_nav_options(step, show_help_button = false)
+    nav = {}
+
+    nav[:nav_options] = [
       {step: 1, page_key: :personal_info, display_label: l10n('tell_us_about_yourself')},
       {step: 2, page_key: :family_info, display_label: l10n('family_info')}
     ]
+    nav[:links] = false
+    nav[:step] = step
+    nav[:title] = l10n('account_setup')
+
+    nav[:show_help_button] = show_help_button ? true : (step != 1 && step < 6)
+    nav[:show_exit_button] = !['match', 'search'].include?(action_name) && step < 6
+    nav[:show_previous_button] = !['search'].include?(action_name) && ![6].include?(step)
+    nav[:show_account_button] = step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
+    nav[:is_complete] = step == 6
+    nav[:back_to_account_flag] == false
+
+    nav
   end
 
   def individual_nav_options
