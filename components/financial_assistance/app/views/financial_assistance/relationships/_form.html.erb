@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <%= render partial: 'financial_assistance/applications/faa_progress_options', locals: {step: 2} %>
+  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 2} %>
   <h1><%= l10n("family_relationships") %></h1>
   <p>
     <%= l10n("household_relationships") %>
@@ -7,9 +7,11 @@
       <%= l10n("continue_to_next_step") %>
     </b>
   </p>
+  <% primary_applicant = @all_relationships[0][:applicant] if @all_relationships[0].present? %>
   <% @all_relationships.each do |er| %>
-    <h2><%= @application.applicants.find(er[:applicant]).full_name %></h2>
-    <%= form_for @application do |f| %>
+    <% if er[:relation].present? && (er[:applicant] == primary_applicant) %>
+    <h2><%= @application.applicants.find(er[:relative]).full_name %></h2>
+      <%= form_for @application do |f| %>
       <div>
         <h3>
           <label class="required" for="relationships-<%= er[:applicant] %>"><%= l10n("relationship_to_primary") %></label>
@@ -17,6 +19,7 @@
         <%= f.select :relationships, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), {:prompt => 'Select Option', required: true }, { "class": "focus input-field #{'invalid-relation' if er[:relation] == 'none'}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "relationships-#{er[:applicant]}" } %>
       </div>
       <br>
+      <% end %>
     <% end %>
   <% end %>
   <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_application_path(@application)} %>
