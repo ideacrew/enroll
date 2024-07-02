@@ -25,6 +25,8 @@ RSpec.describe ::Operations::CreateBeforePersonSaved, dbclean: :after_each do
 
 
     before do
+      person.ensure_relationship_with(dependent, "spouse")
+      family.reload
       @result = described_class.new.call(changed_attributes, cv3_family_member)
     end
 
@@ -82,10 +84,6 @@ RSpec.describe ::Operations::CreateBeforePersonSaved, dbclean: :after_each do
     end
 
     context "with valid Relationship attributes" do
-      before do
-        person.ensure_relationship_with(dependent, "spouse")
-        family.reload
-      end
 
       it 'updates cv3 family person relationship attributes' do
         cv3_family = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family).success
