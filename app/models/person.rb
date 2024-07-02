@@ -484,12 +484,12 @@ class Person
       
       # TODO: Refactor to capture embedded changed attributes in Person object changed_attributes
       embedded_changed_attributes = {
-                                      changed_person_attributes: changed_attributes, 
-                                      changed_address_attributes: changed_address_attributes, 
-                                      changed_phone_attributes: changed_phone_attributes, 
-                                      changed_email_attributes: changed_email_attributes, 
-                                      changed_relationship_attributes: changed_relationship_attributes
-                                    }
+        changed_person_attributes: changed_attributes,
+        changed_address_attributes: changed_address_attributes,
+        changed_phone_attributes: changed_phone_attributes,
+        changed_email_attributes: changed_email_attributes,
+        changed_relationship_attributes: changed_relationship_attributes
+      }
       event(
         'events.private.person_saved',
         headers: {
@@ -649,7 +649,7 @@ class Person
       save!
       Rails.logger.info {"643 #{existing_relationship.inspect}"}
     elsif id != person.id
-      self.person_relationships.build(kind: relationship, relative_id: person.id)   
+      self.person_relationships.build(kind: relationship, relative_id: person.id)
       save!
     end
   end
@@ -1419,7 +1419,7 @@ class Person
   private
 
   def changed_address_attributes
-     addresses.collect do |address|
+    addresses.collect do |address|
       address_changed_attributes = address.changed_attributes
       address_changed_attributes.merge!({:kind => address.kind})
     end
