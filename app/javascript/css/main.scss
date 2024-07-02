@@ -576,3 +576,8 @@ a.disabled {
     @extend .font-weight-bold;
   }
 }
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
+}
