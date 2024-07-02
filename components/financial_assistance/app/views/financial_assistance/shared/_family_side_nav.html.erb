@@ -1,0 +1,66 @@
+<% content_for(:nav_width) { "2" } %>
+<% content_for :side_nav do %>
+  <nav class="portal-nav">
+    <ul id="">
+      <li>
+        <a href="<%= main_app.family_account_path(tab: 'home') %>" class="<%= 'active' if action_name == "home" %>"><%= l10n("layout.header.home") %></a>
+      </li>
+      <% if EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
+        <li>
+          <%= link_to l10n("enrollment_history_nav_label"), main_app.enrollment_history_insured_families_path, class: "#{'active' if action_name == 'enrollment_history'}" %>
+        </li>
+      <% end %>
+      <% if display_my_broker?(@person, @employee_role) && display_broker_info_for_consumer %>
+        <li>
+          <%= link_to main_app.brokers_insured_families_path(tab: l10n("brokers_tab")), class: "#{'active' if action_name == 'brokers'}" do %>
+            <%= l10n("my_broker") %>
+          <% end %>
+        </li>
+      <% end %>
+      <% if display_documents_tab?(@family_members, @person) %>
+        <li>
+          <div class="d-flex">
+            <%= link_to l10n("Verifications"), main_app.verification_insured_families_path(tab: 'verification'), class: "#{'active' if action_name == 'verification'}" %>
+            <% if enrollment_group_unverified?(@person) %>
+              <div role="alert" class="verifications-warning-icon icon d-inline-block mt-1" alt="warning" aria-hidden="true">&nbsp;</div>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+      <% if @person.has_consumer_role? && EnrollRegistry.feature_enabled?(:financial_assistance) %>
+        <li>
+          <%= link_to financial_assistance.applications_path(tab: 'cost_savings'), class: "#{'active' if ['index', 'applications', 'review'].include? action_name }" do %>
+            <%= l10n("faa.cost_savings_nav") %>
+          <% end %>
+        </li>
+      <% end %>
+      <% if current_user.has_hbx_staff_role? && has_active_resident_members?(@family_members) %>
+        <li>
+          <%= link_to main_app.upload_application_insured_families_path(tab: 'verification'), class: "#{'active' if action_name == 'upload_application'}"  do %>
+            <%= l10n("upload_paper_application") %>
+          <% end %>
+        </li>
+      <% end %>
+      <% if current_user.try(:has_hbx_staff_role?) && ivl_osse_enabled? && display_childcare_program_options(@person) %>
+        <li>
+          <%= link_to(main_app.healthcare_for_childcare_program_insured_families_path(tab: 'osse'), class: "#{'active' if action_name == 'healthcare_for_childcare_program'}") do %>
+            <%= l10n("osse_eligibility") %>
+          <% end %>
+        </li>
+      <% end %>
+      <li>
+        <%= link_to(main_app.inbox_insured_families_path(tab: 'messages'), class: "#{'active' if action_name == 'inbox'}") do %>
+          <%= l10n("messages") %>
+          <span class="badge message-unread ml-half"><%= @person.inbox.unread_messages.size %></span>
+        <% end %>
+      </li>
+      <% if event_logging_enabled? && pundit_allow(HbxProfile, :can_view_audit_log?) %>
+        <li>
+          <%= link_to(main_app.event_logs_insured_families_path(tab: 'event_log_ivl'), class: "#{'active' if action_name == 'event_logs'}") do %>
+            <%= l10n("audit_log") %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+<% end %>
