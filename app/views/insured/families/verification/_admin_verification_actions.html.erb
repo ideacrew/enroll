@@ -1,6 +1,6 @@
 <!-- ***** Verification reason ***** -->
 <div class="row">
-  <div class="verification-update-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}" %>>
+  <div class="verification-update-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}"%>>
     <div class="col-md-6">
       Provide verification reason:
     </div>
@@ -21,7 +21,7 @@
 <!-- ==== verification reason ==== -->
 
 <!-- ***** Reject reason ***** -->
-<div class="row" data-turbolinks="false">
+<div class="row">
   <div class="return-for-def-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-return"%>>
     <div class="col-md-6">
       Reject reason:
@@ -35,7 +35,7 @@
           <%= select_tag :verification_reason, options_for_select(build_reject_reason_list(v_type)), {prompt: ' Select Reason', required: true}%>
         </div>
         <div class="col-md-3">
-          <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button", data: { turbolinks: false } %>
+          <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
         </div>
     <%end%>
   </div>

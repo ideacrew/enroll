@@ -2,11 +2,11 @@
     <%= render partial: 'ui-components/v1/navs/families_navigation' %>
 <% end %>
 <h1 class="darkblue no-buffer"><%= l10n("documents") %></h1>
-<%# if EnrollRegistry.feature_enabled?(:show_new_documents_tab_text) %>
+<% if EnrollRegistry.feature_enabled?(:show_new_documents_tab_text) %>
   <h4><%= l10n("insured.verification_information") %></h4>
-<%# else %>
-<!--  <h4 class='starter'><%#= l10n("insured.verification_information_old") %></h4>-->
-<%# end %>
+<% else %>
+  <h4 class='starter'><%= l10n("insured.verification_information_old") %></h4>
+<% end %>
 <div class="documents-tab">
   <% if @person && @family_members.present? %>
       <% if individual_market_is_enabled? %>

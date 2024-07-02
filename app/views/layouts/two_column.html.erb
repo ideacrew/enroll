@@ -8,8 +8,7 @@
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= stylesheet_link_tag "application", :media => "all" %>
-    <%#= javascript_include_tag "application" %>
-    <%= javascript_include_tag "application", 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag "application" %>
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
