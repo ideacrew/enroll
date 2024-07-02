@@ -87,3 +87,49 @@ header.navbar-primary {
   }
 }
 
+.portal-nav {
+  background: var(--primary-color);
+  color: var(--grey-000);
+  border-radius: 6px;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: ($spacer/2) 0;
+    li {
+      padding: ($spacer/2) $spacer;
+      font-weight: 500;
+      width: 100%;
+    }
+  }
+
+  .message-unread {
+    padding: ($spacer / 3) ($spacer / 2);
+    background: var(--enrollment-status-yellow);
+    color: var(--default-font-color);
+    margin-left: $spacer / 3;
+  }
+
+  .verifications-warning-icon {
+    width: 20px;
+    height: 20px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none"><path d="M7.35631 2.13451C8.44557 -0.0448384 11.5544 -0.0448359 12.6437 2.13451L19.6841 16.2208C20.6668 18.1868 19.2377 20.5 17.0405 20.5H2.95955C0.762308 20.5 -0.666776 18.1868 0.315858 16.2208L7.35631 2.13451Z" fill="%23E5A900"/><path d="M10.8408 13.6846H9.17285L8.82422 7.00586H11.1895L10.8408 13.6846ZM8.79688 16.0225C8.79688 15.6396 8.89941 15.3503 9.10449 15.1543C9.30957 14.9583 9.60807 14.8604 10 14.8604C10.3783 14.8604 10.6699 14.9606 10.875 15.1611C11.0846 15.3617 11.1895 15.6488 11.1895 16.0225C11.1895 16.3825 11.0846 16.6673 10.875 16.877C10.6654 17.082 10.3737 17.1846 10 17.1846C9.61719 17.1846 9.32096 17.0843 9.11133 16.8838C8.90169 16.6787 8.79688 16.3916 8.79688 16.0225Z" fill="%23201F1E"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    color: transparent !important;
+    font-size: 27px !important;
+    margin-left: $spacer / 3;
+  }
+
+  a {
+    color: var(--grey-000);
+    text-decoration: none;
+    font-size: 18px;
+    &.active {
+      font-weight: 600;
+    }
+    &:hover, &:focus {
+      text-decoration: underline;
+    }
+  }
+}
