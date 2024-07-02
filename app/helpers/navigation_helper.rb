@@ -77,6 +77,8 @@ module NavigationHelper
     nav[:links] = false
     nav[:step] = step
     nav[:title] = l10n('insured.enroll_in_coverage')
+
+    nav
   end
 
   def sign_up_nav_options(step, show_help_button = false)

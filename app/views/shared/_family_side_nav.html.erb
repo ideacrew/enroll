@@ -22,7 +22,7 @@
           <div class="d-flex">
             <%= link_to l10n("Verifications"), main_app.verification_insured_families_path(tab: 'verification'), class: "#{'active' if action_name == 'verification'}" %>
 
-            <% if true #enrollment_group_unverified?(@person) %>
+            <% if enrollment_group_unverified?(@person) %>
               <div role="alert" class="verifications-warning-icon icon d-inline-block mt-1" alt="warning" aria-hidden="true">&nbsp;</div>
             <% end %>
           </div>
