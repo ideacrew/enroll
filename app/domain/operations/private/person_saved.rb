@@ -19,7 +19,6 @@ module Operations
       private
 
       def validate(headers, params)
-        Rails.logger.info { headers.inspect }
         return Failure('Missing headers') if headers.blank?
         return Failure('Missing after save version') if params[:after_save_version].blank?
         Success(params)
@@ -32,7 +31,6 @@ module Operations
           Rails.logger.info { "Payload: #{payload}" }
           return payload if payload.failure?
           event('events.families.created_or_updated', attributes: payload.success, headers: headers)&.success&.publish
-          # event('events.families.created_or_updated', attributes: {hello: "hello world"}, headers: {hello: "hello world"})&.success&.publish
         end
         Success("Successfully published 'events.families.created_or_updated' for person with hbx_id: #{person.hbx_id}")
       end

@@ -480,8 +480,7 @@ class Person
   end
 
   def generate_person_saved_event
-    
-    if true
+    if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
       
       # TODO: Refactor to capture embedded changed attributes in Person object changed_attributes
       embedded_changed_attributes = {

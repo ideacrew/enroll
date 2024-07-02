@@ -31,14 +31,6 @@ RSpec.describe ::Operations::Private::PersonSaved, dbclean: :after_each do
     end
   end
 
-  #! DONE: check build family determination
-  #! Done check for updates to first name
-  #! Done check for updates to relationships
-  # Check for updates to addresses
-
-  # check application updates for addresses,phones, emails
-  # build specs in person.rb
-
   describe 'Failure' do
     
     it 'returns failure' do
