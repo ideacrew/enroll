@@ -1,0 +1,27 @@
+@media screen {
+  #printSection {
+    display: none;
+  }
+}
+@media print {
+  body {
+    background: var(--gray-00);
+  }
+  #printSection, #printSection * {
+    visibility:visible;
+  }
+  #printSection {
+    position:absolute;
+    left:0;
+    top:0;
+  }
+  #printArea {
+    display: none  !important;
+  }
+  #printSection #printArea {
+    display: block !important;
+  }
+  #btnPrint, nav, header, footer, .progress-nav-container  {
+    display: none  !important;
+  }
+}
