@@ -4,7 +4,7 @@
   <% end %>
 <% end %>
 <% if @bs4 %>
-  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+  <%= render partial: 'shared/progress_side_nav', locals: {nav: sign_up_nav_options(1)} %>
   <div id="new_person_wrapper">
     <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
       <h1>

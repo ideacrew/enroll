@@ -1,16 +1,4 @@
 <% current_page = current_page.to_sym %>
 <% current_step = nav_options.detect {|f| f[:page_key] == current_page}&.dig(:step) || 1 %>
 
-<% content_for(:step) { current_step } %>
-<% content_for(:title) { l10n('insured.enroll_in_coverage') } %>
-<% content_for(:nav_options) do %>
-  <% nav_options.each do |nav_option| %>
-    <li class="<%= 'complete' if current_step > nav_option[:step] %> <%= 'active' if current_step == nav_option[:step] %>">
-      <span class="circle-progress"></span>
-      <div class="vertical-line-progress"></div>
-      <a class="<%= 'cna disabled' unless current_step > nav_option[:step] or current_step == nav_option[:step] %>">
-        <%= nav_option[:display_label] %>
-      </a>
-    </li>
-  <% end %>
-<% end %>
+<%= render partial: 'shared/progress_side_nav', locals: {nav: plan_shopping_nav_options(current_step, nav_options)} %>

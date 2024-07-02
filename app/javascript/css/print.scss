@@ -1,47 +1,27 @@
 @media screen {
   #printSection {
-    display: none !important;
+    display: none;
   }
 }
 @media print {
-  html,
   body {
-    height: 100vh;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden;
+    background: var(--gray-00);
   }
-
-  body {
-    background: none !important;
-  }
-  body * {
-    visibility: hidden;
-  }
-  #printSection,
-  #printSection * {
-    visibility: visible;
+  #printSection, #printSection * {
+    visibility:visible;
   }
   #printSection {
-    position: absolute;
-    left: 0;
-    top: 0;
+    position:absolute;
+    left:0;
+    top:0;
   }
   #printArea {
-    display: none !important;
+    display: none  !important;
   }
   #printSection #printArea {
     display: block !important;
   }
-  #btnPrint,
-  nav,
-  header,
-  footer,
-  .progress-nav-container {
-    display: none !important;
-  }
-
-  .no-print {
-    display: none !important;
+  #btnPrint, nav, header, footer, .progress-nav-container  {
+    display: none  !important;
   }
 }
