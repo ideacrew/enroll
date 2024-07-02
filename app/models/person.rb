@@ -480,8 +480,9 @@ class Person
   end
 
   def generate_person_saved_event
-    return if self.families.first.primary_person != self
+    
     if true
+      
       # TODO: Refactor to capture embedded changed attributes in Person object changed_attributes
       embedded_changed_attributes = {
                                       changed_person_attributes: changed_attributes, 

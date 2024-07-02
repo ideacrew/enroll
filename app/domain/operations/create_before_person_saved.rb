@@ -13,7 +13,7 @@ module Operations
 
     def validate(changed_attributes, family_member)
       return Failure('changed attributes not present') if changed_attributes.empty?
-      return Failure('cv3 family member not present') if family_member.nil?
+      return Failure('cv3 family member not present') if family_member.empty?
 
       Success(changed_attributes: changed_attributes, family_member: family_member)
     end
@@ -37,8 +37,8 @@ module Operations
       build_before_person_relationships_saved(person, changed_person_relationship_attributes)
       Success(family_member)
     rescue StandardError => e
-      Rails.logger.error { "Failed to build before save cv3 family for family with hbx id: #{family_member[:person][:hbx_id]} due to #{e.message} backtrace: #{e.backtrace.join("\n")}" }
-      Failure( "Failed to build before save cv3 family for family with hbx id: #{family_member[:person][:hbx_id]} due to #{e.message} backtrace: #{e.backtrace.join("\n")}")
+      Rails.logger.error { "Failed to build before save cv3 family due to #{e.message} backtrace: #{e.backtrace.join("\n")}" }
+      Failure( "Failed to build before save cv3 family due to #{e.message} backtrace: #{e.backtrace.join("\n")}")
     end
 
     def build_before_person_saved(person, changed_person_attributes)
@@ -78,6 +78,7 @@ module Operations
     def build_before_person_relationships_saved(person, changed_person_relationships)
       changed_person_relationships.each do |person_relationship_attributes|
         relative_id = person_relationship_attributes[:relative_id]
+        next unless relative_id.present?
         relative = Person.find(relative_id)
         person_relationship = person[:person_relationships].detect { |relationship| relationship[:relative][:hbx_id] == relative&.hbx_id }
         person_relationship&.merge!({:kind => person_relationship_attributes[:kind]})
@@ -86,6 +87,3 @@ module Operations
     end
   end
 end
-
-
-# questions: Should the before person_save always return a success? This way the families.created_or_updated is always being triggered

@@ -96,7 +96,7 @@ class TimeKeeper
     tl_value = thread_local_date_of_record
     return tl_value unless tl_value.blank?
     found_value = Rails.cache.fetch(CACHE_KEY) do
-      log("date_of_record not available for TimeKeeper - using Date.current")
+      # log("date_of_record not available for TimeKeeper - using Date.current")
       Date.current.strftime("%Y-%m-%d")
     end
     Date.strptime(found_value, "%Y-%m-%d")

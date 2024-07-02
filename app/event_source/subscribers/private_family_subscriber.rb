@@ -10,7 +10,7 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
    
       pre_process_message(subscriber_logger, payload, metadata.headers)
-      process_person_saved(metadata.headers, payload) #! do we want to record the success or failure of this operation?
+      process_person_saved(metadata.headers, payload)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -49,6 +49,5 @@ module Subscribers
       ::Operations::Private::PersonSaved.new.call(headers: headers, params: payload)
       # Rails.logger.info "#{::Operations::Private::PersonSaved.new.call(headers, payload).value}"
     end
-    
   end
 end

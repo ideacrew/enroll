@@ -4,11 +4,12 @@ require 'rails_helper'
 
 RSpec.describe ::Operations::CreateBeforePersonSaved, dbclean: :after_each do
 
-  let!(:person) { FactoryBot.create(:person, :with_ssn) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:person) { FactoryBot.create(:person, :with_ssn) }
+  let(:dependent) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:family_member) { FactoryBot.create(:family_member, family: family, person: dependent) }
   let(:cv3_family) { ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family).success }
   let(:cv3_family_member) { cv3_family[:family_members].first }
-  let(:fake_cv3_transformer) { double(Operations::Transformers::FamilyTo::Cv3Family) }
 
 
   describe 'Success' do
@@ -16,7 +17,7 @@ RSpec.describe ::Operations::CreateBeforePersonSaved, dbclean: :after_each do
                                 changed_address_attributes: [{kind: 'home', address_1: '123 Main St', city: 'Portland', state: 'ME', zip: '20001'}],
                                 changed_phone_attributes: [{:kind => 'home',:full_phone_number=>"5555555557", :number=>"5555557", :updated_at=>TimeKeeper.date_of_record}],
                                 changed_email_attributes: [{:kind=>"home", :address=>"test@test.com", :updated_at=>TimeKeeper.date_of_record}],
-                                 changed_relationship_attributes: {}} }
+                                changed_relationship_attributes: [{:kind=>'child', :relative_id=>dependent.id, :updated_at=>nil}] }}
 
     let(:params) { {changed_attributes: changed_attributes, after_save_version: person.to_hash} }
 
@@ -79,18 +80,43 @@ RSpec.describe ::Operations::CreateBeforePersonSaved, dbclean: :after_each do
     end
 
     context "with valid Relationship attributes" do
-      it 'should return Success' do
-        binding.irb
-        expect(@result.success?).to be_truthy
+      before do
+        person.ensure_relationship_with(dependent, "spouse")
+        family.reload
+         
       end
   
-      it 'should return Family Member' do
-        expect(@result.success?).to be_truthy
+      it 'updates cv3 family person relationship attributes' do
+        cv3_family = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family).success
+        family_member = cv3_family[:family_members].first
+        result = described_class.new.call(changed_attributes, family_member)
+        expect(result.success[:person][:person_relationships].first[:kind]).to eql(changed_attributes[:changed_relationship_attributes].first[:kind])
       end
     end
   end
 
   describe "Failure" do
     
+    context "missing changed attributes" do 
+      let(:changed_attributes) { {} }
+      before do
+        @result = described_class.new.call(changed_attributes, cv3_family_member) 
+      end
+
+      it "returns failure message" do
+        expect(@result.failure).to eql("changed attributes not present")
+      end
+    end
+
+    context "missing family_member" do
+      let(:changed_attributes) { {changed_person_attributes: {}} }
+      before do
+        @result = described_class.new.call(changed_attributes, {}) 
+      end
+
+      it "returns failure message" do
+        expect(@result.failure).to eql("cv3 family member not present")
+      end
+    end
   end
 end
