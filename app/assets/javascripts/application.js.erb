@@ -49,13 +49,14 @@
 var disableSelectric = false;
 
 $(document).on('page:load turbolinks:load', function () {
+  console.log('turbolinks:load')
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
   Responsive.setSizeListeners();
+  // $('.interaction-click-control-documents')
   if (controllerName() === 'families' && actionName() === 'verification'){
-    $(document).find('.verification-update-reason .selectric, .return-for-def-reason .selectric').forEach(element => {
-      element.removeEventListener('turbolinks:load');
-    });
+    $('.verification-update-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
+    $('.return-for-def-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
   }
 });
 

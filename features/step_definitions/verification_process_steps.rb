@@ -63,7 +63,10 @@ end
 
 Then(/^the consumer visits verification page$/) do
   visit verification_insured_families_path(tab: 'verification')
-  find(".interaction-click-control-documents", wait: 5).click
+  # binding.irb
+  # sleep(200)
+  assert_selector("a", text: "Documents", exact: true, wait: 5).click
+  # find(".interaction-click-control-documents", visible: false, wait: 5).click
 end
 
 Then(/^the selectric class is visible$/) do
