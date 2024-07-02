@@ -507,7 +507,7 @@ ul.plain {
   }
 }
 
-div.disabled *:not(:has(*)):not(button, a.button) {
+div.disabled *:not(:has(*)):not(button, a.button), div.disabled ::after {
   opacity: .4;
 }
 
