@@ -89,5 +89,4 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     And Individual sees Your Information page
     When user registers as an individual female gender
     When the Individual clicks CONTINUE
-    #When Individual clicks on continue
     Then Individual sees form to enter personal information with checked female gender

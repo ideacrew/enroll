@@ -2,7 +2,6 @@
 
 Feature: Contrast level AA is enabled - existing consumer visits the my expert page
     Background:
-    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     And the FAA feature configuration is enabled
     And an IVL Broker Agency exists

@@ -1,7 +1,6 @@
 Feature: Contrast level AA is enabled - Help Me Sign Up Modal
 
   Background:
-    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     And an IVL Broker Agency exists
     And the broker Max Planck is primary broker for IVL Broker Agency
@@ -20,7 +19,7 @@ Feature: Contrast level AA is enabled - Help Me Sign Up Modal
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
-    And Individual clicks on the Continue button of the Family Information page
+    And Individual clicks on the continue button
     And Individual clicks on continue button on Choose Coverage page
     And Individual clicks on the Help Me Sign Up link
 

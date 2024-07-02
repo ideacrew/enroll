@@ -29,7 +29,6 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
   end
 
   # should be on checklist page now
-  #find('a.interaction-click-control-continue').click
 end
 
 And(/^the user visits the portal outside OE$/) do
@@ -102,8 +101,6 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     find_all('.btn', text: 'ADD INCOME & COVERAGE INFO')[0].click
     find(IvlIapTaxInformationPage.file_taxes_no_radiobtn).click
     find(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn).click
-    #choose(IvlIapTaxInformationPage.file_taxes_no_radiobtn, wait: 5)
-    #choose(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn)
     find(IvlIapTaxInformationPage.continue_btn).click
     choose(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn)
     sleep 1

@@ -472,7 +472,6 @@ Then(/^.+ does not apply for assistance and clicks continue/) do
 end
 
 Then(/\w+ should see the dependents form/) do
-  #expect(page).to have_content('Add Member')
   expect(page).to have_content('Add New Person')
   # screenshot("dependents")
 end
@@ -493,7 +492,6 @@ And(/Individual clicks on add member button/) do
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
-  # screenshot("add_member")
   all(:css, ".mz").last.click
 end
 
@@ -663,7 +661,7 @@ And(/^Individual clicks on purchase button on confirmation page$/) do
 end
 
 Then(/^.+ should see the extended APTC confirmation message/) do
-  #expect(page).to have_content("I must file a federal income tax return")
+  expect(page).to have_content("I must file a federal income tax return")
 end
 
 And(/^.+ clicks on the Continue button to go to the Individual home page/) do
@@ -807,7 +805,6 @@ end
 
 And(/^.+ clicks? on the Continue button of the Account Setup page$/i) do
   wait_for_ajax
-  #sleep 5
   find(IvlPersonalInformation.continue_btn_2, wait: 10).click
 end
 
@@ -1119,11 +1116,11 @@ end
 
 Then(/the individual should see the elected APTC amount and click on the Confirm button of the Thank You page/) do
   wait_for_ajax
-#  expect(page).to have_content '$50.00'
+  expect(page).to have_content '$50.00'
   find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
   fill_in IvlConfirmYourPlanSelection.first_name, :with => ("Patrick")
   fill_in IvlConfirmYourPlanSelection.last_name, :with => ("Doe")
-  #screenshot("aptc_purchase")
+  screenshot("aptc_purchase")
   sleep 2
   find(IvlConfirmYourPlanSelection.confirm_btn).click
 end
