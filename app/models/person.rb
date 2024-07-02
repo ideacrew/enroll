@@ -481,7 +481,7 @@ class Person
 
   def generate_person_saved_event
     if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
-      
+
       # TODO: Refactor to capture embedded changed attributes in Person object changed_attributes
       embedded_changed_attributes = {
         changed_person_attributes: changed_attributes,
@@ -643,11 +643,8 @@ class Person
       rel.relative_id.to_s == person.id.to_s
     end
     if existing_relationship
-      Rails.logger.info {"642 #{existing_relationship.inspect}"}
-      l_relationship = existing_relationship
-      l_relationship.kind = relationship
+      existing_relationship.kind = relationship
       save!
-      Rails.logger.info {"643 #{existing_relationship.inspect}"}
     elsif id != person.id
       self.person_relationships.build(kind: relationship, relative_id: person.id)
       save!
