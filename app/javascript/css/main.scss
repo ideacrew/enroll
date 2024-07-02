@@ -573,3 +573,8 @@ a.disabled {
   padding-bottom: ($spacer / 2);
   border-bottom: 1px solid var(--body-divider);
 }
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
+}
