@@ -326,7 +326,7 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
 end
 
 And(/(.*) should see the dental radio button/) do |role|
-  #bug logged
+  #bug logged for this issue, both health and dental radio buttons missing from UI
   expect(page).to have_css EmployeeChooseCoverage.dental_radio_btn
 end
 
