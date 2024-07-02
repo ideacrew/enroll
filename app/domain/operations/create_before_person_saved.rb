@@ -1,8 +1,11 @@
-module Operations
- class CreateBeforePersonSaved
-  include Dry::Monads[:result, :do]
+# frozen_string_literal: true
 
-    CHANGED_PERSON_ATTRIBUTES = {:first_name => :person_name, :last_name => :person_name, :dob => :person_demographics, :encrypted_ssn => :person_demographics}
+module Operations
+  # Class to update before save cv3 family payload
+  class CreateBeforePersonSaved
+    include Dry::Monads[:result, :do]
+
+    CHANGED_PERSON_ATTRIBUTES = {:first_name => :person_name, :last_name => :person_name, :dob => :person_demographics, :encrypted_ssn => :person_demographics}.freeze
 
     def call(changed_attributes, family_member)
       values = yield validate(changed_attributes, family_member)
@@ -19,7 +22,6 @@ module Operations
     end
 
     def build_before_save_cv3_family(values)
-      
       changed_attributes = values[:changed_attributes]
       family_member = values[:family_member]
 
@@ -38,11 +40,11 @@ module Operations
       Success(family_member)
     rescue StandardError => e
       Rails.logger.error { "Failed to build before save cv3 family due to #{e.message} backtrace: #{e.backtrace.join("\n")}" }
-      Failure( "Failed to build before save cv3 family due to #{e.message} backtrace: #{e.backtrace.join("\n")}")
+      Failure("Failed to build before save cv3 family due to #{e.message} backtrace: #{e.backtrace.join("\n")}")
     end
 
     def build_before_person_saved(person, changed_person_attributes)
-      changed_person_attributes.keys.each do |key|
+      changed_person_attributes.each_key do |key|
         if CHANGED_PERSON_ATTRIBUTES.include?(key)
           attributes_to_merge = {key => changed_person_attributes[key]}
           person[CHANGED_PERSON_ATTRIBUTES[key]]&.merge!(attributes_to_merge)
@@ -52,25 +54,19 @@ module Operations
 
     def build_before_addresses_saved(person, changed_address_attributes)
       changed_address_attributes.each do |address|
-        if address.keys.present?
-          person[:addresses].detect { |new_address| new_address[:kind] == address[:kind] }&.merge!(address)
-        end
+        person[:addresses].detect { |new_address| new_address[:kind] == address[:kind] }&.merge!(address) if address.keys.present?
       end
     end
 
     def build_before_phone_saved(person, changed_phone_attributes)
       changed_phone_attributes.each do |phone_attributes|
-        if phone_attributes.keys.present?
-          person[:phones].detect { |phone| phone[:kind] == phone_attributes[:kind] }&.merge!(phone_attributes)
-        end
+        person[:phones].detect { |phone| phone[:kind] == phone_attributes[:kind] }&.merge!(phone_attributes) if phone_attributes.keys.present?
       end
     end
 
     def build_before_emails_saved(person, changed_email_attributes)
       changed_email_attributes.each do |email_attributes|
-        if email_attributes.keys.present?
-          person[:emails].detect { |email| email[:kind] == email_attributes[:kind] }&.merge!(email_attributes)
-        end
+        person[:emails].detect { |email| email[:kind] == email_attributes[:kind] }&.merge!(email_attributes) if email_attributes.keys.present?
       end
     end
 
@@ -81,7 +77,7 @@ module Operations
         relative = Person.find(relative_id)
         person_relationship = person[:person_relationships].detect { |relationship| relationship[:relative][:hbx_id] == relative&.hbx_id }
         person_relationship&.merge!({:kind => person_relationship_attributes[:kind]})
-        person_relationship[:relative]&.merge!({:relationship_to_primary => person_relationship_attributes[:kind]}) 
+        person_relationship[:relative]&.merge!({:relationship_to_primary => person_relationship_attributes[:kind]})
       end
     end
   end
