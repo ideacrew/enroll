@@ -105,7 +105,7 @@
       <button type="button" class="btn button outline close_member_form hidden cancel_<%= @applicant.id %>_edit"><%= l10n("cancel") %></button>
 
       <% unless @applicant.is_primary_applicant? %>
-        <%= button_tag(id: "delete_applicant_button", class: "btn button-error outline close2") do %>
+        <%= button_tag(type: "button", id: "delete_applicant_button", class: "btn button-error outline close2") do %>
           <%= l10n('remove_member') %>
         <% end %>
       <% end %>
@@ -148,7 +148,7 @@
       }
     });
 
-    $(document).on('click', '#delete_applicant_button', function(e) {
+    $(document).on('click', 'button#delete_applicant_button', function(e) {
       e.preventDefault();
       $("#destroyApplicant").modal();
 
