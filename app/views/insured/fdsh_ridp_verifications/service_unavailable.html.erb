@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <%= render partial: 'shared/consumer_signup.html.erb', locals: {step: 1} %>
+  <%= render partial: 'shared/progress_side_nav', locals: {nav: sign_up_nav_options(1)} %>
   <h1><%= l10n("verify_identity") %></h1>
   <p><strong><%= l10n('insured.interactive_identity_verifications.service_unavailable.try_again_later') %></strong></p>
   <div class="mt-4 mb-4">
