@@ -21,10 +21,11 @@
         <% end %>
       <% else %>
         <% nav[:nav_options].each do |nav_option| %>
-          <li class="<%= 'complete' if nav[:step] > nav_option[:step] %> <%= 'active' if nav[:step] == nav_option[:step] %>">
+          <% step_complete = nav_option[:step_complete].present? nav_option[:step_complete] : (nav[:step] > nav_option[:step]) %>
+          <li class="<%= 'complete' if step_complete %> <%= 'active' if nav[:step] == nav_option[:step] %>">
             <span class="circle-progress"></span>
             <div class="vertical-line-progress"></div>
-            <a class="<%= 'disabled' unless nav[:step] > nav_option[:step] or nav[:step] == nav_option[:step] %>">
+            <a class="<%= 'future-step' unless nav[:step] > nav_option[:step] or nav[:step] == nav_option[:step] %>">
               <%= nav_option[:display_label] %>
             </a>
           </li>
