@@ -15,14 +15,15 @@ module Operations
           def call(params)
             encrypted_family_payload, job_id, @family_hbx_id = yield validate(params)
             @job = yield find_job(job_id)
+            @family = yield find_family(@family_hbx_id)
             values = yield construct_base_response_values
-            @transmission = yield create_response_transmission(values, {job: @job})
-            @transaction = yield create_response_transaction(values, {job: @job, transmission: @transmission})
+            @transmission = yield create_response_transmission(values.merge(job: @job), {job: @job})
+            @transaction = yield create_response_transaction(values.merge(transmission: @transmission, subject: @family), {job: @job, transmission: @transmission})
             decrypted_family_payload = yield decrypt_payload(encrypted_family_payload)
             parsed_family_payload = yield parse_json_payload(decrypted_family_payload)
             @entity_family = yield validate_family(parsed_family_payload)
-            family = yield add_determination
-            trigger_family_determination(family)
+            yield add_determination
+            trigger_family_determination(@family)
 
             Success("Successfully Added Family Determination")
           end
@@ -34,7 +35,16 @@ module Operations
             errors << 'encrypted_family_payload ref missing' unless params[:encrypted_family_payload]
             errors << 'job_id ref missing' unless params[:job_id]
             errors << 'family_hbx_id ref missing' unless params[:family_hbx_id]
-            errors.empty? ? Success([encrypted_family_payload, job_id, family_hbx_id]) : Failure(errors)
+            errors.empty? ? Success([params[:encrypted_family_payload], params[:job_id], params[:family_hbx_id].to_s]) : Failure(errors)
+          end
+
+          def find_family(_family_hbx_id)
+            family = Family.find_by(hbx_assigned_id: @family_hbx_id)
+            if family.present?
+              Success(family)
+            else
+              Failure("Could not find Family with hbx_id #{@family_hbx_id}")
+            end
           end
 
           def decrypt_payload(encrypted_family_payload)
@@ -99,7 +109,6 @@ module Operations
 
           def add_determination
             entity_members = @entity_family.family_members
-            family = Family.find_by(hbx_assigned_id: @family_hbx_id)
 
             entity_members.each do |entity_member|
               person_entity = entity_member.person
@@ -107,24 +116,24 @@ module Operations
               entity_verification_types = person_entity.verification_types
               alive_status_verification_entity = entity_verification_types.detect { |vt| vt.type_name == 'Alive Status' }
               entity_validation_status = alive_status_verification_entity.validation_status
-              next unless ['verified', 'outstanding'].include?(entity_validation_status)
+              next unless ['attested', 'outstanding'].include?(entity_validation_status)
 
-              person = Person.by_hbx_id(person_entity.hbx_id)
+              person = Person.by_hbx_id(person_entity.hbx_id).first
               alive_status_verification_type = person.alive_status
               from_validation_status = alive_status_verification_type.validation_status
 
               if alive_status_verification_type.present?
                 case entity_validation_status
-                when :verified
-                  alive_status_verification_type.pass_type
+                when 'attested'
+                  alive_status_verification_type.update_attributes(validation_status: 'attested')
                   person.demographics_group.alive_status.update(is_deceased: false, date_of_death: alive_status_entity.date_of_death)
-                when :outstanding
+                when 'outstanding'
                   is_enrolled = person.families.any? { |f| f.person_has_an_active_enrollment?(person) }
-                  update_validation_status(alive_status_verification_type,   (is_enrolled ? 'outstanding' : 'negative_response_received'))
+                  update_validation_status(alive_status_verification_type, (is_enrolled ? 'outstanding' : 'negative_response_received'))
                   person.demographics_group.alive_status.update(is_deceased: true, date_of_death: alive_status_entity.date_of_death)
                 end
 
-                message = "DMF Determination response for Family with hbx_id #{hbx_id} received successfully"
+                message = "DMF Determination response for Family with hbx_id #{@family_hbx_id} received successfully"
                 alive_status_verification_type.reload
                 alive_status_verification_type.add_type_history_element(action: "DMF Hub Response", modifier: "System", update_reason: message, from_validation_status: from_validation_status,
                                                                         to_validation_status: alive_status_verification_type.validation_status)
@@ -138,7 +147,7 @@ module Operations
             end
 
             update_status("DMF Family Determination successfully saved", :succeeded, { transmission: @transmission, transaction: @transaction })
-            Success(family)
+            Success("Successfully added determination for family #{@family_hbx_id}")
           rescue StandardError => e
             add_errors(
               :add_determination,
