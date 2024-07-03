@@ -11,7 +11,7 @@
          <div class="modal-questions-container">
              <% 3.times do |num| %>
                <div class="question-wrapper" data-question-index=<%= num %>>
-
+                 <label for="sec-<%= num %>">Please Select A Question</label>
                  <select class="security-question-select form-control" id="sec-<%= num %>" name="security_question_responses[][security_question_id]" required="true" >
                    <option name="id" value="">Please Select A Question</option>
                    <% SecurityQuestion.visible.each_with_index do |question, i| %>
@@ -20,7 +20,8 @@
                  </select>
 
                  <div class="input-wrapper">
-                   <%= f.text_field :question_answer, name: "security_question_responses[][question_answer]", class:'form-control', required: true %>
+                  <label for="sec-input-<%= num %>">Please Select A Question</label>
+                  <%= f.text_field :question_answer, name: "security_question_responses[][question_answer]", class:'form-control', required: true, id: "sec-input-#{num}" %>
                  </div>
                </div>
              <% end %>
