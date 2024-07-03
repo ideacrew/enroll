@@ -85,6 +85,7 @@ SHARED_TRANSLATIONS = {
 
     "en.previous_step" => "Previous Step",
     "en.save_and_exit" => "Save & Exit",
+    "en.log_out" => "Log Out",
     "en.help_sign_up" => "Help Me Sign Up",
     "en.get_help_sign_up" => "Get Help Signing Up",
     "en.close" => "Close",
