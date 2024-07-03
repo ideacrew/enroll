@@ -22,7 +22,7 @@
         <% end %>
       <% else %>
         <% nav[:nav_options].each do |nav_option| %>
-          <%= step_complete = nav_option.key?(:step_complete) ? nav_option[:step_complete] : (nav[:step] > nav_option[:step]) %>
+          <% step_complete = nav_option.key?(:step_complete) ? nav_option[:step_complete] : (nav[:step] > nav_option[:step]) %>
           <li class="<%= 'complete' if step_complete %> <%= 'active' if nav[:step] == nav_option[:step] %>">
             <span class="circle-progress"></span>
             <div class="vertical-line-progress"></div>
