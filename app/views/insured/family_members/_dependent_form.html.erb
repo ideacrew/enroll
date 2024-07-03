@@ -147,8 +147,6 @@
           <div id="remove_confirm" class="hidden"></div>
         </div>
 
-        <%= render partial: 'shared/address_change_confirmation_modal' %>
-
         <div id="add_info_buttons_<%= dependent.id %>" class="pt-2">
           <% if !dependent.persisted? %>
             <a href="#" class="btn button outline remove-new-employee-dependent" data-target="#new_employee_dependent_form">
