@@ -44,7 +44,7 @@
     <% end %>
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
   </head>
-  <body class="font">
+  <body class="font" data-controller="<%= controller.controller_name %>" data-action="<%= action_name %>">
 
     <%= render partial: './ui-components/v1/navs/header' %>
 
