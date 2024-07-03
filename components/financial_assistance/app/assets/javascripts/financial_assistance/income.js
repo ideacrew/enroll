@@ -1064,6 +1064,9 @@ $(document).on('turbolinks:load', function () {
     return isValid;
   }
 
+  $(document).on('focus', '.new-income-form .phone_number', function() {
+    $(this).mask('(000) 000-0000');
+  });
 
   $('body').on('keyup keydown keypress', '#income_employer_phone_full_phone_number', function (e) {
     var key = e.which || e.keyCode || e.charCode;
