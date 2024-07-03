@@ -8,34 +8,6 @@
         <% div_class = kind+"-div" %>
         <% style = address.object.new_record? ? "display:none;" : "display:block;" if kind == 'mailing' %>
 
-        <% if false %>
-        <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
-          <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-            <button class="btn btn-new-address disabled">NEW ADDRESS</button>
-          </div>
-          <div class="col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd address">
-            <div class="form-group form-group-lg">
-              <div class="row" style="margin: 0;">
-                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
-                <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
-                  <div class="dropdown">
-                    <button class="form-control floatlabel adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                      <label><%= kind.capitalize %> Address</label>
-                    </button>
-                  </div>
-                </div>
-                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
-              </div>
-            </div>
-          </div>
-          <% if kind == 'home' && show_no_dc_address %>
-            <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-              <% target = f.object.class.to_s.downcase %>
-            </div>
-          <% end %>
-        </div>
-        <% end %>
-
         <% if kind == 'mailing' %>
           <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
             <br>
@@ -117,7 +89,7 @@
         <% end %>
       <% end%>
     <% end %>
-    <%= render 'shared/error_warning' %>
+
   </div>
   <div class="col-md-2 key col-sm-3 col-xs-12"></div>
 </div>
