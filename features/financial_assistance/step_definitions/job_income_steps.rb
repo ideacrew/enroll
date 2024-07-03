@@ -135,7 +135,7 @@ When(/^the Add Another Job Income link appears$/) do
 end
 
 When(/^the user adds another income$/) do
-  find(IvlIapJobIncomeInformationPage.add_another_job_income).click
+  find('#new-income').double_click
 end
 
 Then(/^the new employer information should be saved on the page$/) do

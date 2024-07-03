@@ -7,7 +7,7 @@ class IvlIapJobIncomeInformationPage
     if EnrollRegistry[:bs4_consumer_flow].enabled?
 
     else
-    'has_job_income_true'
+    '#has_job_income_true'
     end
   end
 
@@ -15,7 +15,7 @@ class IvlIapJobIncomeInformationPage
     if EnrollRegistry[:bs4_consumer_flow].enabled?
 
     else
-    '#has_job_income_false'
+    '.interaction-choice-control-value-has-job-income-false'
     end
   end
 
@@ -92,7 +92,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.add_another_job_income
-    '.interaction-click-control-add-another-job-income'
+    '#new-income'
   end
 
   def self.income_cancel_btn
@@ -159,7 +159,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.self_add_another_self_employment
-    '.interaction-click-control-add-another--self-employed-income'
+    '#new-self-income'
   end
 
   def self.self_employee_edit_btn
