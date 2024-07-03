@@ -1,6 +1,6 @@
 <% if @bs4 %>
-  <%= render partial: 'shared/consumer_signup', locals: {step: 1} %>
-  <h1><%= l10n("insured.consumer_roles.upload_ridp_documents.header") %></h1>
+  <%= render partial: 'shared/progress_side_nav', locals: {nav: sign_up_nav_options(1)} %>
+  <h1><%= l10n("verify_identity") %></h1>
   <% if EnrollRegistry.feature_enabled?(:ridp_h139) %>
     <p><%= l10n("insured.consumer_roles.upload_ridp_documents.ridp_h139_info") %></p>
     <%= render partial: 'insured/fdsh_ridp_verifications/options_to_verify_identity' %>

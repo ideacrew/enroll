@@ -22,10 +22,6 @@ body {
   padding: 0.25rem;
 }
 
-.manage_sep_types .mb-4, .my-4 {
-  margin-bottom: 0.5rem !important;
-}
-
 .nm-content {
   height: calc(100vh - 175px);
   overflow-y: auto;
@@ -507,11 +503,15 @@ ul.plain {
   }
 }
 
-div.disabled *:not(:has(*)):not(button, a.button) {
+div.disabled *:not(:has(*)):not(button, a.button), div.disabled ::after {
   opacity: .4;
 }
 
 a.disabled {
   pointer-events: none;
   cursor: not-allowed;
+}
+.glossary {
+  color: var(--primary-color);
+  text-decoration: underline dashed;
 }

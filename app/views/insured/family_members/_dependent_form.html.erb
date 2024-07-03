@@ -96,7 +96,7 @@
 
           <div class="d-flex mb-md-4">
             <div class="">
-              <%= f.label :relationship, "Relationship to primary account member" %>
+              <%= f.label :relationship, l10n("relationship_to_primary_member"), class: "required" %>
               <%= f.select :relationship, relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => ""}  %>
               <a href="#relationship" data-toggle="modal" data-target="#relationship" class="d-block"><%= l10n("not_sure") %></a>
               <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>

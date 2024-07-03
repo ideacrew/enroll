@@ -404,6 +404,25 @@ module FinancialAssistance
       options << [l10n('insured.preferences.renewal_year_none', site_short_name: site_short_name), 0]
     end
 
+    def faa_nav_options(step, application, applicant)
+      nav = {}
+
+      nav[:nav_options] = applicant.present? ? applicant_faa_nav_options(application, applicant) : no_applicant_faa_nav_options(application)
+      nav[:links] = true
+      nav[:step] = step
+      nav[:title] = l10n("faa.left_nav.my_household")
+      nav[:title_link] = edit_application_path(application)
+      nav[:subheading] = l10n("faa.nav.applicant_subheader")
+
+      nav[:show_help_button] = true
+      nav[:show_exit_button] = true
+      nav[:show_previous_button] = false
+      nav[:show_account_button] = EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
+      nav[:back_to_account_flag] == true
+
+      nav
+    end
+
     def applicant_faa_nav_options(application, applicant)
       [
         {step: 1, label: l10n('faa.nav.tax_info'), link: go_to_step_application_applicant_path(application, applicant, 1), step_complete: applicant.tax_info_complete? },
@@ -439,6 +458,21 @@ module FinancialAssistance
 
     def other_questions_prompt(key, use_applicant_name = false)
       l10n("faa.other_ques.#{key}", subject: use_applicant_name ? @applicant.first_name.capitalize : l10n("faa.other_ques.this_person"))
+    end
+
+    def insurance_kind_select_options(kind)
+      insurance_kind_options = []
+      FinancialAssistance::Benefit.valid_insurance_kinds.each do |insurance_kind|
+        eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
+        term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}"
+        if I18n.exists?("glossary."+insurance_kind)
+          hr_kind = render partial:'shared/glossary', locals: {key: insurance_kind, term: l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) }
+        else
+          hr_kind = l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
+        end
+        insurance_kind_options << [ hr_kind, insurance_kind, :'data-esi' => display_esi_fields?(insurance_kind, kind), :'data-mvsq' => display_minimum_value_standard_question?(insurance_kind) ]
+      end
+      insurance_kind_options
     end
   end
 end

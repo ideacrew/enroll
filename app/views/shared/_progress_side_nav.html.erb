@@ -1,0 +1,44 @@
+<% content_for :side_nav do %>
+  <nav class="progress-nav">
+    <% if nav[:title_link].present? %>
+      <h3><a href="<%= nav[:title_link] %>"><i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i> <%= nav[:title] %></a></h3>
+    <% else %>
+      <h3><%= nav[:title] %></h3>
+    <% end %>
+
+    <% if nav[:subheading].present? %>
+      <h4><%= nav[:subheading] %></h4>
+    <% end %>
+
+    <ul class="progress-wrapper">
+      <% if nav[:links] %>
+        <% nav[:nav_options].each do |nav_option| %>
+          <% step_complete = nav_option.key?(:step_complete) ? nav_option[:step_complete] : (nav[:step] > nav_option[:step]) %>
+          <li class="<%= 'complete' if step_complete %> <%= 'active' if nav[:step] == nav_option[:step] %>">
+            <span class="circle-progress"></span>
+            <div class="vertical-line-progress"></div>
+            <a class="<%= 'future-step' unless nav[:step] > nav_option[:step] or nav[:step] == nav_option[:step] %>" href="<%= nav_option[:link] %>"><%= nav_option[:label] %></a>
+          </li>
+        <% end %>
+      <% else %>
+        <% nav[:nav_options].each do |nav_option| %>
+          <% step_complete = nav_option.key?(:step_complete) ? nav_option[:step_complete] : (nav[:step] > nav_option[:step]) %>
+          <li class="<%= 'complete' if step_complete %> <%= 'active' if nav[:step] == nav_option[:step] %>">
+            <span class="circle-progress"></span>
+            <div class="vertical-line-progress"></div>
+            <a class="<%= 'future-step' unless nav[:step] > nav_option[:step] or nav[:step] == nav_option[:step] %>">
+              <%= nav_option[:display_label] %>
+            </a>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+  </nav>
+  <%= render partial: 'shared/shopping_nav_panel',
+      locals: { show_exit_button: nav[:show_exit_button].present? ? nav[:show_exit_button] : true,
+                show_previous_button: nav[:show_previous_button].present? ? nav[:show_previous_button] : false,
+                show_account_button: nav[:show_account_button].present? ? nav[:show_account_button] : false,
+                is_complete: nav[:is_complete].present? ? nav[:is_complete] : false,
+                show_help_button: nav[:show_help_button].present? ? nav[:show_help_button] : false,
+                back_to_account_flag: nav[:back_to_account_flag].present? ? nav[:back_to_account_flag] : EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
+<% end %>
