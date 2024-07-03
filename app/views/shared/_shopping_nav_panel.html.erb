@@ -33,18 +33,9 @@
       <% if show_exit_button %>
         <li>
           <a href=<%= main_app.destroy_user_session_path %>>
-            <%= l10n("save_and_exit") %>
+            <%= l10n("log_out") %>
           </a>
         </li>
-        <% unless back_to_account_flag || @bs4 %>
-          <br>
-          <br>
-          <li>
-            <p>
-              <%= "If you select #{t('save_and_exit')}, you can save your work and continue where you left off the next time you login." %>
-            </p>
-          </li>
-        <% end %>
       <% end %>
 
       <% if show_help_button && !back_to_account_flag %>
