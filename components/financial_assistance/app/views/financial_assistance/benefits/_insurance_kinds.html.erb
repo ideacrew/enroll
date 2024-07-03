@@ -1,55 +1,119 @@
-<div class="instruction-row row row-form-wrapper no-buffer row-height">
-	<div class="col-md-10 checklist-title">
-    <span> <b class="run-glossary"> <%= text1 %> <%= render partial: "shared/glossary", locals: { key: "coverage", title: "coverage", term: "coverage" } %> <%= text2 %> </b></span>
-  </div>
-</div>
-<div class="instruction-row row row-form-wrapper lightgray no-buffer row-height">
- 	<div class="col-md-12 checklist-title-header">
-  	<span> <b> Check any boxes that apply to this person </b> and enter details when requested. </span>
-  </div>
+<% if @bs4 %>
+
+<div class="benefits-list <%= kind %> mb-4">
+  <% @applicant.benefits.where(kind: kind).each do |benefit| %>
+    <% if display_esi_fields?(benefit.insurance_kind, kind) %>
+      <%= render partial: 'esi_benefit', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: kind } %>
+    <% else %>
+      <%= render partial: 'non_esi_benefit', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: kind } %>
+    <% end %>
+  <% end %>
 </div>
 
-<br />
-<% insurance_kinds.each do |insurance_kind| %>
-  <div id="<%= insurance_kind %>"class="benefit-kind">
-    <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
-      <div class="col-md-10 benefits-check <%= insurance_kind %>">
-        <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox", data: {cuke: "#{insurance_kind}_benefit_checkbox"} %>
-        <% eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
-        <% term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
-        <% if I18n.exists?("glossary."+insurance_kind) %>
-            <%= render partial:'shared/glossary', locals: {key: insurance_kind, term: l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) } %>
-        <% else %>
-            <%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-        <% end %>
+<div id="new-benefit-form-<%= kind %>" class='new-benefit-form my-4 p-3 border rounded bg-white <%= 'hidden' if @applicant.benefits.where(kind: kind).any? %>'>
+  <%= label_tag :insurance_kind, l10n("faa.health_coverage.health_cov_type"), class:"required", for: "insurance_kind_#{kind}" %>
+  <%= select_tag :insurance_kind, options_for_select(insurance_kind_select_options(kind)), required:true, prompt: l10n("faa.health_coverage.health_cov_type"), class: "insurance-kind w-100", id: "insurance_kind_#{kind}", data: {kind: kind} %>
+  <a href="#health_cov_type_<%= kind %>" data-toggle="modal" data-target="#health_cov_type_<%= kind %>" class="d-block my-2"><%= l10n("not_sure") %></a>
+  <a tabindex="0" id="new-benefit-form-<%= kind %>_cancel" class="btn btn-error outline benefit-cancel-before-form mt-4 <%= 'hidden' unless @applicant.benefits.where(kind: kind).any? %>" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
+  <div class="modal" id="health_cov_type_<%= kind %>" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="container pt-2 pb-4 modal-content">
+        <div class="d-flex mb-4 align-items-center">
+          <div class="col-auto px-0">
+            <div class="info-icon icon" alt="Info">&nbsp;</div>
+          </div>
+          <div class="col pl-0">
+              <h5 class="modal-title"><%= l10n("faa.health_coverage.type_modal_header") %></h5>
+          </div>
+          <div class="col-auto px-0">
+            <button type="button" class="close" data-dismiss="modal" aria-label="<%= l10n("close") %>">
+              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <% FinancialAssistance::Benefit.valid_insurance_kinds.each do |insurance_kind| %>
+            <% eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
+            <% term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
+            <p class="bold mb-0 pb-0"><%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
+            <% if I18n.exists?("glossary."+insurance_kind) %>
+              <p class="mt-0 pt-0"><%= t('glossary.' + insurance_kind) %></p>
+            <% end %>
+          <% end %>
+        </div>
+        <div class="d-flex align-items-center mt-4 justify-content-end">
+          <button type="button" class="btn-primary mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>
+        </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="benefits-list <%= kind %>">
-      <% @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).each do |benefit| %>
-        <% if display_esi_fields?(benefit.insurance_kind, kind) %>
-          <%= render partial: 'esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
-        <% else %>
-          <%= render partial: 'non_esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
-        <% end %>
-      <% end %>
-    </div>
+<div id="new-benefit-esi-form-<%= kind %>" class='hidden esi'>
+  <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, kind: kind, insurance_kind: "", edit: false} %>
+</div>
+<div id="new-benefit-non-esi-form-<%= kind %>" class='hidden non-esi'>
+  <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: @applicant.benefits.build, kind: kind, insurance_kind: "", edit: false} %>
+</div>
 
-    <div class='new-benefit-form hidden <%= insurance_kind %>'>
-      <% if display_esi_fields?(insurance_kind, kind) %>
-        <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
-      <% else %>
-        <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
-      <% end %>
-    </div>
-    <div class="col-md-12 add-more-link-<%=insurance_kind%>" id="add-more-link">
-      <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_insurance_kind')" id="add_new_insurance_kind" class="<%= 'hidden' unless @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present? %>">
-        <span class="fa-icon fa-stack plus-mr" aria-hidden="true">
-          <i class="fa fa-circle-thin fa-stack-2x"></i>
-          <i class="fa fa-plus fa-stack-1x"></i>
-        </span>
-        <b> <%= l10n("add_more") %> </b> <%= l10n("faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-      </a>    
+<button tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_insurance_kind')" id="add_new_benefit_kind_<%= kind %>" class="button secondary add_new_benefit_kind <%= 'hidden' unless @applicant.benefits.where(kind: kind).any? %>" data-kind="<%= kind %>">
+  <%= l10n("faa.health_coverage.add_cov_type") %>
+</button>
+
+<% else %>
+  <div class="instruction-row row row-form-wrapper no-buffer row-height">
+    <div class="col-md-10 checklist-title">
+      <span> <b class="run-glossary"> <%= text1 %> <%= render partial: "shared/glossary", locals: { key: "coverage", title: "coverage", term: "coverage" } %> <%= text2 %> </b></span>
     </div>
   </div>
+  <div class="instruction-row row row-form-wrapper lightgray no-buffer row-height">
+    <div class="col-md-12 checklist-title-header">
+      <span> <b> Check any boxes that apply to this person </b> and enter details when requested. </span>
+    </div>
+  </div>
+
+  <br />
+  <% insurance_kinds.each do |insurance_kind| %>
+    <div id="<%= insurance_kind %>"class="benefit-kind">
+      <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
+        <div class="col-md-10 benefits-check <%= insurance_kind %>">
+          <%= check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox", data: {cuke: "#{insurance_kind}_benefit_checkbox"} %>
+          <% eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
+          <% term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
+          <% if I18n.exists?("glossary."+insurance_kind) %>
+              <%= render partial:'shared/glossary', locals: {key: insurance_kind, term: l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) } %>
+          <% else %>
+              <%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="benefits-list <%= kind %>">
+        <% @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).each do |benefit| %>
+          <% if display_esi_fields?(benefit.insurance_kind, kind) %>
+            <%= render partial: 'esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
+          <% else %>
+            <%= render partial: 'non_esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class='new-benefit-form hidden <%= insurance_kind %>'>
+        <% if display_esi_fields?(insurance_kind, kind) %>
+          <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
+        <% else %>
+          <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
+        <% end %>
+      </div>
+      <div class="col-md-12 add-more-link-<%=insurance_kind%>" id="add-more-link">
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_insurance_kind')" id="add_new_insurance_kind" class="<%= 'hidden' unless @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present? %>">
+          <span class="fa-icon fa-stack plus-mr" aria-hidden="true">
+            <i class="fa fa-circle-thin fa-stack-2x"></i>
+            <i class="fa fa-plus fa-stack-1x"></i>
+          </span>
+          <b> <%= l10n("add_more") %> </b> <%= l10n("faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+        </a>
+      </div>
+    </div>
+  <% end %>
 <% end %>

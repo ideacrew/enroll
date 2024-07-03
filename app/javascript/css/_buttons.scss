@@ -65,6 +65,7 @@
     border-color: var(--grey-040);
     color: var(--grey-090);
     cursor: not-allowed;
+    pointer-events: none;
   }
 }
 
