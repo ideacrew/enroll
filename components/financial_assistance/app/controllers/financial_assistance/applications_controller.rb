@@ -383,7 +383,6 @@ module FinancialAssistance
 
     def resolve_layout
       case action_name
-      # TODO: update review step to use correct (homepage?) layout
       when "edit", "submit_your_application", "preferences", "review_and_submit", "review", "step", "eligibility_response_error", "application_publish_error"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
       when "application_year_selection", "application_checklist"
