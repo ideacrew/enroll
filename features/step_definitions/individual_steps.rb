@@ -462,8 +462,13 @@ end
 
 Then(/^.+ is on the Help Paying for Coverage page/) do
   expect(page).to have_content IvlIapHelpPayingForCoverage.your_application_for_premium_reductions_text
-  #expect(find('.pb-1')).to_not be(nil) if EnrollRegistry[:mainecare_cubcare_glossary].enabled?
-  #follow up if this can be reomved 
+  if EnrollRegistry[:mainecare_cubcare_glossary].enabled?  
+  expect(find('.weight-n.required')).to_not be(nil)
+  expect(page).to have_css('.glossary', text:'Cub Care')
+  find('span[data-title="Cub Care"]').click
+  expect(page).to have_content(IvlIapHelpPayingForCoverage.cubcare_glossary_text)
+  find('div[class="mt-4 mb-4"]').click
+  end
 end
 
 Then(/^.+ does not apply for assistance and clicks continue/) do

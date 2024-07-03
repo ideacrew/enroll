@@ -30,4 +30,8 @@ class IvlIapHelpPayingForCoverage
   def self.your_application_for_premium_reductions_text
     'Your Application for Premium Reductions'
   end
+
+  def self.cubcare_glossary_text
+    'The Children’s Health Insurance Program (also referred to as Cub Care in Maine) offers no cost or low-cost health coverage to children aged 0-19 if their household income is too high to qualify for MaineCare'
+  end
 end
