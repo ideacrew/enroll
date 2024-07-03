@@ -1,8 +1,8 @@
 <% if @bs4 %>
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 1} %>
   <%= form_for @applicant, url: {action: "save_tax_info"}, method: :put do |f| %>
-    <h1 data-cuke="tax_info_header"><%= l10n("faa.tax_info.header", person: @applicant.first_name) %></h1>
-    <p><%= l10n("faa.tax_info.subheader") %></p>
+    <h1 data-cuke="tax_info_header"><%= l10n("faa.tax_info.header") %></h1>
+    <p><%= l10n("faa.tax_info.subheader", person: @applicant.first_name) %></p>
     <fieldset>
       <legend id="is_required_to_file_taxes" class="weight-n required">
         <%= l10n("faa.tax_info.question1", year: assistance_year) %>
@@ -43,7 +43,7 @@
     <div class="my-4 hide filing-as-head-of-household">
       <fieldset>
         <legend id="is_filing_as_head_of_household" class="weight-n required">
-          <%= l10n("faa.tax_info.question3") %>
+          <%= l10n("faa.filing_as_head_of_household") %>
         </legend>
         <div class="focus d-flex align-items-center">
           <label for="is_filing_as_head_of_household_yes" class="radio">
