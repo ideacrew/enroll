@@ -291,15 +291,17 @@
 						icon: "warning"
 					});
 				}
-
 				if (count <= 3) {
           plansToCompareArray.push(hios)
+          plansToCompareArray = uniqueValues(plansToCompareArray)
 				}
 			}
 		})
 	}
 
   function compareResults() {
+    console.log(plansToCompareArray)
+    console.log(uniqueValues(plansToCompareArray))
     uri = document.getElementById('compareBtn').dataset.uri;
   	$.ajax({
   		type: "GET",
@@ -311,4 +313,16 @@
   	}
   	});
   }
+
+  function uniquePlans(ids) {
+    console.log(ids);
+    console.log(uniqueValues(ids));
+    uniqueValues(ids)
+  }
+
+  function uniqueValues(array) {
+    let map = new Map();
+    array.forEach(value => map.set(value, value));
+    return [...map.values()];
+  };
 </script>

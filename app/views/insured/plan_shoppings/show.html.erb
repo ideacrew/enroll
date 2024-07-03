@@ -6,7 +6,7 @@
   <div class="select_plan_wrapper" id="plan_shoppings_show_form">
     <h1><%= l10n("insured.plan_shoppings.show.title") %></h1>
     <p><%= @coverage_kind == "health" ? l10n("insured.plan_shoppings.show.health_title.content") : l10n("insured.plan_shoppings.show.dental_title.content")%></p>
-
+    <a class="back btn outline my-2" href="#"><%= l10n("previous_step") %></a>
     <%= render "shared/plan_shoppings/more_plan_details" %>
 
     <div id="plan-summary"></div>
@@ -25,7 +25,7 @@
         <h2>Plan Results</h2>
         <% if true #@market_kind == "individual" || @market_kind == 'coverall' %>
           <button class="button button-primary ivl-compare-selected-plans-link hidden" data-cuke="ivl-compare-selected-plans-link" id="compareBtn"
-            data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+            data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind, bs4: @bs4) %>">
             <%= l10n("compare_plans") %>
           </button>
         <% end %>

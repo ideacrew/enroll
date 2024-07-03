@@ -282,5 +282,10 @@ GLOSSARY_TRANSLATIONS = {
     "en.glossary.generic_make_payments_hover" => "Go to your insurance company’s payment portal to make a new payment or manage your existing payments.",
     "en.glossary.aptc_amount_title_info" => "If you submitted a formal application for financial assistance before shopping for coverage and were approved to receive Advanced Premium Tax Credit savings to reduce your monthly insurance premiums, the amount you’ll save is listed in this column.",
     "en.glossary.metal_level" => "Plans use metal levels as an easy way to help indicate how generous they are in paying expenses. Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan.",
-    "en.glossary.plan_type_title_info" => "The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you'll pay."
+    "en.glossary.plan_type_title_info" => "The plan type you choose impacts which doctors you can see, whether or not you can use out-of-network providers, and how much you'll pay.",
+    "en.glossary..hsa_eligible_title_info" => "Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them.",
+    "en.glossary.network_title_into" => "Doctors, specialists, other providers, facilities and suppliers that a health insurance company contracts with to provide health care services to plan members.",
+    "en.glossary.hc4cc_eligible_title_info" => "Plans that are eligible for premium reductions. HC4CC eligible plans",
+    "en.glossary.filter_by_carrier" => "Filter by the carrier",
+    "en.glossary.premium_amount_title_info" => "Will filter by Your Cost",
 }
