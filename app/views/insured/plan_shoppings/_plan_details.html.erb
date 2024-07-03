@@ -300,6 +300,8 @@
 	}
 
   function compareResults() {
+    console.log(plansToCompareArray)
+    console.log(uniqueValues(plansToCompareArray))
     uri = document.getElementById('compareBtn').dataset.uri;
   	$.ajax({
   		type: "GET",
