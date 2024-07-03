@@ -29,5 +29,6 @@ DEVISE_TRANSLATIONS = {
   :'en.devise.requirement5' => "Must contain at least one lowercase letter",
   :'en.devise.requirement6' => "Must contain at least one number",
   :'en.devise.requirement7' => "Must contain at least one character that isn’t a number or letter",
-  :'en.devise.requirement8' => "Email must be in the following format",
+  :'en.devise.requirement8_1' => "Email must be in the following format",
+  :'en.devise.requirement8_2' => "‘example@domain.com’",
 }
