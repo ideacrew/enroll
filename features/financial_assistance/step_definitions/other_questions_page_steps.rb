@@ -63,7 +63,7 @@ Given(/^all applicants fill all pages except other questions$/) do
     find(:xpath, '//*[@id="btn-continue"]').click
 
     find('#has_enrolled_health_coverage_false').click
-    find('#has_eligible_health_coverage_false').click
+    find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn).click
 
     find(:xpath, '//*[@id="btn-continue"]').click
   end
@@ -159,9 +159,9 @@ And(/^the user enters a pregnancy end date of one month ago$/) do
 end
 
 And(/^the user answers two for how many children$/) do
-  find(".selectric-interaction-choice-control-children-expected-count").click
+  find('div[class="col-lg-3 col-md-3 fa-select select-box"]').click
   sleep 1
-  find('.interaction-choice-control-children-expected-count-2', match: :first).click
+  find('li[data-index="2"]').click
 end
 
 Given(/^the user answers yes to being a primary caregiver$/) do

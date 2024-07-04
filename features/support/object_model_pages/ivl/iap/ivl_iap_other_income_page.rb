@@ -7,7 +7,7 @@ class IvlIapOtherIncomePage
     if EnrollRegistry[:bs4_consumer_flow].enabled?
     
     else
-      'has_unemployment_income_true'
+      '#has_unemployment_income_true'
     end
   end
 

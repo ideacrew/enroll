@@ -226,7 +226,8 @@ When(/^all applicants are in Info Completed state$/) do
     find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
 
     find("#has_enrolled_health_coverage_false", wait: 10).click
-    find("#has_eligible_health_coverage_false", wait: 10).click
+    
+    find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn, wait: 10).click
     find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
 
     find("#is_pregnant_no", wait: 10).click

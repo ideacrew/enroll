@@ -184,11 +184,11 @@ class IvlIapHealthCoveragePage
   end
 
   def self.has_eligible_health_coverage_yes_radiobtn
-    'has_eligible_health_coverage_true'
+    '#has_eligibility_changed_true'
   end
 
   def self.has_eligible_health_coverage_no_radiobtn
-    '#has_eligible_health_coverage_false'
+    '#has_eligibility_changed_false'
   end
 
   def self.not_sure_has_eligible_health_coverage_link

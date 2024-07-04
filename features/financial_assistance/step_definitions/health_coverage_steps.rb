@@ -35,7 +35,7 @@ Then(/^the other health coverage choices should not show$/) do
 end
 
 Given(/^the user answers yes to currently having access to other health coverage$/) do
-  choose('has_eligible_health_coverage_true')
+  find(IvlIapHealthCoveragePage.has_eligible_health_coverage_yes_radiobtn).click
 end
 
 Then(/^the other health coverage choices should show$/) do
@@ -44,7 +44,6 @@ end
 
 Given(/^the user checks a health coverage checkbox$/) do
   skip_this_scenario unless ::FinancialAssistanceRegistry.feature_enabled?(:acf_refugee_medical_assistance)
-
   find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']").set(true)
 end
 

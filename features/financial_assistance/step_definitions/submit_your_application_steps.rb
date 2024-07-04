@@ -102,7 +102,7 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     find(IvlIapTaxInformationPage.file_taxes_no_radiobtn).click
     find(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn).click
     find(IvlIapTaxInformationPage.continue_btn).click
-    choose(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn)
+    find(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn).click
     sleep 1
     fill_in IvlIapJobIncomeInformationPage.employer_name, with: 'GloboGym'
     fill_in IvlIapJobIncomeInformationPage.income_amount, with: '100'
@@ -127,7 +127,7 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     find(IvlIapJobIncomeInformationPage.continue_btn).click
 
     if FinancialAssistanceRegistry[:unemployment_income].enabled?
-      choose(IvlIapOtherIncomePage.has_unemployment_income_yes_radiobtn)
+      find(IvlIapOtherIncomePage.has_unemployment_income_yes_radiobtn).click
       sleep 1
       fill_in IvlIapOtherIncomePage.income_amount, with: '100'
       fill_in IvlIapOtherIncomePage.income_from, with: '1/1/2018'
@@ -136,13 +136,12 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
       find(IvlIapOtherIncomePage.unemployment_save_btn).click
     end
     find(IvlIapOtherIncomePage.has_other_income_yes_radiobtn).click
-
     sleep 1
-    
     find('.other-income-checkbox-interest.interaction-choice-control-value-other-income-kind').click
-    
+  
     fill_in IvlIapOtherIncomePage.income_amount, with: '100'
     fill_in IvlIapOtherIncomePage.income_from, with: '1/1/2018'
+    
     find(IvlIapOtherIncomePage.interest_how_often_dropdown).click
     find(IvlIapOtherIncomePage.interest_select_yearly).click
 
