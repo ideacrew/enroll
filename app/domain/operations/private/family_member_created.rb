@@ -11,7 +11,6 @@ module Operations
 
           values = yield validate(family_member)
           build_and_publish_cv3_family(values)
-
         end
 
         Private
@@ -28,9 +27,11 @@ module Operations
           if family.present?
             cv3_family = build_cv3_family(family)
             if cv3_family.success?
-              event('events.families.created_or_updated', attributes: cv3_family.success, headers: headers)&.success&.publish
+              event('events.families.created_or_updated', attributes: {after_save_version: cv3_family.success}, headers: headers)&.success&.publish
+              Rails.logger.info { "Successfully published 'events.families.created_or_updated' for family member with hbx_id: #{family_member&.person&.hbx_id}" }
+              return Success(family_member)
             else
-              return Failure("Failed to build cv3 family for family member: #{family_member.person.hbx_id} due to #{cv3_family.failure}")
+              return Failure("Failed to build cv3 family for family member: #{family_member&.person&.hbx_id} due to #{cv3_family.failure}")
             end
           else
             return Failure("Family not found for family member: #{family_member.person.hbx_id}")
