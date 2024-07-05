@@ -263,7 +263,7 @@ module Insured::FamiliesHelper
     label = group[condition] || { text: enrollment.aasm_state.to_s.titleize, color: 'grey' }
     # Coverage reinstated is a special case where the aasm state is something else but we want to show it as reinstated in "green" (active) scenarios
     label = state_groups[:coverage_reinstated][:default] if enrollment.is_reinstated_enrollment? && label[:color] == 'green'
-    content_tag(:span, label[:text], class: "label label-#{label[:color]}")
+    content_tag(:span, label[:text], class: "label label-#{label[:color]} px-2")
   end
 
   def determine_condition(enrollment, enrollment_state)
