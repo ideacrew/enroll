@@ -255,12 +255,12 @@
         </div>
         <div class="col-md-6 mt11">
           <div class="col-md-3 no-padding">
-            <%= radio_button_tag("has_eligibility_changed", true, @applicant.has_eligibility_changed?, class: "radio-yml" ) %>
-            <label class="radio-yml" for="eligible_for_health_coverage_yes"><%=l10n("yes")%></label>
+            <%= radio_button_tag("has_eligible_health_coverage", true, @applicant.has_eligible_health_coverage, class: "radio-yml", id: "has_eligible_health_coverage_true" ) %>
+            <label class="radio-yml" for="has_eligible_health_coverage_true"><%=l10n("yes")%></label>
           </div>
           <div class="col-md-3 no-padding">
-            <%= radio_button_tag("has_eligibility_changed", false, @applicant.has_eligibility_changed == false, class: "radio-yml" ) %>
-            <label class="radio-yml" for="ineligible_for_health_coverage_no"><%=l10n("no")%></label>
+            <%= radio_button_tag("has_eligible_health_coverage", false, @applicant.has_eligible_health_coverage == false, class: "radio-yml", id: "has_eligible_health_coverage_false" ) %>
+            <label class="radio-yml" for="has_eligible_health_coverage_false"><%=l10n("no")%></label>
           </div>
           <div class="col-md-6 left-seprator">
             <a href="#<%= applicant_eligibly_enrolled_key%>" data-toggle="modal" data-target="#<%= applicant_eligibly_enrolled_key%>" class="interaction-click-control-not-sure?">Not sure?</a>
