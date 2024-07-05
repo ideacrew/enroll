@@ -94,7 +94,7 @@ module NavigationHelper
 
     nav[:show_help_button] = show_help_button ? true : (step != 1 && step < 6)
     nav[:show_exit_button] = !['match', 'search'].include?(action_name) && step < 6
-    nav[:show_previous_button] = false
+    nav[:show_previous_button] = true
     nav[:show_account_button] = step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
     nav[:is_complete] = step == 6
     nav[:back_to_account_flag] == false
