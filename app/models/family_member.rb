@@ -168,9 +168,15 @@ class FamilyMember
 
   private
 
+  def publish_private_family_member_created_event
+    ::Operations::Private::FamilyMemberCreated.new.call(self)
+  end
+
   def family_member_created
     deactivate_tax_households
     create_financial_assistance_applicant
+    publish_private_family_member_created_event
+    #rescue here?
   end
 
   def notify_family
