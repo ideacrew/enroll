@@ -10,7 +10,7 @@ Given(/^all applicants fill all pages except other questions$/) do
     sleep 1
     find('#has_job_income_true').click
     sleep 1
-    #bug logged for this employer details missing from application
+
     fill_in 'income[employer_name]', with: 'GloboGym'
     fill_in 'income[amount]', with: '100'
     fill_in 'income[start_on]', with: '1/1/2018'
