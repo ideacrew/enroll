@@ -8,7 +8,6 @@ RSpec.describe ::Operations::Private::PersonSaved, dbclean: :after_each do
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let(:dependent) { FactoryBot.create(:person, :with_consumer_role, dob: Date.today - 30.years) }
 
-
   describe 'Success' do
     let(:changed_attributes) do
       {changed_person_attributes: {first_name: 'John', last_name: "Fitz", encrypted_ssn: 'New Encrypted SSN', dob: TimeKeeper.date_of_record - 20.years},
@@ -17,7 +16,6 @@ RSpec.describe ::Operations::Private::PersonSaved, dbclean: :after_each do
        changed_email_attributes: [{:kind => "home", :address => "test@test.com", :updated_at => TimeKeeper.date_of_record}],
        changed_relationship_attributes: [{:kind => 'child', :relative_id => dependent.id, :updated_at => nil}] }
     end
-    let(:subject) { ::Operations::Private::PersonSaved.new }
     let(:params) { {changed_attributes: changed_attributes, after_save_version: person.to_hash} }
     let(:headers) {{after_updated_at: person.updated_at, before_updated_at: person.updated_at - 1.second}}
 
