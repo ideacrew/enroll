@@ -111,39 +111,7 @@ module Operations
             entity_members = @entity_family.family_members
 
             entity_members.each do |entity_member|
-              person_entity = entity_member.person
-              alive_status_entity = person_entity.person_demographics.alive_status
-              entity_verification_types = person_entity.verification_types
-              alive_status_verification_entity = entity_verification_types.detect { |vt| vt.type_name == 'Alive Status' }
-              entity_validation_status = alive_status_verification_entity.validation_status
-              next unless ['attested', 'outstanding'].include?(entity_validation_status)
-
-              person = Person.by_hbx_id(person_entity.hbx_id).first
-              alive_status_verification_type = person.alive_status
-              from_validation_status = alive_status_verification_type.validation_status
-
-              if alive_status_verification_type.present?
-                case entity_validation_status
-                when 'attested'
-                  alive_status_verification_type.update_attributes(validation_status: 'attested')
-                  person.demographics_group.alive_status.update(is_deceased: false, date_of_death: alive_status_entity.date_of_death)
-                when 'outstanding'
-                  is_enrolled = person.families.any? { |f| f.person_has_an_active_enrollment?(person) }
-                  update_validation_status(alive_status_verification_type, (is_enrolled ? 'outstanding' : 'negative_response_received'))
-                  person.demographics_group.alive_status.update(is_deceased: true, date_of_death: alive_status_entity.date_of_death)
-                end
-
-                message = "DMF Determination response for Family with hbx_id #{@family_hbx_id} received successfully"
-                alive_status_verification_type.reload
-                alive_status_verification_type.add_type_history_element(action: "DMF Hub Response", modifier: "System", update_reason: message, from_validation_status: from_validation_status,
-                                                                        to_validation_status: alive_status_verification_type.validation_status)
-              else
-                add_errors(
-                  :add_determination,
-                  "Alive status verification type not present for  member hbx_id: #{person.hbx_id}",
-                  { transmission: @transmission, transaction: @transaction}
-                )
-              end
+              process_member(entity_member)
             end
 
             update_status("DMF Family Determination successfully saved", :succeeded, { transmission: @transmission, transaction: @transaction })
@@ -158,6 +126,47 @@ module Operations
             Failure("unable to update Alive Status Verification Type for family : #{@family_hbx_id} , error: #{e}")
           end
 
+          def process_member(entity_member)
+            person_entity = entity_member.person
+            alive_status_entity = person_entity.person_demographics.alive_status
+            entity_verification_types = person_entity.verification_types
+            alive_status_verification_entity = entity_verification_types.detect { |vt| vt.type_name == 'Alive Status' }
+            entity_validation_status = alive_status_verification_entity.validation_status
+            return unless ['attested', 'outstanding'].include?(entity_validation_status)
+
+            person = Person.by_hbx_id(person_entity.hbx_id).first
+            alive_status_verification_type = person.alive_status
+
+            if alive_status_verification_type.present?
+              add_member_determination(alive_status_verification_type, entity_validation_status, person, alive_status_entity)
+            else
+              add_errors(
+                :add_determination,
+                "Alive status verification type not present for  member hbx_id: #{person.hbx_id}",
+                { transmission: @transmission, transaction: @transaction}
+              )
+            end
+          end
+
+          def add_member_determination(alive_status_verification_type, entity_validation_status, person, alive_status_entity)
+            from_validation_status = alive_status_verification_type.validation_status
+
+            case entity_validation_status
+            when 'attested'
+              alive_status_verification_type.update_attributes(validation_status: 'attested')
+              person.demographics_group.alive_status.update(is_deceased: false, date_of_death: alive_status_entity.date_of_death)
+            when 'outstanding'
+              is_enrolled = person.families.any? { |f| f.person_has_an_active_enrollment?(person) }
+              update_validation_status(alive_status_verification_type, (is_enrolled ? 'outstanding' : 'negative_response_received'))
+              person.demographics_group.alive_status.update(is_deceased: true, date_of_death: alive_status_entity.date_of_death)
+            end
+
+            message = "DMF Determination response for Family with hbx_id #{@family_hbx_id} received successfully"
+            alive_status_verification_type.reload
+            alive_status_verification_type.add_type_history_element(action: "DMF Hub Response", modifier: "System", update_reason: message, from_validation_status: from_validation_status,
+                                                                    to_validation_status: alive_status_verification_type.validation_status)
+          end
+
           def update_validation_status(alive_status_verification_type, new_validation_status)
             verification_document_due = EnrollRegistry[:bulk_call_verification_due_in_days].item
 
@@ -167,7 +176,6 @@ module Operations
                        new_validation_status
                      end
             attrs = {:validation_status => status, :due_date => (TimeKeeper.date_of_record + verification_document_due.days), :due_date_type => 'bulk_response_from_hub'}
-
 
             alive_status_verification_type.update_attributes(attrs)
           end

@@ -3,8 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination, dbclean: :after_each do
-    # include Dry::Monads[:result, :do]
-
   let(:person) do
     p = FactoryBot.create(:person, :with_consumer_role, hbx_id: cv3_family_payload[:family_members][0][:person][:hbx_id])
     p.update_attributes(ssn: cv3_family_payload[:family_members][0][:person][:person_demographics][:ssn])
@@ -22,18 +20,22 @@ RSpec.describe Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination, dbclean: :aft
   end
 
   context "when member is not enrolled" do
-    it "should set the verification status to NRR" do
-      result = described_class.new.call({encrypted_family_payload: encrypted_family_payload, job_id: job.job_id, family_hbx_id: family.hbx_assigned_id})
+    before do
+      @result = described_class.new.call({encrypted_family_payload: encrypted_family_payload, job_id: job.job_id, family_hbx_id: family.hbx_assigned_id})
       person.reload
+      family.reload
+    end
 
+    it "should set the verification status to NRR" do
       alive_status = person.demographics_group.alive_status
       alive_status_type = person.verification_types.last
-      expect(result).to be_success
+      expect(@result).to be_success
       expect(alive_status_type.validation_status).to eq("negative_response_received")
       expect(alive_status.is_deceased).to be_truthy
       expect(alive_status.date_of_death.present?).to be_truthy
+    end
 
-      family.reload
+    it "should set the family eligibility determination objects" do
       expect(family.eligibility_determination.outstanding_verification_status).to eq("not_enrolled")
       expect(family.eligibility_determination.subjects[0].eligibility_states[1].evidence_states.last.status).to eq(:negative_response_received)
     end
@@ -64,21 +66,24 @@ RSpec.describe Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination, dbclean: :aft
       hbx_enrollment
     end
 
-    it "should set the verification status to outstanding" do
-      result = described_class.new.call({encrypted_family_payload: encrypted_family_payload, job_id: job.job_id, family_hbx_id: family.hbx_assigned_id})
+    before do
+      @result = described_class.new.call({encrypted_family_payload: encrypted_family_payload, job_id: job.job_id, family_hbx_id: family.hbx_assigned_id})
       person.reload
+      family.reload
+    end
+
+    it "should set the verification status to outstanding" do
       alive_status = person.demographics_group.alive_status
       alive_status_type = person.verification_types.alive_status_type.last
       expect(result).to be_success
       expect(alive_status_type.validation_status).to eq("outstanding")
       expect(alive_status.is_deceased).to be_truthy
       expect(alive_status.date_of_death.present?).to be_truthy
+    end
 
-      family.reload
+    it "should set the family eligibility determination objects" do
       expect(family.eligibility_determination.outstanding_verification_status).to eq("outstanding")
       expect(family.eligibility_determination.subjects[0].eligibility_states[1].evidence_states.last.status).to eq(:outstanding)
     end
   end
-
-
 end
