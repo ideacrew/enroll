@@ -75,7 +75,7 @@ RSpec.describe Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination, dbclean: :aft
     it "should set the verification status to outstanding" do
       alive_status = person.demographics_group.alive_status
       alive_status_type = person.verification_types.alive_status_type.last
-      expect(result).to be_success
+      expect(@result).to be_success
       expect(alive_status_type.validation_status).to eq("outstanding")
       expect(alive_status.is_deceased).to be_truthy
       expect(alive_status.date_of_death.present?).to be_truthy
