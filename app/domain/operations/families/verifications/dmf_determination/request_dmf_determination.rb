@@ -65,6 +65,8 @@ module Operations
               # specify in description which family in bulk call
               description: "#{@job.description}: individual call for family with hbx_id #{hbx_id}",
               correlation_id: hbx_id,
+              transmission_id: hbx_id,
+              transaction_id: hbx_id,
               started_at: DateTime.now,
               publish_on: DateTime.now,
               event: 'initial',
