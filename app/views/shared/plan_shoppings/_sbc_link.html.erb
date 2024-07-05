@@ -1,29 +1,59 @@
-<% custom_css = (defined? custom_css) ? custom_css : false %>
-<% if plan.sbc_document.present? %>
-  <% plan_kind = (plan.try(:kind) || plan.try(:coverage_kind)).to_s %>
-  <% link_text = "Summary of Benefits and Coverage" %>
-  <% link_text_class = "Summary-of-Benefits-and-Coverage" %>
-  <% link_text = "Plan Summary" unless plan_kind == "health" %>
-  <% link_text_class = "plan-summary" unless plan_kind == "health" %>
-  <% icon_class = "pull-left" unless plan_kind == "health" %>
-  <% text_class = "health" %>
-  <% text_class = "dental" unless plan_kind == "health" %>
 
-  <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
-  <% plan_name = plan.try(:title) || plan.try(:name) %>
-  <% id = (defined? hbx_id) ? "plan_doc_#{hbx_id}" : "summary_benefits" %>
-  <a href="<%= main_app.document_product_sbc_download_path(plan.sbc_document.id) + "?product_id=#{plan.id}&content_type=application/pdf&filename=#{plan_name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" %>" class="sbc_link <%= text_class %> vertically-aligned-row" target="_blank" rel="noopener noreferrer" id="<%= id %>">
-    <% if custom_css.present? %>
-      <i class="fa fa-file-pdf-o fa-2x pull-left" ></i>
-      <div class="fa-icon-label <%= text_class %> col-xs-11 enrollment-tile-summary" style="display: inline; font-size: 10px;"><%= link_text %></div>
-    <% else %>
-      <i class="far fa-file-pdf fa-2x <%= icon_class %>" ></i>
+<% if @bs4 %>
+  <% if plan.sbc_document.present? %>
+    <% plan_kind = (plan.try(:kind) || plan.try(:coverage_kind)).to_s %>
+    <% link_text = "Summary of Benefits and Coverage" %>
+    <% link_text_class = "Summary-of-Benefits-and-Coverage" %>
+    <% link_text = "Plan Summary" unless plan_kind == "health" %>
+    <% link_text_class = "plan-summary" unless plan_kind == "health" %>
+    <% text_class = "health" %>
+    <% text_class = "dental" unless plan_kind == "health" %>
+
+    <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
+    <% plan_name = plan.try(:title) || plan.try(:name) %>
+    <% id = (defined? hbx_id) ? "plan_doc_#{hbx_id}" : "summary_benefits" %>
+
+    <a href="<%= main_app.document_product_sbc_download_path(plan.sbc_document.id) + "?product_id=#{plan.id}&content_type=application/pdf&filename=#{plan_name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" %>"
+      class="sbc_link <%= text_class %> vertically-aligned-row text-decoration-none" target="_blank" rel="noopener noreferrer" id="<%= id %>">
+      <i class="far fa-file-pdf" ></i>
       <span class = "<%= link_text_class %> col-xs-11 enrollment-tile-summary"><%= link_text %></span>
-    <% end %>
-  </a>
+    </a>
+  <% else %>
+    <a class="vertically-aligned-row text-decoration-none" data-target="#">
+      <i class="far fa-file-pdf no-plan-sbc-doc-found"></i>
+      <span class="<%= link_text_class %> col-xs-11 enrollment-tile-summary">No Document Found</span>
+    </a>
+  <% end %>
+
+
 <% else %>
-  <a class="vertically-aligned-row" data-target="#">
-    <i class="far fa-file-pdf fa-2x  <%= text_class %> no-plan-sbc-doc-found"></i>
-    <span class="<%= link_text_class %> col-xs-11 enrollment-tile-summary">No Document Found</span>
-  </a>
+  <% custom_css = (defined? custom_css) ? custom_css : false %>
+  <% if plan.sbc_document.present? %>
+    <% plan_kind = (plan.try(:kind) || plan.try(:coverage_kind)).to_s %>
+    <% link_text = "Summary of Benefits and Coverage" %>
+    <% link_text_class = "Summary-of-Benefits-and-Coverage" %>
+    <% link_text = "Plan Summary" unless plan_kind == "health" %>
+    <% link_text_class = "plan-summary" unless plan_kind == "health" %>
+    <% icon_class = "pull-left" unless plan_kind == "health" %>
+    <% text_class = "health" %>
+    <% text_class = "dental" unless plan_kind == "health" %>
+
+    <% key, bucket = get_key_and_bucket(plan.sbc_document.identifier) %>
+    <% plan_name = plan.try(:title) || plan.try(:name) %>
+    <% id = (defined? hbx_id) ? "plan_doc_#{hbx_id}" : "summary_benefits" %>
+    <a href="<%= main_app.document_product_sbc_download_path(plan.sbc_document.id) + "?product_id=#{plan.id}&content_type=application/pdf&filename=#{plan_name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" %>" class="sbc_link <%= text_class %> vertically-aligned-row" target="_blank" rel="noopener noreferrer" id="<%= id %>">
+      <% if custom_css.present? %>
+        <i class="fa fa-file-pdf-o fa-2x pull-left" ></i>
+        <div class="fa-icon-label <%= text_class %> col-xs-11 enrollment-tile-summary" style="display: inline; font-size: 10px;"><%= link_text %></div>
+      <% else %>
+        <i class="far fa-file-pdf fa-2x <%= icon_class %>" ></i>
+        <span class = "<%= link_text_class %> col-xs-11 enrollment-tile-summary"><%= link_text %></span>
+      <% end %>
+    </a>
+  <% else %>
+    <a class="vertically-aligned-row" data-target="#">
+      <i class="far fa-file-pdf fa-2x  <%= text_class %> no-plan-sbc-doc-found"></i>
+      <span class="<%= link_text_class %> col-xs-11 enrollment-tile-summary">No Document Found</span>
+    </a>
+  <% end %>
 <% end %>

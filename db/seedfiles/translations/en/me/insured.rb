@@ -221,6 +221,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.enrollments' => "Enrollment(s)",
   :'en.enrollment_history_nav_label' => "Enrollments",
   :'en.enrollment_history_title' => "Enrollment History",
+  :'en.enrollment_history.show_all' => "Show All Enrollments",
+  :'en.enrollment_history.hide_all' => "Hide Inactive Enrollments",
   :'en.no_current_or_past_enrollments' => "No current or past enrollments on %{short_name}.",
   :'en.open' => "Open",
   :'en.info_complete' => "Info Complete",
