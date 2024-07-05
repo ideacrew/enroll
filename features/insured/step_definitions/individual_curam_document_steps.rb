@@ -4,7 +4,9 @@ When(/^the user navigates to the DOCUMENTS tab$/) do
 end
 
 When(/^MEDICAID & TAX CREDITS button is visible to the user$/) do
-  find(IvlDocumentsPage.medicare_and_tax_credit_btn, wait: 5).visible?
+  # after refactoring turbolinks and selectric, return interaction through class
+  find_all('a', text: 'Go to District Direct', visible: false, wait: 5)[0].visible?
+  # find(IvlDocumentsPage.medicare_and_tax_credit_btn,visible: false, wait: 5).visible?
 end
 
 Then(/^there will be text to the left of the MEDICAID & TAX CREDITS button$/) do
