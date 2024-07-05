@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (enrollmentToggleCheckbox.checked) {
             for (let i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
                 initiallyHiddenEnrollmentPanels[i].classList.remove("hidden");
-                enrollmentToggleButton.innerText = l10n("");
+                enrollmentToggleButton.innerText = "Hide Inactive Enrollments";
             }
         } else {
             for (let i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
