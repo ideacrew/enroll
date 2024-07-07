@@ -76,7 +76,7 @@ Then(/^the CONTINUE will be visibly enabled$/) do
 end
 
 Then(/^should be actionable\.$/) do
-  expect(page).to have_selector('.interaction-click-control-continue', visible: true)
+  expect(page).to have_selector('#btn-continue', visible: true)
 end
 
 Given(/^the user is on the Tax Info page for a given applicant$/) do
