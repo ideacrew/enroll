@@ -228,7 +228,7 @@ class IvlIapIncomeAdjustmentsPage
   end
 
   def self.health_savings_account_glossary_link
-    '.health_savings_account span'
+    '[data-title="Health savings account"]'
   end
 
   def self.alimony_paid

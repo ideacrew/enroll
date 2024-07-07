@@ -126,7 +126,7 @@ module FinancialAssistance
 
       authorize @application, :step?
 
-      if params[:id] == 1
+      if params[:step] == "1"
         redirect_to preferences_application_path(@application)
       else
         redirect_to submit_your_application_application_path(@application)

@@ -12,11 +12,7 @@ class IvlIapHealthCoveragePage
   end
 
   def self.has_enrolled_health_coverage_no_radiobtn
-    if EnrollRegistry[:bs4_consumer_flow].enabled?
-
-    else
     '#has_enrolled_health_coverage_false'
-    end
   end
 
   def self.not_sure_has_enrolled_health_coverage_link
@@ -208,7 +204,7 @@ class IvlIapHealthCoveragePage
   end
 
   def self.medicare_glossary_link
-    '.medicare span'
+    '[data-title="Medicare"]'
   end
 
   def self.coverage_obtained_through_another_exchange

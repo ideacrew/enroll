@@ -72,7 +72,7 @@ When(/^Will this person be claimed as a tax dependent for <system year>\? does n
 end
 
 Then(/^the CONTINUE will be visibly enabled$/) do
-  expect(find('.interaction-click-control-continue')['disabled']).to eq("false")
+  expect(find('#btn-continue')['disabled']).to eq("false")
 end
 
 Then(/^should be actionable\.$/) do

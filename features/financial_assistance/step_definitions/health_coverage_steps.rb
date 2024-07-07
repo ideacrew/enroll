@@ -85,7 +85,7 @@ end
 Then(/^the medicare have glossary content$/) do
   #bug logged for this, glossary text issue on health coverage page for medicare,medicaid, coverage and cobra
   find(IvlIapHealthCoveragePage.medicare_glossary_link).click
-  expect(page).to have_content 'A federal health insurance program for people who are 65 or older'
+  expect(page).to have_content "The program helps with the cost of health care, but it doesn't cover all medical expenses or the cost of most"
 end
 
 Then(/^the coverage_obtained_through_another_exchange does not have glossary link$/) do
