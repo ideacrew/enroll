@@ -226,7 +226,7 @@ When(/^all applicants are in Info Completed state$/) do
     find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
 
     find("#has_enrolled_health_coverage_false", wait: 10).click
-    
+
     find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn, wait: 10).click
     find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
     find(IvlIapOtherQuestions.is_pregnant_no_radiobtn, wait: 10).click
@@ -244,7 +244,7 @@ And(/^primary applicant completes application and marks they are required to fil
   sleep 1
   find("#is_claimed_as_tax_dependent_no").click
   find("#is_joint_tax_filing_no").click if page.all("#is_joint_tax_filing_no").present?
-  find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
+  find('input[id="btn-continue"]').click
 
   find("#has_job_income_false").click
   find("#has_self_employment_income_false").click
@@ -266,7 +266,7 @@ And(/^primary applicant completes application and marks they are required to fil
   find("#has_daily_living_no").click
   find("#need_help_paying_bills_no").click
   find("#radio_physically_disabled_no").click
-  find('[name=commit]').click
+  find(IvlIapOtherQuestions.continue_btn, wait: 10).click
 end
 
 Then(/^the CONTINUE button will be ENABLED$/) do
