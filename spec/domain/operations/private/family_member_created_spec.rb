@@ -12,7 +12,6 @@ RSpec.describe ::Operations::Private::FamilyMemberCreated, dbclean: :after_each 
     let(:subject) { described_class.new }
 
     it 'returns success' do
-      binding.irb
       result = subject.call(family_member)
 
       expect(result.success?).to be_truthy
@@ -32,7 +31,6 @@ RSpec.describe ::Operations::Private::FamilyMemberCreated, dbclean: :after_each 
 
     it 'returns failure when cv3 family fails' do
       result = described_class.new.call(family_member)
-      binding.irb
       expect(result.failure?).to be_truthy
     end
   end
