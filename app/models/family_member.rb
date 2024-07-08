@@ -175,8 +175,7 @@ class FamilyMember
   def family_member_created
     deactivate_tax_households
     create_financial_assistance_applicant
-    publish_private_family_member_created_event
-    #rescue here?
+    publish_private_family_member_created_event if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
   end
 
   def notify_family
