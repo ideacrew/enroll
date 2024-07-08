@@ -72,7 +72,7 @@
             </div>
           </div>
         </div>
-        <% if kind = 'home' %>
+        <% if kind == 'home' %>
           <div class="address-row show no-dc-address-reasons mb-4">
             <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
               <label class="weight-n">
