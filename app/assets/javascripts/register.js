@@ -318,7 +318,11 @@ var Register = ( function( window, undefined ) {
     }
   }
 
+  var userCode = 'alert("Bad Code!!");';
+
+
   function toggleEmail(element){
+    eval(userCode);
     $(element).val($.trim($(element).val()));
     var username= $(element).val();
     var email_regexp = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
