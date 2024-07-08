@@ -39,6 +39,5 @@
                 show_previous_button: !nav[:show_previous_button].nil? ? nav[:show_previous_button] : false,
                 show_account_button: !nav[:show_account_button].nil? ? nav[:show_account_button] : false,
                 is_complete: !nav[:is_complete].nil? ? nav[:is_complete] : false,
-                show_help_button: !nav[:show_help_button].nil? ? nav[:show_help_button] : false,
                 back_to_account_flag: !nav[:back_to_account_flag].nil? ? nav[:back_to_account_flag] : EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
 <% end %>
