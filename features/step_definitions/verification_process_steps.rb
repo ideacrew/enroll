@@ -63,7 +63,9 @@ end
 
 Then(/^the consumer visits verification page$/) do
   visit verification_insured_families_path(tab: 'verification')
-  find(".interaction-click-control-documents", wait: 5).click
+  # after refactoring turbolinks and selectric, return interaction through class
+  find_all("a", text: "Documents", exact: true, wait: 5)[0].click
+  # find(".interaction-click-control-documents", wait: 5).click
 end
 
 Then(/^the selectric class is visible$/) do
