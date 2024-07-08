@@ -17,9 +17,9 @@ RSpec.describe ::Operations::Private::FamilyMemberCreated, dbclean: :after_each 
       expect(result.success?).to be_truthy
     end
 
-    it 'returns success' do
+    it 'returns family member' do
       result = described_class.new.call(family_member)
-      expect(result.success).to eql(family_member)
+      expect(result.success).to eql("Successfully published 'events.families.created_or_updated' for family member with hbx_id: #{family_member&.person&.hbx_id}")
     end
   end
 

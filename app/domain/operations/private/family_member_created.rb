@@ -47,7 +47,7 @@ module Operations
       def publish_families_created_or_updated(family_member, cv3_family, headers)
         event('events.families.created_or_updated', attributes: {after_save_version: cv3_family}, headers: headers)&.success&.publish
         Rails.logger.info { "Successfully published 'events.families.created_or_updated' for family member with hbx_id: #{family_member&.person&.hbx_id}" }
-        Success(family_member)
+        Success("Successfully published 'events.families.created_or_updated' for family member with hbx_id: #{family_member&.person&.hbx_id}")
       end
     end
   end
