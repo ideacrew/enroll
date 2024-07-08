@@ -117,12 +117,12 @@ class Insured::VerificationDocumentsController < ApplicationController
     action = "Upload #{file_name(file)}" if params[:action] == "upload"
     params = {action: action, modifier: actor}
     statuses = validation_statuses
-    params = params.merge!({from_validation_status: statuses[:from_validation_status], to_validation_status: statuses[:to_validation_status] }) if @verification_type.type_name == 'Alive Status'
+    params.merge!({from_validation_status: statuses[:from_validation_status], to_validation_status: statuses[:to_validation_status] }) if @verification_type.type_name == 'Alive Status'
     @verification_type.add_type_history_element(params)
   end
 
   def validation_statuses
-    status= {from_validation_status: nil, to_validation_status: nil}
+    status = {from_validation_status: nil, to_validation_status: nil}
     history_track = @verification_type.history_tracks.last
     if history_track.modified["validation_status"].present? && history_track.original["validation_status"].present?
       status[:from_validation_status] = history_track.tracked_changes["validation_status"]["from"]
