@@ -101,11 +101,10 @@ module FinancialAssistance
       respond_to :html
     end
 
-    def submit
+    def submit_your_application_save
       raise ActionController::UnknownFormat unless request.format.html?
 
       authorize @application, :submit?
-
       if params[:application].present?
         @application.assign_attributes(permit_params(params[:application]))
 
@@ -572,7 +571,6 @@ module FinancialAssistance
       return { path: application_publish_error_application_path(@application), flash: { error: build_error_messages(@application) } } unless @application.complete?
 
       publish_result = determination_request_class.new.call(application_id: @application.id)
-
       return { path: wait_for_eligibility_response_application_path(@application), flash: nil } if publish_result.success?
 
       @application.unsubmit! if @application.may_unsubmit?
