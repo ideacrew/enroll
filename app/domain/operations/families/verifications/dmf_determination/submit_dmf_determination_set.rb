@@ -17,8 +17,8 @@ module Operations
           # @return [ Success ] Job successfully completed
           def call
             families = yield query_families_with_active_members
-            job = yield create_job(dmf_job_params)
-            result = yield submit_for_dmf_determination(families, job)
+            @job = yield create_job(dmf_job_params)
+            result = yield submit_for_dmf_determination(families)
 
             Success(result)
           end
@@ -42,23 +42,24 @@ module Operations
             }
           end
 
-          def submit_for_dmf_determination(families, job)
+          def submit_for_dmf_determination(families)
             count = 0
+            dmf_logger.info("dmf determination started for job with job_id #{@job.job_id}, at #{DateTime.now}")
 
             families.each do |family|
               if family.hbx_assigned_id.present?
-                publish({ family_hbx_id: family.hbx_assigned_id, job_id: job.job_id })
+                publish({ family_hbx_id: family.hbx_assigned_id, job_id: @job.job_id })
 
                 count += 1
-                dmf_logger.info("********************************* published #{count} families *********************************") if count % 100 == 0
+                dmf_logger.info("********************************* published #{count} families for job with job_id #{@job.job_id} *********************************") if count % 100 == 0
               else
-                dmf_logger.error("Family with id #{family.id} is missing hbx_assigned_id -- unable to proceed with dmf determination")
+                dmf_logger.error("Family with id #{family.id} is missing hbx_assigned_id -- unable to proceed with dmf determination, job_id: #{@job.job_id}")
               end
             rescue StandardError => e
-              dmf_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}")
+              dmf_logger.error("Failed to process for family with hbx_id #{family&.hbx_assigned_id} due to #{e.inspect}, job_id: #{@job.job_id}")
             end
 
-            Success('Published all dmf-eligible family hbx_ids')
+            Success("Published all dmf-eligible family hbx_ids for job with job_id #{@job.job_id}")
           end
 
           def build_event(payload)
