@@ -53,7 +53,7 @@ module Operations
           Failure("Failed to construct cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to #{cv3_family.failure}")
         end
       rescue StandardError => e
-        Rails.logger.error {"Error constructing cv3 family due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}"}
+        Rails.logger.error {"Error constructing cv3 family for family: #{family&.primary_person&.hbx_id} due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}"}
         Failure("Error constructing cv3 family due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}")
       end
 
