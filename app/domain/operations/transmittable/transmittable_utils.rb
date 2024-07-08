@@ -41,6 +41,13 @@ module Operations
         Operations::Transmittable::FindOrCreateJob.new.call(job_params)
       end
 
+      def find_job(job_id)
+        job = ::Transmittable::Job.find_by(job_id: job_id.to_s)
+        Success(job)
+      rescue Mongoid::Errors::DocumentNotFound
+        Failure("Could not find Transmittable::Job with job_id #{job_id}")
+      end
+
       # @param [Hash] opts The options to create a request transmittable transaction
       # @option opts [Hash, Transmittable::Job]
       #   :transaction_params The params to create a transaction
