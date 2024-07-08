@@ -17,9 +17,9 @@
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
     <% if EnrollRegistry.feature_enabled?(:jquery_migrate) %>
       <% if EnrollRegistry[:jquery_migrate].setting(:show_warnings).item == true %>
-        <script src="https://code.jquery.com/jquery-migrate-3.4.1.js" integrity="sha384-cG5RCHYtwmrSoNV1o0el92fuszs0g3Q7LmgwVE5f6u2Yn" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-migrate-3.4.1.js" integrity="sha384-cG5RCHYtwmrSoNV1o0el92fuszs0g3Q7LmgwVE5f6u2Yn/LWDcUeEsDdmAhV0D3e" crossorigin="anonymous"></script>
       <% else %>
-        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js" integrity="sha384-ez4i72z0XhJqm0ZRoQkpPN0bDV8Kw8PK3n8kjEZsWhRDrfICLd0AGghHJB" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js" integrity="sha384-ez4i72z0XhJqm0ZRoQkpPN0bDV8Kw8PK3n8kjEZsWhRDrfICLd0AGghHJB+vytx0" crossorigin="anonymous"></script>
       <% end %>
     <% end %>
     <%= csrf_meta_tags %>
