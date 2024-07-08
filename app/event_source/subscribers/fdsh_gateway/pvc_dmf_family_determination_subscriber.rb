@@ -13,7 +13,7 @@ module Subscribers
         job_id = payload[:job_id]
         status = metadata[:headers]["status"]
         if status == "failure"
-          handle_failure_response(job_id, payload[:family_hbx_id])
+          handle_failure_response(job_id, payload[:correlation_id])
           logger.info "FdshGateway::PvcDmfFamilyDeterminationSubscriber: on_determined acked and processed failure from fdsh_gateway"
         else
           logger.info "FdshGateway::PvcDmfFamilyDeterminationSubscriber: parsed_response: #{payload.inspect}"
