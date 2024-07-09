@@ -50,6 +50,9 @@ class Person
                         :is_homeless,
                         :is_temporarily_out_of_state,
                         :is_active,
+                        # There is suspicion that hbx_id is being updated for a Person. Ideally, hbx_id should not be updated for a Person record.
+                        # By adding hbx_id to the track_history, we can track when the hbx_id is being updated to figure out the root cause.
+                        :hbx_id,
                         :no_ssn],
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
