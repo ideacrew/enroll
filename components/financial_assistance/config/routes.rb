@@ -11,7 +11,7 @@ FinancialAssistance::Engine.routes.draw do
     get :preferences, on: :member
     put :save_preferences, on: :member
     get :submit_your_application, on: :member
-    put :submit, on: :member
+    put :submit_your_application_save, on: :member
     put :step, on: :member
     put ':step/:step', on: :member, action: 'step'
     post :step, on: :collection
