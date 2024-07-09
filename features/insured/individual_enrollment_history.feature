@@ -6,6 +6,7 @@ Feature: Enrollment History Page
   Enrollment History Page page.
 
   Background:
+    Given bs4_consumer_flow feature is disable
     Given a consumer exists
     And the consumer is logged in
     And consumer has successful ridp
