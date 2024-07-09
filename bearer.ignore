@@ -520,5 +520,11 @@
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but this is a script that will only be used internally and is supposed to write this data to a csv",
     "false_positive": true,
     "ignored_at": "2024-07-09T18:03:30Z"
+  },
+  "e3e26ab97eae216d706ff5df2d9b4d56_1": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but this is a script that will only be used internally and is supposed to write this data to a csv",
+    "false_positive": true,
+    "ignored_at": "2024-07-09T18:03:30Z"
   }
 }
