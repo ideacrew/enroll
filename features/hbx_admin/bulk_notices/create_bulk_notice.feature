@@ -1,6 +1,7 @@
 Feature: Hbx Admin Bulk Notice
 
 Background: Admin has ability to create a new Bulk Notice
+  Given bs4_consumer_flow feature is disable
   Given the shop market configuration is enabled
   Given an HBX admin exists
   And the HBX admin is logged in

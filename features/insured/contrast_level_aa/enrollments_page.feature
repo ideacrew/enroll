@@ -1,6 +1,7 @@
 Feature: Contrast level AA is enabled - Enrollment History Page
 
   Background:
+    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     Given a consumer exists
     And the consumer is logged in
