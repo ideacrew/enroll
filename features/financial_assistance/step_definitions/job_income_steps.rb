@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Given(/^the user answers no to having an income from an employer$/) do
-  choose(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn)
+  find(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn).click
   sleep 1
 end
 
@@ -11,7 +11,7 @@ Then(/^the job income form should not show$/) do
 end
 
 Given(/^the user answers no to having self employment income$/) do
-  choose(IvlIapJobIncomeInformationPage.has_self_employee_income_no_radiobtn)
+  find(IvlIapJobIncomeInformationPage.has_self_employee_income_no_radiobtn).click
   sleep 1
 end
 
@@ -20,7 +20,7 @@ Then(/^self employment form should not show$/) do
 end
 
 Given(/^the user answers yes to having and income from an employer$/) do
-  choose(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn)
+  find(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn).click
   sleep 1
 end
 
@@ -30,7 +30,7 @@ Then(/^the job income form should show$/) do
 end
 
 Given(/^the user answers yes to having self employment income$/) do
-  choose(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn)
+  find(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn).click
   sleep 1
 end
 
@@ -111,7 +111,7 @@ Then(/^the employer information should be saved on the page$/) do
 end
 
 Given(/^the user has entered at least one job income information$/) do
-  choose(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn)
+  find(IvlIapJobIncomeInformationPage.has_job_income_yes_radiobtn).click
   sleep 1
   fill_in IvlIapJobIncomeInformationPage.employer_name, with: "Sample Employer1"
   fill_in IvlIapJobIncomeInformationPage.income_amount, with: '33.3'
@@ -135,7 +135,7 @@ When(/^the Add Another Job Income link appears$/) do
 end
 
 When(/^the user adds another income$/) do
-  find(IvlIapJobIncomeInformationPage.add_another_job_income).click
+  find('#new-income').double_click
 end
 
 Then(/^the new employer information should be saved on the page$/) do
@@ -166,7 +166,7 @@ And(/^the user fills out the required self employment information with incorrect
 end
 
 Given(/^the user has entered at least one self employment information$/) do
-  choose(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn)
+  find(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn).click
   sleep 1
   fill_in IvlIapJobIncomeInformationPage.income_amount, with: '23.3'
   find(IvlIapJobIncomeInformationPage.self_employee_how_often_dropdown).click
@@ -183,7 +183,7 @@ Then(/^the self employment information should be saved on the page$/) do
 end
 
 When(/^the Add Another Self Employment link appears$/) do
-  find('.interaction-click-control-add-another--self-employed-income').visible?
+  find('#new-self-income').visible?
 end
 
 And(/^the user adds another self employment income$/) do

@@ -17,7 +17,7 @@ Given(/^that the user is on the FAA Household Info page$/) do
   # should be on application year select page now
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    find('a.interaction-click-control-continue').click
+    find('.interaction-click-control-continue').click
     sleep 2
   end
 
@@ -52,7 +52,6 @@ When(/^Will this person be claimed as a tax dependent for <system year>\? has a 
 end
 
 Then(/^the CONTINUE will be visibly disabled$/) do
-  # binding.irb
   expect(find('input[id="btn-continue"]')['disabled']).to eq("true")
 end
 
@@ -73,11 +72,11 @@ When(/^Will this person be claimed as a tax dependent for <system year>\? does n
 end
 
 Then(/^the CONTINUE will be visibly enabled$/) do
-  expect(find('.interaction-click-control-continue')['disabled']).to eq("false")
+  expect(find('#btn-continue')['disabled']).to eq("false")
 end
 
 Then(/^should be actionable\.$/) do
-  expect(page).to have_selector('.interaction-click-control-continue', visible: true)
+  expect(page).to have_selector('#btn-continue', visible: true)
 end
 
 Given(/^the user is on the Tax Info page for a given applicant$/) do
