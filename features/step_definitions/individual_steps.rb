@@ -572,6 +572,7 @@ Then(/Individual does not see the error on tooltip indicating a password longer 
 
   else
     wait_for_ajax
+    sleep 2
     script = "return document.querySelector('.longer').getAttribute('data-icon');"
     data_icon_value = page.execute_script(script)
     expect(data_icon_value).to eq('check')
