@@ -182,14 +182,14 @@ else
 find(IvlIapFamilyInformation.add_income_and_coverage_info_btn).click
 find(IvlIapTaxInformationPage.file_taxes_no_radiobtn).click
 find(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn).click
-find(IvlIapTaxInformationPage.continue_btn).click
+find(IvlIapTaxInformationPage.continue_btn, wait:5).click
 find(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn).click
 find(IvlIapJobIncomeInformationPage.has_self_employee_income_no_radiobtn).click
-find(IvlIapJobIncomeInformationPage.continue_btn).click
+find(IvlIapJobIncomeInformationPage.continue_btn, wait:5).click
 find(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn).click
 find(IvlIapOtherIncomePage.has_other_income_no_radiobtn).click
-find(IvlIapOtherIncomePage.continue_btn).click
-find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn).click
+find(IvlIapOtherIncomePage.continue_btn, wait:5).click
+find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn, wait:5).click
 find(IvlIapIncomeAdjustmentsPage.continue_btn).click
 find(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn).click
 find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn).click
