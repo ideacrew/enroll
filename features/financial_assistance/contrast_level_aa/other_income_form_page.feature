@@ -3,6 +3,7 @@
 Feature: Contrast level AA is enabled - unemployment and other income form page
 
   Background: User logs in and visits applicant's other income page
+    Given bs4_consumer_flow feature is disable
     Given the contrast level aa feature is enabled
     And a consumer, with a family, exists
     And is logged in

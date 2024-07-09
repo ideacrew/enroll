@@ -1,5 +1,6 @@
 Feature: Email Address Feature
     Background: Setup permissions and other things
+        Given bs4_consumer_flow feature is disable
         Given all permissions are present
 
     Scenario: user is on hbx home page and email address feature is enabled
