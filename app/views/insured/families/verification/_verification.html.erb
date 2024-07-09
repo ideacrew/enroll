@@ -1,133 +1,189 @@
-<div class="row">
-  <div class="col-xs-6">
-    <h4>
-      <% if can_show_due_date?(@person) %>
-        <%= l10n("document_due_date") %>:&nbsp;&nbsp;
-        <% due_date = @person.primary_family&.eligibility_determination&.outstanding_verification_earliest_due_date || default_verification_due_date %>
-        <% if due_date <= TimeKeeper.date_of_record %>
-          <span class="label label-danger"><%= due_date %> (<%= l10n("past_due") %>)</span>
-        <% else %>
-          <span class="label label-warning"><%= due_date %></span>
-        <% end %>
+<% if @bs4 %>
+  <h2>Verification Documents</h2> <%# TODO: localize %>
+  <% @family_members.each do |family_member| %>
+    <% person = family_member.person %>
+    <section class="card">
+      <h3 class="mb-0"><%= person.full_name %></h3>
+      <hr>
+      <% verification_filter = if EnrollRegistry.feature_enabled?(:location_residency_verification_type) %>
+        <% person.verification_types.active.all%>
+      <% else %>
+        <% person.verification_types.active.all.select {|v_type| v_type.type_name != EnrollRegistry[:enroll_app].setting(:state_residency).item} %>
       <% end %>
-    </h4>
-  </div>
-</div>
-
-<div class="table table-sm">
-  <div class="module verification-process col-md-12">
-    <% @family_members.each do |f_member| %>
-      <% person = f_member.person %>
-      <div class="row">
-        <div class="family-member col-md-12">
-          <div class="person">
-            <%= f_member.person.full_name %>
-          </div>
-          <div class="verification-types col-md-12">
-            <% verification_filter = if EnrollRegistry.feature_enabled?(:location_residency_verification_type) %>
-              <% person.verification_types.active.all%>
-            <% else %>
-              <% person.verification_types.active.all.select {|v_type| v_type.type_name != EnrollRegistry[:enroll_app].setting(:state_residency).item} %>
-            <% end %>
-            <% verification_filter.each do |verif_type| %>
-              <% v_type = verif_type.type_name %>
-              <% if can_display_or_modify_type?(verif_type) %>
-                <div class="row">
-                  <div class="v-type col-md-12">
-                    <div class="v-type-name col-md-2">
-                      <%= display_verification_type_name(v_type) %>
-                    </div>
-                    <div class="v-type-status col-md-2 text-center">
-                      <span class="label lb-md label-<%=verification_type_class(verif_type.validation_status)%>">
-                        <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
-                      </span>&nbsp;
-                      <%= pundit_span Family, :updateable? %>
-                    </div>
-
-                    <div class="v-type-due-date col-md-3">
-                      <% if VerificationType::DUE_DATE_STATES.include? verif_type.validation_status %>
-                        <span class="text-danger"><%= l10n('due_date') %></span>
-                        <%= verif_type.verif_due_date %>
-                      <% end %>
-                    </div>
-
-                    <div class="v-type-upload col-md-3">
-                      <% if display_upload_for_verification?(verif_type) %>
-                        <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
-                          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file">
-                            <i class="fa fa-upload" aria-hidden="true"></i>
-                            <%= l10n('upload_documents') %>
-                            <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents"%>
-                          </span  >
-                          <%= hidden_field_tag 'docs_owner', person.id  %>
-                          <%= hidden_field_tag 'verification_type', verif_type.id  %>
-                        <% end %>
-                      <% end %>
-                    </div>
-                    <% if current_user.has_hbx_staff_role? %>
-                      <div class="v-type-actions col-md-2">
-                        <%= select_tag :verification_actions, admin_actions(verif_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
-                      </div>
-                    <% end %>
-                  </div>
+      <% verification_filter.each do |verif_type| %>
+        <% v_type = verif_type.type_name %>
+        <% if can_display_or_modify_type?(verif_type) %>
+          <div class="my-3">
+            <div class="row mb-2 p-0">
+              <div class="d-flex col-sm align-items-center">
+                <div class="col-5 px-0">
+                  <h6 class="my-0"><%= display_verification_type_name(v_type) %></h6>
                 </div>
-              <% end %>
-              <% if current_user.has_hbx_staff_role? %>
-                <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
-              <% end %>
-
-              <div class="row">
-                <% if verif_type.type_documents.any? %>
-
-                  <div class="v-doc-list col-md-12">
-                    <% verif_type.type_documents.each do |vlp_doc|%>
-                      <div class="row" id="doc_table_row_<%=vlp_doc.id%>">
-                        <div class="v-doc-elem col-md-12">
-                          <div class="v-doc col-md-11">
-                            <% if vlp_doc.identifier.present? %>
-                              <% key = vlp_doc.identifier.split('#').last %>
-                              <%= h(content_tag(:a, href: "/insured/verification_documents/download/#{key}", target: "_blank", rel: "noopener noreferrer", title: "Download", data: {toggle: "tooltip"}) do %>
-                                <%= vlp_doc.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
-                              <% end) %>
-                            <% end %>
-                          </div>
-                          <div class="v-doc col-md-1">
-                            <span class="<%=pundit_class(Family, :updateable?)%>" >
-                              <%= link_to document_path(vlp_doc, :person_id => person.id, :verification_type => verif_type.id, :doc_title => vlp_doc.title.titleize), method: :delete do %>
-                                <i class="far fa-trash-alt fa-lg role-trashcan pull-right" title="Delete"><span class="hide"><%=l10n("delete")%></span></i>
-                              <% end %>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    <% end %>
-                  </div>
+                <div class="d-flex ml-sm-0 ml-auto">
+                  <span class="badge badge-status badge-<%= verification_type_class(verif_type.validation_status) %> p-2" id="status">
+                    <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
+                  </span>
+                </div>
+              </div> <%= pundit_span Family, :updateable? %>
+              <div class="d-flex col-sm">
+                <% if current_user.has_hbx_staff_role? %>
+                  <span class="v-type-actions mr-2">
+                    <%= select_tag :verification_actions, admin_actions(verif_type, family_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
+                  </span>
+                <% end %>
+                <% if display_upload_for_verification?(verif_type) %>
+                  <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
+                    <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file">
+                      <i class="fa fa-upload" aria-hidden="true"></i>
+                      <label>
+                        <%= l10n('upload_documents') %>
+                        <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents"%>
+                      </label>
+                    </span>
+                    <%= hidden_field_tag 'docs_owner', person.id  %>
+                    <%= hidden_field_tag 'verification_type', verif_type.id  %>
+                  <% end %>
                 <% end %>
               </div>
-            <% end %>
+            </div>
+          </div>
+          <hr class="subcard-divider">
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
+<% else %>
+  <div class="row">
+    <div class="col-xs-6">
+      <h4>
+        <% if can_show_due_date?(@person) %>
+          <%= l10n("document_due_date") %>:&nbsp;&nbsp;
+          <% due_date = @person.primary_family&.eligibility_determination&.outstanding_verification_earliest_due_date || default_verification_due_date %>
+          <% if due_date <= TimeKeeper.date_of_record %>
+            <span class="label label-danger"><%= due_date %> (<%= l10n("past_due") %>)</span>
+          <% else %>
+            <span class="label label-warning"><%= due_date %></span>
+          <% end %>
+        <% end %>
+      </h4>
+    </div>
+  </div>
+
+  <div class="table table-sm">
+    <div class="module verification-process col-md-12">
+      <% @family_members.each do |f_member| %>
+        <% person = f_member.person %>
+        <div class="row">
+          <div class="family-member col-md-12">
+            <div class="person">
+              <%= f_member.person.full_name %>
+            </div>
+            <div class="verification-types col-md-12">
+              <% verification_filter = if EnrollRegistry.feature_enabled?(:location_residency_verification_type) %>
+                <% person.verification_types.active.all%>
+              <% else %>
+                <% person.verification_types.active.all.select {|v_type| v_type.type_name != EnrollRegistry[:enroll_app].setting(:state_residency).item} %>
+              <% end %>
+              <% verification_filter.each do |verif_type| %>
+                <% v_type = verif_type.type_name %>
+                <% if can_display_or_modify_type?(verif_type) %>
+                  <div class="row">
+                    <div class="v-type col-md-12">
+                      <div class="v-type-name col-md-2">
+                        <%= display_verification_type_name(v_type) %>
+                      </div>
+                      <div class="v-type-status col-md-2 text-center">
+                        <span class="label lb-md label-<%=verification_type_class(verif_type.validation_status)%>">
+                          <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
+                        </span>&nbsp;
+                        <%= pundit_span Family, :updateable? %>
+                      </div>
+
+                      <div class="v-type-due-date col-md-3">
+                        <% if VerificationType::DUE_DATE_STATES.include? verif_type.validation_status %>
+                          <span class="text-danger"><%= l10n('due_date') %></span>
+                          <%= verif_type.verif_due_date %>
+                        <% end %>
+                      </div>
+
+                      <div class="v-type-upload col-md-3">
+                        <% if display_upload_for_verification?(verif_type) %>
+                          <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
+                            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file">
+                              <i class="fa fa-upload" aria-hidden="true"></i>
+                              <%= l10n('upload_documents') %>
+                              <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents"%>
+                            </span  >
+                            <%= hidden_field_tag 'docs_owner', person.id  %>
+                            <%= hidden_field_tag 'verification_type', verif_type.id  %>
+                          <% end %>
+                        <% end %>
+                      </div>
+                      <% if current_user.has_hbx_staff_role? %>
+                        <div class="v-type-actions col-md-2">
+                          <%= select_tag :verification_actions, admin_actions(verif_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+                <% if current_user.has_hbx_staff_role? %>
+                  <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
+                <% end %>
+
+                <div class="row">
+                  <% if verif_type.type_documents.any? %>
+
+                    <div class="v-doc-list col-md-12">
+                      <% verif_type.type_documents.each do |vlp_doc|%>
+                        <div class="row" id="doc_table_row_<%=vlp_doc.id%>">
+                          <div class="v-doc-elem col-md-12">
+                            <div class="v-doc col-md-11">
+                              <% if vlp_doc.identifier.present? %>
+                                <% key = vlp_doc.identifier.split('#').last %>
+                                <%= h(content_tag(:a, href: "/insured/verification_documents/download/#{key}", target: "_blank", rel: "noopener noreferrer", title: "Download", data: {toggle: "tooltip"}) do %>
+                                  <%= vlp_doc.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
+                                <% end) %>
+                              <% end %>
+                            </div>
+                            <div class="v-doc col-md-1">
+                              <span class="<%=pundit_class(Family, :updateable?)%>" >
+                                <%= link_to document_path(vlp_doc, :person_id => person.id, :verification_type => verif_type.id, :doc_title => vlp_doc.title.titleize), method: :delete do %>
+                                  <i class="far fa-trash-alt fa-lg role-trashcan pull-right" title="Delete"><span class="hide"><%=l10n("delete")%></span></i>
+                                <% end %>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
           </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
-    <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) && EnrollRegistry.feature_enabled?(:complete_verification_for_enrollment) %>
-      <%= link_to l10n("insured.families.verification.complete_verification_for_enrollment"), enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: l10n("insured.families.verification.complete_verification_for_enrollment_confirm") } %>
-    <% end %>
+  <div class="row">
+    <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
+      <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) && EnrollRegistry.feature_enabled?(:complete_verification_for_enrollment) %>
+        <%= link_to l10n("insured.families.verification.complete_verification_for_enrollment"), enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: l10n("insured.families.verification.complete_verification_for_enrollment_confirm") } %>
+      <% end %>
+    </div>
+    <div class="col-xs-6">
+      <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? "none" : "collapse" %>  href=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item : "#docs-verification-faq" %> role="button" rel="noopener noreferrer" target=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? "_blank" : "" %> >
+        <%= l10n("insured.families.verification.documents_FAQ") %>
+      </a>
+    </div>
   </div>
-  <div class="col-xs-6">
-    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? "none" : "collapse" %>  href=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item : "#docs-verification-faq" %> role="button" rel="noopener noreferrer" target=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? "_blank" : "" %> >
-      <%= l10n("insured.families.verification.documents_FAQ") %>
-    </a>
-  </div>
-</div>
 
-<div class="collapse" id="docs-verification-faq">
-  <%= render partial: "insured/families/verification/documents_verification_list" %>
-</div>
+  <div class="collapse" id="docs-verification-faq">
+    <%= render partial: "insured/families/verification/documents_verification_list" %>
+  </div>
+<% end %>
 
 <script>
   $(document).ready(function() {
