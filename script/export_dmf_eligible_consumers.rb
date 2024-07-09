@@ -6,7 +6,7 @@
 # bundle exec rails runner script/export_dmf_eligible_consumers.rb
 
 require "#{Rails.root}/app/domain/operations/families/verifications/dmf_determination/dmf_utils.rb"
-include ::Operations::Families::Verifications::DmfDetermination::DmfUtils
+include ::Operations::Families::Verifications::DmfDetermination::DmfUtils # rubocop:disable Style/MixinUsage
 
 if EnrollRegistry.feature_enabled?(:alive_status)
   csv_headers = [
@@ -32,7 +32,7 @@ if EnrollRegistry.feature_enabled?(:alive_status)
 
       consumer_hash = {
         family_hbx_id: family.hbx_assigned_id,
-        person_hbx_id: member.person.hbx_id, 
+        person_hbx_id: member.person.hbx_id,
         person_first_name: member.person.first_name,
         person_last_name: member.person.last_name,
         enrollment_hbx_id: enrollment_hbx_id,
