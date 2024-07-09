@@ -1,6 +1,7 @@
 Feature: Contrast level AA is enabled - User data usage preferences and voter registration
 
   Background: Your Preferences Page
+    Given bs4_consumer_flow feature is disable
     Given the contrast level aa feature is enabled
     And a consumer exists
     And is logged in
