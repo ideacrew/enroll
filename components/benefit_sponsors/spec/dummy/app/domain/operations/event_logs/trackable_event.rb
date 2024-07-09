@@ -7,7 +7,7 @@ module Operations
   module EventLogs
     # Publish trackable event
     class TrackableEvent
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
       include EventSource::Command
       include EventSource::Logging
 

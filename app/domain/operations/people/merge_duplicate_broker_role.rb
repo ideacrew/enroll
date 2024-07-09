@@ -7,8 +7,7 @@ module Operations
   module People
     # This class uses merge broker with multiple person records
     class MergeDuplicateBrokerRole
-      send(:include, Dry::Monads[:result, :do])
-      send(:include, Dry::Monads[:try])
+      include Dry::Monads[:do, :result, :try]
 
       # params {
       #     source_hbx_id:,

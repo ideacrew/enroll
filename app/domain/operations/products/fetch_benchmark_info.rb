@@ -6,7 +6,7 @@ module Operations
   module Products
     # This class is to fetch product premiums for slcsp & lcsp
     class FetchBenchmarkInfo
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
 
       # @param [Date] effective_date

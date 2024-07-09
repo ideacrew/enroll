@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   # This class is invoked when we want to send a tax notice
   class SendTaxFormNoticeAlert
-    send(:include, Dry::Monads[:result, :do, :try])
+    include Dry::Monads[:do, :result]
 
     include Config::SiteHelper
 

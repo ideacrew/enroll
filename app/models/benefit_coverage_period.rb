@@ -187,7 +187,7 @@ class BenefitCoveragePeriod
   end
   # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Style/ConditionalAssignment
 
-  def get_benefit_packages(**attrs)
+  def get_benefit_packages(attrs)
     any_member_greater_than_30 = attrs[:hbx_enrollment].any_member_greater_than_30?
     fetch_benefit_packages(any_member_greater_than_30, attrs[:csr_kind], attrs[:coverage_kind]).inject([]) do |result, bg|
       satisfied = true
@@ -208,7 +208,7 @@ class BenefitCoveragePeriod
     end
   end
 
-  def product_entries(**attrs)
+  def product_entries(attrs)
     factory = product_factory.new({market_kind: attrs[:market]})
     elected_products = factory.by_coverage_kind_year_and_csr(attrs[:coverage_kind], start_on.year, csr_kind: attrs[:csr_kind]).by_product_ids(attrs[:elected_product_ids])
 

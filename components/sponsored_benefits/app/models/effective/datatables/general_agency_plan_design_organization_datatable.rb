@@ -9,7 +9,7 @@ module Effective
           if row.broker_relationship_inactive?
             row.legal_name
           else
-            (link_to row.legal_name, eval(benefit_sponsor_home_url(row)))
+            link_to row.legal_name, benefit_sponsor_home_url(row)
           end
         }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
@@ -72,7 +72,10 @@ module Effective
       end
 
       def benefit_sponsor_home_url(row)
-        "benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home')"
+        ::BenefitSponsors::Engine.routes.url_helpers.profiles_employers_employer_profile_path(
+          row.sponsor_profile_id,
+          tab: 'home'
+        )
       end
 
       def on_general_agency_portal?

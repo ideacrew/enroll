@@ -7,7 +7,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"
 RSpec.describe Operations::Eligible::EligibilityBatchHandler,
                type: :model,
                dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let(:batch_handler) do
     described_class.new(

@@ -13,13 +13,13 @@ module Subscribers
         census_employee = GlobalID::Locator.locate(payload[:employee_global_id])
         employer = census_employee.employer_profile
 
-        subscriber_logger.info "on_census_employee_created, census_employee: #{census_employee.full_name} employer: #{employer.legal_name} fein: #{employer.fein}"
+        subscriber_logger.info "on_census_employee_created, census_employee: #{census_employee.id} employer: #{employer.legal_name} fein: #{employer.fein}"
         subscriber_logger.info "CensusEmployeeSubscriber on_census_employee_created payload: #{payload}"
         logger.info "CensusEmployeeSubscriber on_census_employee_created payload: #{payload}"
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.error "CensusEmployeeSubscriber, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        subscriber_logger.error "CensusEmployeeSubscriber, census_employee: #{census_employee.id}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
         logger.error "CensusEmployeeSubscriber: errored & acked. payload: #{payload}, error message: #{e.message}, Backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
@@ -31,7 +31,7 @@ module Subscribers
         employer = census_employee.employer_profile
         employee_role = census_employee.employee_role
 
-        subscriber_logger.info "on_census_employee_terminated, census_employee: #{census_employee.full_name} employer: #{employer.legal_name} fein: #{employer.fein}"
+        subscriber_logger.info "on_census_employee_terminated, census_employee: #{census_employee.id} employer: #{employer.legal_name} fein: #{employer.fein}"
         subscriber_logger.info "CensusEmployeeSubscriber on_census_employee_terminated payload: #{payload}"
         logger.info "CensusEmployeeSubscriber on_census_employee_terminated payload: #{payload}"
 
@@ -45,7 +45,7 @@ module Subscribers
         )
 
         if result.success?
-          subscriber_logger.info "on_census_employee_terminated employer fein: #{employer.fein}, employee: #{census_employee&.full_name} processed successfully"
+          subscriber_logger.info "on_census_employee_terminated employer fein: #{employer.fein}, employee: #{census_employee&.id} processed successfully"
           logger.info "on_census_employee_terminated CensusEmployeeSubscriber: acked, SuccessResult: #{result.success}"
         else
           errors =
@@ -55,12 +55,12 @@ module Subscribers
             when Dry::Validation::Result
               result.failure.errors.to_h
             end
-          subscriber_logger.info "on_census_employee_terminated employer fein: #{employer.fein}, failed!!, FailureResult: #{errors}, employee: #{person&.full_name}"
-          logger.info "CensusEmployeeSubscriber: acked, FailureResult: #{errors} for employee: #{person&.full_name}, employer fein: #{employer.fein}"
+          subscriber_logger.info "on_census_employee_terminated employer fein: #{employer.fein}, failed!!, FailureResult: #{errors}, employee: #{census_employee&.id}"
+          logger.info "CensusEmployeeSubscriber: acked, FailureResult: #{errors} for employee: #{census_employee&.id}, employer fein: #{employer.fein}"
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.error "CensusEmployeeSubscriber on_census_employee_terminated, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        subscriber_logger.error "CensusEmployeeSubscriber on_census_employee_terminated, census_employee: #{census_employee.id}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
         logger.error "CensusEmployeeSubscriber on_census_employee_terminated: errored & acked. payload: #{payload} error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end

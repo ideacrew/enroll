@@ -7,7 +7,7 @@ module Operations
     # of the newly created benefit_group_assignment will be nil
     # Also, the result benefit_group_assignment is a non-persisted object.
     class Clone
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ BenefitGroupAssignment ] benefit_group_assignment
       # @param [ Hash ] options additional attributes for new benefit_group_assignment

@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Documents
     class Download
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       include Config::SiteHelper
 

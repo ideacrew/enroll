@@ -10,7 +10,7 @@ module FinancialAssistance
         module H14
           # publising request to H14 hub service for esi mec determination
           class PublishEsiMecRequest
-            send(:include, Dry::Monads[:result, :do, :try])
+            include Dry::Monads[:do, :result]
             include EventSource::Command
 
             def call(payload, application_id)

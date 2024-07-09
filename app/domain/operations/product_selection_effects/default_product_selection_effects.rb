@@ -5,7 +5,7 @@ module Operations
     # This class is invoked when a product selection is made.
     # It will execute the default side effects of making a product selection.
     class DefaultProductSelectionEffects
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Invoke the operation.
       # @param opts [Entities::ProductSelection] the invocation options

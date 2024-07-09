@@ -32,7 +32,7 @@ module TransportProfiles::TransportCredentials
     def self.credentials_for_sftp(uri)
       return nil if uri.userinfo.blank?
       return nil if uri.user.blank?
-      lookup_username = URI.decode(uri.user)
+      lookup_username = CGI.unescape(uri.user)
       self.where({user: lookup_username, host: uri.host}).first
     end
 

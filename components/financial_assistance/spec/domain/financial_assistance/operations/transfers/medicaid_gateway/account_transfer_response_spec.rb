@@ -5,7 +5,7 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 require 'aca_entities/atp/transformers/cv/family'
 
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferResponse, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   before :all do
     DatabaseCleaner.clean

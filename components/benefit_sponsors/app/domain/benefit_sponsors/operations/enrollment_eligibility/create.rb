@@ -8,7 +8,7 @@ module BenefitSponsors
     module EnrollmentEligibility
       # Creates enrollment eligibility entity
       class Create
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param  [ enrollment_eligibility_params ] enrollment_eligibility_params
         # @return [ BenefitSponsors::Entities::EnrollmentEligibility ] enrollment_eligibility

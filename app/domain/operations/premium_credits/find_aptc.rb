@@ -7,7 +7,7 @@ module Operations
   module PremiumCredits
     # This operation is to find Max Aptc
     class FindAptc
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include FloatHelper
 
       def call(params)

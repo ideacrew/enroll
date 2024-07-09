@@ -1,4 +1,4 @@
-$(document).on("ready ajax:success", function() {
+$(document).on('turbolinks:load', function() {
 
   // Max Date for Cancellation Datepicker
   // Minimum date is current date

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   before :each do
     DatabaseCleaner.clean
