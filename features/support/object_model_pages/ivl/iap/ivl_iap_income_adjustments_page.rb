@@ -4,11 +4,19 @@
 class IvlIapIncomeAdjustmentsPage
 
   def self.income_adjustments_yes_radiobtn
-    'has_deductions_true'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    '#has_deductions_true'
+    end
   end
 
   def self.income_adjustments_no_radiobtn
-    'has_deductions_false'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    '#has_deductions_false'
+    end
   end
 
   def self.not_sure_has_deductions
@@ -220,7 +228,7 @@ class IvlIapIncomeAdjustmentsPage
   end
 
   def self.health_savings_account_glossary_link
-    '.health_savings_account span'
+    '[data-title="Health savings account"]'
   end
 
   def self.alimony_paid

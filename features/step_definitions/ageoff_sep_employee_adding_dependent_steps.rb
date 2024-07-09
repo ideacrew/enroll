@@ -15,7 +15,7 @@ When(/(.*) selects a current qle date/) do |_person|
   # screenshot("past_qle_date")
   fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
-    find(IvlChooseCoverage.continue_btn).click
+    find('.interaction-click-control-continue')
   end
 end
 
