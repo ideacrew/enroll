@@ -411,8 +411,7 @@ And(/Admin selects (.*) market radio button$/) do |market_kind|
 end
 
 And("Admin fills Create SEP Type form with Reason") do
-  find(:xpath, '//select[@id="reason"]', :wait => 10).click
-  find(:xpath, '//*[@id="reason"]/option[9]').click
+  find('#reason option:nth-child(8)').select_option
 end
 
 And(/Admin fills active reason for (.*) SEP type form$/) do |market_kind|

@@ -5,6 +5,7 @@ Feature: Cost Savings Raw Application
   consumer shall not be able see or access Cost Savings page.
 
   Background:
+    Given bs4_consumer_flow feature is disable
     Given the FAA feature configuration is enabled
     And FAA display_medicaid_question feature is enabled
     And a family with financial application and applicants in determined state exists

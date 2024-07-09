@@ -105,7 +105,6 @@ document.addEventListener("turbolinks:load", function() {
     clonedForm.querySelector('.insurance-kind-label').innerHTML = selected.innerHTML;
     clonedForm.querySelector('#benefit_insurance_kind').value = selected.value;
     clonedForm.removeAttribute('id');
-    console.log(select.value)
     clonedForm.classList.remove('hidden');
     clonedForm.classList.add(selected.value);
     clonedForm.classList.add('benefit');
@@ -559,7 +558,9 @@ document.addEventListener("turbolinks:load", function() {
           $('#add_new_benefit_kind_is_enrolled').removeClass('hidden');
         } else {
           $('#add_new_benefit_kind_is_enrolled').addClass('hidden');
-          startEditing($('#has_enrolled_health_coverage_true').closest(".driver-question"));
+          if ($("body").data('bs4')) {
+            startEditing($('#has_enrolled_health_coverage_true').closest(".driver-question"));
+          }
         }
       } else{
         $("#enrolled-benefit-kinds").addClass('hide');

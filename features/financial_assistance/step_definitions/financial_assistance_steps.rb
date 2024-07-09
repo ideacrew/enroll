@@ -105,7 +105,6 @@ end
 
 Then(/^they should be taken to the applicant's Tax Info page$/) do
   sleep 5
-  #binding.irb
   expect(page).to have_selector("[data-cuke='tax_info_header']")
 end
 
