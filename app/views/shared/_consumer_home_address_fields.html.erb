@@ -73,32 +73,23 @@
           </div>
         </div>
         <% if kind == 'home' %>
-          <% if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
-            <% display_class="d-none" %>
-          <% end %>
-          <div class="address-row show no-dc-address-reasons <%= display_class %>">
+          <div class="address-row show no-dc-address-reasons mb-4">
             <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-                <div class="address_checkbox">
-                  <%= f.check_box :is_moving_to_state %>
-                  <label for="checkbox"><span><strong><%= l10n('insured.moving_to_dc') %></strong></span> <span><%= l10n('insured.moving_to_dc_extension') %></span></label>
-                </div>
-              </div>
+              <label class="weight-n">
+                 <%= f.check_box :is_moving_to_state %>
+                 <strong><%= l10n('insured.moving_to_dc') %> </strong><%= l10n('insured.moving_to_dc_extension') %>
+              </label>
             <% end %>
             <% if EnrollRegistry.feature_enabled?(:living_outside_state) %>
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-                <div class="address_checkbox">
-                  <%= f.check_box :is_temporarily_out_of_state %>
-                  <label for="checkbox"><span><strong><%= l10n('insured.outside_dc') %></strong></span> <span><%= l10n('insured.outside_dc_extension') %></span></label>
-                </div>
-              </div>
+              <label class="weight-n">
+                <%= f.check_box :is_temporarily_out_of_state %>
+                <strong><%= l10n('insured.outside_dc') %></strong> <%= l10n('insured.outside_dc_extension') %>
+              </label>
             <% end %>
-            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-              <label for="is_homeless">
-                <%= f.check_box :is_homeless, id: "is_homeless" %>
-                <span><strong><%= l10n('insured.dc_homeless') %></strong></span> <span><%= l10n('insured.dc_homeless_extension') %></span>
-              </div>
-            </div>
+            <label class="weight-n">
+              <%= f.check_box :is_homeless, id: "is_homeless" %>
+              <strong><%= l10n('insured.dc_homeless') %></strong> <%= l10n('insured.dc_homeless_extension') %>
+            </label>
           </div>
         <% end %>
       </div>

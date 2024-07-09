@@ -35,10 +35,9 @@
     </ul>
   </nav>
   <%= render partial: 'shared/shopping_nav_panel',
-      locals: { show_exit_button: nav[:show_exit_button].present? ? nav[:show_exit_button] : true,
-                show_previous_button: nav[:show_previous_button].present? ? nav[:show_previous_button] : false,
-                show_account_button: nav[:show_account_button].present? ? nav[:show_account_button] : false,
-                is_complete: nav[:is_complete].present? ? nav[:is_complete] : false,
-                show_help_button: nav[:show_help_button].present? ? nav[:show_help_button] : false,
-                back_to_account_flag: nav[:back_to_account_flag].present? ? nav[:back_to_account_flag] : EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
+      locals: { show_exit_button: !nav[:show_exit_button].nil? ? nav[:show_exit_button] : true,
+                show_previous_button: !nav[:show_previous_button].nil? ? nav[:show_previous_button] : false,
+                show_account_button: !nav[:show_account_button].nil? ? nav[:show_account_button] : false,
+                is_complete: !nav[:is_complete].nil? ? nav[:is_complete] : false,
+                back_to_account_flag: !nav[:back_to_account_flag].nil? ? nav[:back_to_account_flag] : EnrollRegistry.feature_enabled?(:back_to_account_all_shop) } %>
 <% end %>
