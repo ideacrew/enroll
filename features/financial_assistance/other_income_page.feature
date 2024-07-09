@@ -19,7 +19,7 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
   Scenario: User answers no to having other income
     Given the user answers no to having other income
     Then the other income choices should not show
-  
+
   Scenario: Divorce agreement copy displays
     Given the user answers yes to having other income
     Then the other income choices should show
