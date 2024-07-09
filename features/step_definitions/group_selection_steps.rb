@@ -326,7 +326,7 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
 end
 
 And(/(.*) should see the dental radio button/) do |role|
-  #bug logged
+  #bug logged for this issue, both health and dental radio buttons missing from UI
   expect(page).to have_css EmployeeChooseCoverage.dental_radio_btn
 end
 
@@ -430,11 +430,11 @@ When(/(.*) clicked continue on household info page/) do |role|
 end
 
 Then(/(.*) should see all the family members names/) do |role|
-  
+
   people = Person.all
   people.each do |person|
-    expect(page).to have_content "#{person.last_name}".upcase
-    expect(page).to have_content "#{person.first_name}".upcase
+    expect(page).to have_content("#{person.last_name}")
+    expect(page).to have_content("#{person.first_name}")
   end
 end
 

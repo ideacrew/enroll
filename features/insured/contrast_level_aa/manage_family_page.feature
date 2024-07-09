@@ -2,6 +2,7 @@
 
 Feature: Contrast level AA is enabled - existing consumer visits the manage family page
   Background:
+    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     Given a consumer exists
     And the consumer is logged in

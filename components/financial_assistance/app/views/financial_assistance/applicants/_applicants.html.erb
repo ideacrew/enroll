@@ -20,11 +20,11 @@
       </div>
       <div>
         <label for="primary-gender"><%= l10n("gender")%></label>
-        <input id="primary-gender" type="text" value="<%= "#{@person.gender.humanize}" %>" disabled >
+        <input id="primary-gender" type="text" value="<%= "#{@person.gender&.humanize}" %>" disabled >
       </div>
       <div>
         <label for="primary-relation"><%= l10n("relationship")%></label>
-        <input id="primary-relation" type="text" value="<%= l10n("self").humanize %>" disabled >
+        <input id="primary-relation" type="text" value="<%= l10n("self")&.humanize %>" disabled >
       </div>
     </div>
 
@@ -99,7 +99,7 @@
       </div>
       <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel" for="name"><%= l10n("gender").to_s.upcase %></label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.gender.humanize}" %></span>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.gender&.humanize}" %></span>
       </div>
       <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel" for="relation">RELATIONSHIP</label>

@@ -1,6 +1,7 @@
 Feature: Insured Plan Shopping on Individual market Document Errors
 
   Background:
+    Given bs4_consumer_flow feature is disable
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     Given AI AN Details feature is enabled
