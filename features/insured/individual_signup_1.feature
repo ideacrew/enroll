@@ -28,7 +28,7 @@ Feature: Insured Plan Shopping on Individual market 1
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
-    And Individual clicks on the Continue button of the Family Information page
+    And Individual clicks on the continue button
     And Individual clicks on continue button on Choose Coverage page
     And Individual selects a plan on plan shopping page
     And Individual checks the Insured portal open enrollment dates
