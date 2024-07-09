@@ -99,6 +99,7 @@ Then(/^Individual sees the error message (.*)$/) do |error_message|
 end
 
 Then(/^Individual should see the error message Invalid Social Security number$/) do
+  wait_for_ajax
   script = "return document.querySelector('.required.floatlabel.form-control.interaction-field-control-person-ssn.active-floatlabel').getAttribute('oninvalid');"
   invalid_value = page.execute_script(script)
   expect(invalid_value).to include("this.setCustomValidity('Invalid Social Security number.')")
