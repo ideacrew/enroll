@@ -1,6 +1,8 @@
 Feature: Non-congressional EE adding non-diabled 26 years old dependent
 
   Background: Setup site, employer, and benefit application
+    Given bs4_consumer_flow feature is disable
+    Given is your health coverage expanded question is disable
     Given the shop market configuration is enabled
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
@@ -26,6 +28,7 @@ Feature: Non-congressional EE adding non-diabled 26 years old dependent
     And employee should see the "my account" page
     When employee clicks "Losing other health insurance" link in the qle carousel
     And employee selects a current qle date
+    And employee clicks continue
     Then Individual clicks no and clicks continue
     And employee sees the QLE confirmation message and clicks on continue
     And employee clicks Add Member
@@ -39,7 +42,6 @@ Feature: Non-congressional EE adding non-diabled 26 years old dependent
     And employee sees the list of plans
     And employee selects a plan on the plan shopping page
     And employee clicks on Confirm button on the coverage summary page
-    And employee clicks back to my account button
     Then employee should see his active enrollment including his wife
     When Employee should click on Manage Family button
     And Employee should click on the Personal Tab link

@@ -1,6 +1,7 @@
 Feature: Start a new Financial Assistance Application and answers questions on Other Questions page
 
   Background: User logs in and visits applicant's other questions page
+    Given bs4_consumer_flow feature is disable
     And the FAA feature configuration is enabled
     And the primary caretaker question configuration is enabled
     And FAA student_follow_up_questions feature is enabled
