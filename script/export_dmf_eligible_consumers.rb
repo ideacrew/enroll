@@ -5,72 +5,67 @@
 # To run this script
 # bundle exec rails runner script/export_dmf_eligible_consumers.rb
 
-valid_eligibility_states = [
-                            'health_product_enrollment_status',
-                            'dental_product_enrollment_status'
-                          ].freeze
+require "#{Rails.root}/app/domain/operations/families/verifications/dmf_determination/dmf_utils.rb"
+include ::Operations::Families::Verifications::DmfDetermination::DmfUtils
 
-family_ids = Family.with_applied_aptc_or_csr_active_enrollments(csr_list).distinct(:_id)
+csv_headers = [
+  "Family Hbx ID",
+  "Person Hbx ID",
+  "Person First Name",
+  "Person Last Name",
+  "Enrollment Hbx ID",
+  "Enrollment Type",
+  "Enrollment Status"
+].freeze
 
-p "found #{family_ids.count} families"  unless Rails.env.test?
+dmf_eligibile_members = []
+
+Family.enrolled_members_with_ssn.no_timeout.each do |family|
+  family.family_members.each do |member|
+    eligibility_states = member_dmf_determination_eligible_enrollments(member, family)
+    next unless eligibility_states
+    next unless AcaEntities::Operations::EncryptedSsnValidator.new.call(member.person.encrypted_ssn).success?
+
+    enrollment_types = eligibility_states.map { |state| state.eligibility_item_key.split('_')[0] }.join(', ')
+    enrollment_hbx_id, enrollment_status = extract_enrollment_info(family, member.hbx_id)
+
+    consumer_hash = {
+      family_hbx_id: family.hbx_assigned_id,
+      person_hbx_id: member.person.hbx_id, 
+      person_first_name: member.person.first_name,
+      person_last_name: member.person.last_name,
+      enrollment_hbx_id: enrollment_hbx_id,
+      enrollment_types: enrollment_types,
+      enrollment_status: enrollment_status
+    }
+
+    dmf_eligibile_members << consumer_hash
+  end
+rescue StandardError => e
+  p "Error processing family with hbx_id #{family.hbx_assigned_id} due to #{e}"
+end
+
+p "found #{dmf_eligibile_members.size} dmf-eligible consumers"  unless Rails.env.test?
 
 CSV.open("export_dmf_eligible_consumers_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%H:%M:%S')}.csv", "w") do |csv|
-  csv << [
-      "Family Hbx ID",
-      "Person Hbx ID",
-      "First Name",
-      "Last Name",
-      "Enrollment Type",
-      "Enrollment Status"
-      ]
+  csv << csv_headers
+  consumers_counter = 0
 
-  families_counter = 0
-  applicants_counter = 0
+  puts "Processing dmf-eligible consumers" unless Rails.env.test?
 
-  puts "Processing families" unless Rails.env.test?
+  dmf_eligibile_members.each do |consumer_hash|
+    consumers_counter += 1
+    puts "Processing person with hbx_id #{person.hbx_id} and index at #{consumers_counter}" unless Rails.env.test?
 
-  family_ids.each do |family_id|
-    families_counter += 1
-    puts "Processing family_id: #{family_id} and index at #{families_counter}" unless Rails.env.test?
-    family = Family.where(:_id => family_id).first
-    primary_person = family.primary_person
-
-    applications = ::FinancialAssistance::Application.where(:family_id => family.id,
-                                                            :assistance_year => assistance_year,
-                                                            :aasm_state => 'determined',
-                                                            :"applicants.is_ia_eligible" => true)
-
-    determined_application = applications.max_by(&:submitted_at)
-    next if determined_application.blank?
-
-    determined_application.active_applicants.each do |applicant|
-      non_esi_evidence = applicant.non_esi_evidence
-      next if non_esi_evidence.blank?
-      request_result = non_esi_evidence.request_results.max_by(&:date_of_action)
-      pvc_determination = request_result&.result || 'no pvc result found'
-      workflow_transition = non_esi_evidence.workflow_state_transitions.max_by(&:transition_at)
-      verification_history = non_esi_evidence.verification_histories.max_by(&:date_of_action)
-
-      applicants_counter += 1
-
-      csv << [
-          primary_person.hbx_id,
-          applicant.person_hbx_id,
-          determined_application.hbx_id,
-          applicant.encrypted_ssn.present?,
-          non_esi_evidence.title,
-          workflow_transition&.transition_at,
-          workflow_transition&.from_state,
-          workflow_transition&.to_state,
-          verification_history&.date_of_action,
-          verification_history&.action,
-          verification_history&.update_reason,
-          verification_history&.updated_by,
-          request_result&.date_of_action,
-          pvc_determination
-      ]
-    end
+    csv << [
+      consumer_hash[:family_hbx_id],
+      consumer_hash[:person_hbx_id],
+      consumer_hash[:person_first_name],
+      consumer_hash[:person_last_name],
+      consumer_hash[:enrollment_hbx_id],
+      consumer_hash[:enrollment_types],
+      consumer_hash[:enrollment_status]
+    ]
   end
-  p "processed #{applicants_counter} applicants"  unless Rails.env.test?
-  p "processed #{families_counter} families"  unless Rails.env.test?
+  p "processed #{consumers_counter} consumers"  unless Rails.env.test?
 end

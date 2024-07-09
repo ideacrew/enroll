@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 describe 'export_dmf_eligible_consumers_families' do
+  include Dry::Monads[:result, :do]
+
   before do
     DatabaseCleaner.clean
   end
@@ -83,6 +85,7 @@ describe 'export_dmf_eligible_consumers_families' do
         person_id: family_member.person.id
       )
 
+      subject.eligibility_states.create(eligibility_item_key: 'health_product_enrollment_status', is_eligible: true)
       state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
       state.grants.create(
         key: "CsrAdjustmentGrant",
@@ -94,6 +97,8 @@ describe 'export_dmf_eligible_consumers_families' do
       )
     end
 
+    determination.subjects[0].update(hbx_id: primary_applicant.hbx_id, encrypted_ssn: "Ih3m7vvmvWg7qcf1N6B6Hw==\n")
+    determination.subjects[0].eligibility_states.create(eligibility_item_key: 'dental_product_enrollment_status', is_eligible: true)
     determination
   end
 
@@ -150,14 +155,20 @@ describe 'export_dmf_eligible_consumers_families' do
     [
       "Family Hbx ID",
       "Person Hbx ID",
-      "First Name",
-      "Last Name",
+      "Person First Name",
+      "Person Last Name",
+      "Enrollment Hbx ID",
       "Enrollment Type",
       "Enrollment Status"
     ]
   end
 
+  let(:encrypted_ssn_validator) { double(AcaEntities::Operations::EncryptedSsnValidator) }
+
   before :each do
+    allow(AcaEntities::Operations::EncryptedSsnValidator).to receive(:new).and_return(encrypted_ssn_validator)
+    allow(encrypted_ssn_validator).to receive(:call).and_return(Success('success'))
+
     application.non_primary_applicants.each{|applicant| application.ensure_relationship_with_primary(applicant, applicant.relationship) }
     invoke_export_dmf_determination_eligible_consumers_report
     @file_content = CSV.read(filename)
@@ -169,6 +180,24 @@ describe 'export_dmf_eligible_consumers_families' do
 
   it 'should contain the requested fields' do
     expect(@file_content[0]).to eq(field_names)
+  end
+
+  it 'should contain eligible consumer details' do
+    consumer_content = [
+      family.hbx_assigned_id.to_s,
+      primary_applicant.hbx_id,
+      primary_applicant.first_name,
+      primary_applicant.last_name,
+      hbx_enrollment.hbx_id,
+      "health, dental",
+      hbx_enrollment.aasm_state
+    ]
+
+    expect(@file_content[1]).to eq(consumer_content)
+  end
+
+  it 'should does not include non-eligible members of Familes with eligibile members' do
+    expect(@file_content[2]).to be_nil
   end
 
   after :each do
