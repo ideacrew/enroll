@@ -45,7 +45,7 @@ module Operations
           if before_person_saved.success?
             Success({before_save_cv3_family: before_save_cv3_family, after_save_cv3_family: cv3_family.success})
           else
-            Rails.logger.info { "Before Save CV3 Family failed for family: #{values[:after_save_version][:hbx_id]} #{before_person_saved.failure} "}
+            Rails.logger.info { "Before Save CV3 Family failed due to: #{before_person_saved.failure} "}
             Success({before_save_cv3_family: {}, after_save_cv3_family: cv3_family.success})
           end
         else
