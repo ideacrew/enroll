@@ -568,8 +568,10 @@ Then(/Individual does not see the error on tooltip indicating a password longer 
   if EnrollRegistry[:bs4_consumer_flow].enabled?
 
   else
-    sleep 5
-    expect(find(".longer")[:class]).not_to include("fa-times")
+    wait_for_ajax
+    script = "return document.querySelector('.longer').getAttribute('data-icon');"
+    data_icon_value = page.execute_script(script)
+    expect(data_icon_value).to eq('check')
   end
 end
 

@@ -39,7 +39,6 @@ And(/^Identity verification is OUTSTANDING$/) do
 end
 
 Then(/^the CONTINUE button is functionally DISABLED$/) do
-  #bug logged for this, Continue button missing from UI
   expect(['disabled', 'true']).to include(find('.interaction-click-control-continue')['disabled'])
 end
 

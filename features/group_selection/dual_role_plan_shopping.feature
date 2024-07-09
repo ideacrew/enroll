@@ -2,6 +2,7 @@ Feature: EE with consumer role plan purchase
 
   # TODO: revisit code for background scenarios
   Background: Setup permissions, HBX Admin, users, and organizations and employer profiles
+    Given bs4_consumer_flow feature is disable
     Given enable change tax credit button is enabled
     Given the shop market configuration is enabled
     Given all announcements are enabled for user to select
