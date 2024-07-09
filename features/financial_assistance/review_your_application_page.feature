@@ -1,6 +1,7 @@
 Feature: Review your application page functionality 1
 
   Background: Review your application page
+    Given bs4_consumer_flow feature is disable
     Given a consumer exists with family
     And the consumer is RIDP verified
     And is logged in

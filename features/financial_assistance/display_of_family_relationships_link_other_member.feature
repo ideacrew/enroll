@@ -1,6 +1,7 @@
 Feature: Conditional Display of Family Relationships link in the left nav of the FAA Household Info page.
 
   Background: Household Info page
+    Given bs4_consumer_flow feature is disable
     Given a consumer exists with family
     And the consumer is RIDP verified
     And is logged in
