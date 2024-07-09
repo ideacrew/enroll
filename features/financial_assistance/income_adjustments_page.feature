@@ -1,6 +1,7 @@
 Feature: Start a new Financial Assistance Application and fills out Income Adjustments form
 
   Background: User logs in and visits applicant's income adjustments page
+    Given bs4_consumer_flow feature is disable
     Given EnrollRegistry crm_update_family_save feature is disabled
     Given EnrollRegistry crm_publish_primary_subscriber feature is disabled
     Given divorce agreement year feature is disabled
