@@ -644,7 +644,7 @@ class Person
     end
     if existing_relationship
       existing_relationship.kind = relationship
-      save!
+      save
     elsif id != person.id
       self.person_relationships << PersonRelationship.new({
                                                             :kind => relationship,

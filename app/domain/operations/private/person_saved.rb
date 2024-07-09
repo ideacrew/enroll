@@ -2,7 +2,7 @@
 
 module Operations
   module Private
-    # This class publishes before and after save cv3 family payloads
+    # This class publishes before and after save cv family payloads
     class PersonSaved
       include Dry::Monads[:result, :do]
       include EventSource::Command
@@ -26,35 +26,35 @@ module Operations
 
       def construct_and_publish_cv_family_events(headers, person, values)
         person.families.each do |family|
-          payload = construct_before_and_after_cv3_family(family, headers, person, values)
+          payload = construct_before_and_after_cv_family(family, headers, person, values)
           return payload if payload.failure?
           event('events.families.created_or_updated', attributes: payload.success, headers: headers)&.success&.publish
         end
         Success("Successfully published 'events.families.created_or_updated' for person with hbx_id: #{person.hbx_id}")
       end
 
-      def construct_before_and_after_cv3_family(family, _headers, _person, values)
-        cv3_family = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
-        if cv3_family.success?
-          before_save_cv3_family = cv3_family.success.deep_dup
-          before_family_member = before_save_cv3_family[:family_members].detect do |family_member|
+      def construct_before_and_after_cv_family(family, _headers, _person, values)
+        cv_family = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+        if cv_family.success?
+          before_save_cv_family = cv_family.success.deep_dup
+          before_family_member = before_save_cv_family[:family_members].detect do |family_member|
             family_member[:person][:hbx_id] == values[:after_save_version][:hbx_id]
           end
 
           before_person_saved = ::Operations::CreateBeforePersonSaved.new.call(values[:changed_attributes], before_family_member)
           if before_person_saved.success?
-            Success({before_save_cv3_family: before_save_cv3_family, after_save_cv3_family: cv3_family.success})
+            Success({before_save_cv_family: before_save_cv_family, after_save_cv_family: cv_family.success})
           else
-            Rails.logger.info { "Before Save CV3 Family failed due to: #{before_person_saved.failure} "}
-            Success({before_save_cv3_family: {}, after_save_cv3_family: cv3_family.success})
+            Rails.logger.info { "Before Save CV Family failed due to: #{before_person_saved.failure} "}
+            Success({before_save_cv_family: {}, after_save_cv_family: cv_family.success})
           end
         else
-          Rails.logger.error { "Failed to construct cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to #{cv3_family.failure}" }
-          Failure("Failed to construct cv3 family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to #{cv3_family.failure}")
+          Rails.logger.error { "Failed to construct cv family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to #{cv_family.failure}" }
+          Failure("Failed to construct cv family for family with hbx id: #{values[:after_save_version][:hbx_id]} due to #{cv_family.failure}")
         end
       rescue StandardError => e
-        Rails.logger.error {"Error constructing cv3 family for family: #{family&.primary_person&.hbx_id} due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}"}
-        Failure("Error constructing cv3 family due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}")
+        Rails.logger.error {"Error constructing cv family for family: #{family&.primary_person&.hbx_id} due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}"}
+        Failure("Error constructing cv family due to: #{e.message}, backtrace: #{e.backtrace.join("\n")}")
       end
 
       def find_person(after_save_version)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Operations
-  # Class to update before save cv3 family payload
+  # Class to update before save cv family payload
   class CreateBeforePersonSaved
     include Dry::Monads[:result, :do]
 
@@ -9,19 +9,19 @@ module Operations
 
     def call(changed_attributes, family_member)
       values = yield validate(changed_attributes, family_member)
-      build_before_save_cv3_family(values)
+      build_before_save_cv_family(values)
     end
 
     private
 
     def validate(changed_attributes, family_member)
       return Failure('changed attributes not present') if changed_attributes.empty?
-      return Failure('cv3 family member not present') if family_member.empty?
+      return Failure('cv family member not present') if family_member.empty?
 
       Success(changed_attributes: changed_attributes, family_member: family_member)
     end
 
-    def build_before_save_cv3_family(values)
+    def build_before_save_cv_family(values)
       changed_attributes = values[:changed_attributes]
       family_member = values[:family_member]
 
@@ -39,8 +39,8 @@ module Operations
       build_before_person_relationships_saved(person, changed_person_relationship_attributes)
       Success(family_member)
     rescue StandardError => e
-      Rails.logger.error { "Failed to build before save cv3 family due to #{e.message} backtrace: #{e.backtrace.join("\n")}" }
-      Failure("Failed to build before save cv3 family due to #{e.message} backtrace: #{e.backtrace.join("\n")}")
+      Rails.logger.error { "Failed to build before save cv family due to #{e.message} backtrace: #{e.backtrace.join("\n")}" }
+      Failure("Failed to build before save cv family due to #{e.message} backtrace: #{e.backtrace.join("\n")}")
     end
 
     def build_before_person_saved(person, changed_person_attributes)
