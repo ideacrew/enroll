@@ -552,7 +552,8 @@ end
 When (/^(.*) logs? out$/) do |someone|
   find_link('Logout', wait: 5)
   click_link "Logout"
-  visit "/"
+  sleep 5
+  visit "http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"
   find('.container.welcome', wait: 5) do |element|
     element.find('.heading-text', text: /Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}/i)
     element.find('.sub-text', text: /#{EnrollRegistry[:enroll_app].setting(:byline).item}/i)

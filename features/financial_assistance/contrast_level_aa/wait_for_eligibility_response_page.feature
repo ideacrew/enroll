@@ -1,6 +1,7 @@
 Feature: Contrast level AA is enabled - The page that appears while the user is waiting for eligibility results to be returned
 
   Scenario: User is waiting for eligibility results
+   Given bs4_consumer_flow feature is disable
     Given the contrast level aa feature is enabled
     And the FAA feature configuration is enabled
     And the user is on FAA Household Info: Family Members page
