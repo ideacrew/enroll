@@ -29,11 +29,6 @@ module NavigationHelper
     return true if controller_name == "family_members" && action_name == "index"
   end
 
-  def local_assigned_boolean(local, default)
-    return default unless local
-    local == "true"
-  end
-
   def special_enrollment_period_hash
     if @change_plan.blank?
       sep_nav_options
@@ -92,12 +87,12 @@ module NavigationHelper
     nav[:step] = step
     nav[:title] = l10n('account_setup')
 
-    nav[:show_help_button] = show_help_button ? true : (step != 1 && step < 6)
-    nav[:show_exit_button] = !['match', 'search'].include?(action_name) && step < 6
+    nav[:show_help_button] = show_help_button ? true : (step == 2)
+    nav[:show_exit_button] = !['match', 'search'].include?(action_name)
     nav[:show_previous_button] = false
-    nav[:show_account_button] = step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
-    nav[:is_complete] = step == 6
-    nav[:back_to_account_flag] == false
+    nav[:show_account_button] = false
+    nav[:is_complete] = false
+    nav[:back_to_account_flag] = false
 
     nav
   end
