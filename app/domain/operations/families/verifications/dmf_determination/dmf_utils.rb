@@ -26,7 +26,7 @@ module Operations
           end
 
           def extract_enrollment_info(family, hbx_id)
-            family.enrollments.where(:'aasm_state'.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).each do |enrollment|
+            family.enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).each do |enrollment|
               # get first active enrollment which includes the hbx_id (person) as a member
               next if enrollment.hbx_enrollment_members.none? { |member| member.hbx_id == hbx_id }
 
