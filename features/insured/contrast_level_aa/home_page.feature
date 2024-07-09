@@ -1,5 +1,6 @@
 Feature: Contrast level AA is enabled - Consumer shops for plan
   Background: Setup IVL benefit packages and benefit coverage periods
+    Given bs4_consumer_flow feature is enabled
     Given the contrast level aa feature is enabled
     Given the FAA feature configuration is enabled
     And Individual market is not under open enrollment period

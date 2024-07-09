@@ -1,6 +1,7 @@
 Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP BSD
 
   Background: Singing up a consumer account and landing on the Personal information page
+    Given bs4_consumer_flow feature is disable
     Given Individual has not signed up as an HBX user
     And EnrollRegistry tobacco_cost feature is disabled
     When the user visits the Consumer portal during open enrollment
