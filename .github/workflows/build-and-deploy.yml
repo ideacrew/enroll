@@ -6,10 +6,12 @@ on:
     branches:
       - 'trunk'
       - 'rails-upgrade-5.2-6.0'
+      - 'ticket_187349466'
   pull_request:
     branches:
       - 'trunk'
       - 'rails-upgrade-5.2-6.0'
+      - 'ticket_187349466'
 
 concurrency:
   group: docker-${{ github.ref }}

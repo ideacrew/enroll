@@ -626,6 +626,9 @@ class Exchanges::HbxProfilesController < ApplicationController
   def configuration
     authorize HbxProfile, :configuration?
 
+    family =  Person.where(hbx_id: "1000595").first.primary_family
+    result = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+    @cv3_family = result.success? ? result.success : nil
     @time_keeper = Forms::TimeKeeper.new
     respond_to do |format|
       format.html { render '/exchanges/hbx_profiles/configuration_index.html.erb' }

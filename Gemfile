@@ -116,6 +116,9 @@ gem 'dry-configurable', '0.13.0'
 gem 'dry-container', '0.9.0'
 gem 'devise-security'
 gem 'file_validators'
+gem 'rack-mini-profiler'
+gem 'memory_profiler'
+gem 'stackprof'
 
 group :development do
   gem "certified",              '~> 1'

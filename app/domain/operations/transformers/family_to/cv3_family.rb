@@ -215,6 +215,10 @@ module Operations
             }
             if enrollments.present?
               transformed_enrollments = transform_hbx_enrollments(enrollments, options)
+              Rack::MiniProfiler.step('Transform hbx_enrollments') do
+                transform_hbx_enrollments(enrollments, options)
+              end
+
               return transformed_enrollments if transformed_enrollments.failure?
 
               household_data.merge!(hbx_enrollments: transformed_enrollments.value!)

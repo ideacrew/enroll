@@ -13,8 +13,9 @@ module Operations
         rating_area       = yield find_rating_area(values[:effective_date], values[:address])
         service_areas     = yield find_service_areas(values[:effective_date], values[:address])
         query             = yield query_criteria(rating_area.id, service_areas.map(&:id), values[:effective_date])
-        products          = yield fetch_products(query, values)
-        payload           = yield construct_payload(products, rating_area.id)
+        cache_key         = yield construct_cache_key(rating_area.id, service_areas.map(&:id), values[:effective_date])
+        products          = yield fetch_products(cache_key, query, values)
+        payload           = yield construct_payload(products, rating_area.id, rating_area.exchange_provided_code)
 
         Success(payload)
       end
@@ -58,8 +59,22 @@ module Operations
                 })
       end
 
-      def fetch_products(query_criteria, values)
-        products = BenefitMarkets::Products::Product.where(query_criteria)
+      def construct_cache_key(rating_area, service_areas, effective_date)
+        Success({
+          :metal_level_kinds => [:silver, :dental],
+          :'rating_area_id' => rating_area.to_s,
+          :service_area_ids => service_areas.map(&:to_s),
+          :active_year => effective_date.year,
+          :benefit_market_kind => :aca_individual
+        })
+      end
+
+
+      def fetch_products(cache_key, query_criteria, values)
+        products = Rails.cache.fetch(cache_key.to_json, expire_in: 12.hours) do
+          BenefitMarkets::Products::Product.where(query_criteria).to_a
+        end
+
         if products.present?
           Success(products)
         else
@@ -67,8 +82,9 @@ module Operations
         end
       end
 
-      def construct_payload(products, rating_area_id)
-        Success({products: products, rating_area_id: rating_area_id})
+      def construct_payload(products, rating_area_id, rating_area_exchange_provided_code)
+        Success({products: products, rating_area_id: rating_area_id,
+                 rating_area_exchange_provided_code: rating_area_exchange_provided_code})
       end
     end
   end

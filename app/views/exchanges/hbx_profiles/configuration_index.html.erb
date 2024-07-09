@@ -3,6 +3,7 @@
   <div class="bottom-pd">
       <h1 class="heading-text">Configuration</h1>
     <div class="input-no-pd">
+      <%= @cv3_family[:hbx_id] %>
       <%= link_to 'Announcements', exchanges_announcements_path, {class: 'btn btn-default'} %>
       <% if aca_security_questions %>
         <%= link_to 'Security Questions', exchanges_security_questions_path, {class: 'btn btn-default'} %>
