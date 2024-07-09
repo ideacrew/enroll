@@ -1,6 +1,7 @@
 Feature: Start a new Financial Assistance Application and fills out Other Income form
 
   Background: User logs in and visits applicant's other income page
+    Given bs4_consumer_flow feature is disable
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
@@ -137,8 +138,6 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
 
   Scenario: Divorce agreement copy displays
     Given divorce agreement year feature is enabled
-    And they visit the other income page via the left nav
-    And the user will navigate to the Other Income page for the corresponding applicant
     Given the user answers yes to having other income
     Then the other income choices should show
     Then the divorce agreement copy should show

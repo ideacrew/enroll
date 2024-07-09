@@ -4,11 +4,15 @@
 class IvlIapHealthCoveragePage
 
   def self.has_enrolled_health_coverage_yes_radiobtn
-    'has_enrolled_health_coverage_true'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    '#has_enrolled_health_coverage_true'
+    end
   end
 
   def self.has_enrolled_health_coverage_no_radiobtn
-    'has_enrolled_health_coverage_false'
+    '#has_enrolled_health_coverage_false'
   end
 
   def self.not_sure_has_enrolled_health_coverage_link
@@ -176,11 +180,11 @@ class IvlIapHealthCoveragePage
   end
 
   def self.has_eligible_health_coverage_yes_radiobtn
-    'has_eligible_health_coverage_true'
+    '#has_eligible_health_coverage_true'
   end
 
   def self.has_eligible_health_coverage_no_radiobtn
-    'has_eligible_health_coverage_false'
+    '#has_eligible_health_coverage_false'
   end
 
   def self.not_sure_has_eligible_health_coverage_link
@@ -200,7 +204,7 @@ class IvlIapHealthCoveragePage
   end
 
   def self.medicare_glossary_link
-    '.medicare span'
+    '[data-title="Medicare"]'
   end
 
   def self.coverage_obtained_through_another_exchange
@@ -209,5 +213,17 @@ class IvlIapHealthCoveragePage
 
   def self.coverage_obtained_through_another_exchange_glossary_link
     '.coverage_obtained_through_another_exchange span'
+  end
+
+  def self.has_eligible_medicaid_cubcare_false
+    '#has_eligible_medicaid_cubcare_false'
+  end
+
+  def self.has_eligibility_changed_false
+    '#has_eligibility_changed_false'
+  end
+
+  def self.mainecare_ineligible_question_text
+    "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since"
   end
 end

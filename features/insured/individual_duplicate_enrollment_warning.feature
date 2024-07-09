@@ -23,7 +23,7 @@ Feature: Individual market with duplicate enrollments
     And Individual clicks on Add New Person
     And Individual adds spouse dependent info
     Then Individual confirms dependent info
-    And Individual clicks on the Continue button of the Family Information page
+    When the Individual clicks CONTINUE
     And Individual clicks on continue button on Choose Coverage page
     And Individual selects a plan on plan shopping page
     And Individual clicks on purchase button on confirmation page

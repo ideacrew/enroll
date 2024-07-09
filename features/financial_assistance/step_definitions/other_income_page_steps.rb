@@ -122,7 +122,7 @@ Then(/^the other income form should not show$/) do
 end
 
 When(/^the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link$/) do
-  click_link('BACK TO ALL HOUSEHOLD MEMBERS')
+  find('.interaction-click-control-back-to-all-household-members').click
 end
 
 Then(/^a modal should show asking the user are you sure you want to leave this page$/) do

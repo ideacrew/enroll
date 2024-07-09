@@ -1,6 +1,5 @@
 Feature: Contrast level AA is enabled - Insured Plan Shopping with SEP
   Background:
-    Given bs4_consumer_flow feature is disable
     Given the contrast level aa feature is enabled
     Given the FAA feature configuration is enabled
     Given individual Qualifying life events are present
@@ -20,7 +19,7 @@ Feature: Contrast level AA is enabled - Insured Plan Shopping with SEP
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     Then Individual does not apply for assistance and clicks continue
-    And Individual clicks on the Continue button of the Family Information page
+    And Individual navigates to Sep Page
     When Individual click the "Had a baby" in qle carousel
     And Individual selects a current qle date
     Then Individual should see confirmation and continue

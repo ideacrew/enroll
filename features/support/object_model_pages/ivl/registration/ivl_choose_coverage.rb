@@ -36,7 +36,11 @@ class IvlChooseCoverage
   end
 
   def self.continue_btn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+    '.interaction-click-control-continue-to-next-step'
+    else
     '.interaction-click-control-continue'
+    end
   end
 
   def self.choose_coverage_for_your_household_text

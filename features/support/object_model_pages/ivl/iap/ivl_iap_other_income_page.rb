@@ -4,11 +4,19 @@
 class IvlIapOtherIncomePage
 
   def self.has_unemployment_income_yes_radiobtn
-    'has_unemployment_income_true'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+    
+    else
+      '#has_unemployment_income_true'
+    end
   end
 
   def self.has_unemployment_income_no_radiobtn
-    'has_unemployment_income_false'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    '#has_unemployment_income_false'
+    end
   end
 
   def self.not_sure_has_unemployment_link
@@ -64,11 +72,19 @@ class IvlIapOtherIncomePage
   end
 
   def self.has_other_income_yes_radiobtn
-    'has_other_income_true'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    '#has_other_income_true'
+    end
   end
 
   def self.has_other_income_no_radiobtn
-    'has_other_income_false'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+
+    else
+    '#has_other_income_false'
+    end
   end
 
   def self.not_sure_has_other_income_link
@@ -80,7 +96,11 @@ class IvlIapOtherIncomePage
   end
 
   def self.continue_btn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+     '.interaction-click-control-continue-to-next-step'
+    else
     '.interaction-click-control-continue'
+    end
   end
 
   def self.alimony_received_checkbox
