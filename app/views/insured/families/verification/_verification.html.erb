@@ -1,5 +1,12 @@
 <% if @bs4 %>
   <h2>Verification Documents</h2> <%# TODO: localize %>
+  <% if can_show_due_date?(@person) %>
+    <% due_date = @person.primary_family&.eligibility_determination&.outstanding_verification_earliest_due_date || default_verification_due_date %>
+    <dl class="d-flex">
+      <dt><%= l10n("document_due_date") %>:</dt>
+      <dd><%= due_date %> <%= "(#{l10n("past_date")})" if due_date <= TimeKeeper.date_of_record %></dd>
+    </dl>
+  <% end %>
   <% @family_members.each do |family_member| %>
     <% person = family_member.person %>
     <section class="card">
