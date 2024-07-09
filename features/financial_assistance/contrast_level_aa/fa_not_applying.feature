@@ -1,9 +1,11 @@
 Feature: Contrast level AA is enabled - User is not applying for financial assistance
   Background:
+    Given bs4_consumer_flow feature is enable
     Given the contrast level aa feature is enabled
     Given the FAA feature configuration is enabled
     When the user is applying for a CONSUMER role
     And the primary member has filled mandatory information required
+    And the person named Patrick Doe is RIDP verified
     And the primary member authorizes system to call EXPERIAN
     And system receives a positive response from the EXPERIAN
     And the user answers all the VERIFY IDENTITY  questions
