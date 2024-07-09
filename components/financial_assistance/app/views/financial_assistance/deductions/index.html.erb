@@ -9,10 +9,9 @@
       <legend class="weight-n required">
         <span><%= l10n("faa.deductions.income_adjustments", subject: applicant_name) %></span>
       </legend>
-      <% has_deductions = @applicant.has_deductions == true %>
       <div class="d-flex align-items-center focus">
-        <label class="weight-n"><%= radio_button_tag :has_deductions, true, has_deductions %><span><%= l10n('yes') %></span></label>
-        <label class="weight-n"><%= radio_button_tag :has_deductions, false, has_deductions == false %><span><%= l10n('no') %></span></label>
+        <label class="weight-n"><%= radio_button_tag :has_deductions, true, @applicant.has_deductions %><span><%= l10n('yes') %></span></label>
+        <label class="weight-n"><%= radio_button_tag :has_deductions, false, @applicant.has_deductions == false %><span><%= l10n('no') %></span></label>
       </div>
     </fieldset>
     <div>
