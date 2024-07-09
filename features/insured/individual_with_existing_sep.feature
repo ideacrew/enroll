@@ -12,5 +12,5 @@ Feature: Consumer shops for plan with existing seps
     When Patrick Doe clicks continue from qle
     Then Patrick Doe should see family members page and clicks continue
     And Patrick Doe should see the group selection page
-    When Patrick Doe clicks Back to my account button
+    And Patrick Doe clicks on back to my account button
     Then Patric Doe should land on Home page and should see Shop for Plans Banner

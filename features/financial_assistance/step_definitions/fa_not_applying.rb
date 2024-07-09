@@ -292,12 +292,11 @@ And(/Individual fills in info required and selects text only as contact option/)
     fill_in IvlPersonalInformation.zip, with: '04330'
   else
   fill_in IvlPersonalInformation.city, with: personal_information[:city]
-  find(IvlPersonalInformation.select_dc_state).click
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
+  find('#address_info li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
 end
-  
-  
-  fill_in "person_phones_attributes_1_full_phone_number", with: "23424512343"
+    fill_in "person_phones_attributes_1_full_phone_number", with: "23424512343"
   
   if find('#contact_type_text').checked?
     find(IvlPersonalInformation.mail_checkbox).click
@@ -334,7 +333,8 @@ And(/Individual fills in info required and selects no contact option/) do
     fill_in IvlPersonalInformation.zip, with: '04330'
   else
   fill_in IvlPersonalInformation.city, with: personal_information[:city]
-  find(IvlPersonalInformation.select_dc_state).click
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
+  find('#address_info li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
   end
 

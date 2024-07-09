@@ -1,6 +1,6 @@
 <% if @bs4 %>
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 3} %>
-  <%= form_for @application, url: {action: "submit"}, method: :put do |f| %>
+  <%= form_for @application, url: {action: "submit_your_application_save"}, method: :put do |f| %>
     <h1><%= l10n("faa.submit_application_header") %></h1>
     <p><%= l10n('faa.last_step_1') %> <%= l10n('faa.last_step_2') %></p>
     <h2><%= l10n("insured.preferences.agreements") %></h2>
@@ -84,7 +84,7 @@
 
     <fieldset class="my-4">
       <legend class="weight-n"><%= l10n("faa.electronic_signature") %></legend>
-      <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+      <% person = @application.try(:primary_applicant) %>
       <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
       <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
       <div class="col-md-4 px-0">
@@ -102,7 +102,7 @@
     </fieldset>
     <div class="mt-4">
     <% content_for :submit_button do %>
-      <%= submit_tag l10n("submit_application"), class: "btn"  %>
+      <%= f.submit l10n("submit_application"), class: "btn"  %>
     <% end %>
     <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
       previous_link: preferences_application_path(@application), show_back_to_household_button: true } %>
@@ -110,8 +110,7 @@
   <% end %>
 
 <% else %>
-
-  <%= form_for @application, url: {action: "submit"}, method: :put do |f| %>
+  <%= form_for @application, url: {action: "submit_your_application_save"}, method: :put do |f| %>
     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
       <div class="col-md-9">
         <div class="">
@@ -177,11 +176,11 @@
               </div>
               <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
                 <div class="col-md-2">
-                  <%= f.radio_button("parent_living_out_of_home_terms", false, class: "radio-yml", id: "living_outside_yes", required: true) %>
+                  <%= f.radio_button("parent_living_out_of_home_terms", true, class: "radio-yml", id: "living_outside_yes", required: true) %>
                   <label class="radio-yml" for="living_outside_yes">Yes</label>
                 </div>
                 <div class='col-md-2'>
-                  <%= f.radio_button("parent_living_out_of_home_terms", true, class: "radio-yml", id: "living_outside_no", required: true) %>
+                  <%= f.radio_button("parent_living_out_of_home_terms", false, class: "radio-yml", id: "living_outside_no", required: true) %>
                   <label class="radio-yml" for="living_outside_no">No</label>
                 </div>
               </div>
@@ -238,19 +237,19 @@
                 </div>
                 <div class="col-md-4">
                   <%= text_field_tag "first_name_thank_you", nil, placeholder: "First Name *", required: true, class: "floatlabel thank_you_field", id: "first_name_thank_you" %>
-                  <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+                  <% person = @application.try(:primary_applicant) %>
                   <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
                   <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
                 </div>
                 <div class="col-md-4">
                   <%= text_field_tag "middle_name_thank_you", nil, placeholder: "Middle Name", required: false, class: "floatlabel thank_you_field" %>
-                  <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+                  <% person = @application.try(:primary_applicant) %>
                   <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
                   <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
                 </div>
                 <div class="col-md-4">
                   <%= text_field_tag "last_name_thank_you", nil, placeholder: "Last Name *", required: false, class: "floatlabel thank_you_field", id: "last_name_thank_you" %>
-                  <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+                  <% person = @application.try(:primary_applicant) %>
                   <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
                   <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
                 </div>
@@ -268,7 +267,7 @@
         </div>
       </div>
       <div class="col-md-3">
-        <%= submit_tag 'Submit Application', :class => "btn btn-lg btn-primary"  %>
+        <%= f.submit 'Submit Application', class: "btn btn-lg btn-primary"  %>
         <p class="small-left-margin very-small-margin-top faded">
           <ul class='list-unstyled list-right-section'>
             <li>

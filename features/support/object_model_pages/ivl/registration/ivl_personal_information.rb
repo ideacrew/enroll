@@ -110,7 +110,7 @@ class IvlPersonalInformation
       ''
     else
     'label[for="radio_female"] span'
-    end
+     end
   end
 
   def self.reason_yes_radiobtn
