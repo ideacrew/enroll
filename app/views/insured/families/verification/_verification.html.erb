@@ -13,26 +13,34 @@
       <h3 class="mb-0"><%= person.full_name %></h3>
       <hr>
       <% verification_filter = if EnrollRegistry.feature_enabled?(:location_residency_verification_type) %>
-        <% person.verification_types.active.all%>
+        <% person.verification_types.active.all %>
       <% else %>
         <% person.verification_types.active.all.select {|v_type| v_type.type_name != EnrollRegistry[:enroll_app].setting(:state_residency).item} %>
       <% end %>
       <% verification_filter.each do |verif_type| %>
         <% v_type = verif_type.type_name %>
+        <% display_due_date = VerificationType::DUE_DATE_STATES.include?(verif_type.validation_status) %>
         <% if can_display_or_modify_type?(verif_type) %>
           <div class="my-3">
             <div class="row mb-2 p-0">
-              <div class="d-flex col-sm align-items-center">
-                <div class="col-5 px-0">
+              <div class="d-flex col-lg <%= "pr-0" if display_due_date %> pb-2 pb-lg-0 align-items-center">
+                <div class="<%= display_due_date ? "col-xl-5 col-lg-3 col-md-5 col-3" : "col-5" %> px-0">
                   <h6 class="my-0"><%= display_verification_type_name(v_type) %></h6>
                 </div>
-                <div class="d-flex ml-sm-0 ml-auto">
+                <div class="d-flex <%= "ml-auto ml-lg-0" unless display_due_date %>">
                   <span class="badge badge-status badge-<%= verification_type_class(verif_type.validation_status) %> p-2" id="status">
                     <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
+                    <%= pundit_span Family, :updateable? %>
                   </span>
                 </div>
-              </div> <%= pundit_span Family, :updateable? %>
-              <div class="d-flex col-sm">
+                <% if display_due_date %>
+                  <dl class="d-flex col justify-content-end align-items-center mb-0">
+                    <dt><%= l10n("due_date") %>:</dt>
+                    <dd><%= verif_type.verif_due_date %></dd>
+                  </dl>
+                <% end %>
+              </div>
+              <div class="d-flex col-lg-auto pl-lg-0 justify-content-lg-end">
                 <% if current_user.has_hbx_staff_role? %>
                   <span class="v-type-actions mr-2">
                     <%= select_tag :verification_actions, admin_actions(verif_type, family_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
@@ -40,7 +48,7 @@
                 <% end %>
                 <% if display_upload_for_verification?(verif_type) %>
                   <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
-                    <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file">
+                    <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file text-nowrap">
                       <i class="fa fa-upload" aria-hidden="true"></i>
                       <label>
                         <%= l10n('upload_documents') %>
