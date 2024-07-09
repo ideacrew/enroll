@@ -114,7 +114,7 @@ RSpec.describe ::Operations::CreateBeforePersonSaved, dbclean: :after_each do
       end
 
       it "returns failure message" do
-        expect(@result.failure).to eql("cv3 family member not present")
+        expect(@result.failure).to eql("cv family member not present")
       end
     end
   end
