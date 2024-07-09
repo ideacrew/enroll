@@ -76,9 +76,7 @@
     <%# Applicants summary %>
     <% @applicants.each do |applicant| %>
       <section>
-        <div class="mb-4">
-          <h2><%= capitalize_full_name(applicant.full_name) %></h2>
-        </div>
+        <h2 class="mb-4"><%= capitalize_full_name(applicant.full_name) %></h2>
         <% applicant_summary_hashes(applicant, false).each do |subsection| %>
           <%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: subsection, applicant: applicant} %>
         <% end %>
