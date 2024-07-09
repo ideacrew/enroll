@@ -166,6 +166,7 @@ describe 'export_dmf_eligible_consumers_families' do
   let(:encrypted_ssn_validator) { double(AcaEntities::Operations::EncryptedSsnValidator) }
 
   before :each do
+    allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
     allow(AcaEntities::Operations::EncryptedSsnValidator).to receive(:new).and_return(encrypted_ssn_validator)
     allow(encrypted_ssn_validator).to receive(:call).and_return(Success('success'))
 
