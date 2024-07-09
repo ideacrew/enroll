@@ -2,7 +2,7 @@
 
 Feature: UI Validations for Contact Method
     Background:
-        Given bs4_consumer_flow feature is enabled
+        Given bs4_consumer_flow feature is disable
         Given Adtl contact required for text feature is enabled
         Given Contact method via dropdown feature is NOT enabled
         Given Individual has not signed up as an HBX user
