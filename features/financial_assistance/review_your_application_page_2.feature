@@ -1,7 +1,7 @@
 Feature: Review your application page functionality 2
 
   Background: Review your application page
-    Given a consumer exists with family
+    Given bs4_consumer_flow feature is disable
     And the consumer is RIDP verified
     And is logged in
     And the FAA feature configuration is enabled
