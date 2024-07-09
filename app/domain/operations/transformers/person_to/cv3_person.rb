@@ -11,7 +11,7 @@ module Operations
       # Person params to be transformed.
       class Cv3Person
         include Rails.application.routes.url_helpers
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(person)
           request_payload = yield construct_payload(person)

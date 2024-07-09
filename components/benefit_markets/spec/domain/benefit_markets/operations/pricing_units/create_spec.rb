@@ -24,15 +24,15 @@ RSpec.describe BenefitMarkets::Operations::PricingUnits::Create, dbclean: :after
       let(:params)                      { {pricing_unit_params: ee_pricing_unit, package_kind: package_kind} }
 
       it "should be successful for #{package_kind} package_kind" do
-        expect(subject.call(params).success?).to be_truthy
+        expect(subject.call(**params).success?).to be_truthy
       end
 
       it "should create appropriate pricing unit entity for #{package_kind} package_kind" do
         # TODO: Figure out how to refactor this with ResourceRegistry if possible
         if package_kind == :single_product && EnrollRegistry[:enroll_app].setting(:site_key).item == :cca
-          expect(subject.call(params).success).to be_a BenefitMarkets::Entities::TieredPricingUnit
+          expect(subject.call(**params).success).to be_a BenefitMarkets::Entities::TieredPricingUnit
         else
-          expect(subject.call(params).success).to be_a BenefitMarkets::Entities::RelationshipPricingUnit
+          expect(subject.call(**params).success).to be_a BenefitMarkets::Entities::RelationshipPricingUnit
         end
       end
     end

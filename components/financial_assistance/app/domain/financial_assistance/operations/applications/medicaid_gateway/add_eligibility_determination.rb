@@ -11,7 +11,7 @@ module FinancialAssistance
         # This Operation adds the eligibility determination to the Application(persistence object)
         # Operation receives the MagiMedicaidApplication with Full Determination
         class AddEligibilityDetermination
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
 
           # @param [Hash] opts The options to add eligibility determination to Application(persistence object)
           # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params

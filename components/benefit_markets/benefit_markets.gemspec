@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency 'rails', '~> 6.1.7.6'
+  s.add_dependency 'rails', '~> 6.1.7.8'
 
   s.add_dependency 'mongoid', '~> 7.5.4'
   s.add_dependency 'bson', '~> 4.3'
@@ -52,7 +52,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   s.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
-  s.add_development_dependency 'test-prof',                 '~> 0.5.0'
-
+  s.add_development_dependency 'test-prof',                 '~> 1.3'
 end
-

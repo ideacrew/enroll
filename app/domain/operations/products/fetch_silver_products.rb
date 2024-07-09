@@ -4,7 +4,7 @@ module Operations
   module Products
     # This class is to fetch silver products for giving rating & service area ids.
     class FetchSilverProducts
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Date] effective_date
       # @param [Address] address

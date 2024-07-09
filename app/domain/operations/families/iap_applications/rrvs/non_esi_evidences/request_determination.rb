@@ -10,7 +10,7 @@ module Operations
         module NonEsiEvidences
           # This operation is to publish cv3 application for rrv non_esi verification
           class RequestDetermination
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
             include EventSource::Command
             include EventSource::Logging
 

@@ -5,7 +5,7 @@ module Operations
     module Addresses
       # Class to compare address changes and build payload
       class Compare
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [Hash] params
         # @return [Dry::Monads::Result]

@@ -7,7 +7,7 @@ module Operations
     RSpec.describe Create do
 
       subject do
-        described_class.new.call(params)
+        described_class.new.call(**params)
       end
 
       let(:tempfile) do

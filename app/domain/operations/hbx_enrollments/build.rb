@@ -8,7 +8,7 @@ module Operations
     # This class initializes a hbx_enrollment entity after
     # validating the incoming hbx_enrollment params.
     class Build
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ Hash ] hbx_enrollment attributes
       # @return [ ::Entities::HbxEnrollments::HbxEnrollment ] hbx_enrollment

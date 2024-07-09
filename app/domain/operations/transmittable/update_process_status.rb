@@ -4,7 +4,7 @@ module Operations
   module Transmittable
     # Update the process status of a transmittable object
     class UpdateProcessStatus
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate_params(params)

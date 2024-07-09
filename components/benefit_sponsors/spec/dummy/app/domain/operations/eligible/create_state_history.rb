@@ -7,7 +7,7 @@ module Operations
   module Eligible
     # Create Eligibility
     class CreateStateHistory
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to build evidence
       # @option opts [GlobalID] :subject required

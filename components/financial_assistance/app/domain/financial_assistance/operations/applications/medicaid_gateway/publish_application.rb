@@ -14,7 +14,7 @@ module FinancialAssistance
         #   2. submit_renewal_draft for publishing the payload to submit/renew renewal draft application
         #      The event submit_renewal_draft is for EA's internal use
         class PublishApplication
-          include Dry::Monads[:result, :do, :try]
+          include Dry::Monads[:do, :result]
           include EventSource::Command
 
           # Update this constant with new events that are added/registered in ::Publishers::ApplicationPublisher

@@ -10,7 +10,7 @@ module Operations
     # will be coverage_selected. Currently, this operation supports SHOP
     # enrollments only does not account for IVL cases.
     class Reinstate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ HbxEnrollment ] hbx_enrollment
       # @param [ Hash ] options include new benefit package which will

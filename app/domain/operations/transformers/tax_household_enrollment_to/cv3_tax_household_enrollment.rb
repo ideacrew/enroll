@@ -8,7 +8,7 @@ module Operations
     module TaxHouseholdEnrollmentTo
       # TaxHouseholdEnrollment params to be transformed.
       class Cv3TaxHouseholdEnrollment
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(tax_household_enrollment)
           request_payload = yield construct_payload(tax_household_enrollment)

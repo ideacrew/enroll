@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module People
     class CreateOrUpdateConsumerRole
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params:)
         values = yield validate(params[:applicant_params])

@@ -7,7 +7,7 @@ module Operations
   module Notices
     # IVL Account Transfer Notice
     class IvlAccountTransferNotice
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
       include EventSource::Logging
 

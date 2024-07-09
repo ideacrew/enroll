@@ -22,7 +22,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorship::DetermineEnrollm
       }
     end
 
-    let(:result) { subject.call(params) }
+    let(:result) { subject.call(**params) }
 
     before :each do
       benefit_sponsorship.benefit_applications.delete_all
@@ -55,7 +55,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorship::DetermineEnrollm
         }
       end
 
-      let(:result) { subject.call(params) }
+      let(:result) { subject.call(**params) }
 
       it 'should return enrollment eligibility' do
         expect(result.success?).to be_truthy

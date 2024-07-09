@@ -4,7 +4,7 @@ module Operations
   module BenchmarkProducts
     # This Operation is used to identify rating area and service areas for rating_address of Primary Person of Family
     class IdentifyRatingAndServiceAreasForMigration
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         # params = { family: family, benchmark_product_model: benchmark_product_model }

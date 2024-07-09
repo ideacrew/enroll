@@ -9,7 +9,7 @@ module Operations
   module Eligibilities
     # Build evidences data
     class FamilyEvidencesDataExport
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to update evidence due on dates
       # @option opts [Family] :family required

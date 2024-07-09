@@ -73,7 +73,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it "should render json template" do
-      get :binder_index_datatable, {format: :json}
+      get :binder_index_datatable, params: { format: :json }
       expect(response).to render_template("exchanges/hbx_profiles/binder_index_datatable")
     end
 
@@ -1965,7 +1965,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
     end
 
-    context '.new_benefit_application' do
+    context '#new_benefit_application' do
       before :each do
         get :new_benefit_application, params: {benefit_sponsorship_id: benefit_sponsorship.id.to_s}, xhr: true
       end

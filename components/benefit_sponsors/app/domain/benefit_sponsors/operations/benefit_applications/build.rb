@@ -9,7 +9,7 @@ module BenefitSponsors
       # This class initializes a benefit_application entity after
       # validating the incoming benefit_application params.
       class Build
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [ Hash ] benefit_application attributes
         # @return [ BenefitSponsors::Entities::BenefitApplication ] benefit_application
