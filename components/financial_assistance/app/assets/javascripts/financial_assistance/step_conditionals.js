@@ -7,8 +7,13 @@ document.addEventListener("turbolinks:load", function() {
   });
 
   /* attestations */
-  $('#living_outside_yes, #living_outside_no').change(function(e) {
-    $('#application_attestation_terms').attr('required', e.target.value == 'true');
+  $('#living_outside_yes, #living_outside_no').off('change')
+  $('#living_outside_yes, #living_outside_no').on('change', function(e) {
+    if ($('#living_outside_yes').is(':checked')) {
+      $('#application_attestation_terms').attr('required', true);
+    } else {
+      $('#application_attestation_terms').removeAttr('required');
+    }
   });
 
   if ($('#medicaid_pregnancy_yes').length) {
@@ -546,7 +551,6 @@ $(document).ready(function(){
     living_outside_checked = living_outside_no || (living_outside_yes && attestation_terms)
     signature_valid = (first_name_thank_you == subscriber_first_name) && (last_name_thank_you == subscriber_last_name)
     checks_complete = boxes_checked && living_outside_checked && signature_valid
-
     if(checks_complete){
       $('.interaction-click-control-submit-application').removeClass('disabled');
     } else {

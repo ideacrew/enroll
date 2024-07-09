@@ -12,7 +12,11 @@ class IvlFamilyInformation
   end
 
   def self.continue_btn
-    '#btn_household_continue'
+    if enroll_registry[:bs4_consumer_flow].enabled?
+
+    else
+    '.interaction-click-control-continue'
+    end
   end
 
   def self.edit_icon
