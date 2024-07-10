@@ -10,6 +10,7 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
 
       pre_process_message(subscriber_logger, payload, metadata.headers)
+      process_person_saved(metadata.headers, payload)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -41,6 +42,10 @@ module Subscribers
       Logger.new(
         "#{Rails.root}/log/#{event}_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
       )
+    end
+
+    def process_person_saved(headers, payload)
+      ::Operations::Private::PersonSaved.new.call(headers: headers, params: payload)
     end
   end
 end

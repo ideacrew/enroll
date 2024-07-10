@@ -1239,9 +1239,9 @@ describe Family, "with 2 households a person and 2 extended family members", :db
 
   before(:each) do
     f_id = family.id
-    family.add_family_member(primary, { is_primary_applicant: true })
-    family.relate_new_member(family_member_person_1, "unknown")
-    family.relate_new_member(family_member_person_2, "unknown")
+    family.add_family_member(primary, is_primary_applicant: true)
+    family.relate_new_member(family_member_person_1, "domestic_partners_child")
+    family.relate_new_member(family_member_person_2, "domestic_partners_child")
     family.save!
   end
 
