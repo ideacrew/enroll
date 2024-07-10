@@ -27,13 +27,13 @@ if EnrollRegistry.feature_enabled?(:alive_status)
   Family.all.no_timeout.each do |family|
     family.family_members.each do |member|
       person = member.person
-      
+
       next unless member.person.consumer_role.present?
-      
+
       eligibility_states = member_dmf_determination_eligible_enrollments(member, family)
       ssn_present = person&.ssn&.present?
       # is_ssn_composition_correct? will return 'nil' if the composition is correct
-      valid_ssn = (ssn_present && person&.is_ssn_composition_correct? == nil)
+      valid_ssn = (ssn_present && person&.is_ssn_composition_correct?.nil?)
       has_eligible_enrollment = eligibility_states.present?
 
       consumer_hash = {
