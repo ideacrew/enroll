@@ -17,7 +17,7 @@ describe 'generate post dmf call report' do
       p
     end
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, hbx_assigned_id: cv3_family_payload[:hbx_id], person: person) }
-    let(:person2) do
+    let!(:person2) do
       p2 = FactoryBot.create(:person, :with_consumer_role, hbx_id: cv3_family_payload[:family_members][1][:person][:hbx_id])
       p2.update_attributes(ssn: cv3_family_payload[:family_members][1][:person][:person_demographics][:ssn])
       FactoryBot.create(:family_member, person: p2, family: family)
@@ -30,7 +30,7 @@ describe 'generate post dmf call report' do
       p3
     end
     let(:family2) { FactoryBot.create(:family, :with_primary_family_member, hbx_assigned_id: cv3_family2_payload[:hbx_id], person: person3) }
-    let(:person4) do
+    let!(:person4) do
       p4 = FactoryBot.create(:person, :with_consumer_role, hbx_id: cv3_family2_payload[:family_members][1][:person][:hbx_id])
       p4.update_attributes(ssn: cv3_family2_payload[:family_members][1][:person][:person_demographics][:ssn])
       FactoryBot.create(:family_member, person: p4, family: family2)
@@ -41,20 +41,12 @@ describe 'generate post dmf call report' do
     let(:date) { TimeKeeper.date_of_record }
     let(:file_name)  { "#{Rails.root}/post_dmf_call_report_for_job_#{job.job_id}.csv" }
     let(:file_data) { File.read("spec/test_data/dmf_payloads/dmf_response_cv_payload.json") }
-    let(:cv3_family_payload) { JSON.parse(JSON.parse(file_data),symbolize_names: true)  }
-    let!(:cv3_family2_payload) do
-      payload2 = JSON.parse(JSON.parse(file_data),symbolize_names: true)
-      payload2[:hbx_id] = '786139'
-      payload2[:family_members][0][:person][:hbx_id] = '1000396'
-      payload2[:family_members][1][:person][:hbx_id] = '1000498'
-      payload2[:family_members][0][:person][:person_demographics][:ssn] = "345769237"
-      payload2[:family_members][1][:person][:person_demographics][:ssn] = "345769234"
-      payload2[:family_members][1][:person][:verification_types][0][:validation_status] = "attested"
-      payload2
-    end
+    let(:file_data2) { File.read("spec/test_data/dmf_payloads/dmf_response_cv_payload2.json") }
+    let(:cv3_family_payload) { JSON.parse(JSON.parse(file_data), symbolize_names: true)  }
+    let!(:cv3_family2_payload) { JSON.parse(JSON.parse(file_data2), symbolize_names: true) }
 
     let(:encrypted_family_payload) { AcaEntities::Operations::Encryption::Encrypt.new.call(value: JSON.parse(file_data)).value! }
-    let(:encrypted_family2_payload) { AcaEntities::Operations::Encryption::Encrypt.new.call(value: cv3_family2_payload.to_json).value! }
+    let(:encrypted_family2_payload) { AcaEntities::Operations::Encryption::Encrypt.new.call(value: JSON.parse(file_data2)).value! }
 
     let(:hbx_enrollment_member) do
       FactoryBot.build(:hbx_enrollment_member,
@@ -65,7 +57,6 @@ describe 'generate post dmf call report' do
     end
 
     let(:hbx_enrollment_member2) do
-      person2
       FactoryBot.build(:hbx_enrollment_member,
                        is_subscriber: true,
                        applicant_id: family.family_members[1].id,
@@ -81,7 +72,6 @@ describe 'generate post dmf call report' do
                        eligibility_date: TimeKeeper.date_of_record.beginning_of_month)
     end
     let(:hbx_enrollment_member4) do
-      person4
       FactoryBot.build(:hbx_enrollment_member,
                        is_subscriber: true,
                        applicant_id: family2.family_members[1].id,
@@ -183,12 +173,7 @@ describe 'generate post dmf call report' do
       ]
     end
 
-    let(:encrypted_ssn_validator) { double(AcaEntities::Operations::EncryptedSsnValidator) }
-
     before do
-      allow(AcaEntities::Operations::EncryptedSsnValidator).to receive(:new).and_return(encrypted_ssn_validator)
-      allow(encrypted_ssn_validator).to receive(:call).and_return(Success('success'))
-
       persons = [person, person2, person3, person4]
       persons.each do |demo_person|
         demo_person.build_demographics_group
@@ -220,7 +205,8 @@ describe 'generate post dmf call report' do
         person.hbx_id,
         enrollment.aasm_state,
         'unverified',
-        'outstanding'
+        'outstanding',
+        '07/03/2024'
       ]
 
       expect(@file_content[1]).to eq(consumer_content)

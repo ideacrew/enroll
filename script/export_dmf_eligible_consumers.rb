@@ -15,7 +15,7 @@ if EnrollRegistry.feature_enabled?(:alive_status)
     "Person First Name",
     "Person Last Name",
     "Has SSN?",
-    "Has valid SSN?",
+    "Has Valid SSN?",
     "Has Eligible Enrollment?",
     "Enrollment Hbx ID",
     "Enrollment Type",
@@ -49,13 +49,13 @@ if EnrollRegistry.feature_enabled?(:alive_status)
       if valid_ssn & has_eligible_enrollment
         enrollment_types = eligibility_states.map { |state| state.eligibility_item_key.split('_')[0] }.join(', ')
         enrollment_hbx_id, enrollment_status = extract_enrollment_info(family, member.hbx_id)
-        addtl_params = {
+        addtl_enrollment_info = {
           enrollment_hbx_id: enrollment_hbx_id,
           enrollment_types: enrollment_types,
           enrollment_status: enrollment_status
         }
 
-        consumer_hash.merge!(addtl_params)
+        consumer_hash.merge!(addtl_enrollment_info)
       end
 
       dmf_eligibile_members << consumer_hash
@@ -63,8 +63,6 @@ if EnrollRegistry.feature_enabled?(:alive_status)
   rescue StandardError => e
     p "Error processing family with hbx_id #{family.hbx_assigned_id} due to #{e}"
   end
-
-  binding.irb
 
   p "found #{dmf_eligibile_members.size} dmf-eligible consumers"  unless Rails.env.test?
 
