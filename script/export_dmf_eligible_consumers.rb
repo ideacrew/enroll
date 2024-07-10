@@ -14,6 +14,9 @@ if EnrollRegistry.feature_enabled?(:alive_status)
     "Person Hbx ID",
     "Person First Name",
     "Person Last Name",
+    "Has SSN?",
+    "Has valid SSN?",
+    "Has Eligible Enrollment?",
     "Enrollment Hbx ID",
     "Enrollment Type",
     "Enrollment Status"
@@ -21,30 +24,47 @@ if EnrollRegistry.feature_enabled?(:alive_status)
 
   dmf_eligibile_members = []
 
-  Family.enrolled_members_with_ssn.no_timeout.each do |family|
+  Family.all.no_timeout.each do |family|
     family.family_members.each do |member|
+      person = member.person
+      
+      next unless member.person.consumer_role.present?
+      
       eligibility_states = member_dmf_determination_eligible_enrollments(member, family)
-      next unless eligibility_states
-      next unless AcaEntities::Operations::EncryptedSsnValidator.new.call(member.person.encrypted_ssn).success?
-
-      enrollment_types = eligibility_states.map { |state| state.eligibility_item_key.split('_')[0] }.join(', ')
-      enrollment_hbx_id, enrollment_status = extract_enrollment_info(family, member.hbx_id)
+      ssn_present = person&.ssn&.present?
+      # is_ssn_composition_correct? will return 'nil' if the composition is correct
+      valid_ssn = (ssn_present && person&.is_ssn_composition_correct? == nil)
+      has_eligible_enrollment = eligibility_states.present?
 
       consumer_hash = {
         family_hbx_id: family.hbx_assigned_id,
-        person_hbx_id: member.person.hbx_id,
-        person_first_name: member.person.first_name,
-        person_last_name: member.person.last_name,
-        enrollment_hbx_id: enrollment_hbx_id,
-        enrollment_types: enrollment_types,
-        enrollment_status: enrollment_status
+        person_hbx_id: person.hbx_id,
+        person_first_name: person.first_name,
+        person_last_name: person.last_name,
+        has_ssn: ssn_present,
+        has_valid_ssn: valid_ssn,
+        has_eligible_enrollment: has_eligible_enrollment
       }
+
+      if valid_ssn & has_eligible_enrollment
+        enrollment_types = eligibility_states.map { |state| state.eligibility_item_key.split('_')[0] }.join(', ')
+        enrollment_hbx_id, enrollment_status = extract_enrollment_info(family, member.hbx_id)
+        addtl_params = {
+          enrollment_hbx_id: enrollment_hbx_id,
+          enrollment_types: enrollment_types,
+          enrollment_status: enrollment_status
+        }
+
+        consumer_hash.merge!(addtl_params)
+      end
 
       dmf_eligibile_members << consumer_hash
     end
   rescue StandardError => e
     p "Error processing family with hbx_id #{family.hbx_assigned_id} due to #{e}"
   end
+
+  binding.irb
 
   p "found #{dmf_eligibile_members.size} dmf-eligible consumers"  unless Rails.env.test?
 
@@ -63,6 +83,9 @@ if EnrollRegistry.feature_enabled?(:alive_status)
         consumer_hash[:person_hbx_id],
         consumer_hash[:person_first_name],
         consumer_hash[:person_last_name],
+        consumer_hash[:has_ssn],
+        consumer_hash[:has_valid_ssn],
+        consumer_hash[:has_eligible_enrollment],
         consumer_hash[:enrollment_hbx_id],
         consumer_hash[:enrollment_types],
         consumer_hash[:enrollment_status]

@@ -27,7 +27,7 @@ describe 'export_dmf_eligible_consumers_families' do
   end
 
   let(:dependent) { FactoryBot.create(:person) }
-  let(:primary) {  FactoryBot.create(:person, :with_consumer_role)}
+  let(:primary) {  FactoryBot.create(:person, :with_consumer_role, :with_ssn)}
   let(:primary_applicant) { family.primary_applicant }
   let(:dependents) { family.dependents }
   let!(:tax_household_group_current) do
@@ -157,17 +157,20 @@ describe 'export_dmf_eligible_consumers_families' do
       "Person Hbx ID",
       "Person First Name",
       "Person Last Name",
+      "Has SSN?",
+      "Has valid SSN?",
+      "Has Eligible Enrollment?",
       "Enrollment Hbx ID",
       "Enrollment Type",
       "Enrollment Status"
     ]
   end
 
-  let(:encrypted_ssn_validator) { double(AcaEntities::Operations::EncryptedSsnValidator) }
+  let(:encrypted_ssn_validator) { double(Operations::Fdsh::EncryptedSsnValidator) }
 
   before :each do
     allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
-    allow(AcaEntities::Operations::EncryptedSsnValidator).to receive(:new).and_return(encrypted_ssn_validator)
+    allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(encrypted_ssn_validator)
     allow(encrypted_ssn_validator).to receive(:call).and_return(Success('success'))
 
     application.non_primary_applicants.each{|applicant| application.ensure_relationship_with_primary(applicant, applicant.relationship) }
@@ -189,8 +192,11 @@ describe 'export_dmf_eligible_consumers_families' do
       primary_applicant.hbx_id,
       primary_applicant.first_name,
       primary_applicant.last_name,
+      'true',
+      'true',
+      'true',
       hbx_enrollment.hbx_id,
-      "health, dental",
+      'health, dental',
       hbx_enrollment.aasm_state
     ]
 
