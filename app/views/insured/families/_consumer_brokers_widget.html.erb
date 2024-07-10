@@ -4,16 +4,20 @@
   <div class="home-widget p-2">
     <h3 class="d-flex justify-content-between">
       <%= l10n("insured.broker_or_assister") %>
-      <i class="fa fa-question-circle ml-4 mt-1" aria-hidden="true"></i>
+      <%= link_to '#', data: { toggle: 'modal', target: '#read_only_modal_what_is_a_broker_or_assister' } do %>
+        <i class="fa fa-question-circle ml-4 mt-1" aria-hidden="true"></i>
+        <span class="hide"><%= l10n("insured.what_is_a_broker_or_assister") %></span>
+      <% end %>
     </h3>
     <div class="pr-2 pl-2 pb-2 w-100">
       <% if current_broker_agency && display_broker_info_for_consumer %>
-        <%= link_to l10n("insured.go_to_my_expert"), '', class: 'btn w-100 btn-default' %>
+        <%= h(link_to l10n("insured.go_to_my_expert"), '', class: 'btn w-100 btn-default') %>
       <% else %>
-        <%= link_to l10n("insured.assign_an_expert"), '', class: 'btn w-100 btn-default' %>
+        <%= h(link_to l10n("insured.assign_an_expert"), '', class: 'btn w-100 btn-default') %>
       <% end %>
     </div>
   </div>
+<%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker_or_assister', header_icon: "<i class='fa fa-info-circle primary-blue' aria-hidden='true'></i>", title: l10n("insured.what_is_a_broker_or_assister"), body: [l10n("insured.answer_for_broker", site_short_name: site_short_name), l10n("insured.answer_for_assister", site_short_name: site_short_name)], subtitle: [l10n("broker"), l10n("assister")] } %>
 <% else %>
   <% current_broker_agency = @person&.primary_family&.current_broker_agency %>
   <% writing_agent =  @person&.primary_family&.current_broker_agency&.writing_agent %>
