@@ -40,7 +40,7 @@ describe 'generate post dmf call report' do
     let(:job) { FactoryBot.create(:transmittable_job, :dmf_determination) }
     let(:date) { TimeKeeper.date_of_record }
     let(:file_name)  { "#{Rails.root}/post_dmf_call_report_for_job_#{job.job_id}.csv" }
-    let(:file_data) { File.read("spec/test_data/dmf_response_cv_payload.json") }
+    let(:file_data) { File.read("spec/test_data/dmf_payloads/dmf_response_cv_payload.json") }
     let(:cv3_family_payload) { JSON.parse(JSON.parse(file_data),symbolize_names: true)  }
     let!(:cv3_family2_payload) do
       payload2 = JSON.parse(JSON.parse(file_data),symbolize_names: true)
@@ -178,7 +178,8 @@ describe 'generate post dmf call report' do
         "Person Hbx ID",
         "Enrollment Status",
         "Before DMF call deceased verification state",
-        "After DMF call deceased verification state"
+        "After DMF call deceased verification state",
+        "Deceased Date"
       ]
     end
 

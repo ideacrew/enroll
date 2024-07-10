@@ -17,7 +17,8 @@ if EnrollRegistry.feature_enabled?(:alive_status)
     "Person Hbx ID",
     "Enrollment Status",
     "Before DMF call deceased verification state",
-    "After DMF call deceased verification state"
+    "After DMF call deceased verification state",
+    "Deceased Date" # if confirmed, date should be included
   ].freeze
 
   # ARGV[0] is the arg provided when calling the script --> it should be a valid job_id
@@ -39,18 +40,23 @@ if EnrollRegistry.feature_enabled?(:alive_status)
     next unless family
 
     family.family_members.each do |member|
-      next unless member_dmf_determination_eligible_enrollments(member, family)
-      next unless AcaEntities::Operations::EncryptedSsnValidator.new.call(member.person.encrypted_ssn).success?
+      person = member&.person
 
-      _enrollment_hbx_id, enrollment_status = extract_enrollment_info(family, member.hbx_id)
+      next unless member_dmf_determination_eligible_enrollments(member, family)
+      # is_ssn_composition_correct? will return 'nil' if the composition is correct
+      next unless (person&.ssn&.present? && person&.is_ssn_composition_correct? == nil)
+
+      _enrollment_hbx_id, enrollment_status = extract_enrollment_info(family, member&.hbx_id)
       before_dmf_state, after_dmf_state = extract_dmf_states(member)
+      deceased_date = person&.demographics_group&.alive_status&.date_of_death
 
       consumer_hash = {
         family_hbx_id: family.hbx_assigned_id,
         person_hbx_id: member.person.hbx_id,
         enrollment_status: enrollment_status,
         before_dmf_state: before_dmf_state,
-        after_dmf_state: after_dmf_state
+        after_dmf_state: after_dmf_state,
+        deceased_date: deceased_date
       }
 
       dmf_call_consumers << consumer_hash
@@ -77,7 +83,8 @@ if EnrollRegistry.feature_enabled?(:alive_status)
         consumer_hash[:person_hbx_id],
         consumer_hash[:enrollment_status],
         consumer_hash[:before_dmf_state],
-        consumer_hash[:after_dmf_state]
+        consumer_hash[:after_dmf_state],
+        consumer_hash[:deceased_date]
       ]
     end
     p "processed #{consumers_counter} consumers after in dmf call with job_id #{job.job_id}"  unless Rails.env.test?
