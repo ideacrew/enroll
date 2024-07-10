@@ -131,14 +131,14 @@ module PortalHeaderHelper
     end
   end
 
-  def portal_link_with_image_and_no_navigation(image_path, *args)
+  def portal_link_with_image_and_no_navigation(image_path, link_text, *args)
     content_tag("a", *args) do
       concat image_tag(image_path)
       concat sanitize(link_text)
     end
   end
 
-  def portal_link_with_image(image_path, *args)
+  def portal_link_with_image(image_path, link_text,*args)
     link_to(*args) do
       concat image_tag(image_path)
       concat sanitize(link_text)
