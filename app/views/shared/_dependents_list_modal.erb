@@ -3,7 +3,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Coverage For</h4>
+        <h4 class="modal-title"><%= l10n("plans.dependents_modal.title") %></h4>
         <button aria-label="Close" class="close" data-dismiss="modal" type="button">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -16,10 +16,10 @@
               <thead class="thead-default">
                 <tr>
                   <th>
-                    Name
+                    <%= l10n("plans.comparison_table.name") %>
                   </th>
                   <th>
-                    Relationship
+                    <%= l10n("plans.dependents_modal.relationship") %>
                   </th>
                 </tr>
               </thead>
@@ -47,7 +47,7 @@
         <ul class="application-warnings"></ul>
       </div>
       <div class="modal-footer">
-        <%= link_to 'Close', '', :class => 'btn btn-default', data: { dismiss: "modal"} %>
+        <%= link_to l10n("close"), '', :class => 'btn btn-default', data: { dismiss: "modal"} %>
       </div>
     </div>
   </div>

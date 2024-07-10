@@ -1,35 +1,31 @@
 <% if @bs4 %>
   <%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :complete, nav_options: plan_shopping_progress_hash } %>
   <div id="printArea">
-    <h1>Enrollment Submitted</h1>
-    <p>Your enrollment has been submitted as of <%= format_datetime(@enrollment.updated_at) %>.</p>
-    <p>Please print this page for your records. A copy of this confirmation has also been emailed to you.</p>
+    <h1><%= l10n("plans.plan_shopping.receipt.title") %></h1>
+    <p><%= l10n("plans.plan_shopping.receipt.description1", date_time: format_datetime(@enrollment.updated_at)) %></p>
+    <p><%= l10n("plans.plan_shopping.receipt.description2") %></p>
     <% carrier_key = carrier_key_from_enrollment(@enrollment) %>
     <% if @enrollment.employee_role.present? %>
     <% else %>
       <% if show_pay_now?("plan_shopping", @enrollment) && enrollment_is_ivl_or_coverall?(@enrollment) %>
-        <p><strong>Important:</strong> You must pay your first month’s premium directly to <%= EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %>
-          to activate your coverage. Select PAY NOW to make your first premium payment online. To learn about
-          other payment options, select ‘How to Pay’.</p>
+        <p><strong><%= l10n("plans.plan_shopping.receipt.important") %>:</strong> <%= l10n("plans.plan_shopping.receipt.pay_now_important", carrier_name: EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item) %></p>
       <% else %>
-        <p><strong>Important:</strong> You must pay your first month’s premium directly to your carrier for
-          your coverage to take effect. Select 'How to Pay' to learn more.</p>
+        <p><strong><%= l10n("plans.plan_shopping.receipt.important") %>:</strong> <%= l10n("plans.plan_shopping.receipt.not_pay_now_important") %></p>
       <% end %>
     <% end %>
     <div class="mt-2 mb-4">
       <% unless @enrollment.employee_role.present? %>
-        <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'how_to_pay_button')" id="how_to_pay_button" class="btn outline mr-2" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+        <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'how_to_pay_button')" id="how_to_pay_button" class="btn outline mr-2" data-target="#how_to_pay" data-toggle="modal"><%= l10n("plans.plan_shopping.receipt.how_to_pay.title") %></span>
       <% end %>
       <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Plan Shopping", hbx_enrollment: @enrollment }%>
     </div>
-
-
+    <!-- modal -->
     <div id="how_to_pay" class="modal" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
         <div class="modal-dialog">
           <div class="modal-content">
-            <div class="d-flex mb-4 align-items-center">
+            <div class="d-flex mb-4 align-items-center modal-header">
               <div class="col pl-0">
-                <h4 class="modal-title"><b>How to Pay</b></h4>
+                <h4 class="modal-title"><b><%= l10n("plans.plan_shopping.receipt.how_to_pay.title") %></b></h4>
               </div>
               <div class="col-auto px-0">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -40,36 +36,23 @@
             <div class="modal-body">
               <% if @plan.kind == :health %>
                 <h4><strong><%= @plan.title %></strong></h4>
-                <br/>
                 <ol>
                   <li>
                     <% if show_pay_now?("plan_shopping", @enrollment) && enrollment_is_ivl_or_coverall?(@enrollment) %>
-                      You must pay your first month’s premium directly to <%= EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %> to activate your
-                      coverage. <%= site_short_name %> does not collect premium payments.<br/><br/>
-                      There are two ways to pay your first month’s premium and activate your coverage:
-                      <br/>
-                      <br/>
-                      <ul style="padding-left: 18px;list-style-type: disc;/* padding-left: 18px; */">
+                      <p><%= l10n("plans.plan_shopping.receipt.modal.pay_direct_description", legal_name: EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item, site_short_name: site_short_name) %></p>
+                      <ul>
                         <li>
-                          <strong>Select PAY NOW to make your first premium payment directly to Kaiser Permanente. </strong>
+                          <strong><%= l10n("plans.plan_shopping.receipt.modal.select_pay_now") %></strong>
                         </li>
                         <li>
-                          <strong>Pay when you receive your invoice. </strong>We sent your enrollment information to
-                          <%= EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %> electronically. They will send you an invoice. If you don’t receive an
-                          invoice within 2 weeks, call <%= EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %> at (844) 524-7370 to make your payment.
+                          <strong><%= l10n("plans.plan_shopping.receipt.modal.pay_after_invoice") %> </strong>
+                          <%= l10n("plans.plan_shopping.receipt.modal.pay_after_invoice_description", legal_name: EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item) %>
                         </li>
                       </ul>
-                      <br/>
-                      Once your coverage is activated, <%= EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item %> will send you your insurance cards and
-                      member number. You can start using your benefits on the day your coverage begins.
+                      <p><%= l10n("plans.plan_shopping.receipt.modal.pay_after_invoice_description", legal_name: EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item) %></p>
                     <% else %>
-                      <strong>Make your first premium payment directly to <%= @plan.issuer_profile.legal_name %>.</strong>
-                      Your enrollment information was electronically submitted
-                      to <%= @plan.issuer_profile.legal_name %>, and they will send you an invoice.
-                      If you don’t receive an invoice from <%= @plan.issuer_profile.legal_name %> within two weeks,
-                      please call <%= @plan.issuer_profile.legal_name %> at the number below.
-                      Your coverage will be active as of the effective date once you have paid the first month’s premium for coverage.
-                      You must make this payment directly to <%= @plan.issuer_profile.legal_name %>. <%= site_short_name %> doesn’t collect your premium payments.
+                      <strong><%= l10n("plans.plan_shopping.receipt.modal.pay_direct", legal_name: @plan.issuer_profile.legal_name) %></strong>
+                      <%= l10n("plans.plan_shopping.receipt.modal.pay_direct_alt_description", legal_name: @plan.issuer_profile.legal_name, site_short_name: site_short_name) %>
                     <% end %>
                     <br/>
                   </li>
@@ -77,131 +60,108 @@
                   <div class="carrier-numbers">
                     <% if @plan.issuer_profile.legal_name == "CareFirst" %>
                     <div>
-                      Call: <strong>1-855-444-3119</strong>
+                      <%= l10n("plans.call") %> <strong>1-855-444-3119</strong>
                     </div>
                     <% elsif @plan.issuer_profile.legal_name == "Aetna" %>
                     <div>
-                      <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
-                      Call: <strong>1-855-586-6959</strong><br/>
-                      from 8am-6pm EST, Monday - Friday
-                      <br/>
-                      <br/>
-                      <strong>For Brokers and Employers</strong><br/>
-                      Call: <strong>1-888-422-2128</strong><br/>
-                      from 8am-5pm EST, Monday - Friday
-                      <br/>
-                      <br/>
-
-                      <strong>For Small Business Employees</strong><br/>
-                      Call: <strong>Call 1-855-885-3289</strong><br/>
-                      from 8am-6pm EST, Monday - Friday
-                      <br/>
+                      <p class="bold"><%= l10n("plans.plan_shopping.receipt.aetna.customers") %></p>
+                      <p><%= l10n("plans.call") %> <strong>1-855-586-6959</strong><br/>
+                      <%= l10n("plans.plan_shopping.receipt.aetna.hours") %></p>
+                      <p class="bold"><%= l10n("plans.plan_shopping.receipt.aetna.brokers") %></p>
+                      <p><%= l10n("plans.call") %> <strong>1-888-422-2128</strong><br/>
+                      <%= l10n("plans.plan_shopping.receipt.aetna.hours") %></p>
+                      <p class="bold"><%= l10n("plans.plan_shopping.receipt.aetna.small") %></p>
+                      <p><%= l10n("plans.call") %> <strong>1-855-885-3289</strong><br/>
+                      <%= l10n("plans.plan_shopping.receipt.aetna.hours") %></p>
                     </div>
                     <% elsif ["Kaiser Permanente", "Kaiser"].include?(@plan.issuer_profile.legal_name) %>
                     <% unless show_pay_now?("plan_shopping", @enrollment) && enrollment_is_ivl_or_coverall?(@enrollment) %>
                       <div>
-                        Call: <strong>1-844-524-7370</strong>
+                        <%= l10n("plans.call") %> <strong>1-844-524-7370</strong>
                       </div>
                     <% end %>
                     <% elsif @plan.issuer_profile.legal_name == "UnitedHealthcare" %>
                     <div>
-                      Call: <strong>1-877-856-2430</strong><br/>
+                      <%= l10n("plans.call") %> <strong>1-877-856-2430</strong><br/>
                     </div>
                     <% end %>
                   </div>
-                  <br/>
-                  <br/>
                   <% unless show_pay_now?("plan_shopping", @enrollment) && enrollment_is_ivl_or_coverall?(@enrollment) %>
-                    <li>
-                      <strong>Start using your benefits.</strong> Once <%= @plan.issuer_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
+                    <li class="pt-4 pb-2">
+                      <strong><%= l10n("plans.plan_shopping.receipt.modal.start") %></strong> <%= l10n("plans.plan_shopping.receipt.modal.start_description", legal_name: @plan.issuer_profile.legal_name) %>
                     </li>
                   <% end %>
                 </ol>
               <% else %>
                 <h4><strong><%= @plan.name %></strong></h4>
-                <br/>
-                <ol>
+                <ol class="mt-2">
                   <li>
-                    <strong>Make your first premium payment directly to <%= @plan.issuer_profile.legal_name %></strong>.
-                    Your enrollment information was electronically submitted to <%= @plan.issuer_profile.legal_name %>. <%= @plan.issuer_profile.legal_name %> will bill you directly.
-                    If you do not receive a bill within two weeks, please call <%= @plan.issuer_profile.legal_name %> at the number below.
-                    Your dental coverage will be active once you have paid the premium for your first month of coverage.
-                    You must make this payment directly to <%= @plan.issuer_profile.legal_name %>.   <%= site_short_name %> does not collect premiums.
-                    <br/>
+                    <strong><%= l10n("plans.plan_shopping.receipt.modal.pay_direct", legal_name: @plan.issuer_profile.legal_name) %></strong>.
+                    <%= l10n("plans.plan_shopping.receipt.modal.pay_direct_description", legal_name: @plan.issuer_profile.legal_name, site_short_name: site_short_name) %>
                   </li>
                   <div class="carrier-numbers">
                     <% if @plan.issuer_profile.legal_name == "CareFirst" %>
-                    <div><br/>
-                      Call: <strong>1-855-444-3119</strong><br/>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-855-444-3119</strong><br/>
                     </div>
                     <% elsif @plan.issuer_profile.legal_name == "Delta Dental" %>
-                    <div><br/>
-                      Call: <strong>1-800-471-0236</strong> or <strong>1-800-471-0275</strong>
-                      <br/>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-800-471-0236</strong> <%= l10n("or") %> <strong>1-800-471-0275</strong>
                     </div>
                     <% elsif @plan.issuer_profile.legal_name == "MetLife" %>
-                    <div><br/>
-                      Call: <strong>1-855-638-2221</strong><br/>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-855-638-2221</strong><br/>
                     </div>
                     <% elsif @plan.issuer_profile.legal_name == "Dentegra" %>
-                    <div><br/>
-                      Call: <strong>1-800-471-0284</strong><br/>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-800-471-0284</strong><br/>
                     </div>
                     <% elsif @plan.issuer_profile.legal_name == "Dominion" %>
-                    <div><br/>
-                      Call: <strong>1-855-224-3016</strong><br/>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-855-224-3016</strong><br/>
                     </div>
                     <% elsif @plan.issuer_profile.legal_name == "BestLife" %>
-                    <div><br/>
-                      Call: <strong>1-800-433-0088</strong><br/>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-800-433-0088</strong><br/>
                     </div>
                     <% end %>
                   </div>
-                  <br/>
-                  <br/>
-                  <li>
-                    <strong>Start using your benefits.</strong> Once <%= @plan.issuer_profile.legal_name %> receives
-                    your first payment, they can provide the information you’ll need to start using your benefits (such as member number).
-                    They’ll also mail your insurance cards to you.<br/>
+                  <li class="pt-4 pb-2">
+                    <strong><%= l10n("plans.plan_shopping.receipt.modal.start") %></strong> <%= l10n("plans.plan_shopping.receipt.modal.start_description", legal_name: @plan.issuer_profile.legal_name) %>
                   </li>
                 </ol>
               <% end %>
             </div>
-            <br/>
-            <br/>
-          </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
+          </div>
+        </div>
       </div>
 
-    <h2>Selected Enrollment</h2>
+    <h2><%= l10n("plans.plan_shopping.receipt.selected") %></h2>
     <% if @enrollment.employee_role.present? %>
       <%= render "insured/plan_shoppings/coverage_information" %>
     <% else %>
       <h3><%= @plan.title %></h3>
       <dl class="parent weight-n">
-        <dt>Benefit:</dt>
+        <dt><%= l10n("benefit")%>:</dt>
         <dd><%= @plan.kind&.to_s&.titleize %></dd>
-        <dt>Market:</dt>
-        <dd>Individual</dd>
-        <dt>Metal Tier:</dt>
+        <dt><%= l10n("market")%>:</dt>
+        <dd><%= show_market_name_by_enrollment @enrollment %></dd>
+        <dt><%= l10n("plans.plan_shopping.receipt.metal_tier") %>:</dt>
         <dd><%= @plan.metal_level&.titleize %></dd>
-        <dt>Coverage Start Date:</dt>
+        <dt><%= l10n("enrollment_member.coverage_state_date")%>:</dt>
         <dd><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></dd>
       </dl>
       <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
     <% end %>
 
     <% if @enrollment.is_cobra_status? %>
-      <p>* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If
-        you have any questions, please direct them to the Employer.</p>
+      <p><%= l10n("plans.plan_shopping.receipt.is_cobra_status") %></p>
     <% end %>
 
-    <p>When you’re finished, select <%= EnrollRegistry.feature_enabled?(:back_to_account_all_shop) ? "CONTINUE" : "GO TO MY ACCOUNT" %> to view the status of your enrollment. You can also
-        contact your insurance carrier directly for additional information or to check the status of your
-        enrollment.</p>
+    <p><%= l10n("plans.plan_shopping.receipt.when_finished", action: EnrollRegistry.feature_enabled?(:back_to_account_all_shop) ? "CONTINUE" : "GO TO MY ACCOUNT") %></p>
     <div class="mt-4">
-      <%= link_to 'Print', '#', id: 'btnPrint', class: "btn outline interaction-click-control-print-purchase-confirmation mr-2" %>
-      <%= h(link_to 'Go to My Account', main_app.family_account_path, class: "btn secondary text-center", id: 'btn-continue') %>
+      <%= link_to l10n("plans.plan_shopping.receipt.print"), '#', id: 'btnPrint', class: "btn outline interaction-click-control-print-purchase-confirmation mr-2" %>
+      <%= h(link_to l10n("en.exceptions.go_to_my_account"), main_app.family_account_path, class: "btn secondary text-center", id: 'btn-continue') %>
     </div>
   </div>
 <% else %>

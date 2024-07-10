@@ -1,11 +1,11 @@
 <% if @bs4 %>
   <dl class="parent mt-2">
-    <dt>Coverage For:</dt>
+    <dt><%= l10n("plans.dependents_modal.title")%>:</dt>
     <dd><%= plan_shopping_dependent_text(@hbx_enrollment) %></dd>
-    <dt>Available Plans:</dt>
+    <dt><%= l10n("plans.more_plan_details.available")%>:</dt>
     <% products = (['shop','employer_sponsored','fehb'].include?(@market_kind)) ? @member_groups : @plans %>
     <dd id='plans-count'><%= products_count(products)%></dd>
-    <dt>Coverage Start Date:</dt>
+    <dt><%= l10n("plans.coverage_start_date")%>:</dt>
     <dd><%= @hbx_enrollment.effective_on %></dd>
   </dl>
 <% else %>

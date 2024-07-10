@@ -13,7 +13,7 @@
           <% if osse_eligible %>
             <th class="text-right" colspan="2" scope="colgroup"><%=l10n("premium_discount") %></th>
           <% end %>
-          <th class="text-right"><%= render partial:"shared/glossary", locals: {key: "aptc_amount_title_info", term: "APTC amount" } %></th>
+          <th class="text-right"><%= render partial:"shared/glossary", locals: {key: "aptc_amount_title_info", term: "APTC amount", question_mark: true } %></th>
           <th class="text-right" width="80"><%= l10n("you_pay") %></th>
         </tr>
       </thead>
@@ -55,7 +55,7 @@
           </tr>
         <% end %>
         <tr class="gray-row">
-          <td colspan="3" class="text-left capital"><strong>TOTAL</strong></td>
+          <td colspan="3" class="text-left capital"><strong><%= l10n("plans.plan_shopping.receipt.total").upcase %></strong></td>
           <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
           <% if osse_eligible %>
             <td></td>

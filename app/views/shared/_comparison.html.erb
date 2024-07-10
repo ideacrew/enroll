@@ -1,42 +1,36 @@
 <% if @bs4 %>
-  <% unique_plans = [] %>
-  <% qhps.each do |qhp| %>
-    <% ids = unique_plans.map(&:hios_plan_and_variant_id) %>
-    <% unique_plans << qhp unless ids.include?(qhp.hios_plan_and_variant_id) %>
-  <% end %>
-  <% qhps = unique_plans %>
   <div class="modal-body">
     <div id="printArea">
-      <p>Each plan is different. Make sure you understand the differences so you can find the right plan to meet your needs and budget.</p>
+      <p><%= l10n("plans.comparison_table.description") %></p>
       <%= render "shared/plan_shoppings/more_plan_details" %>
       <div class="table-responsive">
       <table class="table compare-table">
         <tr class="left-border-all">
-          <th class="row-title">Plans</th>
+          <th class="row-title"><%= l10n("plans.plans") %></th>
           <% qhps.each do |qhp|%>
             <td colspan="2"><%= display_carrier_logo(Maybe.new(qhp.product_for(@market_kind)), {width: 80}) %></td>
           <% end %>
         </tr>
         <tr class="left-border-all">
-          <th>Name</th>
+          <th><%= l10n("plans.comparison_table.name") %></th>
           <% qhps.each do |qhp|%>
-            <td colspan="2" class=""><%= qhp.product_for(@market_kind).name %></td>
+            <td colspan="2"><%= qhp.product_for(@market_kind).name %></td>
           <% end %>
         </tr>
         <tr class="left-border-all">
-          <th>Metal Level / Type</th>
+          <th><%= l10n("plans.comparison_table.metal_level_type") %></th>
           <% qhps.each do |qhp|%>
-            <td class="" colspan="2"><%= display_dental_metal_level qhp.product_for(@market_kind) %> / <%= qhp.product_for(@market_kind).product_type.upcase %></td>
+            <td colspan="2"><%= display_dental_metal_level qhp.product_for(@market_kind) %> / <%= qhp.product_for(@market_kind).product_type.upcase %></td>
           <% end %>
         </tr>
         <tr class="left-border-all">
-          <th>Premium</th>
+          <th><%= l10n("plans.premium") %></th>
           <% qhps.each do |qhp|%>
             <td colspan="2"><%=number_to_currency(qhp[:total_employee_cost]) + " per month" %></td>
           <% end %>
         </tr>
         <tr class="left-border-all">
-          <th>Provider Network</th>
+          <th><%= l10n("plans.provider_network") %></th>
           <% qhps.each do |qhp|%>
             <td colspan="2"><%= render partial: "shared/network_data", locals: {plan: qhp.product_for(@market_kind)} %></td>
           <% end %>
@@ -57,7 +51,7 @@
               <% qhps.each do |qhp| %>
                 <td colspan="2">
                   <% if qhp.product_for(@market_kind).nationwide %>
-                    <%= h(link_to 'DOCTOR DIRECTORY', qhp.plan.provider_directory_url, target: '_blank', rel: "noopener noreferrer") %>
+                    <%= h(link_to l10n("plans.comparison_table.dd"), qhp.plan.provider_directory_url, target: '_blank', rel: "noopener noreferrer") %>
                   <% end %>
                 </td>
               <% end %>
@@ -73,7 +67,7 @@
             <% qhps.each do |qhp|%>
               <td colspan="2">
                 <% if qhp.product_for(@market_kind).kind.to_s == "health" && qhp.product_for(@market_kind).rx_formulary_url.present? %>
-                  <%= h(link_to "DRUG LIST", qhp.plan.rx_formulary_url, target: "_blank", rel: "noopener noreferrer") %>
+                  <%= h(link_to l10n("plans.comparison_table.drug_list"), qhp.plan.rx_formulary_url, target: "_blank", rel: "noopener noreferrer") %>
                 <% end %>
               </td>
             <% end %>
@@ -82,9 +76,9 @@
 
         <% if @coverage_kind == "health" %>
           <tr>
-            <th>Plan Benefits (In Network)</th>
+            <th><%= l10n("plans.comparison_table.plan_benefits") %></th>
             <% qhps.each do |qhp|%>
-              <td colspan="2" data-toggle="tooltip" data-container="body" title="Once you meet your deductible, you'll share the costs for any covered services you receive until you reach your out-of-pocket limit. Copayments are a fixed dollar amount you pay for a covered service, usually when you receive the service. Coinsurance is calculated as a percent of the allowed amount for a covered service."> Co-Pay </td>
+              <td colspan="2" data-toggle="tooltip" data-container="body" title="<%= l10n("plans.comparison_table.plan_benefits_description")%>"><%= l10n("plans.comparison_table.copay") %></td>
             <% end %>
           </tr>
           <%= render partial: "shared/plan_shoppings/plan_visit_types", locals: { qhps: qhps } %>
@@ -116,12 +110,10 @@
   <div class="modal-footer" style="border-top: none;">
     <button type="button" class="btn btn-default btn-default" id='btnPrint'>Print</button>
     <% if @coverage_kind == "health" %>
-      <%= link_to "Download", comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind, standard_component_ids: @standard_component_ids, hbx_enrollment_id: @hbx_enrollment_id, active_year: @active_year, format: :csv), class: "btn btn-default" %>
+      <%= link_to l10n("plans.download"), comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind, standard_component_ids: @standard_component_ids, hbx_enrollment_id: @hbx_enrollment_id, active_year: @active_year, format: :csv), class: "btn btn-default" %>
     <% end %>
-    <button type="button" class="btn  btn-default btn-default" data-dismiss="modal" data-cuke="compare_selected_plans_close_btn">Close</button>
+    <button type="button" class="btn  btn-default btn-default" data-dismiss="modal" data-cuke="compare_selected_plans_close_btn"><%= l10n("close") %></button>
   </div>
-
-
 <% else %>
 <div class="modal-body">
   <div id="printArea">
