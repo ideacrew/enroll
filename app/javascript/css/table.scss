@@ -1,6 +1,9 @@
-th,
-td {
+th, td {
   padding: 0.75rem;
+
+  &.button-cell {
+    padding: 2px;
+  }
 }
 
 table {

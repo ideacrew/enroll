@@ -1,24 +1,68 @@
-<% content_for :navigation do %>
-<%= render partial: 'ui-components/v1/navs/families_navigation' %>
-<% end %>
-<%= javascript_pack_tag 'benefit_sponsors' %>
+<% if @bs4 %>
+  <%= render partial: '/shared/family_side_nav' %>
 
-<div class="my-account-page">
-  <h1><%= l10n("manage_family") %></h1>
-</div>
+  <div class="my-household-page">
+    <h1><%= l10n("my_household") %></h1>
+    <p><%= l10n("my_household_desc")%></p>
 
-<% if @resident %>
-  <div class="content-bottom">
-    <%= render "profile_submenu", :active_subtab => "family-tab" %>
-    <div id="profile-content">
-      <%= render 'insured/families/coverall/family' %>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th><%= l10n("name") %></th>
+          <th><%= l10n("hbx_id") %></th>
+          <th><%= l10n("age") %></th>
+          <th><%= l10n("sex") %></th>
+          <th><%= l10n("relationship") %></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @family.active_family_members.each do |member| %>
+          <tr class="member-<%= member.id%>-row">
+            <td><%= member.full_name.titleize %></td>
+            <td><%= member.hbx_id[0,10] %></td>
+            <td><%= member.age_on(TimeKeeper.date_of_record) %></td>
+            <td><%= member.gender.humanize %></td>
+            <td><%= member.relationship.try(:humanize) %></td>
+            <td class="button-cell">
+              <% edit_url = member.is_primary_applicant ? personal_insured_families_path({bs4: @bs4}) : main_app.edit_insured_family_member_path(member, {bs4: @bs4}) %>
+              <%= h(link_to l10n("edit_member"), edit_url, remote: true, id: "edit-member-#{member.id}", class: 'btn button outline close-2') %>
+              <%= h(link_to l10n("cancel_edit"), insured_family_member_path(member, {bs4: @bs4}), remote: true, id: "cancel-edit-#{member.id}", class: 'hidden btn button outline close-2') %>
+              <%= h(link_to l10n("save_changes"), "", remote: true, id: "save-member-#{member.id}", class: 'hidden btn button close-2 ml-3') %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+
+    <div class="append_consumer_info"></div>
+
+    <%= h(link_to l10n("add_new_member"), new_insured_family_member_path({family_id: @family.id, bs4: @bs4}), remote: true, id: 'add-new-member', class: 'btn button close-2') %>
   </div>
 <% else %>
-  <div class="content-bottom">
-    <%= render "profile_submenu", :active_subtab => "family-tab" %>
-    <div id="profile-content">
-      <%= render 'family' %>
-    </div>
+  <% content_for :navigation do %>
+  <%= render partial: 'ui-components/v1/navs/families_navigation' %>
+  <% end %>
+  <%= javascript_pack_tag 'benefit_sponsors' %>
+
+  <div class="my-account-page">
+    <h1><%= l10n("manage_family") %></h1>
   </div>
+
+  <% if @resident %>
+    <div class="content-bottom">
+      <%= render "profile_submenu", :active_subtab => "family-tab" %>
+      <div id="profile-content">
+        <%= render 'insured/families/coverall/family' %>
+      </div>
+    </div>
+  <% else %>
+    <div class="content-bottom">
+      <%= render "profile_submenu", :active_subtab => "family-tab" %>
+      <div id="profile-content">
+        <%= render 'family' %>
+      </div>
+    </div>
+  <% end %>
 <% end %>
