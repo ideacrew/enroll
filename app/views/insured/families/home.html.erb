@@ -5,7 +5,7 @@
     <% enrollments = @hbx_enrollments %>
   <% end %>
   <div class="w-100">
-    <%= render partial: 'financial_assistance/shared/family_side_nav' %>
+    <%= render partial: 'shared/family_side_nav' %>
     <div class="pl-2">
       <% @person.active_employee_roles.each do |employee_role|%>
         <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
@@ -14,8 +14,6 @@
       <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? %>
       <h1><strong><%= l10n("insured.my_coverme_header") %></strong></h1>
 
-      <%= render partial: 'qle_detail' %>
-      <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present? %>
       <%= render 'right_column' %>
       <h2><%= enrollments.last.coverage_year %> <%= l10n('coverage').titleize %></h2>
       <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
