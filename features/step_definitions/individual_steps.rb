@@ -108,6 +108,8 @@ Then(/^Individual should not see the error message (.*)$/) do |error_message|
 end
 
 When(/^validate SSN feature is (.*)$/) do |feature|
+  allow(EnrollRegistry[:ssn_ui_validation].feature).to receive(:is_enabled).and_return(true)
+
   if feature == "enabled"
     stub_const('Forms::ConsumerCandidate::SSN_REGEX', /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
   else
