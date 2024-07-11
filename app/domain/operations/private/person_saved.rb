@@ -25,6 +25,7 @@ module Operations
       end
 
       def construct_and_publish_cv_family_events(headers, person, values)
+        Rails.logger.error "No families present for person with hbx_id: #{person&.hbx_id}" if person.families.blank?
         person.families.each do |family|
           payload = construct_before_and_after_cv_family(family, headers, person, values)
           return payload if payload.failure?
