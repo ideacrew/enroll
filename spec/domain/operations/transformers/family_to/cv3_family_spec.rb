@@ -3,6 +3,12 @@
 require 'dry/monads'
 require 'dry/monads/do'
 require 'rails_helper'
+require 'rspec-benchmark'
+
+RSpec.configure do |config|
+  config.include RSpec::Benchmark::Matchers
+end
+
 
 RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around_each do
   let(:primary_applicant) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "732020") }
@@ -12,9 +18,11 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
   let(:family_member3) { FactoryBot.create(:family_member, family: family, person: dependent2) }
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
-  let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, :male, application: application, family_member_id: primary_applicant.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id) }
-  let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, :male, application: application, family_member_id: family_member2.id, person_hbx_id: dependent1.hbx_id) }
-  let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, :female, application: application, family_member_id: family_member3.id, person_hbx_id: dependent2.hbx_id) }
+  let!(:applicant1) do
+    FactoryBot.create(:financial_assistance_applicant, :male, dob: TimeKeeper.date_of_record - 30.years, application: application, family_member_id: primary_applicant.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id)
+  end
+  let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, :male, dob: TimeKeeper.date_of_record - 30.years, application: application, family_member_id: family_member2.id, person_hbx_id: dependent1.hbx_id) }
+  let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, :female, dob: TimeKeeper.date_of_record - 30.years, application: application, family_member_id: family_member3.id, person_hbx_id: dependent2.hbx_id) }
   let(:create_instate_addresses) do
     application.applicants.each do |appl|
       appl.addresses = [FactoryBot.build(:financial_assistance_address,
@@ -40,6 +48,107 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   end
   let(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsorship) }
   let!(:hbx_profile) { FactoryBot.create :hbx_profile, benefit_sponsorship: benefit_sponsorship}
+
+  context 'cv3 family generation' do
+    let!(:applications) { FactoryBot.create_list(:financial_assistance_application, 20, :with_applicants, family_id: family.id, aasm_state: 'determined', effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+    let(:family) do
+      family = FactoryBot.build(:family, person: primary)
+      family.family_members = [
+        FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, family: family, person: primary),
+        FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, family: family, person: dependent)
+      ]
+
+      family.person.person_relationships.push PersonRelationship.new(relative_id: dependent.id, kind: 'spouse')
+      family.save
+      family
+    end
+
+    let(:dependent) { FactoryBot.create(:person) }
+    let(:primary) { FactoryBot.create(:person) }
+    let(:primary_applicant) { family.primary_applicant }
+    let(:dependents) { family.dependents }
+    let!(:eligibility_determination) do
+      determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+      determination
+    end
+
+    let!(:primary_grant) do
+      eligibility_determination.grants.create(
+        key: "AdvancePremiumAdjustmentGrant",
+        value: 110,
+        start_on: TimeKeeper.date_of_record.beginning_of_year,
+        end_on: TimeKeeper.date_of_record.end_of_year,
+        assistance_year: TimeKeeper.date_of_record.year,
+        member_ids: [primary_applicant.id.to_s],
+        tax_household_id: primary_tax_household.id
+      )
+    end
+
+    let!(:dependents_grant) do
+      eligibility_determination.grants.create(
+        key: "AdvancePremiumAdjustmentGrant",
+        value: 120,
+        start_on: TimeKeeper.date_of_record.beginning_of_year,
+        end_on: TimeKeeper.date_of_record.end_of_year,
+        assistance_year: TimeKeeper.date_of_record.year,
+        member_ids: dependents.map(&:id).map(&:to_s),
+        tax_household_id: dependents_tax_household.id
+      )
+    end
+
+    let!(:tax_household_group) do
+      family.tax_household_groups.create!(
+        assistance_year: TimeKeeper.date_of_record.year,
+        source: 'Admin',
+        start_on: TimeKeeper.date_of_record.beginning_of_year,
+        tax_households: [
+          FactoryBot.build(:tax_household, household: family.active_household),
+          FactoryBot.build(:tax_household, household: family.active_household)
+        ]
+      )
+    end
+
+    let(:primary_tax_household) do
+      tax_household_group.tax_households.first
+    end
+
+    let(:dependents_tax_household) do
+      tax_household_group.tax_households.second
+    end
+
+    let!(:hbx_enrollments) do
+      FactoryBot.create_list(:hbx_enrollment, 20,
+                             :individual_shopping,
+                             :with_silver_health_product,
+                             :with_enrollment_members,
+                             enrollment_members: family.family_members,
+                             effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                             aasm_state: 'coverage_canceled',
+                             product_id: products.first.id,
+                             family: family)
+    end
+
+    let!(:seps) { FactoryBot.create_list(:special_enrollment_period, 10, family: family)}
+    let!(:payment_transactions) { FactoryBot.create_list(:payment_transaction, 5, family: family)}
+    let!(:products) do
+      products = FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 20, :silver)
+      rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary.rating_address, during: TimeKeeper.date_of_record.beginning_of_year)
+      products.each do |product|
+        product.premium_tables.each do |pt|
+          pt.update_attributes(rating_area_id: rating_area.id)
+        end
+      end
+    end
+
+    it 'performs under 2 seconds' do
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+      ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
+
+      expect do
+        ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+      end.to perform_under(2).sec
+    end
+  end
 
   context 'nested cv3 transform failures' do
 
