@@ -99,11 +99,8 @@ Then(/^Individual sees the error message (.*)$/) do |error_message|
 end
 
 Then(/^Individual should see the error message Invalid Social Security number$/) do
-  sleep 10
   wait_for_ajax
-  script = "return document.querySelector('.required.floatlabel.form-control.interaction-field-control-person-ssn.active-floatlabel').getAttribute('oninvalid');"
-  invalid_value = page.execute_script(script)
-  expect(invalid_value).to include("this.setCustomValidity('Invalid Social Security number.')")
+  expect(page.find("input[class='required floatlabel form-control interaction-field-control-person-ssn active-floatlabel']")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
 end
 
 Then(/^Individual should not see the error message (.*)$/) do |error_message|
