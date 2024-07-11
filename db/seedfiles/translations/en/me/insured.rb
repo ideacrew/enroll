@@ -498,7 +498,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.outside_dc_extension' => "and plan to return",
   :'en.insured.dc_homeless' => "I'm a ME resident experiencing homelessness",
   :'en.insured.dependent_dc_homeless' => "This person is ME resident who is experiencing homeless",
-  :'en.insured.dc_homeless_extension' => ", or have no permanent home address",
+  :'en.insured.dc_homeless_extension' => "or have no permanent home address",
   :'en.insured.family_members.index.sep_header' => "%{sep} on: %{sep_date}",
   :'en.insured.family_members.index.continue_to_get_insurance' => "If you need to get health insurance coverage for other members of your family, select 'Add New Person'. When you’re finished, select 'Continue to Next Step'.",
   :'en.insured.family_members.index.add_member_info_html' => "<span class='bold'>Here's your chance to add family members to your plan.</span><br>Add family members by clicking the 'Add Member' button. If you don't need to add more members, or when you are done adding members, click continue.",
