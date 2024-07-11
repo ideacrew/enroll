@@ -80,9 +80,12 @@ module Operations
           def store_response_and_get_consumer_role(person, initial_response)
             consumer_role = person.consumer_role
             return Failure("No Consumer role found for person with hbx_id: #{person_hbx_id}") unless consumer_role
+
             event_response_record = EventResponse.new({received_at: Time.now, body: initial_response.to_h.to_json})
             consumer_role.lawful_presence_determination.ssa_responses << event_response_record
-            person.verification_types.active.reject{|type| [VerificationType::LOCATION_RESIDENCY, "American Indian Status", "Immigration status"].include? type.type_name}.each do |type|
+            non_ssa_types = [VerificationType::LOCATION_RESIDENCY, "American Indian Status", "Immigration status"]
+
+            person.verification_types.without_alive_status_type.active.reject{|type| non_ssa_types.include? type.type_name}.each do |type|
               type.add_type_history_element(action: "FDSH SSA Hub Response",
                                             modifier: "external Hub",
                                             update_reason: "Hub response",
