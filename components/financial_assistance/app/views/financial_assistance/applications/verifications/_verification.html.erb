@@ -1,8 +1,8 @@
 <% application = fetch_latest_determined_application(family_id) %>
 <% if application.present? %>
   <% if @bs4 %>
-      <h2><%= l10n('faa.verification.documents') %></h2>
-      <% applicants.each do |applicant| %>
+    <h2><%= l10n('faa.verification.documents') %></h2>
+    <% applicants.each do |applicant| %>
       <section class="card">
         <h3 class="mb-0"><%= applicant.full_name %></h3>
         <hr>
@@ -15,6 +15,7 @@
           <% end %>
         <% end %>
       </section>
+    <% end %>
   <% else %>
     <h1><%= l10n('faa.verification.documents') %></h1>
     <div class="table table-sm">
