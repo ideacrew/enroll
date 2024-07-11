@@ -22,9 +22,8 @@ module Subscribers
     subscribe(:on_family_member_created) do |delivery_info, metadata, response|
       subscriber_logger = subscriber_logger_for(:on_private_family_member_created)
       payload = JSON.parse(response, symbolize_names: true)
-      headers = JSON.parse(metadata.headers, symbolize_names: true)
-      pre_process_message(subscriber_logger, payload, headers)
-      process_family_member_created(payload[:family], headers)
+      pre_process_message(subscriber_logger, payload, metadata.headers)
+      process_family_member_created(payload[:family], metadata.headers)
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       subscriber_logger.error "PrivateFamilyMemberSubscriber::Created, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
@@ -46,6 +45,8 @@ module Subscribers
 
     def process_person_saved(headers, payload)
       ::Operations::Private::PersonSaved.new.call(headers: headers, params: payload)
+    end
+
     def process_family_member_created(family, headers)
       ::Operations::Private::FamilyMemberCreated.new.call(family, headers)
     end

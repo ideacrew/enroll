@@ -12,7 +12,7 @@ module Operations
 
       def call(params, headers)
         values = yield validate(params, headers)
-        family = yield find_family(params)
+        family = yield find_family(values)
         build_and_publish_cv_family(family, headers)
       end
 
@@ -29,7 +29,6 @@ module Operations
       end
 
       def build_and_publish_cv_family(family, headers)
-        return Failure("Family not found for family member: #{family&.primary_person&.hbx_id}") unless family.present?
         cv_family = build_cv_family(family)
         if cv_family.success?
           publish_families_created_or_updated(family, cv_family.success, headers)
@@ -42,7 +41,7 @@ module Operations
       end
 
       def build_cv_family(family)
-        Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+        Operations::Transformers::FamilyTo::Cv3Family.new.call(family, true)
       end
 
       def handle_cv_family_failure(family, cv_family)

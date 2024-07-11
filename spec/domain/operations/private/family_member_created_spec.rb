@@ -12,13 +12,13 @@ RSpec.describe ::Operations::Private::FamilyMemberCreated, dbclean: :after_each 
     let(:subject) { described_class.new }
 
     it 'returns success' do
-      result = subject.call(family_member)
+      result = subject.call(family, family_member.created_at)
 
       expect(result.success?).to be_truthy
     end
 
     it 'returns success message' do
-      result = described_class.new.call(family_member)
+      result = described_class.new.call(family, family_member.created_at)
       expect(result.success).to eql("Successfully published 'events.families.created_or_updated' for family member with hbx_id: #{family_member&.person&.hbx_id}")
     end
   end
@@ -30,7 +30,7 @@ RSpec.describe ::Operations::Private::FamilyMemberCreated, dbclean: :after_each 
     end
 
     it 'returns failure when cv3 family fails' do
-      result = described_class.new.call(family_member)
+      result = described_class.new.call(family, family_member.created_at)
       expect(result.failure?).to be_truthy
     end
   end
