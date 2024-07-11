@@ -257,6 +257,12 @@ ul.list-right-section {
     background-color: var(--warning-status-tint);
     border: 1px solid var(--warning-border);
   }
+
+  &.badge-absent {
+    background-color: var(--grey-040);
+    border: 1px solid var(--grey-160);
+  
+  }
 }
 
 .badge-current-plan {

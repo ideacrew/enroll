@@ -20,11 +20,13 @@
       <% verification_filter.each do |verif_type| %>
         <% v_type = verif_type.type_name %>
         <% can_show_verif_due_date = VerificationType::DUE_DATE_STATES.include?(verif_type.validation_status) %>
+        <% can_show_actions_button = current_user.has_hbx_staff_role? %>
+        <% badge_col_class = can_show_actions_button ? "5" : "4" %>
         <% if can_display_or_modify_type?(verif_type) %>
           <div class="my-3">
             <div class="row mb-2 p-0">
               <div class="d-flex col-lg <%= "pr-0" if can_show_verif_due_date %> pb-2 pb-lg-0 align-items-center">
-                <div class="<%= can_show_verif_due_date ? "col-xl-5 col-lg-3 col-md-5 col-3" : "col-5" %> px-0">
+                <div class="<%= can_show_verif_due_date ? "col-xl-#{badge_col_class} col-lg-3 col-md-#{badge_col_class} col-3" : "col-#{badge_col_class}" %> px-0">
                   <h6 class="my-0"><%= display_verification_type_name(v_type) %></h6>
                 </div>
                 <div class="d-flex <%= "ml-auto ml-lg-0" unless can_show_verif_due_date %>">
@@ -41,7 +43,7 @@
                 <% end %>
               </div>
               <div class="d-flex col-lg-auto pl-lg-0 justify-content-lg-end">
-                <% if current_user.has_hbx_staff_role? %>
+                <% if can_show_actions_button %>
                   <span class="v-type-actions mr-2">
                     <%= select_tag :verification_actions, admin_actions(verif_type, family_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
                   </span>
