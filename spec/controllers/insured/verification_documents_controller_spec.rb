@@ -334,6 +334,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             it 'uploads a new VerificationDocument' do
               post :upload, params: params
               expect(flash[:notice]).to eq("File Saved")
+              expect(alive_status_verification.reload.validation_status).to eq('outstanding')
+              expect(alive_status_verification.type_history_elements.last.from_validation_status).to eq('unverified')
+              expect(alive_status_verification.type_history_elements.last.to_validation_status).to eq('outstanding')
             end
           end
         end
