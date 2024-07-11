@@ -12,6 +12,16 @@ $('#btn-continue').addClass('disabled');
       $(ele).remove();
   });
   $("#dependent_ul").append("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
+
+  //manage family/ my household page
+  $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent,person: @person) %>");
+  //disable all other buttons
+  $("a[id^=edit-member]").addClass('disabled');
+  $("#add-new-member").addClass("hidden");
+  $("#edit-member-<%= @dependent.id %>").addClass("hidden");
+  $("#cancel-edit-<%= @dependent.id %>").removeClass("hidden");
+  $("#save-member-<%= @dependent.id %>").removeClass("hidden");
+
 <% end %>
 
 $("#add_member_list_<%= @dependent.id %>").attr('data-confirm', '');

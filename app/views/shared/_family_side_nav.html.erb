@@ -35,6 +35,11 @@
           <% end %>
         </li>
       <% end %>
+      <li>
+        <%= link_to personal_insured_families_path(tab: 'personal'), class: "#{'active' if action_name == 'personal'}" do %>
+          <%= l10n("my_household") %>
+        <% end %>
+      </li>
       <% if current_user.has_hbx_staff_role? && has_active_resident_members?(@family_members) %>
         <li>
           <%= link_to main_app.upload_application_insured_families_path(tab: 'verification'), class: "#{'active' if action_name == 'upload_application'}"  do %>
