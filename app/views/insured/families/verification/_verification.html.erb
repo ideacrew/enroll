@@ -27,7 +27,7 @@
             <div class="row mb-2 p-0">
               <div class="d-flex col-lg <%= "pr-0" if can_show_verif_due_date %> pb-2 pb-lg-0 align-items-center">
                 <div class="<%= can_show_verif_due_date ? "col-xl-#{badge_col_class} col-lg-3 col-md-#{badge_col_class} col-3" : "col-#{badge_col_class}" %> px-0">
-                  <h6 class="my-0"><%= display_verification_type_name(v_type) %></h6>
+                  <h6 class="my-0 pr-5"><%= display_verification_type_name(v_type) %></h6>
                 </div>
                 <div class="d-flex <%= "ml-auto ml-lg-0" unless can_show_verif_due_date %>">
                   <span class="badge badge-status badge-<%= verification_type_class(verif_type.validation_status) %> p-2" id="status">
