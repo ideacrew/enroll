@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::RequestEvidenceDetermination, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let!(:person_1) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020") }
   let!(:person_2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021") }

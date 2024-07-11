@@ -758,7 +758,7 @@ $(document).on('turbolinks:load', function () {
       $("a.interaction-click-control-add-more").addClass('hide');
 
       var url = $(self).parents('.other-income').attr('id').replace('financial_assistance_income_', '');
-      console.log(url);
+
       $.ajax({
         type: 'DELETE',
         url: url,
@@ -813,7 +813,7 @@ $(document).on('turbolinks:load', function () {
       $("a.interaction-click-control-add-more").addClass('hide');
 
       var url = $(self).parents('.unemployment-income').attr('id').replace('financial_assistance_income_', '');
-      console.log(url);
+
       $.ajax({
         type: 'DELETE',
         url: url,
@@ -869,7 +869,6 @@ $(document).on('turbolinks:load', function () {
       $("a.interaction-click-control-add-more").addClass('hide');
 
       var url = $(self).parents('.ai-an-income').attr('id').replace('financial_assistance_income_', '');
-      console.log(url);
       $.ajax({
         type: 'DELETE',
         url: url,

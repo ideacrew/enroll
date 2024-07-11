@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::AddMecCheckPerson, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let(:person_id) { "b3dc8e08e28e487f80285fb79681b337" }
 

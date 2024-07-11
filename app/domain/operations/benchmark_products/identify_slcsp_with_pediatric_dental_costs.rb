@@ -6,7 +6,7 @@ module Operations
     # This class considers rating address of primary person of the given family to determine available products and their ratings.
     # All the members of the request payload should be eligible for InsuranceAssistance(APTC)
     class IdentifySlcspWithPediatricDentalCosts
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Identify the type of APTC household
       # Identify the SLCSADP

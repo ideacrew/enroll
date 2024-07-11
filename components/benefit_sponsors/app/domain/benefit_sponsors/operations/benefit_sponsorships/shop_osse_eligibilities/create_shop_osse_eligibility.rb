@@ -9,7 +9,7 @@ module BenefitSponsors
       module ShopOsseEligibilities
         # Operation to support eligibility creation
         class CreateShopOsseEligibility
-          send(:include, Dry::Monads[:result, :do])
+          include Dry::Monads[:do, :result]
 
           attr_accessor :subject, :default_eligibility, :prospective_eligibility
 

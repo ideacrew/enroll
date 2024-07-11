@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Households
     class DeactivateFinancialAssistanceEligibility
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       #params: {family_id , date}
       def call(params:)

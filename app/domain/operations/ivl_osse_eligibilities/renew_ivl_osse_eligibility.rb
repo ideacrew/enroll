@@ -7,7 +7,7 @@ module Operations
   module IvlOsseEligibilities
     # Operation to support IVL osse eligibility renewals
     class RenewIvlOsseEligibility
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
       include EventSource::Command
 
       # @param [Hash] opts Options to trigger ivl osse eligibility renewals

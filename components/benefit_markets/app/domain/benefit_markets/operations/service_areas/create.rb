@@ -7,7 +7,7 @@ module BenefitMarkets
   module Operations
     module ServiceAreas
       class Create
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ Hash ] params Service Area attributes
         # @return [ BenefitMarkets::Entities::ServiceArea ] service_area Service Area

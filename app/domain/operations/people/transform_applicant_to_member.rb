@@ -7,7 +7,7 @@ module Operations
   module People
     # Class for transforming applicant parameters to member parameters
     class TransformApplicantToMember
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Transforms the applicant parameters to member parameters.
       #

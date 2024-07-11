@@ -21,7 +21,7 @@ function httpRequest(type,url,dataType,data) {
   //xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onload = function() {
       if (this.status === 200) {
-          console.log(this.responseText)
+          // console.log(this.responseText)
       }
   }
 }

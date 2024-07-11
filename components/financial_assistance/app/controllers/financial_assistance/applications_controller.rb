@@ -13,7 +13,7 @@ module FinancialAssistance
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
-    include FinancialAssistance::L10nHelper
+    include ::L10nHelper
     include ::FileUploadHelper
     require 'securerandom'
 

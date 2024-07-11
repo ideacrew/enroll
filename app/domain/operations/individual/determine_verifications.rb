@@ -7,7 +7,7 @@ module Operations
   module Individual
     # Determine verifications
     class DetermineVerifications
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         consumer_role_id = yield validate(params[:id])

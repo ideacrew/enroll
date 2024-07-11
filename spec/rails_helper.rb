@@ -53,7 +53,7 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   load Rails.root + "db/seedfiles/english_translations_seed.rb"
-  DatabaseCleaner.strategy = :deletion, {:except => %w[translations]}
+  DatabaseCleaner.strategy = DatabaseCleaner::Mongoid::Deletion.new(except: %w[translations])
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean

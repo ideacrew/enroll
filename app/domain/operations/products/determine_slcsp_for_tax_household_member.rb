@@ -4,7 +4,7 @@ module Operations
   module Products
     # This class is to fetch second lowest cost silver plan for a given tax household member.
     class DetermineSlcspForTaxHouseholdMember
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
 
       # @param [Date] effective_date
