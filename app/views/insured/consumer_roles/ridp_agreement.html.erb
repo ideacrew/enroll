@@ -36,18 +36,23 @@
     $(document).ready(function() {
       const agree = document.querySelector("[for='agreement_agree']");
       const agree_link = "<%= EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true') ? new_insured_fdsh_ridp_verification_path : new_insured_interactive_identity_verification_path %>";
+      const continue_button = document.getElementById("continue_button");
+      const disagree_disclaimer = $(document.querySelector(".aut_cons_text")).parents('.row-form-wrapper');
 
       if ($(agree).find('input').prop('checked')) { // defensive code in case default agree requirement is changed in the future
-        $("#continue_button").attr("href", agree_link);
-        $("#continue_button").removeClass('disabled');
+        $(continue_button).attr("href", agree_link);
+        $(continue_button).removeClass('disabled');
+        $(disagree_disclaimer).addClass('hide');
       }
 
       $(agree).on("click", function() {
-        $("#continue_button").attr("href", agree_link);
+        $(continue_button).attr("href", agree_link);
+        $(disagree_disclaimer).addClass('hide');
       });
 
       $("[for='agreement_disagree']").on("click", function() {
-        $("#continue_button").attr("href", "<%= upload_ridp_document_insured_consumer_role_index_path %>");
+        $(continue_button).attr("href", "<%= upload_ridp_document_insured_consumer_role_index_path %>");
+        $(disagree_disclaimer).removeClass('hide');
       });
     });
   </script>
