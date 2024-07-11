@@ -76,7 +76,7 @@
         <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
         <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
       </section>
-
+      
       <% unless @applicant.is_primary_applicant? %>
         <section class="mb-4">
           <h4 class="gamma mb-0"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
