@@ -1,78 +1,128 @@
 <% evidence_type = evidence.title %>
-<div class="row" data-cuke="<%=evidence_kind%>_for_<%=applicant.full_name.parameterize.underscore%>">
-  <div class="v-type col-md-12">
-    <div class="v-type-name col-md-2" id="evidence_kind_<%= evidence_kind %>">
-      <%= l10n(display_evidence_type(evidence_type)) %>
-    </div>
-    <div class="v-type-status col-md-2 text-center">
-        <span class="label lb-md label-<%=verification_status_class(evidence.aasm_state.to_s)%>">
-          <%= show_verification_status(evidence.aasm_state.to_s, current_user.has_hbx_staff_role?) %>
-        </span>&nbsp;
-    </div>
-
-    <div class="v-type-due-date col-md-3">
-      <% if Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state.to_s) %>
-        <span class="text-danger"><%= l10n('due_date') %></span>
-        <%= evidence.verif_due_date %>
-      <% end %>
-    </div>
-
-    <div class="v-type-upload col-md-3">
-      <% if display_upload_for_evidence?(evidence) %>
-        <%= form_tag financial_assistance.application_applicant_verification_documents_upload_path(application, applicant), multipart: true, method: :post do %>
-          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_evidence_<%= evidence.id %>')" class="btn btn-default btn-file">
-            <i class="fa fa-upload" aria-hidden="true"></i>
-            <%= l10n('upload_documents') %>
-            <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, value: "Upload Documents", tabindex: "-1", id: "upload_evidence_#{evidence.id}" %>
+<% if @bs4 %>
+  <% can_show_verif_due_date = Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state.to_s) %>
+  <% can_show_actions_button = current_user.has_hbx_staff_role? && evidence_type.present? %>
+  <% badge_col_class = can_show_actions_button ? "5" : "4" %>
+  <div class="my-3" data-cuke="<%= evidence_kind %>_for_<%= applicant.full_name.parameterize.underscore %>">
+    <div class="row mb-2 p-0">
+      <div class="d-flex col-lg <%= "pr-0" if can_show_verif_due_date %> pb-2 pb-lg-0 align-items-center">
+        <div class="<%= can_show_verif_due_date ? "col-xl-#{badge_col_class} col-lg-3 col-md-#{badge_col_class} col-3" : "col-#{badge_col_class}" %> px-0" id="evidence_kind_<%= evidence_kind %>">
+          <h6 class="my-0"><%= l10n(display_evidence_type(evidence_type)) %></h6>
+        </div>
+        <div class="d-flex <%= "ml-auto ml-lg-0" unless can_show_verif_due_date %>">
+          <span class="badge badge-status badge-<%= verification_status_class(evidence.aasm_state.to_s) %> p-2" id="status">
+            <%= show_verification_status(evidence.aasm_state.to_s, current_user.has_hbx_staff_role?) %>
           </span>
-          <%= hidden_field_tag 'applicant_id', applicant.id  %>
-          <%= hidden_field_tag 'evidence', evidence.id  %>
-          <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
+        </div>
+        <% if can_show_verif_due_date %>
+          <dl class="d-flex col justify-content-end align-items-center mb-0">
+            <dt><%= l10n("due_date") %>:</dt>
+            <dd><%= evidence.verif_due_date %></dd>
+          </dl>
         <% end %>
-      <% end %>
-    </div>
-    <% if current_user.has_hbx_staff_role? && evidence_type.present? %>
-      <div class="v-type-actions col-md-2">
-        <%= select_tag :verification_actions, admin_actions_on_faa_documents(evidence), {id: "v-action-#{applicant.id}-#{evidence_type.downcase.split.join('-')}", prompt: 'Action'} %>
       </div>
+      <div class="d-flex col-lg-auto pl-lg-0 justify-content-lg-end">
+        <% if can_show_actions_button %>
+          <span class="v-type-actions mr-2">
+            <%= select_tag :verification_actions, admin_actions(verif_type, family_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
+          </span>
+        <% end %>
+        <% if display_upload_for_evidence?(evidence) %>
+          <%= form_tag financial_assistance.application_applicant_verification_documents_upload_path(application, applicant), multipart: true, method: :post do %>
+            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_evidence_<%= evidence.id %>')" class="btn btn-default btn-file text-nowrap">
+              <i class="fa fa-upload" aria-hidden="true"></i>
+              <label>
+                <%= l10n('upload_documents') %>
+                <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, value: "Upload Documents", tabindex: "-1", id: "upload_evidence_#{evidence.id}" %>
+              </label>
+            </span>
+            <%= hidden_field_tag 'applicant_id', applicant.id  %>
+            <%= hidden_field_tag 'evidence', evidence.id  %>
+            <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    <% if false && current_user.has_hbx_staff_role? && evidence_type.present? # TODO: implement for admin flow %>
+      <%= render :partial => "financial_assistance/applications/verifications/admin_verification_actions", locals: { application: application, applicant: applicant, evidence: evidence, evidence_kind: evidence_kind} %>
     <% end %>
   </div>
-</div>
+<% else %>
+  <div class="row" data-cuke="<%=evidence_kind%>_for_<%=applicant.full_name.parameterize.underscore%>">
+    <div class="v-type col-md-12">
+      <div class="v-type-name col-md-2" id="evidence_kind_<%= evidence_kind %>">
+        <%= l10n(display_evidence_type(evidence_type)) %>
+      </div>
+      <div class="v-type-status col-md-2 text-center">
+          <span class="label lb-md label-<%=verification_status_class(evidence.aasm_state.to_s)%>">
+            <%= show_verification_status(evidence.aasm_state.to_s, current_user.has_hbx_staff_role?) %>
+          </span>&nbsp;
+      </div>
 
-<% if current_user.has_hbx_staff_role? && evidence_type.present? %>
-  <%= render :partial => "financial_assistance/applications/verifications/admin_verification_actions", locals: { application: application, applicant: applicant, evidence: evidence, evidence_kind: evidence_kind} %>
-<% end %>
+      <div class="v-type-due-date col-md-3">
+        <% if Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state.to_s) %>
+          <span class="text-danger"><%= l10n('due_date') %></span>
+          <%= evidence.verif_due_date %>
+        <% end %>
+      </div>
 
-<div class="row">
-  <% if evidence.documents.any? %>
-
-    <div class="v-doc-list col-md-12">
-      <% evidence.documents.each do |document|%>
-        <% key = document.identifier.split('#').last %>
-        <div class="row" id="doc_table_row_<%=document.id%>">
-          <div class="v-doc-elem col-md-12">
-            <div class="v-doc col-md-11">
-              <% if document.identifier.present? %>
-                <%= link_to(
-                      "/financial_assistance/applications/#{application.id}/applicants/#{applicant.id}/verification_documents/download?key=#{key}&evidence_kind=#{evidence_kind}",
-                      :target => '_blank',
-                      rel: 'noopener noreferrer',
-                      title: "Download",
-                      data: {"toggle": "tooltip"}) do %>
-                  <%= document.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
-                <% end %>
-              <% end %>
-            </div>
-            <div class="v-doc col-md-1">
-              <span class="<%=pundit_class(Family, :updateable?)%>" >
-                <%= link_to financial_assistance.application_applicant_verification_documents_destroy_path(document, :applicant_id => applicant.id, :evidence => evidence.id, :doc_key => key, :doc_title => document.title.titleize, evidence_kind: evidence_kind), method: :delete do %>
-                  <i class="far fa-trash-alt fa-lg role-trashcan pull-right" title="Delete"><span class="hide"><%=l10n("delete")%></span></i>
-                <% end %>
-              </span>
-            </div>
-          </div>
+      <div class="v-type-upload col-md-3">
+        <% if display_upload_for_evidence?(evidence) %>
+          <%= form_tag financial_assistance.application_applicant_verification_documents_upload_path(application, applicant), multipart: true, method: :post do %>
+            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_evidence_<%= evidence.id %>')" class="btn btn-default btn-file">
+              <i class="fa fa-upload" aria-hidden="true"></i>
+              <%= l10n('upload_documents') %>
+              <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true, value: "Upload Documents", tabindex: "-1", id: "upload_evidence_#{evidence.id}" %>
+            </span>
+            <%= hidden_field_tag 'applicant_id', applicant.id  %>
+            <%= hidden_field_tag 'evidence', evidence.id  %>
+            <%= hidden_field_tag 'evidence_kind', evidence_kind  %>
+          <% end %>
+        <% end %>
+      </div>
+      <% if current_user.has_hbx_staff_role? && evidence_type.present? %>
+        <div class="v-type-actions col-md-2">
+          <%= select_tag :verification_actions, admin_actions_on_faa_documents(evidence), {id: "v-action-#{applicant.id}-#{evidence_type.downcase.split.join('-')}", prompt: 'Action'} %>
         </div>
       <% end %>
     </div>
+  </div>
+
+  <% if current_user.has_hbx_staff_role? && evidence_type.present? %>
+    <%= render :partial => "financial_assistance/applications/verifications/admin_verification_actions", locals: { application: application, applicant: applicant, evidence: evidence, evidence_kind: evidence_kind} %>
   <% end %>
-</div>
+
+  <div class="row">
+    <% if evidence.documents.any? %>
+
+      <div class="v-doc-list col-md-12">
+        <% evidence.documents.each do |document|%>
+          <% key = document.identifier.split('#').last %>
+          <div class="row" id="doc_table_row_<%=document.id%>">
+            <div class="v-doc-elem col-md-12">
+              <div class="v-doc col-md-11">
+                <% if document.identifier.present? %>
+                  <%= link_to(
+                        "/financial_assistance/applications/#{application.id}/applicants/#{applicant.id}/verification_documents/download?key=#{key}&evidence_kind=#{evidence_kind}",
+                        :target => '_blank',
+                        rel: 'noopener noreferrer',
+                        title: "Download",
+                        data: {"toggle": "tooltip"}) do %>
+                    <%= document.title.titleize %> <i class='fa fa-download fa-lg' aria-hidden='true'></i>
+                  <% end %>
+                <% end %>
+              </div>
+              <div class="v-doc col-md-1">
+                <span class="<%=pundit_class(Family, :updateable?)%>" >
+                  <%= link_to financial_assistance.application_applicant_verification_documents_destroy_path(document, :applicant_id => applicant.id, :evidence => evidence.id, :doc_key => key, :doc_title => document.title.titleize, evidence_kind: evidence_kind), method: :delete do %>
+                    <i class="far fa-trash-alt fa-lg role-trashcan pull-right" title="Delete"><span class="hide"><%=l10n("delete")%></span></i>
+                  <% end %>
+                </span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -1,29 +1,46 @@
 <% application = fetch_latest_determined_application(family_id) %>
 <% if application.present? %>
-  <h1><%= l10n('faa.verification.documents') %></h1>
-  <div class="table table-sm">
-    <div class="module verification-process col-md-12">
-      <% applicants = application.applicants %>
+  <% if @bs4 %>
+      <h2><%= l10n('faa.verification.documents') %></h2>
       <% applicants.each do |applicant| %>
-        <div class="row">
-          <div class="family-member col-md-12">
-            <div class="person">
-              <%= applicant.full_name %>
-            </div>
-            <div class="verification-types col-md-12">
-              <% FinancialAssistance::Applicant::EVIDENCES.each do |evidence_kind| %>
-                <% next if evidence_kind == :local_mec_evidence && !FinancialAssistanceRegistry.feature_enabled?(:mec_check) %>
-                <% evidence = applicant.send(evidence_kind) %>
-                <% if evidence.present? %>
-                  <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: evidence, evidence_kind: evidence_kind } %>
+      <section class="card">
+        <h3 class="mb-0"><%= applicant.full_name %></h3>
+        <hr>
+        <% FinancialAssistance::Applicant::EVIDENCES.each do |evidence_kind| %>
+          <% next if evidence_kind == :local_mec_evidence && !FinancialAssistanceRegistry.feature_enabled?(:mec_check) %>
+          <% evidence = applicant.send(evidence_kind) %>
+          <% if evidence.present? %>
+            <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: evidence, evidence_kind: evidence_kind } %>
+            <hr class="subcard-divider">
+          <% end %>
+        <% end %>
+      </section>
+  <% else %>
+    <h1><%= l10n('faa.verification.documents') %></h1>
+    <div class="table table-sm">
+      <div class="module verification-process col-md-12">
+        <% applicants = application.applicants %>
+        <% applicants.each do |applicant| %>
+          <div class="row">
+            <div class="family-member col-md-12">
+              <div class="person">
+                <%= applicant.full_name %>
+              </div>
+              <div class="verification-types col-md-12">
+                <% FinancialAssistance::Applicant::EVIDENCES.each do |evidence_kind| %>
+                  <% next if evidence_kind == :local_mec_evidence && !FinancialAssistanceRegistry.feature_enabled?(:mec_check) %>
+                  <% evidence = applicant.send(evidence_kind) %>
+                  <% if evidence.present? %>
+                    <%= render partial: "financial_assistance/applications/verifications/verification_card", locals: {applicant: applicant, application: application, evidence: evidence, evidence_kind: evidence_kind } %>
+                  <% end %>
                 <% end %>
-              <% end %>
+              </div>
             </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
-  </div>
+  <% end %>
 <% end %>
 
 <script>
