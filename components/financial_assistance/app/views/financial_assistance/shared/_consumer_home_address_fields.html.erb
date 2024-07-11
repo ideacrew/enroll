@@ -1,7 +1,6 @@
 <%= javascript_pack_tag 'benefit_sponsors' %>
 <div id="address_info" class="row no-buffer focus_effect personal-info-row">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-
     <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
       <% kind = address.object.kind %>
 
