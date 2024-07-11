@@ -10,7 +10,7 @@ module FinancialAssistance
         # This Operation adds the MEC Check to the Application(persistence object)
         # Operation receives the MEC Check results
         class AddMecCheckApplication
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
 
           # @param [Hash] opts The options to add eligibility determination to Application(persistence object)
           # @return [Dry::Monads::Result]

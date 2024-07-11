@@ -12,7 +12,7 @@ module FinancialAssistance
           # This Operation determines applicants non esi mec eligibility
           # Operation receives the Application with non esi mec determination values
           class AddNonEsiMecDetermination
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
 
             # @param [Hash] opts The options to add non esi mec determination to applicants
             # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params

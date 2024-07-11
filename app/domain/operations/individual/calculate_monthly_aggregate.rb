@@ -7,7 +7,7 @@ module Operations
   module Individual
     # Calculate Yearly Aggregate amount based on current enrollment
     class CalculateMonthlyAggregate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include FloatHelper
 
       def call(params)

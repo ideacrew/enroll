@@ -7,7 +7,7 @@ module Operations
   module Eligibilities
     # Build grant based on the type passed in arguments
     class BuildGrant
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate(params)

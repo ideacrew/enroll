@@ -22,8 +22,8 @@ RSpec.describe BenefitMarkets::Operations::Products::Find, dbclean: :after_each 
   context 'sending required parameters' do
 
     it 'should find Product' do
-      expect(subject.call(params).success?).to be_truthy
-      expect(subject.call(params).success.first.class.to_s).to match(/BenefitMarkets::Entities::HealthProduct/)
+      expect(subject.call(**params).success?).to be_truthy
+      expect(subject.call(**params).success.first.class.to_s).to match(/BenefitMarkets::Entities::HealthProduct/)
     end
   end
 end

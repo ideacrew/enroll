@@ -4,7 +4,7 @@ module Operations
   module HbxEnrollments
     # This class terminates an existing enrollment and reinstates a new enrollment without members selected to be dropped from coverage
     class DropEnrollmentMembers
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       attr_reader :new_effective_date, :termination_date, :base_enrollment, :new_enrollment, :future_effective
 

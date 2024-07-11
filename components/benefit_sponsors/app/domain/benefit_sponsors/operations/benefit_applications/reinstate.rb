@@ -14,11 +14,16 @@ module BenefitSponsors
       # from draft to reinstated before the final state(active) to indicate that
       # this very application is reinstated.
       class Reinstate
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
-        # @param [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
-        # @return [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
-        def call(params:)
+        # Reinstates a benefit application.
+        #
+        # @param params [Hash] A hash containing :benefit_application key.
+        #   - :benefit_application [BenefitSponsors::BenefitApplications::BenefitApplication] The benefit application to reinstate.
+        #   - :options [Hash] (optional) Additional options. For example, :transmit_to_carrier to indicate whether to transmit the reinstatement to the carrier.
+        #
+        # @return [BenefitSponsors::BenefitApplications::BenefitApplication] The reinstated benefit application.
+        def call(params)
           values               = yield validate(params)
           cloned_ba            = yield clone_benefit_application(values)
           cloned_bsc           = yield clone_benefit_sponsor_catalog(values)

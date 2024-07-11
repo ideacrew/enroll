@@ -7,7 +7,7 @@ module FinancialAssistance
   module Operations
     module Application
       class Export
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ FinancialAssistance::Application ] application Applicant Attributes
         # @return [ Hash ] payload Application Payload

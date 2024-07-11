@@ -7,7 +7,7 @@ module BenefitMarkets
   module Operations
     module Products
       class Find
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ Date ] effective_date Effective date of the benefit application in rfc3339 date format
         # @param [ Array<BenefitMarkets::Entities::ServiceArea> ] service_areas Service Areas

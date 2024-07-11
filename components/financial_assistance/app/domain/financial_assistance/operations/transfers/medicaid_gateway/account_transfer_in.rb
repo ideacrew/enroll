@@ -228,7 +228,13 @@ module FinancialAssistance
             # assign_citizen_status
             params = applicant_params.except("lawful_presence_determination")
             merge_params = params.merge(citizen_status: applicant_params["lawful_presence_determination"]["citizen_status"])
-            ::Operations::People::CreateOrUpdateConsumerRole.new.call(params: { applicant_params: merge_params, family_member: family_member })
+            ::Operations::People::CreateOrUpdateConsumerRole.new.call(
+              params: {
+                applicant_params: merge_params,
+                family_member: family_member,
+                optimistic_upstream_coverage_attestation_interpretation: EnrollRegistry.feature_enabled?(:optimistic_upstream_coverage_attestation)
+              }
+            )
           rescue StandardError => e
             Failure("create_or_update_consumer_role: #{e}")
           end

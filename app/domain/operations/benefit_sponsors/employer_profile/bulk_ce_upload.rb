@@ -9,7 +9,7 @@ module Operations
     module EmployerProfile
       # This class will persist Census Employees to roster
       class BulkCeUpload
-        send(:include, Dry::Monads[:result, :do, :try])
+        include Dry::Monads[:do, :result]
         include EventSource::Command
 
         def call(params)

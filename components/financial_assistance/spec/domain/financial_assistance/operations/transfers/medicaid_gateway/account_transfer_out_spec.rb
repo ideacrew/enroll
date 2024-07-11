@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
   let!(:person2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021") }

@@ -19,7 +19,7 @@ module Operations
         private
 
         def fetch_people_with_consumer_role
-          result = Person.exists(consumer_role: true).exists(demographics_group: false)
+          result = Person.exists(consumer_role: true, encrypted_ssn: true, demographics_group: false)
 
           if result.present?
             Success(result)

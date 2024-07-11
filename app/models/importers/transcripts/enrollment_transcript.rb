@@ -387,7 +387,7 @@ module Importers::Transcripts
           else
             census_employees = CensusEmployee.matchable(matched_person.ssn, matched_person.dob).to_a + CensusEmployee.unclaimed_matchable(matched_person.ssn, matched_person.dob).to_a
             census_employees = census_employees.select{|ce| ce.employer_profile == employer_profile}
-            raise "found multiple roster entrees for #{matched_person.full_name}" if census_employees.size > 1
+            raise "found multiple roster entrees for #{matched_person.hbx_id}" if census_employees.size > 1
             raise "unable to find census employee record" if census_employees.blank?
             census_employee = census_employees.first
           end
@@ -459,7 +459,7 @@ module Importers::Transcripts
             end
           end
 
-          family_member = family.add_family_member(matched_person, is_primary_applicant: false)
+          family_member = family.add_family_member(matched_person, { is_primary_applicant: false })
           hbx_enrollment.hbx_enrollment_members.build({
                                                         applicant_id: family_member.id,
                                                         is_subscriber: member.is_subscriber,

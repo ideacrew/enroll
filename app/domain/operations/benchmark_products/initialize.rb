@@ -7,7 +7,7 @@ module Operations
   module BenchmarkProducts
     # This class takes BenchmarkProducts params as input and returns the BenchmarkProductsModel entity
     class Initialize
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         validated_params  = yield validate_params(params)

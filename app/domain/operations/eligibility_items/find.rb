@@ -7,7 +7,7 @@ module Operations
   module EligibilityItems
     # Find eligibility item from resource registry
     class Find
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to find eligibility item from Resource Registry
 

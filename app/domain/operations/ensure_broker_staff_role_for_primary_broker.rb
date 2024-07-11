@@ -22,7 +22,7 @@ module Operations
   # to provide a single place for the logic until we can perform a more
   # comprehensive refactor of the behaviour.
   class EnsureBrokerStaffRoleForPrimaryBroker
-    include Dry::Monads[:result, :do]
+    include Dry::Monads[:do, :result]
 
     VALID_SCENARIOS = [
       :application_approved,

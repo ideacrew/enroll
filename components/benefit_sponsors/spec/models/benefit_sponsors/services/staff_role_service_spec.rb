@@ -2,6 +2,15 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::StaffRoleService, type: :model, :dbclean => :after_each do
+
+    before :all do
+      DatabaseCleaner.clean
+    end
+
+    after :all do
+      DatabaseCleaner.clean
+    end
+
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
     let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }

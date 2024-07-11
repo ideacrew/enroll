@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module People
     class CreateOrUpdate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
 
@@ -48,14 +48,13 @@ module Operations
           person = Person.new(person_entity.to_h) #if person_valid_params.success?
           person.save!
         else
-          return Success(person) if no_infomation_changed?({params: {attributes_hash: person_entity, person: person}})
+          return Success(person) if no_infomation_changed?(params: { attributes_hash: person_entity, person: person })
           person.assign_attributes(person_entity.except(:addresses, :phones, :emails, :hbx_id))
           person.save!
           create_or_update_associations(person, person_entity.to_h, :addresses)
           create_or_update_associations(person, person_entity.to_h, :emails)
           create_or_update_associations(person, person_entity.to_h, :phones)
         end
-
         Success(person)
       rescue StandardError => e
         Failure(person.errors.messages)

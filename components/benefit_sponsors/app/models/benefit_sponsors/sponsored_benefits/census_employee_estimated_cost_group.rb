@@ -80,8 +80,7 @@ module BenefitSponsors
                 sponsor_contribution_prohibited: ["cobra_eligible", "cobra_linked", "cobra_termination_pending"].include?(census_employee.aasm_state)
               })
             ::BenefitSponsors::Members::MemberGroup.new(
-              member_entries,
-              {group_enrollment: group_enrollment, group_id: census_employee.id}
+              member_entries, group_enrollment: group_enrollment, group_id: census_employee.id
             )
           end
         end

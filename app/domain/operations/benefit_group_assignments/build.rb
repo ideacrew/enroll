@@ -5,7 +5,7 @@ module Operations
     # This class initializes a benefit_group_assignment entity after
     # validating the incoming benefit_group_assignment params.
     class Build
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ Hash ] benefit_group_assignment attributes
       # @return [ ::Entities::BenefitGroupAssignments::BenefitGroupAssignment ] benefit_group_assignment

@@ -4,7 +4,7 @@ module Operations
   module ProductSelectionEffects
     # Terminate or cancel previous selections that overlap with a given selection.
     class TerminatePreviousSelections
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Invoke the operation.
       # @param opts [Entities::ProductSelection] the invocation options
