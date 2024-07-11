@@ -5,6 +5,7 @@ class FamilyMember
   include MongoidSupport::AssociationProxies
   include ApplicationHelper
   include GlobalID::Identification
+  include EventSource::Command
 
   embedded_in :family
 
@@ -168,14 +169,14 @@ class FamilyMember
 
   private
 
-  def publish_private_family_member_created_event
-    ::Operations::Private::FamilyMemberCreated.new.call(self)
-  end
-
   def family_member_created
     deactivate_tax_households
     create_financial_assistance_applicant
     publish_private_family_member_created_event if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
+  end
+
+  def publish_private_family_member_created_event
+    event('events.private.family_member_created', attributes: { family: family }, headers: { after_updated_at: created_at })&.success&.publish
   end
 
   def notify_family
