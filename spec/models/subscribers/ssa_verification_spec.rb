@@ -52,6 +52,7 @@ describe Subscribers::SsaVerification do
         subject.call(nil, nil, nil, nil, payload)
         expect(BSON::ObjectId.from_string(history_elements_SSN.first.event_response_record_id)).to eq consumer_role.lawful_presence_determination.ssa_responses.first.id
       end
+
       it "stores duplicate SSA records for both SSN and Citizenship types" do
         person.verification_types.each{|type| type.type_history_elements.delete_all }
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
@@ -59,44 +60,98 @@ describe Subscribers::SsaVerification do
         expect(history_elements_SSN.count).to eq 1
         expect(history_elements_SSN[0].event_response_record_id).to eq history_elements_citizen[0].event_response_record_id
       end
+
+      it "does not store a verification history element for other verification types" do
+        person.verification_types.each{|type| type.type_history_elements.delete_all }
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+
+        alive_status_elements = person.alive_status.type_history_elements
+        expect(alive_status_elements.present?).to be_falsey
+      end
     end
 
     context "ssn_verified and citizenship_verified=true" do
-      it "should approve lawful presence" do
+      before do
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+
         subject.call(nil, nil, nil, nil, payload)
+        person.reload
+      end
+
+      it "should approve lawful presence" do
         expect(consumer_role.aasm_state).to eq('fully_verified')
         expect(consumer_role.lawful_presence_determination.vlp_authority).to eq('ssa')
         expect(consumer_role.lawful_presence_determination.citizen_status).to eq(::ConsumerRole::US_CITIZEN_STATUS)
         expect(consumer_role.lawful_presence_determination.ssa_responses.count).to eq(1)
         expect(consumer_role.lawful_presence_determination.ssa_responses.first.body).to eq(payload[:body])
       end
+
+      it 'should update the correct verification_types accordingly' do
+        ssa_verification = person.verification_types.by_name('Social Security Number').first
+        citizenship_verification = person.verification_types.by_name('Citizenship').first
+        alive_status_verification = person.verification_types.by_name('Alive Status').first
+
+        expect(ssa_verification.validation_status).to eq 'verified'
+        expect(citizenship_verification.validation_status).to eq 'verified'
+        expect(alive_status_verification.validation_status).to eq 'unverified'
+      end
     end
 
     context "ssn_verified and citizenship_verified=false" do
-      it "should approve lawful presence and set citizen_status to not_lawfully_present_in_us" do
+      before do
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash3)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+
         subject.call(nil, nil, nil, nil, payload)
+        person.reload
+      end
+
+      it "should approve lawful presence and set citizen_status to not_lawfully_present_in_us" do
         expect(consumer_role.aasm_state).to eq('verification_outstanding')
         expect(consumer_role.lawful_presence_determination.vlp_authority).to eq('ssa')
         #response doesn't change user's input
         expect(consumer_role.lawful_presence_determination.citizen_status).to eq(::ConsumerRole::US_CITIZEN_STATUS)
       end
+
+      it 'should update the correct verification_types accordingly' do
+        ssa_verification = person.verification_types.by_name('Social Security Number').first
+        citizenship_verification = person.verification_types.by_name('Citizenship').first
+        alive_status_verification = person.verification_types.by_name('Alive Status').first
+
+        expect(ssa_verification.validation_status).to eq 'verified'
+        expect(citizenship_verification.validation_status).to eq 'negative_response_received'
+        expect(alive_status_verification.validation_status).to eq 'unverified'
+      end
     end
 
     context "ssn_verification_failed" do
-      it "should deny lawful presence" do
+      before do
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash2)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+
         subject.call(nil, nil, nil, nil, payload)
+        person.reload
+      end
+
+      it "should deny lawful presence" do
         expect(consumer_role.aasm_state).to eq('verification_outstanding')
         expect(consumer_role.lawful_presence_determination.vlp_authority).to eq('ssa')
         expect(consumer_role.lawful_presence_determination.ssa_responses.count).to eq(1)
         #response doesn't change user's input
         expect(consumer_role.lawful_presence_determination.citizen_status).to eq(::ConsumerRole::US_CITIZEN_STATUS)
         expect(consumer_role.lawful_presence_determination.ssa_responses.first.body).to eq(payload[:body])
+      end
+
+      it 'should update the correct verification_types accordingly' do
+        ssa_verification = person.verification_types.by_name('Social Security Number').first
+        citizenship_verification = person.verification_types.by_name('Citizenship').first
+        alive_status_verification = person.verification_types.by_name('Alive Status').first
+
+        expect(ssa_verification.validation_status).to eq 'negative_response_received'
+        expect(citizenship_verification.validation_status).to eq 'negative_response_received'
+        expect(alive_status_verification.validation_status).to eq 'unverified'
       end
     end
 
