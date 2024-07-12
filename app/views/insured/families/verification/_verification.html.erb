@@ -28,7 +28,7 @@
                 <div class="<%= "col-xl-#{badge_col_class} col-md-#{badge_col_class}" %> col-lg-3 col-4 px-0">
                   <h6 class="my-0 pr-5"><%= display_verification_type_name(v_type) %></h6>
                 </div>
-                <div class="d-flex ml-auto ml-lg-0">
+                <div class="ml-auto ml-lg-0">
                   <span class="badge badge-status badge-<%= verification_type_class(verif_type.validation_status) %> p-2" id="status">
                     <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
                     <%= pundit_span Family, :updateable? %>
