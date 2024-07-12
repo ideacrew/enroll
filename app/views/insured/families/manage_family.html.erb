@@ -24,17 +24,17 @@
             <td><%= member.age_on(TimeKeeper.date_of_record) %></td>
             <td><%= member.gender.humanize %></td>
             <td><%= member.relationship.try(:humanize) %></td>
-            <td class="button-cell">
+            <td class="button-cell <%= pundit_class Family, :updateable? %>">
               <% edit_url = member.is_primary_applicant ? personal_insured_families_path({bs4: @bs4}) : main_app.edit_insured_family_member_path(member, {bs4: @bs4}) %>
               <%= h(link_to l10n("edit_member"), edit_url, remote: true, id: "edit-member-#{member.id}", class: 'btn button outline close-2') %>
               <%= h(link_to l10n("cancel_edit"), insured_family_member_path(member, {bs4: @bs4}), remote: true, id: "cancel-edit-#{member.id}", class: 'hidden btn button outline close-2') %>
-              <%= h(link_to l10n("save_changes"), "", remote: true, id: "save-member-#{member.id}", class: 'hidden btn button close-2 ml-3') %>
+              <%# defers click to in-form submit button via JS, note primary & dependents have different forms %>
+              <%= h(link_to l10n("save_changes"), "", remote: true, id: "save-member-#{member.id}", class: 'hidden btn button close-2 ml-3 my-hh-save-member') %>
             </td>
           </tr>
         <% end %>
       </tbody>
     </table>
-
 
     <div class="append_consumer_info"></div>
 
