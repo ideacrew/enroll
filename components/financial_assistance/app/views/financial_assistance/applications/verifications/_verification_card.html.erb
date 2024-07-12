@@ -20,7 +20,7 @@
           </dl>
         <% end %>
       </div>
-      <div class="d-flex col-lg-auto pl-0 justify-content-lg-end">
+      <div class="d-flex col-lg-auto px-0 justify-content-lg-end">
         <% if can_show_actions_button %>
           <span class="v-type-actions mr-2">
             <%= select_tag :verification_actions, admin_actions_on_faa_documents(evidence), {id: "v-action-#{applicant.id}-#{evidence_type.downcase.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
