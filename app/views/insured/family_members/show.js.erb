@@ -13,9 +13,10 @@ if (!$(".my-household-page")) {
   <% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['create', 'update', 'destroy'].include? controller.action_name) && (@person.consumer_role.present?) %>
     $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
   <% end %>
-}
-else {
+} else {
   $("#add_member_list_<%= @dependent.id %>").replaceWith("<div class='append_consumer_info'></div>");
+  $(".append_consumer_info").html("");
+
   $("a[id^=edit-member]").removeClass('disabled');
   $("#add-new-member").removeClass("hidden");
   $("#edit-member-<%= @dependent.id %>").removeClass("hidden");
