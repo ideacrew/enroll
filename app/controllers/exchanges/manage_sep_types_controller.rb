@@ -65,7 +65,7 @@ module Exchanges
     end
 
     def expire_sep_type
-      @result = EnrollRegistry.lookup(:expire_sep_type) { {params: format_expire_sep_type(params)} }
+      @result = EnrollRegistry.lookup(:expire_sep_type) { format_expire_sep_type(params) }
       @row = params[:qle_action_id]
 
       if @result.failure?

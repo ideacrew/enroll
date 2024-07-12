@@ -6,6 +6,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::SepAll
   include ::Config::AcaHelper
   include HtmlScrubberUtil
+  include StringScrubberUtil
 
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -756,17 +757,17 @@ class Exchanges::HbxProfilesController < ApplicationController
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       @element_to_replace_id = params[:tax_household_group][:family_actions_id]
       family = Person.find(params[:tax_household_group][:person_id]).primary_family
-      result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call({
-                                                                     family: family,
-                                                                     th_group_info: params.require(:tax_household_group).permit(
-                                                                       :person_id,
-                                                                       :family_actions_id,
-                                                                       :effective_date,
-                                                                       :tax_households => {}
-                                                                     ).to_h
-                                                                   })
+      result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call(
+        {
+          family: family,
+          th_group_info: params.require(:tax_household_group).permit(
+            :person_id, :family_actions_id, :effective_date, tax_households: {}
+          ).to_h
+        }
+      )
+
       @result = if result.success?
-                  { success: true, message: l10n('eligibility.created') }
+                  { success: true, message: result.success }
                 else
                   { success: false, error: result.failure }
                 end
@@ -972,7 +973,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def new_ba_params
-    params.merge!({ admin_datatable_action: true }).permit(:benefit_sponsorship_id, :admin_datatable_action)
+    { benefit_sponsorship_id: sanitize_to_hex(params[:benefit_sponsorship_id]), admin_datatable_action: true }
   end
 
   def create_ba_params
@@ -1053,7 +1054,9 @@ class Exchanges::HbxProfilesController < ApplicationController
       result.deliver_now
       puts result.to_s if Rails.env.development?
     else
-      Rails.logger.warn("No email found for #{full_name} with hbx_id #{hbx_id}")
+      Rails.logger.warn(
+        "No email found for person with hbx_id #{hbx_id}, person_id: #{params[:consumer_person_id] || params[:person]}"
+      )
     end
   end
 

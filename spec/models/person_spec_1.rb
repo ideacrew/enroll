@@ -104,4 +104,24 @@ RSpec.describe Person, type: :model do
       expect(person.alive_status.validation_status).to eq('unverified')
     end
   end
+
+  describe 'track_history' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:new_hbx_id) { HbxIdGenerator.generate_member_id }
+
+    it 'tracks history on hbx_id' do
+      person.save!
+      current_hbx_id = person.hbx_id
+      person.hbx_id = new_hbx_id
+      person.save!
+      expect(person.hbx_id).to eq(new_hbx_id)
+      expect(
+        person.history_tracks.where(
+          action: 'update',
+          original: { 'hbx_id' => current_hbx_id },
+          modified: { 'hbx_id' => new_hbx_id.to_s }
+        ).present?
+      ).to be_truthy
+    end
+  end
 end

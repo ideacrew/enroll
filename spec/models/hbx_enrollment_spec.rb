@@ -809,10 +809,13 @@ describe '#advance_day', dbclean: :after_each do
   before :each do
     allow(::BenefitSponsors::Organizations::Organization).to receive(:where).and_return [benefit_sponsorship.organization]
     allow(initial_application).to receive(:active_and_cobra_enrolled_families).and_return [family]
-    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today.beginning_of_month)
   end
 
   context 'when age off dependent exists on terminating enrollment' do
+    before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today.beginning_of_month)
+    end
+
     let(:enr_aasm_state) { 'coverage_termination_pending' }
 
     it 'should not create a new enrollment' do
@@ -823,6 +826,10 @@ describe '#advance_day', dbclean: :after_each do
   end
 
   context 'when age off dependent exists on active enrollment' do
+    before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today.beginning_of_year)
+    end
+
     let(:enr_aasm_state) { 'coverage_enrolled' }
 
     it 'should create a new enrollment by dropping dependent' do
@@ -872,5 +879,9 @@ describe '#can_make_changes_for_ivl_enrollment?' do
     it 'should not have coverage_terminated' do
       expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).not_to include('coverage_terminated')
     end
+  end
+
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 end

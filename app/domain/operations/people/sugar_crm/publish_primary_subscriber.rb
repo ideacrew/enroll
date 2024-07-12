@@ -8,8 +8,8 @@ module Operations
     module SugarCrm
       # Class for publishing the results of primary subscriber to CRM Gateway
       class PublishPrimarySubscriber
-        send(:include, Dry::Monads[:result, :do])
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
+        include Dry::Monads[:do, :result]
         include EventSource::Command
         include EventSource::Logging
 

@@ -7,7 +7,7 @@ module Operations
   module People
     # Class for transforming applicant parameters to member parameters
     class TransformApplicantToMember
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Transforms the applicant parameters to member parameters.
       #
@@ -60,12 +60,15 @@ module Operations
           immigration_documents_attributes: [vlp_document_hash].reject(&:empty?)
         }
         person_hash[:consumer_role][:immigration_documents_attributes] = [] if person_hash[:consumer_role][:citizen_status] == 'us_citizen'
-        person_hash[:demographics_group] = {
-          alive_status: {
-            is_deceased: false,
-            date_of_death: nil
+
+        if EnrollRegistry.feature_enabled?(:alive_status)
+          person_hash[:demographics_group] = {
+            alive_status: {
+              is_deceased: false,
+              date_of_death: nil
+            }
           }
-        }
+        end
 
         Success(person_hash)
       end

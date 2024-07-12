@@ -11,7 +11,6 @@
     <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
     <%= javascript_include_tag "application" %>
     <%= javascript_include_tag "sponsored_benefits/application" %>
-    <%= javascript_pack_tag 'ui_components', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
     <%= csrf_meta_tags %>
@@ -46,7 +45,7 @@
     <% end %>
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
   </head>
-  <body class="font">
+  <body class="font" data-controller="<%= controller.controller_name %>" data-action="<%= action_name %>">
 
     <%= render partial: './ui-components/v1/navs/header' %>
 

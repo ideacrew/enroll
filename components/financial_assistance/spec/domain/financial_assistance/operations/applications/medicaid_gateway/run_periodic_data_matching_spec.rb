@@ -7,7 +7,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     DatabaseCleaner.clean
   end
 
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: 4_378_657_346_576) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person, hbx_assigned_id: "10028") }

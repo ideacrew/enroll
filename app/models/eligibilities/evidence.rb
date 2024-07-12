@@ -8,7 +8,6 @@ module Eligibilities
     include Mongoid::Timestamps
     include AASM
     include ::EventSource::Command
-    include Dry::Monads[:result, :do, :try]
     include GlobalID::Identification
     include Eligibilities::Eventable
 

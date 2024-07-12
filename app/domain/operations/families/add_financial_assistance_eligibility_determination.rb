@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Families
     class AddFinancialAssistanceEligibilityDetermination
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(application)
         values = yield validate(application) #application_contract

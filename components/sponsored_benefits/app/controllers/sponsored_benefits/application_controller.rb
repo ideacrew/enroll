@@ -1,6 +1,9 @@
 module SponsoredBenefits
   class ApplicationController < ActionController::Base
     include ::FileUploadHelper
+
+    protect_from_forgery with: :exception, prepend: true
+
     before_action :set_broker_agency_profile_from_user
 
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired

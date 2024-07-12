@@ -6,7 +6,7 @@ module Operations
     # It will execute the side effects of making a product selection, as
     # specific to the DCHBX customer.
     class DchbxProductSelectionEffects
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Invoke the operation.
       # @param opts [Entities::ProductSelection] the invocation options

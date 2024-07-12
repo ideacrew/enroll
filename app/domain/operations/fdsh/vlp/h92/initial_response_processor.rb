@@ -9,7 +9,7 @@ module Operations
       module H92
         # This class will update the person and consumer role based on response
         class InitialResponseProcessor
-          send(:include, Dry::Monads[:result, :do, :try])
+          include Dry::Monads[:do, :result, :try]
           include EventSource::Command
 
           def call(params)

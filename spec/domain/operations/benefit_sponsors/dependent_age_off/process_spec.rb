@@ -58,7 +58,7 @@ RSpec.describe Operations::BenefitSponsors::DependentAgeOff::Process, type: :mod
     if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
       context 'Annual' do
         it 'Should fail when configured annually' do
-          result = subject.call(new_date: Date.new(2020,7,1))
+          result = subject.call({ new_date: Date.new(2020, 7, 1) })
           expect(result.failure).to eq("Cannot process the request, because shop dependent age off is not set for end of every month")
         end
       end
@@ -68,7 +68,7 @@ RSpec.describe Operations::BenefitSponsors::DependentAgeOff::Process, type: :mod
     if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :monthly
       context 'Monthly' do
         it 'Should fail when configured annually' do
-          result = subject.call(new_date: Date.new(2020,7,1))
+          result = subject.call({ new_date: Date.new(2020, 7, 1) })
           expect(result.success).to match(/Successfully processed dependent age-off termination at/)
         end
       end
@@ -78,7 +78,7 @@ RSpec.describe Operations::BenefitSponsors::DependentAgeOff::Process, type: :mod
   # rubocop:disable Style/IdenticalConditionalBranches
   context 'valid date' do
     it 'Should process the request when configured annually' do
-      result = subject.call(new_date: TimeKeeper.date_of_record.beginning_of_year)
+      result = subject.call({ new_date: TimeKeeper.date_of_record.beginning_of_year })
       expect(result.success).to match(/Successfully processed dependent age-off termination at/)
     end
   end
@@ -101,7 +101,7 @@ RSpec.describe Operations::BenefitSponsors::DependentAgeOff::Process, type: :mod
     it 'Should pick shop enrollments and trigger event' do
       expect(shop_family.active_household.hbx_enrollments.count).to eq(1)
       expect(shop_enrollment.hbx_enrollment_members.count).to eq(3)
-      result = subject.call(new_date: TimeKeeper.date_of_record.beginning_of_year)
+      result = subject.call({ new_date: TimeKeeper.date_of_record.beginning_of_year })
       expect(result.success).to match(/Successfully processed dependent age-off termination at/)
     end
   end

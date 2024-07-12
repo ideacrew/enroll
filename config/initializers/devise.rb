@@ -11,6 +11,8 @@ Devise.setup do |config|
   end
 
   config.jwt do |jwt|
+    # This is a dummy value. The actual secret is picked from the environment variable 'ENROLL_JWT_SECRET' in the Docker environment.
+    # Refer to .docker/config/devise.rb for more details.
     jwt.secret = "2f79bac651f5ebedd286c976febdf8bb7f74b7f1a8013ba23c0f8e5a42faaaedc53f2c9e1062ecbcb48a277636bc9b45cc24a0a5512df0862520c366c0c01489"
   end
 

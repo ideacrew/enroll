@@ -6,7 +6,7 @@ module Operations
     # hbx_enrollment when employment termianted/future terminated sceanrio,
     # more enhancement need to be done to this class to handle various enrollment terminations.
     class Terminate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ HbxEnrollment ] hbx_enrollment
       # @return [ HbxEnrollment ] hbx_enrollment

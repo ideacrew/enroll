@@ -8,7 +8,7 @@ module FinancialAssistance
     include Ssn
     include UnsetableSparseFields
     include ActionView::Helpers::TranslationHelper
-    include FinancialAssistance::L10nHelper
+    include ::L10nHelper
     include Eligibilities::Visitors::Visitable
     include GlobalID::Identification
 
@@ -1438,6 +1438,26 @@ module FinancialAssistance
     # @return [Address, nil] the first mailing address if one exists, otherwise nil
     def mailing_address
       addresses.mailing.first
+    end
+
+    # Fetches the evidence based on the provided evidence type.
+    #
+    # This method accepts an evidence type as a parameter and returns the corresponding evidence.
+    # The evidence type can be one of the following: 'income_evidence', 'esi_evidence', 'non_esi_evidence', or 'local_mec_evidence'.
+    #
+    # @param evidence_type [String] The type of evidence to fetch.
+    # @return [Object] The evidence corresponding to the provided type.
+    def fetch_evidence(evidence_type)
+      case evidence_type
+      when 'income_evidence'
+        income_evidence
+      when 'esi_evidence'
+        esi_evidence
+      when 'non_esi_evidence'
+        non_esi_evidence
+      when 'local_mec_evidence'
+        local_mec_evidence
+      end
     end
 
     private

@@ -51,15 +51,21 @@ var disableSelectric = false;
 $(document).on('page:load turbolinks:load', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
-  indicateRequiredFields();
+  Responsive.setSizeListeners();
+  if (controllerName() === 'families' && actionName() === 'verification'){
+    $('.verification-update-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
+    $('.return-for-def-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
+  }
 });
 
-function indicateRequiredFields() {
-  $('label.required, legend.required').each(function() {
-    if ($(this).find('.sr-only').length == 0) {
-      $(this).append('<span class="sr-only sr-required-indicator">*</span>');
-    }
-  });
+function controllerName() {
+  const body = document.body;
+  return body.dataset.controller;
+}
+
+function actionName() {
+  const body = document.body;
+  return body.dataset.action;
 }
 
 function applyJQDatePickerSetup(ele) {

@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.1.7.6'
+gem 'rails', '~> 6.1.7.8'
 gem 'sidekiq', '~> 6.5.10'
 gem 'globalid'
 #######################################################
@@ -62,7 +62,6 @@ gem 'ckeditor',                 '~> 4.2.4'
 gem 'coffee-rails',             '~> 5.0.0'
 gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
-gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
 gem 'devise-jwt',               '0.9.0'
 gem 'warden-jwt_auth',          '0.6.0'
@@ -75,7 +74,7 @@ gem 'interactor',               '~> 3.0'
 gem 'interactor-rails',         '~> 2.2'
 gem 'jbuilder',                 '~> 2.7'
 gem 'jquery-rails',             '~> 4.4'
-gem 'jquery-ui-rails',          '~> 6.0'
+gem 'jquery-ui-rails',          '>= 7.0.0'
 gem 'kaminari',                 '= 1.2.1'
 gem 'kaminari-mongoid'
 gem 'kaminari-actionview'
@@ -91,8 +90,10 @@ gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
+gem 'redis-store',              '~> 1.10'
+gem 'rexml',                    '>= 3.2.7'
 gem 'resque',                   '~> 2.6.0'
-gem 'roo',                      '~> 2.7.0'
+gem 'roo',                      '~> 2.10'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 2.0'
@@ -125,7 +126,7 @@ group :development do
   gem 'rubocop-git'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console',            '>= 3'
-  gem 'listen',                 '>= 3.0.5', '< 3.2'
+  gem 'listen',                 '~> 3.3.0'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
@@ -137,7 +138,7 @@ group :development, :test do
   gem 'action-cable-testing'
   gem 'addressable',            '~> 2.3'
   gem 'axe-core-cucumber',      '~> 4.8.0'
-  gem 'brakeman'
+  gem 'brakeman',               '~> 6.1'
   gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
@@ -146,11 +147,12 @@ group :development, :test do
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
+  gem 'rdoc',                   '~> 6.3.4'
   gem 'rspec-rails',            '~> 5.0.1'
   gem 'rspec_junit_formatter'
   gem 'sdoc',                    '~> 1.0'
   gem 'stimulus_reflex_testing', '~> 0.3.0'
-  gem 'yard',                   '~> 0.9.20',  require: false
+  gem 'yard',                    '>= 0.9.36',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
 end
 
@@ -170,7 +172,7 @@ group :test do
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.22.0',  :require => false
   gem 'simplecov-cobertura'
-  gem 'test-prof'
+  gem 'test-prof',                    '~> 1.3'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.18.0'
   gem 'webdrivers', '~> 5.3.1'

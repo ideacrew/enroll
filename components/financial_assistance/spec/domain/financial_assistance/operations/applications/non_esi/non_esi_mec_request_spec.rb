@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::NonEsiMecRequest, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -96,7 +96,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Non
   context 'success' do
     context 'with valid application' do
       before do
-        @result = subject.call({application_id: application.id})
+        @result = subject.call(application_id: application.id)
       end
 
       it 'should return success' do
@@ -113,7 +113,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Non
   context 'failure' do
     context 'invalid application id' do
       before do
-        @result = subject.call({application_id: 'application_id'})
+        @result = subject.call(application_id: 'application_id')
       end
 
       it 'should return a failure with error message' do

@@ -12,7 +12,7 @@ module FinancialAssistance
 
     include ActionView::Helpers::SanitizeHelper
     include Acapi::Notifiers
-    include FinancialAssistance::L10nHelper
+    include ::L10nHelper
     include ::FileUploadHelper
     include FinancialAssistance::NavigationHelper
     require 'securerandom'

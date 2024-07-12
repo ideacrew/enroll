@@ -8,7 +8,7 @@ module Operations
     module Ridp
       # This class will persist ridp responce to DB
       class CreateEligibilityResponseModel
-        send(:include, Dry::Monads[:result, :do, :try])
+        include Dry::Monads[:do, :result, :try]
         include EventSource::Command
 
         def call(params)

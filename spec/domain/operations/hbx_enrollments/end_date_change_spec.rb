@@ -34,7 +34,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
 
   context 'Invalid enrollment' do
     context 'enrollment id is blank' do
-      let(:params) {{"enrollment_id" => '12345', "new_termination_date" => "11/10/1988"}}
+      let(:params) { { 'enrollment_id' => BSON::ObjectId.new.to_s, 'new_termination_date' => '11/10/1988' } }
 
       it 'fails' do
         expect(subject).not_to be_success

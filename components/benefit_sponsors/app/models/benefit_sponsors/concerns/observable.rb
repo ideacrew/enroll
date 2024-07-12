@@ -15,7 +15,9 @@ module BenefitSponsors
               end
             end
           rescue StandardError => e
-            Rails.logger.error {"unable to trigger observer event #{k.class} for organization hbx_id #{self.hbx_id} due to #{e.inspect}"}
+            Rails.logger.error do
+              "unable to trigger observer event #{k.class} for organization hbx_id #{self.benefit_sponsorship.organization.hbx_id} due to #{e.inspect}"
+            end
           end
         end
       end

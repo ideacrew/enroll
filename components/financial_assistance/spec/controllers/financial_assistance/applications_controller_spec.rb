@@ -156,7 +156,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   before :all do
     DatabaseCleaner.clean
@@ -588,7 +588,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "when there is response from eligibility service" do
-      include FinancialAssistance::L10nHelper
+      include ::L10nHelper
       include ActionView::Helpers::TranslationHelper
 
       before do
@@ -1033,7 +1033,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   before :all do
     DatabaseCleaner.clean

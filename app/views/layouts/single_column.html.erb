@@ -10,7 +10,6 @@
     <%= stylesheet_link_tag "application", :media => "all" %>
     <%= javascript_include_tag "application" %>
 
-
     <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
     <%= javascript_include_tag "sponsored_benefits/application" %>
     <%= javascript_pack_tag ENV['CLIENT'] %>
@@ -40,7 +39,7 @@
       <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
     <% end %>
   </head>
-  <body class="font">
+  <body class="font" data-controller="<%= controller.controller_name %>" data-action="<%= action_name %>">
 
     <%= render partial: './ui-components/v1/navs/header' %>
     <%= yield :horizontal_menu %>
