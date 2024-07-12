@@ -47,12 +47,8 @@ function stopEditing() {
 // in order to make sure the input ids/labels are unique, we need to add a random string to the end
 // so we don't get WAVE errors
 function makeInputIdsUnique(formId, clonedForm) {
-  let newFormId = ""
-  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 10; i++) {
-    const randomInd = Math.floor(Math.random() * characters.length);
-    newFormId += characters.charAt(randomInd);
-  }
+  const myArray = new Uint32Array(10)
+  let newFormId = window.crypto.getRandomValues(myArray)[0]
 
   clonedForm.querySelectorAll('label').forEach(function(label) {
     var currentFor = label.getAttribute('for');
@@ -78,10 +74,14 @@ document.addEventListener("turbolinks:load", function() {
   // if benefits already exist, show them and default to yes
   if ($("#enrolled-benefit-kinds .benefit").length > 0) {
     $('#has_enrolled_health_coverage_true').prop('checked', true).trigger('change');
+  } else {
+    $('#has_enrolled_health_coverage_true').removeAttr('checked')
   }
 
   if ($("#eligible-benefit-kinds .benefit").length > 0) {
     $('#has_eligible_health_coverage_true').prop('checked', true).trigger('change');
+  } else {
+    $('#has_eligible_health_coverage_true').removeAttr('checked');
   }
 
   // add the new benefit form fields once the insurance kind is selected
@@ -102,7 +102,7 @@ document.addEventListener("turbolinks:load", function() {
     var benefitForm = esi == "true" ? document.getElementById('new-benefit-esi-form-' + kind) : document.getElementById('new-benefit-non-esi-form-' + kind);
     var clonedForm = benefitForm.cloneNode(true);
     document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
-    clonedForm.querySelector('.insurance-kind-label').innerText = selected.innerText;
+    clonedForm.querySelector('.insurance-kind-label').innerHTML = selected.innerHTML;
     clonedForm.querySelector('#benefit_insurance_kind').value = selected.value;
     clonedForm.removeAttribute('id');
     clonedForm.classList.remove('hidden');
@@ -164,10 +164,8 @@ document.addEventListener("turbolinks:load", function() {
 
     select.closest(".new-benefit-form").classList.add('hidden');
     benefitList.appendChild(clonedForm);
-    startEditing(select.closest(".driver-question"));} else {
-      console.log(selected)
-      console.log(select.value)
-    }
+    startEditing(select.closest(".driver-question"));
+  }
   });
 
   // show the field to select the insurance kind when the add new benefit button is clicked
