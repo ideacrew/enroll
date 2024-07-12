@@ -8,12 +8,12 @@
     <table>
       <thead>
         <tr>
-          <th><%= l10n("name") %></th>
-          <th><%= l10n("hbx_id") %></th>
-          <th><%= l10n("age") %></th>
-          <th><%= l10n("sex") %></th>
-          <th><%= l10n("relationship") %></th>
-          <th></th>
+          <th scope="col" class="w-256px"><%= l10n("age") %></th>
+          <th scope="col"><%= l10n("hbx_id") %></th>
+          <th scope="col"><%= l10n("name") %></th>
+          <th scope="col"><%= l10n("sex") %></th>
+          <th scope="col"><%= l10n("relationship") %></th>
+          <th scope="col" class="w-256px" aria-label="actions"></th>
         </tr>
       </thead>
       <tbody>
@@ -40,6 +40,13 @@
 
     <%= h(link_to l10n("add_new_member"), new_insured_family_member_path({family_id: @family.id, bs4: @bs4}), remote: true, id: 'add-new-member', class: 'btn button close-2') %>
   </div>
+
+  <script>
+    $(".my-hh-save-member").on('click', function () {
+      $("#save_personal").click();
+      $("#confirm-dependent").click();
+    });
+  </script>
 <% else %>
   <% content_for :navigation do %>
   <%= render partial: 'ui-components/v1/navs/families_navigation' %>
