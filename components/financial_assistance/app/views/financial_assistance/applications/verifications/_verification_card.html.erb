@@ -6,7 +6,7 @@
     <div class="row mb-2 mx-0 p-0">
       <div class="d-flex col-lg px-0 pb-2 pb-lg-0 align-items-center">
         <div class="<%= "col-xl-#{badge_col_class} col-md-#{badge_col_class}" %> col-lg-3 col-4 px-0">
-          <h6 class="my-0 pr-5"><%= l10n(display_evidence_type(evidence_type)) %></h6>
+          <%= l10n(display_evidence_type(evidence_type)) %>
         </div>
         <div class="ml-auto ml-lg-0">
           <span class="badge badge-status badge-<%= verification_status_class(evidence.aasm_state.to_s) %> p-2" id="status">
