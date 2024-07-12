@@ -3,11 +3,14 @@ Given(/^Employer exists and logs in$/) do
 end
 
 Then(/^Employee should click on Manage Family button$/) do
-  find('a.interaction-click-control-manage-family').click
+  wait_for_ajax
+  sleep 2 
+  find(IvlHomepage.manage_family_btn).click
 end
 
 Then(/^Employee should click on the Personal Tab link$/) do
-  find('a.interaction-click-control-personal').click
+  wait_for_ajax
+  find(IvlManageFamilyPage.personal_tab).click
 end
 
 Then(/^Employee should not see the Ageoff Exclusion checkbox$/) do
