@@ -19,6 +19,7 @@
       <% end %>
       <% verification_filter.each do |verif_type| %>
         <% v_type = verif_type.type_name %>
+        <% v_type_display = display_verification_type_name(v_type) %>
         <% can_show_actions_button = current_user.has_hbx_staff_role? %>
         <% badge_col_class = can_show_actions_button ? "5" : "4" %>
         <% if can_display_or_modify_type?(verif_type) %>
@@ -26,7 +27,7 @@
             <div class="row mb-2 mx-0 p-0">
               <div class="d-flex col-lg px-0 pb-2 pb-lg-0 align-items-center">
                 <div class="<%= "col-xl-#{badge_col_class} col-md-#{badge_col_class}" %> col-lg-3 col-4 px-0">
-                  <h6 class="my-0 pr-5"><%= display_verification_type_name(v_type) %></h6>
+                  <h6 class="my-0 pr-5"><%= v_type_display %></h6>
                 </div>
                 <div class="ml-auto ml-lg-0">
                   <span class="badge badge-status badge-<%= verification_type_class(verif_type.validation_status) %> p-2" id="status">
@@ -66,6 +67,35 @@
           <% if false && current_user.has_hbx_staff_role? # TODO: implement for admin flow %>
             <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
           <% end %>
+          <div>
+            <% if verif_type.type_documents.any? %>
+              <span><label class="my-0"><%= l10n("insured.consumer_roles.upload_ridp_documents.list_header", ridp_type: v_type_display) %></label></span>
+              <div class="col-sm-12 px-0">
+                <% verif_type.type_documents.each do |vlp_doc| %>
+                  <div class="d-flex row py-1 px-0 m-0 align-items-center" id="doc_table_row_<%=vlp_doc.id%>">
+                    <div class="col-sm px-0 m-0">
+                      <%= vlp_doc.title.titleize %> 
+                    </div>
+                    <div class="d-flex col-sm align-items-center justify-content-sm-end px-0 mt-1 mt-sm-0 mb-0">
+                      <% if vlp_doc.identifier.present? %>
+                        <% key = vlp_doc.identifier.split('#').last %>
+                        <%= h(content_tag(:a, href: "/insured/verification_documents/download/#{key}", target: "_blank", rel: "noopener noreferrer", title: "Download", data: {toggle: "tooltip"}, class: "btn outline text-nowrap") do %>
+                          <span>
+                           <i class='fa fa-download' aria-hidden='true'></i> <%= l10n("download") %>
+                          </span>
+                        <% end) %>
+                      <% end %>
+                      <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
+                        <%= link_to document_path(vlp_doc, :person_id => person.id, :verification_type => verif_type.id, :doc_title => vlp_doc.title.titleize), method: :delete, class: "btn-error outline text-nowrap" do %>
+                          <%= l10n("insured.consumer_roles.upload_ridp_documents.remove") %>
+                        <% end %>
+                      </span>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
           <hr class="subcard-divider">
         <% end %>
       <% end %>
