@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <h2>Verification Documents</h2> <%# TODO: localize %>
+  <h2><%= l10n('verification_documents') %></h2>
   <% if can_show_due_date?(@person) %>
     <% due_date = @person.primary_family&.eligibility_determination&.outstanding_verification_earliest_due_date || default_verification_due_date %>
     <dl class="d-flex">
