@@ -3,9 +3,8 @@ Given(/^Employer exists and logs in$/) do
 end
 
 Then(/^Employee should click on Manage Family button$/) do
-  wait_for_ajax
-  sleep 2 
-  find(IvlHomepage.manage_family_btn).click
+  wait_for_ajax 
+  find(IvlHomepage.manage_family_btn, wait: 15).click
 end
 
 Then(/^Employee should click on the Personal Tab link$/) do
