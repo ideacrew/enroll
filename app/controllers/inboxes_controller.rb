@@ -2,6 +2,7 @@
 
 # The base inbox controller all other inbox controllers inherit from
 class InboxesController < ApplicationController
+  before_action :enable_bs4_layout, only: [:show, :destroy] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :find_inbox_provider, except: [:msg_to_portal]
   before_action :find_hbx_profile, only: [:new, :create]
   before_action :find_message, only: [:show, :destroy]
@@ -72,4 +73,9 @@ class InboxesController < ApplicationController
 
     @new_message = Message.new(params.require(:message).permit(:subject, :body, :folder, :to, :from, :sender_id, :parent_message_id, :message_read))
   end
+
+  def enable_bs4_layout
+    @bs4 = true
+  end
+
 end

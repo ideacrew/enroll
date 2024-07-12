@@ -1,22 +1,33 @@
-<% content_for :navigation do %>
-    <%= render partial: 'ui-components/v1/navs/families_navigation' %>
-<% end %>
-<div class="module">
-  <div class="vertically-aligned-row">
-    <h1 class="darkblue no-buffer"><%= l10n("messages") %></h1>
+<% if @bs4 %>
+  <div class="w-100">
+    <%= render partial: 'shared/family_side_nav' %>
     <span class='text-right'>
       <%= h(link_to l10n("upload_notices"), upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank', rel: "noopener noreferrer") if current_user.has_hbx_staff_role? && EnrollRegistry.feature_enabled?(:show_upload_notices)  %>
       <%= h(link_to l10n(".download_tax_documents"), tax_info_url, class: "btn btn-primary", target: '_blank', rel: "noopener noreferrer") if show_download_tax_documents_button? %>
     </span>
+    <%= render 'inbox', provider: @person %>
   </div>
-  <%= render 'inbox', provider: @person %>
-</div>
-<% if individual_market_is_enabled? && medicaid_tax_credits_link_is_enabled? %>
-  &nbsp;
-    <div>
-      <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: l10n('insured.families.apply_for_medicaid_widget')} %>
-    </div>
 <% else %>
-  <br/>
-  <br/>
+  <% content_for :navigation do %>
+      <%= render partial: 'ui-components/v1/navs/families_navigation' %>
+  <% end %>
+  <div class="module">
+    <div class="vertically-aligned-row">
+      <h1 class="darkblue no-buffer"><%= l10n("messages") %></h1>
+      <span class='text-right'>
+        <%= h(link_to l10n("upload_notices"), upload_notice_form_insured_families_path, class: "btn btn-primary", target: '_blank', rel: "noopener noreferrer") if current_user.has_hbx_staff_role? && EnrollRegistry.feature_enabled?(:show_upload_notices)  %>
+        <%= h(link_to l10n(".download_tax_documents"), tax_info_url, class: "btn btn-primary", target: '_blank', rel: "noopener noreferrer") if show_download_tax_documents_button? %>
+      </span>
+    </div>
+    <%= render 'inbox', provider: @person %>
+  </div>
+  <% if individual_market_is_enabled? && medicaid_tax_credits_link_is_enabled? %>
+    &nbsp;
+      <div>
+        <%= render partial: "navigate_to_curam_for_documents", :locals => {display_text: l10n('insured.families.apply_for_medicaid_widget')} %>
+      </div>
+  <% else %>
+    <br/>
+    <br/>
+  <% end %>
 <% end %>
