@@ -51,21 +51,6 @@ var disableSelectric = false;
 $(document).on('page:load turbolinks:load', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
-  Responsive.setSizeListeners();
-  if (controllerName() === 'families' && actionName() === 'verification'){
-    $('.verification-update-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
-    $('.return-for-def-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
-  }
-});
-
-function controllerName() {
-  const body = document.body;
-  return body.dataset.controller;
-}
-
-function actionName() {
-  const body = document.body;
-  return body.dataset.action;
   indicateRequiredFields();
 });
 
@@ -834,7 +819,6 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
 
   // Appends a query parameter to the 'btn-continue' button's href attribute to indicate that the user has disagreed to the terms on the thank you page.
   document.getElementById('btn-continue').href += "&thankyou_page_agreement_terms=disagreed";
-
   if(last_name_thank_you == ""){
     $('#btn-continue').addClass('disabled');
   }else{
@@ -843,10 +827,11 @@ $(document).on('blur keyup', 'input.thank_you_field', function() {
 
         // Appends a query parameter to the 'btn-continue' button's href attribute to indicate that the user has agreed to the terms on the thank you page.
         document.getElementById('btn-continue').href += "&thankyou_page_agreement_terms=agreed";
-
+        $('#btn-continue').removeAttr('disabled');
         $('#btn-continue').removeClass('disabled');
       } else {
         $('#btn-continue').addClass('disabled');
+        $('#btn-continue').attr('disabled', true)
       }
     }
   }
