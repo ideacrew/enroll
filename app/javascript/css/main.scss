@@ -513,5 +513,5 @@ a.disabled {
 }
 .glossary {
   color: var(--primary-color);
-  text-decoration: underline dashed;
+  border-bottom: 1px dashed var(--primary-color);
 }
