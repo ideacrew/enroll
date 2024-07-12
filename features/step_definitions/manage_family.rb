@@ -4,6 +4,9 @@ end
 
 Then(/^Employee should click on Manage Family button$/) do
   wait_for_ajax 
+  if !page.has_content?("Manage Family")
+    find('##btn-continue').ckick
+  end
   expect(page).to have_content("Manage Family")
   find(IvlHomepage.manage_family_btn, wait: 15).click
 end
