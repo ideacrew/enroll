@@ -3,9 +3,13 @@
   <h1><%= l10n("verifications") %></h1>
   <p><%= l10n(EnrollRegistry.feature_enabled?(:show_new_documents_tab_text) ? 'insured.verification_information' : 'insured.verification_information_old') %></p>
   <div class="mb-4">
-    <a aria-controls="docs-verification-faq" aria-expanded="false" data-toggle=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? "none" : "collapse" %>  href=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item : "#docs-verification-faq" %> role="button" rel="noopener noreferrer" target=<%= EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) ? "_blank" : "" %> >
+    <% disable_list_flag = EnrollRegistry.feature_enabled?(:disable_documents_we_accept_list) %>
+    <a aria-controls="docs-verification-faq" aria-expanded="false" data-toggle=<%= disable_list_flag ? "none" : "collapse" %>  href=<%= disable_list_flag ? ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item : "#docs-verification-faq" %> role="button" rel="noopener noreferrer" target=<%= "_blank" if disable_list_flag  %>>
       <%= l10n("insured.families.verification.documents_FAQ") %>
     </a>
+    <div class="mt-2 collapse" id="docs-verification-faq">
+      <%= render partial: "insured/families/verification/documents_verification_list" %>
+    </div>
   </div>
   <% if @person && @family_members.present? && individual_market_is_enabled? %>
     <%= render 'insured/families/verification/verification' %>
