@@ -114,11 +114,11 @@
         <span class="instruction-row"><%= l10n("faa.medicaid_not_eligible") %></span>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="has_eligible_medicaid_cubcare_true">
-            <input id="has_eligible_medicaid_cubcare_true" type="radio" value="true" name="has_eligible_medicaid_cubcare" <%='checked' if @applicant.has_eligible_medicaid_cubcare? %>>
+            <input id="has_eligible_medicaid_cubcare_true" type="radio" value="true" name="has_eligible_medicaid_cubcare" <%='checked' if @applicant.has_eligible_medicaid_cubcare == true %>>
             <%= l10n("yes") %>
           </label>
           <label class="radio mr-3" for="has_eligible_medicaid_cubcare_false">
-            <input id="has_eligible_medicaid_cubcare_false" type="radio" value="false" name="has_eligible_medicaid_cubcare" <%='checked'if @applicant.has_eligible_medicaid_cubcare? == false %>>
+            <input id="has_eligible_medicaid_cubcare_false" type="radio" value="false" name="has_eligible_medicaid_cubcare" <%='checked'if @applicant.has_eligible_medicaid_cubcare == false %>>
             <%= l10n("no") %>
           </label>
         </div>
