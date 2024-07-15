@@ -23,7 +23,7 @@
             <%= radio_button_tag("has_job_income", false, @applicant.has_job_income == false, class: "required", required: true) %>
             <span class="yes_no_pair"><%= l10n("no") %></span>
           </label>
-        </div>   
+        </div>
       </fieldset>
       <div class='left-seprator'>
         <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income"><%= l10n("not_sure") %></a>
@@ -60,7 +60,7 @@
             <%= radio_button_tag("has_self_employment_income", false, @applicant.has_self_employment_income == false, class: "required", required: true) %>
             <span class="yes_no_pair"><%= l10n("no") %></span>
           </label>
-        </div>        
+        </div>
       </fieldset>
       <div class='left-seprator'>
         <a href="#has_self_employment_income" data-toggle="modal" data-target="#has_self_employment_income"><%= l10n("not_sure") %></a>
@@ -226,7 +226,7 @@
         previous_link: tax_info_application_applicant_path(@application, @applicant),
         next_link: other_application_applicant_incomes_path(@application, @applicant),
         show_back_to_household_button: true
-        } %>  
+        } %>
       </div>
     </p>
   </div>
@@ -282,7 +282,7 @@
             <i class="fa fa-circle-thin fa-stack-2x"></i>
             <i class="fa fa-plus fa-stack-1x"></i>
           </span>
-          <b>Add Another</b> Job Income 
+          <b>Add Another</b> Job Income
         </button>
 
         <div id="hidden-income-form" class='new-income-form hidden'>
@@ -323,7 +323,7 @@
             <i class="fa fa-circle-thin fa-stack-2x"></i>
             <i class="fa fa-plus fa-stack-1x"></i>
           </span>
-          <b>Add Another</b> Self-Employed Income 
+          <b>Add Another</b> Self-Employed Income
         </button>
 
         <div id="hidden-income-form" class='new-income-form hidden'>
