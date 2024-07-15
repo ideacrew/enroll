@@ -45,7 +45,7 @@
 
         <div class="<%= 'hidden_field' unless show_immigration_status_container(f.object) %> mb-4" id="immigration_status_container">
           <% if EnrollRegistry[:immigration_status_checkbox].enabled? %>
-            <label for="person_eligible_immigration_status" class="weight-n">
+            <%= f.label :eligible_immigration_status do %>
               <%= l10n('faa.question.eligible_immigration_status') %>
               <div class="alert alert-info d-flex" role="info">
                 <div>
@@ -56,7 +56,7 @@
                   <%= l10n('faa.question.immigration_continue_note_2') %>
                 </div>
               </div>
-            </label>
+            <% end %>
             <div id="immigration-checkbox">
               <%= f.check_box :eligible_immigration_status, {}, "true", "false" %> <span class="ml-1"><%= l10n('yes') %></span>
             </div>
