@@ -99,6 +99,7 @@ Then(/^Individual sees the error message (.*)$/) do |error_message|
 end
 
 Then(/^Individual should see the error message Invalid Social Security number$/) do
+  wait_for_ajax
   expect(page.find("input[class='required floatlabel form-control interaction-field-control-person-ssn active-floatlabel']")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
 end
 
@@ -107,6 +108,7 @@ Then(/^Individual should not see the error message (.*)$/) do |error_message|
 end
 
 When(/^validate SSN feature is (.*)$/) do |feature|
+  allow(EnrollRegistry[:ssn_ui_validation].feature).to receive(:is_enabled).and_return(true)
   if feature == "enabled"
     stub_const('Forms::ConsumerCandidate::SSN_REGEX', /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
   else
