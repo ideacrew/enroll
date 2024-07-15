@@ -1,25 +1,36 @@
-<% if EnrollRegistry.feature_enabled?(:show_sep_attestation_options) %>
-  <div class="qles-panel panel panel-default">
-    <div class="panel-heading">
-      <div class="row" id='qle-header'>
-        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-          <%= image_tag exchange_icon_path('life-event.png'), alt: l10n('.life_event'), style: 'width: 100%' %>
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper p0">
-          <h4><%= l10n("insured.have_life_changes") %>?</h4>
-          <small>
-            <%= l10n("insured.how_may_effect_your_health_insurance") %>
-          </small>
-        </div>
-      </div>
-      <hr>
-    </div>
-    <div class="panel-body">
-      <div id="qle-menu">
-        <div class="row">
-          <%= render 'qles_carousel' %>
-        </div>
+<% if @bs4 %>
+  <% if EnrollRegistry.feature_enabled?(:show_sep_attestation_options) %>
+    <div class="home-widget p-2">
+      <h3><%= l10n("insured.report_a_life_change") %></h3>
+      <div class="pr-2 pl-2 pb-2 w-100">
+        <%= h(link_to l10n("insured.update_family_information"), manage_family_insured_families_path(tab: 'family'), class: 'btn w-100 btn-default ml-auto pull-right') %>
       </div>
     </div>
-  </div>
+  <% end %>
+<% else %>
+  <% if EnrollRegistry.feature_enabled?(:show_sep_attestation_options) %>
+    <div class="qles-panel panel panel-default">
+      <div class="panel-heading">
+        <div class="row" id='qle-header'>
+          <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            <%= image_tag exchange_icon_path('life-event.png'), alt: l10n('.life_event'), style: 'width: 100%' %>
+          </div>
+          <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper p0">
+            <h4><%= l10n("insured.have_life_changes") %>?</h4>
+            <small>
+              <%= l10n("insured.how_may_effect_your_health_insurance") %>
+            </small>
+          </div>
+        </div>
+        <hr>
+      </div>
+      <div class="panel-body">
+        <div id="qle-menu">
+          <div class="row">
+            <%= render 'qles_carousel' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
 <% end %>

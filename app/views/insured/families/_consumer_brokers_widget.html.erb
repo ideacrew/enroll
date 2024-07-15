@@ -1,63 +1,85 @@
-<% current_broker_agency = @person&.primary_family&.current_broker_agency %>
-<% writing_agent =  @person&.primary_family&.current_broker_agency&.writing_agent %>
-<div class="panel panel-default module consumer-broker-widget">
-  <div class="panel-heading">
-    <h3 class="panel-title">
-      <strong>
-        <% if current_broker_agency && display_broker_info_for_consumer %>
-          <%= l10n("insured.your_broker_or_assister") %>
-        <% else %>
-          <%= l10n("insured.select_broker_or_assister") %>
-        <% end %>
-      </strong>
+<% if @bs4 %>
+  <% current_broker_agency = @person&.primary_family&.current_broker_agency %>
+  <% writing_agent =  @person&.primary_family&.current_broker_agency&.writing_agent %>
+  <div class="home-widget p-2">
+    <h3 class="d-flex justify-content-between">
+      <%= l10n("insured.broker_or_assister") %>
+      <%= link_to '#', data: { toggle: 'modal', target: '#read_only_modal_what_is_a_broker_or_assister' } do %>
+        <i class="fa fa-question-circle ml-4 mt-1" aria-hidden="true"></i>
+        <span class="hide"><%= l10n("insured.what_is_a_broker_or_assister") %></span>
+      <% end %>
     </h3>
-  </div>
-  <div class="panel-body">
-    <div class="text-center">
-      <i aria-hidden="true" class="fa fa-user fa-3x"></i>
+    <div class="pr-2 pl-2 pb-2 w-100">
       <% if current_broker_agency && display_broker_info_for_consumer %>
-        <br/>
-        <span class="word-break">
-          <%= current_broker_agency&.broker_agency_profile&.legal_name&.titleize %>
-        </span>
+        <%= h(link_to l10n("insured.go_to_my_expert"), '', class: 'btn w-100 btn-default') %>
       <% else %>
-        <br/>
-          <%= l10n(".no_selection") %>
+        <%= h(link_to l10n("insured.assign_an_expert"), '', class: 'btn w-100 btn-default') %>
       <% end %>
     </div>
-    <div class="text-left">
-      <% if writing_agent && display_broker_info_for_consumer %>
-        <div class="broker-information">
+  </div>
+<%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker_or_assister', header_icon: "<i class='fa fa-info-circle primary-blue' aria-hidden='true'></i>", title: l10n("insured.what_is_a_broker_or_assister"), body: [l10n("insured.answer_for_broker", site_short_name: site_short_name), l10n("insured.answer_for_assister", site_short_name: site_short_name)], subtitle: [l10n("broker"), l10n("assister")] } %>
+<% else %>
+  <% current_broker_agency = @person&.primary_family&.current_broker_agency %>
+  <% writing_agent =  @person&.primary_family&.current_broker_agency&.writing_agent %>
+  <div class="panel panel-default module consumer-broker-widget">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        <strong>
+          <% if current_broker_agency && display_broker_info_for_consumer %>
+            <%= l10n("insured.your_broker_or_assister") %>
+          <% else %>
+            <%= l10n("insured.select_broker_or_assister") %>
+          <% end %>
+        </strong>
+      </h3>
+    </div>
+    <div class="panel-body">
+      <div class="text-center">
+        <i aria-hidden="true" class="fa fa-user fa-3x"></i>
+        <% if current_broker_agency && display_broker_info_for_consumer %>
+          <br/>
           <span class="word-break">
-            <%= writing_agent&.person&.first_name&.capitalize %>
-            <%= writing_agent&.person&.last_name&.capitalize %>
-        </span>
-        <br/>
-        <a href="tel:1-<%= @person.primary_family.current_broker_agency.writing_agent.phone %>">1
-          <%= writing_agent&.phone %></a>
-        <br/>
-        <span class="word-break">
-          <%= mail_to writing_agent&.email&.address, writing_agent&.email&.address %>
-        </span>
-        <br>
+            <%= current_broker_agency&.broker_agency_profile&.legal_name&.titleize %>
+          </span>
+        <% else %>
+          <br/>
+            <%= l10n(".no_selection") %>
+        <% end %>
       </div>
-      <% else %>
-        <%= link_to l10n("insured.get_help_signing_up"), '', class: 'btn btn-default btn-block', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
-        <small>
-          <%= link_to l10n("insured.what_is_an_assister?"), '', data: { target: '#read_only_modal_what_is_an_assister', toggle: 'modal' } %>
-        </small>
-        <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_an_assister', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_an_assister?"), body: l10n("insured.answer_for_assister", site_short_name: site_short_name ) } %>
-        <br/>
-        <small>
-          <%= link_to l10n("insured.what_is_a_broker?"), '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' } %>
-        </small>
-        <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_a_broker?"), body: l10n("insured.answer_for_broker", site_short_name: site_short_name ) } %>
-      <% end %>
-      <% if current_broker_agency && display_broker_info_for_consumer %>
-        <small>
-        <%= link_to l10n("insured.find_assistance_another_way"), '', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
-        </small>
-      <% end %>
+      <div class="text-left">
+        <% if writing_agent && display_broker_info_for_consumer %>
+          <div class="broker-information">
+            <span class="word-break">
+              <%= writing_agent&.person&.first_name&.capitalize %>
+              <%= writing_agent&.person&.last_name&.capitalize %>
+          </span>
+          <br/>
+          <a href="tel:1-<%= @person.primary_family.current_broker_agency.writing_agent.phone %>">1
+            <%= writing_agent&.phone %></a>
+          <br/>
+          <span class="word-break">
+            <%= mail_to writing_agent&.email&.address, writing_agent&.email&.address %>
+          </span>
+          <br>
+        </div>
+        <% else %>
+          <%= link_to l10n("insured.get_help_signing_up"), '', class: 'btn btn-default btn-block', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
+          <small>
+            <%= link_to l10n("insured.what_is_an_assister?"), '', data: { target: '#read_only_modal_what_is_an_assister', toggle: 'modal' } %>
+          </small>
+          <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_an_assister', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_an_assister?"), body: l10n("insured.answer_for_assister", site_short_name: site_short_name ) } %>
+          <br/>
+          <small>
+            <%= link_to l10n("insured.what_is_a_broker?"), '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' } %>
+          </small>
+          <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_a_broker', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_a_broker?"), body: l10n("insured.answer_for_broker", site_short_name: site_short_name ) } %>
+        <% end %>
+        <% if current_broker_agency && display_broker_info_for_consumer %>
+          <small>
+          <%= link_to l10n("insured.find_assistance_another_way"), '', data: { target: '#help_with_plan_shopping', toggle: 'modal' } %>
+          </small>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>
+<% end %>

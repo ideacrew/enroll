@@ -1,58 +1,91 @@
-<%= javascript_pack_tag "enrollment" %>
-<%= stylesheet_pack_tag "enrollment" %>
-
-<% content_for :navigation do %>
-  <%= render partial: 'ui-components/v1/navs/families_navigation' %>
-<% end %>
-
-<div class="col-xs-12">
-  <div id="plan-summary"></div>
-</div>
-
-<div id='account-detail'>
-  <% @person.active_employee_roles.each do |employee_role|%>
-    <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
+<% if @bs4 %>
+  <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+    <% enrollments = @all_hbx_enrollments_for_admin %>
+  <% else %>
+    <% enrollments = @hbx_enrollments %>
   <% end %>
-
-  <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? %>
-
-  <div class="my-account-page">
-    <h1 class="heading-text mt-0"><%= l10n("my_site_short_name", site_short_name: site_short_name) %></h1>
-  </div>
-
-  <div class="row">
-    <div class="col-md-8">
-      <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>
-      <%= render partial: 'qle_detail' %>
-      <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present? %>
-
-      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
-        <% enrollments = @all_hbx_enrollments_for_admin %>
-      <% else %>
-        <% enrollments = @hbx_enrollments %>
+  <div class="w-100">
+    <%= render partial: 'shared/family_side_nav' %>
+    <div class="pl-2">
+      <% @person.active_employee_roles.each do |employee_role|%>
+        <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
       <% end %>
 
+      <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? %>
+      <h1><%= l10n("insured.my_coverme_header") %></h1>
+
+      <%= render 'right_column' %>
+      <h2><%= enrollments.last.coverage_year %> <%= l10n('coverage').titleize %></h2>
       <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
         <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false } %>
       <% else %>
         <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
       <% end %>
 
-      <%= render partial: 'shop_for_plans_widget' %>
-
-      <% if individual_market_is_enabled? && medicaid_tax_credits_link_is_enabled? %>
-        <%= render partial: 'apply_for_medicaid_widget' %>
-      <% end %>
-    </div>
-
-    <div class="col-md-4 right-column">
       <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && !EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
-        <strong>Display All Enrollments?</strong>
+        <strong><%= l10n("insured.display_all_enrollments") %></strong>
         <input class="ml-half" type="checkbox" id="display_all_enrollments"> <br>
       <% end %>
-      <%= render 'right_column' %>
     </div>
   </div>
+  <%= render partial: 'ui-components/v1/modals/help_with_plan' %>
+<% else %>
+  <%= javascript_pack_tag "enrollment" %>
+  <%= stylesheet_pack_tag "enrollment" %>
 
-</div>
-<%= render partial: 'ui-components/v1/modals/help_with_plan' %>
+  <% content_for :navigation do %>
+    <%= render partial: 'ui-components/v1/navs/families_navigation' %>
+  <% end %>
+
+  <div class="col-xs-12">
+    <div id="plan-summary"></div>
+  </div>
+
+  <div id='account-detail'>
+    <% @person.active_employee_roles.each do |employee_role|%>
+      <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
+    <% end %>
+
+    <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? %>
+
+    <div class="my-account-page">
+      <h1 class="heading-text mt-0"><%= l10n("my_site_short_name", site_short_name: site_short_name) %></h1>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8">
+        <%= render partial: 'employers_selection' if @person.has_multiple_active_employers? %>
+        <%= render partial: 'qle_detail' %>
+        <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present? %>
+
+        <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+          <% enrollments = @all_hbx_enrollments_for_admin %>
+        <% else %>
+          <% enrollments = @hbx_enrollments %>
+        <% end %>
+
+        <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+          <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false } %>
+        <% else %>
+          <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+        <% end %>
+
+        <%= render partial: 'shop_for_plans_widget' %>
+
+        <% if individual_market_is_enabled? && medicaid_tax_credits_link_is_enabled? %>
+          <%= render partial: 'apply_for_medicaid_widget' %>
+        <% end %>
+      </div>
+
+      <div class="col-md-4 right-column">
+        <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && !EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
+          <strong>Display All Enrollments?</strong>
+          <input class="ml-half" type="checkbox" id="display_all_enrollments"> <br>
+        <% end %>
+        <%= render 'right_column' %>
+      </div>
+    </div>
+
+  </div>
+  <%= render partial: 'ui-components/v1/modals/help_with_plan' %>
+<% end %>
