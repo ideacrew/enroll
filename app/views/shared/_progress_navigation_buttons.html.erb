@@ -19,7 +19,7 @@
 
   <% unless dont_show_next_button %>
     <% if confirmation_link %>
-      <%= h(link_to l10n("confirm"), checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn btn-primary btn-block disabled", id: 'continue_button', method: :post, disabled: !@enrollable) %>
+      <%= h(link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn disabled confirm-button", id: 'btn-continue', method: :post, disabled: !@enrollable) %>
     <% elsif !button_type.nil? %>
       <button id=<%= button_id %> <%= "disabled=#{disable_link}" if disable_link == true %> type="<%= button_type %>" method="<%= link_method %>">
         <%= l10n("continue_next") %>
