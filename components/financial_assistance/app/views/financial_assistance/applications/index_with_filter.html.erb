@@ -76,7 +76,6 @@
       <% end %>
     </div>
   <% end %>
-
   <div class="modal" id="new-application-confirmation" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="container pt-2 pb-4 modal-content">
@@ -103,141 +102,159 @@
       </div>
     </div>
   </div>
+  <script type="text/javascript">
+    $('#start-new-app').on('click', function() {
+      if (<%= FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>) {
+        startNewApp();
+      } else {
+        StartNewAppModal();
+      }
+    });
+
+    function startNewApp() {
+      $("#start-new-app-form").submit();
+    }
+
+    function StartNewAppModal() {
+      var applications = <%= @applications.present? %>
+      if (applications) {
+        event.preventDefault();
+        $('#new-application-confirmation').modal('show');
+        
+        $('#confirm-new-application').off('click');
+        $('#confirm-new-application').on('click', function() {
+          confirmApp();
+        });
+      }
+    }
+
+    function confirmApp() {
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+      startNewApp();
+    }
+  </script>
 <% else %>
   <div aria-labelledby="aria-labelledby" class="tab-pane fade in active" id="home" data-cuke="index_with_filter">
-  <!-- overriding margin top to account for extra padding added in layout from extra 'container' div, fixing layout is out of scope so modifying here as a stopgap -->
-  <div class="container" style="margin-top: 0 !important;">
-    <div class="row">
-      <div class="col-md-2">
-        <%= render 'ui-components/v1/navs/families_navigation' %>
-      </div>
-      <div class="col-md-10">
-        <h1 class="no-buffer"><%= l10n('faa.cost_savings_applications') %></h1>
-        <h4><%= l10n('faa.cost_savings_applications_desc') %></h4>
-        <% if FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && HbxProfile.current_hbx&.under_open_enrollment? %>
-          <% oe_year = Family.application_applicable_year %>
-          <% current_year = oe_year - 1 %>
-          <h4 data-cuke='coverage_update_reminder_display'><b><%= l10n('faa.coverage_update_reminder', year: current_year, year2: oe_year) %></b></h4>
-        <% end %>
-        <% if FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && !HbxProfile.current_hbx&.under_open_enrollment? && (HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on > TimeKeeper.date_of_record) %>
-          <h4 data-cuke='oe_application_warning_display'><%= l10n('faa.cost_savings_applications_oe_desc', next_year: HbxProfile.current_hbx&.benefit_sponsorship&.benefit_coverage_periods&.last&.open_enrollment_end_on&.year, oe_start: HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on&.strftime("%B %d, %Y")) %></h4>
-        <% end %>
-        <div style="display:flex; justify-content: space-between; padding: 10px 0px;">
-          <%= form_with url: "", method: "get", class:"" do %>
-            <% if @applications.present? %>
-              <label class="font-weight-bold"><%= l10n('application_year') %></label>
-              <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each,
-              {include_blank: "All Years", :selected => params.dig(:filter, :year) },
-              {:onchange => "this.form.submit();"})%>
-            <% end %>
-          <% end %>
+    <!-- overriding margin top to account for extra padding added in layout from extra 'container' div, fixing layout is out of scope so modifying here as a stopgap -->
+    <div class="container" style="margin-top: 0 !important;">
+      <div class="row">
+        <div class="col-md-2">
+          <%= render 'ui-components/v1/navs/families_navigation' %>
         </div>
-
-        <% if @filtered_applications.present? %>
-          <table class="table table-striped">
-            <thead class="form-heading">
-              <tr>
-                <th class="form-heading"><%= l10n('id').upcase %></th>
-                <th class="form-heading"><%= l10n('year').upcase %></th>
-                <th class="form-heading"><%= l10n('status').upcase %></th>
-                <th class="form-heading"><%= l10n('started_on').upcase %></th>
-                <th class="form-heading"><%= l10n('submitted_on').upcase %></th>
-                <th class="form-heading"><%= l10n('actions').upcase %></th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @filtered_applications.each do |application| %>
-              <tr>
-                <td class="text-nowrap">
-                  <%= application.hbx_id %>
-                  <% if application.hbx_id == @recent_determined_hbx_id %>
-                    <span class="bg-primary" style="font-size: smaller; border-radius: 10px; padding: 4px 8px; margin-left: 10px;"><%= l10n('current') %></span>
-                  <% end %>
-                </td>
-                <td><%= application.assistance_year %></td>
-                <td><%= application_state_for_display(application) %></td>
-                <td><%= to_est application.created_at %></td>
-                <td><%= to_est application.submitted_at %></td>
-                <% dropdown = [
-                    ['Update Application', edit_application_path(application), (application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)) ? 'static' : 'disabled'],
-                    ['Copy to New Application', copy_application_path(application), do_not_allow_copy?(application, current_user) ? 'disabled' : 'static'],
-                    ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
-                    ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
-                  ] %>
-                <% if current_user.has_hbx_staff_role? %>
-                  <% dropdown << ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled'] %>
-                  <% dropdown << ['Transfer History', transfer_history_application_path(application), 'static' ] if FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page) %>
-                <% end %>
-                <td>
-                  <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
-                </td>
-              </tr>
-              <%end%>
-            </tbody>
-          </table>
-        <% end %>
-
-        <div>
-          <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start-new-app-form', style: "align-self:flex-end;") do %>
-            <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
-            <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary" %>
+        <div class="col-md-10">
+          <h1 class="no-buffer"><%= l10n('faa.cost_savings_applications') %></h1>
+          <h4><%= l10n('faa.cost_savings_applications_desc') %></h4>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && HbxProfile.current_hbx.under_open_enrollment? %>
+            <% oe_year = Family.application_applicable_year %>
+            <% current_year = oe_year - 1 %>
+            <h4 data-cuke='coverage_update_reminder_display'><b><%= l10n('faa.coverage_update_reminder', year: current_year, year2: oe_year) %></b></h4>
           <% end %>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && !HbxProfile.current_hbx.under_open_enrollment? && (HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on > TimeKeeper.date_of_record) %>
+            <h4 data-cuke='oe_application_warning_display'><%= l10n('faa.cost_savings_applications_oe_desc', next_year: HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on.year, oe_start: HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on&.strftime("%B %d, %Y")) %></h4>
+          <% end %>
+          <div style="display:flex; justify-content: space-between; padding: 10px 0px;">
+            <%= form_with url: "", method: "get", class:"" do %>
+              <% if @applications.present? %>
+                <label class="font-weight-bold"><%= l10n('application_year') %></label>
+                <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each,
+                {include_blank: "All Years", :selected => params.dig(:filter, :year) }, 
+                {:onchange => "this.form.submit();"})%>
+              <% end %>
+            <% end %>
           </div>
 
+          <% if @filtered_applications.present? %>
+            <table class="table table-striped">
+              <thead class="form-heading">
+                <tr>
+                  <th class="form-heading"><%= l10n('id').upcase %></th>
+                  <th class="form-heading"><%= l10n('year').upcase %></th>
+                  <th class="form-heading"><%= l10n('status').upcase %></th>
+                  <th class="form-heading"><%= l10n('started_on').upcase %></th>
+                  <th class="form-heading"><%= l10n('submitted_on').upcase %></th>
+                  <th class="form-heading"><%= l10n('actions').upcase %></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @filtered_applications.each do |application| %>
+                <tr>
+                  <td class="text-nowrap">
+                    <%= application.hbx_id %>
+                    <% if application.hbx_id == @recent_determined_hbx_id %>
+                      <span class="bg-primary" style="font-size: smaller; border-radius: 10px; padding: 4px 8px; margin-left: 10px;"><%= l10n('current') %></span> 
+                    <% end %>
+                  </td>
+                  <td><%= application.assistance_year %></td>
+                  <td><%= application_state_for_display(application) %></td>
+                  <td><%= to_est application.created_at %></td>
+                  <td><%= to_est application.submitted_at %></td>
+                  <% dropdown = [
+                      ['Update Application', edit_application_path(application), (application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)) ? 'static' : 'disabled'],
+                      ['Copy to New Application', copy_application_path(application), do_not_allow_copy?(application, current_user) ? 'disabled' : 'static'],
+                      ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
+                      ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+                    ] %>
+                  <% if current_user.has_hbx_staff_role? %>
+                    <% dropdown << ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled'] %>
+                    <% dropdown << ['Transfer History', transfer_history_application_path(application), 'static' ] if FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page) %>
+                  <% end %>
+                  <td>
+                    <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
+                  </td>
+                </tr>
+                <%end%>
+              </tbody>
+            </table>
+          <% end %>
+
+          <div>
+            <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app', style: "align-self:flex-end;") do %>
+              <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
+              <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+                <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary"%>
+              <% else %>
+                <%= submit_tag l10n('faa.start_new_application'), onclick: "StartNewAppModal()", class: "btn btn-primary"%>
+              <% end %>
+            <% end %>
+            </div>
+          
+        </div>
       </div>
     </div>
-  </div>
   </div>
 
   <!-- modal -->
   <div class="modal" id="new-application-confirmation" role="dialog">
-  <div class="modal-dialog" style="width: 500px;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><%= l10n('faa.start_new_application') %>?</h4>
-      </div>
-      <div class="modal-body" style="text-align: center;">
-        <p><%= l10n('faa.start_new_application_modal_body') %></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default btn-default" data-dismiss="modal"><%= l10n('faa.cancel') %></button>
-        <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmApp(); return false;'><%= l10n('faa.start_new_application') %></button>
+    <div class="modal-dialog" style="width: 500px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title"><%= l10n('faa.start_new_application') %>?</h4>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+          <p><%= l10n('faa.start_new_application_modal_body') %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-default" data-dismiss="modal"><%= l10n('faa.cancel') %></button>
+          <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmApp(); return false;'><%= l10n('faa.start_new_application') %></button>
+        </div>
       </div>
     </div>
   </div>
-  </div>
+
+  <script type="text/javascript">
+    function StartNewAppModal() {
+      var applications = <%= @applications.present? %>
+      if (applications) {
+        event.preventDefault();
+        $('#new-application-confirmation').modal('show')
+      }
+    }
+    function confirmApp() {
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+      $("#start_new_app").submit();
+    }
+  </script>
 <% end %>
-
-<script type="text/javascript">
-  $('#start-new-app').on('click', function() {
-    if (<%= FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>) {
-      startNewApp();
-    } else {
-      StartNewAppModal();
-    }
-  });
-
-  function startNewApp() {
-    $("#start-new-app-form").submit();
-  }
-
-  function StartNewAppModal() {
-    var applications = <%= @applications.present? %>
-    if (applications) {
-      event.preventDefault();
-      $('#new-application-confirmation').modal('show');
-       
-      $('#confirm-new-application').off('click');
-      $('#confirm-new-application').on('click', function() {
-        confirmApp();
-      });
-    }
-  }
-
-  function confirmApp() {
-    $('.modal-backdrop').removeClass('modal-backdrop');
-    $('.modal-open').removeClass('modal-open');
-    startNewApp();
-  }
-</script>
