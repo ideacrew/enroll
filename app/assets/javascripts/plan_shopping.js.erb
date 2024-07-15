@@ -241,7 +241,7 @@ $(function() {
   });
 
   $(document).on('change', 'input[name="elected_pct"]', function(){
-    var elected_pct = $("input[name='elected_pct']").val();
+    var elected_pct = $("input[name='elected_pct']").val() / 100;
     //val() is returing empty, changed to attr('value')
     var elected_amount = parseFloat($('#max_aptc').attr('value')).toFixed(2) * parseFloat(elected_pct).toFixed(2);
     $('#elected_aptc').val(elected_amount.toFixed(2));
@@ -258,6 +258,34 @@ $(function() {
       $("output[name='pct']").text((elected_aptc/max_aptc*100).toFixed(0));
     }
   });
+
+  $("#updateAptc").on('click', function(){
+    $(this).addClass('hidden');
+    $('.aptc').removeClass('hidden');
+  });
+
+  $("#aptc_submit").on('click', function(){
+    var elected_aptc = $("input#elected_aptc").val();
+    var elected_pct = $("input[name='elected_pct']").val();
+    var coverage_kind = $("input#coverage_kind").val();
+    var market_kind = $("input#market_kind").val();
+    $('.aptc-percentage').text(elected_pct);
+    $('.aptc-amount').text(elected_aptc);
+    $.ajax({
+        type: "POST",
+        url: $('#set_elected_aptc_url').val(),
+        data: {
+          'elected_aptc': elected_aptc,
+          'market_kind': market_kind,
+          'coverage_kind': coverage_kind
+        },
+        success: function(data){
+          response = JSON.parse(JSON.stringify(data));
+          console.log(response);
+        },
+      });
+  });
+
 
   $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();

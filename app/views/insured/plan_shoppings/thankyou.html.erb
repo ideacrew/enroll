@@ -24,10 +24,10 @@
   <% if true #@person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual" %>
       <% is_ivl_osse_filter_eligible = ivl_osse_filtering_enabled? && @enrollment.ivl_osse_eligible? %>
       <h3>Applied Credits</h3>
-      <div class="aptc">
+      <div class="aptc hidden">
         <dl class="parent">
           <dt>The total tax credit amount the people on this plan qualify for is:</dt>
-          <dd><span class="aptc-amount"><%= number_to_currency(@elected_aptc, precision: 2) %></span></dd>
+          <dd><%= number_to_currency(@max_aptc, precision: 2) %></dd>
           <dt>The maximum amount you can use for this plan is:</dt>
           <dd><%= number_to_currency(@max_aptc, precision: 2) %></dd>
         </dl>
@@ -64,7 +64,6 @@
               %
             </span>
           </form> -->
-        <form oninput="pct.value = (elected_pct.value*100).toFixed(0)" onsubmit="return false">
           <%= hidden_field_tag :max_aptc, @max_aptc %>
           <%= hidden_field_tag :market_kind, @market_kind %>
           <%= hidden_field_tag :coverage_kind, @coverage_kind %>
@@ -72,23 +71,22 @@
           <div class="d-flex align-items-end">
             <div class="mr-3">
               <% min_aptc = is_ivl_osse_filter_eligible ? minimum_applied_aptc_pct_for_osse : 0 %>
-              <% step = is_ivl_osse_filter_eligible ? 0.005 : 0.05 %>
+              <% step = is_ivl_osse_filter_eligible ? 1 : 1 %>
               <% pct = @max_aptc > 0 ? (@elected_aptc/@max_aptc).round(2) : 0 %>
               <label for="elected_pct" class="required">Percentage Applied</label>
-              <input max="1" min="<%= min_aptc %>" name="elected_pct" step="<%= step %>" type="number" value="<%= pct %>" class="w-100">
+              <input max="100" min="<%= min_aptc %>" name="elected_pct" step="<%= step %>" type="number" value="<%= (pct * 100) %>" class="w-100 thankyou">
             </div>
             <div class="mr-3">
-              <label for="elected_aptc" class="required">Percentage Applied</label>
-              <input id="elected_aptc" onchange="setMinMax(this, #{@max_aptc})" type="number" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>">
+              <label for="elected_aptc" class="required">Amount Applied</label>
+              <input id="elected_aptc" onchange="setMinMax(this, #{@max_aptc})" type="number" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>" class="thankyou">
             </div>
             <div class="">
               <button id="aptc_submit" class="short">Update Applied APTC</button>
             </div>
           </div>
-        </form>
-
-        <p class="mt-4"><span class="aptc-percentage">100% of available APTC ($<span class="aptc-amount">100.00</span>) has been applied to your premium. <%= h(link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}) %></p>
       </div>
+      <p class="mt-4"><span class="aptc-percentage"><%= pct * 100 %></span>% of available APTC (<span class="aptc-amount"><%= number_with_precision(@elected_aptc, precision: 2) %></span>) has been applied to your premium. <%= h(link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}) %></p>
+      <button class="outline" id="updateAptc">Update APTC Amount</button>
     <% end %>
   <% if @enrollment.employee_role.present? %>
     <%= render "insured/plan_shoppings/coverage_information" %>
