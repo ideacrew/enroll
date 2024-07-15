@@ -13,7 +13,7 @@
   <% end %>
 
   <% if @applications.present? %>
-    <%= form_with url: "", :method => :get, class: "" do %>
+    <%= form_with url: nil, :method => :get do %>
       <label>
         <div class="mb-1"><%= l10n('application_year') %></div>
         <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each, {include_blank: "All Years", :selected => params.dig(:filter, :year)}, {:onchange => "this.form.submit();", class: "col-3 col-md-2"})%>
@@ -69,8 +69,40 @@
         <% end %>
       </tbody>
     </table>
+    <div>
+      <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start-new-app-form') do %>
+        <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
+        <%= submit_tag l10n('faa.start_new_application'), id: "start-new-app", class: "btn btn-primary" %>
+      <% end %>
+    </div>
   <% end %>
 
+  <div class="modal" id="new-application-confirmation" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="container pt-2 pb-4 modal-content">
+        <div class="d-flex mb-4 align-items-center">
+          <div class="col-auto px-0">
+            <div class="warning-icon icon" alt="Info" aria-hidden="true">&nbsp;</div>
+          </div>
+          <div class="col pl-0">
+              <h2 class="modal-title"><%= l10n('faa.start_new_application') %>?</h5>
+          </div>
+          <div class="col-auto px-0">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n('faa.start_new_application_modal_body') %></p>
+        </div>
+        <div class="d-flex align-items-center mt-4 justify-content-end">
+          <button type="button" class="btn-secondary mr-2" data-dismiss="modal"><%= l10n('faa.cancel') %></button>
+          <button type="button" id="confirm-new-application" class="btn-primary mr-2"><%= l10n('faa.start_new_application') %></button>
+        </div>
+      </div>
+    </div>
+  </div>
 <% else %>
   <div aria-labelledby="aria-labelledby" class="tab-pane fade in active" id="home" data-cuke="index_with_filter">
   <!-- overriding margin top to account for extra padding added in layout from extra 'container' div, fixing layout is out of scope so modifying here as a stopgap -->
@@ -146,13 +178,9 @@
         <% end %>
 
         <div>
-          <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app', style: "align-self:flex-end;") do %>
+          <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start-new-app-form', style: "align-self:flex-end;") do %>
             <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
-            <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
-              <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary"%>
-            <% else %>
-              <%= submit_tag l10n('faa.start_new_application'), onclick: "StartNewAppModal()", class: "btn btn-primary"%>
-            <% end %>
+            <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary" %>
           <% end %>
           </div>
 
@@ -182,16 +210,34 @@
 <% end %>
 
 <script type="text/javascript">
-function StartNewAppModal() {
-  var applications = <%= @applications.present? %>
-  if (applications) {
-    event.preventDefault();
-    $('#new-application-confirmation').modal('show')
+  $('#start-new-app').on('click', function() {
+    if (<%= FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>) {
+      startNewApp();
+    } else {
+      StartNewAppModal();
+    }
+  });
+
+  function startNewApp() {
+    $("#start-new-app-form").submit();
   }
-}
-function confirmApp() {
-  $('.modal-backdrop').removeClass('modal-backdrop');
-  $('.modal-open').removeClass('modal-open');
-  $("#start_new_app").submit();
-}
+
+  function StartNewAppModal() {
+    var applications = <%= @applications.present? %>
+    if (applications) {
+      event.preventDefault();
+      $('#new-application-confirmation').modal('show');
+       
+      $('#confirm-new-application').off('click');
+      $('#confirm-new-application').on('click', function() {
+        confirmApp();
+      });
+    }
+  }
+
+  function confirmApp() {
+    $('.modal-backdrop').removeClass('modal-backdrop');
+    $('.modal-open').removeClass('modal-open');
+    startNewApp();
+  }
 </script>
