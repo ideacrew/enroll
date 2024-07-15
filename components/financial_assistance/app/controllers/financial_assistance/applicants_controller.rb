@@ -11,6 +11,7 @@ module FinancialAssistance
 
     def new
       authorize @application, :new?
+      @bs4 = true if params[:bs4] == "true"
       @applicant = FinancialAssistance::Forms::Applicant.new(:application_id => params.require(:application_id))
 
       respond_to do |format|
