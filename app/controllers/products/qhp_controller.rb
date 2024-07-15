@@ -9,7 +9,8 @@ class Products::QhpController < ApplicationController
   before_action :set_cache_headers, only: [:summary]
 
   def comparison
-    params.permit("standard_component_ids", :hbx_enrollment_id)
+    @bs4 = true if params[:bs4] == "true"
+    params.permit("standard_component_ids", :hbx_enrollment_id, :bs4)
     found_params = params["standard_component_ids"].map { |str| str[0..13] }
 
     @standard_component_ids = params[:standard_component_ids]

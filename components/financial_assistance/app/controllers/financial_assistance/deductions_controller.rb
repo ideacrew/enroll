@@ -69,7 +69,7 @@ module FinancialAssistance
     def format_date(params)
       return if params[:deduction].blank?
       params[:deduction][:start_on] = format_date_string(params[:deduction][:start_on].to_s)
-      params[:deduction][:end_on] = format_date_string(params[:deduction][:end_on].to_s, date_format) if params[:deduction][:end_on].present?
+      params[:deduction][:end_on] = params[:deduction][:end_on] = format_date_string(params[:deduction][:end_on].to_s) if params[:deduction][:end_on].present?
     end
 
     def format_date_string(string)
