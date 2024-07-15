@@ -40,9 +40,6 @@
     <% end %>
   </head>
   <body class="font" data-controller="<%= controller.controller_name %>" data-action="<%= action_name %>">
-
-  <body class="font">
-
     <%= render partial: './ui-components/v1/navs/header' %>
     <%= yield :horizontal_menu %>
     <%= render_flash %>
