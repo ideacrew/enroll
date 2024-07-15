@@ -465,11 +465,7 @@ module FinancialAssistance
       FinancialAssistance::Benefit.valid_insurance_kinds.each do |insurance_kind|
         eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
         term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}"
-        if I18n.exists?("glossary."+insurance_kind)
-          hr_kind = render partial:'shared/glossary', locals: {key: insurance_kind, term: l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) }
-        else
-          hr_kind = l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
-        end
+        hr_kind = l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
         insurance_kind_options << [ hr_kind, insurance_kind, :'data-esi' => display_esi_fields?(insurance_kind, kind), :'data-mvsq' => display_minimum_value_standard_question?(insurance_kind) ]
       end
       insurance_kind_options
