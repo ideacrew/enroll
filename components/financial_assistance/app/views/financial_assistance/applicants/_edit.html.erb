@@ -42,11 +42,11 @@
         <div class="col-md-6 col-lg-3 p-0">
           <%= f.label :ssn, "Social Security" %>
           <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
               pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
               oninput: "this.setCustomValidity('')", disabled: @applicant.is_primary_applicant? %>
           <% else %>
-            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: @applicant.is_primary_applicant?,
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required mask-ssn", disabled: @applicant.is_primary_applicant?,
               readonly: f.object.is_a?(Forms::EmployeeRole) %>
           <% end %>
         </div>
@@ -72,12 +72,23 @@
       </div>
 
       <h3 class="beta mt-4"><%= l10n("insured.consumer_roles.contact_info_for") %> <%= @applicant.full_name %></h3>
-      <section class="mb-4">
-        <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
-        <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
-      </section>
-      
+
       <% unless @applicant.is_primary_applicant? %>
+        <div class="">
+          <% checked = f.object.same_with_primary.present? ? f.object.same_with_primary : true %>
+          <label for="applicant_same_with_primary" class="weight-n required">
+            <%= f.check_box :same_with_primary, {checked: checked}, "true", "false" %>
+            <%=l10n("live_with_primary_subscriber") %>
+          </label>
+        </div>
+        <div id="applicant-home-address-area" class="<%= 'hidden' unless f.object.same_with_primary.present? and f.object.same_with_primary == true %>">
+          <%= render 'shared/consumer_home_address_fields', f: f %><br>
+        </div>
+      <% else %>
+        <section class="mb-4">
+          <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
+          <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
+        </section>
         <section class="mb-4">
           <h4 class="gamma mb-0"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
           <%= render partial: 'shared/phone_fields', locals: {f: f, bs4: true} %>
@@ -137,14 +148,15 @@
 </div>
 
   <script>
-    Freebies.floatlabels();
-    $.inputMasks();
+    $(document).ready(function() {
+      $.inputMasks();
+    });
 
     $('#applicant_same_with_primary').click(function(){
       if($(this).is(':checked')){
-          $('#applicant-home-address-area').css("display", "none");
+          $('#applicant-home-address-area').addClass("hidden");
       } else {
-          $('#applicant-home-address-area').css("display", "block");
+          $('#applicant-home-address-area').removeClass("hidden");
       }
     });
 

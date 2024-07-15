@@ -43,26 +43,25 @@
 
   <div id="dependent_ul">
     <% @application.non_primary_applicants.each_with_index do |dependent, index| %>
-        <%= render "financial_assistance/applicants/dependent_applicant", dependent: dependent, person: @person, member_number: index+2 %>
-      <% end %>
+      <%= render "financial_assistance/applicants/dependent_applicant", dependent: dependent, person: @person, member_number: index+2 %>
+    <% end %>
   </div>
 
   <div id="dependent_buttons" class="d-flex flex-column flex-md-row mt-md-2 <%= pundit_class Family, :updateable?%> <%= 'hidden' if @family.active_family_members.empty? %>">
-      <%= hidden_field_tag 'origin_source', @source %>
+    <%= hidden_field_tag 'origin_source', @source %>
+    <%= h(link_to(new_application_applicant_path(@application, bs4: @bs4), :remote => true, :id => "household_info_add_member", class:"button secondary d-flex") do %>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.99978 5.99982V9.99976H5.99985" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10.0001 13.9997L10.0001 9.99976L14.0001 9.99976" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="10" cy="10" r="9" stroke="#FFFFFF" stroke-width="2"/>
+      </svg>
+      <span class="ml-2"><%= l10n("add_member_to_household") %></span>
+    <% end) %>
 
-      <%= h(link_to(main_app.new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), bs4: @bs4), :remote => true, :id => "household_info_add_member", class:"button secondary d-flex") do %>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9.99978 5.99982V9.99976H5.99985" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M10.0001 13.9997L10.0001 9.99976L14.0001 9.99976" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="10" cy="10" r="9" stroke="#FFFFFF" stroke-width="2"/>
-        </svg>
-        <span class="ml-2"><%= l10n("add_member_to_household") %></span>
-      <% end) %>
-
-      <div class="help-to-decide align-content-around ml-3">
-        <a href="#help_me_decide" data-toggle="modal" data-target="#help_me_decide" class="d-block"><%= l10n("help_me_decide_title") %></a>
-        <%= render partial: 'shared/modal_support_text_household', locals: {key: "help_me_decide"} %>
-      </div>
+    <div class="help-to-decide align-content-around ml-3">
+      <a href="#help_me_decide" data-toggle="modal" data-target="#help_me_decide" class="d-block"><%= l10n("help_me_decide_title") %></a>
+      <%= render partial: 'shared/modal_support_text_household', locals: {key: "help_me_decide"} %>
+    </div>
   </div>
 
   <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
@@ -73,8 +72,12 @@
   </div>
 
   <div class="mt-md-4">
-    <% group_selection_url = main_app.new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
-    <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: group_selection_url, disable_link: @application.incomplete_applicants? } %>
+    <% if @change_plan.present? %>
+      <% group_selection_url = main_app.new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
+      <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: group_selection_url, disable_link: @application.incomplete_applicants? } %>
+    <% else %>
+      <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_and_submit_application_path, disable_link: @application.incomplete_applicants? } %>
+    <% end %>
   </div>
 
 <% else %>
