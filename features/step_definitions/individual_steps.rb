@@ -100,7 +100,7 @@ end
 
 Then(/^Individual should see the error message Invalid Social Security number$/) do
   wait_for_ajax
-  expect(page.find("input[class='required floatlabel form-control interaction-field-control-person-ssn active-floatlabel']")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
+  expect(page.find("#person_ssn")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
 end
 
 Then(/^Individual should not see the error message (.*)$/) do |error_message|
