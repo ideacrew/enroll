@@ -20,7 +20,7 @@
     <div class="my-4" id="renewal_years">
       <p><%= l10n("insured.preferences.question2_description", site_short_name: site_short_name) %></p>
       <label class="weight-n required" for="application_years_to_renew"><%= l10n("insured.preferences.question2") %></label>
-      <%= f.select(:years_to_renew, options_for_select(renewal_year_select_options), {include_blank: l10n("insured.preferences.select")}, {prompt: true, required: true}) %>
+      <%= f.select(:years_to_renew, options_for_select(renewal_year_select_options), {include_blank: l10n("insured.preferences.select")}, {prompt: true}) %>
     </div>
     <% if FinancialAssistanceRegistry.feature_enabled?(:voter_registration_through_ext_url) %>
       <section class="my-4">
