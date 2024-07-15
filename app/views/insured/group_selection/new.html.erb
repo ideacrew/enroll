@@ -5,6 +5,7 @@
   <%# Main Content (right) %>
   <div id="choose-coverag-page">
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
+      <% effective_date_for_display = @effective_on_date || @new_effective_on %>
       <%= hidden_field_tag(:ivl_effective_on, @ivl_effective_on) %>
       <%= hidden_field_tag(:shop_effective_on, @shop_effective_on) %>
       <%= hidden_field_tag(:waiver_reason, nil, id: "waiver_reason_hidden_value_field") %>
@@ -73,6 +74,10 @@
             <% end %>
           </div>
         </div>
+      <% elsif @adapter.is_fehb?(@person) %>
+        <%= hidden_field_tag 'market_kind', 'fehb' %>
+      <% elsif @adapter.can_shop_shop?(@person) %>
+        <%= hidden_field_tag 'market_kind', 'shop' %>
       <% elsif @adapter.can_shop_individual?(@person) && !@adapter.can_shop_resident?(@person) %>
         <%= hidden_field_tag 'market_kind', 'individual' %>
       <% elsif @adapter.can_shop_resident?(@person) %>
@@ -106,7 +111,13 @@
           </div>
         </div>
       </div>
-
+      <% if @change_plan.present? %>
+        <%= hidden_field_tag 'change_plan', @change_plan %>
+        <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present? %>
+        <% if @change_plan == "change_by_qle" %>
+          <% qle = (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') %>
+        <% end %>
+      <% end %>
       <div id="plan-shopping-page-navigation-buttons" class="d-flex flex-column flex-md-row mt-4" >
         <%= render partial: "shared/progress_navigation_buttons", locals: { previous_style: "outline", button_type: "submit" } %>
       </div>

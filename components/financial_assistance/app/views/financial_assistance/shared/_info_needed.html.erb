@@ -6,7 +6,7 @@
       </div>
     <% else %>
       <div class="alert alert-warning d-flex align-items-center ml-4" role="alert">
-        <div class="warning-icon icon icon-sm" alt="warning" aria-hidden="true">&nbsp;</div>
+        <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
         <%= l10n("additional_info_needed") %>
         <%= ": (#{l10n("ssn_not_present")}" if applicant.is_applying_coverage && !applicant.ssn_present? %>
         <%= ": #{l10n("tax_covering_applicant_not_present")}" unless applicant.covering_applicant_exists? %>
