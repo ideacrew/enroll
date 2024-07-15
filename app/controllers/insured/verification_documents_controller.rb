@@ -115,7 +115,21 @@ class Insured::VerificationDocumentsController < ApplicationController
   def add_type_history_element(file)
     actor = current_user ? current_user.email : "external source or script"
     action = "Upload #{file_name(file)}" if params[:action] == "upload"
-    @verification_type.add_type_history_element(action: action, modifier: actor)
+    params = {action: action, modifier: actor}
+    statuses = validation_statuses
+    params.merge!({from_validation_status: statuses[:from_validation_status], to_validation_status: statuses[:to_validation_status] }) if @verification_type.type_name == 'Alive Status'
+    @verification_type.add_type_history_element(params)
+  end
+
+  def validation_statuses
+    status = {from_validation_status: nil, to_validation_status: nil}
+    history_track = @verification_type.history_tracks.last
+    if history_track.modified["validation_status"].present? && history_track.original["validation_status"].present?
+      status[:from_validation_status] = history_track.tracked_changes["validation_status"]["from"]
+      status[:to_validation_status] = history_track.tracked_changes["validation_status"]["to"]
+    end
+
+    status
   end
 
   def vlp_docs_clean(person)
