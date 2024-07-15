@@ -72,7 +72,9 @@ module NavigationHelper
     nav[:links] = false
     nav[:step] = step
     nav[:title] = l10n('insured.enroll_in_coverage')
-
+    nav[:back_to_account_flag] = true
+    nav[:show_account_button] = true
+    nav[:show_help_button] = true
     nav
   end
 
