@@ -89,7 +89,7 @@ module NavigationHelper
 
     nav[:show_help_button] = show_help_button ? true : (step == 2)
     nav[:show_exit_button] = !['match', 'search'].include?(action_name)
-    nav[:show_previous_button] = false
+    nav[:show_previous_button] = true
     nav[:show_account_button] = false
     nav[:is_complete] = false
     nav[:back_to_account_flag] = false
