@@ -67,11 +67,11 @@
                     <div class="d-flex col-sm align-items-center justify-content-sm-end px-0 mt-1 mt-sm-0 mb-0">
                       <% if ridp_doc.identifier.present? %>
                         <% key = ridp_doc.identifier.split('#').last %>
-                        <%= h(content_tag(:a, href: "/insured/ridp_documents/download/#{key}", title: "Download", data: {toggle: "tooltip"}, target: "_blank", rel: "noopener noreferrer", class: "btn outline text-nowrap") do %>
+                        <%= content_tag(:a, href: "/insured/ridp_documents/download/#{key}", title: "Download", data: {toggle: "tooltip"}, target: "_blank", rel: "noopener noreferrer", class: "btn outline text-nowrap") do %>
                           <span>
                            <i class='fa fa-download' aria-hidden='true'></i> <%= l10n("download") %>
                           </span>
-                        <% end) %>
+                        <% end %>
                       <% end %>
                       <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
                         <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
