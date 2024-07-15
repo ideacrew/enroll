@@ -1,6 +1,6 @@
 <% plan_carrier = Caches::MongoidCache.lookup(BenefitSponsors::Organizations::Organization.issuer_profiles, plan.issuer_profile_id) { plan.issuer_profile } %>
 <% if @bs4 %>
-  <div class="plan-card p-2 border my-2 bg-white rounded-lg"
+  <div class="plan-card plan-row p-2 border my-2 bg-white rounded-lg"
     data-plan-id="<%= plan.id %>"
     data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>"
     data-plan-metal-level="<%= plan.metal_level.downcase %>"
