@@ -300,6 +300,15 @@ ul.list-right-section {
   border: 1px solid var(--error-shade);
 }
 
+.badge-current {
+  border-radius: 10px;
+  color: var(--default-font-color);
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--complete-tint);
+  border: 1px solid var(--complete-color);
+}
+
 .float-end {
   float: inline-end;
 }
