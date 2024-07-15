@@ -109,11 +109,7 @@ module FinancialAssistance
         @application.assign_attributes(permit_params(params[:application]))
 
         if @application.save
-          if submit_and_publish_application_redirect_path[:flash].present?
-            redirect_to submit_and_publish_application_redirect_path[:path], flash: submit_and_publish_application_redirect_path[:flash]
-          else
-            redirect_to submit_and_publish_application_redirect_path[:path]
-          end
+          redirect_to submit_and_publish_application_redirect_path[:path], flash: submit_and_publish_application_redirect_path[:flash]
         else
           @application.save!(validate: false)
           flash[:error] = build_error_messages(@application).join(", ")
@@ -575,7 +571,7 @@ module FinancialAssistance
       return { path: application_publish_error_application_path(@application), flash: { error: build_error_messages(@application) } } unless @application.complete?
 
       publish_result = determination_request_class.new.call(application_id: @application.id)
-      return { path: wait_for_eligibility_response_application_path(@application), flash: nil } if publish_result.success?
+      return { path: wait_for_eligibility_response_application_path(@application) } if publish_result.success?
 
       @application.unsubmit! if @application.may_unsubmit?
 
