@@ -395,7 +395,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.personal' => "Personal",
   :'en.verifications' => "Verifications",
   :'en.verification_faq' => "View the documents we accept",
-  :'en.verification_documents' = > "Verification Documents",
+  :'en.verification_documents' => "Verification Documents",
   :'en.broker_search_placeholder' => "Name or Agency",
   :'en.insured.my_coverme_header' => "My CoverME.gov",
   :'en.insured.report_a_life_change' => "Report a Life Change",
