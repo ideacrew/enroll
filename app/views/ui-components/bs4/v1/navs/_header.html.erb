@@ -1,7 +1,7 @@
 <span id='dchbx_enroll_date_of_record' class='hidden d-none'><%= TimeKeeper.date_of_record.iso8601 %></span>
 <header class="bg-white navbar-primary py-2 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
 
-  <nav class="navbar navbar-expand-lg container py-1 px-0">
+  <nav class="top-nav navbar navbar-expand-lg container py-1 px-0">
     <a class="navbar-brand mr-0" href="#" title="<%= l10n('welcome.index.logo_title')%>">
       <%= image_pack_tag "logo_bs4_#{ENV['CLIENT'] || 'ic'}.svg", alt: "#{ENV['CLIENT']} logo"%>
     </a>
@@ -45,8 +45,8 @@
             <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= " #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
             <span class="horizontal-links">
               <%= render partial: "shared/my_portal_links" %>
-              <span><%= sanitize(link_to l10n('layout.header.help'), 'https://dchealthlink.com/help', target: '_blank', rel: "noopener noreferrer") %></span>
-              <span><%= sanitize(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
+              <span><%= h(link_to l10n('layout.header.help'), site_help_url, target: '_blank', rel: "noopener noreferrer") %></span>
+              <span><%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
             </span>
           </li>
         <% end %>
@@ -100,7 +100,7 @@
         url: "<%= main_app.check_time_until_logout_path(format: :js) %>",
         method: 'GET',
         dataType: 'script',
-        data:{bs4: <%= @bs4 %>},
+        data:{bs4: <%= @bs4 || "" %>},
         success: function(response){
         },
         error: function(response){

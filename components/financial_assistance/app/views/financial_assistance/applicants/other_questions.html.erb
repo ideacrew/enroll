@@ -4,7 +4,7 @@
   <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
     <div>
       <p class="alert alert-error hide"></p>
-      
+
       <% applicant_name = @applicant.first_name.capitalize %>
       <div>
         <div class="col-md-12 px-0">
@@ -29,12 +29,12 @@
           <legend>
             <label class="weight-n <%= 'required' if no_ssn_dropdown %>" for="no_ssn_reason"><%= applicant_prompt('why_no_ssn') %>"</label>
           </legend>
-          <div class="col px-0" data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
+          <div class="col px-0" data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>">
             <% if no_ssn_dropdown %>
               <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true) %>
             <% else %>
               <%= f.text_field :non_ssn_apply_reason, id: "no_ssn_reason", placeholder: l10n('faa.other_ques.ssn_reason') %>
-            <% end %> 
+            <% end %>
           </div>
         </fieldset>
       <% end %>
@@ -95,8 +95,8 @@
         <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n required"><%= applicant_prompt("foster_care_at18") %></legend>
           <div class="focus d-inline-flex">
-            <label class="weight-n"><%= f.radio_button :is_former_foster_care, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_former_foster_care, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
+            <label class="weight-n"><%= f.radio_button :is_former_foster_care, true, id: "is_former_foster_care_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_former_foster_care, false, id: "is_former_foster_care_no" %> <%= l10n('no') %></label>
           </div>
         </fieldset>
 
@@ -254,7 +254,7 @@
             </div>
           </fieldset>
         <% end %>
-      
+
         <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n"> <%= l10n("faa.other_ques.is_vets_spouse_or_child") %></legend>
           <div class="focus d-inline-flex">
@@ -273,7 +273,7 @@
     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row other_questions">
       <div class="col-md-9">
         <p class="alert alert-error hide"></p>
-        
+
         <div class="row">
           <div class="col-md-12">
             <div class="title-icon">
@@ -309,12 +309,12 @@
             <div class='col-md-6'>
               <h5 class="fa-text-color"><%= other_questions_prompt('why_no_ssn') %><%= "*" if no_ssn_dropdown %></h5>
             </div>
-            <div class='col-md-<%= no_ssn_dropdown ? 6 : 2 %>' data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>"> 
+            <div class='col-md-<%= no_ssn_dropdown ? 6 : 2 %>' data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>">
               <% if no_ssn_dropdown %>
                 <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank => "SELECT REASON"}, {:id => 'no_ssn_reason', :class => 'floatlabel', :prompt => true}) %>
               <% else %>
                 <%= f.text_field :non_ssn_apply_reason, class: "floatlabel", id: "no_ssn_reason", placeholder: "Reason" %>
-              <% end %> 
+              <% end %>
             </div>
           </div>
         <% end %>
