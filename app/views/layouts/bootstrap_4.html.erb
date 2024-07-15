@@ -16,7 +16,7 @@
       <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
       <%= javascript_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
       <%= stylesheet_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
-
+      <%= yield :head %>
       <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
         <%= javascript_pack_tag 'contrast_level_aa' %>
         <%= stylesheet_pack_tag 'contrast_level_aa' %>
@@ -97,6 +97,7 @@
       <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
       <%= javascript_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
       <%= stylesheet_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
+      <%= yield :head %>
 
       <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
         <%= javascript_pack_tag 'contrast_level_aa' %>
