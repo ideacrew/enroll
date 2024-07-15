@@ -101,19 +101,6 @@ function clearAll() {
     inputs[i].checked = false;
     inputs[i].value = '';
   }
-  // Load only on plan_shopping page
-  if (window.location.pathname.split('/')[2] == 'plan_shoppings') {
-    // Select options -- WISH LIST GET RID OF SELECTRIC TO REMOVE JQUERY RELIANCE --
-    $('#filter-sidebar select.plan-carrier-selection-filter')
-      .prop('selectedIndex', 0)
-      .selectric('refresh');
-    $('#filter-sidebar select.plan-hsa-eligibility-selection-filter')
-      .prop('selectedIndex', 0)
-      .selectric('refresh');
-    $('#filter-sidebar select.plan-osse-eligibility-selection-filter')
-      .prop('selectedIndex', 0)
-      .selectric('refresh');
-  }
 
   // Clear stored values
   filterParams.selectedMetalLevels = [];

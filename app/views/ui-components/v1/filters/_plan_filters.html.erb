@@ -356,27 +356,7 @@
     -->
     <% if @market_kind == 'shop' || @market_kind == 'fehb' || @market_kind == 'individual' %>
       <script>
-        var promise1 = new Promise(function(resolve, reject) {
-          setTimeout(function() {
-            resolve('completed');
-            $('select.plan-carrier-selection-filter').selectric('destroy');
-            $('select.plan-hsa-eligibility-selection-filter').selectric('destroy');
-            $('select.plan-osse-eligibility-selection-filter').selectric('destroy');
-          }, 700);
-        });
 
-        var promise2 = new Promise(function(resolve, reject) {
-          setTimeout(function() {
-            resolve('promise 2 completed');
-            resetAllFilters();
-          }, 200);
-        });
-
-        (function() {
-          promise1.then(function(value) {
-            promise2;
-          });
-        })();
       </script>
     <% end %>
   </div>
