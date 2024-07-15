@@ -25,16 +25,18 @@ module Operations
       end
 
       def construct_and_publish_cv_family_events(headers, person, values)
+        Rails.logger.error "No families present for person with hbx_id: #{person&.hbx_id}" if person.families.blank?
         person.families.each do |family|
           payload = construct_before_and_after_cv_family(family, headers, person, values)
           return payload if payload.failure?
           event('events.families.created_or_updated', attributes: payload.success, headers: headers)&.success&.publish
+          Rails.logger.info { "Successfully published 'events.families.created_or_updated' for person with hbx_id: #{person&.hbx_id}" }
         end
         Success("Successfully published 'events.families.created_or_updated' for person with hbx_id: #{person.hbx_id}")
       end
 
       def construct_before_and_after_cv_family(family, _headers, _person, values)
-        cv_family = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+        cv_family = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family, true)
         if cv_family.success?
           before_save_cv_family = cv_family.success.deep_dup
           before_family_member = before_save_cv_family[:family_members].detect do |family_member|
@@ -45,7 +47,7 @@ module Operations
           if before_person_saved.success?
             Success({before_save_cv_family: before_save_cv_family, after_save_cv_family: cv_family.success})
           else
-            Rails.logger.info { "Before Save CV Family failed due to: #{before_person_saved.failure} "}
+            Rails.logger.error { "Before Save CV Family failed due to: #{before_person_saved.failure} "}
             Success({before_save_cv_family: {}, after_save_cv_family: cv_family.success})
           end
         else
