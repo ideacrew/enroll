@@ -272,11 +272,16 @@ $(function() {
   }
 
   function resetFilters(){
+
     $("#filter-sidebar input[type='checkbox']").prop("checked", false);
     $("#filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("");
     $("#filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
     $("#filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("");
     $("#filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
+
+    $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").val("");
+    $("#filter-sidebar select.plan-carrier-selection-filter").val("");
+
     if (!disableSelectric) {
       $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
       $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
