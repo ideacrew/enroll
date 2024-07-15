@@ -361,247 +361,358 @@
     <% end %>
   </div>
 <% else %>
-<div id="filter-sidebar" class="col-lg-3 col-md-3 co-sm-3 col-xs-12 pl-0">
+  <div id="filter-sidebar" class="col-lg-3 col-md-3 co-sm-3 col-xs-12 pl-0">
   <% is_ivl_osse_filter_eligible = ivl_osse_filtering_enabled? && @hbx_enrollment.ivl_osse_eligible? %>
 
-  <div class="checkbox-filter-wrapper-uc">
-    <!-- TODO: These links will be deprecated for Maine. New feature checks will be added here to make them disappear. -->
-    <!-- Maine will have a "Go To Plan Compare" link in more_plan_details.html.erb which opens the estimate your cost module -->
-    <% if EnrollRegistry.feature_enabled?(:find_my_doctor_options) %>
-      <h4><%= find_my_doctor %></h4>
-      <% if checkbook_integration_enabled? %>
-        <% if @market_kind == "individual" && @coverage_kind == "health" %>
-          <h4><%= h(link_to l10n("estimate_your_cost"), "", data: {toggle: "modal", target: "#plan_match_redirection"}) %></h4>
+    <div class="checkbox-filter-wrapper-uc">
+      <!-- TODO: These links will be deprecated for Maine. New feature checks will be added here to make them disappear. -->
+      <!-- Maine will have a "Go To Plan Compare" link in more_plan_details.html.erb which opens the estimate your cost module -->
+      <% if EnrollRegistry.feature_enabled?(:find_my_doctor_options) %>
+        <h4><%= find_my_doctor %></h4>
+        <% if checkbook_integration_enabled? %>
+          <% if @market_kind == "individual" && @coverage_kind == "health" %>
+            <h4><%= h(link_to l10n("estimate_your_cost"), "", data: {toggle: "modal", target: "#plan_match_redirection"}) %></h4>
+          <% end %>
+          <% if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year %>
+            <h4><%= h(link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"}) %></h4>
+            <br>
+          <% end %>
+          <h4><%= estimate_your_costs %></h4>
         <% end %>
-        <% if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year %>
-          <h4><%= h(link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"}) %></h4>
-          <br>
-        <% end %>
-        <h4><%= estimate_your_costs %></h4>
       <% end %>
-    <% end %>
-  </div>
+    </div>
 
-  <div id="plan_match_redirection" class="modal fade" role="document" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header" style="height:50px">
-          <button class="close" aria-label="Close" data-dismiss="modal" type="button">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div style="margin-left:20px;">
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
-        </div>
-        <div class="modal-footer" style="padding:10px">
-          <div>
-            <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= h(link_to l10n("proceed"), @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url") %>
+    <div id="plan_match_redirection" class="modal fade" role="document" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="height:50px">
+            <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div style="margin-left:20px;">
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
+          </div>
+          <div class="modal-footer" style="padding:10px">
+            <div>
+              <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
+              <%= h(link_to l10n("proceed"), @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url") %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="plan_match_dental_redirection" class="modal fade" role="document" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header" style="height:50px">
-          <button class="close" aria-label="Close" data-dismiss="modal" type="button">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div style="margin-left:20px;">
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
-        </div>
-        <div class="modal-footer" style="padding:10px">
-          <div>
-            <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= h(link_to l10n("proceed"), l10n("sadpi_url"), class: "btn btn-primary") %>
+    <div id="plan_match_dental_redirection" class="modal fade" role="document" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="height:50px">
+            <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div style="margin-left:20px;">
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
+          </div>
+          <div class="modal-footer" style="padding:10px">
+            <div>
+              <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
+              <%= h(link_to l10n("proceed"), l10n("sadpi_url"), class: "btn btn-primary") %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="plan_match_family" class="modal fade" role="document" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header" style="height:50px">
-          <button class="close" aria-label="Close" data-dismiss="modal" type="button">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div style="margin-left:20px;">
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
-        </div>
-        <div class="modal-footer" style="padding:10px">
-          <div>
-            <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= h(link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary mtz", target: '_blank', rel: 'noopener noreferrer') %>
+    <div id="plan_match_family" class="modal fade" role="document" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="height:50px">
+            <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div style="margin-left:20px;">
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
+          </div>
+          <div class="modal-footer" style="padding:10px">
+            <div>
+              <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
+              <%= h(link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary mtz", target: '_blank', rel: 'noopener noreferrer') %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="plan_match_doctor_shop" class="modal fade" role="document" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header" style="height:50px">
-          <button class="close" aria-label="Close" data-dismiss="modal" type="button">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div style="margin-left:20px;">
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
-        </div>
-        <div class="modal-footer" style="padding:10px">
-          <div>
-            <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= h(link_to l10n("proceed"), Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide"), class: "btn btn-primary", target: '_blank', rel: 'noopener noreferrer') %>
+    <div id="plan_match_doctor_shop" class="modal fade" role="document" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="height:50px">
+            <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div style="margin-left:20px;">
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
+          </div>
+          <div class="modal-footer" style="padding:10px">
+            <div>
+              <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
+              <%= h(link_to l10n("proceed"), Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide"), class: "btn btn-primary", target: '_blank', rel: 'noopener noreferrer') %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="plan_match_shop" class="modal fade" role="document" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header" style="height:50px">
-          <button class="close" aria-label="Close" data-dismiss="modal" type="button">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div style="margin-left:20px;">
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
-          <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
-        </div>
-        <div class="modal-footer" style="padding:10px">
-          <div>
-            <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
-            <%= h(link_to l10n("proceed"), @plan_comparison_checkbook_url, class: "btn btn-primary") %>
+    <div id="plan_match_shop" class="modal fade" role="document" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="height:50px">
+            <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div style="margin-left:20px;">
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen1") %></p>
+            <p style="margin-bottom:0px"><%= l10n("modal_onscreen2") %></p>
+          </div>
+          <div class="modal-footer" style="padding:10px">
+            <div>
+              <button class="btn btn-default btn-default" data-dismiss="modal" type="button">Cancel</button>
+              <%= h(link_to l10n("proceed"), @plan_comparison_checkbook_url, class: "btn btn-primary") %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="how_is_this_calculated" class="modal fade" role="document" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header" style="height:0;border-bottom:0;">
-          <button class="close" aria-label="Close" data-dismiss="modal" type="button">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body" style="margin-right:20px;">
-          <p style="margin-bottom:0px;font-weight:400;">
-            <strong><%= l10n("modal_how_is_this_calculated") %></strong>
-          </p>
-          <p style="margin-bottom:0px;font-weight:400;"><%= l10n("modal_how_is_this_calculated1") %></p>
-          <p style="margin-bottom:0px;font-weight:400;"><%= l10n("modal_how_is_this_calculated2") %></p>
-          <p style="margin-bottom:0px;font-weight:400;"><%= l10n("modal_how_is_this_calculated3") %></p>
-          <ul>
-            <li>
-              <strong><%= l10n("modal_how_is_this_calculated4") %>: </strong>
-              <span><%= l10n("modal_how_is_this_calculated5") %></span>
-            </li>
-            <li>
-              <strong><%= l10n("modal_how_is_this_calculated6") %>: </strong>
-              <span><%= l10n("modal_how_is_this_calculated7") %></span>
-            </li>
-            <li>
-              <strong><%= l10n("modal_how_is_this_calculated8") %>: </strong>
-              <span><%= l10n("modal_how_is_this_calculated9") %></span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <h3 class="header-title">Filter Results</h3>
-  <div class="checkbox-filter-wrapper" style="border-bottom:0;">
-    <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
-      <div class="form-inline search-apply-wrapper mt-1">
-        <a class="btn btn-primary mz" href="javascript:void(0)" onclick="filterResults()" title="Apply all filters"><%= l10n("apply") %></a>
-        <a id="reset-btn" class="btn btn-default" onclick="resetAllFilters()"><%= l10n("reset") %></a>
-      </div>
-    <% else %>
-      <div class="form-inline search-apply-wrapper">
-        <a class="btn btn-primary apply-btn mz" href="javascript:void(0);" title="Apply all filters"><%= l10n("apply") %></a>
-        <a id="reset-btn" class="btn btn-default reset-btn" href="javascript:void(0);"><%= l10n("reset") %></a>
-      </div>
-    <% end %>
-  </div>
-
-  <% if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual" %>
-    <h5>
-      <strong><%= l10n('your_tax_credit') %></strong>
-      <% tooltip_text = is_ivl_osse_filter_eligible ? "#{l10n('your_tax_credit_for_hc4cc')}" : "#{l10n('your_tax_credit')}" %>
-      <a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="<%= tooltip_text %>">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <title><%= l10n('your_tax_credit') %> <%= l10n("info") %></title>
-          <path d="M6 0C9.31371 0 12 2.68629 12 6C12 9.31371 9.31371 12 6 12C2.68629 12 0 9.31371 0 6C0 2.68629 2.68629 0 6 0ZM6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1ZM6 8.5C6.41421 8.5 6.75 8.83579 6.75 9.25C6.75 9.66421 6.41421 10 6 10C5.58579 10 5.25 9.66421 5.25 9.25C5.25 8.83579 5.58579 8.5 6 8.5ZM6 2.5C7.10457 2.5 8 3.39543 8 4.5C8 5.23053 7.78822 5.63969 7.24605 6.20791L6.98196 6.47745C6.60451 6.87102 6.5 7.0831 6.5 7.5C6.5 7.77614 6.27614 8 6 8C5.72386 8 5.5 7.77614 5.5 7.5C5.5 6.76947 5.71178 6.36031 6.25395 5.79209L6.51804 5.52255C6.89549 5.12898 7 4.9169 7 4.5C7 3.94772 6.55228 3.5 6 3.5C5.44772 3.5 5 3.94772 5 4.5C5 4.77614 4.77614 5 4.5 5C4.22386 5 4 4.77614 4 4.5C4 3.39543 4.89543 2.5 6 2.5Z" fill="currentColor"/>
-        </svg>
-      </a>
-    </h5>
-    <div class="aptc panel panel-default">
-      <div class="panel-body" style="padding:10px;">
-        <div class="row" style="margin:0;">
-          <div class="col-xs-6" style="padding:0;">
-            <p class="text-left" style="font-size:12px;"><%= l10n('available').to_s %></p>
+    <div id="how_is_this_calculated" class="modal fade" role="document" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="height:0;border-bottom:0;">
+            <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
-          <div class="col-xs-6" style="padding:0;">
-            <p class="text-right" style="font-size:12px;"><%= number_to_currency(@max_aptc, precision: 2) %></p>
-          </div>
-        </div>
-        <div class="row" style="margin:0;">
-          <div class="col-xs-6" style="padding:0;">
-            <p class="text-left" style="line-height:16px; font-size:12px;"><%= l10n('apply_monthly') %></p>
-          </div>
-          <div class="col-xs-6" style="padding:0;">
-            <p>
-              <input id="elected_aptc" onchange="setMinMax(this, #{@max_aptc})" type="text" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" style="width:100%;" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>">
-              <% pct = @max_aptc > 0 ? (@elected_aptc/@max_aptc).round(2) : 0 %>
+          <div class="modal-body" style="margin-right:20px;">
+            <p style="margin-bottom:0px;font-weight:400;">
+              <strong><%= l10n("modal_how_is_this_calculated") %></strong>
             </p>
+            <p style="margin-bottom:0px;font-weight:400;"><%= l10n("modal_how_is_this_calculated1") %></p>
+            <p style="margin-bottom:0px;font-weight:400;"><%= l10n("modal_how_is_this_calculated2") %></p>
+            <p style="margin-bottom:0px;font-weight:400;"><%= l10n("modal_how_is_this_calculated3") %></p>
+            <ul>
+              <li>
+                <strong><%= l10n("modal_how_is_this_calculated4") %>: </strong>
+                <span><%= l10n("modal_how_is_this_calculated5") %></span>
+              </li>
+              <li>
+                <strong><%= l10n("modal_how_is_this_calculated6") %>: </strong>
+                <span><%= l10n("modal_how_is_this_calculated7") %></span>
+              </li>
+              <li>
+                <strong><%= l10n("modal_how_is_this_calculated8") %>: </strong>
+                <span><%= l10n("modal_how_is_this_calculated9") %></span>
+              </li>
+            </ul>
           </div>
         </div>
-        <%= hidden_field_tag :max_aptc, @max_aptc %>
-        <%= hidden_field_tag :market_kind, @market_kind %>
-        <%= hidden_field_tag :coverage_kind, @coverage_kind %>
-        <%= hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present? %>
-        <form oninput="pct.value = (elected_pct.value*100).toFixed(0)" onsubmit="return false">
-          <% min_aptc = is_ivl_osse_filter_eligible ? minimum_applied_aptc_pct_for_osse : 0 %>
-          <% step = is_ivl_osse_filter_eligible ? 0.005 : 0.05 %>
-          <input max="1" min="<%= min_aptc %>" name="elected_pct" step="<%= step %>" type="range" value="<%= pct %>" style="padding:0;">
-          <span style="font-size:12px;"><%= (min_aptc * 100).to_i %>%</span>
-          <span class="pull-right">
-            <output name="pct" style="font-size:12px;"><%= (pct * 100).to_i %></output>
-            %
-          </span>
-        </form>
-        <h6 style="font-weight:400; margin-top:0;"><%= h(link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}) %></h6>
       </div>
     </div>
-  <% end %>
 
-  <% if is_ivl_osse_filter_eligible %>
+    <h3 class="header-title">Filter Results</h3>
+    <div class="checkbox-filter-wrapper" style="border-bottom:0;">
+      <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
+        <div class="form-inline search-apply-wrapper mt-1">
+          <a class="btn btn-primary mz" href="javascript:void(0)" onclick="filterResults()" title="Apply all filters"><%= l10n("apply") %></a>
+          <a id="reset-btn" class="btn btn-default" onclick="resetAllFilters()"><%= l10n("reset") %></a>
+        </div>
+      <% else %>
+        <div class="form-inline search-apply-wrapper">
+          <a class="btn btn-primary apply-btn mz" href="javascript:void(0);" title="Apply all filters"><%= l10n("apply") %></a>
+          <a id="reset-btn" class="btn btn-default reset-btn" href="javascript:void(0);"><%= l10n("reset") %></a>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual" %>
+      <h5>
+        <strong><%= l10n('your_tax_credit') %></strong>
+        <% tooltip_text = is_ivl_osse_filter_eligible ? "#{l10n('your_tax_credit_for_hc4cc')}" : "#{l10n('your_tax_credit')}" %>
+        <a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="<%= tooltip_text %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <title><%= l10n('your_tax_credit') %> <%= l10n("info") %></title>
+            <path d="M6 0C9.31371 0 12 2.68629 12 6C12 9.31371 9.31371 12 6 12C2.68629 12 0 9.31371 0 6C0 2.68629 2.68629 0 6 0ZM6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1ZM6 8.5C6.41421 8.5 6.75 8.83579 6.75 9.25C6.75 9.66421 6.41421 10 6 10C5.58579 10 5.25 9.66421 5.25 9.25C5.25 8.83579 5.58579 8.5 6 8.5ZM6 2.5C7.10457 2.5 8 3.39543 8 4.5C8 5.23053 7.78822 5.63969 7.24605 6.20791L6.98196 6.47745C6.60451 6.87102 6.5 7.0831 6.5 7.5C6.5 7.77614 6.27614 8 6 8C5.72386 8 5.5 7.77614 5.5 7.5C5.5 6.76947 5.71178 6.36031 6.25395 5.79209L6.51804 5.52255C6.89549 5.12898 7 4.9169 7 4.5C7 3.94772 6.55228 3.5 6 3.5C5.44772 3.5 5 3.94772 5 4.5C5 4.77614 4.77614 5 4.5 5C4.22386 5 4 4.77614 4 4.5C4 3.39543 4.89543 2.5 6 2.5Z" fill="currentColor"/>
+          </svg>
+        </a>
+      </h5>
+      <div class="aptc panel panel-default">
+        <div class="panel-body" style="padding:10px;">
+          <div class="row" style="margin:0;">
+            <div class="col-xs-6" style="padding:0;">
+              <p class="text-left" style="font-size:12px;"><%= l10n('available').to_s %></p>
+            </div>
+            <div class="col-xs-6" style="padding:0;">
+              <p class="text-right" style="font-size:12px;"><%= number_to_currency(@max_aptc, precision: 2) %></p>
+            </div>
+          </div>
+          <div class="row" style="margin:0;">
+            <div class="col-xs-6" style="padding:0;">
+              <p class="text-left" style="line-height:16px; font-size:12px;"><%= l10n('apply_monthly') %></p>
+            </div>
+            <div class="col-xs-6" style="padding:0;">
+              <p>
+                <input id="elected_aptc" onchange="setMinMax(this, #{@max_aptc})" type="text" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" style="width:100%;" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>">
+                <% pct = @max_aptc > 0 ? (@elected_aptc/@max_aptc).round(2) : 0 %>
+              </p>
+            </div>
+          </div>
+          <%= hidden_field_tag :max_aptc, @max_aptc %>
+          <%= hidden_field_tag :market_kind, @market_kind %>
+          <%= hidden_field_tag :coverage_kind, @coverage_kind %>
+          <%= hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present? %>
+          <form oninput="pct.value = (elected_pct.value*100).toFixed(0)" onsubmit="return false">
+            <% min_aptc = is_ivl_osse_filter_eligible ? minimum_applied_aptc_pct_for_osse : 0 %>
+            <% step = is_ivl_osse_filter_eligible ? 0.005 : 0.05 %>
+            <input max="1" min="<%= min_aptc %>" name="elected_pct" step="<%= step %>" type="range" value="<%= pct %>" style="padding:0;">
+            <span style="font-size:12px;"><%= (min_aptc * 100).to_i %>%</span>
+            <span class="pull-right">
+              <output name="pct" style="font-size:12px;"><%= (pct * 100).to_i %></output>
+              %
+            </span>
+          </form>
+          <h6 style="font-weight:400; margin-top:0;"><%= h(link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}) %></h6>
+        </div>
+      </div>
+    <% end %>
+
+    <% if is_ivl_osse_filter_eligible %>
+      <div class="checkbox-filter-wrapper-uc">
+        <h5>
+          <strong>HC4CC Eligible</strong>
+          <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.hc4cc_eligible_title_info") %>">
+            <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
+            <br>
+            <span class="hide"><%= l10n("open") %></span>
+          </a>
+        </h5>
+        <ul class="list-unstyled">
+          <li>
+            <div class="filter-input-block">
+              <%= select_tag :osse_eligibility, options_for_select(["Yes", "No"]), class: "plan-osse-eligibility-selection-filter form-control", include_blank: "All", onchange: "filterOSSEEligibility(this)" %>
+            </div>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+
+    <% if @market_kind == 'individual' || @market_kind == 'coverall' || @sponsored_benefit.try(:product_package_kind) == :single_issuer %>
+      <div class="checkbox-filter-wrapper-uc">
+        <h5>
+          <strong>Metal Level</strong>
+          <a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Plans use metal levels as an easy way to help indicate how generous they are in paying expenses. Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan.">
+            <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
+            <br>
+            <span class="hide"><%= l10n("open") %></span>
+          </a>
+        </h5>
+        <ul class="list-unstyled">
+          <% @metal_levels.each do |level| %>
+            <li>
+              <div class="filter-input-block" style="text-align:left">
+                <label>
+                  <input id="plan-metal-level-<%= level %>" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-<%= level %>" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level="<%= level %>" data-category="planMetalLevel">
+                  <label for="plan-metal-level-<%= level %>" class="checkbox-custom-label">
+                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_'"#{level}"'_title_info') %>"></span>
+                    <%= l10n("#{level}") %>
+                  </label>
+                </label>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <div class="checkbox-filter-wrapper-uc">
       <h5>
-        <strong>HC4CC Eligible</strong>
-        <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.hc4cc_eligible_title_info") %>">
+        <strong><%= l10n(".plan_type") %></strong>
+        <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.plan_type_title_info") %>">
+          <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
+          <br>
+          <span class="hide"><%= l10n("open") %></span>
+        </a>
+      </h5>
+      <ul class="list-unstyled">
+        <% @plan_types.each_with_index do |type, i| %>
+          <li>
+            <div class="filter-input-block" style="text-align:left">
+              <input id="checkbox-<%= 10+i %>" class="plan-type-selection-filter checkbox-custom" name="checkbox-<%= 10+i %>" type="checkbox" data-plan-type="<%= type %>" onClick="filterPlanType(this)" data-category="planType">
+              <label for="checkbox-<%= 10+i %>" class="checkbox-custom-label">
+                <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.'"#{type}"'_title_info') %>"></span>
+                <%= l10n("#{type}") %>
+              </label>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <% if offers_nationwide_plans? %>
+      <div class="checkbox-filter-wrapper-uc">
+        <h5>
+          <strong><%= l10n("network") %></strong>
+          <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.network_title_info") %>">
+            <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
+            <br>
+            <span class="hide"><%= l10n("open") %></span>
+          </a>
+        </h5>
+        <ul class="list-unstyled">
+          <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
+            <% @networks.each_with_index do |network, i| %>
+              <li>
+                <div class="filter-input-block" style="text-align:left">
+                  <input id="checkbox-<%= 15+i %>" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-<%= 15+i %>" type="checkbox" data-plan-network="<%= network %>" onClick="filterPlanNetwork(this)" data-category="planNetwork">
+                  <label for="checkbox-<%= 15+i %>" class="checkbox-custom-label">
+                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info') %>"></span>
+                    <%= l10n("#{network}") %>
+                  </label>
+                </div>
+              </li>
+            <% end %>
+          <% else %>
+            <% @networks.each_with_index do |network, i| %>
+              <li>
+                <div class="filter-input-block" style="text-align:left">
+                  <input id="checkbox-<%= 15+i %>" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-<%= 15+i %>" type="checkbox" data-plan-network="<%= network.gsub('-', ' ').downcase! %>" onClick="filterPlanNetwork(this)" data-category="planNetwork">
+                  <label for="checkbox-<%= 15+i %>" class="checkbox-custom-label">
+                    <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_shoppings_' "#{network}" '_title_info') %>"></span>
+                    <%= l10n("#{network}") %>
+                  </label>
+                </div>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="checkbox-filter-wrapper-uc">
+      <h5>
+        <strong><%= l10n("carrier") %></strong>
+        <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("filter_by_the_carrier") %>">
           <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
           <br>
           <span class="hide"><%= l10n("open") %></span>
@@ -610,205 +721,94 @@
       <ul class="list-unstyled">
         <li>
           <div class="filter-input-block">
-            <%= select_tag :osse_eligibility, options_for_select(["Yes", "No"]), class: "plan-osse-eligibility-selection-filter form-control", include_blank: "All", onchange: "filterOSSEEligibility(this)" %>
+            <% issuer_names = (@market_kind == 'shop' || @market_kind == 'fehb') ? @carrier_names : @carriers %>
+            <%= select_tag :carrier, options_for_select(issuer_names), class: "plan-carrier-selection-filter form-control", include_blank: "All", onchange:"filterPlanCarriers(this)" %>
           </div>
         </li>
       </ul>
     </div>
-  <% end %>
 
-  <% if @market_kind == 'individual' || @market_kind == 'coverall' || @sponsored_benefit.try(:product_package_kind) == :single_issuer %>
     <div class="checkbox-filter-wrapper-uc">
       <h5>
-        <strong>Metal Level</strong>
-        <a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Plans use metal levels as an easy way to help indicate how generous they are in paying expenses. Metal levels only focus on what the plan is expected to pay, and do NOT reflect the quality of health care or service providers available through the health insurance plan.">
+        <strong><%= l10n('hsa_eligible') %></strong>
+        <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.hsa_eligible_title_info") %>">
           <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
           <br>
           <span class="hide"><%= l10n("open") %></span>
         </a>
       </h5>
       <ul class="list-unstyled">
-        <% @metal_levels.each do |level| %>
-          <li>
-            <div class="filter-input-block" style="text-align:left">
-              <label>
-                <input id="plan-metal-level-<%= level %>" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-<%= level %>" type="checkbox" onClick="filterMetalLevel(this)" data-plan-metal-level="<%= level %>" data-category="planMetalLevel">
-                <label for="plan-metal-level-<%= level %>" class="checkbox-custom-label">
-                  <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_'"#{level}"'_title_info') %>"></span>
-                  <%= l10n("#{level}") %>
-                </label>
-              </label>
-            </div>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="checkbox-filter-wrapper-uc">
-    <h5>
-      <strong><%= l10n(".plan_type") %></strong>
-      <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.plan_type_title_info") %>">
-        <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
-        <br>
-        <span class="hide"><%= l10n("open") %></span>
-      </a>
-    </h5>
-    <ul class="list-unstyled">
-      <% @plan_types.each_with_index do |type, i| %>
         <li>
-          <div class="filter-input-block" style="text-align:left">
-            <input id="checkbox-<%= 10+i %>" class="plan-type-selection-filter checkbox-custom" name="checkbox-<%= 10+i %>" type="checkbox" data-plan-type="<%= type %>" onClick="filterPlanType(this)" data-category="planType">
-            <label for="checkbox-<%= 10+i %>" class="checkbox-custom-label">
-              <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.'"#{type}"'_title_info') %>"></span>
-              <%= l10n("#{type}") %>
-            </label>
+          <div class="filter-input-block">
+            <%= select_tag :hsa_eligibility, options_for_select(["Yes", "No"]), class: "plan-hsa-eligibility-selection-filter form-control", include_blank: "All", onchange:"filterHSAEligibility(this)" %>
           </div>
         </li>
-      <% end %>
-    </ul>
-  </div>
+      </ul>
+    </div>
 
-  <% if offers_nationwide_plans? %>
     <div class="checkbox-filter-wrapper-uc">
       <h5>
-        <strong><%= l10n("network") %></strong>
-        <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.network_title_info") %>">
+        <strong><%= l10n("premium_amount") %></strong>
+        <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.premium_amount_title_info") %>">
           <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
           <br>
           <span class="hide"><%= l10n("open") %></span>
         </a>
       </h5>
-      <ul class="list-unstyled">
-        <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
-          <% @networks.each_with_index do |network, i| %>
-            <li>
-              <div class="filter-input-block" style="text-align:left">
-                <input id="checkbox-<%= 15+i %>" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-<%= 15+i %>" type="checkbox" data-plan-network="<%= network %>" onClick="filterPlanNetwork(this)" data-category="planNetwork">
-                <label for="checkbox-<%= 15+i %>" class="checkbox-custom-label">
-                  <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info') %>"></span>
-                  <%= l10n("#{network}") %>
-                </label>
-              </div>
-            </li>
-          <% end %>
-        <% else %>
-          <% @networks.each_with_index do |network, i| %>
-            <li>
-              <div class="filter-input-block" style="text-align:left">
-                <input id="checkbox-<%= 15+i %>" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-<%= 15+i %>" type="checkbox" data-plan-network="<%= network.gsub('-', ' ').downcase! %>" onClick="filterPlanNetwork(this)" data-category="planNetwork">
-                <label for="checkbox-<%= 15+i %>" class="checkbox-custom-label">
-                  <span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_shoppings_' "#{network}" '_title_info') %>"></span>
-                  <%= l10n("#{network}") %>
-                </label>
-              </div>
-            </li>
-          <% end %>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="checkbox-filter-wrapper-uc">
-    <h5>
-      <strong><%= l10n("carrier") %></strong>
-      <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("filter_by_the_carrier") %>">
-        <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
-        <br>
-        <span class="hide"><%= l10n("open") %></span>
-      </a>
-    </h5>
-    <ul class="list-unstyled">
-      <li>
-        <div class="filter-input-block">
-          <% issuer_names = (@market_kind == 'shop' || @market_kind == 'fehb') ? @carrier_names : @carriers %>
-          <%= select_tag :carrier, options_for_select(issuer_names), class: "plan-carrier-selection-filter form-control", include_blank: "All", onchange:"filterPlanCarriers(this)" %>
-        </div>
-      </li>
-    </ul>
-  </div>
-
-  <div class="checkbox-filter-wrapper-uc">
-    <h5>
-      <strong><%= l10n('hsa_eligible') %></strong>
-      <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.hsa_eligible_title_info") %>">
-        <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
-        <br>
-        <span class="hide"><%= l10n("open") %></span>
-      </a>
-    </h5>
-    <ul class="list-unstyled">
-      <li>
-        <div class="filter-input-block">
-          <%= select_tag :hsa_eligibility, options_for_select(["Yes", "No"]), class: "plan-hsa-eligibility-selection-filter form-control", include_blank: "All", onchange:"filterHSAEligibility(this)" %>
-        </div>
-      </li>
-    </ul>
-  </div>
-
-  <div class="checkbox-filter-wrapper-uc">
-    <h5>
-      <strong><%= l10n("premium_amount") %></strong>
-      <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="<%= l10n("insured.plan_shoppings.premium_amount_title_info") %>">
-        <i class="fas fa-question-circle fa-lg pl-1" aria-hidden="true"></i>
-        <br>
-        <span class="hide"><%= l10n("open") %></span>
-      </a>
-    </h5>
-    <div class="filter-input-block">
-      <input class="plan-metal-premium-from-selection-filter form-control" type="text" placeholder="$0" value="0" onblur="premiumFromAmount(this)" maxlength="10" oninput="toCurrency(this)">
-      <small>To</small>
-      <input class="plan-metal-premium-to-selection-filter form-control fr" type="text" placeholder="$<%= @max_total_employee_cost || 2000 %>" value="<%= @max_total_employee_cost || 2000 %>" onblur="premiumToAmount(this)" maxlength="10" oninput="toCurrency(this)">
-      <%= hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000) %>
-    </div>
-    <h5>
-      <strong><%= l10n("deductible_amount") %></strong>
-    </h5>
-    <div class="filter-input-block">
-      <input class="plan-metal-deductible-from-selection-filter form-control" type="text" placeholder="$0" value="0" onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)">
-      <small>To</small>
-      <input class="plan-metal-deductible-to-selection-filter form-control" type="text" placeholder="$<%= @max_deductible || 5000 %>" onblur="deductibleToAmount(this)" maxlength="10" oninput="toCurrency(this)" value="<%= @max_deductible || 5000 %>">
-    </div>
-  </div>
-
-  <div class="checkbox-filter-wrapper">
-    <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
-      <div class="form-inline search-apply-wrapper mt-1">
-        <a class="btn btn-primary mz" href="javascript:void(0)" onclick="filterResults()" title="Apply all filters"><%= l10n("apply") %></a>
-        <a class="btn btn-default" id="reset-btn" onclick="resetAllFilters()"><%= l10n("reset") %></a>
+      <div class="filter-input-block">
+        <input class="plan-metal-premium-from-selection-filter form-control" type="text" placeholder="$0" value="0" onblur="premiumFromAmount(this)" maxlength="10" oninput="toCurrency(this)">
+        <small>To</small>
+        <input class="plan-metal-premium-to-selection-filter form-control fr" type="text" placeholder="$<%= @max_total_employee_cost || 2000 %>" value="<%= @max_total_employee_cost || 2000 %>" onblur="premiumToAmount(this)" maxlength="10" oninput="toCurrency(this)">
+        <%= hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000) %>
       </div>
-    <% else %>
-      <div class="form-inline search-apply-wrapper">
-        <a class="btn btn-primary apply-btn mz" href="javascript:void(0);" title="Apply all filters"><%= l10n("apply") %></a>
-        <a class="btn btn-default reset-btn" id="reset-btn" href="javascript:void(0);"><%= l10n("reset") %></a>
+      <h5>
+        <strong><%= l10n("deductible_amount") %></strong>
+      </h5>
+      <div class="filter-input-block">
+        <input class="plan-metal-deductible-from-selection-filter form-control" type="text" placeholder="$0" value="0" onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)">
+        <small>To</small>
+        <input class="plan-metal-deductible-to-selection-filter form-control" type="text" placeholder="$<%= @max_deductible || 5000 %>" onblur="deductibleToAmount(this)" maxlength="10" oninput="toCurrency(this)" value="<%= @max_deductible || 5000 %>">
       </div>
+    </div>
+
+    <div class="checkbox-filter-wrapper">
+      <% if @market_kind == 'shop' || @market_kind == 'fehb' %>
+        <div class="form-inline search-apply-wrapper mt-1">
+          <a class="btn btn-primary mz" href="javascript:void(0)" onclick="filterResults()" title="Apply all filters"><%= l10n("apply") %></a>
+          <a class="btn btn-default" id="reset-btn" onclick="resetAllFilters()"><%= l10n("reset") %></a>
+        </div>
+      <% else %>
+        <div class="form-inline search-apply-wrapper">
+          <a class="btn btn-primary apply-btn mz" href="javascript:void(0);" title="Apply all filters"><%= l10n("apply") %></a>
+          <a class="btn btn-default reset-btn" id="reset-btn" href="javascript:void(0);"><%= l10n("reset") %></a>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @market_kind == 'shop' || @market_kind == 'fehb' || @market_kind == 'individual' %>
+      <script>
+        var promise1 = new Promise(function(resolve, reject) {
+          setTimeout(function() {
+            resolve('completed');
+            $('select.plan-carrier-selection-filter').selectric('destroy');
+            $('select.plan-hsa-eligibility-selection-filter').selectric('destroy');
+            $('select.plan-osse-eligibility-selection-filter').selectric('destroy');
+          }, 700);
+        });
+
+        var promise2 = new Promise(function(resolve, reject) {
+          setTimeout(function() {
+            resolve('promise 2 completed');
+            resetAllFilters();
+          }, 200);
+        });
+
+        (function() {
+          promise1.then(function(value) {
+            promise2;
+          });
+        })();
+      </script>
     <% end %>
   </div>
-
-  <% if @market_kind == 'shop' || @market_kind == 'fehb' || @market_kind == 'individual' %>
-    <script>
-      var promise1 = new Promise(function(resolve, reject) {
-        setTimeout(function() {
-          resolve('completed');
-          $('select.plan-carrier-selection-filter').selectric('destroy');
-          $('select.plan-hsa-eligibility-selection-filter').selectric('destroy');
-          $('select.plan-osse-eligibility-selection-filter').selectric('destroy');
-        }, 700);
-      });
-
-      var promise2 = new Promise(function(resolve, reject) {
-        setTimeout(function() {
-          resolve('promise 2 completed');
-          resetAllFilters();
-        }, 200);
-      });
-
-      (function() {
-        promise1.then(function(value) {
-          promise2;
-        });
-      })();
-    </script>
-  <% end %>
-</div>
 <% end %>
