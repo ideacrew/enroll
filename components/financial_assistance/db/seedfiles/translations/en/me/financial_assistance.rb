@@ -28,6 +28,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.tax_info.continue" => "Continue to Next Step",
   "en.faa.tax_info.back" => "Back to All Household Members",
   "en.faa.tax_info.back_paranthetical" => "Go back and work on another person",
+  "en.faa.checklist.heading" => "Application Checklist",
   "en.faa.checklist.instructions1" => "Before you get started, please review the application checklist below. If you gather the information in advance, you can complete the application quickly. When you’re ready to begin, select ‘Begin Application’. This application takes about 15-20 minutes to complete, you may save your progress at any time.",
   "en.faa.checklist.instructions2" => "You will need detailed information on each person in your household (even if they don’t need coverage) to complete the application.",
   "en.faa.checklist.needs_insurance_header" => "For each person in your household who needs health insurance, you’ll need:",

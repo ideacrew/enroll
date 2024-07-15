@@ -1,3 +1,193 @@
+<% if @bs4 %>
+  <% dependent = @applicant %>
+  <div id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
+    <h2><%= dependent.id.present? ? l10n("edit_member") : l10n("add_member") %></h2>
+    <div id="add_info_<%= dependent.id %>" class="<%= pundit_class Family, :updateable? %>">
+      <%= form_for @applicant, {url: application_applicants_path(@application), as: :applicant, remote: true} do |f| %>
+        <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
+        <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
+
+        <p class="dependent-invalid-dob"></p>
+
+        <% if dependent.errors.any? %>
+          <div class="alert alert-error">
+            <h4>
+              <%= l10n("insured.consumer_roles.dependent_error.header") %>
+            </h4>
+            <ul>
+              <% dependent.errors.full_messages.each do |msg| %>
+                <% msg = (msg == l10n("insured.consumer_roles.dependent_error.gender") && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? l10n("insured.consumer_roles.dependent_error.sex") : msg %>
+                <li> <%= msg %> </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if @address_errors.present? %>
+          <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
+        <% end %>
+
+        <%= token_tag form_authenticity_token %>
+
+         <div id="personal_info" class="house">
+          <div class="dependent_notice_div_<%= dependent.id%>"></div>
+
+          <div class="d-flex mb-md-4">
+            <div class="col-md-6 col-lg-3 p-0">
+              <%= f.label :first_name, l10n("first_name"), class: "required" %>
+              <%= f.text_field :first_name, class: "required", required: true, placeholder: l10n("first_name"), autocomplete: :off %>
+            </div>
+            <div class="col-md-6 col-lg-3 p-0">
+              <%= f.label :middle_name, l10n("middle_name") %>
+              <%= f.text_field :middle_name, class: "required", required: false, placeholder: l10n("middle_name"), autocomplete: :off %>
+            </div>
+            <div class="col-md-6 col-lg-3 p-0">
+              <%= f.label :last_name, l10n("last_name"), class: "required" %>
+              <%= f.text_field :last_name, class: "required", required: true, placeholder: l10n("last_name"), autocomplete: :off %>
+            </div>
+            <div class="col-md-6 col-lg-3 p-0">
+              <%= f.label :name_sfx, l10n("suffix") %>
+              <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => l10n("none"), autocomplete: :off %>
+            </div>
+          </div>
+
+          <div class="d-flex mb-md-4">
+            <div class="col-md-6 col-lg-3 p-0">
+              <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
+              <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
+            </div>
+            <div class="col-md-6 col-lg-3 p-0">
+              <%= f.label :gender, l10n("gender"), class: 'required'  %>
+              <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], autocomplete: :off, required: true %>
+              <a href="#sex_gender" data-toggle="modal" data-target="#sex_gender" class="d-block"><%= l10n("not_sure") %></a>
+              <%= render partial: 'shared/modal_support_text_household', locals: {key: "sex_gender"} %>
+            </div>
+          </div>
+
+          <div class="d-flex mb-md-4">
+            <div class="col-md-6 col-lg-3 p-0">
+              <%= f.label :ssn, "Social Security" %>
+              <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
+                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
+                  pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+                  oninput: "this.setCustomValidity('')", disabled: false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
+              <% else %>
+                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: false,
+                  readonly: f.object.is_a?(Forms::EmployeeRole) %>
+              <% end %>
+            </div>
+            <div class="col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
+              <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
+                <%= f.check_box :no_ssn %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
+                <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
+                <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
+              <% end %>
+            </div>
+          </div>
+
+          <fieldset class="d-flex mb-md-4">
+            <legend class="required weight-n"><%= l10n("does_person_need_coverage", person: dependent.first_name.present? ? dependent.first_name : "this person") %></legend>
+            <div class="d-flex align-items-center mt-0">
+              <%= render 'shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
+            </div>
+          </fieldset>
+
+          <div class="d-flex mb-md-4">
+            <div class="">
+              <%= f.label :relationship, l10n("relationship_to_primary_member"), class: "required weight-n" %>
+              <%= f.select :relationship, faa_relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => ""}  %>
+              <a href="#relationship" data-toggle="modal" data-target="#relationship" class="d-block"><%= l10n("not_sure") %></a>
+              <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
+            </div>
+          </div>
+
+          <%= render 'shared/ssn_coverage_msg' %>
+          <div id="consumer_fields_sets" >
+            <%= render 'shared/consumer_fields', f: f %>
+          </div>
+
+          <div id="dependent-address" class="my-3">
+            <div class="">
+              <% checked = (f.object.same_with_primary.present? && f.object.same_with_primary == false) ? "false" : "checked" %>
+              <label for="applicant_same_with_primary" class="weight-n required">
+                <%= f.check_box :same_with_primary, {checked: checked, class: 'checked'}, "true", "false" %>
+                <%= l10n("live_with_primary_subscriber") %>
+              </label>
+            </div>
+            <div id="applicant-home-address-area" class="<%= 'hidden' unless f.object.same_with_primary.present? and f.object.same_with_primary == true %>">
+              <%= render 'shared/consumer_home_address_fields', f: f %><br>
+            </div>
+          </div>
+
+          <%= f.hidden_field :family_id %>
+          <div id="remove_confirm" class="hidden"></div>
+        </div>
+
+        <div id="add_info_buttons_<%= dependent.id %>" class="pt-2">
+          <% if !dependent.persisted? %>
+            <a href="#" class="btn button outline remove-new-employee-dependent" data-target="#new_employee_dependent_form">
+              <%= l10n("cancel") %>
+            </a>
+            <a href="#" class="close-1 btn outline button-error remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
+          <% else %>
+            <%= h(link_to l10n("cancel"), insured_family_member_path(dependent, {bs4: @bs4}), :remote => true, class: "btn button outline") %>
+            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button-error outline close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
+          <% end %>
+
+          <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden") do %>
+            <%= l10n("confirm_member") %>
+          <% end %>
+          <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')" id="confirm-dependent" class="btn btn-primary">
+            <%= l10n("confirm_member") %>
+          </span>
+        </div>
+
+      <% end %>
+    </div>
+
+    <script>
+      $(document).ready(function() {
+        $.inputMasks();
+
+        $('.field_with_errors > *').unwrap();
+
+        $('#applicant_same_with_primary').click(function(){
+          if($(this).is(':checked')){
+              $('#applicant-home-address-area').addClass("hidden");
+          } else {
+              $('#applicant-home-address-area').removeClass("hidden");
+          }
+        });
+
+        if($("input#dependent_same_with_primary").is(":checked")){
+          $("#address_info .address_required").removeAttr('required');
+        };
+
+        $("#dependent_first_name").change(function() {
+          var text = $("#dependent_first_name").val() == '' ? "This person" : $("#dependent_first_name").val()
+          $("#is_applying_coverage_value_dep").text("Does "+ text +" need coverage? *");
+          $("#is_applying_coverage_value_dep_1").text(text);
+        });
+      });
+
+      $(document).off('click', '#confirm-dependent');
+      $(document).on('click', '#confirm-dependent', function(e) {
+        $(".btn-confirmation").removeAttr('disabled');
+
+        var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
+
+        if ( form.checkValidity() && !$("input#dependent_same_with_primary").is(":checked")) {
+          $('#addressChangeConfirmation').modal('show');
+        }
+        else {
+        PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+        }
+
+      });
+    </script>
+  </div>
+
+<% else %>
 <li id="<%= employee_dependent_form_id(@applicant) %>" class="dependent_list">
   <div id="add_info_<%= @applicant.id %>" class="<%= pundit_class Family, :updateable?%>">
 
@@ -233,7 +423,6 @@
         </div>
     <% end %>
   </div>
-
   <script>
       $(document).ready(function() {
           $.inputMasks();
@@ -251,3 +440,4 @@
       });
   </script>
 </li>
+<% end %>
