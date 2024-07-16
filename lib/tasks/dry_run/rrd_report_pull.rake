@@ -147,6 +147,7 @@ namespace :dry_run do
                  "Individual Market Role",
                  "Disabled",
                  "Active",
+                 "Deleted from Manage Family"
                  "Physically Disabled",
                  "Age Off Excluded",
                  "Temporarily Out Of State"]
@@ -169,6 +170,7 @@ namespace :dry_run do
                     person.active_individual_market_role,
                     person.is_disabled,
                     person.is_active || person.consumer_role&.is_active,
+                    member.is_active,
                     person.is_physically_disabled,
                     person.age_off_excluded,
                     person.is_temporarily_out_of_state]
