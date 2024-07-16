@@ -188,7 +188,8 @@ find(IvlIapJobIncomeInformationPage.has_self_employee_income_no_radiobtn).click
 find(IvlIapJobIncomeInformationPage.continue_btn).click
 find(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn).click
 find(IvlIapOtherIncomePage.has_other_income_no_radiobtn).click
-find(IvlIapOtherIncomePage.continue_btn, wait:5).click
+find(IvlIapOtherIncomePage.continue_btn, wait:10).click
+sleep 2
 find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn).click
 find(IvlIapIncomeAdjustmentsPage.continue_btn).click
 sleep 2

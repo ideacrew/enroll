@@ -99,6 +99,7 @@ Then(/^Individual sees the error message (.*)$/) do |error_message|
 end
 
 Then(/^Individual should see the error message Invalid Social Security number$/) do
+  #waiting for ajax request to complete before checking the error message
   wait_for_ajax
   expect(page.find("#person_ssn")[:oninvalid]).to eq "this.setCustomValidity('Invalid Social Security number.')"
 end
