@@ -1,23 +1,56 @@
-<tr tabindex="0" onkeydown="handleButtonKeyDown(event, 'message_inbox')", id="message_inbox" class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
-  <td style="font-weight:bold">
-    <%= message.try(:from) if @folder == 'Inbox' %>
-    <%= message.try(:to)   if @folder == 'Sent'%>
-  </td>
-  <td>
-    <%=message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y") %>
+<% if @bs4 %>
+  <tr tabindex="0" onkeydown="handleButtonKeyDown(event, 'message_inbox')", id="message_inbox" class='msg-inbox <%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
+    <td>
+      <div class="inbox-sender"><%= message.try(:from) if @folder == l10n("inbox") %></div>
+      <div class="inbox-sender"><%= message.try(:from) if @folder == l10n("deleted") %></div>
+      <div class="inbox-sender"><%= message.try(:to)   if @folder == l10n("sent") %></div>
+    </td>
     <td>
       <%= message.try(:subject) %>
+      <td>
+        <%= message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y at %H:%M %Z") %>
+      </td>
+      <%- if @folder != 'Deleted' %>
+        <td class="pl-4 <%=pundit_class(Family, :updateable?)%>">
+          <span data-url="<%=retrieve_show_path(provider, message) %>&url=<%=retrieve_inbox_path(provider)%>" class='pull-right delete-message'>
+            <i tabindex="0" onkeydown="handleButtonKeyDown(event, 'delete_message')" id="delete_message" aria-hidden="true" class="far fa-trash-alt fa-2x delete-icon <%=pundit_class Family, :updateable?%>" data-toggle="tooltip">
+              <span class="hide"><%= l10n("Delete") %></span>
+            </i>
+          </span>
+        </td>
+      <% end %>
     </td>
-    <%- if @folder != 'Deleted' %>
-    <td class="  <%=pundit_class(Family, :updateable?)%>">
-      <span onclick='event.stopPropagation();deleteMessage("<%=retrieve_show_path(provider, message) %>&url=<%=retrieve_inbox_path(provider)%>");' class='pull-right'>
-        <i tabindex="0" onkeydown="handleButtonKeyDown(event, 'delete_message')" id="delete_message" aria-hidden="true" class="far fa-trash-alt fa-lg <%=pundit_class Family, :updateable?%>" title="Delete" data-toggle="tooltip"></i>
-        <span class="hide"><%= l10n("Delete") %></span>
-      </span>
+  </tr>
+  <script>
+    $(document).ready(function() {
+      $('.delete-message').on('click', function(event) {
+        event.stopPropagation();
+        deleteMessage($(this).data('url'));
+      });
+    });  
+  </script>
+<% else %>
+  <tr tabindex="0" onkeydown="handleButtonKeyDown(event, 'message_inbox')", id="message_inbox" class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
+    <td style="font-weight:bold">
+      <%= message.try(:from) if @folder == 'Inbox' %>
+      <%= message.try(:to)   if @folder == 'Sent'%>
     </td>
-    <% end %>
-  </td>
-</tr>
+    <td>
+      <%=message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y") %>
+      <td>
+        <%= message.try(:subject) %>
+      </td>
+      <%- if @folder != 'Deleted' %>
+      <td class="  <%=pundit_class(Family, :updateable?)%>">
+        <span onclick='event.stopPropagation();deleteMessage("<%=retrieve_show_path(provider, message) %>&url=<%=retrieve_inbox_path(provider)%>");' class='pull-right'>
+          <i tabindex="0" onkeydown="handleButtonKeyDown(event, 'delete_message')" id="delete_message" aria-hidden="true" class="far fa-trash-alt fa-lg <%=pundit_class Family, :updateable?%>" title="Delete" data-toggle="tooltip"></i>
+          <span class="hide"><%= l10n("Delete") %></span>
+        </span>
+      </td>
+      <% end %>
+    </td>
+  </tr>
+<% end %>
 <script>
   function showMessage(url) {
     $.ajax({type: "GET", url: url, dataType: 'script'});

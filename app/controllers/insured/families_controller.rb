@@ -696,6 +696,8 @@ class Insured::FamiliesController < FamiliesController
     case action_name
     when "find_sep", "personal", "manage_family", "home"
       EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application"
+    when "inbox"
+      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : nil
     when "purchase"
       "application"
     end

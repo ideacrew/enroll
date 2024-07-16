@@ -536,3 +536,54 @@ a.disabled {
   color: var(--primary-color);
   border-bottom: 1px dashed var(--primary-color);
 }
+
+.delete-icon {
+  color: var(--status-red);
+}
+
+.inbox-sender {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tabs {
+  margin-top: 3ch;
+}
+
+.tab {
+  border: none;
+  margin-right: 0.25ch;
+  padding: 1.25ch 1ch 1ch;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--grey-140);
+  background: var(--grey-020);
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tab.active {
+  background: #ffffff;;
+  color: var(--primary-color);
+  border-top: 1px solid #dee2e6;
+  border-left: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+  border-bottom: none;
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+.no-underline:hover {
+  text-decoration: none;
+}
+
+.msg-inbox:hover {
+  background-color: var(--grey-020);
+}
+
+.msg-active {
+  color: #605E5C;
+  font-weight: 600;
+}
