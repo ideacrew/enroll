@@ -1,18 +1,18 @@
 <% if @bs4 %>
+  <% row_actions_id = local_assigns[:row_actions_id].present? ? local_assigns[:row_actions_id] : nil %>
   <div class="dropdown <%= 'pull-right' if !defined? pull_left %>" id="<%= row_actions_id %>">
     <button class="button outline p-2 px-3 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
       <span class="pr-1"><%= l10n("actions") %></span>
     </button>
-    <div class="actions-dropdown dropdown-menu <%= local_assigns[:dropdown_cls] %> shadow-sm py-0" aria-labelledby="dropdown_for_<%= row_actions_id %>">
+    <div class="actions-dropdown dropdown-menu <%= local_assigns[:dropdown_class] %> shadow-sm py-0" aria-labelledby="dropdown_for_<%= row_actions_id %>">
       <% if dropdowns.empty? %>
         <div class="dropdown-item py-2 text-nowrap">
           <%= l10n("no_actions") %>
         </div>
       <% else %>
         <% dropdowns.each do |option| %>
-          <%# remove class attribute from option attributes if it exists because it is handled separately in the `link_to` %>
-          <% option_class = option.dig(:attributes, :class) %>
-          <% attributes = option.dig(:attributes).present? ? option[:attributes].tap { |hash| hash.delete(:class) } : nil %>
+          <% attributes = option.dig(:attributes).present? ? option[:attributes] : {} %>
+          <% option_class = attributes.delete(:class) if attributes.present? %>
           <%= link_to_with_noopener_noreferrer(option[:title], option[:link], class: "dropdown-item py-2 text-nowrap #{option_class}", **attributes) %>
         <% end %>
       <% end %>

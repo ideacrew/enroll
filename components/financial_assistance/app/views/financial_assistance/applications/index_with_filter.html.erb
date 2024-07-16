@@ -55,7 +55,7 @@
                 <td><%= to_est application.created_at %></td>
                 <td><%= to_est application.submitted_at %></td>
                 <td>
-                  <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: application_dropdowns(application), row_actions_id: "", pull_left: true, dropdown_cls: "dropdown-menu-right"}, formats: :html %>
+                  <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: application_dropdowns(application), pull_left: true, dropdown_class: "dropdown-menu-right"} %>
                 </td>
               </tr>
             <% end %>
