@@ -31,13 +31,13 @@
               <%= address.hidden_field :_destroy %></span>
 
               <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "required" %>
-              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} full-width", required: required.present? %>
+              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} w-100", required: required.present? %>
             </div>
           </div>
           <div class="mr col-sm col-md-6 p-0">
             <div class="col-md-12 pr-0">
               <%= address.label :address_2, "#{l10n("address_2")} #{l10n("address_2_desc")}" %>
-              <%= address.text_field :address_2, placeholder: l10n("address_2"), class: "full-width" %>
+              <%= address.text_field :address_2, placeholder: l10n("address_2"), class: "w-100" %>
             </div>
           </div>
         </div>
@@ -46,17 +46,17 @@
             <div class="d-flex col-sm col-md-6 pl-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
                 <%= address.label :city, class:  "required" %>
-                <%= address.text_field :city, placeholder: "City", class: "#{required} full-width", required: required.present? %>
+                <%= address.text_field :city, placeholder: "City", class: "#{required} w-100", required: required.present? %>
               </div>
               <div class="col-sm col-md-6 pr-0">
                 <%= address.label :state, class: "required" %>
-                <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:'full-width stateInput', required: true) %>
+                <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:"w-100 stateInput #{required}", required: true) %>
               </div>
             </div>
             <div class="d-flex col-sm col-md-6 pr-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
                 <%= address.label :zip, l10n("zip_code"), class: "required" %>
-                <%= address.text_field :zip, class: "full-width", required: true, placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
+                <%= address.text_field :zip, class: "w-100 #{required}", required: true, placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
               </div>
               <% if EnrollRegistry.feature_enabled?(:display_county) %>
                 <div id="county-select-<%= f.index %>" class="col-sm col-md-6 pr-0">
@@ -64,7 +64,7 @@
                   <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
                   <% @counties = [@empty_message] if @counties.empty? %>
                   <%= address.label :county %>
-                  <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'full-width', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.county_names })%>
+                  <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'w-100', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.county_names })%>
                 </div>
               <% else %>
                 <div class="col-sm col-md-6 pl-0 sm-hide"></div>
