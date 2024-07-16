@@ -30,11 +30,21 @@
           <th><%= l10n('status') %></th>
           <th><%= l10n('started') %></th>
           <th><%= l10n('submission') %></th>
-          <th><%= l10n('actions') %></th>
+          <th class="d-none d-md-table-cell"><%= l10n('actions') %></th>
         </tr>
       </thead>
       <tbody>
         <% @filtered_applications.each do |application| %>
+          <% dropdown = [
+              ['Update Application', edit_application_path(application), (application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)) ? 'static' : 'disabled'],
+              ['Copy to New Application', copy_application_path(application), do_not_allow_copy?(application, current_user) ? 'disabled' : 'static'],
+              ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
+              ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+            ] %>
+          <% if current_user.has_hbx_staff_role? %>
+            <% dropdown << ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled'] %>
+            <% dropdown << ['Transfer History', transfer_history_application_path(application), 'static' ] if FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page) %>
+          <% end %>
           <tr>
             <td>
               <div class="d-flex row align-items-center mx-0">
@@ -46,24 +56,17 @@
                     <span class="badge badge-current p-2"><%= l10n('current') %></span> 
                   <% end %>
                 </div>
+                <div class="d-md-none">
+                  <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
+                </div>
               </div>
             </td>
             <td><%= application.assistance_year %></td>
             <td><%= application_state_for_display(application) %></td>
             <td><%= to_est application.created_at %></td>
             <td><%= to_est application.submitted_at %></td>
-            <% dropdown = [
-                ['Update Application', edit_application_path(application), (application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)) ? 'static' : 'disabled'],
-                ['Copy to New Application', copy_application_path(application), do_not_allow_copy?(application, current_user) ? 'disabled' : 'static'],
-                ['View Eligibility Determination', eligibility_results_application_path(application), (application.is_determined? || application.is_terminated?) ? 'static' : 'disabled'],
-                ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
-              ] %>
-            <% if current_user.has_hbx_staff_role? %>
-              <% dropdown << ['Full Application', raw_application_application_path(application), application.is_reviewable? ? 'static' : 'disabled'] %>
-              <% dropdown << ['Transfer History', transfer_history_application_path(application), 'static' ] if FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page) %>
-            <% end %>
-            <td>
-              <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
+            <td class="d-none d-md-table-cell">
+              <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true, dropdown_cls: "dropdown-menu-right"}, formats: :html %>
             </td>
           </tr>
         <% end %>
