@@ -617,3 +617,25 @@ a.disabled {
     }
   }
 }
+
+.actions-dropdown {
+  border: 1px solid var(--grey-100);
+
+  .dropdown-item {
+    color: inherit;
+    text-decoration: inherit;
+
+    &:hover {
+      background-color: var(--complete-tint);
+      font-weight: 600;
+    }
+
+    &:last-child {
+      border-radius: 0 0 4px 4px;
+    }
+  
+    &:first-child {
+      border-radius: 4px 4px 0 0;
+    }
+  }
+}
