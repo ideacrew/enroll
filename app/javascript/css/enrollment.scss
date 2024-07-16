@@ -1,3 +1,4 @@
+
 :root {
     .plan-tile {
       font-size: medium;
@@ -166,6 +167,31 @@
                     }
                 }
             }
+        }
+      }
+    }
+
+    .enrollment-details{
+      dl {
+        display: grid;
+        grid-template-columns: 25% auto;
+
+        dt {
+          grid-column: 1;
+        }
+
+        dd {
+          grid-column: 2;
+        }
+      }
+
+      table{
+        th{
+          width: 33%;
+        }
+
+        th:first-child, td:first-child {
+          background-color: var(--grey-030);
         }
       }
     }
