@@ -5,7 +5,7 @@ module Subscribers
     # Subscriber will receive response DMF payload from FDSH gateway
     class PvcDmfFamilyDeterminationSubscriber
       include EventSource::Logging
-      include ::EventSource::Subscriber[amqp: 'fdsh.pvc.dmf.family']
+      include ::EventSource::Subscriber[amqp: 'fdsh.pvc.dmf.responses.family']
 
       subscribe(:on_determined) do |delivery_info, _metadata, response|
         logger.info "FdshGateway::PvcDmfFamilyDeterminationSubscriber: invoked on_determined with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
