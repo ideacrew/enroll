@@ -3,9 +3,10 @@ Given(/^Employer exists and logs in$/) do
 end
 
 Then(/^Employee should click on Manage Family button$/) do
+ #waiting for ajax request to complete 
   wait_for_ajax 
   if !page.has_content?("Manage Family")
-    find('#btn-continue').click
+    find('.interaction-click-control-go-to-my-account').click
   end
   expect(page).to have_content("Manage Family")
   find(IvlHomepage.manage_family_btn, wait: 15).click
