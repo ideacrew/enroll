@@ -4,35 +4,16 @@
       <span class="pr-1"><%= l10n("actions") %></span>
     </button>
     <div class="actions-dropdown dropdown-menu <%= local_assigns[:dropdown_cls] %> shadow-sm py-0" aria-labelledby="dropdown_for_<%= row_actions_id %>">
-      <% dropdowns.each do |line| %>
-        <!-- line[0] is Link Name (Eg: Add SEP)
-            line[1] is Link Path
-            line[2] is Link Type (ajax, static or disabled) -->
-        <% case line[2] %>
-        <% when "disabled" %>
-          <% next %>
-        <% when "static" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", data: {turbolinks: false}) %>
-        <% when "post" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", method: :post) %>
-        <% when "post_ajax" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", method: :post, remote: true) %>
-        <% when "post_ajax_with_confirmation" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", method: :post, remote: true, data: { confirm: line[3] }) %>
-        <% when "ajax" %>
-          <% if line[0] == l10n('admin_actions.edit_aptc_csr') %>
-            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap edit-aptc-csr-enabled", remote: true) %>
-          <% else %>
-            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", remote: true) %>
-          <% end %>
-        <% when "ajax with confirm" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", remote: true, data: { confirm: line[3] }) %>
-        <% when "delete with confirm" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", :method => 'delete', data: { confirm: line[3] }) %>
-        <% when "delete ajax with confirm" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", :method => 'delete', data: { confirm: line[3] }) %>
-        <% when "delete ajax with confirm and elementId" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "dropdown-item py-2 text-nowrap", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4]) %>
+      <% if dropdowns.empty? %>
+        <div class="dropdown-item py-2 text-nowrap">
+          <%= l10n("no_actions") %>
+        </div>
+      <% else %>
+        <% dropdowns.each do |option| %>
+          <%# remove class attribute from option attributes if it exists because it is handled separately in the `link_to` %>
+          <% option_class = option.dig(:attributes, :class) %>
+          <% attributes = option.dig(:attributes).present? ? option[:attributes].tap { |hash| hash.delete(:class) } : nil %>
+          <%= link_to_with_noopener_noreferrer(option[:title], option[:link], class: "dropdown-item py-2 text-nowrap #{option_class}", **attributes) %>
         <% end %>
       <% end %>
     </div>

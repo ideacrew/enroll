@@ -470,5 +470,21 @@ module FinancialAssistance
       end
       insurance_kind_options
     end
+
+    def application_dropdowns(application)
+      def construct_option(title, link)
+        {title: title, link: link, attributes: {data: {turbolinks: false}}}
+      end
+
+      dropdowns = [
+        (construct_option('Update Application', edit_application_path(application)) if application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)),
+        (construct_option('Copy to New Application', copy_application_path(application)) unless do_not_allow_copy?(application, current_user)),
+        (construct_option('View Eligibility Determination', eligibility_results_application_path(application)) if application.is_determined? || application.is_terminated?),
+        (construct_option('Review Application', review_application_path(application)) if application.is_reviewable?),
+        (construct_option('Full Application', raw_application_application_path(application)) if current_user.has_hbx_staff_role? && application.is_reviewable?),
+        (construct_option('Transfer History', transfer_history_application_path(application)) if current_user.has_hbx_staff_role? && FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page))
+      ]
+      dropdowns.compact
+    end
   end
 end
