@@ -182,6 +182,10 @@
 
         dd {
           grid-column: 2;
+
+          &.pre-line {
+            white-space: pre-line;
+          }
         }
       }
 
