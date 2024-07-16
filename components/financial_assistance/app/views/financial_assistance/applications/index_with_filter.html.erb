@@ -48,15 +48,15 @@
           <tr>
             <td>
               <div class="d-flex row align-items-center mx-0">
-                <div class="col-md-auto text-nowrap pl-0 pb-lg-0 pb-1">
+                <div class="col-md-auto text-nowrap pl-0">
                   <%= application.hbx_id %>
                 </div>
                 <% if application.hbx_id == @recent_determined_hbx_id %>
-                  <div class="col-md-auto px-0 pb-lg-0 pb-1">
+                  <div class="col-md-auto px-0 pt-lg-0 pt-1">
                       <span class="badge badge-current p-2"><%= l10n('current') %></span> 
                   </div>
                 <% end %>
-                <div class="d-md-none">
+                <div class="d-md-none pt-1">
                   <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "", pull_left: true}, formats: :html %>
                 </div>
               </div>
