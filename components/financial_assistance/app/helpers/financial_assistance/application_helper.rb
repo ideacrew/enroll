@@ -470,20 +470,5 @@ module FinancialAssistance
       end
       insurance_kind_options
     end
-
-    def application_dropdowns(application)
-      def construct_option(title_key, link)
-        {title: l10n(title_key), link: link, attributes: {data: {turbolinks: false}}}
-      end
-
-      [
-        (construct_option('faa.applications.actions.update', edit_application_path(application)) if application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)),
-        (construct_option('faa.applications.actions.copy', copy_application_path(application)) unless do_not_allow_copy?(application, current_user)),
-        (construct_option('faa.applications.actions.view_eligibility', eligibility_results_application_path(application)) if application.is_determined? || application.is_terminated?),
-        (construct_option('faa.applications.actions.review', review_application_path(application)) if application.is_reviewable?),
-        (construct_option('faa.applications.actions.full_application', raw_application_application_path(application)) if current_user.has_hbx_staff_role? && application.is_reviewable?),
-        (construct_option('faa.applications.actions.transfer_history', transfer_history_application_path(application)) if current_user.has_hbx_staff_role? && FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page))
-      ].compact
-    end
   end
 end
