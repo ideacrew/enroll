@@ -36,7 +36,7 @@
         </li>
       <% end %>
       <li>
-        <%= link_to personal_insured_families_path(tab: 'personal'), class: "#{'active' if action_name == 'personal'}" do %>
+        <%= link_to manage_family_insured_families_path(tab: 'family'), class: "#{'active' if action_name == 'personal'}" do %>
           <%= l10n("my_household") %>
         <% end %>
       </li>
