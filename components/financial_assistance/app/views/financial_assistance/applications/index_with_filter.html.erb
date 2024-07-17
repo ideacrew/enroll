@@ -16,8 +16,8 @@
     <% if @applications.present? %>
       <%= form_with url: nil, :method => :get do %>
         <label>
-          <div class="mb-1"><%= l10n('application_year') %></div>
-          <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each, {include_blank: "All Years", :selected => params.dig(:filter, :year)}, {:onchange => "this.form.submit();", class: "col-3 col-md-2"})%>
+          <div class="mb-1"><%= l10n('faa.applications.application_year') %></div>
+          <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each, {include_blank: l10n('faa.applications.all_years'), :selected => params.dig(:filter, :year)}, {:onchange => "this.form.submit();", class: "col-3 col-md-2"})%>
         </label>
       <% end %>
     <% end %>
@@ -27,11 +27,11 @@
         <table>
           <thead>
             <tr>
-              <th><%= l10n('id').upcase %></th>
-              <th><%= l10n('year') %></th>
-              <th><%= l10n('status') %></th>
-              <th><%= l10n('started') %></th>
-              <th><%= l10n('submission') %></th>
+              <th><%= l10n('faa.applications.table.id') %></th>
+              <th><%= l10n('faa.applications.table.year') %></th>
+              <th><%= l10n('faa.applications.table.status') %></th>
+              <th><%= l10n('faa.applications.table.started') %></th>
+              <th><%= l10n('faa.applications.table.submission') %></th>
               <th><%= l10n('actions') %></th>
             </tr>
           </thead>

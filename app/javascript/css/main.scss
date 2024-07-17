@@ -640,4 +640,9 @@ a.disabled {
       border-top-left-radius: 4px;
     }
   }
+
+  #no-actions {
+    pointer-events: none;
+    color: var(--grey-100);
+  }
 }

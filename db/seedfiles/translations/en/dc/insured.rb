@@ -210,6 +210,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.info' => "Info",
   :'en.next' => "Next Page",
   :'en.previous' => "Previous Page",
+  :'en.actions' => "Actions",
+  :'en.no_actions' => "No actions available",
   :'en.insured.families.medicaid_and_tax_credits' => "Go to District Direct",
   :'en.insured.families.apply_for_medicaid_widget' => "Want to apply for Medicaid? Go to District Direct to apply, recertify benefits, and view notices.",
   :'en.insured.families.aptc_or_csr_enrollments' => "APTC / CSR Enrollments",

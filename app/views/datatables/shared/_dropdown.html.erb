@@ -6,7 +6,7 @@
     </button>
     <div class="actions-dropdown dropdown-menu <%= local_assigns[:dropdown_class] %> shadow-sm py-0" aria-labelledby="dropdown_for_<%= row_actions_id %>">
       <% if dropdowns.empty? %>
-        <div class="dropdown-item py-2 text-nowrap">
+        <div id="no-actions" class="dropdown-item py-2 text-nowrap">
           <%= l10n("no_actions") %>
         </div>
       <% else %>
