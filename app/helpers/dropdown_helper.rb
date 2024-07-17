@@ -19,7 +19,7 @@ module DropdownHelper
   DEFAULT = {data: {turbolinks: false}}.freeze
 
   def construct_options(options_args)
-    options_args.compact.map { |args| construct_option(*args) }
+    options_args.compact.map { |option_args| construct_option(*option_args) }
   end
 
   def construct_option(title_key, link, option_type)
