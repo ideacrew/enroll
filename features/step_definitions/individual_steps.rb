@@ -1407,3 +1407,13 @@ Then(/consumer should see 0 premiums for all plans/) do
     expect(premium).to have_content("$0.00")
   end
 end
+
+Then(/the continue button has a data disabled attribute$/) do
+  continue_button = find('a.btn.btn-lg.btn-primary.btn-block', visible: false)['data-disable-with']
+  expect(continue_button).to eql("Please Wait")
+end
+
+And(/^the Continue button is visible on the Account Setup page/i) do
+  continue_button = find('a.interaction-click-control-continue')
+  expect(continue_button).to be_visible
+end
