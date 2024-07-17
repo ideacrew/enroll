@@ -294,7 +294,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.applications.detail.back" => "Back to All Applications",
   "en.faa.applications.application_year" => "Application Year",
   "en.faa.applications.all_years" => "All Years",
-  "en.faa.applications.table.id" => "ID",
   "en.faa.applications.table.year" => "Year",
   "en.faa.applications.table.status" => "Status",
   "en.faa.applications.table.started" => "Started",
