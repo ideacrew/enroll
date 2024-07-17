@@ -39,7 +39,10 @@
               <td><%= application.assistance_year %></td>
               <td><%= application_state_for_display(application) %></td>
               <td><%= to_est application.created_at %></td>
-              <td><%= to_est application.submitted_at %></td>
+              <td>
+                <% submission = to_est application.submitted_at %>
+                <%= submission.present? ? submission : l10n('faa.not_applicable_abbreviation') %>
+              </td>
               <td>
                 <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: application_dropdowns(application), pull_left: true, dropdown_class: "dropdown-menu-right"} %>
               </td>
