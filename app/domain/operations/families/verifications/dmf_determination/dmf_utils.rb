@@ -33,6 +33,12 @@ module Operations
               return [enrollment.hbx_id, enrollment.aasm_state]
             end
           end
+
+          def extract_dmf_states(family_member)
+            verification = family_member&.person&.alive_status
+            vf_history = verification&.type_history_elements&.max_by(&:created_at)
+            [vf_history&.from_validation_status, vf_history&.to_validation_status]
+          end
         end
       end
     end
