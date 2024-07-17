@@ -1,19 +1,28 @@
 :root {
     .plan-tile {
       font-size: medium;
+      border-radius: 12px;
 
       .plan-header {
         display: flex;
         align-items: center;
+
+        border-radius: 12px 12px 0 0;
         border-bottom: 1px solid #ddd;
         background: #FAF9F8;
+        padding: 6px 12px;
 
-        .plan-year {
-          margin: 0;
-          padding-left: 12px;
+        .plan-type {
+          display: flex;
+          align-items: center;
           flex-grow: 1;
           line-height: 0;
-          font-size: medium;
+          gap: 6px;
+
+          span{
+            font-size: 16px;
+            font-weight: 700;
+          }
         }
 
         .plan-status-container {
@@ -24,7 +33,7 @@
           .label {
             display: flex;
             height: 100%;
-            border-radius: 0 .25rem 0 0;
+            border-radius: 0 12px 0 0;
             align-items: center;
             color: white;
 
@@ -64,7 +73,7 @@
           img {
               flex: 0;
               object-fit: scale-down;
-              height: 70px;
+              height: 100px;
               width: 100px;
           }
 
@@ -146,12 +155,10 @@
                 height: 34px;
                 padding-right: 0;
                 color: var(--theme-primary-blue, --button-default-color);
-                border-color: var(--theme-primary-blue, --button-default-color);
 
                 &:hover {
                     color: var(--theme-primary-blue, --button-default-hover-color);
-                    border-color: var(--theme-primary-blue, --button-default-hover-color);
-                }
+                     }
 
                 a {
                     color: inherit;
