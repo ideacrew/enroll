@@ -1410,7 +1410,7 @@ end
 
 Then(/the continue button has a data disabled attribute$/) do
   continue_button = find('a.btn.btn-lg.btn-primary.btn-block', visible: false)['data-disable-with']
-  expect(continue_button).to eql("Please Wait")
+  expect(continue_button).to eql(l10n("please_wait"))
 end
 
 And(/^the Continue button is visible on Account Setup page/i) do
