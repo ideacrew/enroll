@@ -15,7 +15,7 @@ module DropdownHelper
 
   private
 
-  # dropdown link type attributes
+  # dropdown type link attributes
   DEFAULT = {data: {turbolinks: false}}.freeze
 
   def construct_options(options_args)
