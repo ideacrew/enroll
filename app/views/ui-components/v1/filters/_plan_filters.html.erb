@@ -223,23 +223,23 @@
         </fieldset>
       </div>
       <% end %>
-      <div class="mr-auto col-sm col-md-6 col-lg-3 p-0 hidden">
+      <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <fieldset class="sort-area d-block" id="sort_by">
           <legend><%= l10n("sort_by") %></legend>
           <label for="plan_name_filter" class="weight-n d-flex align-items-center mb-2">
-            <input type="checkbox" id="plan_name_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'plan_name_filter')" data-sort-by="plan-name" onchange="filterBy(this)" class="mr-2">
+            <input type="radio" name="plan_filter" id="plan_name_filter" tabindex="0"  data-sort-by="plan-name" class="mr-2">
             <%= l10n("plan_name") %>
           </label>
           <label for="premium_amount_filter" class="weight-n d-flex align-items-center mb-2">
-            <input type="checkbox" id="premium_amount_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'premium_amount_filter')" data-sort-by="plan-metal-premium" onchange="filterBy(this)" class="mr-2">
+            <input type="radio" name="plan_filter" id="premium_amount_filter" tabindex="0"  data-sort-by="plan-metal-premium" class="mr-2">
             <%= l10n("premium_amount") %>
           </label>
           <label for="deductible_filter" class="weight-n d-flex align-items-center mb-2">
-            <input type="checkbox" id="deductible_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'deductible_filter')" data-sort-by="plan-metal-deductible" onchange="filterBy(this)" class="mr-2">
+            <input type="radio" name="plan_filter" id="deductible_filter" tabindex="0" data-sort-by="plan-metal-deductible" class="mr-2">
             <%= l10n("deductible") %>
           </label>
           <label for="carrier_filter" class="weight-n d-flex align-items-center mb-2">
-            <input type="checkbox" id="carrier_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'carrier_filter')" data-sort-by="plan-carrier" onchange="filterBy(this)" class="mr-2">
+            <input type="radio" name="plan_filter" id="carrier_filter" tabindex="0"  data-sort-by="plan-carrier" class="mr-2">
             <%= l10n("carrier") %>
           </label>
         </fieldset>
