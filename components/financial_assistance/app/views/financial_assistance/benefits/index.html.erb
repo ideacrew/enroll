@@ -182,11 +182,11 @@
         <span class="instruction-row"><%= l10n("faa.has_dependent_with_coverage") %></span>
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="has_dependent_with_coverage_true">
-            <input id="has_dependent_with_coverage_true" type="radio" value="true" name="has_dependent_with_coverage" <%='checked' if @applicant.has_dependent_with_coverage? %>>
+            <input id="has_dependent_with_coverage_true" type="radio" value="true" name="has_dependent_with_coverage" <%='checked' if @applicant.has_dependent_with_coverage == true %>>
             <%= l10n("yes") %>
           </label>
           <label class="radio mr-3" for="has_dependent_with_coverage_false">
-            <input id="has_dependent_with_coverage_false" type="radio" value="false" name="has_dependent_with_coverage" <%='checked'if @applicant.has_dependent_with_coverage? == false %>>
+            <input id="has_dependent_with_coverage_false" type="radio" value="false" name="has_dependent_with_coverage" <%='checked'if @applicant.has_dependent_with_coverage == false %>>
             <%= l10n("no") %>
           </label>
         </div>
