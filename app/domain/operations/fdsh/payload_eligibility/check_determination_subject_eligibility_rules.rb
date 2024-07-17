@@ -22,7 +22,7 @@ module Operations
         # @param request_type [Symbol] The type of request being validated.
         # @return [Dry::Monads::Result] Success or Failure indicating the validation result.
         def validate(payload_entity, request_type)
-          return Failure("Invalid Subject Object #{payload_entity}") unless payload_entity.is_a?(::AcaEntities::Eligibilities::Subject)
+          return Failure("Invalid Subject Object #{payload_entity}") unless payload_entity.is_a?(Hash)
           super(request_type)
         end
 
@@ -31,9 +31,10 @@ module Operations
         # @param payload_entity [AcaEntities::Eligibilities::Subject] The subject entity whose SSN is to be validated.
         # @return [Dry::Monads::Result] Success or Failure indicating the validation result of the SSN.
         def validate_ssn(payload_entity)
-          encrypted_ssn = payload_entity.encrypted_ssn
+          encrypted_ssn = payload_entity[:encrypted_ssn]
           return Failure('No SSN') if encrypted_ssn.nil? || encrypted_ssn.empty?
-          Operations::Fdsh::EncryptedSsnValidator.new.call(encrypted_ssn)
+
+          AcaEntities::Operations::EncryptedSsnValidator.new.call(encrypted_ssn)
         end
 
         # Checks if the member is enrolled based on the eligibility states provided in the payload.
