@@ -14,12 +14,6 @@ if (!$(".my-household-page")) {
     $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
   <% end %>
 } else {
-  $("#add_member_list_<%= @dependent.id %>").replaceWith("<div class='append_consumer_info'></div>");
-  $(".append_consumer_info").html("");
-
-  $("a[id^=edit-member]").removeClass('disabled');
-  $("#add-new-member").removeClass("hidden");
-  $("#edit-member-<%= @dependent.id %>").removeClass("hidden");
-  $("#cancel-edit-<%= @dependent.id %>").addClass("hidden");
-  $("#save-member-<%= @dependent.id %>").addClass("hidden");
+  //manage family/ my household page
+  location.reload();
 }
