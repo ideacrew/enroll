@@ -591,8 +591,4 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.contact_option.text' => "Text",
   :'en.insured.contact_option.email' => "Email",
   :'en.insured.contact_option.mail' => "Mail",
-  :'en.homepage.applications' => 'Applications',
-  :'en.homepage.applications.detail' => 'Application Detail',
-  :'en.homepage.applications.detail.id' => 'Application ID:',
-  :'en.homepage.applications.detail.back' => 'Back to All Applications',
 }.freeze

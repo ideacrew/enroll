@@ -6,16 +6,16 @@
   <div>
     <ul class="breadcrumbs">
       <li><%= l10n('layout.header.home') %></li>
-      <li><%= l10n('homepage.applications') %></li>
-      <li><%= l10n('homepage.applications.detail') %></li>
+      <li><%= l10n('faa.applications') %></li>
+      <li><%= l10n('faa.applications.detail') %></li>
     </ul>
 
-    <h1><%= l10n('homepage.applications.detail') %></h2>
+    <h1><%= l10n('faa.applications.detail') %></h2>
 
-    <%= h(link_to l10n('homepage.applications.detail.back'), applications_path, class: "btn btn-primary mt-2 mb-3") %>
+    <%= h(link_to l10n('faa.applications.detail.back'), applications_path, class: "btn btn-primary mt-2 mb-3") %>
 
     <dl class="d-flex">
-      <dt class="mr-4"><%= l10n('homepage.applications.detail.id') %></dt>
+      <dt class="mr-4"><%= l10n('faa.applications.detail.id') %></dt>
       <dd><%= @application.hbx_id %></dd>
     </dl>
 
@@ -96,7 +96,7 @@
     <section><%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: preferences_hash} %></section>
     <section><%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: household_hash} %></section>
 
-    <%= h(link_to l10n("homepage.applications.detail.back"), applications_path, class: "btn btn-primary mt-2") %>
+    <%= h(link_to l10n("faa.applications.detail.back"), applications_path, class: "btn btn-primary mt-2") %>
   </div>
 <% else %>
   <div class="container">
