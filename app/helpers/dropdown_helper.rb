@@ -15,7 +15,7 @@ module DropdownHelper
 
   private
 
-  DEFAULT = {data: {turbolinks: false}, class: "foobar"}.freeze
+  DEFAULT = {data: {turbolinks: false}}.freeze
 
   def construct_options(options_args)
     options_args.compact.map { |args| construct_option(*args) }
