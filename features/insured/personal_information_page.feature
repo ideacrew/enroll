@@ -35,7 +35,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual agrees to the privacy agreeement
 
   Scenario: Consumer clicks the personal match page continue button
-    Given the Continue button is visible on the Account Setup page
+    Given the Continue button is visible on Account Setup page
     And the continue button has a data disabled attribute
     And Individual clicks on the Continue button of the Account Setup page
     And Individual sees form to enter personal information
