@@ -82,16 +82,7 @@ module FinancialAssistance
       return if params[:evidence_kind].blank?
       evidence_kind = params[:evidence_kind].to_s
       return unless ['income_evidence', 'esi_evidence', 'non_esi_evidence', 'local_mec_evidence'].include?(evidence_kind)
-      @evidence = case evidence_kind
-                  when 'income_evidence'
-                    @docs_owner.income_evidence
-                  when 'esi_evidence'
-                    @docs_owner.esi_evidence
-                  when 'non_esi_evidence'
-                    @docs_owner.non_esi_evidence
-                  when 'local_mec_evidence'
-                    @docs_owner.local_mec_evidence
-                  end
+      @evidence = @docs_owner.fetch_evidence(evidence_kind)
     end
 
     def fetch_applicant_succeeded?

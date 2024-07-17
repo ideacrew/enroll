@@ -6,8 +6,9 @@ RSpec.describe Operations::People::PersonAliveStatus::BatchRequestMigration, dbc
   include EventSource::Command
   include EventSource::Logging
 
-  let(:person_with_consumer_role) { FactoryBot.create(:person, :with_consumer_role)}
-  let(:person_without_consumer_role) { FactoryBot.create(:person)}
+  let(:person_with_consumer_role) { FactoryBot.create(:person, :with_consumer_role, ssn: '123456789')}
+  let(:person_without_consumer_role) { FactoryBot.create(:person, ssn: '223456789')}
+  let(:person_without_ssn) { FactoryBot.create(:person, :with_consumer_role, encrypted_ssn: nil)}
 
   context 'when people with and without consumer role exist' do
     let(:event) { Success(double) }
@@ -20,6 +21,7 @@ RSpec.describe Operations::People::PersonAliveStatus::BatchRequestMigration, dbc
       allow(event.success).to receive(:publish).and_return(true)
       person_with_consumer_role
       person_without_consumer_role
+      person_without_ssn
       @result = subject.call
     end
 

@@ -74,20 +74,6 @@ module Operations
             end
           end
 
-          def member_has_dmf_determination_eligible_enrollment?(family_member)
-            # first check if eligibility_determination has family member as a subject
-            subjects = @family.eligibility_determination.subjects
-            subject = subjects.detect { |sub| sub.hbx_id == family_member.hbx_id }
-            return false unless subject.present?
-
-            # then check if subject has any of the valid eligibility states
-            states = subject&.eligibility_states&.select { |state| VALID_ELIGIBLITY_STATES.include?(state.eligibility_item_key) }
-            return false unless states.present?
-
-            # last check if valid eligibility states have is_eligible as true
-            states.any?(&:is_eligible?)
-          end
-
           def confirm_transmittable_payload(valid_cv3_family)
             payload = { family_hash: valid_cv3_family.to_h, job_id: @job.job_id }
 

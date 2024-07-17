@@ -8,6 +8,14 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 module BenefitSponsors
   RSpec.describe "initial employer monthly transmission",dbclean: :after_each do
 
+    before :all do
+      DatabaseCleaner.clean
+    end
+
+    after :all do
+      DatabaseCleaner.clean
+    end
+
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area,active_year: Date.current.year - 1) }
     let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area,active_year: Date.current.year - 1) }

@@ -9,12 +9,22 @@ module BenefitMarkets
 
       class Assign
         # include Dry::Monads::Do.for(:call)
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
-        # @param [ Hash ] params Benefit Sponsor Catalog attributes
-        # @param [ Array<BenefitMarkets::Entities::ProductPackage> ] product_packages ProductPackage
-        # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog Benefit Sponsor Catalog
-        def call(product_package_values:, enrollment_eligibility:)
+        # Executes the assignment process for a Benefit Sponsor Catalog.
+        # This method takes a hash of parameters, performs a series of operations
+        # to find, filter, match, and assign criteria, and then returns the updated product package values.
+        #
+        # @param params [Hash] A hash containing :product_package_values and :enrollment_eligibility.
+        #   - :product_package_values [Hash] The current product package values.
+        #   - :enrollment_eligibility [EnrollmentEligibility] The enrollment eligibility criteria.
+        #
+        # @return [Dry::Monads::Result] A Success or Failure monad.
+        #   - Success: Contains a hash with the updated product package values.
+        #   - Failure: Contains an error message.
+        def call(params)
+          product_package_values, enrollment_eligibility = params.values_at(:product_package_values, :enrollment_eligibility)
+
           criteria               = yield find_criteria(enrollment_eligibility)
           filtered_criteria      = yield filter_criteria(criteria, product_package_values[:contribution_models])
           matched_criterion      = yield match_criterion(filtered_criteria, enrollment_eligibility)

@@ -9,7 +9,7 @@ module FinancialAssistance
       #This class calculated net annual income for a applicant
       # Net Annual Income = Total Incomes - Total Deductions
       class CalculateAndPersistNetAnnualIncome
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [application assistance year, applicant object] input
         #

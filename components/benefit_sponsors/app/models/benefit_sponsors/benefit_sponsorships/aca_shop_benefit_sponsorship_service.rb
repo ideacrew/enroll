@@ -17,13 +17,24 @@ module BenefitSponsors
       initialize_logger
     end
 
+    # Executes a given event on the benefit sponsorship.
+    #
+    # @param benefit_sponsorship [Object] The benefit sponsorship to execute the event on.
+    # @param event_name [Symbol] The name of the event to execute. Possible values are:
+    #   :begin_open_enrollment, :end_open_enrollment, :begin_sponsor_benefit, :end_sponsor_benefit,
+    #   :terminate_sponsor_benefit, :terminate_pending_sponsor_benefit, :mark_initial_ineligible,
+    #   :auto_cancel_ineligible, :auto_submit_application, :transmit_initial_eligible_event,
+    #   :transmit_renewal_eligible_event, :transmit_renewal_carrier_drop_event, :renew_sponsor_benefit
+    # @param business_policy [Object, nil] The business policy to check before executing the event. If nil or satisfied, the event is executed.
+    # @param async_workflow_id [String, nil] The ID of the asynchronous workflow, if any.
+    # @return [void]
     def execute(benefit_sponsorship, event_name, business_policy = nil, async_workflow_id = nil)
       self.benefit_sponsorship = benefit_sponsorship
       if business_policy.blank? || business_policy.is_satisfied?(benefit_sponsorship)
         if :renew_sponsor_benefit == event_name
           process_event { renew_sponsor_benefit(async_workflow_id) }
         else
-          process_event { eval(event_name.to_s) }
+          process_event { public_send(event_name) }
         end
       else
         # log()

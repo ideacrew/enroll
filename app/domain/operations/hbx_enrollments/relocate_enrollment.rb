@@ -4,7 +4,7 @@ module Operations
   module HbxEnrollments
     # Relocate enrollment operation for SHOP and IVL enrollments based on the given payload
     class RelocateEnrollment
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       ENROLLMENT_ACTION_MAPPING = {
         "Terminate Enrollment Effective End of the Month" => "terminate_enrollment",

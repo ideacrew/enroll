@@ -5,7 +5,7 @@ module Operations
   # It will execute the side effects of making a product selection, as
   # specific to the DCHBX customer.
   class GeneratePriorPlanYearShopRenewals
-    include Dry::Monads[:result, :do, :try]
+    include Dry::Monads[:do, :result]
 
     # Invoke the operation.
     # @param opts [@enrollment] the invocation options

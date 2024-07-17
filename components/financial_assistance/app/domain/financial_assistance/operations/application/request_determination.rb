@@ -7,7 +7,7 @@ module FinancialAssistance
   module Operations
     module Application
       class RequestDetermination
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
         include Acapi::Notifiers
         require 'securerandom'
 

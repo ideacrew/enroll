@@ -7,7 +7,7 @@ module Operations
   module EdiGateway
     # Publish event after find and transform family to cv3 family.
     class PublishCv3Family
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
 
       def call(params)

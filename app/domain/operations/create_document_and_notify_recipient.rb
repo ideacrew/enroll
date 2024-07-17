@@ -6,8 +6,8 @@ require 'dry/monads/do'
 module Operations
   # Consumes payload from Polypress, creates document object for recipient, sends secure message and generic alert
   class CreateDocumentAndNotifyRecipient
-    send(:include, Config::SiteConcern)
-    send(:include, Dry::Monads[:result, :do, :try])
+    include Config::SiteConcern
+    include Dry::Monads[:do, :result]
 
     def call(params)
       validate_params = yield validate_params(params)

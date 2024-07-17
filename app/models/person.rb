@@ -50,6 +50,9 @@ class Person
                         :is_homeless,
                         :is_temporarily_out_of_state,
                         :is_active,
+                        # There is suspicion that hbx_id is being updated for a Person. Ideally, hbx_id should not be updated for a Person record.
+                        # By adding hbx_id to the track_history, we can track when the hbx_id is being updated to figure out the root cause.
+                        :hbx_id,
                         :no_ssn],
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
@@ -478,6 +481,15 @@ class Person
 
   def generate_person_saved_event
     if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
+
+      # TODO: Refactor to capture embedded changed attributes in Person object changed_attributes
+      embedded_changed_attributes = {
+        changed_person_attributes: changed_attributes,
+        changed_address_attributes: changed_address_attributes,
+        changed_phone_attributes: changed_phone_attributes,
+        changed_email_attributes: changed_email_attributes,
+        changed_relationship_attributes: changed_relationship_attributes
+      }
       event(
         'events.private.person_saved',
         headers: {
@@ -486,7 +498,7 @@ class Person
         },
         attributes: {
           after_save_version: to_hash,
-          changed_attributes: changed_attributes
+          changed_attributes: embedded_changed_attributes
         }
       ).success&.publish
     else
@@ -631,7 +643,8 @@ class Person
       rel.relative_id.to_s == person.id.to_s
     end
     if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+      existing_relationship.kind = relationship
+      save
     elsif id != person.id
       self.person_relationships << PersonRelationship.new({
                                                             :kind => relationship,
@@ -1403,6 +1416,34 @@ class Person
   end
 
   private
+
+  def changed_address_attributes
+    addresses.collect do |address|
+      address_changed_attributes = address.changed_attributes
+      address_changed_attributes.merge!({:kind => address.kind})
+    end
+  end
+
+  def changed_phone_attributes
+    phones.collect do |phone|
+      phone_changed_attributes = phone.changed_attributes
+      phone_changed_attributes.merge!({:kind => phone.kind})
+    end
+  end
+
+  def changed_email_attributes
+    emails.collect do |email|
+      email_changed_attributes = email.changed_attributes
+      email_changed_attributes.merge!({:kind => email.kind})
+    end
+  end
+
+  def changed_relationship_attributes
+    person_relationships.collect do |person_relationship|
+      person_relationship_changed_attributes = person_relationship.changed_attributes
+      person_relationship_changed_attributes.merge!({:relative_id => person_relationship.relative_id})
+    end
+  end
 
   # Determines the active roles based on specific conditions for each role.
   # It utilizes a hash where each key is a role (localized string) and its value is a boolean

@@ -11,7 +11,7 @@ module FinancialAssistance
       # Also includes caching and performance improvements to reduce query
       # times.
       class QueryFilteredApplications
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(params)
           validated_params = yield validate_params(params)

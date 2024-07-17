@@ -32,8 +32,8 @@ module TransportGateway
 
     def parse_uri_credentials(uri)
       return nil if uri.user.blank? || uri.password.blank?
-      user     = URI.decode(uri.user)
-      password = URI.decode(uri.password)
+      user     = CGI.unescape(uri.user)
+      password = CGI.unescape(uri.password)
       RawSftpCredentials.new(user, password)
     end
   end

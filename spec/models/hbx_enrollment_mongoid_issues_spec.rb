@@ -9,7 +9,7 @@ describe Family, "with 2 policies", :dbclean => :around_each do
 
   before :each do
     TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 12, 15))
-    family.add_family_member(primary.person, is_primary_applicant: true)
+    family.add_family_member(primary.person, { is_primary_applicant: true })
     family.save!
 
     @hbx_enrollment_1 = HbxEnrollment.create_from(coverage_household: family.active_household.immediate_family_coverage_household, consumer_role: primary, benefit_package: benefit_package)

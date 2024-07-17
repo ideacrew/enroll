@@ -5,7 +5,7 @@ require 'aasm/rspec'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
   include_context 'cms ME simple_scenarios test_case_d'
 
   let(:family_id) { BSON::ObjectId.new }

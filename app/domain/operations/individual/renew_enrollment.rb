@@ -22,7 +22,7 @@ module Operations
     # The default aptc to be applied on to the enrollment is 85% of applicable aptc for the cases where current enrollment is not assisted.
     # If the current enrollment is assisted(has applied aptc), then the same percentage of aptc will be applied to the renewing enrollment.
     class RenewEnrollment
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include FloatHelper
 
       # @param [ HbxEnrollment ] hbx_enrollment Enrollment that needs to be renewed.
