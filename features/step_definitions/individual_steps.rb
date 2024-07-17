@@ -1413,7 +1413,7 @@ Then(/the continue button has a data disabled attribute$/) do
   expect(continue_button).to eql("Please Wait")
 end
 
-And(/^the Continue button is visible on the Account Setup page/i) do
+And(/^the Continue button is visible on Account Setup page/i) do
   continue_button = find('a.interaction-click-control-continue')
   expect(continue_button).to be_visible
 end
