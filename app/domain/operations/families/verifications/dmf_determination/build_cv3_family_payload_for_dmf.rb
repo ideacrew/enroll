@@ -12,11 +12,6 @@ module Operations
           include Dry::Monads[:result, :do]
           include ::Operations::Transmittable::TransmittableUtils
 
-          VALID_ELIGIBLITY_STATES = [
-            'health_product_enrollment_status',
-            'dental_product_enrollment_status'
-          ].freeze
-
           # @return [ Cv3Family ] Job successfully completed
           def call(family, transmittable_params)
             @job = transmittable_params[:job]
@@ -26,7 +21,6 @@ module Operations
 
             cv3_family = yield build_cv3_family
             valid_cv3_family = yield validate_cv3_family(cv3_family)
-
             yield validate_all_family_members(valid_cv3_family)
             result = yield confirm_transmittable_payload(valid_cv3_family)
 
@@ -36,47 +30,48 @@ module Operations
           private
 
           def build_cv3_family
-            cv3_family = Operations::Transformers::FamilyTo::Cv3Family.new.call(@family)
-            return handle_dmf_failure("Unable to transform family into cv3_family: #{cv3_family.failure}", :build_cv3_family) if cv3_family.failure?
+            result = Operations::Transformers::FamilyTo::Cv3Family.new.call(@family)
+            return handle_dmf_failure("Unable to transform family into cv3_family: #{result.failure}", :build_cv3_family) if result.failure?
 
-            cv3_family
+            result
           end
 
           def validate_cv3_family(cv3_family)
-            valid_cv3_family = AcaEntities::Operations::CreateFamily.new.call(cv3_family)
-            return handle_dmf_failure("Invalid cv3 family: #{valid_cv3_family.failure}", :validate_cv3_family) if valid_cv3_family.failure?
+            result = AcaEntities::Operations::CreateFamily.new.call(cv3_family)
+            return handle_dmf_failure("Invalid cv3 family: #{result.failure}", :validate_cv3_family) if result.failure?
 
-            valid_cv3_family
+            result
           end
 
-          def validate_all_family_members(aca_family)
-            invalid_persons = aca_family.family_members.map do |aca_member|
-              family_member = @family.family_members.detect { |fm| fm.hbx_id == aca_member.hbx_id }
+          def validate_all_family_members(family_entity)
+            family_members = @family.family_members
+            entity_subjects = family_entity.eligibility_determination.subjects
 
-              # check if member does not have an enrollment
-              unless member_has_dmf_determination_eligible_enrollment?(family_member)
-                vh_message = "Family Member with hbx_id #{aca_member.hbx_id} does not have a valid enrollment"
-                update_verification_type_histories(vh_message, [family_member])
-                next vh_message
+            members_data = family_entity.family_members.collect do |member_entity|
+              family_member = family_members.detect { |fm| fm.hbx_id == member_entity.hbx_id }
+              entity_subject = entity_subjects.collect{|_k,v| v if v[:hbx_id] == member_entity.hbx_id }.flatten.compact.first
+
+              result = Operations::Fdsh::PayloadEligibility::CheckDeterminationSubjectEligibilityRules.new.call(entity_subject, :alive_status)
+
+              if result.success?
+                {member_entity.hbx_id => {'status' => true, 'error' => :no_errors}}
+              else
+                error = result.failure
+                message = "Family Member is not eligible for DMF Determination due to errors: #{error}"
+                person = family_member.person
+                add_verification_history(person, "DMF_Request_Failed", message)
+                {member_entity.hbx_id => {'status' => false, 'error' => result.failure}}
               end
-
-              # check if member is valid (valid_ssn, etc.)
-              encrypted_ssn = aca_member&.person&.person_demographics&.encrypted_ssn
-              # using the same Validator used by FDSH for consistency
-              valid_ssn = AcaEntities::Operations::EncryptedSsnValidator.new.call(encrypted_ssn)
-              next if valid_ssn.success?
-
-              vh_message = "Family Member with hbx_id #{aca_member.hbx_id} is not valid: #{valid_ssn.failure}"
-              update_verification_type_histories(vh_message, [family_member])
-              vh_message
             end.compact
 
-            # invalid_persons.size == family_members.size indicates no family members were valid
-            return Success(aca_family) unless invalid_persons.size == aca_family.family_members.size
+            member_status = members_data.collect { |hash| hash.collect{|_k,v|  v["status"]} }.flatten.compact
 
-            message = "DMF Determination not sent: no family members are eligible"
-            # 'false' as third param prevent updating verification histories -> have already been updated
-            handle_dmf_failure(message, :build_cv3_family, update_histories: false)
+            if member_status.all?(false)
+              message = "DMF Determination not sent: no family members are eligible"
+              handle_dmf_failure(message, :build_cv3_family, update_histories: false)
+            else
+              Success(family_entity)
+            end
           end
 
           def member_has_dmf_determination_eligible_enrollment?(family_member)
@@ -125,10 +120,14 @@ module Operations
 
           def update_verification_type_histories(message, family_members = @family.family_members)
             family_members.each do |member|
-              alive_status_verification = member&.person&.alive_status
-              next unless alive_status_verification
-              alive_status_verification.add_type_history_element(action: "DMF Determination Request Failure", modifier: "System", update_reason: message)
+              add_verification_history(member.person, "DMF_Request_Failed", message)
             end
+          end
+
+          def add_verification_history(person, action, update_reason)
+            alive_status_verification = person.verification_types.alive_status_type.first
+            return unless alive_status_verification
+            alive_status_verification.add_type_history_element(action: action, modifier: "System", update_reason: update_reason)
           end
         end
       end
