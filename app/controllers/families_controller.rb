@@ -4,7 +4,7 @@ class FamiliesController < ApplicationController
   before_action :set_family #, only: [:index, :show, :new, :create, :edit, :update]
   # before_action :check_hbx_staff_role, except: [:welcome]
 
-  layout "two_column"
+  layout :resolve_layout
 
   # def index
     # @q = params.permit(:q)[:q]
@@ -82,6 +82,17 @@ private
   def check_hbx_staff_role
     unless current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
+    end
+  end
+
+  def resolve_layout
+    case action_name
+    when "verification"
+      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "two_column"
+    when "find_sep"
+      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application"
+    else
+      "two_column"
     end
   end
 end

@@ -374,7 +374,7 @@ class Insured::FamiliesController < FamiliesController
       @terminate_date = fetch_terminate_date(params["terminate_date_#{@enrollment.hbx_id}"]) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
       respond_to do |format|
-        format.html
+        format.html { render :layout => 'application' }
       end
     else
       redirect_to :back
