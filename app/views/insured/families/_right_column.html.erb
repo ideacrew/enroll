@@ -1,20 +1,50 @@
-<div>
-  <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? %>
-    <div class="module brokers-widget">
-      <%= render 'employee_brokers_widget', title: l10n("insured.employer_assigned_broker") %>
-    </div>
-    <div class="module brokers-widget">
-      <%= render 'consumer_brokers_widget', title: nil %>
-    </div>
+<% if @bs4 %>
+<div class="row">
+  <div class="col">
+    <%= render partial: 'shop_for_plans_widget' %>
+  </div>
+  <div class="col">
+    <%= render 'qles_panel' %>
+  </div>
+  <div class="col">
+    <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? %>
+      <div class="module mb-4">
+        <%= render 'employee_brokers_widget', title: l10n("insured.employer_assigned_broker") %>
+      </div>
+      <div class="module mb-4">
+        <%= render 'consumer_brokers_widget', title: nil %>
+      </div>
 
-  <% elsif @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
-    <div class="module brokers-widget">
-      <%= render 'employee_brokers_widget', title: nil %>
-    </div>
-  <% elsif @person.has_consumer_role? || @person.has_resident_role? %>
-    <div class="module brokers-widget">
-      <%= render 'consumer_brokers_widget', title: nil %>
-    </div>
-  <% end %>
-  <%= render 'qles_panel' %>
+    <% elsif @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
+      <div class="module mb-4">
+        <%= render 'employee_brokers_widget', title: nil %>
+      </div>
+    <% elsif @person.has_consumer_role? || @person.has_resident_role? %>
+      <div class="module mb-4">
+        <%= render 'consumer_brokers_widget', title: nil %>
+      </div>
+    <% end %>
+  </div>
 </div>
+<% else %>
+  <div>
+    <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? %>
+      <div class="module brokers-widget">
+        <%= render 'employee_brokers_widget', title: l10n("insured.employer_assigned_broker") %>
+      </div>
+      <div class="module brokers-widget">
+        <%= render 'consumer_brokers_widget', title: nil %>
+      </div>
+
+    <% elsif @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
+      <div class="module brokers-widget">
+        <%= render 'employee_brokers_widget', title: nil %>
+      </div>
+    <% elsif @person.has_consumer_role? || @person.has_resident_role? %>
+      <div class="module brokers-widget">
+        <%= render 'consumer_brokers_widget', title: nil %>
+      </div>
+    <% end %>
+    <%= render 'qles_panel' %>
+  </div>
+<% end %>
