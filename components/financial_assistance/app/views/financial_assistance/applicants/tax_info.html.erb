@@ -4,7 +4,7 @@
     <h1 data-cuke="tax_info_header"><%= l10n("faa.tax_info.header") %></h1>
     <p><%= l10n("faa.tax_info.subheader", person: @applicant.first_name) %></p>
     <fieldset>
-      <legend id="is_required_to_file_taxes" class="weight-n required">
+      <legend class="weight-n required">
         <%= l10n("faa.tax_info.question1", year: assistance_year) %>
       </legend>
       <div class="focus d-flex align-items-center">
@@ -19,10 +19,11 @@
       </div>
     </fieldset>
     <a href="#is_required_to_file_taxes" data-toggle="modal" data-target="#is_required_to_file_taxes"><%= l10n("faa.question.not_sure")%></a>
+    <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_required_to_file_taxes"} %>
 
     <div class="my-4 hide is_joint_tax_filing">
       <fieldset>
-        <legend id="is_joint_tax_filing" class="weight-n required">
+        <legend class="weight-n required">
           <%= l10n("faa.tax_info.question2") %>
         </legend>
         <div class="focus d-flex align-items-center">
@@ -38,11 +39,12 @@
 
       </fieldset>
       <a href="#is_joint_tax_filing" data-toggle="modal" data-target="#is_joint_tax_filing"><%= l10n("faa.question.not_sure")%></a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_joint_tax_filing"} %>
     </div>
 
     <div class="my-4 hide filing-as-head-of-household">
       <fieldset>
-        <legend id="is_filing_as_head_of_household" class="weight-n required">
+        <legend class="weight-n required">
           <%= l10n("faa.filing_as_head_of_household") %>
         </legend>
         <div class="focus d-flex align-items-center">
@@ -57,11 +59,12 @@
         </div>
       </fieldset>
       <a href="#is_filing_as_head_of_household" data-toggle="modal" data-target="#is_filing_as_head_of_household"><%= l10n("faa.question.not_sure")%></a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_filing_as_head_of_household"} %>
     </div>
 
     <div class="my-4 is_claimed_as_tax_dependent">
       <fieldset>
-        <legend id="is_claimed_as_tax_dependent" class="weight-n required">
+        <legend class="weight-n required">
           <%= l10n("faa.tax_info.question4", year: assistance_year) %>
         </legend>
         <div class="focus d-flex align-items-center">
@@ -75,7 +78,8 @@
           </label>
         </div>
       </fieldset>
-      <a href="#is_claimed_as_tax_dependent" data-toggle="modal" data-target="#is_claimed_as_tax_dependent"><%= l10n("faa.question.not_sure")%></a>
+      <a href="#claimed_as_tax_dependent_by" data-toggle="modal" data-target="#claimed_as_tax_dependent_by"><%= l10n("faa.question.not_sure")%></a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "claimed_as_tax_dependent_by"} %>
     </div>
 
     <div class="my-4 claimed_as_tax_dependent_by hide">
