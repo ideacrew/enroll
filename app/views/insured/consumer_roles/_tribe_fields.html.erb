@@ -44,10 +44,15 @@
         <%= f.select(:tribal_state, options_for_select(State::NAME_IDS, selected: f.object.tribal_state), {include_blank: l10n("insured.consumer_roles.select_state")}, id: "tribal-state")  %>
       </div>
 
-      <fieldset class="mb-4 featured-tribe-container hide">
+      <fieldset class="mb-4 d-block featured-tribe-container hide">
         <legend for="tribe_codes" class="weight-n"><%= l10n("insured.tribal_name") %> *</legend>
         <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>
-          <div> <%= tribe.label(:"data-value" => tribe.value) { tribe.check_box + tribe.text } %> </div>
+          <div>
+            <%= tribe.label(:"data-value" => tribe.value) do %>
+              <span class="mr-2"><%= tribe.check_box %></span>
+              <%= tribe.text %>
+            <% end %>
+          </div>
         <% end %>
       </fieldset>
 
