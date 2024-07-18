@@ -258,6 +258,11 @@ ul.list-right-section {
     border: 1px solid var(--warning-border);
   }
 
+  &.badge-info { 
+    background-color: var(--info-tint);
+     border: 1px solid var(--info-color); 
+  }
+
   &.badge-absent {
     background-color: var(--grey-040);
     border: 1px solid var(--grey-160);
