@@ -7,7 +7,7 @@ module Subscribers
       include EventSource::Logging
       include ::EventSource::Subscriber[amqp: 'fdsh.pvc.dmf.responses.family']
 
-      subscribe(:on_determined) do |delivery_info, _metadata, response|
+      subscribe(:on_determined) do |delivery_info, metadata, response|
         logger.info "FdshGateway::PvcDmfFamilyDeterminationSubscriber: invoked on_determined with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
         payload = JSON.parse(response, :symbolize_names => true)
         job_id = payload[:job_id]
