@@ -18,7 +18,7 @@ module Operations
         # Validates the payload entity to ensure it is a valid Subject object and then
         # calls the superclass's validate method.
         #
-        # @param payload_entity [AcaEntities::Eligibilities::Subject] The subject entity to validate.
+        # @param payload_entity [Subject Hash] The subject entity to validate.
         # @param request_type [Symbol] The type of request being validated.
         # @return [Dry::Monads::Result] Success or Failure indicating the validation result.
         def validate(payload_entity, request_type)
@@ -28,7 +28,7 @@ module Operations
 
         # Validates the Social Security Number (SSN) of the payload entity.
         #
-        # @param payload_entity [AcaEntities::Eligibilities::Subject] The subject entity whose SSN is to be validated.
+        # @param payload_entity [Subject Hash] The subject entity whose SSN is to be validated.
         # @return [Dry::Monads::Result] Success or Failure indicating the validation result of the SSN.
         def validate_ssn(payload_entity)
           encrypted_ssn = payload_entity[:encrypted_ssn]
@@ -39,7 +39,7 @@ module Operations
 
         # Checks if the member is enrolled based on the eligibility states provided in the payload.
         #
-        # @param payload_entity [AcaEntities::Eligibilities::Subject] The subject entity to check enrollment status for.
+        # @param payload_entity [Subject Hash] The subject entity to check enrollment status for.
         # @return [Dry::Monads::Result] Success if the subject is enrolled in either health or dental enrollment,
         #   otherwise Failure.
         def is_member_enrolled?(payload_entity)
