@@ -755,6 +755,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.enrollment_member.services' => 'Services You May Need',
   :'en.enrollment_member.your_cost' => 'Your Cost At Participating Provider',
   :'en.enrollment_member.in_network' => '(In-Network)',
+  :'en.enrollment.no_plans' => 'No Plans Found',
   :'en.not_available' => 'NA',
   :'en.insured.rejected' => "%{ridp_type} successfully rejected.",
   :'en.insured.email_text' => "EMAIL *",
