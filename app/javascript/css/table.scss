@@ -1,54 +1,60 @@
-th,
-td {
-  padding: 0.75rem;
-}
-
 table {
   font-size: 1em;
   width: 100%;
   margin-bottom: 2ch;
-}
 
-td {
-  border: none;
-  border-bottom: 1px solid var(--grey-030);
-  font-size: 12px;
-  line-height: 20px;
-  font-weight: 400;
-}
+  thead {
+    th {
+      padding: 0.75rem;
+      border: none;
+      border-bottom: 1px solid var(--grey-060);
+      text-align: left;
+      vertical-align: top;
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 600;
 
-td.wide {
-  word-wrap: break-word;
-  max-width: 250px;
-}
+      &.w-256px{
+        width: 256px;
+      }
+    }
+  }
 
-tbody tr:hover {
-  background: var(--grey-000);
-}
+  tbody {
+    tr:hover {
+      background: var(--grey-000);
+    }
 
-thead th {
-  border: none;
-  border-bottom: 1px solid var(--grey-060);
-  text-align: left;
-  vertical-align: top;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 600;
-}
+    td {
+      border: none;
+      border-bottom: 1px solid var(--grey-030);
+      font-size: 12px;
+      line-height: 20px;
+      font-weight: 400;
+      padding: 0.75rem;
 
-tbody th,
-td:first-of-type {
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 400;
-}
+      &:first-of-type {
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 400;
+      }
+    }
+  }
 
-td.numeric,
-th.numeric {
-  text-align: right;
-}
+  td, th{
+    &.numeric {
+      text-align: right;
+    }
 
-caption {
-  text-align: left;
-  margin: 1em 0;
+    &.button-cell {
+      padding: 2px;
+      display: flex;
+      justify-content: start;
+    }
+  }
+
+  caption {
+    text-align: left;
+    margin: 1em 0;
+  }
 }
