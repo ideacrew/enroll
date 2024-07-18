@@ -1,3 +1,7 @@
+
+
+
+if (!$(".my-household-page")) {
 $('#dependents_info_wrapper h4:first').text("Please enter the information requested below. When you\'re finished, select \'Confirm Member\' at the bottom of the page.");
 $('#btn-continue').addClass('disabled');
 <% if @dependent.errors.present? || @address_errors.present?  %>
@@ -25,6 +29,18 @@ $('.remove-new-employee-dependent').each(function(idx, ele) {
     return false;
   });
 });
+
+} else {
+  //manage family/ my household page
+  $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent,person: @person) %>");
+
+  $("a[id^=edit-member]").addClass('disabled');
+  $("#add-new-member").addClass("hidden");
+  $("#edit-member-<%= @dependent.id %>").addClass("hidden");
+  $("#cancel-edit-<%= @dependent.id %>").removeClass("hidden");
+  $("#save-member-<%= @dependent.id %>").removeClass("hidden");
+}
+
 if (!disableSelectric) {
   $("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select, .no-selectric').selectric();
 }
