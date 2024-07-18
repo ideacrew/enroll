@@ -11,9 +11,9 @@
         </div>
       <% else %>
         <% dropdowns.each do |option| %>
-          <% attributes = option.dig(:attributes).present? ? option[:attributes] : {} %>
-          <% option_class = attributes.delete(:class) if attributes.present? %>
-          <%= link_to_with_noopener_noreferrer(option[:title], option[:link], class: "dropdown-item py-2 text-nowrap #{option_class}", **attributes) %>
+          <% attributes = option[:attributes] %>
+          <% option_class = attributes&.delete(:class) %>
+          <%= link_to_with_noopener_noreferrer(option[:title], option[:link], class: "dropdown-item py-2 text-nowrap #{option_class}", **(attributes.present? ? attributes : {})) %>
         <% end %>
       <% end %>
     </div>
