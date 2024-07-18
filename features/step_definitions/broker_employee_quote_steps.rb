@@ -401,6 +401,7 @@ And(/^Primary Broker should see HC4CC option$/) do
 end
 
 Then(/^Primary broker should see plan names in employee costs$/) do
+  wait_for_ajax
   expect(page).to have_content(/Lowest Cost Plan/)
 end
 
