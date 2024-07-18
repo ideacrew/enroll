@@ -503,6 +503,15 @@ ul.plain {
   }
 }
 
+.home-widget {
+  background-color: var(--grey-000);
+  border: 1px solid var(--grey-060);
+}
+
+.primary-blue {
+  color: var(--theme-primary-blue, #007bc4);
+}
+
 div.disabled *:not(:has(*)):not(button, a.button), div.disabled ::after {
   opacity: .4;
 }
