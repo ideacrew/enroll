@@ -3,7 +3,12 @@
     <div class="home-widget p-2">
       <h3><%= l10n("insured.report_a_life_change") %></h3>
       <div class="pr-2 pl-2 pb-2 w-100">
-        <%= h(link_to l10n("insured.update_family_information"), manage_family_insured_families_path(tab: 'family'), class: 'btn w-100 btn-default ml-auto pull-right') %>
+        <% applications = FinancialAssistance::Application.where({family_id: @person.primary_family.id}) %>
+        <% if applications.any? { |application| application.aasm_state == 'draft' } %>
+          <%= h(link_to l10n("insured.report_a_life_change"), financial_assistance.applications_path, class: 'btn w-100 btn-default') %>
+        <% else %>
+          <%= h(link_to l10n("insured.update_family_information"), manage_family_insured_families_path(tab: 'family'), class: 'btn w-100 btn-default ml-auto pull-right') %>
+        <% end %>
       </div>
     </div>
   <% end %>

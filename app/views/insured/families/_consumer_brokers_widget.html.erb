@@ -11,9 +11,9 @@
     </h3>
     <div class="pr-2 pl-2 pb-2 w-100">
       <% if current_broker_agency && display_broker_info_for_consumer %>
-        <%= h(link_to l10n("insured.go_to_my_expert"), '', class: 'btn w-100 btn-default') %>
+        <%= h(link_to l10n("insured.go_to_my_expert"), brokers_insured_families_path, class: 'btn w-100 btn-default') %>
       <% else %>
-        <%= h(link_to l10n("insured.assign_an_expert"), '', class: 'btn w-100 btn-default') %>
+        <%= h(link_to l10n("insured.assign_an_expert"), '', class: 'btn w-100 btn-default', data: { target: "#help_with_plan_shopping", toggle: "modal" }, id: "help_me_sign_up", tabindex: "0", onkeydown: "handleButtonKeyDown(event, 'help_me_sign_up')") %>
       <% end %>
     </div>
   </div>

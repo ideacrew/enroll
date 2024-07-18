@@ -15,11 +15,13 @@
       <h1><%= l10n("insured.my_coverme_header") %></h1>
 
       <%= render 'right_column' %>
-      <h2><%= enrollments.last.coverage_year %> <%= l10n('coverage').titleize %></h2>
-      <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
-        <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false } %>
-      <% else %>
-        <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+      <% if enrollments.present? %>
+        <h2><%= enrollments.last.coverage_year %> <%= l10n('coverage').titleize %></h2>
+        <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+          <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false } %>
+        <% else %>
+          <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+        <% end %>
       <% end %>
 
       <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && !EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
