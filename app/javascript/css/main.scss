@@ -515,3 +515,44 @@ a.disabled {
   color: var(--primary-color);
   border-bottom: 1px dashed var(--primary-color);
 }
+
+
+.tabs {
+  margin-top: 3ch;
+}
+
+.ui-tabs ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tab, .ui-tab {
+  border: none;
+  margin-right: 0.25ch;
+  padding: 1.25ch 1ch 1ch;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--grey-140);
+  background: var(--grey-020);
+  border-radius: 5px 5px 0 0;
+
+  display: inline-block;
+  margin-bottom: -1px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tab.active, .ui-tab.ui-state-active {
+  background: #ffffff;;
+  color: var(--primary-color);
+  border-top: 1px solid #dee2e6;
+  border-left: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--grey-000);
+}
+
+.tab-content {
+  background: var(--grey-000);
+  padding: 0.5ch;
+  border-top: 1px solid #dee2e6;
+}
