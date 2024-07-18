@@ -93,8 +93,8 @@
               </div>
             <% end %>
           </div>
-          <% if false && current_user.has_hbx_staff_role? # TODO: implement for admin flow %>
-            <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
+          <% if current_user.has_hbx_staff_role? %>
+            <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: family_member} %>
           <% end %>
           <hr class="subcard-divider">
         <% end %>

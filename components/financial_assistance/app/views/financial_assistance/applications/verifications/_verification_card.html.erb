@@ -76,7 +76,7 @@
         </div>
       <% end %>
     </div>
-    <% if false && current_user.has_hbx_staff_role? && evidence_type.present? # TODO: implement for admin flow %>
+    <% if current_user.has_hbx_staff_role? && evidence_type.present? %>
       <%= render :partial => "financial_assistance/applications/verifications/admin_verification_actions", locals: { application: application, applicant: applicant, evidence: evidence, evidence_kind: evidence_kind} %>
     <% end %>
   </div>

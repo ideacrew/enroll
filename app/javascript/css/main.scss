@@ -323,6 +323,22 @@ ul.list-right-section {
   display: none;
 }
 
+.return-for-def-reason {
+  display: none;
+}
+
+.fedhub-request {
+  display: none;
+}
+
+.extend-request {
+  display: none;
+}
+
+.view-history {
+  display: none;
+}
+
 // medium breakpoint
 @media screen and (max-width: 767px) {
   .d-flex.sm-block {
