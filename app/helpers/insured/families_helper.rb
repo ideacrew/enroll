@@ -116,7 +116,7 @@ module Insured::FamiliesHelper
     )
   end
 
-  def qle_link_generater(qle, index)
+  def qle_link_generator(qle, index)
     options = {class: 'qle-menu-item'}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
