@@ -193,11 +193,13 @@ $(document).on('turbolinks:load', function () {
       e.preventDefault();
       $("#destroyDeduction").modal();
 
-      $("#destroyDeduction .modal-cancel-button").click(function(e) {
+      $("#destroyDeduction .modal-cancel-button").off('click');
+      $("#destroyDeduction .modal-cancel-button").on('click', function(e) {
         $("#destroyDeduction").modal('hide');
       });
 
-      $("#destroyDeduction .modal-continue-button").click(function(e) {
+      $("#destroyDeduction .modal-continue-button").off('click');
+      $("#destroyDeduction .modal-continue-button").on('click', function(e) {
         $("#destroyDeduction").modal('hide');
 
         var url = $(self).parents('.deduction').attr('id').replace('deduction_', 'deductions/');
