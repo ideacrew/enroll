@@ -432,6 +432,11 @@ RSpec.describe TaxHousehold, type: :model do
               product: product
             )
           end
+
+          before do
+            ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+          end
+
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment, shopping_hbx_enrollment.effective_on)
             expect(result).to eq(301.14)

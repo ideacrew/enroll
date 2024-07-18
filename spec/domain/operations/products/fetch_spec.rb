@@ -123,6 +123,10 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       }
     end
 
+    before do
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+    end
+
     context 'with one member having addresses in different state' do
 
       before do
@@ -240,6 +244,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
         end
         BenefitMarkets::Locations::RatingArea.update_all(covered_states: ['ME'])
         ::BenefitMarkets::Locations::CountyZip.all.update_all(county_name: 'york',zip: "04007", state: "ME")
+        ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
         @result = subject.call(params)
       end
 

@@ -42,7 +42,6 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
 
     before do
       ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-      ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
     end
 
     context 'when address, rating area, service area exists' do

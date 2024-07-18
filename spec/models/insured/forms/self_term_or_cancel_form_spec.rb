@@ -209,6 +209,7 @@ module Insured
         tax_household_member2.update_attributes(csr_percent_as_integer: 87)
         enrollment.update_attributes(product: product, applied_aptc_amount: applied_aptc_amount)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: product.id)}
+        ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       end
 
       it 'should create a new enrollment with same variant when the hios_id does not match' do

@@ -126,7 +126,6 @@ RSpec.describe TaxHouseholdMember, type: :model do
 
     before do
       ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-      ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
     end
 
     it 'should return valid benchmark value' do

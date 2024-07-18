@@ -83,8 +83,6 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
     let(:renewal_individual_premium_table) { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
 
     before :each do
-      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-      ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
       allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage)).to receive(:item).and_return(1.0)
 
@@ -102,7 +100,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
       @product.save!
       enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "coverage_selected")
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001", 'N').and_return(679.8)
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       cr1 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
       family.family_members[1].person.consumer_role = cr1
       cr2 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")

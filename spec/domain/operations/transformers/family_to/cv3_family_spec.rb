@@ -142,7 +142,6 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
 
     it 'performs under 4 seconds' do
       ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-      ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
 
       expect do
         ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)

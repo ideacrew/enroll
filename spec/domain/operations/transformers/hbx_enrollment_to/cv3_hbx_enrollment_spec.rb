@@ -38,7 +38,6 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
 
   before do
     ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-    ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
   end
 
   context 'failure' do
