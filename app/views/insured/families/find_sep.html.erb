@@ -11,7 +11,7 @@
       <% if @qualifying_life_events %>
         <ul>
           <% @qualifying_life_events.each_with_index do |qle, index| %>
-            <li class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generater(qle, index) %></li>
+            <li class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generator(qle, index) %></li>
           <% end %>
         </ul>
       <% end %>
