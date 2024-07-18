@@ -4,13 +4,11 @@ require 'rails_helper'
 
 RSpec.describe Operations::Fdsh::PayloadEligibility::CheckDeterminationSubjectEligibilityRules, dbclean: :after_each do
   let(:primary_dob){ Date.today - 57.years }
-
-
   let(:family) do
     FactoryBot.create(:family, :with_primary_family_member, :person => primary)
   end
 
-  let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: 101011012) }
+  let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: 101_011_012) }
   let!(:spouse) { FactoryBot.create(:family_member, person: spouse_person, family: family) }
   let(:spouse_dob) { Date.today - 55.years }
   let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, metal_level_kind: :silver, benefit_market_kind: :aca_individual) }
@@ -40,8 +38,8 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckDeterminationSubjectEl
   end
 
   context 'when all family members are eligible' do
-    let(:primary) { FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, ssn: 101011011) }
-    let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: 101011012) }
+    let(:primary) { FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, ssn: 101_011_011) }
+    let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: 101_011_012) }
 
     it 'should return success' do
       result = subject.call(family_entity.eligibility_determination.subjects.values.first, :alive_status)
@@ -50,7 +48,7 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckDeterminationSubjectEl
   end
 
   context 'when family member is not eligible' do
-    let(:primary) { FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, ssn: 101011011) }
+    let(:primary) { FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, ssn: 101_011_011) }
     let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: nil) }
 
     it 'should return failure' do
