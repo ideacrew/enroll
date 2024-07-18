@@ -25,7 +25,7 @@ module Operations
         return Failure('Missing Products') if params[:products].blank?
         return Failure('Missing Family') if params[:family].blank?
         return Failure('Missing Effective Date') if params[:effective_date].blank?
-        return Failure('Missing rating area id') if params[:rating_area_exchange_provided_code].blank?
+        return Failure('Missing rating area exchange code') if params[:rating_area_exchange_provided_code].blank?
 
         Success(params)
       end

@@ -83,6 +83,8 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
     let(:renewal_individual_premium_table) { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
 
     before :each do
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+      ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
       allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage)).to receive(:item).and_return(1.0)
 

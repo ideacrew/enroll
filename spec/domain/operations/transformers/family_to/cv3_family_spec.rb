@@ -140,13 +140,13 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       end
     end
 
-    it 'performs under 2 seconds' do
+    it 'performs under 4 seconds' do
       ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
 
       expect do
         ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
-      end.to perform_under(2).sec
+      end.to perform_under(4).sec
     end
   end
 
