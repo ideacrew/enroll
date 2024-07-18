@@ -1,13 +1,23 @@
 <% if @bs4 %>
-  $(".append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
+  if (!$(".my-household-page")) {
+    $("#edit-primary-person").hide();
+    $("#primary-info-display").addClass('hidden');
 
-  $("#edit-primary-person").hide();
-  $("#primary-info-display").addClass('hidden');
+    $("#edit-member-form").html("<%= escape_javascript(render partial: "personal")%>");
 
-  // Had to extensively call this function because this is being called only on Document load.
-  // FAA specific case For Primary Demographic fields conditional edit.
-  demographicValidations();
+    // Had to extensively call this function because this is being called only on Document load.
+    // FAA specific case For Primary Demographic fields conditional edit.
+    demographicValidations();
 
+  } else {
+    //manage family/ my household page
+    $(".append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
+    $("a[id^=edit-member]").addClass('disabled');
+    $("#add-new-member").addClass("hidden");
+    $("#edit-member-<%= @family_members.first.id %>").addClass("hidden");
+    $("#cancel-edit-<%= @family_members.first.id %>").removeClass("hidden");
+    $("#save-member-<%= @family_members.first.id %>").removeClass("hidden");
+  }
 <% else %>
   $(".append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
   $("#jq_datepicker_ignore_person_dob").closest(".floatlabel-wrapper").hide();
