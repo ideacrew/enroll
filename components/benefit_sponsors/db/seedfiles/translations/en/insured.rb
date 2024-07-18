@@ -125,6 +125,7 @@ INSURED_TRANSLATIONS = {
   "en.phone_number" => "Phone Number",
   "en.email_address" => "Email Address",
   "en.insured.your_broker_or_assister" => "Your Broker or Assister",
+  "en.insured.broker_or_assister" => "Broker or Assister",
   "en.insured.select_broker_or_assister" => "Select a Broker or Assister",
   "en.no_selection" => "No Selection",
   "en.insured.get_help_signing_up" => "Get Help Signing Up",
