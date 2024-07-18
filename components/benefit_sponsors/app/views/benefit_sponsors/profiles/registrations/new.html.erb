@@ -1,0 +1,176 @@
+<% if @bs4 %>
+<% if @profile_type == "broker_agency" %>
+  <div id="broker_agency_form">
+    <ul class="">
+      <li class="list-unstyled">
+        <a href="#broker_registration"><%= l10n("broker") %> Agency</a>
+      </li>
+      <li class="">
+        <a href="#broker_agency_staff"><%= l10n("broker_agency_staff") %></a>
+      </li>
+    </ul>
+    <div id="broker_registration" class="tab-content">
+      <%= render partial: "benefit_sponsors/profiles/registrations/broker_registration_form" %>
+    </div>
+    <div id="broker_agency_staff" class="tab-content"></div>
+  </div>
+<% elsif @profile_type == "general_agency" %>
+  <div id="general_agency_form">
+    <ul>
+      <li>
+        <a href="#general_agency_registration"><%= l10n("general_agency") %></a>
+      </li>
+      <li>
+        <a href="#general_agency_staff"><%= l10n("general_agency_staff") %></a>
+      </li>
+    </ul>
+    <div id="general_agency_registration">
+      <%= render partial: "benefit_sponsors/profiles/registrations/general_agency_registration_form" %>
+    </div>
+    <div id="general_agency_staff"></div>
+  </div>
+<% else %>
+  <%= form_for @agency, as: :agency, url: { action: "create" }, html: { class: "needs-validation s508", novalidate: true } do |f| %>
+    <%= f.hidden_field :profile_type, value: params[:profile_type] %>
+    <%= render 'benefit_sponsors/shared/error_messages', object: @agency %>
+    <%= render './ui-components/v1/forms/employer_registration/employer_profile_form', f: f %>
+  <% end %>
+<% end %>
+
+<script>
+  validateForm();
+
+  $("#broker_agency_form").tabs({
+    activate: function (event, ui) {
+      if (ui.newPanel.attr('id') == "broker_agency_staff") {
+        var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new?profile_type";
+        if (!$("#loaded").length) {
+          $.ajax({
+            url: url,
+            type: "GET",
+            data: { profile_type: "broker_agency_staff" },
+            success: function (data) {
+              $("#broker_agency_staff").html(data);
+              setTimeout(function () {
+                initDatepicker('inputStaffDOB', new Date("<%= Date.today.beginning_of_month - 90.years %>"), new Date("<%= Date.today.end_of_month - 18.years %>"));
+
+                var cleave = new Cleave('#inputStaffDOB', {
+                  date: true,
+                  datePattern: ['m', 'd', 'Y']
+                });
+              });
+            }
+          });
+        }
+      }
+    }
+  });
+
+  $("#general_agency_form").tabs({
+    activate: function (event, ui) {
+      if (ui.newPanel.attr('id') == "general_agency_staff") {
+        var url = "/benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/new";
+        if (!$("#loaded").length) {
+          $.ajax({
+            url: url,
+            type: "GET",
+            data: { profile_type: "general_agency_staff" },
+            success: function (data) {
+              $("#general_agency_staff").html(data);
+              initDatepicker('inputStaffDOB', new Date("<%= Date.today.beginning_of_month - 90.years %>"), new Date("<%= Date.today.end_of_month - 18.years %>"));
+            }
+          });
+        }
+      }
+    }
+  });
+</script>
+<% else %>
+
+<% if @profile_type == "broker_agency" %>
+  <div id="broker_agency_form">
+    <ul>
+      <li>
+        <a href="#broker_registration"><%= l10n("broker") %></a>
+      </li>
+      <li>
+        <a href="#broker_agency_staff"><%= l10n("broker_agency_staff") %></a>
+      </li>
+    </ul>
+    <div id="broker_registration">
+      <%= render partial: "benefit_sponsors/profiles/registrations/broker_registration_form" %>
+    </div>
+    <div id="broker_agency_staff"></div>
+  </div>
+<% elsif @profile_type == "general_agency" %>
+  <div id="general_agency_form">
+    <ul>
+      <li>
+        <a href="#general_agency_registration"><%= l10n("general_agency") %></a>
+      </li>
+      <li>
+        <a href="#general_agency_staff"><%= l10n("general_agency_staff") %></a>
+      </li>
+    </ul>
+    <div id="general_agency_registration">
+      <%= render partial: "benefit_sponsors/profiles/registrations/general_agency_registration_form" %>
+    </div>
+    <div id="general_agency_staff"></div>
+  </div>
+<% else %>
+  <%= form_for @agency, as: :agency, url: { action: "create" }, html: { class: "needs-validation s508", novalidate: true } do |f| %>
+    <%= f.hidden_field :profile_type, value: params[:profile_type] %>
+    <%= render 'benefit_sponsors/shared/error_messages', object: @agency %>
+    <%= render './ui-components/v1/forms/employer_registration/employer_profile_form', f: f %>
+  <% end %>
+<% end %>
+
+<script>
+  validateForm();
+
+  $("#broker_agency_form").tabs({
+    activate: function (event, ui) {
+      if (ui.newPanel.attr('id') == "broker_agency_staff") {
+        var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new?profile_type";
+        if (!$("#loaded").length) {
+          $.ajax({
+            url: url,
+            type: "GET",
+            data: { profile_type: "broker_agency_staff" },
+            success: function (data) {
+              $("#broker_agency_staff").html(data);
+              setTimeout(function () {
+                initDatepicker('inputStaffDOB', new Date("<%= Date.today.beginning_of_month - 90.years %>"), new Date("<%= Date.today.end_of_month - 18.years %>"));
+
+                var cleave = new Cleave('#inputStaffDOB', {
+                  date: true,
+                  datePattern: ['m', 'd', 'Y']
+                });
+              });
+            }
+          });
+        }
+      }
+    }
+  });
+
+  $("#general_agency_form").tabs({
+    activate: function (event, ui) {
+      if (ui.newPanel.attr('id') == "general_agency_staff") {
+        var url = "/benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/new";
+        if (!$("#loaded").length) {
+          $.ajax({
+            url: url,
+            type: "GET",
+            data: { profile_type: "general_agency_staff" },
+            success: function (data) {
+              $("#general_agency_staff").html(data);
+              initDatepicker('inputStaffDOB', new Date("<%= Date.today.beginning_of_month - 90.years %>"), new Date("<%= Date.today.end_of_month - 18.years %>"));
+            }
+          });
+        }
+      }
+    }
+  });
+</script>
+<% end %>
