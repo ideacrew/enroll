@@ -67,7 +67,7 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::RequestDmf
       person.reload
       alive_status_element = person.alive_status.type_history_elements.last
 
-      expect(alive_status_element.action).to eq 'DMF Determination Request'
+      expect(alive_status_element.action).to eq 'DMF_Request_Submitted'
       expect(alive_status_element.modifier).to eq 'System'
     end
 

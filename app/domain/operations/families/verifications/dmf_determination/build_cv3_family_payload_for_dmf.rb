@@ -57,8 +57,8 @@ module Operations
                 {member_entity.hbx_id => {'status' => true, 'error' => :no_errors}}
               else
                 error = result.failure
-                message = "Family Member is not eligible for DMF Determination due to errors: #{error}"
                 person = family_member.person
+                message = "Family Member is not eligible for DMF Determination due to errors: #{error}"
                 add_verification_history(person, "DMF_Request_Failed", message)
                 {member_entity.hbx_id => {'status' => false, 'error' => result.failure}}
               end

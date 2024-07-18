@@ -100,15 +100,18 @@ module Operations
 
           def record_verification_history
             @family.family_members.each do |member|
-              message = "DMF Determination request for Family with hbx_id #{hbx_id} submitted"
+              message = "DMF Determination request for Family with hbx_id #{@family.hbx_assigned_id} is submitted"
               person = member.person
               alive_status_type = person.verification_types.alive_status_type.first
               alive_status_type.add_type_history_element(action: "DMF_Request_Submitted", modifier: "System", update_reason: message)
             end
+
+            Success(true)
           end
 
           def publish(event)
             event.publish
+            message = "DMF Determination request for Family with hbx_id #{@family.hbx_assigned_id} is submitted"
             update_status(message, :succeeded, { transmission: @transmission, transaction: @transaction })
 
             Success(message)

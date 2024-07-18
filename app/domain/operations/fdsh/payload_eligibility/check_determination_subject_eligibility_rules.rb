@@ -32,7 +32,7 @@ module Operations
         # @return [Dry::Monads::Result] Success or Failure indicating the validation result of the SSN.
         def validate_ssn(payload_entity)
           encrypted_ssn = payload_entity[:encrypted_ssn]
-          return Failure('No SSN') if encrypted_ssn.nil? || encrypted_ssn.empty?
+          return Failure("No SSN for member #{payload_entity[:hbx_id]}") if encrypted_ssn.nil? || encrypted_ssn.empty?
 
           AcaEntities::Operations::EncryptedSsnValidator.new.call(encrypted_ssn)
         end
@@ -45,7 +45,7 @@ module Operations
         def is_member_enrolled?(payload_entity)
           states = payload_entity[:eligibility_states].collect { |k, v| v[:is_eligible] if VALID_ELIGIBLITY_STATES.include?(k.to_s) }.flatten.compact
 
-          return Failure("No states found for the given subject") unless states.present?
+          return Failure("No states found for the given subject/member hbx_id: #{payload_entity[:hbx_id]} ") unless states.present?
           return Success() if states.any?(true)
 
           Failure("subject is not enrolled in health or dental enrollment")
