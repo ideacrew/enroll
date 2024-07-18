@@ -11,10 +11,10 @@ module Operations
             'dental_product_enrollment_status'
           ].freeze
 
-          def member_dmf_determination_eligible_enrollments(family_member, family)
+          def member_dmf_determination_eligible_enrollments(family_member, family) # rubocop:disable Metrics/CyclomaticComplexity
             # first check if eligibility_determination has family member as a subject
-            subjects = family.eligibility_determination.subjects
-            subject = subjects.detect { |sub| sub.hbx_id == family_member.hbx_id }
+            subjects = family&.eligibility_determination&.subjects
+            subject = subjects&.detect { |sub| sub.hbx_id == family_member.hbx_id }
             return false unless subject.present?
 
             # then check if subject has any of the valid eligibility states

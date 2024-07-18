@@ -76,7 +76,7 @@ if EnrollRegistry.feature_enabled?(:alive_status)
 
     dmf_call_consumers.each do |consumer_hash|
       consumers_counter += 1
-      puts "Processing person with hbx_id #{person.hbx_id} and index at #{consumers_counter}" unless Rails.env.test?
+      puts "Processing person with hbx_id #{consumer_hash[:person_hbx_id]} and index at #{consumers_counter}" unless Rails.env.test?
 
       csv << [
         consumer_hash[:family_hbx_id],
