@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <%= render partial: 'shared/progress_side_nav', locals: {nav: sign_up_nav_options(1)} %>
   <h1><%= l10n("verify_identity") %></h1>
-  <p><%= l10n(".answer_the_following_questions_when_you_finish") %></p>
+  <p><%= l10n("insured.interactive_identity_verifications.new.answer_the_following_questions_when_you_finish") %></p>
   <%= form_for(@interactive_verification, as: :interactive_verification, url: insured_interactive_identity_verifications_path, method: :post) do |f| %>
     <%= f.hidden_field :session_id %>
     <%= f.hidden_field :transaction_id %>
