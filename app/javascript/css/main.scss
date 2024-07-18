@@ -546,37 +546,32 @@ a.disabled {
   font-weight: 600;
 }
 
-.tabs {
-  margin-top: 3ch;
+.tab-holder {
+  margin-bottom: 6px;
 }
 
 .tab {
   border: none;
-  margin-right: 0.25ch;
-  padding: 1.25ch 1ch 1ch;
+  padding: 1.25ch 1ch 1.1ch;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--grey-140);
-  background: var(--grey-020);
+  color: var(--default-font-color);
+  background: var(--nav-tab-unselected);
   border-radius: 5px 5px 0 0;
-  border-bottom: 1px solid #dee2e6;
 }
 
 .tab.active {
   background: #ffffff;;
   color: var(--primary-color);
-  border-top: 1px solid #dee2e6;
-  border-left: 1px solid #dee2e6;
-  border-right: 1px solid #dee2e6;
-  border-bottom: none;
+  border-top: 1px solid var(--grey-060);
+  border-left: 1px solid var(--grey-060);
+  border-right: 1px solid var(--grey-060);
+  border-bottom: 1px solid var(--grey-000);
 }
 
-.no-underline {
-  text-decoration: none;
-}
-
-.no-underline:hover {
-  text-decoration: none;
+.tab-container {
+  margin-top: 7px;
+  border: 1px solid var(--grey-060);
 }
 
 .msg-inbox:hover {
@@ -584,6 +579,6 @@ a.disabled {
 }
 
 .msg-active {
-  color: #605E5C;
+  color: var(--grey-060);
   font-weight: 600;
 }

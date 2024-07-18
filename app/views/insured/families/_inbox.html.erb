@@ -1,21 +1,21 @@
 <% if @bs4 %>
   <% sorted_inbox_messages = @provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
-  <div id="inbox-headers">
+  <div id="inbox-headers" class="tab-holder">
     <h1><%= l10n("messages") %></h1>
     <div class="pl-3 inbox-sender row">
       <%= l10n("unread_messages")%>
       <div class="pl-2"><%= @person.inbox.unread_messages.size %></div>
     </div>
   </div>
-  <div class="mt-4" id="inbox-nav-tabs">
-    <a class="no-underline tabs tab tab-content <%= 'active' if @folder.try(:capitalize) == 'Inbox' %>" href="<%= inbox_insured_families_path(@provider) %>">
+  <div class="mt-4 mb-1" id="inbox-nav-tabs">
+    <a class="text-decoration-none tabs tab tab-content <%= 'active' if @folder.try(:capitalize) == 'Inbox' %>" href="<%= inbox_insured_families_path(@provider) %>">
       <% if @folder == 'Inbox' %>
         <strong><%= l10n("inbox") %></strong>
       <% else %>
         <%= l10n("inbox") %>
       <% end %>
     </a>
-    <a class="no-underline tabs tab tab-content <%= 'active' if @folder.try(:capitalize) == 'Deleted' %>" href="<%= inbox_insured_families_path(@provider, folder: 'Deleted') %>">
+    <a class="text-decoration-none tabs tab tab-content <%= 'active' if @folder.try(:capitalize) == 'Deleted' %>" href="<%= inbox_insured_families_path(@provider, folder: 'Deleted') %>">
       <% if @folder == 'Deleted' %>
         <strong><%= l10n("deleted") %></strong>
       <% else %>
@@ -24,7 +24,7 @@
     </a>
   </div>
   <% if @folder == 'Deleted' && sorted_inbox_messages.size == 0 %>
-    <div class="rounded border bg-white mb-4 mt-1">
+    <div class="rounded-end bg-white mb-4 tab-container">
       <section>
         <div class="pl-2 pr-2 pt-3">
           <p><%= l10n("zero_deleted_messages") %></p>
@@ -32,7 +32,7 @@
       </section>
     </div>
   <% else %>
-    <div id="message_list_form" class="rounded border bg-white mb-4 mt-1">
+    <div id="message_list_form" class="rounded-end bg-white mb-4 tab-container">
       <section>
         <div class="pl-2 pr-2">
           <table>
