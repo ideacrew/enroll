@@ -288,7 +288,11 @@ class IvlIapFamilyInformation
   end
 
   def self.previous_link
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
     '.interaction-click-control-previous-step'
+    else
+    '.interaction-click-control-previous'
+    end
   end
 
 end
