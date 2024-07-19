@@ -132,7 +132,7 @@ namespace :dry_run do
       end
     end
 
-    def pull_member_data(filename, families, _year)
+    def pull_member_data(filename, families, year)
       headers = ["Member ID",
                  "Primary Member ID",
                  "Relationship to Primary Member",
@@ -147,7 +147,7 @@ namespace :dry_run do
                  "Individual Market Role",
                  "Disabled",
                  "Active",
-                 "Deleted from Manage Family"
+                 "Deleted from Manage Family",
                  "Physically Disabled",
                  "Age Off Excluded",
                  "Temporarily Out Of State"]
