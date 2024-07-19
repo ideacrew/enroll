@@ -121,15 +121,10 @@ module Insured
         enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
         @product = product
         @product.update_attributes(ehb: 0.9844)
-        premium_table = @product.premium_tables.first
-        premium_table.premium_tuples.where(age: hbx_enrollment_member_2_age).first.update_attributes(cost: 614.85)
-        premium_table.premium_tuples.where(age: primary_person_age).first.update_attributes(cost: 679.8)
-        @product.save!
         enrollment.update_attributes(product: @product, applied_aptc_amount: applied_aptc_amount)
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
         site_key = EnrollRegistry[:enroll_app].setting(:site_key).item.upcase
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, hbx_enrollment_member_2_age, "R-#{site_key}001", 'NA').and_return(814.85)
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, primary_person_age, "R-#{site_key}001", 'NA').and_return(879.8)
+        ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       end
 
       it 'should create a valid form for the view' do
@@ -148,7 +143,8 @@ module Insured
         form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
         # TODO: Not sure about these values
         # monthly aggregate should be applied for enrollments within the same coverage year
-        expect(form.available_aptc).to eq(1732.14) if future_effective_date.year == enrollment.effective_on.year
+        ehb_premium = (enrollment.total_premium * @product.ehb).round(2)
+        expect(form.available_aptc).to eq(ehb_premium) if future_effective_date.year == enrollment.effective_on.year
       end
 
       it 'should return default_tax_credit_value' do
@@ -166,7 +162,7 @@ module Insured
         # TODO: Not sure about these values
         # monthly aggregate should be applied for enrollments within the same coverage year
         if future_effective_date.year == enrollment.effective_on.year
-          expect(form.new_enrollment_premium).to eq(1638.82)
+          expect(form.new_enrollment_premium).to eq(enrollment.total_premium - applied_aptc_amount)
         else
           expect(form.new_enrollment_premium).to eq(enrollment.total_premium)
         end

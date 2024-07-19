@@ -252,6 +252,7 @@ RSpec.describe TaxHousehold, type: :model do
 
     before :each do
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
     end
 
     context 'when all family members checked' do
@@ -414,6 +415,7 @@ RSpec.describe TaxHousehold, type: :model do
         person.update_attributes!(dob: TimeKeeper.date_of_record - 38.years)
         person.primary_family.family_members[1].person.update_attributes!(dob: TimeKeeper.date_of_record - 28.years)
         person.primary_family.family_members[2].person.update_attributes!(dob: TimeKeeper.date_of_record - 18.years)
+        ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       end
 
       context 'having only one previous non aptc enrollment' do
