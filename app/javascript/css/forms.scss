@@ -37,7 +37,8 @@
   }
 }
 
-label, legend {
+label,
+legend {
   display: block;
   font-size: 16px;
   line-height: 24px;
@@ -46,7 +47,8 @@ label, legend {
   color: var(--text-secondary);
 }
 
-button, .btn {
+button,
+.btn {
   label {
     display: inline;
     margin-bottom: 0ch;
@@ -55,14 +57,16 @@ button, .btn {
   }
 }
 
-label.required:after, legend.required:after, dt.required:after {
+label.required:after,
+legend.required:after,
+dt.required:after {
   content: '*';
   margin-left: 0.25ch;
   color: var(--enrollment-status-red);
   font-weight: 600;
 }
 
-input:not([type="submit"]),
+input:not([type='submit']),
 select,
 .input {
   box-sizing: border-box;
@@ -85,15 +89,15 @@ select,
   }
 }
 
-input.fake-disabled-input:not([type="submit"]):disabled {
+input.fake-disabled-input:not([type='submit']):disabled {
   background: var(--grey-030);
   color: var(--default-font-color);
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   &:active,
   &:focus {
-  outline: 1px solid var(--grey-150);
+    outline: 1px solid var(--grey-150);
   }
 }
 
@@ -101,8 +105,8 @@ input[type="checkbox"] {
   &:active,
   &:focus,
   &:focus-within {
-  outline: -webkit-focus-ring-color auto 1px;
-  outline-offset: 4px;
+    outline: -webkit-focus-ring-color auto 1px;
+    outline-offset: 4px;
   }
 }
 
@@ -117,12 +121,14 @@ input[type="checkbox"] {
   }
 }
 
-input.full-width, select.full-width, .input.full-width {
+input.full-width,
+select.full-width,
+.input.full-width {
   width: 100%;
 }
 
-input:not([type="hidden"]) + label,
-input:not([type="hidden"]) + fieldset,
+input:not([type='hidden']) + label,
+input:not([type='hidden']) + fieldset,
 select + label,
 select + fieldset,
 .input + label,
@@ -141,7 +147,7 @@ select {
 
 select.button-select {
   -webkit-appearance: menulist-button;
-  box-sizing:border-box;
+  box-sizing: border-box;
   background-image: none;
   padding: 0 10px;
   font-weight: 600;
@@ -152,11 +158,25 @@ select.button-select {
   color: var(--button-primary-color);
 }
 
-input[type='checkbox'], input[type='radio'] {
+select.button-select {
+  -webkit-appearance: menulist-button;
+  box-sizing: border-box;
+  background-image: none;
+  padding: 0 10px;
+  font-weight: 600;
+  line-height: 40px;
+  height: 40px;
+  border-radius: 4px;
+  border: 2px solid var(--button-primary-color);
+  color: var(--button-primary-color);
+}
+
+input[type='checkbox'],
+input[type='radio'] {
   vertical-align: middle;
   position: relative;
   width: 24px;
-  margin-right: $spacer*.25;
+  margin-right: $spacer * 0.25;
   margin-left: 0;
   accent-color: var(--button-primary-color);
 }
@@ -203,7 +223,9 @@ input[type='date']:invalid::-webkit-datetime-edit {
     width: 100%;
     padding-right: $spacer * 2;
   }
-  button, .button, .btn {
+  button,
+  .button,
+  .btn {
     position: absolute;
     right: $spacer / 2;
     top: $spacer / 4;
@@ -216,8 +238,8 @@ input[type='date']:invalid::-webkit-datetime-edit {
     font-size: 1.5em;
     -webkit-transform: rotate(-45deg);
     -moz-transform: rotate(-45deg);
-      -o-transform: rotate(-45deg);
-         transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
   }
 }
 
@@ -226,7 +248,7 @@ input[type='date']:invalid::-webkit-datetime-edit {
   overflow: hidden;
 }
 
-.btn-file input[type=file] {
+.btn-file input[type='file'] {
   position: absolute;
   top: 0;
   right: 0;
