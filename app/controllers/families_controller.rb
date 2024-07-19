@@ -87,10 +87,8 @@ private
 
   def resolve_layout
     case action_name
-    when "verification"
+    when "verification", "personal", "manage_family", "home"
       EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "two_column"
-    when "find_sep"
-      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application"
     else
       "two_column"
     end
