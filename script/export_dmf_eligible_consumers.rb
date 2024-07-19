@@ -15,7 +15,7 @@ if EnrollRegistry.feature_enabled?(:alive_status)
     "Person First Name",
     "Person Last Name",
     "Has SSN?",
-    "Has valid SSN?",
+    "Has Valid SSN?",
     "Has Eligible Enrollment?",
     "Enrollment Hbx ID",
     "Enrollment Type",
@@ -28,7 +28,7 @@ if EnrollRegistry.feature_enabled?(:alive_status)
     family.family_members.each do |member|
       person = member.person
 
-      next unless member.person.consumer_role.present?
+      next unless person&.consumer_role.present?
 
       eligibility_states = member_dmf_determination_eligible_enrollments(member, family)
       ssn_present = person&.ssn&.present?
@@ -49,13 +49,13 @@ if EnrollRegistry.feature_enabled?(:alive_status)
       if valid_ssn & has_eligible_enrollment
         enrollment_types = eligibility_states.map { |state| state.eligibility_item_key.split('_')[0] }.join(', ')
         enrollment_hbx_id, enrollment_status = extract_enrollment_info(family, member.hbx_id)
-        addtl_params = {
+        addtl_enrollment_info = {
           enrollment_hbx_id: enrollment_hbx_id,
           enrollment_types: enrollment_types,
           enrollment_status: enrollment_status
         }
 
-        consumer_hash.merge!(addtl_params)
+        consumer_hash.merge!(addtl_enrollment_info)
       end
 
       dmf_eligibile_members << consumer_hash
@@ -74,7 +74,7 @@ if EnrollRegistry.feature_enabled?(:alive_status)
 
     dmf_eligibile_members.each do |consumer_hash|
       consumers_counter += 1
-      puts "Processing person with hbx_id #{person.hbx_id} and index at #{consumers_counter}" unless Rails.env.test?
+      puts "Processing person with hbx_id #{consumer_hash[:person_hbx_id]} and index at #{consumers_counter}" unless Rails.env.test?
 
       csv << [
         consumer_hash[:family_hbx_id],
