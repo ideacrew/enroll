@@ -1,11 +1,15 @@
 <% if @bs4 %>
   <%= benefit_form_for @application, @applicant, benefit do |f| %>
   <% form_id = SecureRandom.random_number(10000000) %>
-  <h1><%= insurance_kind %></h1>
+  <% if insurance_kind.present? %>
+    <h1><%= insurance_kind %></h1>
+  <% end %>
   <section class="my-4 p-3 border rounded bg-white benefit-form-container" id="<%= form_id %>">
     <%= f.hidden_field :kind, value: kind %>
     <%= f.hidden_field :insurance_kind, value: kind %>
-    <h2 class="insurance-kind-label"><%= insurance_kind.present? ? insurance_kind.humanize.titleize : "" %></h2>
+    <% if insurance_kind.present? %>
+      <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titleize %></h2>
+    <% end %>
     <%= f.label :employer_name, l10n("faa.health_coverage.esi.employer_name"), required: false, class: "required mt-2", for: "employer_name|#{form_id}" %>
     <%= f.text_field :employer_name, placeholder: l10n("faa.health_coverage.esi.employer_name"), required: false, id: "employer_name|#{form_id}" %>
     <div class="d-flex mt-4">
@@ -25,11 +29,11 @@
       <fieldset class="mt-4">
         <legend class="weight-n required"><%= l10n("faa.health_coverage.esi.waiting_question") %></legend>
         <div class="focus d-flex align-items-center">
-          <label for="is_esi_waiting_period_true" class="radio is_esi_waiting_period_true" for="is_esi_waiting_period_true|<%= form_id %>">
+          <label class="radio is_esi_waiting_period_true" for="is_esi_waiting_period_true|<%= form_id %>">
             <%= f.radio_button("is_esi_waiting_period", true, class: "required", id: "is_esi_waiting_period_true|#{form_id}") %>
             <span class="yes_no_pair"><%= l10n("yes") %></span>
           </label>
-          <label for="is_esi_waiting_period_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_esi_waiting_period_false')" class="radio" for="is_esi_waiting_period_false|<%= form_id %>">
+          <label tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_esi_waiting_period_false')" class="radio" for="is_esi_waiting_period_false|<%= form_id %>">
             <%= f.radio_button("is_esi_waiting_period", false, class: "required", id: "is_esi_waiting_period_false", id: "is_esi_waiting_period_false|#{form_id}") %>
             <span class="yes_no_pair"><%= l10n("no") %></span>
           </label>
@@ -115,11 +119,11 @@
       <fieldset class="mt-4">
         <legend class="weight-n required"><%= l10n("health_plan_meets_mvs_and_affordable_question") %></legend>
         <div class="focus d-flex align-items-center">
-          <label for="health_plan_meets_mvs_and_affordable_true" class="radio health_plan_meets_mvs_and_affordable" for="health_plan_meets_mvs_and_affordable_true|<%= form_id %>">
+          <label class="radio health_plan_meets_mvs_and_affordable" for="health_plan_meets_mvs_and_affordable_true|<%= form_id %>">
             <%= f.radio_button("health_plan_meets_mvs_and_affordable", true, class: "required", id: "health_plan_meets_mvs_and_affordable_true|#{form_id}") %>
             <span class="yes_no_pair"><%= l10n("yes") %></span>
           </label>
-          <label for="health_plan_meets_mvs_and_affordable_false" tabindex="0" onkeydown="handleRadioKeyDown(event, 'health_plan_meets_mvs_and_affordable_false')" class="radio" for="health_plan_meets_mvs_and_affordable_false|<%= form_id %>">
+          <label tabindex="0" onkeydown="handleRadioKeyDown(event, 'health_plan_meets_mvs_and_affordable_false')" class="radio" for="health_plan_meets_mvs_and_affordable_false|<%= form_id %>">
             <%= f.radio_button("health_plan_meets_mvs_and_affordable", false, class: "required", id: "health_plan_meets_mvs_and_affordable_false|#{form_id}") %>
             <span class="yes_no_pair"><%= l10n("no") %></span>
           </label>
