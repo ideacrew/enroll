@@ -36,7 +36,7 @@
         </li>
       <% end %>
       <li>
-        <%= link_to manage_family_insured_families_path(tab: 'family'), class: "#{'active' if ['personal', 'manage_family'].include?(action_name)}" do %>
+        <%= link_to main_app.manage_family_insured_families_path(tab: 'family'), class: "#{'active' if ['personal', 'manage_family'].include?(action_name)}" do %>
           <%= l10n("my_household") %>
         <% end %>
       </li>
