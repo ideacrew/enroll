@@ -4,7 +4,8 @@
     <%= v.text_field :passport_number, :placeholder => l10n("insured.passport_number"),
                     :pattern => "[a-zA-Z0-9]{6,12}",
                     :class => "doc_fields",
-                    :title => l10n("insured.passport_number_req").gsub("-li-", "") %>
+                    :title => l10n("insured.passport_number_req").gsub("-li-", ""),
+                    :id => "passport_number" %>
     <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.passport_number_req")} %>
   </div>
 <% else %>
