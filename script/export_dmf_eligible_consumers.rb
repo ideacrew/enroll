@@ -28,7 +28,7 @@ if EnrollRegistry.feature_enabled?(:alive_status)
     family.family_members.each do |member|
       person = member.person
 
-      next unless member.person.consumer_role.present?
+      next unless person&.consumer_role.present?
 
       eligibility_states = member_dmf_determination_eligible_enrollments(member, family)
       ssn_present = person&.ssn&.present?
@@ -74,7 +74,7 @@ if EnrollRegistry.feature_enabled?(:alive_status)
 
     dmf_eligibile_members.each do |consumer_hash|
       consumers_counter += 1
-      puts "Processing person with hbx_id #{person.hbx_id} and index at #{consumers_counter}" unless Rails.env.test?
+      puts "Processing person with hbx_id #{consumer_hash[:person_hbx_id]} and index at #{consumers_counter}" unless Rails.env.test?
 
       csv << [
         consumer_hash[:family_hbx_id],
