@@ -43,7 +43,7 @@
 
 <% unless @bs4 %>
   <% if step == 1 && search_page == true %>
-    <%= h(link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary btn-block') %>
+    <%= h(link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary btn-block', data: { disable_with: 'Continue' }) %>
   <% elsif step == 1 %>
     <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'continue_button')" id="continue_button" class="btn btn-lg btn-primary btn-br btn-block" onkeydown="handleButtonKeyDown(event, 'continue_button');" onclick="PersonValidations.manageRequiredValidations($(this));">CONTINUE</span>
     <button class="btn btn-lg btn-primary btn-br btn-block interaction-click-control-continue hidden" type="submit">CONTINUE</button>
