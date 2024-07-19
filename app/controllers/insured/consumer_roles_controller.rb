@@ -5,7 +5,7 @@ class Insured::ConsumerRolesController < ApplicationController
   include VlpDoc
   include ErrorBubble
 
-  layout 'bootstrap_4', only: [:privacy, :search, :match, :edit, :ridp_agreement, :help_paying_coverage] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  layout :resolve_layout
 
   before_action :enable_bs4_layout, only: [:privacy, :search, :match, :edit, :ridp_agreement, :help_paying_coverage, :upload_ridp_document] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :check_consumer_role, only: [:search, :match]
