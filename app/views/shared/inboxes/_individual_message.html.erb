@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <tr tabindex="0" onkeydown="handleButtonKeyDown(event, 'message_inbox')", id="message_inbox" class='msg-inbox <%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
+  <tr tabindex="0" onkeydown="handleButtonKeyDown(event, 'message_inbox')" id="message_inbox" class='msg-inbox <%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' data-url="<%= retrieve_show_path(provider, message) %>">
     <td>
       <div class="inbox-sender"><%= message.try(:from) if @folder == l10n("inbox") %></div>
       <div class="inbox-sender"><%= message.try(:from) if @folder == l10n("deleted") %></div>
@@ -27,7 +27,19 @@
         event.stopPropagation();
         deleteMessage($(this).data('url'));
       });
-    });  
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var messageRows = document.querySelectorAll('#message_inbox');
+
+      messageRows.forEach(function(row) {
+        row.addEventListener('click', function() {
+        var url = this.getAttribute('data-url');
+      
+        showMessage(url);
+        });
+      });
+    });
   </script>
 <% else %>
   <tr tabindex="0" onkeydown="handleButtonKeyDown(event, 'message_inbox')", id="message_inbox" class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
