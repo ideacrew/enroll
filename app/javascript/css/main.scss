@@ -113,10 +113,6 @@ nav .login-options li {
   display: none;
 }
 
-.hidden_field {
-  display: none;
-}
-
 .nav-stacked li {
   padding: $spacer;
   margin-bottom: ($spacer * .25);
@@ -275,14 +271,6 @@ ul.list-right-section {
 
   li {
     margin-bottom: $spacer;
-  }
-
-  .ethnicity-container label {
-    width: 100%;
-  }
-
-  .sm-hide {
-    display: none;
   }
 }
 
