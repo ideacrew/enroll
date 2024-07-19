@@ -10,7 +10,7 @@ RSpec.describe Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination, dbclean: :aft
   end
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, hbx_assigned_id: cv3_family_payload[:hbx_id], person: person) }
   let(:job) { FactoryBot.create(:transmittable_job, :dmf_determination) }
-  let(:file_data) { File.read("spec/test_data/dmf_response_cv_payload.json") }
+  let(:file_data) { File.read("spec/test_data/dmf_payloads/dmf_response_cv_payload.json") }
   let(:cv3_family_payload) { JSON.parse(JSON.parse(file_data),symbolize_names: true)  }
   let(:encrypted_family_payload) { AcaEntities::Operations::Encryption::Encrypt.new.call(value: JSON.parse(file_data)).value! }
 
