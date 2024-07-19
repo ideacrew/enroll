@@ -1,27 +1,48 @@
-<% content_for :navigation do %>
-<%= render partial: 'ui-components/v1/navs/families_navigation' %>
-<% end %>
-<% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? && @person.primary_family &&has_writing_agent?(@person) %>
-<h1 class="darkblue no-buffer"><%= l10n('my_brokers') %></h1>
-<br/>
-<%= render 'consumer_broker', title: l10n(".your_broker_or_assister") %>
-<%= render 'employee_broker', title: l10n(".employer_assigned_broker") %>
-<% else %>
-<h1 class="darkblue no-buffer"><%= l10n('my_broker') %></h1>
-
-<% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
-<%= render 'employee_broker', title: nil %>
-<% elsif @person.has_consumer_role? && has_writing_agent?(@person)%>
-
-<%= render 'consumer_broker', title: nil %>
-<% end %>
-<% end %>
-<div class="vertically-aligned-row">
-  <div class="col-xs-12 col-sm-4 col-md-3">
-    <div class="row">
-      <%= link_to(:back, class: 'btn btn-default btn-block') do %>
-        <i class='fa fa-caret-left' aria-hidden='true'></i>&nbsp; <%= l10n('.back') %>
+<% if @bs4 %>
+  <%= render partial: 'shared/family_side_nav' %>
+  <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? && @person.primary_family &&has_writing_agent?(@person) %>
+    <h1><%= l10n('my_brokers') %></h1>
+    <section class="rounded-lg bg-white border p-2 my-4 col-9">
+      <%= render 'consumer_broker', title: l10n(".your_broker_or_assister") %>
+      <%= render 'employee_broker', title: l10n(".employer_assigned_broker") %>
+    </section>
+  <% else %>
+    <h1><%= l10n('my_broker') %></h1>
+    <section class="rounded-lg bg-white border p-3 my-4 col-9">
+      <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
+        <%= render 'employee_broker', title: nil %>
+      <% elsif @person.has_consumer_role? && has_writing_agent?(@person)%>
+        <%= render 'consumer_broker', title: nil %>
       <% end %>
+    </section>
+  <% end %>
+  <a href="<%= main_app.family_account_path(tab: 'home') %>" class="button mt-4">Return Home</a>
+<% else %>
+  <% content_for :navigation do %>
+  <%= render partial: 'ui-components/v1/navs/families_navigation' %>
+  <% end %>
+  <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? && @person.primary_family &&has_writing_agent?(@person) %>
+    <h1 class="darkblue no-buffer"><%= l10n('my_brokers') %></h1>
+    <br/>
+    <%= render 'consumer_broker', title: l10n(".your_broker_or_assister") %>
+    <%= render 'employee_broker', title: l10n(".employer_assigned_broker") %>
+  <% else %>
+    <h1 class="darkblue no-buffer"><%= l10n('my_broker') %></h1>
+
+    <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
+      <%= render 'employee_broker', title: nil %>
+    <% elsif @person.has_consumer_role? && has_writing_agent?(@person)%>
+
+      <%= render 'consumer_broker', title: nil %>
+    <% end %>
+  <% end %>
+  <div class="vertically-aligned-row">
+    <div class="col-xs-12 col-sm-4 col-md-3">
+      <div class="row">
+        <%= link_to(:back, class: 'btn btn-default btn-block') do %>
+          <i class='fa fa-caret-left' aria-hidden='true'></i>&nbsp; <%= l10n('.back') %>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>
+<% end %>

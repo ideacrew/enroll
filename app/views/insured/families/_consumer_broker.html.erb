@@ -1,3 +1,62 @@
+<% if @bs4 %>
+  <% writing_agent = @person&.primary_family&.current_broker_agency&.writing_agent %>
+  <div class="d-flex justify-content-between mb-4">
+    <div class="d-flex align-items-center">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" class="primary-text">
+        <title><%= l10n('my_broker') %></title>
+        <path d="M3.3111 15.4941L10.6566 15.4938C10.2201 16.0222 9.93855 16.6832 9.88136 17.4073L9.87057 17.6817V23.3067C9.87057 24.1379 10.1656 24.9002 10.6566 25.4946L10.4956 25.4956C6.21936 25.4956 3.06566 24.1554 1.13796 21.4499C0.723007 20.8676 0.5 20.1703 0.5 19.4552V18.3052C0.5 16.7527 1.75857 15.4941 3.3111 15.4941ZM16.4331 12.3692H20.1831C20.9921 12.3692 21.6575 12.9841 21.7375 13.772L21.7456 13.9317L21.745 15.4937L23.3081 15.4942C24.5162 15.4942 25.4956 16.4736 25.4956 17.6817V23.3067C25.4956 24.5148 24.5162 25.4942 23.3081 25.4942H13.3081C12.0999 25.4942 11.1206 24.5148 11.1206 23.3067V17.6817C11.1206 16.4736 12.0999 15.4942 13.3081 15.4942L14.87 15.4937L14.8706 13.9317C14.8706 13.1227 15.4854 12.4573 16.2733 12.3773L16.4331 12.3692H20.1831H16.4331ZM19.8706 14.2442H16.7456L16.745 15.4937H19.87L19.8706 14.2442ZM10.4956 0.5C13.9474 0.5 16.7456 3.29822 16.7456 6.75C16.7456 10.2018 13.9474 13 10.4956 13C7.04379 13 4.24557 10.2018 4.24557 6.75C4.24557 3.29822 7.04379 0.5 10.4956 0.5Z" fill="currentColor"/>
+      </svg>
+      <h2 class="ml-2"><%= writing_agent&.person&.first_name&.capitalize %> <%= writing_agent&.person&.last_name&.capitalize %></h2>
+    </div>
+    <a href="#destroyBroker" data-toggle="modal" data-target="#destroyBroker" class="button outline error">Remove Expert</a>
+  </div>
+  <div class="d-flex md-col-6 pl-0">
+    <div class="col-6 pl-0">
+      <dl class="parent">
+        <dt><%= l10n("insured.brokers.agency") %>:</dt>
+        <dd><%= @person.primary_family.current_broker_agency.broker_agency_profile.legal_name.titleize %></dd>
+        <dt><%= l10n("insured.brokers.assignment_date") %>:</dt>
+        <dd><% date = @person.primary_family.current_broker_agency.start_on.in_time_zone('Eastern Time (US & Canada)') %>
+          <%= format_date(date) %> <%= date.strftime("%-I:%M%p") %></dd>
+      </dl>
+    </div>
+    <div class="col-6 pr-0">
+      <dl class="parent">
+        <dt><%= l10n("phone") %>:</dt>
+        <dd><%= @person.primary_family.current_broker_agency.writing_agent.phone %></dd>
+        <dt><%= l10n("email") %>:</dt>
+        <dd><%= @person.primary_family.current_broker_agency.writing_agent.email.address %></dd>
+      </dl>
+    </div>
+  </div>
+  <!-- Hidden destroy other income modal -->
+  <div class="modal" id="destroyBroker" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="container pt-2 pb-4 modal-content">
+        <div class="d-flex mb-4 align-items-center">
+          <div class="col-auto px-0 mr-1">
+            <div class="warning-icon icon" alt="Info">&nbsp;</div>
+          </div>
+          <div class="col pl-0">
+            <h4 class="modal-title"><%= l10n("warning") %></h4>
+          </div>
+          <div class="col-auto px-0">
+            <button type="button" class="close" data-dismiss="modal" aria-label="<%= l10n("close") %>">
+              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+            </button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <p><%= l10n("insured.brokers.removal_warning") %></p>
+        </div>
+        <div class="d-flex align-items-center mt-4 justify-content-end">
+          <button type="button" class="btn outline modal-cancel-button mr-1" data-dismiss="modal"><%= l10n("cancel") %></button>
+          <%= h(link_to(l10n("insured.brokers.removal_confirm"), delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: l10n("confirm_delete_msg") }, class: 'button'+ pundit_class(Family,:updateable?))) %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %>
 <div class="panel panel-default module broker consumer-broker">
   <div class="panel-heading vertically-aligned-row">
     <div>
@@ -16,7 +75,7 @@
         <%= link_to(delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: l10n("confirm_delete_msg") }, class: 'btn btn-default'+ pundit_class(Family,:updateable?)) do %>
           <%= l10n('insured.delete_broker') %> &nbsp;<i class='fa fa-user-times' aria-hidden='true'></i>
         <% end %>
-      <% end %>       
+      <% end %>
     </div>
   </div>
   <div class="panel-body">
@@ -63,3 +122,4 @@
     </div>
   </div>
 </div>
+<% end %>
