@@ -384,5 +384,9 @@ registry:
           item: 12_950
         - key: :unearned_income_filing_threshold_2024
           item: 1_150
+        - key: :earned_income_filing_threshold_2025
+          item: 12_950
+        - key: :unearned_income_filing_threshold_2025
+          item: 1_150
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings
