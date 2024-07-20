@@ -29,7 +29,7 @@
       <% deduction_kind = deduction_kind.to_s %>
       <div id="<%= deduction_kind %>"class="my-4 deduction-kind">
         <div>
-          <label class="weight-n">
+          <label class="weight-n" data-input-label>
             <div class="d-flex align-items-center">
               <div class="flex-col mr-1">
                 <%= check_box_tag :deduction_kind, deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
@@ -61,6 +61,8 @@
           </button>
         </div>
       </div>
+
+
     <% end %>
   </div>
 
@@ -158,6 +160,18 @@
       show_back_to_household_button: true
     } %>
   </div>
+
+  <script>
+    // Prevent clicking on the label from triggering the radio button
+    const labels = document.querySelectorAll('label[data-input-label]');
+    labels.forEach(label => {
+      const input = label.querySelector('input');
+      label.addEventListener('click', event => {
+        if (event.target === input) return;
+        event.preventDefault();
+      });
+    });
+  </script>
 <% else %>
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
     <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">

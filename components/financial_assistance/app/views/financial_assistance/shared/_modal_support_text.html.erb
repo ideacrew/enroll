@@ -1,13 +1,13 @@
 <% if @bs4 %>
-  <div class="modal fade" id="<%= (defined? id)? id : (key.is_a?(Array) ? key[0] : key) %>" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+  <div class="modal" id="<%= (defined? id)? id : (key.is_a?(Array) ? key[0] : key) %>" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="container pt-2 pb-4 modal-content">
-        <div class="d-flex mb-4 align-items-center">
+        <div class="modal-header d-flex mb-4 align-items-center">
           <div class="col-auto px-0">
             <div class="info-icon icon" alt="Info" aria-hidden="true">&nbsp;</div>
           </div>
           <div class="col pl-0">
-              <h2 class="modal-title"><%= l10n("faa.other_ques.question_detail") %></h2>
+            <%= l10n("not_sure") %>
           </div>
           <div class="col-auto px-0">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
