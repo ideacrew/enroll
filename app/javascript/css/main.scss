@@ -166,7 +166,15 @@ dt {
 dt {
   font-weight: 600;
   color: var(--text-secondary);
-  padding-right: 1ch;
+  padding-right: 2ch;
+}
+
+dl.parent.weight-n {
+  dt {
+    font-weight: 400;
+    color: var(--default-font-color);
+    padding-right: 2ch;
+  }
 }
 
 #personal_info {
@@ -466,6 +474,37 @@ a.disabled {
 .inbox-sender {
   font-size: 16px;
   font-weight: 600;
+}
+
+.nav-stacked li {
+  padding: $spacer;
+  margin-bottom: ($spacer * .25);
+  width: 100%;
+  background: var(--grey-010);
+  color: var(--info-color);
+  a {
+    color: var(--info-color);
+  }
+  &.activer {
+    background: var(--info-color);
+    color: var(--grey-000);
+    a {
+      color: var(--grey-000);
+    }
+  }
+  &.active {
+    @extend .font-weight-bold;
+  }
+}
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
+}
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
 }
 
 .tab-holder {
