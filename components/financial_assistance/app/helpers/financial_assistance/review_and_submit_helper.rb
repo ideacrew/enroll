@@ -121,10 +121,10 @@ module FinancialAssistance
 
     include RowKeyTranslator
 
-    def applicant_summary_hashes(applicant)
+    def applicant_summary_hashes(applicant, can_edit)
       def personal_info_hash(applicant)
         hash = {age: applicant.age_of_the_applicant, gender: applicant.gender.humanize}
-        unless @all_relationships.empty?
+        if @all_relationships.present?
           hash[:relationship] = applicant.relationship_kind_with_primary.humanize
         end
         hash[:status] = applicant.citizen_status.present? ? applicant.format_citizen : nil
@@ -134,7 +134,7 @@ module FinancialAssistance
         return create_section_hash(title: l10n('personal_information'), rows: hash, :map => :personal_info_keys)
       end
 
-      def tax_info_hash(applicant)
+      def tax_info_hash(applicant, can_edit)
         helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
 
         hash = {file_in_year: required_value(human_boolean(applicant.is_required_to_file_taxes))}
@@ -146,10 +146,16 @@ module FinancialAssistance
           hash[:dependent_by] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name
         end
 
-        return create_section_hash(title: l10n('faa.review.tax_info'), edit_link: go_to_step_application_applicant_path(@application, applicant, 1), rows: hash, :map => :tax_info_keys)
+        return create_section_hash(
+          title: l10n('faa.review.tax_info'),
+          can_edit: can_edit, 
+          edit_link: go_to_step_application_applicant_path(@application, applicant, 1), 
+          rows: hash, 
+          :map => :tax_info_keys
+          )
       end
 
-      def income_info_hash(applicant)
+      def income_info_hash(applicant, can_edit)
         helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
 
         hash = {from_employer: required_value(human_boolean(applicant.has_job_income))}
@@ -181,15 +187,26 @@ module FinancialAssistance
 
         hash[:other_sources] = required_value(human_boolean(applicant.has_other_income))
 
-        return create_section_hash(title: l10n('faa.evidence_type_income'), edit_link: application_applicant_incomes_path(@application, applicant), rows: hash, :map => :income_info_keys)
+        return create_section_hash(
+          title: l10n('faa.evidence_type_income'),
+          can_edit: can_edit,
+          edit_link: application_applicant_incomes_path(@application, applicant), 
+          rows: hash, 
+          :map => :income_info_keys
+          )
       end
 
-      def deductions_info_hash(applicant)
+      def deductions_info_hash(applicant, can_edit)
         row = {l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: assistance_year) => required_value(human_boolean(applicant.has_deductions))}
-        create_section_hash(title: l10n('faa.review.income_adjustments'), edit_link: application_applicant_deductions_path(@application, applicant), rows: row)
+        create_section_hash(
+          title: l10n('faa.review.income_adjustments'),
+          can_edit: can_edit,
+          edit_link: application_applicant_deductions_path(@application, applicant),
+          rows: row
+        )
       end
 
-      def coverage_info_hash(applicant)
+      def coverage_info_hash(applicant, can_edit)
         hash = {
           is_enrolled: {
             value: human_boolean(applicant.has_enrolled_health_coverage),
@@ -236,10 +253,15 @@ module FinancialAssistance
           end
         }
 
-        return create_section_hash(title: l10n('health_coverage'), edit_link: application_applicant_benefits_path(@application, applicant), rows: hash, :map => :coverage_info_keys)
+        return create_section_hash(
+          title: l10n('health_coverage'),
+          can_edit: can_edit,
+          edit_link: application_applicant_benefits_path(@application, applicant),
+          rows: hash, 
+          :map => :coverage_info_keys)
       end
 
-      def other_questions_hash(applicant)
+      def other_questions_hash(applicant, can_edit)
         helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
 
         hash = {}
@@ -296,10 +318,21 @@ module FinancialAssistance
           hash[:disability_question] = human_boolean(applicant.is_physically_disabled)
         end
 
-        return create_section_hash(title: l10n('faa.review.other_questions'), edit_link: other_questions_application_applicant_path(@application, applicant), rows: hash, :map => :other_questions_keys)
+        return create_section_hash(
+          title: l10n('faa.review.other_questions'),
+          can_edit: can_edit,
+          edit_link: other_questions_application_applicant_path(@application, applicant), 
+          rows: hash, 
+          :map => :other_questions_keys)
       end
 
-      [personal_info_hash(applicant), tax_info_hash(applicant), income_info_hash(applicant), deductions_info_hash(applicant), coverage_info_hash(applicant), other_questions_hash(applicant)]
+      [
+        personal_info_hash(applicant),
+        tax_info_hash(applicant, can_edit), 
+        income_info_hash(applicant, can_edit), 
+        deductions_info_hash(applicant, can_edit), 
+        coverage_info_hash(applicant, can_edit), 
+        other_questions_hash(applicant, can_edit)]
     end
 
     def review_benefits_esi_hash(benefit)
@@ -394,8 +427,8 @@ module FinancialAssistance
       {value: value, is_required: true}
     end
 
-    def create_section_hash(title:, edit_link: nil, rows:, map: nil)
-      return {title: title, edit_link: edit_link, rows: map.nil? ? rows : translate_row_keys(rows, map)}
+    def create_section_hash(title:, can_edit: true, edit_link: nil, rows:, map: nil)
+      return {title: title, edit_link: can_edit ? edit_link : nil, rows: map.nil? ? rows : translate_row_keys(rows, map)}
     end
   end
 end
