@@ -55,7 +55,9 @@
                 <%= side_nav %>
               </div>
               <div class="col-sm-12 col-md-12 col-lg-<%= 12 - nav_width %> pl-4">
-                <%= render_flash use_bs4: @bs4 %>
+                <% unless @override_flash %>
+                  <%= render_flash use_bs4: @bs4 %>
+                <% end %>
                 <% if content_for? :content %>
                   <%= yield :content %>
                 <% else %>

@@ -1,11 +1,21 @@
-<div class="col-md-7">
-  <div class="">
-    <p class="alert alert-error hide"></p>
-    <h1 class="darkblue">Error Submitting Application</h1>
-    <h4 class="darkblue"><%= l10n('faa.publish_error.second_error_message') %></h4>
+<% if @bs4 %>
+  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 3} %>
+  <h1><%= l10n("faa.publish_error.title") %></h1>
+  <div class="my-4">
+    <%= render_flash use_bs4: @bs4 %>
   </div>
-</div>
+  <p class="mb-4"><%= l10n('faa.publish_error.second_error_message_with_help', phone: "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}") %></p>
+  <%= h(link_to(l10n("faa.publish_error.back"), financial_assistance.applications_path(tab: 'cost_savings'))) %>
+<% else %>
+  <div class="col-md-7">
+    <div class="">
+      <p class="alert alert-error hide"></p>
+      <h1 class="darkblue">Error Submitting Application</h1>
+      <h4 class="darkblue"><%= l10n('faa.publish_error.second_error_message') %></h4>
+    </div>
+  </div>
 
-<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-</div>
-<%= render partial: "/ui-components/v1/modals/help_with_plan"  %>
+  <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+  </div>
+  <%= render partial: "/ui-components/v1/modals/help_with_plan"  %>
+<% end %>
