@@ -1,3 +1,18 @@
+<% if @bs4 %>
+  <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 3} %>
+  <h1><%= l10n("financial_assistance.applications.response_error")%></h1>
+  <p><%= l10n("financial_assistance.applications.cant_determine_eligibility",
+          site_short_name: site_short_name,
+          contact_center_phone_number: health_benefit_exchange_authority_phone_number,
+          contact_center_tty_number: contact_center_tty_number,
+          contact_center_email_address: contact_center_email_address)%></p>
+  <% if @application.determination_http_status_code.present? %>
+    <p><%= l10n('financial_assistance.applications.report_error', determination_http_status_code: @application.determination_http_status_code) %></p>
+  <% end %>
+  <% group_selection_url = main_app.new_insured_group_selection_path(person_id: @person.id, consumer_role_id: @person.consumer_role.id) %>
+  <% find_sep_url = main_app.find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id) %>
+  <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: { previous_link: applications_path, next_link: @person.consumer_role.present? && is_under_open_enrollment? ? group_selection_url : find_sep_url } %>
+<% else %>
 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
   <div class="col-md-9">
     <div class="">
@@ -32,3 +47,4 @@
   </div>
   <%= render partial: './ui-components/v1/modals/help_with_plan' %>
 </div>
+<% end %>
