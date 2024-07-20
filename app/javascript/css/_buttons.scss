@@ -111,3 +111,7 @@ button.unstyled, button.close {
     color: var(--button-primary-active-color);
   }
 }
+
+button.short, .button.short, .btn.short {
+  padding: 6px 12px;
+}

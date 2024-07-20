@@ -1,6 +1,6 @@
 <% plan_carrier = Caches::MongoidCache.lookup(BenefitSponsors::Organizations::Organization.issuer_profiles, plan.issuer_profile_id) { plan.issuer_profile } %>
 <% if @bs4 %>
-  <div class="plan-card plan-row p-2 border my-2 bg-white rounded-lg"
+  <div class="plan-card plan-row border my-2  rounded-lg"
     data-plan-id="<%= plan.id %>"
     data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>"
     data-plan-metal-level="<%= plan.metal_level.downcase %>"
@@ -15,25 +15,48 @@
     data-plan-osse-eligibility="<%= osse_status(plan) %>"
     data-plan-ehb="<%= plan.ehb %>"
     data-can-use-aptc="<%= plan.can_use_aptc? %>">
-    <div class="panel-body">
-      <div class="d-flex justify-content-end mb-3">
-        <% if plan.try(:is_standard_plan) %>
-              <span tabindex="0" compare_plans class="badge badge-pill badge-info" data-toggle="tooltip" data-placement="top" data-container="body" title= "<%=l10n('insured.plan_shoppings.standard_plan_title_info') %>">
-                <%= plan.standard_plan_label.titleize %>
-              </span>
-        <% end %>
-
-        <% if true %>
-        <%# if @enrolled_hbx_enrollment_plan_ids.include?(plan.id) %>
-            <span class="badge badge-pill badge-success ml-2">
+    <div class="panel-header p-2 d-flex justify-content-between">
+      <div class="pl-0 col-3">
+        <label for="compare_plan_checkbox_<%= plan.id %>" data-cuke="compare_plan_checkbox" class="weight-n d-flex align-items-center">
+          <input id="compare_plan_checkbox_<%= plan.id %>" type="checkbox" class="compare_plan_checkbox checkbox-custom ivl-select-plan-for-comparison mr-2" data-hbx-id="<%= @hbx_enrollment.id %>" data-hios-id="<%= plan.hios_id %>" data-plan-year="<%= plan.active_year %>" data-plan-enrollment-kind="<%= @enrollment_kind %>" data-plan-change-plan="<%= @change_plan%>"></input>
+          <%= l10n("compare") %>
+        </label>
+      </div>
+      <div>
+        <div class="d-flex justify-content-between mb-3">
+          <% if plan.try(:is_standard_plan) %>
+            <span tabindex="0" compare_plans class="badge badge-pill badge-lg badge-standard d-flex align-items-center" data-toggle="tooltip" data-placement="top" data-container="body" title= "<%=l10n('insured.plan_shoppings.standard_plan_title_info') %>">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                <title>Checkmark</title>
+                <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="2"/>
+                <path d="M14 7L8.46154 13L6 10.3333" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <%= plan.standard_plan_label.titleize %>
+            </span>
+          <% end %>
+          <% if @enrolled_hbx_enrollment_plan_ids.include?(plan.id) %>
+            <span class="badge badge-pill badge-lg badge-current-plan ml-2 d-flex align-items-center">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <title>Star</title>
+                <g clip-path="url(#clip0_4990_3099)" class="mr-2">
+                  <path d="M7.10433 0.898925C7.47114 0.155678 8.53099 0.155683 8.8978 0.898926L10.8282 4.81042L15.1448 5.43766C15.9651 5.55685 16.2926 6.56482 15.699 7.14335L12.5755 10.188L13.3129 14.4872C13.453 15.3041 12.5956 15.927 11.8619 15.5414L8.00106 13.5116L4.14018 15.5414C3.40655 15.9271 2.54913 15.3041 2.68924 14.4872L3.4266 10.188L0.303081 7.14335C-0.290438 6.56482 0.0370772 5.55685 0.857295 5.43766L5.17389 4.81042L7.10433 0.898925Z" fill="currentColor"/>
+                </g>
+                <defs>
+                  <clipPath id="clip0_4990_3099">
+                    <rect width="16" height="16" fill="white"/>
+                  </clipPath>
+                </defs>
+              </svg>
               <%= l10n("your_current_plan", year: plan.try(:active_year)) %>
             </span>
-        <% end %>
+          <% end %>
+        </div>
       </div>
-
+    </div>
+    <div class="panel-body bg-white p-2">
       <div class="d-flex">
-        <div class="col-md-2 col-sm-2"><%= display_carrier_logo(Maybe.new(plan), {width: 80}) %></div>
-        <div class="col-md-7">
+        <div class="col-md-2 col-sm-2 align-self-center"><%= display_carrier_logo(Maybe.new(plan), {width: 100}) %></div>
+        <div class="col-md-8">
           <h3 class="no-buffer">
             <%= link_to summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, active_year: plan.try(:active_year), market_kind: @market_kind, coverage_kind: @coverage_kind}), {:remote => true} do %>
               <% if plan.is_csr?%>
@@ -41,67 +64,56 @@
               <% end %>
               <%= plan.name %>
             <% end %>
-            <br/>
-            <small><%= plan_carrier.legal_name %></small>
           </h3>
         </div>
-        <div class="col-md-3">
-          <div class="price-wrapper pull-right">
+        <div class="col-md-2">
+          <div class="price-wrapper text-right">
+            <strong class="text-secondary"><%= l10n("premium") %></strong>
             <% if @tax_household.present? && params[:market_kind]=='individual' %>
-              <h2 class="no-buffer plan-premium"><%= number_to_currency(shopping_group_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.total_childcare_subsidy_amount, plan.can_use_aptc?)) %></h2>
+              <p class="bold beta m-0"><%= number_to_currency(shopping_group_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.total_childcare_subsidy_amount, plan.can_use_aptc?)) %></p>
             <% else %>
-              <h2 class="no-buffer plan-premium"><%= number_to_currency(plan.total_employee_cost - plan.total_childcare_subsidy_amount) %></h2>
+              <p class="bold beta m-0"><%= number_to_currency(plan.total_employee_cost - plan.total_childcare_subsidy_amount) %></p>
             <% end %>
-            <small>/<%= l10n("month") %></small>
+            <small class="weight-n">per <%= l10n("month") %></small>
           </div>
         </div>
       </div>
-      <br>
-
-      <div class="mb-3">
-        <table class="table gn-10">
-          <thead>
-          <tr>
-            <th><%= l10n("type") %></th>
-            <th><%= l10n("level") %></th>
-            <th><%= l10n("network") %></th>
-            <th><%= l10n("deductible") %></th>
-          </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><%= plan.product_type ? plan.product_type.upcase : "" %></td>
-              <td>
-                <% plan_level = plan.metal_level.titleize %>
-                <span class="<%= plan_level.downcase %>-icon">
-                  <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).titleize %>
-                </span>
-              </td>
-              <td>
-                <% if offers_nationwide_plans? %>
-                  <%= plan.network %>
-                <% else %>
-                  <% if plan.network_information.present? %>
-                      Network Notes
-                      <i tabindex="0" class='fa fa-question-circle' data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
-                  <% end %>
-                <% end %>
-              </td>
-              <td> <%= deductible_display(@hbx_enrollment, plan) %> </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="d-flex">
+        <dl class="parent col-5 pl-0">
+          <dt>Carrier</dt>
+          <dd><%= plan_carrier.legal_name %></dd>
+          <dt><%= l10n("network") %></dt>
+          <dd>
+            <% if offers_nationwide_plans? %>
+              <%= plan.network %>
+            <% else %>
+              <% if plan.network_information.present? %>
+                  Network Notes
+                  <i tabindex="0" class='fa fa-question-circle' data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
+              <% end %>
+            <% end %>
+          </dd>
+          <dt><%= l10n("deductible") %></dt>
+          <dd><%= deductible_display(@hbx_enrollment, plan) %></dd>
+        </dl>
+        <dl class="parent col-5 pl-0">
+          <dt><%= l10n("level") %></dt>
+          <dd>
+            <% plan_level = plan.metal_level.titleize %>
+            <span class="badge badge-pill badge-lg badge-<%= plan_level.downcase %>">
+              <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).titleize %>
+            </span>
+          </dd>
+          <dt><%= l10n("type") %></dt>
+          <dd><%= plan.product_type ? plan.product_type.upcase : "" %></dd>
+        </dl>
       </div>
 
-      <div class="d-flex align-items-center">
-        <div class="col-3">
-          <input id="compare_plan_checkbox" type="checkbox" class="checkbox-custom ivl-select-plan-for-comparison" data-hbx-id="<%= @hbx_enrollment.id %>" data-hios-id="<%= plan.hios_id %>" data-plan-year="<%= plan.active_year %>" data-plan-enrollment-kind="<%= @enrollment_kind %>" data-plan-change-plan="<%= @change_plan%>"></input>
-          <span for="compare_plan_checkbox" class="checkbox-custom-label" style="font-weight: bold;" data-cuke="compare_plan_checkbox"><%= l10n("compare") %></span>
-        </div>
-        <div class="col-5">
+      <div class="d-flex align-items-center justify-content-between plan-footer">
+        <div>
           <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan, custom_css: false } %>
+          <%= link_to l10n("see_details"), summary_products_plans_path({plan_id: plan.id, :standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "primary-text ml-4", :remote => true} %>
         </div>
-        <div class="col-4 ">
           <% if (@tax_household || @aptc_grants) && params[:market_kind]=='individual' && params[:coverage_kind] == 'health' %>
             <% if @csr_available && plan.metal_level != "silver" %>
               <%= link_to l10n("select_plan"), "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"} %>
@@ -113,8 +125,6 @@
           <% else %>
             <%= link_to(l10n("select_plan"), "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
           <% end %>
-          <%= link_to l10n("see_details"), summary_products_plans_path({plan_id: plan.id, :standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default", :remote => true} %>
-        </div>
       </div>
 
     </div>
@@ -210,7 +220,7 @@
         <div class="col-xs-3">
           <div class="checkbox no-buffer">
             <label>
-              <input id="compare_plan_checkbox" type="checkbox" class="checkbox-custom ivl-select-plan-for-comparison" data-hbx-id="<%= @hbx_enrollment.id %>" data-hios-id="<%= plan.hios_id %>" data-plan-year="<%= plan.active_year %>" data-plan-enrollment-kind="<%= @enrollment_kind %>" data-plan-change-plan="<%= @change_plan%>"></input>
+              <input id="compare_plan_checkbox" type="checkbox" class="compare_plan_checkbox checkbox-custom ivl-select-plan-for-comparison" data-hbx-id="<%= @hbx_enrollment.id %>" data-hios-id="<%= plan.hios_id %>" data-plan-year="<%= plan.active_year %>" data-plan-enrollment-kind="<%= @enrollment_kind %>" data-plan-change-plan="<%= @change_plan%>"></input>
               <span for="compare_plan_checkbox" class="checkbox-custom-label" style="font-weight: bold;" data-cuke="compare_plan_checkbox"><%= l10n("compare") %></span>
             </label>
           </div>
@@ -245,7 +255,7 @@
   </style>
 <% end %>
 <script>
-  var compareChecks = document.querySelectorAll("#compare_plan_checkbox");
+  var compareChecks = document.querySelectorAll(".compare_plan_checkbox");
   compareChecks.forEach(check => check.addEventListener('click', event => {
     comparePlan(check);
   }));
@@ -254,7 +264,7 @@
 
     var compareBtn = document.getElementById('compareBtn')
     compareBtn.classList.add('hidden')
-    checkboxes = document.querySelectorAll('#compare_plan_checkbox')
+    checkboxes = document.querySelectorAll('.compare_plan_checkbox')
     checkboxes.forEach(function(checkbox) {
        checkbox.checked = false;
     })
@@ -262,7 +272,7 @@
 
 	function comparePlan(element) {
     plansToCompareArray = [];
-		checkboxes = document.querySelectorAll('#compare_plan_checkbox')
+		checkboxes = document.querySelectorAll('.compare_plan_checkbox')
 		count = 0;
 		checkboxes.forEach(function(checkbox) {
 			//
@@ -300,8 +310,6 @@
 	}
 
   function compareResults() {
-    console.log(plansToCompareArray)
-    console.log(uniqueValues(plansToCompareArray))
     uri = document.getElementById('compareBtn').dataset.uri;
   	$.ajax({
   		type: "GET",
@@ -312,10 +320,6 @@
       "change_plan": changePlan
   	}
   	});
-  }
-
-  function uniquePlans(ids) {
-    uniqueValues(ids)
   }
 
   function uniqueValues(array) {
