@@ -1,21 +1,46 @@
-<%- if message.present? %>
-<div class="col-xs-12">
-  <ul class="list-group">
-    <li class="list-group-item">
-      Sent By:
-      <%= "System Admin on #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y")} at #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p")}"%>
-      <br></li>
-    <li class="list-group-item">
-      Subject:
-      <%= sanitize_html(message.try(:subject)) %>
-      <br></li>
-    <li class="list-group-item">
-      <%= sanitize_html(message.try(:body)) %>
-      <br></li>
-  </ul>
-  <br class="clear"/>
-  <%= link_to(:back, class: 'btn btn-default') do %>
-    <i aria-hidden='true' class='fa fa-caret-left'></i>&nbsp;Back</a>
+<% if @bs4 %>
+  <%- if message.present? %>
+    <div id="message_list_form" class="border rounded bg-white mb-4 mt-1">
+      <p>
+        <div class="pl-2 row">
+          <div class="col-1 msg-active"><%= l10n("from") %></div>
+          <div class="col-11"><%= sanitize_html(message.try(:from)) %></div>
+        </div>
+        <div class="pl-2 row">
+          <div class="col-1 msg-active"><%= l10n("date") %></div>
+          <div class="col-11"><%= message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y at %I:%M %p") %></div>
+        </div>
+        <div class="pl-2 row">
+          <div class="col-1 msg-active"><%= l10n("subject") %></div>
+          <div class="col-11"><%= sanitize_html(message.try(:subject)) %></div>
+        </div>
+      </p>
+      <div class="pl-2 mb-2">
+        <%= sanitize_html(message.try(:body)) %>
+      </div> 
+    </div>     
+    <%= h(link_to(l10n("back_to_messages"), :back, class: 'btn outline btn-default')) %>
   <% end %>
-</div>
+<% else %>
+  <%- if message.present? %>
+  <div class="col-xs-12">
+    <ul class="list-group">
+      <li class="list-group-item">
+        Sent By:
+        <%= "System Admin on #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y")} at #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p")}"%>
+        <br></li>
+      <li class="list-group-item">
+        Subject:
+        <%= sanitize_html(message.try(:subject)) %>
+        <br></li>
+      <li class="list-group-item">
+        <%= sanitize_html(message.try(:body)) %>
+        <br></li>
+    </ul>
+    <br class="clear"/>
+    <%= link_to(:back, class: 'btn btn-default') do %>
+      <i aria-hidden='true' class='fa fa-caret-left'></i>&nbsp;Back</a>
+    <% end %>
+  </div>
+  <% end %>
 <% end %>
