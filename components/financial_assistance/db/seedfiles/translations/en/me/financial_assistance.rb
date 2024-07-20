@@ -304,6 +304,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.year_selection_oe_range_through" => " through ",
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' rel='noopener noreferrer' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
+  'en.faa.publish_error.second_error_message_with_help' => "You may try resubmitting your application or call customer service at %{phone} for assistance.",
+  'en.faa.publish_error.title' => "Error Submitting Application",
+  'en.faa.publish_error.back' => "Back to My Applications",
   "en.faa.eligibility_go_to_my_account_message" => "If you've already enrolled in a CoverME.gov Individual & Family plan, you're finished! You'll see your updated plan in a minute or two. Select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
   "en.faa.application_for_premium_reductions" => "Your Application for Premium Reductions",
