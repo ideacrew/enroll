@@ -42,7 +42,7 @@
 
       <div class="need-coverage-selection">
         <div class="d-flex flex-row-reverse justify-content-end align-items-center my-3">
-          <label class="mb-0 ml-1 weight-n"><%= l10n("insured.group_selection.needs_coverage", name: family_member.first_name) %></label>
+          <label class="mb-0 ml-1 weight-n" for="family_member_ids_<%= index %>"><%= l10n("insured.group_selection.needs_coverage", name: family_member.first_name) %></label>
           <%= check_box_tag("family_member_ids[#{index}]",
             family_member.id,
             is_checked && !family_member_eligible_for_medicaid(family_member, @family, @new_effective_on&.year),
@@ -52,22 +52,24 @@
 
       <% if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %>
         <div class="tobacco_user_container">
-          <label class="required"><%= l10n("insured.group_selection.is_tobacco_user") %></label>
-          <% member = @latest_enrollment.hbx_enrollment_members.where(applicant_id: family_member.id).first if @latest_enrollment %>
-          <div class="n-radio-group d-flex align-items-center mt-2 mb-2">
-            <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_Y_<%= index %>')" class="n-radio-row mr-3">
-              <label data-cuke="is_tobacco_user_Y_<%= index %>" class="n-radio radio-label weight-n" for="is_tobacco_user_Y_<%= index %>">
-                <input id="is_tobacco_user_Y_<%= index %>" type="radio" value="Y" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use == 'Y' %>>
-                <%= l10n('yes') %>
-              </label>
+          <fieldset>
+            <legend class="required"><%= l10n("insured.group_selection.is_tobacco_user") %></legend>
+            <% member = @latest_enrollment.hbx_enrollment_members.where(applicant_id: family_member.id).first if @latest_enrollment %>
+            <div class="n-radio-group d-flex align-items-center mt-2 mb-2">
+              <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_Y_<%= index %>')" class="n-radio-row mr-3">
+                <label data-cuke="is_tobacco_user_Y_<%= index %>" class="n-radio radio-label weight-n" for="is_tobacco_user_Y_<%= index %>">
+                  <input id="is_tobacco_user_Y_<%= index %>" type="radio" value="Y" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use == 'Y' %>>
+                  <%= l10n('yes') %>
+                </label>
+              </div>
+              <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_N_<%= index %>')" class="n-radio-row mr-3">
+                <label data-cuke="is_tobacco_user_N_<%= index %>" class="n-radio radio-label weight-n" for="is_tobacco_user_N_<%= index %>">
+                  <input id="is_tobacco_user_N_<%= index %>" type="radio" value="N" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use != 'Y' %>>
+                  <%= l10n('no') %>
+                </label>
+              </div>
             </div>
-            <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_N_<%= index %>')" class="n-radio-row mr-3">
-              <label data-cuke="is_tobacco_user_N_<%= index %>" class="n-radio radio-label weight-n" for="is_tobacco_user_N_<%= index %>">
-                <input id="is_tobacco_user_N_<%= index %>" type="radio" value="N" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use != 'Y' %>>
-                <%= l10n('no') %>
-              </label>
-            </div>
-          </div>
+          </fieldset>
         </div>
       <% end %>
     </div>
