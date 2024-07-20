@@ -8,7 +8,6 @@ function stopEditingIncome() {
   $(
     '.driver-question input, .instruction-row input, .income input:not(":input[type=submit], .fake-disabled-input"), .other-income-kind input:not(":input[type=submit], .fake-disabled-input"), .unemployment-income input:not(":input[type=submit], .fake-disabled-input")'
   ).removeAttr('disabled');
-
   // enable "Add New" income buttons
   $(
     '#new-unemployment-income, #new-ai-an-income, .new-income, .add_new_other_income_kind'
