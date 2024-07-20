@@ -52,9 +52,9 @@
   --text-secondary: hsla(30, 2%, 37%, 1);
 
   //palette
-  --primary-color: #3d5d6f;
-  --primary-color-dark: #314a59;
-  --primary-color-darker: #253843;
+  --primary-color: #293352;
+  --primary-color-dark: #293352;
+  --primary-color-darker: #293352;
   --default-font-color: #323130;
   --placeholder-color: #676767;
   --placeholder-font-weight: 400;
@@ -70,14 +70,13 @@
   --form-element-text-color: #454545;
   --tertiary-tint: #E0E5D8;
 
+  --secondary-color: #005595;
+  --secondary-color-dark: #004C86;
+  --secondary-color-darker: #004477;
 
-  --secondary-color: #3b6b90;
-  --secondary-color-dark: #2e5470;
-  --secondary-color-darker: #213c50;
-
-  --tertiary-color: #5a7334;
-  --tertiary-color-dark: #465929;
-  --tertiary-color-darker: #32401d;
+  --tertiary-color: #c60778;
+  --tertiary-color-dark: #b2066c;
+  --tertiary-color-darker: #9e0560;
 
   //fundamentals
   --primary-hover-color: var(--primary-color-dark);
@@ -107,21 +106,21 @@
 
   --enrollment-status-red: #a21e1f;
   --enrollment-status-green: #027314;
-  --enrollment-status-yellow: #e5a900;
-  --enrollment-status-blue: #003260;
-  --enrollment-status-grey: #3b3a39;
+  --enrollment-status-yellow: #E5A900;
+  --enrollment-status-blue: #293352;
+  --enrollment-status-grey: #3B3A39;
 
-  --button-primary-color: #3d5d6f;
-  --button-primary-hover-color: #314a59;
-  --button-primary-active-color: #253843;
+  --button-primary-color: #293352;
+  --button-primary-hover-color: #293352;
+  --button-primary-active-color: #293352;
 
-  --button-secondary-color: #3b6b90;
-  --button-secondary-hover-color: #345f80;
-  --button-secondary-active-color: #274760;
+  --button-secondary-color: var(--secondary-color);
+  --button-secondary-hover-color: var(--secondary-color-dark);
+  --button-secondary-active-color: var(--secondary-color-dark);
 
-  --button-tertiary-color: #647f3a;
-  --button-tertiary-hover-color: #50662e;
-  --button-tertiary-active-color: #3c4c23;
+  --button-tertiary-color: var(--tertiary-color);
+  --button-tertiary-hover-color: var(--tertiary-color-darker);
+  --button-tertiary-active-color: var(--tertiary-color-darker);
 
   --button-error-color: var(--status-red);
   --button-error-hover-color: var(--status-red-hover);
@@ -175,13 +174,13 @@
 [data-contrast='true'] {
   --secondary-font-color: #676c72; //secondary text gray
   --bold-font-color: #323130; //bold text
-  --theme-primary-blue: #3b6b90; //primary blue
-  --theme-secondary: #425c6e; //secondary dark blue
-  --primary-red: #d42537; //primary red
-  --background-light-red: #f9f1f1; //error notice background color
-  --primary-green: #5a7334; //green continue buttons
-  --secondary-green: #738c4a; //green for continue button hover
-  --success-green-background: #e3f9e6; //green for success pill
+  --theme-primary-blue: var(--primary-color); //primary blue
+  --theme-secondary: var(--secondary-color); //secondary dark blue
+  --primary-red: #D42537; //primary red
+  --background-light-red: #F9F1F1; //error notice background color
+  --primary-green: #5A7334; //green continue buttons
+  --secondary-green: #738C4A; //green for continue button hover
+  --success-green-background: #E3F9E6; //green for success pill
 
   --primary-yellow: #ffd600;
   --soft-yellow: #fffadf;
@@ -205,22 +204,6 @@
   --floatlabel-onclick-color: #676767;
   --input-text-color: #454545;
   --form-element-text-color: #454545;
-
-  --button-default-color: #3d5d6f;
-  --button-default-hover-color: #314a59;
-  --button-default-active-color: #253843;
-
-  --button-primary-color: #3d5d6f;
-  --button-primary-hover-color: #314a59;
-  --button-primary-active-color: #253843;
-
-  --button-secondary-color: #3b6b90;
-  --button-secondary-hover-color: #345f80;
-  --button-secondary-active-color: #274760;
-
-  --button-tertiary-color: #647f3a;
-  --button-tertiary-hover-color: #50662e;
-  --button-tertiary-active-color: #3c4c23;
 
   --button-error-color: var(--status-red);
   --button-error-hover-color: var(--status-red-hover);

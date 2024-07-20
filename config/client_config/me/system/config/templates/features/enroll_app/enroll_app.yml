@@ -64,17 +64,17 @@ registry:
           - key: :main_web_address
             item: 'https://www.coverme.gov'
           - key: :state_name
-            item: 'Maine'
+            item: 'Oregon'
           - key: :short_name
-            item: 'CoverME.gov'
+            item: 'OregonHealthCare.gov'
           - key: :byline
-            item: "Maine's Official Health Insurance Marketplace"
+            item: "Oregon's Official Health Insurance Marketplace"
           - key: :long_name
-            item: 'CoverME.gov'
+            item: 'OregonHealthCare.gov'
           - key: :header_message
-            item: "Maine's Official Health Insurance Marketplace"
+            item: "Oregon's Official Health Insurance Marketplace"
           - key: :byline
-            item: "Welcome to Maine's Health Insurance Marketplace"
+            item: "Welcome to Oregon's Health Insurance Marketplace"
           - key: :logo_file_name
             item: 'logo_me.svg'
           - key: :make_their_premium_payments_online
@@ -181,7 +181,7 @@ registry:
           - key: :nationwide_area
             item: 'Nationwide'
           - key: :statewide_area
-            item: 'Maine/Regional'
+            item: 'Oregon/Regional'
           - key: :standard_plan_label
             item: 'CLEAR CHOICE PLAN'
           - key: :exchange_name
@@ -189,7 +189,7 @@ registry:
           - key: :social_media
             item: ''
           - key: :state_long_title
-            item: 'the state of Maine'
+            item: 'the state of Oregon'
           - key: :state_dmv_link
             item: 'https://www.maine.gov/sos/bmv/'
           - key: :contact_center_po_box

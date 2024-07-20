@@ -3,7 +3,7 @@
 
   <nav class="top-nav navbar navbar-expand-lg container py-1 px-0">
     <a class="navbar-brand mr-0" href="#" title="<%= l10n('welcome.index.logo_title')%>">
-      <%= image_pack_tag "logo_bs4_#{ENV['CLIENT'] || 'ic'}.svg", alt: "#{ENV['CLIENT']} logo"%>
+      <%= image_pack_tag "oregon.png", alt: "#{ENV['CLIENT']} logo"%>
     </a>
 
     <button class="navbar-toggler unstyled collapsed" type="button" data-toggle="collapse" data-target="#nav-drawer-collapsible" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,7 +26,7 @@
       <ul id="portal-type-home-link" class="navbar-nav mr-auto">
         <li class="nav-item-divider"></li>
         <li class="nav-item d-flex flex-column site-name-market">
-          <span><%= l10n('welcome.index.welcome_to_site_header')%></span>
+          <span><%= site_byline %></span>
           <%= bs4_portal_type(controller_name) %>
         </li>
       </ul>
