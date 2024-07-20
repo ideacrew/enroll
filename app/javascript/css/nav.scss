@@ -1,4 +1,4 @@
-
+// site header
 header.navbar-primary {
   font-size: 14px;
   background-color: var(--grey-000);
@@ -87,6 +87,122 @@ header.navbar-primary {
   }
 }
 
+// progress layout nav pane
+.progress-nav {
+  background-color: var(--grey-000);
+  border: 1px solid var(--grey-050);
+  border-radius: 5px;
+  padding: 15px 10px;
+  margin-bottom: $spacer;
+
+  a {
+    color: var(--default-font-color);
+    text-decoration: none;
+  }
+}
+
+.progress-wrapper {
+  padding: 0;
+
+    li {
+      padding: 0px;
+      list-style: none;
+      padding-right: 35px;
+      margin-bottom: 10px;
+
+      .vertical-line-progress {
+        background-color: #cacaca;
+        width: 2px;
+        height: 28px;
+        position: absolute;
+        right: 38px;
+        margin-top: 12px;
+      }
+
+      span.circle-progress {
+        border-radius: 50px;
+        background: var(--grey-000);
+        border: 2px solid #cacaca;
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        right: 33px;
+        margin-top: 8px;
+        z-index: 5;
+      }
+
+      &.complete {
+        .vertical-line-progress {
+          background-color: var(--theme-primary-blue, #007bc4);
+        }
+
+        span.circle-progress {
+          background-color: var(--theme-primary-blue, #007bc4);
+          border: none;
+          width: 14px;
+          right: 32px;
+          height: 14px;
+          margin-top: 6px;
+        }
+      }
+
+      &.active {
+        font-weight: bold;
+        color: var(--theme-primary-blue, #007bc4);
+
+        .vertical-line-progress {
+          background-color: #cacaca;
+        }
+
+        span.circle-progress {
+          background-color: var(--grey-000);
+          border: 2px solid var(--theme-primary-blue, #007bc4);
+          width: 14px;
+          right: 32px;
+          height: 14px;
+          margin-top: 6px;
+        }
+      }
+
+      &:last-child .vertical-line-progress {
+        display: none;
+      }
+    }
+
+}
+
+// breadcrumbs
+ul.breadcrumbs {
+  padding: 0;
+  list-style: none;
+  margin-bottom: 3ch;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+
+  li {
+    display: inline;
+    a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+  }
+
+  li:last-of-type {
+    font-weight: bold;
+    a {
+      color: var(--text-primary);
+    }
+  }
+
+  li:not(:last-of-type):after {
+    padding: 1ch;
+    content: '/';
+  }
+}
+
+// family side nav
 .portal-nav {
   background: var(--primary-color);
   color: var(--grey-000);
