@@ -21,7 +21,9 @@
     <dt><%= l10n("enrollment_member.coverage_state_date")%>:</dt>
     <dd><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></dd>
   </dl>
-  <% if true #@person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual" %>
+
+  <% if @person.has_active_consumer_role? && (@tax_household.present? || @aptc_grants.present?) && @market_kind == "individual" %>
+    <div class="mb-4">
       <% is_ivl_osse_filter_eligible = ivl_osse_filtering_enabled? && @enrollment.ivl_osse_eligible? %>
       <h3>Applied Credits</h3>
       <div class="aptc hidden">
@@ -29,42 +31,12 @@
           <dt>The total tax credit amount the people on this plan qualify for is:</dt>
           <dd><%= number_to_currency(@max_aptc, precision: 2) %></dd>
           <dt>The maximum amount you can use for this plan is:</dt>
-          <dd><%= number_to_currency(@max_aptc, precision: 2) %></dd>
+          <% per_plan_max = @plan.total_premium > @max_aptc ? @max_aptc : (@plan.total_premium - 1).round(2) %>
+          <dd><%= number_to_currency(per_plan_max) %></dd>
         </dl>
-          <!--<div class="row" style="margin:0;">
-            <div class="col-xs-6" style="padding:0;">
-              <p class="text-left" style="font-size:12px;"><%= l10n('available').to_s %></p>
-            </div>
-            <div class="col-xs-6" style="padding:0;">
-              <p class="text-right" style="font-size:12px;"><%= number_to_currency(@max_aptc, precision: 2) %></p>
-            </div>
-          </div>
-          <div class="row" style="margin:0;">
-            <div class="col-xs-6" style="padding:0;">
-              <p class="text-left" style="line-height:16px; font-size:12px;"><%= l10n('apply_monthly') %></p>
-            </div>
-            <div class="col-xs-6" style="padding:0;">
-              <p>
-                <input id="elected_aptc" onchange="setMinMax(this, #{@max_aptc})" type="text" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" style="width:100%;" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>">
-                <% pct = @max_aptc > 0 ? (@elected_aptc/@max_aptc).round(2) : 0 %>
-              </p>
-            </div>
-          </div>
           <%= hidden_field_tag :max_aptc, @max_aptc %>
-          <%= hidden_field_tag :market_kind, @market_kind %>
-          <%= hidden_field_tag :coverage_kind, @coverage_kind %>
-          <%= hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present? %>
-          <form oninput="pct.value = (elected_pct.value*100).toFixed(0)" onsubmit="return false">
-            <% min_aptc = is_ivl_osse_filter_eligible ? minimum_applied_aptc_pct_for_osse : 0 %>
-            <% step = is_ivl_osse_filter_eligible ? 0.005 : 0.05 %>
-            <input max="1" min="<%= min_aptc %>" name="elected_pct" step="<%= step %>" type="range" value="<%= pct %>" style="padding:0;">
-            <span style="font-size:12px;"><%= (min_aptc * 100).to_i %>%</span>
-            <span class="pull-right">
-              <output name="pct" style="font-size:12px;"><%= (pct * 100).to_i %></output>
-              %
-            </span>
-          </form> -->
-          <%= hidden_field_tag :max_aptc, @max_aptc %>
+          <%= hidden_field_tag :plan, @plan.id %>
+          <%= hidden_field_tag :enrollment, @enrollment.id %>
           <%= hidden_field_tag :market_kind, @market_kind %>
           <%= hidden_field_tag :coverage_kind, @coverage_kind %>
           <%= hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present? %>
@@ -73,12 +45,12 @@
               <% min_aptc = is_ivl_osse_filter_eligible ? minimum_applied_aptc_pct_for_osse : 0 %>
               <% step = is_ivl_osse_filter_eligible ? 1 : 1 %>
               <% pct = @max_aptc > 0 ? (@elected_aptc/@max_aptc).round(2) : 0 %>
-              <label for="elected_pct" class="required">Percentage Applied</label>
-              <input max="100" min="<%= min_aptc %>" name="elected_pct" step="<%= step %>" type="number" value="<%= (pct * 100) %>" class="w-100 thankyou">
+              <label for="elected_aptc_pct" class="required">Percentage Applied</label>
+              <input max="100" min="<%= min_aptc %>" name="elected_aptc_pct" step="<%= step %>" type="number" value="<%= number_with_precision(pct * 100, precision: 2) %>" class="w-100 thankyou">
             </div>
             <div class="mr-3">
-              <label for="elected_aptc" class="required">Amount Applied</label>
-              <input id="elected_aptc" onchange="setMinMax(this, #{@max_aptc})" type="number" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>" class="thankyou">
+              <label for="elected_aptc_value" class="required">Amount Applied</label>
+              <input id="elected_aptc_value" max="<%= per_plan_max %>" type="number" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>" class="thankyou">
             </div>
             <div class="">
               <button id="aptc_submit" class="short">Update Applied APTC</button>
@@ -87,9 +59,10 @@
       </div>
       <p class="mt-4"><span class="aptc-percentage"><%= pct * 100 %></span>% of available APTC (<span class="aptc-amount"><%= number_with_precision(@elected_aptc, precision: 2) %></span>) has been applied to your premium. <%= h(link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}) %></p>
       <button class="outline" id="updateAptc">Update APTC Amount</button>
-    <% end %>
+    </div>
+  <% end %>
   <% if @enrollment.employee_role.present? %>
-    <%= render "insured/plan_shoppings/coverage_information" %>
+    <%= render "insured/plan_shoppings/individual_coverage_information" %>
   <% else %>
     <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate: true} %>
     <%= render "insured/plan_shoppings/individual_agreement", locals: {coverage_year: @enrollment.effective_on.year.to_s} %>

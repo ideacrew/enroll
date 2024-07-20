@@ -240,8 +240,20 @@ class Insured::PlanShoppingsController < ApplicationController
     plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
     plan_comparision_obj.elected_aptc = session[:elected_aptc]
     checkbook_url = plan_comparision_obj.generate_url
+
+    # for the thank you page will need member data returned to update table
+    if params[:plan].present? && params[:enrollment].present?
+      plan = BenefitMarkets::Products::Product.where(:id => params[:plan])&.first
+      enrollment = HbxEnrollment.find(params[:enrollment])
+      if plan.present? && enrollment
+        decorated_plan = UnassistedPlanCostDecorator.new(plan, enrollment, session[:elected_aptc])
+        responsible_amount = decorated_plan.total_employee_cost - enrollment.eligible_child_care_subsidy.to_f
+        amount = responsible_amount < 1 ? 0.00 : responsible_amount
+      end
+    end
+
     respond_to do |format|
-      format.json { render json: {message: 'ok',checkbook_url: checkbook_url } }
+      format.json { render json: {message: 'ok',checkbook_url: checkbook_url, responsible_amount: amount } }
     end
   end
 

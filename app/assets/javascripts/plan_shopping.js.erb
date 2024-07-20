@@ -241,7 +241,7 @@ $(function() {
   });
 
   $(document).on('change', 'input[name="elected_pct"]', function(){
-    var elected_pct = $("input[name='elected_pct']").val() / 100;
+    var elected_pct = $("input[name='elected_pct']").val();
     //val() is returing empty, changed to attr('value')
     var elected_amount = parseFloat($('#max_aptc').attr('value')).toFixed(2) * parseFloat(elected_pct).toFixed(2);
     $('#elected_aptc').val(elected_amount.toFixed(2));
@@ -259,29 +259,69 @@ $(function() {
     }
   });
 
+  $(document).on('change', 'input[name="elected_aptc_pct"]', function(){
+    var max = parseFloat($('input#elected_aptc_value').attr('max'));
+    var elected_pct = $("input[name='elected_aptc_pct']").val() / 100;
+    var elected_amount = parseFloat($('#max_aptc').attr('value')).toFixed(2) * parseFloat(elected_pct).toFixed(2);
+    if (elected_amount <= 1) {
+      elected_amount = 1.00;
+    }
+    if (elected_amount > max) {
+      elected_amount = max;
+      $("input[name='elected_aptc_pct']").val(100);
+    }
+    $('#elected_aptc_value').val(elected_amount.toFixed(2));
+    $('#elected_aptc_value').attr('value', elected_amount.toFixed(2));
+  });
+
+  $(document).on('change', 'input#elected_aptc_value', function(){
+    var elected_aptc = $(this).val();
+    var max = $('input#elected_aptc_value').attr('max');
+    var max_aptc = $('input#max_aptc').val();
+    elected_pct = (elected_aptc/max_aptc).toFixed(2) * 100;
+    if (elected_pct <= 0) {
+      elected_amount = 0;
+    }
+    if (elected_pct > 100) {
+      elected_pct = 100;
+      $('#elected_aptc_value').val(max);
+    }
+    $("input[name='elected_aptc_pct']").val(elected_pct);
+  });
+
   $("#updateAptc").on('click', function(){
     $(this).addClass('hidden');
     $('.aptc').removeClass('hidden');
   });
 
+  var USDollar = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
+
   $("#aptc_submit").on('click', function(){
-    var elected_aptc = $("input#elected_aptc").val();
-    var elected_pct = $("input[name='elected_pct']").val();
+    var elected_aptc = $("input#elected_aptc_value").val();
+    var elected_pct = $("input[name='elected_aptc_pct']").val();
     var coverage_kind = $("input#coverage_kind").val();
     var market_kind = $("input#market_kind").val();
+    var plan = $("input#plan").val();
+    var enrollment = $("input#enrollment").val();
     $('.aptc-percentage').text(elected_pct);
-    $('.aptc-amount').text(elected_aptc);
+    $('.aptc-amount').text(USDollar.format(elected_aptc));
     $.ajax({
         type: "POST",
         url: $('#set_elected_aptc_url').val(),
         data: {
           'elected_aptc': elected_aptc,
           'market_kind': market_kind,
-          'coverage_kind': coverage_kind
+          'coverage_kind': coverage_kind,
+          'plan': plan,
+          'enrollment': enrollment
         },
         success: function(data){
           response = JSON.parse(JSON.stringify(data));
-          console.log(response);
+          var amount = USDollar.format(data['responsible_amount']);
+          $('#resp-amount').text(amount);
         },
       });
   });
