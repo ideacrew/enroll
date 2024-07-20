@@ -144,8 +144,6 @@ function maybeAddComparisonPlan(cb) {
 }
 
 function doPlanComparison(action_uri) {
-  console.log(plansToCompareArray);
-  console.log(uniqueValues(plansToCompareArray));
 	$.ajax({
 		type: "GET",
 	url: action_uri,
