@@ -40,7 +40,7 @@
 }
 
 .alert {
-  padding: .25em;
+  padding: 0.25em;
   border-radius: 12px;
   border-width: 1px;
   border-style: solid;
@@ -71,14 +71,14 @@
 
   &.alert-sm {
     height: 36px;
-    padding-left: $spacer * .75;
+    padding-left: $spacer * 0.75;
     padding-right: $spacer;
   }
 }
 
 //notice is just an alert without a border
 .notice {
-  padding: .25em;
+  padding: 0.25em;
   border-radius: 6px;
 
   &.notice-error {
@@ -111,7 +111,7 @@
 .notice .icon,
 .modal .icon {
   width: 1em;
-  margin-right: .25em;
+  margin-right: 0.25em;
   height: 24px;
   width: 24px;
   color: transparent !important;
