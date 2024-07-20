@@ -1,3 +1,55 @@
+<% if @bs4 %>
+  <section>
+    <h2><%= l10n("insured.individual_agreement.agreement.title") %></h2>
+    <p><%= l10n("insured.individual_agreement.agreement.report_changes", contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number) %></p>
+    <p><%= l10n("insured.individual_agreement.agreement.i_am_signature") %></p>
+    <p><%= l10n("insured.individual_agreement.agreement.reviewed_info") %></p>
+    <% if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message) && @plan.total_aptc_amount > 0 %>
+      <% cov_year = locals[:coverage_year] %>
+      <p><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf") %></p>
+      <ul>
+        <li><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf.file_return", coverage_year: cov_year)%></li>
+        <li><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf.if_married_file", coverage_year: cov_year) %></li>
+      </ul>
+      <p><%= l10n("insured.individual_agreement.agreement.aptc.i_expect") %></p>
+      <ul>
+        <li><%= l10n("insured.individual_agreement.agreement.aptc.i_expect.not_dependent", coverage_year: cov_year) %></li>
+        <li><%= l10n("insured.individual_agreement.agreement.aptc.i_expect.claim_dependents", coverage_year: cov_year, site_short_name: site_short_name) %></li>
+      </ul>
+      <p><%= l10n("insured.individual_agreement.agreement.aptc.if_changes") %></p>
+      <ul>
+        <li><%= l10n("insured.individual_agreement.agreement.aptc.if_changes.impact_credit") %></li>
+        <li><%= l10n("insured.individual_agreement.agreement.aptc.if_changes.irs_compares", coverage_year: cov_year) %></li>
+      </ul>
+    <% end %>
+    <label class="agree weight-n d-flex align-items-center" for="terms_check_thank_you"><%= check_box_tag 'terms_check_thank_you', true, false, class: 'mr-2' %><%= l10n("insured.individual_agreement.agreement.i_agree") %></label>
+  </section>
+  <section class="mt-4">
+    <h2><%= l10n("insured.individual_agreement.terms_conditions.title") %></h2>
+    <p><%= l10n("insured.individual_agreement.terms_conditions.cant_change_terms") %></p>
+    <p><%= l10n("insured.individual_agreement.terms_conditions.limitations") %></p>
+    <p><%= l10n("insured.individual_agreement.terms_conditions.collect_info", aca_state_name: aca_state_name) %></p>
+    <p><%= l10n("insured.individual_agreement.terms_conditions.best_of_knowledge") %></p>
+    <p><%= l10n("insured.individual_agreement.terms_conditions.contract") %></p>
+    <p><%= l10n("insured.individual_agreement.terms_conditions.insurer_agreement") %></p>
+    <p><%= l10n("insured.individual_agreement.terms_conditions.fraud_warning") %></p>
+    <h3><%= l10n("insured.individual_agreement.electronic_signature.title") %></h3>
+    <p><%= l10n("insured.individual_agreement.electronic_signature.desc") %></p>
+    <div class="d-flex">
+      <div class="mr-3">
+        <label for="first_name_thank_you" class="required"><%= l10n("first_name") %></label>
+        <%= text_field_tag 'first_name_thank_you', "", :placeholder => l10n("first_name"), :class => "thank_you_field" %>
+      </div>
+      <div>
+        <label for="last_name_thank_you" class="required"><%= l10n("last_name") %></label>
+        <%= text_field_tag 'last_name_thank_you', "", :placeholder => l10n("last_name"), :class => "thank_you_field" %>
+      </div>
+    </div>
+    <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+    <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
+    <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
+  </section>
+<% else %>
 <div class="table-border table-responsive">
   <table class="table">
     <tbody>
@@ -61,3 +113,4 @@
     </tbody>
   </table>
 </div>
+<% end %>

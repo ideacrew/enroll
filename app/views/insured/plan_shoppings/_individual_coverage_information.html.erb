@@ -2,7 +2,7 @@
 <% calculate = (defined? calculate) ? calculate : true %>
 <% family_tier_eligible = @enrollment.product&.family_based_rating? %>
 <% if @bs4 %>
-  <div class="table-border table-responsive">
+  <div class="table-border table-responsive" id="ivl-coverage-table">
     <table class="table">
       <thead>
         <tr class="secondary-text">
@@ -19,7 +19,7 @@
       </thead>
       <tbody>
         <% @enrollment.hbx_enrollment_members.each do |member| %>
-          <tr>
+          <tr id="member_<%= member.id %>">
             <td><%= member.person.full_name %></td>
             <td><%= member.primary_relationship.titleize %></td>
             <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
@@ -54,7 +54,7 @@
             <% end %>
           </tr>
         <% end %>
-        <tr class="gray-row">
+        <tr>
           <td colspan="3" class="text-left capital"><strong><%= l10n("plans.plan_shopping.receipt.total").upcase %></strong></td>
           <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
           <% if osse_eligible %>
@@ -62,13 +62,13 @@
             <td class="text-right"><strong><%= number_to_currency(@enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
           <% end %>
           <% if calculate %>
-            <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
+            <td class="text-right"><strong class="aptc-amount"><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
             <% responsible_amount = @plan.total_employee_cost - @enrollment.eligible_child_care_subsidy.to_f %>
           <% else %>
-            <td class="text-right"><strong><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
+            <td class="text-right"><strong class="aptc-amount"><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
             <% responsible_amount = @plan.total_premium - @enrollment.applied_aptc_amount.to_f - @enrollment.eligible_child_care_subsidy.to_f %>
           <% end %>
-          <td class="text-right"><strong><%= number_to_currency((responsible_amount < 1 ? 0.00 : responsible_amount)) %></strong></td>
+          <td class="text-right"><strong id="resp-amount"><%= number_to_currency((responsible_amount < 1 ? 0.00 : responsible_amount)) %></strong></td>
         </tr>
       </tbody>
     </table>
