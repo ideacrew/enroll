@@ -16,7 +16,7 @@
       <% end %>
     </section>
   <% end %>
-  <a href="<%= main_app.family_account_path(tab: 'home') %>" class="button mt-4">Return Home</a>
+  <a href="<%= main_app.family_account_path(tab: 'home') %>" class="button mt-4"><%= l10n("insured.brokers.return_home") %></a>
 <% else %>
   <% content_for :navigation do %>
   <%= render partial: 'ui-components/v1/navs/families_navigation' %>

@@ -274,6 +274,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.answer_for_broker' => "Brokers are licensed professionals with health insurance expertise who can help you find a plan that fits your needs. In Maine, Brokers must have an active Maine insurance license in good standing, and complete training on %{site_short_name}. A broker will be able to help you at no cost to you, but they may get paid by an insurance company.",
   :'en.insured.find_assistance_another_way' => "Find Assistance Another Way",
   :'en.insured.brokers.remove_expert' => "Remove Expert",
+  :'en.insured.brokers.return_home' => "Return Home",
   :'en.insured.brokers.agency' => "Agency",
   :'en.insured.brokers.assignment_date' => "Assignment Date",
   :'en.insured.brokers.removal_warning' => "Are you sure you want to remove this expert?",
