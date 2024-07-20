@@ -98,6 +98,7 @@ function applyPlanFilters() {
     applyPlanFilterCBs("plan-metal-network-selection-filter", "data-plan-network", "data-plan-metal-network")
   ];
   combineAllPlanSelectors(all_selectors);
+  $("#filter-sidebar input[type='radio']").prop("checked", false);
   $("strong#plans-count").text($(".plan-row:visible").length);
   $("dd#plans-count").text($(".plan-row:visible").length);
 }
@@ -116,7 +117,7 @@ function maybeAddComparisonPlan(cb) {
   change_plan =  $(cb).attr("data-plan-change-plan");
 	var is_checked = $(cb).prop("checked");
 	if (is_checked) {
-		if (plansToCompareArray.length > 3) {
+		if (plansToCompareArray.length > 2) {
       $("#ivl-plans-compare-alert").modal("show");
 			var removed_id = plansToCompareArray.shift();
 			var lookup_string = "input[data-hios-id='" +
@@ -143,16 +144,24 @@ function maybeAddComparisonPlan(cb) {
 }
 
 function doPlanComparison(action_uri) {
+  console.log(plansToCompareArray);
+  console.log(uniqueValues(plansToCompareArray));
 	$.ajax({
 		type: "GET",
 	url: action_uri,
 	dataType: 'script',
 	data: {
-		"standard_component_ids": plansToCompareArray,"hbx_enrollment_id": hbx, "active_year": active_year, "enrollment_kind": enrollment_kind,
+		"standard_component_ids": uniqueValues(plansToCompareArray),"hbx_enrollment_id": hbx, "active_year": active_year, "enrollment_kind": enrollment_kind,
     "change_plan": change_plan
 	}
 	});
 }
+
+function uniqueValues(array) {
+  let map = new Map();
+  array.forEach(value => map.set(value, value));
+  return [...map.values()];
+};
 
 function applyPlanSort(sort_by){
   var plandivs = $('#all-plans #ivl_plans .plan-row');
@@ -252,115 +261,8 @@ $(function() {
     }
   });
 
-  // opens the update aptc form on the thank you page
-  const updateAptc = document.getElementById("updateAptc");
-  if (updateAptc) {
-    document.getElementById("updateAptc").addEventListener('click', function(){
-      this.classList.add('hidden');
-      document.getElementById("aptcDesc").classList.add('hidden');
-      document.querySelectorAll('.aptc').forEach(function(element) {
-        element.classList.remove('hidden');
-      });
-    });
-  }
-
-  // aptc form on thank you page
-  const aptcForm = document.getElementById("updateAptcForm");
-  if (aptcForm) {
-    const maxAptc = parseFloat(aptcForm.dataset.max);
-    const minAptc = parseFloat(aptcForm.dataset.min);
-    const updateUrl = aptcForm.dataset.url;
-
-    // updates the aptc percentage on the thank you page
-    const electedAptcPercentage = document.getElementById("electedAptcPercentage");
-    const electedAptcAmount = document.getElementById("electedAptcAmount");
-
-    electedAptcPercentage.addEventListener('blur', function(){
-      var electedPct = parseFloat(this.value);
-      if (electedPct > 100) {
-        this.value = 100;
-        electedAptcAmount.value = maxAptc;
-      } else {
-        let electedAptc = ((electedPct/100) * maxAptc);
-        electedAptc = electedAptc < 0 ? 0 : electedAptc;
-        if (electedAptc > parseFloat(maxAptc)) {
-          electedAptc = maxAptc.toFixed(2);
-          electedAptcPercentage.value = 100;
-        }
-        electedAptcAmount.value = electedAptc.toFixed(2);
-      }
-    });
-
-    electedAptcAmount.addEventListener('blur', function(){
-      var electedAptc = parseFloat(this.value);
-      if (electedAptc > maxAptc) {
-        this.value = maxAptc;
-        electedAptcPercentage.value = 100;
-      } else {
-        let electedPct = (electedAptc/maxAptc) * 100;
-        if (electedPct < minAptc) {
-          electedPct = 100;
-          this.value = minAptc.toFixed(2);
-        }
-        if (electedPct > 100) {
-          electedPct = 100;
-          this.value = maxAptc.toFixed(2);
-        }
-        electedAptcPercentage.value = electedPct.toFixed(0);
-      }
-    });
-
-    // submits the update aptc form on the thank you page
-    const submitAptcChange = document.getElementById("submitAptcChange");
-
-    document.getElementById("submitAptcChange").addEventListener('click', function(){
-      setUpdatedAptc(electedAptcAmount.value, updateUrl)
-    });
-  }
-
-  // non jquery ajax post request
-  function postAjax(url, data, success) {
-    var params = typeof data == 'string' ? data : Object.keys(data).map(
-            function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
-        ).join('&');
-
-    var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    xhr.open('POST', url);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
-    };
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    var token = document.querySelector('meta[name="csrf-token"]').content;
-    xhr.setRequestHeader('X-CSRF-Token', token);
-    xhr.send(params);
-    return xhr;
-}
-
-  function setUpdatedAptc(elected, updateUrl) {
-    const electedAptcPercentage = document.getElementById("electedAptcPercentage");
-    const electedAptcAmount = document.getElementById("electedAptcAmount");
-    document.querySelectorAll('.aptc-percentage').forEach(function(element) {
-      element.textContent = electedAptcPercentage.value;
-    });
-    document.querySelectorAll('.aptc-amount').forEach(function(element) {
-      element.textContent = electedAptcAmount.value.toLocaleString("en-US", {style:"currency", currency:"USD"});
-    });
-    urlParts = updateUrl.split("?");
-    var url = document.location.origin + urlParts[0]
-    var params = urlParts[1] + "&elected_aptc=" + elected
-    postAjax(url, params, function(data){
-      response = JSON.parse(data);
-      var amount = parseFloat(response['responsible_amount']).toLocaleString("en-US", {style:"currency", currency:"USD"});;
-      document.getElementById("resp-amount").textContent = amount;
-    });
-  }
-
   $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();
-
-    const sort_by = $('#sort_by input:checked').data('sort-by');
-    applyPlanSort(sort_by);
 
     if ($('.aptc').length > 0){
       var elected_aptc = $("input#elected_aptc").val();
@@ -420,6 +322,10 @@ $(function() {
     }
   }
 
+  $(document).on('change', '#sort_by input', function(){
+    applyPlanSort($(this).data('sort-by'));
+  });
+
   $(document).on('click', "#ivl_plans .plan-select.btn-default.select", function(e){
     var url = $(this).data('url');
     if ($('.aptc').length > 0){
@@ -440,9 +346,3 @@ function disableSelectricInModal() {
     $('select#waiver_reason_selection_dropdown').selectric('destroy');
   })
 }
-
-// show the dependent table when the primary's name is clicked
-$(document).on("click", "#dependentList", function(event) {
-  event.preventDefault();
-  $("#dependentTable").toggleClass('hidden');
-});
