@@ -571,7 +571,7 @@ module FinancialAssistance
       return { path: application_publish_error_application_path(@application), flash: { error: build_error_messages(@application) } } unless @application.complete?
 
       publish_result = determination_request_class.new.call(application_id: @application.id)
-      return { path: wait_for_eligibility_response_application_path(@application), flash: nil } if publish_result.success?
+      return { path: wait_for_eligibility_response_application_path(@application) } if publish_result.success?
 
       @application.unsubmit! if @application.may_unsubmit?
 
