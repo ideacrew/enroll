@@ -452,9 +452,11 @@ a.disabled {
   pointer-events: none;
   cursor: not-allowed;
 }
+
 .glossary {
   color: var(--primary-color);
   border-bottom: 1px dashed var(--primary-color);
+  cursor: pointer;
 }
 
 .delete-icon {
