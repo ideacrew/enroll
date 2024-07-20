@@ -22,8 +22,8 @@
       <hr />
 
       <div class="d-flex justify-content-between">
-        <h2>Plan Results</h2>
-        <% if true #@market_kind == "individual" || @market_kind == 'coverall' %>
+        <h2><%= l10n("plans.plan_results") %></h2>
+        <% if @market_kind == "individual" || @market_kind == 'coverall' %>
           <button class="button button-primary ivl-compare-selected-plans-link hidden" data-cuke="ivl-compare-selected-plans-link" id="compareBtn"
             data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind, bs4: @bs4) %>">
             <%= l10n("compare_plans") %>
