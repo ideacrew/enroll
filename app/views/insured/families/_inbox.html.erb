@@ -1,64 +1,128 @@
-<div class="module inbox col-xs-12">
-  <div class="row">
-    <div class="inboxes" id="inbox_form">
-      <div class="pull-right">
-        <a href="<%= inbox_insured_families_path(@provider) %>">
-          <% if @folder == 'Inbox' %>
-            <strong><%= l10n("inbox") %></strong>
-          <% else %>
-            <%= l10n("inbox") %>
-          <% end %>
-          <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
-        </a>
-        <% if @sent_box == true %>
-          <span style="padding: 1px;">|</span>
-          <a href="<%= inbox_insured_families_path(@provider, folder: 'Sent') %>">
-            <% if @folder == 'Sent' %>
-              <strong><%= l10n("sent") %></strong>
+<% if @bs4 %>
+  <% sorted_inbox_messages = @provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
+  <div id="inbox-headers" class="tab-holder">
+    <h1><%= l10n("messages") %></h1>
+    <div class="pl-3 inbox-sender row">
+      <%= l10n("unread_messages")%>
+      <div class="pl-2"><%= @person.inbox.unread_messages.size %></div>
+    </div>
+  </div>
+  <div class="mt-4 mb-1" id="inbox-nav-tabs">
+    <a class="text-decoration-none tabs tab tab-content <%= 'active' if @folder.try(:capitalize) == 'Inbox' %>" href="<%= inbox_insured_families_path(@provider) %>">
+      <% if @folder == 'Inbox' %>
+        <strong><%= l10n("inbox") %></strong>
+      <% else %>
+        <%= l10n("inbox") %>
+      <% end %>
+    </a>
+    <a class="text-decoration-none tabs tab tab-content <%= 'active' if @folder.try(:capitalize) == 'Deleted' %>" href="<%= inbox_insured_families_path(@provider, folder: 'Deleted') %>">
+      <% if @folder == 'Deleted' %>
+        <strong><%= l10n("deleted") %></strong>
+      <% else %>
+        <%= l10n("deleted") %>
+      <% end %>
+    </a>
+  </div>
+  <% if @folder == 'Deleted' && sorted_inbox_messages.size == 0 %>
+    <div class="rounded-end bg-white mb-4 tab-container">
+      <section>
+        <div class="pl-2 pr-2 pt-3">
+          <p><%= l10n("zero_deleted_messages") %></p>
+        </div>
+      </section>
+    </div>
+  <% else %>
+    <div id="message_list_form" class="rounded-end bg-white mb-4 tab-container">
+      <section>
+        <div class="pl-2 pr-2">
+          <table>
+            <thead>
+              <tr>
+                <th><%= l10n("from") %></th>
+                <th><%= l10n("subject") %></th>
+                <th>
+                  <%= l10n("date") %>
+                  <i class="fa fa-arrow-down fa-sm ml-2" aria-hidden="true"></i>
+                </th>
+                <%- if @folder != 'Deleted' %>
+                  <th><%= l10n("delete") %></th>
+                <%- end %>
+              </tr>
+            </thead>
+            <tbody>
+              <%- if @provider.try(:inbox).try(:messages) %>
+                <%= render partial: "shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: @provider} %>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  <% end %>
+  <div id="show_message_form"></div>
+<% else %>
+  <div class="module inbox col-xs-12">
+    <div class="row">
+      <div class="inboxes" id="inbox_form">
+        <div class="pull-right">
+          <a href="<%= inbox_insured_families_path(@provider) %>">
+            <% if @folder == 'Inbox' %>
+              <strong><%= l10n("inbox") %></strong>
             <% else %>
-              <%= l10n("sent") %>
+              <%= l10n("inbox") %>
+            <% end %>
+            <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
+          </a>
+          <% if @sent_box == true %>
+            <span style="padding: 1px;">|</span>
+            <a href="<%= inbox_insured_families_path(@provider, folder: 'Sent') %>">
+              <% if @folder == 'Sent' %>
+                <strong><%= l10n("sent") %></strong>
+              <% else %>
+                <%= l10n("sent") %>
+              <% end %>
+            </a>
+          <% end %>
+          <span style="padding: 1px;">|</span>
+          <a href="<%= inbox_insured_families_path(@provider, folder: 'Deleted') %>">
+            <% if @folder == 'Deleted' %>
+              <strong><%= l10n("deleted") %></strong>
+            <% else %>
+              <%= l10n("deleted") %>
             <% end %>
           </a>
-        <% end %>
-        <span style="padding: 1px;">|</span>
-        <a href="<%= inbox_insured_families_path(@provider, folder: 'Deleted') %>">
-          <% if @folder == 'Deleted' %>
-            <strong><%= l10n("deleted") %></strong>
-          <% else %>
-            <%= l10n("deleted") %>
-          <% end %>
-        </a>
+        </div>
       </div>
-    </div>
-    <br/>
-  </div>
-  <div class="row">
-    <%- @folder = (@folder||'Inbox').capitalize %>
-    <div class="table-responsive" id="message_list_form">
-      <table class="table table-striped table-hover table-sm">
-        <thead class="thead-default">
-          <tr>
-            <th>
-              <%= l10n("from") %></th>
-            <th>
-              <%= l10n("date_label") %>
-            </th>
-            <th><%= l10n("subject") %></th>
-            <%- if @folder != 'Deleted' %>
-            <th></th>
-            <%- end %>
-          </tr>
-        </thead>
-        <tbody>
-          <%- if @provider.try(:inbox).try(:messages) %>
-          <% sorted_inbox_messages = @provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
-          <%= render partial: "shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: @provider} %>
-          <% end %>
-        </tbody>
-      </table>
+      <br/>
     </div>
     <div class="row">
-      <div id="show_message_form"></div>
+      <%- @folder = (@folder||'Inbox').capitalize %>
+      <div class="table-responsive" id="message_list_form">
+        <table class="table table-striped table-hover table-sm">
+          <thead class="thead-default">
+            <tr>
+              <th>
+                <%= l10n("from") %></th>
+              <th>
+                <%= l10n("date_label") %>
+              </th>
+              <th><%= l10n("subject") %></th>
+              <%- if @folder != 'Deleted' %>
+              <th></th>
+              <%- end %>
+            </tr>
+          </thead>
+          <tbody>
+            <%- if @provider.try(:inbox).try(:messages) %>
+            <% sorted_inbox_messages = @provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
+            <%= render partial: "shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: @provider} %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div id="show_message_form"></div>
+      </div>
     </div>
   </div>
-</div>
+<% end %>
