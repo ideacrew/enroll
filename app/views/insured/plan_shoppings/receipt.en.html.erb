@@ -1,3 +1,170 @@
+<% if @bs4 %>
+  <%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :complete, nav_options: plan_shopping_progress_hash } %>
+  <div id="printArea">
+    <h1><%= l10n("plans.plan_shopping.receipt.title") %></h1>
+    <p><%= l10n("plans.plan_shopping.receipt.description1", date_time: format_datetime(@enrollment.updated_at)) %></p>
+    <p><%= l10n("plans.plan_shopping.receipt.description2") %></p>
+    <% carrier_key = carrier_key_from_enrollment(@enrollment) %>
+    <% if @enrollment.employee_role.present? %>
+    <% else %>
+      <% if show_pay_now?("plan_shopping", @enrollment) && enrollment_is_ivl_or_coverall?(@enrollment) %>
+        <p><strong><%= l10n("plans.plan_shopping.receipt.important") %>:</strong> <%= l10n("plans.plan_shopping.receipt.pay_now_important", carrier_name: EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item) %></p>
+      <% else %>
+        <p><strong><%= l10n("plans.plan_shopping.receipt.important") %>:</strong> <%= l10n("plans.plan_shopping.receipt.not_pay_now_important") %></p>
+      <% end %>
+    <% end %>
+    <div class="mt-2 mb-4">
+      <% unless @enrollment.employee_role.present? %>
+        <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'how_to_pay_button')" id="how_to_pay_button" class="btn outline mr-2" data-target="#how_to_pay" data-toggle="modal"><%= l10n("plans.plan_shopping.receipt.how_to_pay.title") %></span>
+      <% end %>
+      <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Plan Shopping", hbx_enrollment: @enrollment }%>
+    </div>
+    <!-- modal -->
+    <div id="how_to_pay" class="modal" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="d-flex mb-4 align-items-center modal-header">
+              <div class="col pl-0">
+                <h4 class="modal-title"><b><%= l10n("plans.plan_shopping.receipt.how_to_pay.title") %></b></h4>
+              </div>
+              <div class="col-auto px-0">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+                </button>
+              </div>
+            </div>
+            <div class="modal-body">
+              <% if @plan.kind == :health %>
+                <h4><strong><%= @plan.title %></strong></h4>
+                <ol>
+                  <li>
+                    <% if show_pay_now?("plan_shopping", @enrollment) && enrollment_is_ivl_or_coverall?(@enrollment) %>
+                      <p><%= l10n("plans.plan_shopping.receipt.modal.pay_direct_description", legal_name: EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item, site_short_name: site_short_name) %></p>
+                      <ul>
+                        <li>
+                          <strong><%= l10n("plans.plan_shopping.receipt.modal.select_pay_now") %></strong>
+                        </li>
+                        <li>
+                          <strong><%= l10n("plans.plan_shopping.receipt.modal.pay_after_invoice") %> </strong>
+                          <%= l10n("plans.plan_shopping.receipt.modal.pay_after_invoice_description", legal_name: EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item) %>
+                        </li>
+                      </ul>
+                      <p><%= l10n("plans.plan_shopping.receipt.modal.pay_after_invoice_description", legal_name: EnrollRegistry["#{carrier_key}_pay_now".to_sym]&.setting(:carriers_long_name)&.item) %></p>
+                    <% else %>
+                      <strong><%= l10n("plans.plan_shopping.receipt.modal.pay_direct", legal_name: @plan.issuer_profile.legal_name) %></strong>
+                      <%= l10n("plans.plan_shopping.receipt.modal.pay_direct_alt_description", legal_name: @plan.issuer_profile.legal_name, site_short_name: site_short_name) %>
+                    <% end %>
+                    <br/>
+                  </li>
+                  <br/>
+                  <div class="carrier-numbers">
+                    <% if @plan.issuer_profile.legal_name == "CareFirst" %>
+                    <div>
+                      <%= l10n("plans.call") %> <strong>1-855-444-3119</strong>
+                    </div>
+                    <% elsif @plan.issuer_profile.legal_name == "Aetna" %>
+                    <div>
+                      <p class="bold"><%= l10n("plans.plan_shopping.receipt.aetna.customers") %></p>
+                      <p><%= l10n("plans.call") %> <strong>1-855-586-6959</strong><br/>
+                      <%= l10n("plans.plan_shopping.receipt.aetna.hours") %></p>
+                      <p class="bold"><%= l10n("plans.plan_shopping.receipt.aetna.brokers") %></p>
+                      <p><%= l10n("plans.call") %> <strong>1-888-422-2128</strong><br/>
+                      <%= l10n("plans.plan_shopping.receipt.aetna.hours") %></p>
+                      <p class="bold"><%= l10n("plans.plan_shopping.receipt.aetna.small") %></p>
+                      <p><%= l10n("plans.call") %> <strong>1-855-885-3289</strong><br/>
+                      <%= l10n("plans.plan_shopping.receipt.aetna.hours") %></p>
+                    </div>
+                    <% elsif ["Kaiser Permanente", "Kaiser"].include?(@plan.issuer_profile.legal_name) %>
+                    <% unless show_pay_now?("plan_shopping", @enrollment) && enrollment_is_ivl_or_coverall?(@enrollment) %>
+                      <div>
+                        <%= l10n("plans.call") %> <strong>1-844-524-7370</strong>
+                      </div>
+                    <% end %>
+                    <% elsif @plan.issuer_profile.legal_name == "UnitedHealthcare" %>
+                    <div>
+                      <%= l10n("plans.call") %> <strong>1-877-856-2430</strong><br/>
+                    </div>
+                    <% end %>
+                  </div>
+                  <% unless show_pay_now?("plan_shopping", @enrollment) && enrollment_is_ivl_or_coverall?(@enrollment) %>
+                    <li class="pt-4 pb-2">
+                      <strong><%= l10n("plans.plan_shopping.receipt.modal.start") %></strong> <%= l10n("plans.plan_shopping.receipt.modal.start_description", legal_name: @plan.issuer_profile.legal_name) %>
+                    </li>
+                  <% end %>
+                </ol>
+              <% else %>
+                <h4><strong><%= @plan.name %></strong></h4>
+                <ol class="mt-2">
+                  <li>
+                    <strong><%= l10n("plans.plan_shopping.receipt.modal.pay_direct", legal_name: @plan.issuer_profile.legal_name) %></strong>.
+                    <%= l10n("plans.plan_shopping.receipt.modal.pay_direct_description", legal_name: @plan.issuer_profile.legal_name, site_short_name: site_short_name) %>
+                  </li>
+                  <div class="carrier-numbers">
+                    <% if @plan.issuer_profile.legal_name == "CareFirst" %>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-855-444-3119</strong><br/>
+                    </div>
+                    <% elsif @plan.issuer_profile.legal_name == "Delta Dental" %>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-800-471-0236</strong> <%= l10n("or") %> <strong>1-800-471-0275</strong>
+                    </div>
+                    <% elsif @plan.issuer_profile.legal_name == "MetLife" %>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-855-638-2221</strong><br/>
+                    </div>
+                    <% elsif @plan.issuer_profile.legal_name == "Dentegra" %>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-800-471-0284</strong><br/>
+                    </div>
+                    <% elsif @plan.issuer_profile.legal_name == "Dominion" %>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-855-224-3016</strong><br/>
+                    </div>
+                    <% elsif @plan.issuer_profile.legal_name == "BestLife" %>
+                    <div class="pt-2">
+                      <%= l10n("plans.call") %> <strong>1-800-433-0088</strong><br/>
+                    </div>
+                    <% end %>
+                  </div>
+                  <li class="pt-4 pb-2">
+                    <strong><%= l10n("plans.plan_shopping.receipt.modal.start") %></strong> <%= l10n("plans.plan_shopping.receipt.modal.start_description", legal_name: @plan.issuer_profile.legal_name) %>
+                  </li>
+                </ol>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <h2><%= l10n("plans.plan_shopping.receipt.selected") %></h2>
+    <% if @enrollment.employee_role.present? %>
+      <%= render "insured/plan_shoppings/coverage_information" %>
+    <% else %>
+      <h3><%= @plan.title %></h3>
+      <dl class="parent weight-n">
+        <dt><%= l10n("benefit")%>:</dt>
+        <dd><%= @plan.kind&.to_s&.titleize %></dd>
+        <dt><%= l10n("market")%>:</dt>
+        <dd><%= show_market_name_by_enrollment @enrollment %></dd>
+        <dt><%= l10n("plans.plan_shopping.receipt.metal_tier") %>:</dt>
+        <dd><%= @plan.metal_level&.titleize %></dd>
+        <dt><%= l10n("enrollment_member.coverage_state_date")%>:</dt>
+        <dd><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></dd>
+      </dl>
+      <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
+    <% end %>
+
+    <% if @enrollment.is_cobra_status? %>
+      <p><%= l10n("plans.plan_shopping.receipt.is_cobra_status") %></p>
+    <% end %>
+
+    <p><%= l10n("plans.plan_shopping.receipt.when_finished", action: EnrollRegistry.feature_enabled?(:back_to_account_all_shop) ? "CONTINUE" : "GO TO MY ACCOUNT") %></p>
+    <div class="mt-4">
+      <%= link_to l10n("plans.plan_shopping.receipt.print"), '#', id: 'btnPrint', class: "btn outline interaction-click-control-print-purchase-confirmation mr-2" %>
+      <%= h(link_to l10n("en.exceptions.go_to_my_account"), main_app.family_account_path, class: "btn secondary text-center", id: 'btn-continue') %>
+    </div>
+  </div>
+<% else %>
 <% content_for :horizontal_status do %>
   <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 3} %>
 <% end %>
@@ -218,4 +385,4 @@
     </div>
   </div>
 </div>
-<br/>
+<% end %>
