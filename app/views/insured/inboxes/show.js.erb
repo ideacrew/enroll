@@ -1,4 +1,6 @@
 $("#message_list_form").hide();
+$("#inbox-nav-tabs").hide();
+$("#inbox-headers").hide();
 $("#inbox_form").show();
 $('#show_message_form').show().html("<%= escape_javascript(render "shared/inboxes/message", message: @message) %>");
 $(".btn-danger").click(function(){
