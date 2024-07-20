@@ -31,6 +31,14 @@
   --error-color: hsl(0, 69%, 38%);
   --error-tint: hsl(0, 80%, 86%);
   --body-divider: hsl(214, 16%, 80%);
+  --platinum-border: hsla(240, 2%, 37%, 1);
+  --platinum-bg: hsla(240, 1%, 84%, 1);
+  --gold-border: hsla(43, 96%, 54%, 1);
+  --gold-bg: hsla(44, 93%, 88%, 1);
+  --silver-border: hsla(0, 0%, 75%, 1);
+  --silver-bg: hsla(0, 0%, 94%, 1);
+  --bronze-border: hsla(30, 61%, 50%, 1);
+  --bronze-bg: hsla(31, 60%, 87%, 1);
 
   // May be unique colors, but used by all clients
   --bright-green: hsl(65, 100%, 42%);
@@ -116,6 +124,11 @@
   --button-error-color: var(--status-red);
   --button-error-hover-color: var(--status-red-hover);
   --button-error-active-color: var(--status-red-active);
+
+  --badge-current-bg: hsla(206, 30%, 82%, 1);
+  --badge-current-border: hsla(206, 33%, 66%, 1);
+  --badge-standard-bg: hsla(321, 19%, 80%, 1);
+  --badge-standard-border: hsla(317, 33%, 38%, 1);
 }
 
 [data-theme='dc'] {
