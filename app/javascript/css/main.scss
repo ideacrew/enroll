@@ -361,6 +361,7 @@ ul.list-right-section {
   .navbar-brand img {
     padding-left: $spacer / 2;
   }
+
 }
 
 // large breakpoint
@@ -587,27 +588,6 @@ a.disabled {
 .msg-active {
   color: var(--grey-130);
   font-weight: 600;
-}
-
-.nav-stacked li {
-  padding: $spacer;
-  margin-bottom: ($spacer * .25);
-  width: 100%;
-  background: var(--grey-010);
-  color: var(--info-color);
-  a {
-    color: var(--info-color);
-  }
-  &.activer {
-    background: var(--info-color);
-    color: var(--grey-000);
-    a {
-      color: var(--grey-000);
-    }
-  }
-  &.active {
-    @extend .font-weight-bold;
-  }
 }
 
 .filter-input-block legend.bb, .sort-area legend {
