@@ -209,6 +209,10 @@ ul.list-right-section {
   .sm-hide {
     display: none;
   }
+
+  .sm-hide {
+    display: none;
+  }
 }
 
 .card {
@@ -256,6 +260,47 @@ ul.list-right-section {
     background-color: var(--warning-status-tint);
     border: 1px solid var(--warning-border);
   }
+}
+
+.badge-current-plan {
+  background-color: var(--badge-current-bg);
+  border: 1px solid var(--badge-current-border);
+  padding: 1px 8px;
+}
+
+.badge-standard {
+  background-color: var(--badge-standard-bg);
+  border: 1px solid var(--badge-standard-border);
+}
+
+.badge-platinum {
+  font-weight: 400;
+  background-color: var(--platinum-bg);
+  border: 1px solid var(--platinum-border);
+}
+
+.badge-gold {
+  font-weight: 400;
+  background-color: var(--gold-bg);
+  border: 1px solid var(--gold-border);
+}
+
+.badge-silver {
+  font-weight: 400;
+  background-color: var(--silver-bg);
+  border: 1px solid var(--silver-border);
+}
+
+.badge-bronze {
+  font-weight: 400;
+  background-color: var(--bronze-bg);
+  border: 1px solid var(--bronze-border);
+}
+
+.badge-catastrophic {
+  font-weight: 400;
+  background-color: var(--error-tint);
+  border: 1px solid var(--error-shade);
 }
 
 .float-end {
@@ -545,8 +590,24 @@ a.disabled {
   font-weight: 600;
 }
 
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
+}
 
 .filter-input-block legend.bb, .sort-area legend {
   padding-bottom: ($spacer / 2);
   border-bottom: 1px solid var(--body-divider);
+}
+
+.plan-card {
+  background: var(--grey-010);
+
+  .plan-footer {
+    a:not(.btn) {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--info-color);
+    }
+  }
 }
