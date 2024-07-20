@@ -316,6 +316,7 @@ ul.list-right-section {
   .navbar-brand img {
     padding-left: $spacer / 2;
   }
+
 }
 
 // large breakpoint
@@ -542,4 +543,10 @@ a.disabled {
 .msg-active {
   color: var(--grey-130);
   font-weight: 600;
+}
+
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
 }

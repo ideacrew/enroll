@@ -20,7 +20,7 @@
       <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Plan Shopping", hbx_enrollment: @enrollment }%>
     </div>
     <!-- modal -->
-    <div id="how_to_pay" class="modal" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
+    <div id="how_to_pay" class="modal" role="dialog" class="hidden" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="d-flex mb-4 align-items-center modal-header">
