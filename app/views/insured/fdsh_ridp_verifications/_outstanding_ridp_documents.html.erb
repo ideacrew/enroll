@@ -75,9 +75,9 @@
                       <% end %>
                       <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
                         <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
-                          <%= link_to(insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true, class: "btn-error outline text-nowrap") do %>
+                          <%= h(link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true, class: "btn-error outline text-nowrap" do %>
                             <%= l10n("insured.consumer_roles.upload_ridp_documents.remove") %>
-                          <% end %>
+                          <% end)%>
                         </span>
                       <% end %>
                     </div>
@@ -178,12 +178,13 @@
               </div>
             </div>
           </div>
-        </div>
     </div>
   </div>
 
+
 <div class="row">
   <div class="col-xs-12">
+    <%= h(link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank', rel: "noopener noreferrer") %>
     <%= h(link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank', rel: "noopener noreferrer") %>
   </div>
 
