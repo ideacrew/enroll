@@ -22,6 +22,15 @@
         </li>
       <% end %>
 
+      <% if show_help_button %>
+        <li>
+          <a data-target="#help_with_plan_shopping" data-toggle="modal">
+            <%= l10n("insured.get_help_signing_up") %>
+          </a>
+          <%= render partial: 'ui-components/v1/modals/help_with_plan' %>
+        </li>
+      <% end %>
+
       <% if show_exit_button %>
         <li>
           <a href=<%= main_app.destroy_user_session_path %>>
