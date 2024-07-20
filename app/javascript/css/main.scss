@@ -177,88 +177,6 @@ dl.parent.weight-n {
   }
 }
 
-.progress-nav {
-  background-color: var(--grey-000);
-  border: 1px solid var(--grey-050);
-  border-radius: 5px;
-  padding: 15px 10px;
-  margin-bottom: $spacer;
-
-  a {
-    color: var(--default-font-color);
-    text-decoration: none;
-  }
-}
-
-.progress-wrapper {
-  padding: 0;
-
-  li {
-    padding: 0px;
-    list-style: none;
-    padding-right: 35px;
-    margin-bottom: 10px;
-
-    .vertical-line-progress {
-      background-color: #cacaca;
-      width: 2px;
-      height: 28px;
-      position: absolute;
-      right: 38px;
-      margin-top: 12px;
-    }
-
-    span.circle-progress {
-      border-radius: 50px;
-      background: var(--grey-000);
-      border: 2px solid #cacaca;
-      width: 12px;
-      height: 12px;
-      position: absolute;
-      right: 33px;
-      margin-top: 8px;
-      z-index: 5;
-    }
-
-    &.complete {
-      .vertical-line-progress {
-        background-color: var(--theme-primary-blue, #007bc4);
-      }
-
-      span.circle-progress {
-        background-color: var(--theme-primary-blue, #007bc4);
-        border: none;
-        width: 14px;
-        right: 32px;
-        height: 14px;
-        margin-top: 6px;
-      }
-    }
-
-    &.active {
-      font-weight: bold;
-      color: var(--theme-primary-blue, #007bc4);
-
-      .vertical-line-progress {
-        background-color: #cacaca;
-      }
-
-      span.circle-progress {
-        background-color: var(--grey-000);
-        border: 2px solid var(--theme-primary-blue, #007bc4);
-        width: 14px;
-        right: 32px;
-        height: 14px;
-        margin-top: 6px;
-      }
-    }
-
-    &:last-child .vertical-line-progress {
-      display: none;
-    }
-  }
-}
-
 #personal_info {
   input:not([type='checkbox']):not([type='radio']),
   select,
@@ -542,9 +460,20 @@ a.disabled {
   pointer-events: none;
   cursor: not-allowed;
 }
+
 .glossary {
   color: var(--primary-color);
   border-bottom: 1px dashed var(--primary-color);
+  cursor: pointer;
+}
+
+.delete-icon {
+  color: var(--status-red);
+}
+
+.inbox-sender {
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .nav-stacked li {
@@ -576,4 +505,41 @@ a.disabled {
 .filter-input-block legend.bb, .sort-area legend {
   padding-bottom: ($spacer / 2);
   border-bottom: 1px solid var(--body-divider);
+}
+
+.tab-holder {
+  margin-bottom: 6px;
+}
+
+.tab {
+  border: none;
+  padding: 1.25ch 1ch 1.1ch;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--default-font-color);
+  background: var(--tertiary-tint);
+  border-radius: 5px 5px 0 0;
+}
+
+.tab.active {
+  background: #ffffff;;
+  color: var(--primary-color);
+  border-top: 1px solid var(--grey-060);
+  border-left: 1px solid var(--grey-060);
+  border-right: 1px solid var(--grey-060);
+  border-bottom: 1px solid var(--grey-000);
+}
+
+.tab-container {
+  margin-top: 7px;
+  border: 1px solid var(--grey-060);
+}
+
+.msg-inbox:hover {
+  background-color: var(--grey-020);
+}
+
+.msg-active {
+  color: var(--grey-130);
+  font-weight: 600;
 }

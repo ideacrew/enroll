@@ -35,38 +35,39 @@
   // May be unique colors, but used by all clients
   --bright-green: hsl(65, 100%, 42%);
   --orange: hsl(359, 80%, 54%);
-
 }
 
-[data-theme="me"] {
+[data-theme='me'] {
   --default-font-color: #323130;
   --text-secondary: hsla(30, 2%, 37%, 1);
 
   //palette
-  --primary-color: #3D5D6F;
-  --primary-color-dark: #314A59;
+  --primary-color: #3d5d6f;
+  --primary-color-dark: #314a59;
   --primary-color-darker: #253843;
   --default-font-color: #323130;
   --placeholder-color: #676767;
   --placeholder-font-weight: 400;
   --floatlabel-color: #767676;
-  --floatlabel-onclick-color:#676767;
+  --floatlabel-onclick-color: #676767;
   --input-text-color: #454545;
   --form-element-text-color: #454545;
   --default-font-color: #323130;
   --placeholder-color: #676767;
   --floatlabel-color: #767676;
-  --floatlabel-onclick-color:#676767;
+  --floatlabel-onclick-color: #676767;
   --input-text-color: #454545;
   --form-element-text-color: #454545;
+  --tertiary-tint: #E0E5D8;
 
-  --secondary-color: #3B6B90;
-  --secondary-color-dark: #2E5470;
-  --secondary-color-darker: #213C50;
 
-  --tertiary-color: #5A7334;
+  --secondary-color: #3b6b90;
+  --secondary-color-dark: #2e5470;
+  --secondary-color-darker: #213c50;
+
+  --tertiary-color: #5a7334;
   --tertiary-color-dark: #465929;
-  --tertiary-color-darker: #32401D;
+  --tertiary-color-darker: #32401d;
 
   //fundamentals
   --primary-hover-color: var(--primary-color-dark);
@@ -86,7 +87,7 @@
   --placeholder-color: #676767;
   --placeholder-font-weight: 400;
   --floatlabel-color: #767676;
-  --floatlabel-onclick-color:#676767;
+  --floatlabel-onclick-color: #676767;
   --input-text-color: #454545;
   --form-element-text-color: #454545;
 
@@ -94,126 +95,125 @@
   --button-default-hover-color: var(--primary-hover-color);
   --button-default-active-color: var(--primary-color-darker);
 
-  --enrollment-status-red: #A21E1F;
+  --enrollment-status-red: #a21e1f;
   --enrollment-status-green: #027314;
-  --enrollment-status-yellow: #E5A900;
+  --enrollment-status-yellow: #e5a900;
   --enrollment-status-blue: #003260;
-  --enrollment-status-grey: #3B3A39;
+  --enrollment-status-grey: #3b3a39;
 
-  --button-primary-color: #3D5D6F;
-  --button-primary-hover-color: #314A59;
+  --button-primary-color: #3d5d6f;
+  --button-primary-hover-color: #314a59;
   --button-primary-active-color: #253843;
 
-  --button-secondary-color: #3B6B90;
-  --button-secondary-hover-color: #345F80;
+  --button-secondary-color: #3b6b90;
+  --button-secondary-hover-color: #345f80;
   --button-secondary-active-color: #274760;
 
-  --button-tertiary-color: #647F3A;
-  --button-tertiary-hover-color: #50662E;
-  --button-tertiary-active-color: #3C4C23;
+  --button-tertiary-color: #647f3a;
+  --button-tertiary-hover-color: #50662e;
+  --button-tertiary-active-color: #3c4c23;
 
   --button-error-color: var(--status-red);
   --button-error-hover-color: var(--status-red-hover);
   --button-error-active-color: var(--status-red-active);
 }
 
-[data-theme="dc"] {
+[data-theme='dc'] {
   --default-font-color: #323130;
 
-  --body-color: #FAFAFA;
+  --body-color: #fafafa;
 
   --placeholder-color: #676767;
   --floatlabel-color: #767676;
-  --floatlabel-onclick-color:#676767;
+  --floatlabel-onclick-color: #676767;
   --input-text-color: #454545;
   --form-element-text-color: #454545;
 
-  --button-default-color: #4A7EA6;
-  --button-default-hover-color: #345F80;
+  --button-default-color: #4a7ea6;
+  --button-default-hover-color: #345f80;
   --button-default-active-color: #274760;
 
-  --enrollment-status-red: #A21E1F;
+  --enrollment-status-red: #a21e1f;
   --enrollment-status-green: #027314;
-  --enrollment-status-yellow: #E5A900;
+  --enrollment-status-yellow: #e5a900;
   --enrollment-status-blue: #003260;
-  --enrollment-status-grey: #3B3A39;
+  --enrollment-status-grey: #3b3a39;
 
   //buttons
-  --button-primary-color: #007BC4;
-  --button-primary-hover-color: #00629D;
-  --button-primary-active-color: #004A76;
+  --button-primary-color: #007bc4;
+  --button-primary-hover-color: #00629d;
+  --button-primary-active-color: #004a76;
 
   --button-secondary-color: #003260;
-  --button-secondary-hover-color: #00284D;
-  --button-secondary-active-color: #001E3A;
+  --button-secondary-hover-color: #00284d;
+  --button-secondary-active-color: #001e3a;
 
-  --button-tertiary-color: #9D6E00;
-  --button-tertiary-hover-color: #7E5800;
-  --button-tertiary-active-color: #5E4200;
+  --button-tertiary-color: #9d6e00;
+  --button-tertiary-hover-color: #7e5800;
+  --button-tertiary-active-color: #5e4200;
 
-  --button-error-color: #A21E1F;
-  --button-error-hover-color: #85191A;
+  --button-error-color: #a21e1f;
+  --button-error-hover-color: #85191a;
   --button-error-active-color: #671314;
 }
 
-
-[data-contrast="true"] {
-  --secondary-font-color: #676C72; //secondary text gray
+[data-contrast='true'] {
+  --secondary-font-color: #676c72; //secondary text gray
   --bold-font-color: #323130; //bold text
-  --theme-primary-blue: #3B6B90; //primary blue
-  --theme-secondary: #425C6E; //secondary dark blue
-  --primary-red: #D42537; //primary red
-  --background-light-red: #F9F1F1; //error notice background color
-  --primary-green: #5A7334; //green continue buttons
-  --secondary-green: #738C4A; //green for continue button hover
-  --success-green-background: #E3F9E6; //green for success pill
+  --theme-primary-blue: #3b6b90; //primary blue
+  --theme-secondary: #425c6e; //secondary dark blue
+  --primary-red: #d42537; //primary red
+  --background-light-red: #f9f1f1; //error notice background color
+  --primary-green: #5a7334; //green continue buttons
+  --secondary-green: #738c4a; //green for continue button hover
+  --success-green-background: #e3f9e6; //green for success pill
 
-  --primary-yellow: #FFD600;
-  --soft-yellow: #FFFADF;
+  --primary-yellow: #ffd600;
+  --soft-yellow: #fffadf;
   --primary-white: #ffffff;
   --primary-black: #000000;
-  --alert-notice-green: #62703E; //success notice green
-  --soft-blue: #D6EBFF; //home page right nav text color
+  --alert-notice-green: #62703e; //success notice green
+  --soft-blue: #d6ebff; //home page right nav text color
 
-  --status-red: #A21E1F; //status danger
-  --status-red-hover: #85191A; //status danger
+  --status-red: #a21e1f; //status danger
+  --status-red-hover: #85191a; //status danger
   --status-red-active: #671314; //status danger
   --status-blue: #003260; //status pending
-  --status-yellow: #E5A900; //status needs info
+  --status-yellow: #e5a900; //status needs info
   --status-green: #027314; //status complete
-  --light-gray: #A19F9D;
+  --light-gray: #a19f9d;
 
   --default-font-color: #323130;
 
   --placeholder-color: #676767;
   --floatlabel-color: #767676;
-  --floatlabel-onclick-color:#676767;
+  --floatlabel-onclick-color: #676767;
   --input-text-color: #454545;
   --form-element-text-color: #454545;
 
-  --button-default-color: #3D5D6F;
-  --button-default-hover-color: #314A59;
+  --button-default-color: #3d5d6f;
+  --button-default-hover-color: #314a59;
   --button-default-active-color: #253843;
 
-  --button-primary-color: #3D5D6F;
-  --button-primary-hover-color: #314A59;
+  --button-primary-color: #3d5d6f;
+  --button-primary-hover-color: #314a59;
   --button-primary-active-color: #253843;
 
-  --button-secondary-color: #3B6B90;
-  --button-secondary-hover-color: #345F80;
+  --button-secondary-color: #3b6b90;
+  --button-secondary-hover-color: #345f80;
   --button-secondary-active-color: #274760;
 
-  --button-tertiary-color: #647F3A;
-  --button-tertiary-hover-color: #50662E;
-  --button-tertiary-active-color: #3C4C23;
+  --button-tertiary-color: #647f3a;
+  --button-tertiary-hover-color: #50662e;
+  --button-tertiary-active-color: #3c4c23;
 
   --button-error-color: var(--status-red);
   --button-error-hover-color: var(--status-red-hover);
   --button-error-active-color: var(--status-red-active);
 
-  --enrollment-status-red: #A21E1F;
+  --enrollment-status-red: #a21e1f;
   --enrollment-status-green: #027314;
-  --enrollment-status-yellow: #E5A900;
+  --enrollment-status-yellow: #e5a900;
   --enrollment-status-blue: #003260;
-  --enrollment-status-grey: #3B3A39;
+  --enrollment-status-grey: #3b3a39;
 }
