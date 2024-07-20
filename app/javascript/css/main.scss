@@ -177,14 +177,6 @@ dl.parent.weight-n {
   }
 }
 
-dl.parent.weight-n {
-  dt {
-    font-weight: 400;
-    color: var(--default-font-color);
-    padding-right: 2ch;
-  }
-}
-
 #personal_info {
   input:not([type='checkbox']):not([type='radio']),
   select,
@@ -325,9 +317,6 @@ ul.list-right-section {
     padding-left: $spacer / 2;
   }
 
-  .sm-hide {
-    display: none;
-  }
 }
 
 // large breakpoint
@@ -556,26 +545,6 @@ a.disabled {
   font-weight: 600;
 }
 
-.nav-stacked li {
-  padding: $spacer;
-  margin-bottom: ($spacer * .25);
-  width: 100%;
-  background: var(--grey-010);
-  color: var(--info-color);
-  a {
-    color: var(--info-color);
-  }
-  &.activer {
-    background: var(--info-color);
-    color: var(--grey-000);
-    a {
-      color: var(--grey-000);
-    }
-  }
-  &.active {
-    @extend .font-weight-bold;
-  }
-}
 
 .filter-input-block legend.bb, .sort-area legend {
   padding-bottom: ($spacer / 2);
