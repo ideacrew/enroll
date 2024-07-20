@@ -53,15 +53,13 @@
                       <% amount = number_to_currency(embedded_document.amount.to_s) %>
                       <%= embedded_document.is_a?(FinancialAssistance::Deduction) ? "(#{amount})" : amount %>
                     </td>
-                    <td>
-                      <div class="d-flex justify-content-between">
-                        <%= start_to_end_dates(embedded_document) %>
-                        <span>
-                          <%= h(link_to(income_and_deductions_edit(@application, applicant, embedded_document), id: 'edit-income-and-deductions-pencil') do %>
-                            <%= l10n("edit") %>
-                          <% end) %>
-                        </span>
-                      </div>
+                    <td class="d-flex justify-content-between">
+                      <%= start_to_end_dates(embedded_document) %>
+                      <span>
+                        <%= h(link_to(income_and_deductions_edit(@application, applicant, embedded_document), id: 'edit-income-and-deductions-pencil') do %>
+                          <%= l10n("edit") %>
+                        <% end) %>
+                      </span>
                     </td>
                   </tr>
                 <% end %>
@@ -69,7 +67,7 @@
                   <tr>
                     <td colspan="3">
                       <b><%= l10n("faa.review.income.table.annual_income", applicant_name: applicant.first_name, assistance_year: @application.assistance_year) %></b>
-                      <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"><span class="hide"><%=l10n("info")%></span></i></a>
+                      <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"></i><span class="sr-only"><%=l10n("info")%></span></a>
                       <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "net_annual_income"} %>
                     </td>
                     <td colspan="2"><b><%= number_to_currency(applicant.net_annual_income) %></b></td>
@@ -85,10 +83,8 @@
     <%# Applicants summary %>
     <% @applicants.each do |applicant| %>
       <section>
-        <div class="mb-4">
-          <h2><%= capitalize_full_name(applicant.full_name) %></h2>
-        </div>
-        <% applicant_summary_hashes(applicant).each do |subsection| %>
+        <h2 class="mb-4"><%= capitalize_full_name(applicant.full_name) %></h2>
+        <% applicant_summary_hashes(applicant, true).each do |subsection| %>
           <%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: subsection, applicant: applicant} %>
         <% end %>
       </section>

@@ -64,6 +64,33 @@ function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
   }
 }
 
+
+
+
+// Only load this script on the plan shopping page
+  if (window.location.pathname.includes('/insured/plan_shoppings')) {
+
+  // Setup an interval to look for [data-plans-loading] presence
+  // If it is not present, we can assume the plans are loaded
+  let intervalId = setInterval(checkPlansLoadedState, 500);
+  var ogPlanSort; // stores original plan sort order
+  function checkPlansLoadedState() {
+    const loading = document.querySelector('[data-plans-loading]');
+    if (!loading) {
+      clearInterval(intervalId);
+      initSorts();
+    } else {
+      console.log('Plans are still loading');
+    }
+  }
+
+  function initSorts() {
+    console.log('Plans are loaded');
+    ogPlanSort = $('#all-plans #ivl_plans .plan-row')
+  }
+}
+
+
 function applyPlanFilters() {
   var all_selectors = [
     applyPlanFilterCBs("plan-type-selection-filter", "data-plan-type", "data-plan-category"),
@@ -71,7 +98,9 @@ function applyPlanFilters() {
     applyPlanFilterCBs("plan-metal-network-selection-filter", "data-plan-network", "data-plan-metal-network")
   ];
   combineAllPlanSelectors(all_selectors);
+  $("#filter-sidebar input[type='radio']").prop("checked", false);
   $("strong#plans-count").text($(".plan-row:visible").length);
+  $("dd#plans-count").text($(".plan-row:visible").length);
 }
 
 var plansToCompareArray = new Array();
@@ -120,11 +149,17 @@ function doPlanComparison(action_uri) {
 	url: action_uri,
 	dataType: 'script',
 	data: {
-		"standard_component_ids": plansToCompareArray,"hbx_enrollment_id": hbx, "active_year": active_year, "enrollment_kind": enrollment_kind,
+		"standard_component_ids": uniqueValues(plansToCompareArray),"hbx_enrollment_id": hbx, "active_year": active_year, "enrollment_kind": enrollment_kind,
     "change_plan": change_plan
 	}
 	});
 }
+
+function uniqueValues(array) {
+  let map = new Map();
+  array.forEach(value => map.set(value, value));
+  return [...map.values()];
+};
 
 function applyPlanSort(sort_by){
   var plandivs = $('#all-plans #ivl_plans .plan-row');
@@ -264,17 +299,28 @@ $(function() {
   }
 
   function resetFilters(){
+
     $("#filter-sidebar input[type='checkbox']").prop("checked", false);
     $("#filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("");
     $("#filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
     $("#filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("");
     $("#filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
-    $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
-    $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
-    $("#filter-sidebar select.plan-osse-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+
+    $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").val("");
+    $("#filter-sidebar select.plan-carrier-selection-filter").val("");
+
+    $("#filter-sidebar input[type='radio']").prop("checked", false);
+
+    $("#all-plans #ivl_plans").empty().append(ogPlanSort);
+
+    if (!disableSelectric) {
+      $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+      $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+      $("#filter-sidebar select.plan-osse-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    }
   }
 
-  $(document).on('click', '#sort_by a', function(){
+  $(document).on('change', '#sort_by input', function(){
     applyPlanSort($(this).data('sort-by'));
   });
 

@@ -1,78 +1,152 @@
 <% osse_eligible = (@enrollment.eligible_child_care_subsidy > 0) %>
 <% calculate = (defined? calculate) ? calculate : true %>
 <% family_tier_eligible = @enrollment.product&.family_based_rating? %>
-<div class="table-border table-responsive">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th><%= l10n("name") %></th>
-        <th><%= l10n("relationship") %></th>
-        <th><%= l10n("age") %></th>
-        <th class="text-right"><%= l10n("premium") %></th>
-        <% if osse_eligible %>
-          <th class="text-right" colspan="2" scope="colgroup"><%=l10n("premium_discount") %></th>
-        <% end %>
-        <th class="text-right"><%= l10n("APTC_amount") %> <span><i tabindex="0" class='fa fa-question-circle' data-toggle="tooltip" title="<%= l10n('APTC_amount_title_info') %>"><span class="hide"><%=l10n("info")%></span></i></span></th>
-        <th class="text-right" width="50"><%= l10n("you_pay") %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @enrollment.hbx_enrollment_members.each do |member| %>
-        <tr>
-          <td><%= member.person.full_name %></td>
-          <td><%= member.primary_relationship %></td>
-          <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
-          <% unless family_tier_eligible %>
-            <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
-          <% else %>
-            <td> -- </td>
+<% if @bs4 %>
+  <div class="table-border table-responsive">
+    <table class="table">
+      <thead>
+        <tr class="secondary-text">
+          <th><%= l10n("name") %></th>
+          <th><%= l10n("relationship") %></th>
+          <th><%= l10n("age") %></th>
+          <th class="text-right"><%= l10n("premium") %></th>
+          <% if osse_eligible %>
+            <th class="text-right" colspan="2" scope="colgroup"><%=l10n("premium_discount") %></th>
           <% end %>
-          <% if !EnrollRegistry.feature_enabled?(:display_you_pay) %>
-            <td class='text-right' data-cuke='no_you_pay'></td>
-            <td class='text-right'></td>
-          <% elsif calculate %>
-            <% if osse_eligible %>
-              <td class="text-right"></td>
-              <td class="text-right"></td>
-              <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
-              <td class="text-right"><%= number_to_currency(0.00) %></td>
-            <% else %>
-              <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
-              <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
-            <% end %>
-          <% else %>
-            <% if osse_eligible %>
-              <td class="text-right"></td>
-              <td class="text-right"></td>
-              <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
-              <td class="text-right"><%= number_to_currency(0.00) %></td>
-            <% else %>
-              <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
-              <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
-            <% end %>
-          <% end %>
+          <th class="text-right"><%= render partial:"shared/glossary", locals: {key: "aptc_amount_title_info", term: "APTC amount", question_mark: true } %></th>
+          <th class="text-right" width="80"><%= l10n("you_pay") %></th>
         </tr>
-      <% end %>
-      <tr class="gray-row">
-        <td colspan="3" class="text-left capital"><strong><%= l10n("totals") %></strong></td>
-        <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
-        <% if osse_eligible %>
-          <td></td>
-          <td class="text-right"><strong><%= number_to_currency(@enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
+      </thead>
+      <tbody>
+        <% @enrollment.hbx_enrollment_members.each do |member| %>
+          <tr>
+            <td><%= member.person.full_name %></td>
+            <td><%= member.primary_relationship.titleize %></td>
+            <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
+            <% unless family_tier_eligible %>
+              <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+            <% else %>
+              <td> -- </td>
+            <% end %>
+            <% if !EnrollRegistry.feature_enabled?(:display_you_pay) %>
+              <td class='text-right' data-cuke='no_you_pay'></td>
+              <td class='text-right'></td>
+            <% elsif calculate %>
+              <% if osse_eligible %>
+                <td class="text-right"></td>
+                <td class="text-right"></td>
+                <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
+                <td class="text-right"><%= number_to_currency(0.00) %></td>
+              <% else %>
+                <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
+                <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+              <% end %>
+            <% else %>
+              <% if osse_eligible %>
+                <td class="text-right"></td>
+                <td class="text-right"></td>
+                <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
+                <td class="text-right"><%= number_to_currency(0.00) %></td>
+              <% else %>
+                <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
+                <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
+              <% end %>
+            <% end %>
+          </tr>
         <% end %>
-        <% if calculate %>
-          <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
-          <% responsible_amount = @plan.total_employee_cost - @enrollment.eligible_child_care_subsidy.to_f %>
-        <% else %>
-          <td class="text-right"><strong><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
-          <% responsible_amount = @plan.total_premium - @enrollment.applied_aptc_amount.to_f - @enrollment.eligible_child_care_subsidy.to_f %>
+        <tr class="gray-row">
+          <td colspan="3" class="text-left capital"><strong><%= l10n("plans.plan_shopping.receipt.total").upcase %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+          <% if osse_eligible %>
+            <td></td>
+            <td class="text-right"><strong><%= number_to_currency(@enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
+          <% end %>
+          <% if calculate %>
+            <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
+            <% responsible_amount = @plan.total_employee_cost - @enrollment.eligible_child_care_subsidy.to_f %>
+          <% else %>
+            <td class="text-right"><strong><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
+            <% responsible_amount = @plan.total_premium - @enrollment.applied_aptc_amount.to_f - @enrollment.eligible_child_care_subsidy.to_f %>
+          <% end %>
+          <td class="text-right"><strong><%= number_to_currency((responsible_amount < 1 ? 0.00 : responsible_amount)) %></strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="table-border table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th><%= l10n("name") %></th>
+          <th><%= l10n("relationship") %></th>
+          <th><%= l10n("age") %></th>
+          <th class="text-right"><%= l10n("premium") %></th>
+          <% if osse_eligible %>
+            <th class="text-right" colspan="2" scope="colgroup"><%=l10n("premium_discount") %></th>
+          <% end %>
+          <th class="text-right"><%= l10n("APTC_amount") %> <span><i tabindex="0" class='fa fa-question-circle' data-toggle="tooltip" title="<%= l10n('APTC_amount_title_info') %>"><span class="hide"><%=l10n("info")%></span></i></span></th>
+          <th class="text-right" width="50"><%= l10n("you_pay") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @enrollment.hbx_enrollment_members.each do |member| %>
+          <tr>
+            <td><%= member.person.full_name %></td>
+            <td><%= member.primary_relationship %></td>
+            <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
+            <% unless family_tier_eligible %>
+              <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
+            <% else %>
+              <td> -- </td>
+            <% end %>
+            <% if !EnrollRegistry.feature_enabled?(:display_you_pay) %>
+              <td class='text-right' data-cuke='no_you_pay'></td>
+              <td class='text-right'></td>
+            <% elsif calculate %>
+              <% if osse_eligible %>
+                <td class="text-right"></td>
+                <td class="text-right"></td>
+                <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
+                <td class="text-right"><%= number_to_currency(0.00) %></td>
+              <% else %>
+                <td class="text-right"><%- number_to_currency(@plan.aptc_amount(member)) %></td>
+                <td class="text-right"><%= number_to_currency(@plan.employee_cost_for(member)) %></td>
+              <% end %>
+            <% else %>
+              <% if osse_eligible %>
+                <td class="text-right"></td>
+                <td class="text-right"></td>
+                <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
+                <td class="text-right"><%= number_to_currency(0.00) %></td>
+              <% else %>
+                <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
+                <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
+              <% end %>
+            <% end %>
+          </tr>
         <% end %>
-        <td class="text-right"><strong><%= number_to_currency((responsible_amount < 1 ? 0.00 : responsible_amount)) %></strong></td>
-      </tr>
-      <tr>
-        <td colspan=<%= osse_eligible ? "7" : "5" %> class="text-right"><%= l10n("your_coverage_start_date") %> :</td>
-        <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
-      </tr>
-    </tbody>
-  </table>
-</div><br>
+        <tr>
+          <td colspan="3" class="text-left capital"><strong><%= l10n("totals") %></strong></td>
+          <td class="text-right"><strong><%= number_to_currency(@plan.total_premium) %></strong></td>
+          <% if osse_eligible %>
+            <td></td>
+            <td class="text-right"><strong><%= number_to_currency(@enrollment.eligible_child_care_subsidy.to_f) %></strong></td>
+          <% end %>
+          <% if calculate %>
+            <td class="text-right"><strong><%= number_to_currency(@plan.total_aptc_amount) %></strong></td>
+            <% responsible_amount = @plan.total_employee_cost - @enrollment.eligible_child_care_subsidy.to_f %>
+          <% else %>
+            <td class="text-right"><strong><%= number_to_currency(@enrollment.applied_aptc_amount.to_f) %></strong></td>
+            <% responsible_amount = @plan.total_premium - @enrollment.applied_aptc_amount.to_f - @enrollment.eligible_child_care_subsidy.to_f %>
+          <% end %>
+          <td class="text-right"><strong><%= number_to_currency((responsible_amount < 1 ? 0.00 : responsible_amount)) %></strong></td>
+        </tr>
+        <tr>
+          <td colspan=<%= osse_eligible ? "7" : "5" %> class="text-right"><%= l10n("your_coverage_start_date") %> :</td>
+          <td><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div><br>
+<% end %>
