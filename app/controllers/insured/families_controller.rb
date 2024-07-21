@@ -6,6 +6,7 @@ class Insured::FamiliesController < FamiliesController
   include Insured::FamiliesHelper
 
   layout :resolve_layout
+
   before_action :enable_bs4_layout, only: [:home, :find_sep, :record_sep, :check_qle_date, :check_move_reason, :check_marriage_reason, :check_insurance_reason, :personal, :inbox, :manage_family, :brokers, :enrollment_history] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -699,7 +700,7 @@ class Insured::FamiliesController < FamiliesController
     when "brokers", "inbox", "home", "enrollment_history", "personal", "manage_family"
       EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "two_column"
     when "purchase"
-      "application"
+      "two_column"
     end
   end
 end

@@ -16,6 +16,9 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :validate_rating_address, only: [:show]
   before_action :check_enrollment_state, only: [:show, :thankyou]
   before_action :set_cache_headers, only: [:show, :thankyou]
+  before_action :enable_bs4_layout, only: [:show, :plans, :receipt, :thankyou] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
+  layout :resolve_layout
 
   def checkout
     (redirect_back(fallback_location: root_path) and return) unless agreed_to_thankyou_ivl_page_terms
@@ -237,8 +240,20 @@ class Insured::PlanShoppingsController < ApplicationController
     plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
     plan_comparision_obj.elected_aptc = session[:elected_aptc]
     checkbook_url = plan_comparision_obj.generate_url
+
+    # for the thank you page will need member data returned to update table
+    if params[:plan].present? && params[:enrollment].present?
+      plan = BenefitMarkets::Products::Product.where(:id => params[:plan])&.first
+      enrollment = HbxEnrollment.find(params[:enrollment])
+      if plan.present? && enrollment
+        decorated_plan = UnassistedPlanCostDecorator.new(plan, enrollment, session[:elected_aptc])
+        responsible_amount = decorated_plan.total_employee_cost - enrollment.eligible_child_care_subsidy.to_f
+        amount = responsible_amount < 1 ? 0.00 : responsible_amount
+      end
+    end
+
     respond_to do |format|
-      format.json { render json: {message: 'ok',checkbook_url: checkbook_url } }
+      format.json { render json: {message: 'ok',checkbook_url: checkbook_url, responsible_amount: amount } }
     end
   end
 
@@ -698,5 +713,14 @@ class Insured::PlanShoppingsController < ApplicationController
 
     flash[:error] = l10n("insured.out_of_state_error_message")
     redirect_to family_account_path
+  end
+
+  def resolve_layout
+    return "application" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    "progress"
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end

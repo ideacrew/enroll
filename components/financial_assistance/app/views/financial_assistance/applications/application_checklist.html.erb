@@ -2,6 +2,15 @@
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 1} %>
   <h1><%= l10n("faa.checklist.heading") %></h1>
   <p><%= l10n("faa.checklist.instructions1") %></p>
+  <div class="my-4">
+    <% content_for :submit_button do %>
+      <%= h(link_to_with_noopener_noreferrer(l10n("faa.checklist.begin_application"), financial_assistance.edit_application_path(@application), class: 'button btn-continue', id: 'btn-continue')) %>
+    <% end %>
+    <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
+        previous_link: application_checklist_previous_url(@application),
+        next_link: financial_assistance.edit_application_path(@application)
+      } %>
+  </div>
   <p class="b"><%= l10n("faa.checklist.instructions2") %></p>
   <div class="d-flex sm-block my-4">
     <div class="mr-auto col-sm col-md-6 pl-0">
@@ -55,12 +64,8 @@
       </ul>
     </div>
   </div>
-  <% content_for :submit_button do %>
-    <%= h(link_to_with_noopener_noreferrer(l10n("faa.checklist.begin_application"), financial_assistance.edit_application_path(@application), class: 'button btn-continue', id: 'btn-continue')) %>
-  <% end %>
   <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
-      previous_link: application_checklist_previous_url(@application),
-      next_link: financial_assistance.edit_application_path(@application)
+      previous_link: application_checklist_previous_url(@application)
     } %>
 <% else %>
 <div class="container">

@@ -22,7 +22,7 @@
 
       <% if @effective_on_date.present? || @new_effective_on %>
         <div class="mb-4">
-          <label class="d-inline"><%= l10n("effective_date") %>:</label>
+          <span class="d-inline"><%= l10n("effective_date") %>:</span>
           <span id='effective_date_for_display'>
             <%= format_date(@effective_on_date || @new_effective_on) %>
           </span>
@@ -60,7 +60,8 @@
 
       <% if @adapter.can_shop_both_markets?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) %>
         <div id="market_kinds" class="mb-3">
-          <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
+        <fieldset>
+          <legend class="text-reset"><h3><%= l10n("insured.group_selection.new.marketplace") %></h3></legend>
           <div class="n-radio-group d-flex align-items-center my-2">
             <% view_market_places(@person).each_with_index do |kind, index| %>
               <label class="n-radio weight-n" for="market_kind_<%= kind %>">
@@ -73,6 +74,7 @@
               </label>
             <% end %>
           </div>
+        </fieldset>
         </div>
       <% elsif @adapter.is_fehb?(@person) %>
         <%= hidden_field_tag 'market_kind', 'fehb' %>
@@ -93,7 +95,8 @@
       <% end %>
 
       <div id="coverage_kinds" class="mb-3">
-        <h3><%= l10n("benefit_type") %></h3>
+      <fieldset>
+        <legend class="text-reset"><h3><%= l10n("benefit_type") %></h3></legend>
 
         <div class="n-radio-group d-flex align-items-center my-2">
           <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'coverage_kind_health')" class="n-radio-row mr-3">
@@ -110,6 +113,7 @@
             </label>
           </div>
         </div>
+      </fieldset>
       </div>
       <% if @change_plan.present? %>
         <%= hidden_field_tag 'change_plan', @change_plan %>
@@ -121,7 +125,6 @@
       <div id="plan-shopping-page-navigation-buttons" class="d-flex flex-column flex-md-row mt-4" >
         <%= render partial: "shared/progress_navigation_buttons", locals: { previous_style: "outline", button_type: "submit" } %>
       </div>
-
     <% end %>
   </div>
 
@@ -284,6 +287,7 @@
         </div>
         <div class="col-xs-3 right-section pull-right">
           <% if @change_plan.blank? && @market_kind == "individual" %>
+
             <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
               <%= render partial: 'shared/individual_progress', locals: {step: '3'} %>
             <% else %>
