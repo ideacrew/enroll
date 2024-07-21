@@ -155,6 +155,7 @@ dl.parent {
   padding: 0;
   margin: 0;
   margin-bottom: 3ch;
+  grid-auto-rows: min-content
 }
 
 dd,
@@ -204,10 +205,6 @@ ul.list-right-section {
 
   li {
     margin-bottom: $spacer;
-  }
-
-  .sm-hide {
-    display: none;
   }
 
   .sm-hide {
