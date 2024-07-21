@@ -31,6 +31,7 @@
 
     <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && enrollments&.any? %>
       <button id="display_all_enrollments_btn" class="button button-primary"><%= l10n("enrollment_history.show_all") %></button>
+      <label for="display_all_enrollments" class="ml-half hidden"><%= l10n("enrollment_history.show_all") %></label>
       <input id="display_all_enrollments" class="ml-half hidden" type="checkbox" >
     <% end %>
   </div>

@@ -24,7 +24,7 @@
 
       <% if display_enr_summary_is_enabled(@hbx_enrollment) %>
         <h2 data-cuke="enrollment_detail"><%= l10n('enrollment.details.header') %></h2>
-        <dl>
+        <dl class="parent">
           <dt><%= l10n('enrollment.effective_on') %></dt>
           <dd><%= @hbx_enrollment&.effective_on %></dd>
 

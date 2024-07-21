@@ -1,6 +1,7 @@
 @import 'colors';
 
-.special-cover-header, #special-cover-header {
+.special-cover-header,
+#special-cover-header {
   display: block;
   max-width: 100%;
   max-height: 100%;
@@ -37,7 +38,8 @@ footer {
   background-color: var(--theme-primary-blue, #007bc4);
   width: 100%;
 
-  a, a:hover {
+  a,
+  a:hover {
     color: var(--grey-000);
     text-decoration: none;
   }
@@ -49,7 +51,7 @@ footer.page-footer {
   color: var(--grey-150);
 
   .footer-column {
-    :first-child{
+    :first-child {
       font-weight: bold;
     }
   }
@@ -62,7 +64,7 @@ footer.page-footer {
       border-radius: 999px;
     }
 
-    .btn-group{
+    .btn-group {
       gap: 8px;
 
       a.button {
@@ -85,7 +87,7 @@ footer.page-footer {
 }
 
 nav .login-options li {
-  margin-right: 0
+  margin-right: 0;
 }
 
 #sort_notification_msg {
@@ -95,16 +97,19 @@ nav .login-options li {
   max-width: 466px;
   margin-left: 295px;
 
-  &.success, .success {
+  &.success,
+  .success {
     background-color: var(--success-tint);
   }
 
-  &.error, .error {
+  &.error,
+  .error {
     background-color: var(--error-tint);
   }
 }
 
-.hide, .hidden {
+.hide,
+.hidden {
   @extend .sr-only;
   visibility: hidden;
 }
@@ -115,7 +120,7 @@ nav .login-options li {
 
 .nav-stacked li {
   padding: $spacer;
-  margin-bottom: ($spacer * .25);
+  margin-bottom: ($spacer * 0.25);
   width: 100%;
   background: var(--grey-010);
   color: var(--info-color);
@@ -150,9 +155,11 @@ dl.parent {
   padding: 0;
   margin: 0;
   margin-bottom: 3ch;
+  grid-auto-rows: min-content
 }
 
-dd, dt {
+dd,
+dt {
   margin: 0;
   padding: 0;
 }
@@ -160,94 +167,21 @@ dd, dt {
 dt {
   font-weight: 600;
   color: var(--text-secondary);
-  padding-right: 1ch;
+  padding-right: 2ch;
 }
 
-.progress-nav {
-  background-color: var(--grey-000);
-  border: 1px solid var(--grey-050);
-  border-radius: 5px;
-  padding: 15px 10px;
-  margin-bottom: $spacer;
-
-  a {
+dl.parent.weight-n {
+  dt {
+    font-weight: 400;
     color: var(--default-font-color);
-    text-decoration: none;
+    padding-right: 2ch;
   }
 }
 
-.progress-wrapper {
-  padding: 0;
-
-    li {
-      padding: 0px;
-      list-style: none;
-      padding-right: 35px;
-      margin-bottom: 10px;
-
-      .vertical-line-progress {
-        background-color: #cacaca;
-        width: 2px;
-        height: 28px;
-        position: absolute;
-        right: 38px;
-        margin-top: 12px;
-      }
-
-      span.circle-progress {
-        border-radius: 50px;
-        background: var(--grey-000);
-        border: 2px solid #cacaca;
-        width: 12px;
-        height: 12px;
-        position: absolute;
-        right: 33px;
-        margin-top: 8px;
-        z-index: 5;
-      }
-
-      &.complete {
-        .vertical-line-progress {
-          background-color: var(--theme-primary-blue, #007bc4);
-        }
-
-        span.circle-progress {
-          background-color: var(--theme-primary-blue, #007bc4);
-          border: none;
-          width: 14px;
-          right: 32px;
-          height: 14px;
-          margin-top: 6px;
-        }
-      }
-
-      &.active {
-        font-weight: bold;
-        color: var(--theme-primary-blue, #007bc4);
-
-        .vertical-line-progress {
-          background-color: #cacaca;
-        }
-
-        span.circle-progress {
-          background-color: var(--grey-000);
-          border: 2px solid var(--theme-primary-blue, #007bc4);
-          width: 14px;
-          right: 32px;
-          height: 14px;
-          margin-top: 6px;
-        }
-      }
-
-      &:last-child .vertical-line-progress {
-        display: none;
-      }
-    }
-
-}
-
 #personal_info {
-  input:not([type='checkbox']):not([type='radio']), select, .input {
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  .input {
     width: 180px;
   }
 
@@ -272,6 +206,11 @@ ul.list-right-section {
   li {
     margin-bottom: $spacer;
   }
+
+  .sm-hide {
+    display: none;
+  }
+
 }
 
 .card {
@@ -321,22 +260,63 @@ ul.list-right-section {
   }
 }
 
+.badge-current-plan {
+  background-color: var(--badge-current-bg);
+  border: 1px solid var(--badge-current-border);
+  padding: 1px 8px;
+}
+
+.badge-standard {
+  background-color: var(--badge-standard-bg);
+  border: 1px solid var(--badge-standard-border);
+}
+
+.badge-platinum {
+  font-weight: 400;
+  background-color: var(--platinum-bg);
+  border: 1px solid var(--platinum-border);
+}
+
+.badge-gold {
+  font-weight: 400;
+  background-color: var(--gold-bg);
+  border: 1px solid var(--gold-border);
+}
+
+.badge-silver {
+  font-weight: 400;
+  background-color: var(--silver-bg);
+  border: 1px solid var(--silver-border);
+}
+
+.badge-bronze {
+  font-weight: 400;
+  background-color: var(--bronze-bg);
+  border: 1px solid var(--bronze-border);
+}
+
+.badge-catastrophic {
+  font-weight: 400;
+  background-color: var(--error-tint);
+  border: 1px solid var(--error-shade);
+}
+
 .float-end {
   float: inline-end;
 }
 
 .vertically-centered-row {
   line-height: 40px;
-  flex-direction:row;
+  flex-direction: row;
 
-  .badge  {
+  .badge {
     padding: 0 10px;
     line-height: 40px;
   }
 }
 
 .verification-update-reason {
-  display: none
+  display: none;
 }
 
 // medium breakpoint
@@ -350,11 +330,14 @@ ul.list-right-section {
     margin-right: $spacer;
   }
 
-  .sm-space, .col-sm {
+  .sm-space,
+  .col-sm {
     margin-bottom: $spacer;
   }
 
-  .ethnicity-container label, .w-75, .w-25 {
+  .ethnicity-container label,
+  .w-75,
+  .w-25 {
     width: 100% !important;
   }
 
@@ -363,7 +346,7 @@ ul.list-right-section {
   }
 
   .vertically-centered-row {
-    flex-direction:column;
+    flex-direction: column;
 
     & > * {
       display: inline-block;
@@ -376,6 +359,7 @@ ul.list-right-section {
   .navbar-brand img {
     padding-left: $spacer / 2;
   }
+
 }
 
 // large breakpoint
@@ -410,7 +394,6 @@ ul.list-right-section {
   }
 }
 
-
 .full-height {
   height: 70vh;
 }
@@ -433,7 +416,6 @@ ul.list-right-section {
     border-top: 0;
   }
 }
-
 
 // accordion
 .accordion {
@@ -471,8 +453,9 @@ ul.plain {
 
 // tables
 .border-top-0 {
-  th, td {
-    border-top: 0
+  th,
+  td {
+    border-top: 0;
   }
 }
 
@@ -512,15 +495,117 @@ ul.plain {
   color: var(--theme-primary-blue, #007bc4);
 }
 
-div.disabled *:not(:has(*)):not(button, a.button), div.disabled ::after {
-  opacity: .4;
+div.disabled *:not(:has(*)):not(button, a.button),
+div.disabled ::after {
+  opacity: 0.4;
 }
 
 a.disabled {
   pointer-events: none;
   cursor: not-allowed;
 }
+
 .glossary {
   color: var(--primary-color);
   border-bottom: 1px dashed var(--primary-color);
+  cursor: pointer;
+}
+
+.delete-icon {
+  color: var(--status-red);
+}
+
+.inbox-sender {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nav-stacked li {
+  padding: $spacer;
+  margin-bottom: ($spacer * .25);
+  width: 100%;
+  background: var(--grey-010);
+  color: var(--info-color);
+  a {
+    color: var(--info-color);
+  }
+  &.activer {
+    background: var(--info-color);
+    color: var(--grey-000);
+    a {
+      color: var(--grey-000);
+    }
+  }
+  &.active {
+    @extend .font-weight-bold;
+  }
+}
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
+}
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
+}
+
+.tab-holder {
+  margin-bottom: 6px;
+}
+
+.tab {
+  border: none;
+  padding: 1.25ch 1ch 1.1ch;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--default-font-color);
+  background: var(--tertiary-tint);
+  border-radius: 5px 5px 0 0;
+}
+
+.tab.active {
+  background: #ffffff;;
+  color: var(--primary-color);
+  border-top: 1px solid var(--grey-060);
+  border-left: 1px solid var(--grey-060);
+  border-right: 1px solid var(--grey-060);
+  border-bottom: 1px solid var(--grey-000);
+}
+
+.tab-container {
+  margin-top: 7px;
+  border: 1px solid var(--grey-060);
+}
+
+.msg-inbox:hover {
+  background-color: var(--grey-020);
+}
+
+.msg-active {
+  color: var(--grey-130);
+  font-weight: 600;
+}
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
+}
+
+.filter-input-block legend.bb, .sort-area legend {
+  padding-bottom: ($spacer / 2);
+  border-bottom: 1px solid var(--body-divider);
+}
+
+.plan-card {
+  background: var(--grey-010);
+
+  .plan-footer {
+    a:not(.btn) {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--info-color);
+    }
+  }
 }
