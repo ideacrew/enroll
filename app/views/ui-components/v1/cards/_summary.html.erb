@@ -1,0 +1,295 @@
+<% if @hbx_enrollment.is_shop? %>
+  <% member_enrollment = @member_group.group_enrollment %>
+  <% @plan = member_enrollment.product %>
+<% else %>
+  <% @plan = @member_group %>
+<% end %>
+
+<% unless @hbx_enrollment.shopping? %>
+  <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
+  <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
+<% end %>
+
+<% if @bs4 %>
+  <div class="enrollment-details">
+    <% if qhp.present? %>
+      <h1><%= @hbx_enrollment.coverage_year %> <%= @hbx_enrollment&.product&.kind.to_s.titleize %> <%= l10n('coverage').titleize %></h1>
+
+      <%= render partial: "insured/families/enrollment_refactored", :collection => [@hbx_enrollment], :as => :hbx_enrollment, locals: { read_only: false } %>
+
+      <% unless @hbx_enrollment.shopping? %>
+        <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
+        <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
+      <% end %>
+
+      <% if display_enr_summary_is_enabled(@hbx_enrollment) %>
+        <h2 data-cuke="enrollment_detail"><%= l10n('enrollment.details.header') %></h2>
+        <dl class="parent">
+          <dt><%= l10n('enrollment.effective_on') %></dt>
+          <dd><%= @hbx_enrollment&.effective_on %></dd>
+
+          <dt><%= l10n('enrollment.transitions') %></dt>
+          <dd class="pre-line"><%= all_transitions(@hbx_enrollment) %></dd>
+
+          <dt><%= l10n('product_hios_id') %></dt>
+          <dd><%= @hbx_enrollment&.product&.hios_id || l10n('not_available') %></dd>
+
+          <dt><%= l10n('rating_area.exchange_provided_code') %></dt>
+          <dd><%= @hbx_enrollment&.rating_area&.exchange_provided_code || l10n('not_available') %></dd>
+
+          <dt><%= l10n('service_area') %></dt>
+          <dd><%= @hbx_enrollment&.product&.service_area&.issuer_provided_code || l10n('not_available') %></dd>
+        </dl>
+
+        <h2 data-cuke="enrollment_member_detail"><%= l10n('enrollment.members.header') %></h2>
+        <% @hbx_enrollment.hbx_enrollment_members.each do |member| %>
+          <h3><%= member.full_name.titleize %></h3>
+          <dl>
+            <dt><%= l10n('enrollment_member.coverage_state_date') %></dt>
+            <dd><%= member.coverage_start_on %></dd>
+          </dl>
+        <% end %>
+      <% end %>
+
+      <h2><%= l10n("enrollment_member.enrollment_services") %></h2>
+      <table>
+        <thead>
+          <tr>
+            <th><%= l10n("enrollment_member.services") %></th>
+            <th><%= l10n("enrollment_member.your_cost") %></th>
+            <th><%= l10n("enrollment_member.in_network") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
+        </tbody>
+      </table>
+
+      <% if @hbx_enrollment.shopping? %>
+        <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+      <% else %>
+        <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
+        <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
+      <% end %>
+
+    <% else %>
+      <%= l10n("enrollment.no_plans") %>
+    <% end %>
+  </div>
+
+<% else %>
+  <% if qhp.present? %>
+    <div class="plan module mt-0" >
+      <div class="col-xs-12">
+        <div class="col-xs-6">
+          <span class="pull-left">
+            <%= display_carrier_logo(Maybe.new(@plan), {width: 180}) %>
+          </span>
+        </div>
+        <div class="col-xs-6">
+          <span class="pull-right">
+            <span style="font-size: 24px;">
+              <% if @hbx_enrollment.is_shop? %>
+                <%= number_to_currency(member_enrollment.product_cost_total - member_enrollment.sponsor_contribution_total) %>
+              <% else %>
+                <% if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.kind == :health %>
+                  <%= number_to_currency(shopping_group_premium(@plan.total_employee_cost, @plan.total_ehb_premium, @plan.total_childcare_subsidy_amount, @plan.can_use_aptc?)) %>
+                <% else %>
+                  <%= number_to_currency(@plan.total_employee_cost) %>
+                <% end %>
+              <% end %>
+            </span>
+
+            <span class="lg per month">per month</span>
+          </span>
+        </div>
+      </div>
+      <div class="col-xs-12">
+        <h3 class="text-blue"><%= @plan.title %></h3>
+      </div>
+      <div>
+        <% if @plan.try(:is_standard_plan) %>
+          <div class="col-md-12">
+            <i class="fa fa-bookmark"></i>
+            &nbsp;
+            <%= @plan.standard_plan_label %>
+          </div>
+        <% end %>
+      </div>
+      <div class="col-xs-12">
+        <div class="row">
+          <div class="col-xs-7">
+            <table style="width: 100%; table-layout: fixed;">
+              <tr>
+                <td>
+                  <span class="ttu lg twelve">Type</span>
+
+                  <span class="ttu dg fourteen"><%= @plan.product_type ? @plan.product_type.upcase : "" %></span>
+                </td>
+                <td>
+                  <span class="ttu lg twelve" style="margin-left: -10px">Metal Level</span>
+
+                  <span class="ttu dg fourteen" style="margin-left: -10px">
+                    <% plan_level = @plan.metal_level.titleize %>
+                    <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(@plan).titleize %>
+                  </span>
+                </td>
+                <td>
+                  <span class="ttu lg twelve" style="margin-left: -10px">Network</span>
+
+                  <span class="ttu dg fourteen" style="margin-left: -10px">
+                    <% if offers_nationwide_plans? %>
+                      <%= @plan.network %>
+                    <% else %>
+                      <% if @plan.network_information.present? %>
+                        Network Notes
+                        <i class="fa fa-question-circle" data-toggle="tooltip" title="<%= @plan.network_information %>"></i>
+                      <% end %>
+                    <% end %>
+                  </span>
+                </td>
+                <td>
+                  <span class="ttu lg twelve" style="margin-left: -10px">
+                    <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
+                      Family Deductible
+                    <% else %>
+                      Deductible
+                    <% end %>
+                  </span>
+
+                  <span class="ttu dg fourteen" style="margin-left: -10px">
+                    <%= deductible_display(@hbx_enrollment, @plan) %>
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-xs-5">
+            <div class="pull-right">
+              <% if @hbx_enrollment.shopping? %>
+                <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12">
+        <div class="row">
+          <hr>
+          <div class="col-xs-4">
+            <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: @plan } %>
+          </div>
+          <div class="col-xs-4">
+            <% if @plan.kind == :health && @plan.rx_formulary_url.present? %>
+              <%= link_to "RX FORMULARY URL", @plan.rx_formulary_url, target: "_blank", rel: 'noopener noreferrer' %>
+            <% end %>
+          </div>
+          <div class="col-xs-4">
+            <% if offers_nationwide_plans? && show_provider_directory_url?(@plan) && @plan.provider_directory_url.present? %>
+              <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank", rel: 'noopener noreferrer' %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <% if display_enr_summary_is_enabled(@hbx_enrollment) %>
+      <div class="plan pt-4">
+          <h2 "data-cuke="enrollment_detail"><%= l10n('enrollment.details.header') %></h2>
+
+          <label class="pt-2"><%= l10n('enrollment.effective_on') %></label>
+          <%= @hbx_enrollment&.effective_on %>
+
+          <label class="pt-2"><%= l10n('enrollment.transitions') %></label>
+          <div>
+            <%= all_transitions(@hbx_enrollment) %>
+          </div>
+
+          <label class="pt-2"><%= l10n('product_hios_id') %></label>
+          <%= @hbx_enrollment&.product&.hios_id || l10n('not_available') %>
+
+          <label class="pt-2"><%= l10n('rating_area.exchange_provided_code') %></label>
+          <%= @hbx_enrollment&.rating_area&.exchange_provided_code || l10n('not_available') %>
+
+          <label class="pt-2"><%= l10n('service_area') %>:</label>
+          <%= @hbx_enrollment&.product&.service_area&.issuer_provided_code || l10n('not_available') %>
+
+
+          <h2 data-cuke="enrollment_member_detail"><%= l10n('enrollment.members.header') %></h2>
+
+          <% @hbx_enrollment.hbx_enrollment_members.each do |member| %>
+              <table class="table-responsive">
+                <tr>
+                  <td class="font-weight-bold">
+                    <%= member.full_name.titleize %>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="pt-1">
+                    <span class="" data-cuke="tobbaco_use"><%= l10n('enrollment.tobbaco_user') %></span>
+                    <span class=""><%= member.tobacco_use_value %></span>
+                  </td>
+                  <td class="pt-1">
+                    <span class="" data-cuke="enrollment_coverage_state_date"><%= l10n('enrollment_member.coverage_state_date') %></span>
+
+                    <span class=""><%= member.coverage_start_on %></span>
+                  </td>
+                </tr>
+              </table>
+          <% end %>
+      </div>
+    <% end %>
+
+    <div class="d-none">
+      <% if @market_kind == "employer_sponsored" && @coverage_kind == 'health' %>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <h3><%= number_to_currency(member_enrollment.product_cost_total) %></h3>
+          <small>Premium</small>
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <h3><%= number_to_currency(member_enrollment.sponsor_contribution_total) %></h3>
+          <small>Employer</small>
+        </div>
+      <% end %>
+    </div>
+
+
+    <div class="details pt-4">
+      <h2 >Enrollment Services & Estimated Costs</h2>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th width="30%">SERVICES YOU MAY NEED</th>
+            <th width="40%">YOUR COST AT PARTICIPATING PROVIDER</th>
+            <th width="30%">(IN-NETWORK)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
+          <tr>
+            <td></td>
+            <td class="text-center" colspan="3">
+              <% if @hbx_enrollment.shopping? %>
+                <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+              <% else %>
+                <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
+                <%= link_to(request.referrer, class: 'btn btn-default all-plans') do %>
+                  <i class="fa fa-chevron-left"></i>
+                  <%= back_btn_text %>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @hbx_enrollment.shopping? %>
+      <%= h(link_to back_btn_text.to_s, '#', class: 'btn btn-default all-plans mb-2') %>
+    <% end %>
+
+  <% else %>
+    No Plan Found
+  <% end %>
+<% end %>
