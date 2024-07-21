@@ -1,48 +1,89 @@
-<%= javascript_pack_tag "enrollment" %>
-<%= stylesheet_pack_tag "enrollment" %>
-<% content_for :navigation do %>
-  <%= render partial: 'ui-components/v1/navs/families_navigation' %>
-<% end %>
+<% if @bs4 %>
+  <%= render partial: '/shared/family_side_nav' %>
 
-<div class="col-xs-12">
+  <%= javascript_pack_tag "enrollment" %>
+  <%= stylesheet_pack_tag "enrollment" %>
+
   <div id="plan-summary"></div>
-</div>
 
-<div id='account-detail'>
-  <div class="my-account-page">
-    <h1 class="heading-text mt-0" id="enrollment-history-title"><%= l10n("enrollment_history_title") %></h1>
+  <div id="account-detail">
+    <h1 id="enrollment-history-title"><%= l10n("enrollment_history_title") %></h1>
+
+    <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+      <% enrollments = @all_hbx_enrollments_for_admin %>
+    <% else %>
+      <% enrollments = @hbx_enrollments %>
+    <% end %>
+
+    <% if enrollments&.any? %>
+      <% enrollments.group_by { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
+        <% show_year_heading = yearly_enrollments.any?{|enrollment| !initially_hide_enrollment?(enrollment)} %>
+        <h2 id=<%="#{year}-year-heading"%> class="my-2 <%= "initially_hidden_enrollment hidden" unless show_year_heading %>"><%= year %></h2>
+        <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+          <%= render partial: "enrollment_refactored", :collection => yearly_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+        <% else %>
+          <%= render partial: "enrollment", :collection => yearly_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <%= l10n("no_current_or_past_enrollments", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+    <% end %>
+
+    <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && enrollments&.any? %>
+      <button id="display_all_enrollments_btn" class="button button-primary"><%= l10n("enrollment_history.show_all") %></button>
+      <label for="display_all_enrollments" class="ml-half hidden"><%= l10n("enrollment_history.show_all") %></label>
+      <input id="display_all_enrollments" class="ml-half hidden" type="checkbox" >
+    <% end %>
   </div>
 
-  <div class="row">
-    <div class="col-md-8">
-      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
-        <% enrollments = @all_hbx_enrollments_for_admin %>
-      <% else %>
-        <% enrollments = @hbx_enrollments %>
-      <% end %>
-      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && enrollments&.any? %>
-        <strong id="display-all-enrollments-qs">Display All Enrollments?</strong>
-        <input class="ml-half" type="checkbox" id="display_all_enrollments">
-      <% end %>
-      <% if enrollments&.any? %>
-        <% enrollments.group_by { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
-          <% show_year_heading = yearly_enrollments.any?{|enrollment| !initially_hide_enrollment?(enrollment)} %>
-          <h2 id=<%="#{year}-year-heading"%> class="year-heading mt-0 ml-1 <%= "initially_hidden_enrollment hidden" unless show_year_heading %>"><%= year %></h2>
-          <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
-            <%= render partial: "enrollment_refactored",
-                       :collection => yearly_enrollments,
-                       :as => :hbx_enrollment,
-                       locals: { read_only: false } %>
-          <% else %>
-            <%= render partial: "enrollment",
-                       :collection => yearly_enrollments,
-                       :as => :hbx_enrollment,
-                       locals: { read_only: false } %>
-          <% end %>
+<% else %>
+  <%= javascript_pack_tag "enrollment" %>
+  <%= stylesheet_pack_tag "enrollment" %>
+
+  <% content_for :navigation do %>
+    <%= render partial: 'ui-components/v1/navs/families_navigation' %>
+  <% end %>
+
+  <div class="col-xs-12">
+    <div id="plan-summary"></div>
+  </div>
+
+  <div id='account-detail'>
+    <div class="my-account-page">
+      <h1 class="heading-text mt-0" id="enrollment-history-title"><%= l10n("enrollment_history_title") %></h1>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8">
+        <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
+          <% enrollments = @all_hbx_enrollments_for_admin %>
+        <% else %>
+          <% enrollments = @hbx_enrollments %>
         <% end %>
-      <% else %>
-         <%= l10n("no_current_or_past_enrollments", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-      <% end %>
+        <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && enrollments&.any? %>
+          <strong id="display-all-enrollments-qs">Display All Enrollments?</strong>
+          <input class="ml-half" type="checkbox" id="display_all_enrollments">
+        <% end %>
+        <% if enrollments&.any? %>
+          <% enrollments.group_by { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
+            <% show_year_heading = yearly_enrollments.any?{|enrollment| !initially_hide_enrollment?(enrollment)} %>
+            <h2 id=<%="#{year}-year-heading"%> class="year-heading mt-0 ml-1 <%= "initially_hidden_enrollment hidden" unless show_year_heading %>"><%= year %></h2>
+            <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+              <%= render partial: "enrollment_refactored",
+                        :collection => yearly_enrollments,
+                        :as => :hbx_enrollment,
+                        locals: { read_only: false } %>
+            <% else %>
+              <%= render partial: "enrollment",
+                        :collection => yearly_enrollments,
+                        :as => :hbx_enrollment,
+                        locals: { read_only: false } %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <%= l10n("no_current_or_past_enrollments", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>
+<% end %>
