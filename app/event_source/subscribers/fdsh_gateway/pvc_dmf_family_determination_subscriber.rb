@@ -21,7 +21,7 @@ module Subscribers
           warn "family_hbx_id: #{payload[:correlation_id]} processed failure from fdsh_gateway"
         else
           info "parsed_response: #{payload.inspect}"
-          result = Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination.new.call({encrypted_payload: payload[:encrypted_payload], job_id: job_id, family_hbx_id: family_hbx_id})
+          result = Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination.new.call({encrypted_family_payload: payload[:encrypted_payload], job_id: job_id, family_hbx_id: family_hbx_id})
 
           if result.success?
             info "success: #{result.success}"
