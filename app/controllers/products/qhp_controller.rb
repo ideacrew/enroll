@@ -48,6 +48,7 @@ class Products::QhpController < ApplicationController
   end
 
   def summary
+    @bs4 = true if params[:bs4] == "true"
     @standard_component_ids = [] << @new_params[:standard_component_id]
     active_year_result = Validators::ControllerParameters::ProductsQhpParameters::SummaryActiveYearContract.new.call(params.permit(:active_year).to_h)
     if active_year_result.success?
