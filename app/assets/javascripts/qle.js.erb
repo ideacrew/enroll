@@ -82,7 +82,6 @@ $(function () {
     }else{
       var dateMax = pre_days + 'd';
     }
-    var cur_qle_title = $('.qle-details-title').html();
     $(target).val('');
     $(target).datepicker('destroy');
     $(target).datepicker({
@@ -101,15 +100,24 @@ $(function () {
     });
   }
 
+  function set_details_title(event_element) {
+    const title = $(event_element).data('title');
+    var header = document.createElement("h3");
+    if($(event_element).data('reason') == 'covid-19') {
+      var underlined_title = $(document.createElement("u")).text(title);
+      $('.qle-details-title-container').html(header.html(underlined_title));
+      $('.qle-details-title').html(underlined_title); // legacy
+    } else {
+      $('.qle-details-title-container').html($(header).text(title));
+      $('.qle-details-title').html(title); // legacy
+    }
+  };
+
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
 
-    if($(this).data('reason') == 'covid-19'){
-      $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
-    } else {
-      $('.qle-details-title').html($(this).data('title'));
-    }
+    set_details_title(this);
 
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
@@ -150,11 +158,7 @@ $(function () {
     $('.seps-panel').addClass('hidden');
     $('#no_qle_checkbox').parent().addClass('hidden');
     $('#qle_flow_info #qle-menu').hide();
-    if($(this).data('reason') == 'covid-19'){
-      $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
-    } else {
-      $('.qle-details-title').html($(this).data('title'));
-    }
+    set_details_title(this);
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
