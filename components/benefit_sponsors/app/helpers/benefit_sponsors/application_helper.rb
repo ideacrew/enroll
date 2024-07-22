@@ -66,7 +66,7 @@ module BenefitSponsors
       amount < 0 ? 'style=color:red' : ""
     end
 
-    def render_flash
+    def render_flash(use_bs4: false)
       rendered = []
       flash.each do |type, messages|
         next if messages.blank?
