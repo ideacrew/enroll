@@ -692,15 +692,4 @@ class Insured::FamiliesController < FamiliesController
   def enable_bs4_layout
     @bs4 = conditionally_bs4_enabled_actions.include?(action_name) ? params[:bs4] == "true" : true
   end
-
-  def resolve_layout
-    case action_name
-    when "find_sep"
-      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application"
-    when "brokers", "inbox", "home", "enrollment_history", "personal", "manage_family"
-      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "two_column"
-    when "purchase"
-      "two_column"
-    end
-  end
 end
