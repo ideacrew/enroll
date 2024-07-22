@@ -3,26 +3,26 @@
   <% can_show_actions_button = current_user.has_hbx_staff_role? && evidence_type.present? %>
   <% badge_col_class = can_show_actions_button ? "5" : "4" %>
   <div class="my-3" data-cuke="<%= evidence_kind %>_for_<%= applicant.full_name.parameterize.underscore %>">
-    <div class="row mb-2 mx-0 p-0">
-      <div class="d-flex col-xl-7 px-0 pb-2 pb-xl-0 align-items-center">
+    <div class="d-flex sm-block sm-space justify-content-between mb-2 mx-0 p-0">
+      <div class="d-flex sm-block sm-space col-md-9 px-0 pb-2 pb-lg-0 align-items-center">
         <div class="<%= "col-xl-#{badge_col_class} col-md-#{badge_col_class}" %> col-lg-3 col-4 px-0">
           <%= l10n(display_evidence_type(evidence_type)) %>
         </div>
-        <div class="mr-auto ml-xl-0">
+        <div class="ml-auto ml-lg-0 sm-block sm-space">
           <span class="badge badge-status badge-<%= verification_status_class(evidence.aasm_state.to_s) %> p-2" id="status">
             <%= show_verification_status(evidence.aasm_state.to_s, current_user.has_hbx_staff_role?) %>
           </span>
         </div>
         <% if Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state.to_s) %>
-          <p class="d-flex align-items-center my-0 ml-md-3">
+          <p class="d-flex align-items-center my-0 ml-md-3 sm-block sm-space">
             <strong class="secondary-text"><%= l10n("due_date") %>: </strong>
             <%= evidence.verif_due_date %>
           </p>
         <% end %>
       </div>
-      <div class="d-flex col-xl-5 pl-xl-2 px-0 justify-content-xl-end">
+      <div class="d-flex col-md-3 pl-lg-2 px-0 justify-content-lg-end sm-block sm-space">
         <% if can_show_actions_button %>
-          <span class="v-type-actions mr-2">
+          <span class="v-type-actions mr-2 sm-block sm-space">
             <%= select_tag :verification_actions, admin_actions_on_faa_documents(evidence), {id: "v-action-#{applicant.id}-#{evidence_type.downcase.split.join('-')}", prompt: l10n("insured.consumer_roles.upload_ridp_documents.actions"), class: "button-select"} %>
           </span>
         <% end %>
@@ -44,15 +44,15 @@
     </div>
     <div>
       <% if evidence.documents.any? %>
-        <span><label class="my-0"><%= l10n("documents_list_title", document_type: l10n(display_evidence_type(evidence_type))) %></label></span>
+        <span><label class="my-0"><%= l10n("insured.consumer_roles.upload_ridp_documents.list_header", ridp_type: v_type_display) %></label></span>
         <div class="col-sm-12 px-0">
           <% evidence.documents.each do |document|%>
-            <% key = document.identifier.split('#').last %>
             <div class="d-flex row py-1 px-0 m-0 align-items-center" id="doc_table_row_<%=document.id%>">
               <div class="col-sm px-0 m-0">
-                <%= document.title.titleize %>
+                <%= vlp_doc.title.titleize %>
               </div>
               <div class="d-flex col-sm align-items-center justify-content-sm-end px-0 mt-1 mt-sm-0 mb-0">
+
                 <% if document.identifier.present? %>
                   <%= h(content_tag(
                     :a,
@@ -66,9 +66,9 @@
                   <% end) %>
                 <% end %>
                 <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
-                  <%= h(link_to(financial_assistance.application_applicant_verification_documents_destroy_path(document, :applicant_id => applicant.id, :evidence => evidence.id, :doc_key => key, :doc_title => document.title.titleize, evidence_kind: evidence_kind), :method => :delete, class: "btn-error outline text-nowrap") do %>
+                  <%= link_to financial_assistance.application_applicant_verification_documents_destroy_path(document, :applicant_id => applicant.id, :evidence => evidence.id, :doc_key => key, :doc_title => document.title.titleize, evidence_kind: evidence_kind), method: :delete, class: "btn-error outline text-nowrap" do %>
                     <%= l10n("insured.consumer_roles.upload_ridp_documents.remove") %>
-                  <% end) %>
+                  <% end %>
                 </span>
               </div>
             </div>
