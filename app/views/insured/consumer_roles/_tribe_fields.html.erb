@@ -45,7 +45,7 @@
       </div>
 
       <fieldset class="mb-4 d-block featured-tribe-container hide">
-        <legend for="tribe_codes"><%= l10n("insured.tribal_name") %> *</legend>
+        <legend class="weight-n" for="tribe_codes"><%= l10n("insured.tribal_name") %> *</legend>
         <%= f.collection_check_boxes(:tribe_codes, featured_tribes_collection, :value, :name, {}, :class => 'tribe_codes')  do |tribe| %>
           <div>
             <%= tribe.label(:"data-value" => tribe.value) do %>
