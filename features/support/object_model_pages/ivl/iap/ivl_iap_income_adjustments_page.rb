@@ -4,19 +4,11 @@
 class IvlIapIncomeAdjustmentsPage
 
   def self.income_adjustments_yes_radiobtn
-    if EnrollRegistry[:bs4_consumer_flow].enabled?
-
-    else
-    '#has_deductions_true'
-    end
+    '#has_deductions_true' unless EnrollRegistry[:bs4_consumer_flow].enabled?
   end
 
   def self.income_adjustments_no_radiobtn
-    if EnrollRegistry[:bs4_consumer_flow].enabled?
-
-    else
-    '#has_deductions_false'
-    end
+    '#has_deductions_false' unless EnrollRegistry[:bs4_consumer_flow].enabled?
   end
 
   def self.not_sure_has_deductions

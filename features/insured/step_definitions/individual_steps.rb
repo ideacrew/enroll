@@ -139,8 +139,6 @@ Then(/^.+ enter personal information with american indian alaska native status w
     find("#tribal-state-container .selectric-items li", text: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item).click
     tribe_codes = find_all('input.tribe_codes')
     tribe_codes.first.click unless tribe_codes.empty?
-  else
-
   end
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
@@ -163,8 +161,6 @@ Then(/^.+ enter personal information with american indian alaska native status w
     tribe_codes = find_all('input.tribe_codes')
     tribe_codes.last.click unless tribe_codes.empty?
     fill_in IvlPersonalInformation.tribal_name, :with => "testTribeName" unless tribe_codes.empty?
-  else
-
   end
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"

@@ -108,11 +108,12 @@ module BenefitSponsors
 
     def employer_contribution_tool_tip_helper
       employer_contribution = "Employers are required to contribute at least #{aca_shop_market_employer_contribution_percent_minimum}% of the premium costs for employees based on the reference plan selected, except during the special annual enrollment period at the end of each year."
-      if individual_market_is_enabled?
-        add_on_text = "Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."
-      else
-        add_on_text = "Offering family coverage is optional, but if offered, employers are required to contribute at least #{aca_shop_market_employer_family_contribution_percent_minimum}% towards family premiums, except during the special annual enrollment period at the end of each year."
-      end
+      add_on_text = if individual_market_is_enabled?
+                      "Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."
+                    else
+                      "Offering family coverage is optional, but if offered, employers are required to contribute at least #{aca_shop_market_employer_family_contribution_percent_minimum}% towards family premiums,
+                      except during the special annual enrollment period at the end of each year."
+                    end
       employer_contribution + add_on_text
     end
 
@@ -138,11 +139,13 @@ module BenefitSponsors
 
       if benefit_application.is_renewing?
         [
-["<p>Claiming this quote will replace your existing renewal draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
+["<p>Claiming this quote will replace your existing renewal draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p>
+<p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
 ]
       else
         [
-["<p>Claiming this quote will replace your existing draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p><p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
+["<p>Claiming this quote will replace your existing draft plan year. This action cannot be undone. Are you sure you wish to claim this quote?</p>
+<p>If you wish to review the quote details prior to claiming, please contact your Broker to provide you with a pdf copy of this quote.</p>"], "#claimQuoteWarning"
 ]
       end
     end
