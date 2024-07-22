@@ -180,7 +180,7 @@ Lint/LambdaWithoutLiteralBlock: # (new in 1.8)
 Lint/NoReturnInBeginEndBlocks: # (new in 1.2)
   Enabled: true
 Lint/RedundantDirGlobSort: # (new in 1.8)
-  Enabled: true
+  Enabled: false
 Lint/ToEnumArguments: # (new in 1.1)
   Enabled: true
 Lint/UnexpectedBlockArity: # (new in 1.5)
