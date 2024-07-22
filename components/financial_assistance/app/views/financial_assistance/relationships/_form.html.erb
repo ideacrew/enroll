@@ -3,7 +3,7 @@
   <h1><%= l10n("family_relationships") %></h1>
   <p>
     <%= l10n("household_relationships") %>
-    <b> 
+    <b>
       <%= l10n("continue_to_next_step") %>
     </b>
   </p>
@@ -22,7 +22,7 @@
       <% end %>
     <% end %>
   <% end %>
-  <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_application_path(@application)} %>
+  <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_and_submit_application_path(@application)} %>
 <% else %>
 <h1 class="darkblue">Family Relationships</h1>
 <p>We need to understand how members of your household are related. Select the relationship for each person listed

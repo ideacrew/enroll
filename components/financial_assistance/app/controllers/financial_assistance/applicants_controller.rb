@@ -115,15 +115,12 @@ module FinancialAssistance
       end
     end
 
-    #rubocop:disable Metrics/AbcSize
     def step
       raise ActionController::UnknownFormat unless request.format.html?
 
       authorize @applicant, :step?
-
       redirect_to tax_info_application_applicant_path(@application, @applicant)
     end
-    #rubocop:enable Metrics/AbcSize
 
     def age_of_applicant
       authorize @applicant, :age_of_applicant?
@@ -198,9 +195,7 @@ module FinancialAssistance
 
       model_params["person_coverage_end_on"] = format_date_string(model_params["person_coverage_end_on"].to_s) if model_params["person_coverage_end_on"].present?
       model_params["medicaid_cubcare_due_on"] = format_date_string(model_params["medicaid_cubcare_due_on"].to_s) if model_params["medicaid_cubcare_due_on"].present?
-      model_params["medicaid_cubcare_due_on"] = nil if model_params.key?("medicaid_cubcare_due_on") && model_params["medicaid_cubcare_due_on"].blank?
-      model_params["has_eligibility_changed"] = nil if model_params.key?("has_eligibility_changed") && model_params["has_eligibility_changed"].blank? && !model_params["has_eligibility_changed"].nil?
-      model_params["has_household_income_changed"] = nil if model_params.key?("has_household_income_changed") && model_params["has_household_income_changed"].blank? && !model_params["has_household_income_changed"].nil?
+      model_params = format_nil_for_blank_date(model_params)
 
       model_params["dependent_job_end_on"] = format_date_string(model_params["dependent_job_end_on"].to_s) if model_params["dependent_job_end_on"].present?
     end
@@ -271,6 +266,13 @@ module FinancialAssistance
       address_hash = params.find {|key| key.is_a?(Hash) && key[:addresses_attributes]}
       address_hash[:addresses_attributes] << :county if EnrollRegistry.feature_enabled?(:display_county) && address_hash.present?
       params
+    end
+
+    def format_nil_for_blank_date(model_params)
+      model_params["medicaid_cubcare_due_on"] = nil if model_params.key?("medicaid_cubcare_due_on") && model_params["medicaid_cubcare_due_on"].blank?
+      model_params["has_eligibility_changed"] = nil if model_params.key?("has_eligibility_changed") && model_params["has_eligibility_changed"].blank? && !model_params["has_eligibility_changed"].nil?
+      model_params["has_household_income_changed"] = nil if model_params.key?("has_household_income_changed") && model_params["has_household_income_changed"].blank? && !model_params["has_household_income_changed"].nil?
+      model_params
     end
 
     def enable_bs4_layout

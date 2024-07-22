@@ -41,11 +41,11 @@
       <div class="focus d-flex align-items-center mt-2 mb-2">
         <label class="radio-label radio" for="living_outside_yes">
           <%= f.radio_button("parent_living_out_of_home_terms", true, id: "living_outside_yes") %>
-          <span class="weight-n"><%= l10n('faa.i_agree') %></span>
+          <span class="weight-n"><%= l10n('yes') %></span>
         </label>
         <label class="radio-label radio weight-n" for="living_outside_no">
           <%= f.radio_button("parent_living_out_of_home_terms", false, id: "living_outside_no") %>
-          <%= l10n("insured.preferences.i_disagree") %>
+          <%= l10n("no") %>
         </label>
       </div>
     </fieldset>

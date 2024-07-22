@@ -6,8 +6,10 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
-    before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :edit, :eligibility_results, :review_and_submit, :review, :submit_your_application, :wait_for_eligibility_response, :preferences, :application_publish_error, :eligibility_response_error, :index, :index_with_filter] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-
+    if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+      before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :edit, :eligibility_results, :review_and_submit, :review,
+                                               :submit_your_application, :wait_for_eligibility_response, :preferences, :application_publish_error, :eligibility_response_error, :index, :index_with_filter]
+    end
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
     include ActionView::Helpers::SanitizeHelper
@@ -388,11 +390,8 @@ module FinancialAssistance
       when "application_year_selection", "application_checklist", "index", "index_with_filter"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance"
       when "eligibility_results"
-        if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-          return params.keys.include?('cur') ? "financial_assistance_progress" : "bs4_financial_assistance"
-        else
-          return params.keys.include?('cur') ? "financial_assistance_nav" : "financial_assistance"
-        end
+        return "financial_assistance_progress" if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        params.keys.include?('cur') ? "financial_assistance_nav" : "financial_assistance"
       when "wait_for_eligibility_response"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "bs4_financial_assistance" : "financial_assistance"
       else
@@ -502,16 +501,15 @@ module FinancialAssistance
 
     def generate_income_hash(applicant)
       income_hash = {
-        strip_tags(l10n('faa.incomes.from_employer', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + '*') => human_boolean(applicant.has_job_income),
+        "#{l10n('faa.incomes.from_employer', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)}*" => human_boolean(applicant.has_job_income),
         "jobs" => generate_employment_hash(applicant.incomes.jobs),
-        strip_tags(l10n('faa.incomes.from_self_employment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + '*') => human_boolean(applicant.has_self_employment_income)
+        l10n('faa.incomes.from_self_employment',
+             assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) => human_boolean(applicant.has_self_employment_income),
+        l10n('faa.other_incomes.other_sources', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) => human_boolean(applicant.has_other_income)
       }
       if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-        income_hash.merge!(strip_tags(l10n('faa.other_incomes.unemployment',
-                                           assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + '*') => human_boolean(applicant.has_unemployment_income))
+        income_hash.merge!(l10n('faa.other_incomes.unemployment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) => human_boolean(applicant.has_unemployment_income))
       end
-      income_hash.merge!(strip_tags(l10n('faa.other_incomes.other_sources',
-                                         assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) + '*') => human_boolean(applicant.has_other_income))
       income_hash
     end
 
