@@ -7,9 +7,11 @@
   <section class="my-4 p-3 border rounded bg-white benefit-form-container" id="<%= form_id %>">
     <%= f.hidden_field :kind, value: kind %>
     <%= f.hidden_field :insurance_kind, value: kind %>
-    <% if insurance_kind.present? %>
-      <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titleize %></h2>
-    <% end %>
+    <div class="insurance-kind-label-container">
+      <% if insurance_kind.present? %>
+        <h2><%= insurance_kind.humanize.titleize %></h2>
+      <% end %>
+    </div>
     <%= f.label :employer_name, l10n("faa.health_coverage.esi.employer_name"), required: false, class: "required mt-2", for: "employer_name|#{form_id}" %>
     <%= f.text_field :employer_name, placeholder: l10n("faa.health_coverage.esi.employer_name"), required: false, id: "employer_name|#{form_id}" %>
     <div class="d-flex mt-4">

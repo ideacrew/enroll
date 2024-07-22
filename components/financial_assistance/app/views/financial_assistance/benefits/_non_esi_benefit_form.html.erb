@@ -4,9 +4,11 @@
     <div class="my-4 p-3 border rounded bg-white benefit-form-container" data-cuke="non_esi_benefit" id="<%= form_id %>">
       <%= f.hidden_field :kind, value: kind %>
       <%= f.hidden_field :insurance_kind, value: "" %>
-      <% if insurance_kind.present? %>
-        <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titleize %></h2>
-      <% end %>
+      <div class="insurance-kind-label-container">
+        <% if insurance_kind.present? %>
+          <h2><%= insurance_kind.humanize.titleize %></h2>
+        <% end %>
+      </div>
       <div class="d-flex flex-column">
         <%= l10n("faa.health_coverage.coverage_period_question") %>
         <div class="d-flex">
