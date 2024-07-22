@@ -71,31 +71,20 @@ module FinancialAssistance
     end
 
     def verification_status_class(status)
+      default_class = @bs4 ? "absent" : "default"
       case status
-      when "verified"
+      when "verified", "valid"
         "success"
-      when "review"
+      when "review", "negative_response_received"
         "warning"
-      when "outstanding"
+      when "outstanding", "rejected"
         "danger"
-      when "curam"
-        "default"
-      when "attested"
-        "default"
-      when "valid"
-        "success"
+      when "curam", "attested", "expired", "unverified"
+        default_class
       when "pending"
         "info"
-      when "expired"
-        "default"
-      when "unverified"
-        "default"
-      when "rejected"
-        "danger"
-      when "negative_response_received"
-        "warning"
       else
-        "default"
+        default_class
       end
     end
   end
