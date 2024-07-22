@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div id="<%= dom_id benefit %>" class="benefit">
     <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="esi_benefit">
-      <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titlecase %></h2>
+      <h2><%= insurance_kind.humanize.titlecase %></h2>
       <h3><%= benefit.employer_name %></h3>
       <dl class="parent mb-4">
         <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
