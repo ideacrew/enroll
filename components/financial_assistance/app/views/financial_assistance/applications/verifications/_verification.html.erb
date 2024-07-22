@@ -2,7 +2,7 @@
 <% if application.present? %>
   <% if @bs4 %>
     <h2><%= l10n('faa.verification.documents') %></h2>
-    <% applicants.each do |applicant| %>
+    <% application.applicants.each do |applicant| %>
       <section class="card">
         <h3 class="mb-0"><%= applicant.full_name %></h3>
         <hr>
