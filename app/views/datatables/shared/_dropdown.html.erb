@@ -1,45 +1,67 @@
-<div class="dropdown <%= 'pull-right' if !defined? pull_left %>" id="<%= row_actions_id %>">
-	<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
-    Actions
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown_for_<%= row_actions_id %>">
-  <% dropdowns.each do |line| %>
-    <!-- line[0] is Link Name (Eg: Add SEP)
-         line[1] is Link Path
-         line[2] is Link Type (ajax, static or disabled) -->
-    <li >
-      <%case line[2]%>
-      <%when "disabled"%>
-        <% if line[0] == 'Edit APTC / CSR' %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-info btn-xs edit_aptc_csr_#{row_actions_id}", disabled: true, remote: true) %>
-        <% else %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-info btn-xs", disabled: true) %>
+<% if @bs4 %>
+  <% row_actions_id = local_assigns[:row_actions_id].present? ? local_assigns[:row_actions_id] : nil %>
+  <div class="dropdown <%= 'pull-right' if !defined? pull_left %>" id="<%= row_actions_id %>">
+    <button class="btn outline p-2 px-3 dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
+      <span class="pr-1"><%= l10n("actions") %></span>
+    </button>
+    <div class="actions-dropdown dropdown-menu <%= local_assigns[:dropdown_class] %> shadow-sm py-0" aria-labelledby="dropdown_for_<%= row_actions_id %>">
+      <% if dropdowns.empty? %>
+        <div class="dropdown-item no-actions py-2 text-nowrap">
+          <%= l10n("no_actions") %>
+        </div>
+      <% else %>
+        <% dropdowns.each do |option| %>
+          <% attributes = option[:attributes] %>
+          <% option_class = attributes&.delete(:class) %>
+          <%= link_to_with_noopener_noreferrer(option[:title], option[:link], class: "dropdown-item py-2 text-nowrap #{option_class}", **(attributes.present? ? attributes : {})) %>
         <% end %>
-      <%when "static"%>
-        <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", data: {turbolinks: false}) %>
-			<% when "post" %>
-				<%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "btn btn-xs") %>
-      <%when "post_ajax"%>
-        <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "btn btn-xs",remote: true) %>
-      <%when "post_ajax_with_confirmation"%>
-        <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "btn btn-xs", remote: true, data: { confirm: line[3] }) %>
-      <%when "ajax"%>
-				<% if line[0] == l10n('admin_actions.edit_aptc_csr') %>
-					<%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs edit-aptc-csr-enabled", remote: true) %>
-				<% else %>
-					<%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", remote: true) %>
-				<% end %>
-      <%when "ajax with confirm"%>
-        <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", remote: true, data: { confirm: line[3] }) %>
-      <%when "delete with confirm"%>
-        <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", :method => 'delete', data: { confirm: line[3] }) %>
-			<% when "delete ajax with confirm"%>
-				<%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", :method=> 'delete', data: { confirm: line[3] }) %>
-      <% when "delete ajax with confirm and elementId"%>
-        <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4]) %>
-      <%end%>
-    </li>
-  <% end %>
-  </ul>
-</div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="dropdown <%= 'pull-right' if !defined? pull_left %>" id="<%= row_actions_id %>">
+    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
+      Actions
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdown_for_<%= row_actions_id %>">
+    <% dropdowns.each do |line| %>
+      <!-- line[0] is Link Name (Eg: Add SEP)
+          line[1] is Link Path
+          line[2] is Link Type (ajax, static or disabled) -->
+      <li >
+        <%case line[2]%>
+        <%when "disabled"%>
+          <% if line[0] == 'Edit APTC / CSR' %>
+            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-info btn-xs edit_aptc_csr_#{row_actions_id}", disabled: true, remote: true) %>
+          <% else %>
+            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-info btn-xs", disabled: true) %>
+          <% end %>
+        <%when "static"%>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", data: {turbolinks: false}) %>
+        <% when "post" %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "btn btn-xs") %>
+        <%when "post_ajax"%>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "btn btn-xs",remote: true) %>
+        <%when "post_ajax_with_confirmation"%>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "btn btn-xs", remote: true, data: { confirm: line[3] }) %>
+        <%when "ajax"%>
+          <% if line[0] == l10n('admin_actions.edit_aptc_csr') %>
+            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs edit-aptc-csr-enabled", remote: true) %>
+          <% else %>
+            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", remote: true) %>
+          <% end %>
+        <%when "ajax with confirm"%>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", remote: true, data: { confirm: line[3] }) %>
+        <%when "delete with confirm"%>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", :method => 'delete', data: { confirm: line[3] }) %>
+        <% when "delete ajax with confirm"%>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", :method=> 'delete', data: { confirm: line[3] }) %>
+        <% when "delete ajax with confirm and elementId"%>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "btn btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4]) %>
+        <%end%>
+      </li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>

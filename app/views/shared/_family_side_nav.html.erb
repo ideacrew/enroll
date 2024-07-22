@@ -30,13 +30,13 @@
       <% end %>
       <% if @person.has_consumer_role? && EnrollRegistry.feature_enabled?(:financial_assistance) %>
         <li>
-          <%= link_to financial_assistance.applications_path(tab: 'cost_savings'), class: "#{'active' if action_name == 'index'}" do %>
+          <%= link_to financial_assistance.applications_path(tab: 'cost_savings'), class: "#{'active' if ['index', 'index_with_filter', 'applications', 'review'].include?(action_name)}" do %>
             <%= l10n("faa.cost_savings_nav") %>
           <% end %>
         </li>
       <% end %>
       <li>
-        <%= link_to manage_family_insured_families_path(tab: 'family'), class: "#{'active' if action_name == 'personal'}" do %>
+        <%= link_to main_app.manage_family_insured_families_path(tab: 'family'), class: "#{'active' if ['personal', 'manage_family'].include?(action_name)}" do %>
           <%= l10n("my_household") %>
         <% end %>
       </li>
