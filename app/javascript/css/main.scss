@@ -257,6 +257,16 @@ ul.list-right-section {
     background-color: var(--warning-status-tint);
     border: 1px solid var(--warning-border);
   }
+
+  &.badge-info { 
+    background-color: var(--info-tint);
+    border: 1px solid var(--info-color); 
+  }
+
+  &.badge-absent {
+    background-color: var(--grey-040);
+    border: 1px solid var(--grey-160);
+  }
 }
 
 .badge-current-plan {
@@ -324,6 +334,22 @@ ul.list-right-section {
 }
 
 .verification-update-reason {
+  display: none;
+}
+
+.return-for-def-reason {
+  display: none;
+}
+
+.fedhub-request {
+  display: none;
+}
+
+.extend-request {
+  display: none;
+}
+
+.view-history {
   display: none;
 }
 
