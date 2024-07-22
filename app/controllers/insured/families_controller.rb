@@ -7,7 +7,7 @@ class Insured::FamiliesController < FamiliesController
 
   layout :resolve_layout
 
-  before_action :enable_bs4_layout, only: [:home, :find_sep, :record_sep, :check_qle_date, :check_move_reason, :check_marriage_reason, :check_insurance_reason, :personal, :inbox, :manage_family, :brokers, :enrollment_history] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:home, :find_sep, :record_sep, :check_qle_date, :check_move_reason, :check_marriage_reason, :check_insurance_reason, :verification, :personal, :inbox, :manage_family, :brokers, :enrollment_history] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
@@ -142,7 +142,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     respond_to do |format|
-      format.html
+      format.html { render :layout => EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application" }
     end
   end
 
@@ -374,7 +374,7 @@ class Insured::FamiliesController < FamiliesController
       @terminate_date = fetch_terminate_date(params["terminate_date_#{@enrollment.hbx_id}"]) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
       respond_to do |format|
-        format.html
+        format.html { render :layout => 'application' }
       end
     else
       redirect_to :back
@@ -691,16 +691,5 @@ class Insured::FamiliesController < FamiliesController
 
   def enable_bs4_layout
     @bs4 = conditionally_bs4_enabled_actions.include?(action_name) ? params[:bs4] == "true" : true
-  end
-
-  def resolve_layout
-    case action_name
-    when "find_sep"
-      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application"
-    when "brokers", "inbox", "home", "enrollment_history", "personal", "manage_family"
-      EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "two_column"
-    when "purchase"
-      "two_column"
-    end
   end
 end
