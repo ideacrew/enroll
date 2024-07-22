@@ -4,6 +4,7 @@ module ApplicationHelper
   include FloatHelper
   include ::FinancialAssistance::VerificationHelper
   include HtmlScrubberUtil
+  include DropdownHelper
 
   def add_external_links_enabled?
     EnrollRegistry.feature_enabled?(:add_external_links)
