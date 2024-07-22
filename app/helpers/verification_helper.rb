@@ -87,7 +87,7 @@ module VerificationHelper
     when 'outstanding', 'rejected'
       'danger'
     when 'curam', 'attested', 'expired', 'unverified'
-      'default'
+      @bs4 ? 'absent' : 'default'
     when 'pending'
       'info'
     end
