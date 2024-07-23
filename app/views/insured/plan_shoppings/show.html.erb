@@ -725,7 +725,7 @@
 
   <%= render partial: "ui-components/v1/modals/help_with_plan", locals: { enrollment: @hbx_enrollment } %>
   <script>
-    var marketKind = "#{@hbx_enrollment.is_shop? ? 'shop' : @hbx_enrollment.kind}";
+    var marketKind = "<%= @hbx_enrollment.is_shop? ? 'shop' : @hbx_enrollment.kind %>";
     // Needs to be defined outside of conditional for marketKind
     // because will try to render on plan_filters.html.slim even on individual market
     var selectedPlans = document.getElementsByClassName("myfilteredPlans");
@@ -1150,9 +1150,8 @@
     }
     if (marketKind === 'individual' || marketKind === 'coverall') {
       $(document).ready(function () {
-        var coverageKind = "#{@hbx_enrollment.coverage_kind}";
         $.ajax({
-          url: "#{plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present?}",
+          url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present? %>",
           type: "GET"
         });
       });
