@@ -11,8 +11,8 @@
         <% end %>
       </dl>
       <div class="mt-4">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-edit-<%= dom_id benefit %>')" id="non-esi-edit-<%= dom_id benefit %>" class="btn btn-error outline edit-benefit" data-kind="<%= benefit.kind %>"><%= l10n("en.faa.health_coverage.edit") %></a>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-delete-<%= dom_id benefit %>')" id="non-esi-delete-<%= dom_id benefit%>" class="btn btn-error delete-benefit" data-kind="<%= benefit.kind %>"><%= l10n("en.faa.health_coverage.delete") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-delete-<%= dom_id benefit %>')" id="non-esi-delete-<%= dom_id benefit%>" class="btn btn-error outline delete-benefit mr-2" data-kind="<%= benefit.kind %>"><%= l10n("faa.edit.remove") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-edit-<%= dom_id benefit %>')" id="non-esi-edit-<%= dom_id benefit %>" class="btn btn outline edit-benefit" data-kind="<%= benefit.kind %>"><%= l10n("edit") %></a>
       </div>
     </div>
 

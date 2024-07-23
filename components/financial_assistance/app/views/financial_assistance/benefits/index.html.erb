@@ -129,7 +129,7 @@
             <span class="instruction-row"><%=l10n("faa.medicaid_cubcare_end_date")%></span>
             <div class="mr-auto mt-3">
               <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
-              <%= date_field :medicaid_cubcare_due_on, {id: "medicaid_cubcare_due_on", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
+              <%= date_field_tag :medicaid_cubcare_due_on, {id: "medicaid_cubcare_due_on", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
             </div>
         </div>
 
@@ -153,7 +153,7 @@
             <span class="instruction-row"><%=l10n("faa.person_medicaid_last_day")%></span>
             <div class="mr-auto mt-3">
               <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
-              <%= date_field :person_coverage_end_on, {id: "medicaid-chip-person_coverage_end_on-last-day", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
+              <%= date_field_tag :person_coverage_end_on, {id: "medicaid-chip-person_coverage_end_on-last-day", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
             </div>
           </div>
 
@@ -198,7 +198,7 @@
           <span class="instruction-row"><%=l10n("faa.dependent_job_end_on")%></span>
           <div class="mr-auto mt-3">
             <label class="required" for="dependent_job_end_on"><%=l10n("dependent_job_end_on")%></label>
-            <%= date_field :dependent_job_end_on, {id: "dependent_job_end_on", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
+            <%= date_field_tag :dependent_job_end_on, {id: "dependent_job_end_on", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
           </div>
         </div>
       </div>

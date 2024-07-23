@@ -24,9 +24,9 @@
       </div>
       <div class="mt-4">
         <% if edit %>
-          <a tabindex="0" id="benefit_edit_cancel_<%= kind %>|<%= form_id %>" class="btn btn-error outline benefit-edit-cancel mr-2" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
+          <a tabindex="0" id="benefit_edit_cancel_<%= kind %>|<%= form_id %>" class="btn outline benefit-edit-cancel mr-2" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
         <% else %>
-          <a tabindex="0" id="non_esi_cancel_<%= kind %>|<%= form_id %>" class="btn btn-error outline benefit-form-cancel mr-2" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
+          <a tabindex="0" id="non_esi_cancel_<%= kind %>|<%= form_id %>" class="btn outline benefit-form-cancel" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
         <% end %>
         <%= f.submit l10n("faa.health_coverage.save"), class: 'btn btn-save' %>
       </div>
