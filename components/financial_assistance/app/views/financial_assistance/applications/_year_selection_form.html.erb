@@ -9,7 +9,7 @@
     <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form) %>
       <div class="alert alert-warning d-flex" role="alert">
         <div>
-          <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+          <div class="warning-icon icon mt-2" alt="warning" aria-hidden="true">&nbsp;</div>
         </div>
         <div class="mt-2 mb-1">
           <%= l10n("faa.update_reminder", year: current_year, year2: oe_year) %>
