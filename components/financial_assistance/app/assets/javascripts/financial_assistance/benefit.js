@@ -210,7 +210,6 @@ document.addEventListener("turbolinks:load", function() {
     var container = button.closest('form').closest('div');
     var benefitList = container.closest('.benefits-list');
     container.remove();
-    document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
     if (benefitList.querySelectorAll('.benefit').length == 0) {
       document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
     } else {
