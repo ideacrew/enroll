@@ -150,6 +150,7 @@ module FinancialAssistance
     end
 
     def immigration_document_options
+      @bs4 = true if params[:bs4] == "true"
       if params[:target_type] == "FinancialAssistance::Applicant" && params[:target_id].present?
         @target = FinancialAssistance::Applicant.find(params[:target_id])
         authorize @target, :immigration_document_options?

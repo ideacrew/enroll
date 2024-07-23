@@ -302,9 +302,9 @@ module FinancialAssistance
       ::FinancialAssistance::Applicant.find(id)&.full_name
     end
 
-    def immigration_document_options_submission_url(application, model)
+    def immigration_document_options_submission_url(application, model, bs4)
       if model.try(:persisted?)
-        { :remote => true, method: :put, :url => application_applicant_path(application_id: application.id, id: model.id), :as => :applicant }
+        { :remote => true, method: :put, :url => application_applicant_path(application_id: application.id, id: model.id, bs4: bs4), :as => :applicant }
       else
         { :remote => true, method: :post, :url => "/applications/#{application.id}/applicants", :as => :applicant }
       end
