@@ -11,7 +11,7 @@
 </div>
 
 <div id="new-benefit-form-<%= kind %>" class='new-benefit-form my-4 p-3 border rounded bg-white <%= 'hidden' if @applicant.benefits.where(kind: kind).any? %>'>
-  <% title = kind == l10n("is_enrolled" ? "faa.health_coverage.health_cov_type" : "faa.health_coverage.other_health_cov_type") %>
+  <% title = l10n(kind == "is_enrolled" ? "faa.health_coverage.health_cov_type" : "faa.health_coverage.other_health_cov_type") %>
   <%= label_tag :insurance_kind, title, class:"required", for: "insurance_kind_#{kind}" %>
   <%= select_tag :insurance_kind, options_for_select(insurance_kind_select_options(kind)), required:true, prompt: title, class: "insurance-kind w-100", id: "insurance_kind_#{kind}", data: {kind: kind} %>
   <a href="#health_cov_type_<%= kind %>" data-toggle="modal" data-target="#health_cov_type_<%= kind %>" class="d-block my-2"><%= l10n("not_sure") %></a>
