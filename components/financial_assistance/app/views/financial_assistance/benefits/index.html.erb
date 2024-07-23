@@ -19,8 +19,8 @@
         </label>
       </div>
       <div class="instruction-row">
-        <a href="#has_enrolled_health_coverage" data-toggle="modal" data-target="#has_enrolled_health_coverage" class="d-block"><%= l10n("not_sure") %></a>
-        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: 'has_enrolled_health_coverage'} %>
+        <a href="#<%= applicant_currently_enrolled_key %>" data-toggle="modal" data-target="#<%= applicant_currently_enrolled_key %>" class="d-block"><%= l10n("not_sure") %></a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: applicant_currently_enrolled_key} %>
       </div>
       <div class="benefit-kinds" id="enrolled-benefit-kinds">
         <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_enrolled" } %>
