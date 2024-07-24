@@ -52,6 +52,15 @@
         </tbody>
       </table>
     </div>
+  <% else %>
+    <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app', style: "align-self:flex-end;") do %>
+      <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
+      <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
+        <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary"%>
+      <% else %>
+        <%= submit_tag l10n('faa.start_new_application'), onclick: "StartNewAppModal()", class: "btn btn-primary"%>
+      <% end %>
+    <% end %>
   <% end %>
 
   <!-- modal -->
@@ -99,7 +108,7 @@
       if (applications) {
         event.preventDefault();
         $('#new-application-confirmation').modal('show');
-        
+
         $('#confirm-new-application').off('click');
         $('#confirm-new-application').on('click', function() {
           confirmApp();

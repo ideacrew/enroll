@@ -117,7 +117,7 @@ function maybeAddComparisonPlan(cb) {
   change_plan =  $(cb).attr("data-plan-change-plan");
 	var is_checked = $(cb).prop("checked");
 	if (is_checked) {
-		if (plansToCompareArray.length > 2) {
+		if (plansToCompareArray.length > 3) {
       $("#ivl-plans-compare-alert").modal("show");
 			var removed_id = plansToCompareArray.shift();
 			var lookup_string = "input[data-hios-id='" +
@@ -149,17 +149,11 @@ function doPlanComparison(action_uri) {
 	url: action_uri,
 	dataType: 'script',
 	data: {
-		"standard_component_ids": uniqueValues(plansToCompareArray),"hbx_enrollment_id": hbx, "active_year": active_year, "enrollment_kind": enrollment_kind,
+		"standard_component_ids": plansToCompareArray,"hbx_enrollment_id": hbx, "active_year": active_year, "enrollment_kind": enrollment_kind,
     "change_plan": change_plan
 	}
 	});
 }
-
-function uniqueValues(array) {
-  let map = new Map();
-  array.forEach(value => map.set(value, value));
-  return [...map.values()];
-};
 
 function applyPlanSort(sort_by){
   var plandivs = $('#all-plans #ivl_plans .plan-row');
