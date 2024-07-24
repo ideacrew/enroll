@@ -270,7 +270,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     context "when person records exits and the payload has incarceration set to nil in the payload" do
       let!(:person) do
         FactoryBot.create(:person, first_name: "Junior", last_name: "Banfield",
-                          dob: Date.new(2014,1,1), is_incarcerated: true)
+                                   dob: Date.new(2014,1,1), is_incarcerated: true)
       end
 
       let(:document) do
@@ -283,12 +283,12 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         record = serializer.parse(document.root.canonicalize, :single => true)
         @transformed = transformer.transform(record.to_hash(identifier: true))
         @result = subject.call(@transformed)
-        family_member =  @transformed["family"]["family_members"].detect do |member|
+        family_member = @transformed["family"]["family_members"].detect do |member|
           member if member["person"]["person_name"]["first_name"] == person.first_name
         end
         matching_person = Person.all.where(first_name: "Junior").first
-        expect(matching_person). to be_present
-        expect(matching_person.is_incarcerated). to eq true
+        expect(matching_person).to be_present
+        expect(matching_person.is_incarcerated).to eq true
         expect(family_member["person"]["person_demographics"]["is_incarcerated"]).not_to eq matching_person.is_incarcerated
       end
     end

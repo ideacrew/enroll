@@ -44,12 +44,12 @@ module Operations
       def match_or_update_or_create_person(person_entity)
         person = find_existing_person(person_entity.to_h)
         #create new person
-        person_record =  if person.blank?
-                           create_new_person(person_entity)
-                         else
-                           return Success(person) if no_infomation_changed?(params: { attributes_hash: person_entity, person: person })
-                           update_existing_person(person, person_entity)
-                         end
+        person_record = if person.blank?
+                          create_new_person(person_entity)
+                        else
+                          return Success(person) if no_infomation_changed?(params: { attributes_hash: person_entity, person: person })
+                          update_existing_person(person, person_entity)
+                        end
         Success(person_record)
       rescue StandardError => e
         Failure(person.errors.messages)
