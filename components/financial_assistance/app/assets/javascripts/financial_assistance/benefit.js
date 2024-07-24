@@ -181,7 +181,9 @@ document.addEventListener("turbolinks:load", function() {
     var button = event.target;
     var kind = button.dataset.kind;
     button.classList.add('hidden');
-    document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
+    var newBenefitFormEl = document.getElementById('new-benefit-form-' + kind);
+    newBenefitFormEl.classList.remove('hidden');
+    $(newBenefitFormEl).find('select').prop('selectedIndex', 0);
     //document.getElementById('new-benefit-form-' + kind).querySelectorAll('.benefit-cancel-before-form').classList.remove('hidden')
   });
 
