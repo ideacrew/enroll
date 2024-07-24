@@ -1,7 +1,6 @@
 <% if @bs4 %>
   <div data-cuke="index_with_filter">
     <%= render partial: 'shared/family_side_nav' %>
-
     <h1><%= l10n('faa.cost_savings_applications') %></h1>
     <p><%= l10n('faa.cost_savings_applications_desc') %></p>
     <% if FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) %>
@@ -20,6 +19,11 @@
           <div class="mb-1"><%= l10n('faa.applications.application_year') %></div>
           <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each, {include_blank: l10n('faa.applications.all_years'), :selected => params.dig(:filter, :year)}, {:onchange => "this.form.submit();", class: "col-3 col-md-2"})%>
         </label>
+      <% end %>
+    <% else %>
+      <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start-new-app-form') do %>
+        <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
+        <%= submit_tag l10n('faa.start_new_application'), id: "start-new-app", class: "btn btn-primary" %>
       <% end %>
     <% end %>
 
@@ -46,7 +50,7 @@
                     </div>
                     <% if application.hbx_id == @recent_determined_hbx_id %>
                       <div class="col-md-auto px-0 pt-lg-0 pt-1">
-                        <span class="badge badge-current-application p-2"><%= l10n('current') %></span> 
+                        <span class="badge badge-current-application p-2"><%= l10n('current') %></span>
                       </div>
                     <% end %>
                   </div>
@@ -120,7 +124,7 @@
       if (applications) {
         event.preventDefault();
         $('#new-application-confirmation').modal('show');
-        
+
         $('#confirm-new-application').off('click');
         $('#confirm-new-application').on('click', function() {
           confirmApp();
@@ -158,7 +162,7 @@
               <% if @applications.present? %>
                 <label class="font-weight-bold"><%= l10n('application_year') %></label>
                 <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each,
-                {include_blank: "All Years", :selected => params.dig(:filter, :year) }, 
+                {include_blank: "All Years", :selected => params.dig(:filter, :year) },
                 {:onchange => "this.form.submit();"})%>
               <% end %>
             <% end %>
@@ -182,7 +186,7 @@
                   <td class="text-nowrap">
                     <%= application.hbx_id %>
                     <% if application.hbx_id == @recent_determined_hbx_id %>
-                      <span class="bg-primary" style="font-size: smaller; border-radius: 10px; padding: 4px 8px; margin-left: 10px;"><%= l10n('current') %></span> 
+                      <span class="bg-primary" style="font-size: smaller; border-radius: 10px; padding: 4px 8px; margin-left: 10px;"><%= l10n('current') %></span>
                     <% end %>
                   </td>
                   <td><%= application.assistance_year %></td>
@@ -218,7 +222,7 @@
               <% end %>
             <% end %>
             </div>
-          
+
         </div>
       </div>
     </div>
