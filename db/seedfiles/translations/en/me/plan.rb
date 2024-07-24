@@ -1,5 +1,6 @@
 PLAN_TRANSLATIONS = {
   'en.plans.plan_results' => 'Plan Results',
+  'en.plans.plan_contact_info' => 'Plan Contact Info',
   'en.plans.csl' => 'Customer Service Line',
   'en.plans.call' => 'Call:',
   'en.plans.tty' => 'TTY:',
