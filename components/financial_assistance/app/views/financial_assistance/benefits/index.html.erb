@@ -11,11 +11,11 @@
       <div class="focus d-flex mt-3 instruction-row">
         <label class="radio mr-3" for="has_enrolled_health_coverage_true">
           <input id="has_enrolled_health_coverage_true" type="radio" value="true" name="has_enrolled_health_coverage" <%='checked' if @applicant.has_enrolled_health_coverage == true %>>
-          <%= l10n("yes") %>
+          <span><%= l10n("yes") %></span>
         </label>
         <label class="radio mr-3" for="has_enrolled_health_coverage_false">
           <input id="has_enrolled_health_coverage_false" type="radio" value="false" name="has_enrolled_health_coverage" <%='checked'if @applicant.has_enrolled_health_coverage == false %>>
-          <%= l10n("no") %>
+          <span><%= l10n("no") %></span>
         </label>
       </div>
       <div class="instruction-row">
@@ -32,11 +32,11 @@
       <div class="focus d-flex mt-3 instruction-row">
         <label class="radio mr-3" for="has_eligible_health_coverage_true">
           <input id="has_eligible_health_coverage_true" type="radio" value="true" name="has_eligible_health_coverage" <%='checked' if @applicant.has_eligible_health_coverage == true %>>
-          <%= l10n("yes") %>
+          <span><%= l10n("yes") %></span>
         </label>
         <label class="radio mr-3" for="has_eligible_health_coverage_false">
           <input id="has_eligible_health_coverage_false" type="radio" value="false" name="has_eligible_health_coverage" <%='checked'if @applicant.has_eligible_health_coverage == false %>>
-          <%= l10n("no") %>
+          <span><%= l10n("no") %></span>
         </label>
       </div>
       <div class="instruction-row">
