@@ -58,7 +58,7 @@
         <div class="col-md-2 col-sm-2 align-self-center"><%= display_carrier_logo(Maybe.new(plan), {width: 100}) %></div>
         <div class="col-md-8">
           <h3 class="no-buffer">
-            <%= link_to summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, active_year: plan.try(:active_year), market_kind: @market_kind, coverage_kind: @coverage_kind}), {:remote => true} do %>
+            <%= link_to summary_products_plans_path({plan_id: plan.id, :standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year), bs4: @bs4}), {:remote => true} do %>
               <% if plan.is_csr?%>
                 <span tabindex="0" class="far fa-check-square" title="Eligible for Cost Sharing Reduction" data-toggle="tooltip"></span>
               <% end %>
@@ -112,7 +112,7 @@
       <div class="d-flex align-items-center justify-content-between plan-footer">
         <div>
           <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan, custom_css: false } %>
-          <%= link_to l10n("see_details"), summary_products_plans_path({plan_id: plan.id, :standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "primary-text ml-4", :remote => true} %>
+          <%= link_to l10n("see_details"), summary_products_plans_path({plan_id: plan.id, :standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year), bs4: @bs4}), {:class => "primary-text ml-4", :remote => true} %>
         </div>
           <% if (@tax_household || @aptc_grants) && params[:market_kind]=='individual' && params[:coverage_kind] == 'health' %>
             <% if @csr_available && plan.metal_level != "silver" %>
