@@ -18,8 +18,12 @@ if (!$(".my-household-page")) {
   $("#dependent_buttons").addClass('hidden');
 
 } else {
-    //manage family/ my household page
-  $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
+  //manage family/ my household page
+  if ($("#dependent-<%= @dependent.id %>")) {
+    $("#dependent-<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
+  } else {
+    $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
+  }
 
   $("a[id^=edit-member]").addClass('disabled');
   $("#add-new-member").addClass("hidden");
