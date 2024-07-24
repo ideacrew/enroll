@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 3} %>
   <%= form_for @application, url: {action: "submit_your_application_save"}, method: :put do |f| %>
-    <h1><%= l10n("faa.submit_application_header") %></h1>
+    <h1><%= l10n("submit_application_header") %></h1>
     <p><%= l10n('faa.last_step_1') %> <%= l10n('faa.last_step_2') %></p>
     <h2><%= l10n("insured.preferences.agreements") %></h2>
 
@@ -9,7 +9,7 @@
       <p class="bold required"><%= l10n('faa.i_understand_eligibility') %></p>
       <p><%= l10n('faa.renewal_process_1', short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %><%= l10n('faa.renewal_process_2')%> <%= l10n('faa.send_notice_1', short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)%><%= l10n('faa.send_notice_2')%> <%= l10n('faa.send_notice_3') %></p>
       <%= f.label :medicaid_terms do %>
-        <%= f.check_box :medicaid_terms, {required: true}, "yes", "no" %>
+        <%= f.check_box :medicaid_terms, {required: true, checked: false}, "yes", "no" %>
         <span class="weight-n"><%= l10n('faa.i_agree') %></span>
       <% end %>
     </div>
@@ -20,18 +20,17 @@
       <p><%= l10n('faa.signature_line_below_1')%><%= l10n('faa.signature_line_below_2')%></p>
       <p><%= l10n('insured.review_information') %></p>
       <%= f.label :report_change_terms do %>
-        <%= f.check_box :report_change_terms, {required: true}, "yes", "no" %>
+        <%= f.check_box :report_change_terms, {required: true, checked: false}, "yes", "no" %>
         <span class="weight-n"><%= l10n('faa.i_agree') %></span>
       <% end %>
     </div>
 
     <div class="my-4">
       <p><%= l10n('faa.i_understand_evaluation_1')%><%= l10n('faa.i_understand_evaluation_2')%><%= l10n('faa.i_understand_evaluation_3')%></p>
-      <p><%= l10n('faa.anyone_found_eligible_1') %></p>
-      <p><%= l10n('faa.anyone_found_eligible_2') %></p>
+      <p><%= l10n('faa.anyone_found_eligible_1') %> <%= l10n('faa.anyone_found_eligible_2') %></p>
       <p><%= l10n('faa.anyone_found_eligible_3') %></p>
       <%= f.label :medicaid_insurance_collection_terms do %>
-        <%= f.check_box :medicaid_insurance_collection_terms, {required: true}, "yes", "no" %>
+        <%= f.check_box :medicaid_insurance_collection_terms, {required: true, checked: false}, "yes", "no" %>
         <span class="weight-n"><%= l10n('faa.i_agree') %></span>
       <% end %>
     </div>
@@ -40,12 +39,12 @@
       <legend class="weight-n"><%= l10n("faa.parent_living_outside_of_home_question") %></legend>
       <div class="focus d-flex align-items-center mt-2 mb-2">
         <label class="radio-label radio" for="living_outside_yes">
-          <%= f.radio_button("parent_living_out_of_home_terms", true, id: "living_outside_yes") %>
-          <span class="weight-n"><%= l10n('faa.i_agree') %></span>
+          <%= f.radio_button("parent_living_out_of_home_terms", true, id: "living_outside_yes", checked: false) %>
+          <span class="weight-n"><%= l10n('yes') %></span>
         </label>
         <label class="radio-label radio weight-n" for="living_outside_no">
-          <%= f.radio_button("parent_living_out_of_home_terms", false, id: "living_outside_no") %>
-          <%= l10n("insured.preferences.i_disagree") %>
+          <%= f.radio_button("parent_living_out_of_home_terms", false, id: "living_outside_no", checked: false) %>
+          <%= l10n("no") %>
         </label>
       </div>
     </fieldset>
@@ -55,15 +54,15 @@
       <p><%= l10n('faa.parent_living_outside_of_home_2') %></p>
       <p><%= l10n('faa.parent_living_outside_of_home_3') %></p>
       <%= f.label :attestation_terms do %>
-        <%= f.check_box :attestation_terms, {}, "yes", "no" %>
+        <%= f.check_box :attestation_terms, {checked: false}, "yes", "no" %>
         <span class="weight-n"><%= l10n('faa.i_agree') %></span>
       <% end %>
     </div>
 
     <div class="my-4">
-      <p><%= l10n('faa.submission_terms_question') %></p>
+      <p><%= l10n('submission_terms_question') %></p>
       <%= f.label :submission_terms do %>
-        <%= f.check_box :submission_terms, {}, "yes", "no" %>
+        <%= f.check_box :submission_terms, {checked: false}, "yes", "no" %>
         <span class="weight-n"><%= l10n('faa.i_agree') %></span>
       <% end %>
     </div>
@@ -72,18 +71,18 @@
       <legend class="weight-n"><%= l10n("faa.medicaid_question") %></legend>
       <div class="focus d-flex align-items-center mt-2 mb-2">
         <label class="radio-label radio" for="medicaid_determination_yes">
-          <%= f.radio_button("full_medicaid_determination", true, id: "medicaid_determination_yes") %>
+          <%= f.radio_button("full_medicaid_determination", true, id: "medicaid_determination_yes", checked: false) %>
           <%= l10n("insured.preferences.i_agree") %>
         </label>
         <label class="radio-label radio" for="medicaid_determination_no">
-          <%= f.radio_button("full_medicaid_determination", false, id: "medicaid_determination_no") %>
+          <%= f.radio_button("full_medicaid_determination", false, id: "medicaid_determination_no", checked: false) %>
           <%= l10n("insured.preferences.i_disagree") %>
         </label>
       </div>
     </fieldset>
 
     <fieldset class="my-4">
-      <legend class="weight-n"><%= l10n("faa.electronic_signature") %></legend>
+      <legend class="weight-n"><%= l10n("electronic_signature") %></legend>
       <% person = @application.try(:primary_applicant) %>
       <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
       <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>

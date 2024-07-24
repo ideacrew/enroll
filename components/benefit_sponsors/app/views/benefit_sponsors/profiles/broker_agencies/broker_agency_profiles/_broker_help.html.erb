@@ -20,7 +20,7 @@
     <h2><%= active_broker.person.full_name %></h2>
     <h3><%= broker_agency_profile.legal_name %></h3>
     <dl class="parent">
-      <dt><%= l10n("broker_agencies.profiles.phone")%>:</dt>
+      <dt><%= l10n("phone")%>:</dt>
       <dd><%= active_broker.phone ? active_broker.phone.to_s : l10n("broker_agencies.profiles.no_phone_number") %></dd>
       <dt><%= l10n("email")%>:</dt>
       <dd><a href="mailto:<%= active_broker.email.address %>"><%= active_broker.email.address %></a></dd>
