@@ -106,7 +106,7 @@
     <% end %>
 
     <div class="mb-5 <%= pundit_class Family, :updateable? %>">
-      <%= h(link_to l10n("cancel"), insured_family_members_path, :remote => true, class: "btn button outline") %>
+      <%= h(link_to l10n("cancel"), insured_family_members_path, :remote => true, class: "btn button outline remove-personal-form") %>
 
       <button type="submit" class="btn btn-primary btn-br hidden"><%= l10n("confirm_member") %></button>
       <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'save_personal')" id="save_personal" class='btn btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));' data-cuke="personal-save">
@@ -114,6 +114,13 @@
       </span>
     </div>
   <% end %>
+
+  <script>
+    $('.remove-personal-form').off('click');
+    $('.remove-personal-form').on('click', function (e) {
+      $(".append_consumer_info").empty()
+    });
+  </script>
 
 <% else %>
   <%= form_for @person do |f|%>
