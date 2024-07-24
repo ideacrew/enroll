@@ -36,7 +36,7 @@
             <% end %>
           </tr>
           <tr class="left-border-all">
-            <th></th>
+            <td class="th"></td>
             <% qhps.each do |qhp|%>
               <td colspan="2" class="pb-5">
                 <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.product_for(@market_kind) } %>
@@ -47,7 +47,7 @@
           <% if qhps.map(&:product).compact.map(&:benefit_market_kind) == :aca_individual %>
             <% if qhps.map(&:product).compact.map(&:nationwide).compact.uniq.include?(true) %>
               <tr class="left-border-all">
-                <th></th>
+                <th class="th"></th>
                 <% qhps.each do |qhp| %>
                   <td colspan="2">
                     <% if qhp.product_for(@market_kind).nationwide %>
@@ -63,7 +63,7 @@
 
           <% if qhps.map(&:plan).compact.map(&:rx_formulary_url).compact.present? %>
             <tr class="left-border-all">
-              <th></th>
+              <td class="th"></td>
               <% qhps.each do |qhp|%>
                 <td colspan="2">
                   <% if qhp.product_for(@market_kind).kind.to_s == "health" && qhp.product_for(@market_kind).rx_formulary_url.present? %>
@@ -84,7 +84,7 @@
             <%= render partial: "shared/plan_shoppings/plan_visit_types", locals: { qhps: qhps } %>
           <% end %>
           <tr>
-            <th></th>
+            <td class="th"></td>
             <% qhps.each do |qhp|%>
               <td colspan="2">
                 <div class="plan_comparison">
@@ -95,7 +95,7 @@
           </tr>
           <% if @coverage_kind == "health" %>
             <tr>
-              <th></th>
+              <td class="th"></td>
               <% qhps.each do |qhp|%>
                 <td colspan="2">
                   <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.product_for(@market_kind) } %>
