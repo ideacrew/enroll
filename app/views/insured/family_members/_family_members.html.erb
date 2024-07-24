@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <%= h(link_to l10n("edit_member"), personal_insured_families_path({bs4: @bs4}), remote: true, id: 'edit-primary-person', class: 'btn button outline close-2 my-3') %>
+    <%= h(link_to l10n("edit_member"), personal_insured_families_path({bs4: @bs4, person: @person.id}), remote: true, id: 'edit-primary-person', class: 'btn button outline close-2 my-3') %>
 
     <div class="append_consumer_info"></div>
   </div>
@@ -42,6 +42,7 @@
   <div id="dependent_ul">
     <% @family.active_family_members.reject(&:is_primary_applicant).each_with_index do |dependent, index| %>
       <%= render "insured/family_members/dependent", dependent: dependent, person: @person, member_number: index+2 %>
+      <div class="append_consumer_info" id="dependent-<%= dependent.id %>"></div>
     <% end %>
   </div>
 
