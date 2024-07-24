@@ -22,6 +22,7 @@
         <% else %>
           <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
         <% end %>
+        <div id="plan-summary"></div>
       <% end %>
 
       <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && !EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
