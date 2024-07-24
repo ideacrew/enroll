@@ -1,5 +1,4 @@
 <% product = hbx_enrollment.product %>
-
 <% if hbx_enrollment.is_coverage_waived? %>
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || hbx_enrollment.can_make_changes?, hbx_enrollment: hbx_enrollment } %>
 <% else %>
@@ -28,7 +27,7 @@
           <div class="col-md-2 col-sm-2 align-self-center"><%= display_carrier_logo(Maybe.new(product), {width: 100}) %></div>
           <div class="col-md-8">
             <h3 class="no-buffer">
-              <%= link_to product.title, summary_products_plans_path({ :standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year }), remote: true %>
+              <%= link_to product.title, summary_products_plans_path({plan_id: product.id, :standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, market_kind: hbx_enrollment.market_name&.downcase, coverage_kind: hbx_enrollment.coverage_kind, active_year: product.active_year, bs4: @bs4}), remote: true %>
             </h3>
           </div>
         </div>
