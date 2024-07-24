@@ -79,6 +79,7 @@ PLAN_TRANSLATIONS = {
   'en.plans.plans' => 'Plans',
   'en.plans.download' => 'Download',
   'en.plans.premium' => 'Premium',
+  'en.plans.pay_now' => 'Pay Now',
   'en.plans.provider_network' => 'Provider Network',
   'en.plans.comparison_table.name' => "Name",
   'en.plans.comparison_table.metal_level_type' => "Metal Level / Type",
