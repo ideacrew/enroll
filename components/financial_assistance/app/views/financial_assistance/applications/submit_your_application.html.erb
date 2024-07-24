@@ -101,7 +101,7 @@
     </fieldset>
     <div class="mt-4">
     <% content_for :submit_button do %>
-      <%= f.submit l10n("faa.submit_application"), class: "btn", id: 'btn-continue'  %>
+      <%= f.submit l10n("submit_application"), class: "btn", id: 'btn-continue'  %>
     <% end %>
     <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
       previous_link: preferences_application_path(@application), show_back_to_household_button: true } %>
