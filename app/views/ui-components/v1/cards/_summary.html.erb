@@ -5,8 +5,9 @@
   <% @plan = @member_group %>
 <% end %>
 
+<% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
+
 <% unless @hbx_enrollment.shopping? %>
-  <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
   <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
 <% end %>
 
