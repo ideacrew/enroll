@@ -44,7 +44,7 @@
     </div>
     <div>
       <% if evidence.documents.any? %>
-        <span><label class="my-0"><%= l10n("insured.consumer_roles.upload_ridp_documents.list_header", ridp_type: l10n(display_evidence_type(evidence_type))) %></label></span>
+        <span><label class="my-0"><%= l10n("documents_list_title", document_type: l10n(display_evidence_type(evidence_type))) %></label></span>
         <div class="col-sm-12 px-0">
           <% evidence.documents.each do |document|%>
             <div class="d-flex row py-1 px-0 m-0 align-items-center" id="doc_table_row_<%=document.id%>">

@@ -66,7 +66,7 @@
           </div>
           <div>
             <% if verif_type.type_documents.any? %>
-              <span><label class="my-0"><%= l10n("insured.consumer_roles.upload_ridp_documents.list_header", ridp_type: v_type_display) %></label></span>
+              <span><label class="my-0"><%= l10n("documents_list_title", document_type: v_type_display) %></label></span>
               <div class="col-sm-12 px-0">
                 <% verif_type.type_documents.each do |vlp_doc| %>
                   <div class="d-flex row py-1 px-0 m-0 align-items-center" id="doc_table_row_<%=vlp_doc.id%>">
