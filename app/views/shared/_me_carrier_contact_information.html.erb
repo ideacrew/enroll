@@ -1,3 +1,68 @@
+<% if @bs4 %>
+  <div class="modal fade carrier-contact" id="<%= plan.kind.to_s %>-<%= plan.id %>-<%= hbx_enrollment.hbx_id%>" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <strong class="modal-title border-0">
+            <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <title><%= l10n("phone") %></title>
+              <path d="M5.772.44L6.848.094c1.01-.322 2.087.199 2.52 1.218l.859 2.027c.374.883.167 1.922-.514 2.568L7.819 7.706c.116 1.076.478 2.135 1.084 3.177a8.678 8.678 0 002.271 2.595l2.275-.759c.863-.287 1.802.043 2.33.82l1.233 1.81c.615.904.505 2.15-.259 2.916l-.817.822c-.814.817-1.977 1.113-3.052.777-2.539-.791-4.873-3.143-7.003-7.053-2.133-3.916-2.886-7.239-2.258-9.968C3.887 1.695 4.704.78 5.772.44z" fill="currentColor"/>
+            </svg>
+            <%= l10n("plans.plan_contact_info") %>
+          </strong>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body border-0">
+          <div class="carrier-numbers">
+            <% case plan.issuer_profile.legal_name %>
+            <% when "Community Health Options" %>
+              <div>
+                <p class="bold mb-0"><%=l10n("plans.cho")%></p>
+                <p class="mb-0"><%=l10n("plans.cho_hours")%></p>
+                <p class="mb-0"><%=l10n("plans.call")%>: <a href=<%=l10n("plans.cho_href_phone")%> ><%=l10n("plans.cho_phone")%></a></p>
+                <p><%=l10n("plans.cho_contact_url")%></p>
+              </div>
+            <% when "Anthem Blue Cross and Blue Shield" %>
+              <div>
+                <p class="bold mb-0"><%=l10n("plans.anthm")%></p>
+                <p class="mb-0"><%=l10n("plans.anthm_hours")%></p>
+                <p class="mb-0"><%=l10n("plans.call")%>: <a href=<%=l10n("plans.anthm_href_phone")%> ><%=l10n("plans.anthm_phone")%></a></p>
+                <p><%=l10n("plans.anthm_contact_url")%></p>
+              </div>
+            <% when "Taro Health" %>
+              <div>
+                <p class="bold mb-0"><%=l10n("plans.taro")%></p>
+                <p class="mb-0"><%=l10n("plans.taro_hours")%></p>
+                <p class="mb-0"><%=l10n("plans.call")%>: <a href=<%=l10n("plans.taro_href_phone_1")%> ><%=l10n("plans.taro_phone_1")%></a></p>
+                <p><%=l10n("plans.taro_contact_url")%></p>
+              </div>
+            <% when "Harvard Pilgrim Health Care" %>
+              <div>
+                <p class="bold mb-0"><%=l10n("plans.hphc")%></p>
+                <p class="mb-0"><%=l10n("plans.hphc_hours")%></p>
+                <p><%=l10n("plans.call")%>: <a href=<%=l10n("plans.hphc_href_phone")%> ><%=l10n("plans.hphc_phone")%></a></p>
+              </div>
+            <% when "Northeast Delta Dental" %>
+              <div>
+                <p class="bold mb-0"><%=l10n("plans.nedd")%></p>
+                <p class="mb-0"><%=l10n("plans.nedd_hours")%></p>
+                <p class="mb-0"><%=l10n("plans.call")%></>
+                <a href=<%=l10n("plans.nedd_href_phone_1")%> ><%=l10n("plans.nedd_phone_1")%></a><br>
+                <a href=<%=l10n("plans.nedd_href_phone_2")%> ><%=l10n("plans.nedd_phone_2")%></a>
+                <p><%=l10n("plans.nedd_contact_url")%></p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %>
 <div class="modal fade carrier-contact" id="<%= plan.kind.to_s %>-<%= plan.id %>-<%= hbx_enrollment.hbx_id%>" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -76,3 +141,4 @@
     </div>
   </div>
 </div>
+<% end %>
