@@ -1,12 +1,12 @@
 <% if @bs4 %>
   <%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :review, nav_options: plan_shopping_progress_hash } %>
-  <h1>Review & Submit</h1>
+  <h1><%= l10n('insured.plan_shoppings.thankyou.heading') %></h1>
   <p><%= l10n('insured.plan_shoppings.thankyou.confirm_your_plan_selection.content') %></p>
   <%= render partial: "insured/plan_shoppings/prior_coverage_information", locals: {dependent_members: @dependent_members, enrollment: @enrollment} if @dependent_members.present? %>
   <% unless @enrollment.employee_role.present? %>
     <p><strong><%= l10n("important") %>:</strong> <%= l10n("insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll") %></p>
   <% end %>
-  <h2>Selected Enrollment</h2>
+  <h2><%= l10n('insured.plan_shoppings.thankyou.selected_enrollment') %></h2>
   <% if @employer_profile.present? %>
   <p class="bold"><%= @employer_profile.legal_name %></p>
   <% end %>
@@ -25,12 +25,12 @@
   <% if @person.has_active_consumer_role? && (@tax_household.present? || @aptc_grants.present?) && @market_kind == "individual" %>
     <div class="mb-4">
       <% is_ivl_osse_filter_eligible = ivl_osse_filtering_enabled? && @enrollment.ivl_osse_eligible? %>
-      <h3>Applied Credits</h3>
+      <h3><%= l10n('insured.plan_shoppings.thankyou.applied_credits') %></h3>
       <div class="aptc hidden">
         <dl class="parent">
-          <dt>The total tax credit amount the people on this plan qualify for is:</dt>
+          <dt><%= l10n('insured.plan_shoppings.thankyou.total_credit') %>:</dt>
           <dd><%= number_to_currency(@max_aptc, precision: 2) %></dd>
-          <dt>The maximum amount you can use for this plan is:</dt>
+          <dt><%= l10n('insured.plan_shoppings.thankyou.max_credit') %>:</dt>
           <% per_plan_max = @plan.total_premium > @max_aptc ? @max_aptc : (@plan.total_premium - 1).round(2) %>
           <dd><%= number_to_currency(per_plan_max) %></dd>
         </dl>
@@ -45,20 +45,20 @@
               <% min_aptc = is_ivl_osse_filter_eligible ? minimum_applied_aptc_pct_for_osse : 0 %>
               <% step = is_ivl_osse_filter_eligible ? 1 : 1 %>
               <% pct = @max_aptc > 0 ? (@elected_aptc/@max_aptc).round(2) : 0 %>
-              <label for="elected_aptc_pct" class="required">Percentage Applied</label>
-              <input max="100" min="<%= min_aptc %>" name="elected_aptc_pct" step="<%= step %>" type="number" value="<%= number_with_precision(pct * 100, precision: 2) %>" class="w-100 thankyou">
+              <label for="elected_aptc_pct" class="required"><%= l10n('insured.plan_shoppings.thankyou.percent_applied') %></label>
+              <input max="100" min="<%= min_aptc %>" name="elected_aptc_pct" id="elected_aptc_pct" step="<%= step %>" type="number" value="<%= number_with_precision(pct * 100, precision: 2) %>" class="w-100 thankyou">
             </div>
             <div class="mr-3">
-              <label for="elected_aptc_value" class="required">Amount Applied</label>
+              <label for="elected_aptc_value" class="required"><%= l10n('insured.plan_shoppings.thankyou.amount_applied') %></label>
               <input id="elected_aptc_value" max="<%= per_plan_max %>" type="number" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>" class="thankyou">
             </div>
             <div class="">
-              <button id="aptc_submit" class="short">Update Applied APTC</button>
+              <button id="aptc_submit" class="short"><%= l10n('insured.plan_shoppings.thankyou.update_applied') %></button>
             </div>
           </div>
       </div>
-      <p class="mt-4"><span class="aptc-percentage"><%= pct * 100 %></span>% of available APTC (<span class="aptc-amount"><%= number_with_precision(@elected_aptc, precision: 2) %></span>) has been applied to your premium. <%= h(link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}) %></p>
-      <button class="outline" id="updateAptc">Update APTC Amount</button>
+      <p class="mt-4"><span class="aptc-percentage"><%= pct * 100 %></span><%= l10n('insured.plan_shoppings.thankyou.aptc_numbers_1') %><span class="aptc-amount"><%= number_with_precision(@elected_aptc, precision: 2) %></span><%= l10n('insured.plan_shoppings.thankyou.aptc_numbers_2') %> <%= h(link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}) %></p>
+      <button class="outline" id="updateAptc"><%= l10n('insured.plan_shoppings.thankyou.update_amount') %></button>
     </div>
   <% end %>
   <% if @enrollment.employee_role.present? %>
