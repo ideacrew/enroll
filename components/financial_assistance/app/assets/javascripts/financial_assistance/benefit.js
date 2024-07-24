@@ -650,7 +650,7 @@ document.addEventListener("turbolinks:load", function() {
     });
 
     /* Saving Responses to Income  Driver Questions */
-    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false,#has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false, #has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on, #medicaid_cubcare_due_on, #has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on, #medicaid_chip_ineligible_true, #medicaid_chip_ineligible_false, #immigration_status_changed_true, #immigration_status_changed_false').on('change', function(e) {
+    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false, #has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on, #medicaid_cubcare_due_on, #has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on, #medicaid_chip_ineligible_true, #medicaid_chip_ineligible_false, #immigration_status_changed_true, #immigration_status_changed_false').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
