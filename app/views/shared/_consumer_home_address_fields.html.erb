@@ -215,23 +215,23 @@
             <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
               <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
                 <div class="address_checkbox">
-                  <%= f.check_box :is_moving_to_state %>
-                  <label for="checkbox"><span><strong><%= l10n('insured.moving_to_dc') %></strong></span> <span><%= l10n('insured.moving_to_dc_extension') %></span></label>
+                  <%= f.check_box :is_moving_to_state, id: "is_moving_to_state" %>
+                  <label for="is_moving_to_state"><span><strong><%= l10n('insured.moving_to_dc') %></strong></span> <span><%= l10n('insured.moving_to_dc_extension') %></span></label>
                 </div>
               </div>
             <% end %>
             <% if EnrollRegistry.feature_enabled?(:living_outside_state) %>
               <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
                 <div class="address_checkbox">
-                  <%= f.check_box :is_temporarily_out_of_state %>
-                  <label for="checkbox"><span><strong><%= l10n('insured.outside_dc') %></strong></span> <span><%= l10n('insured.outside_dc_extension') %></span></label>
+                  <%= f.check_box :is_temporarily_out_of_state, id: "is_temporarily_out_of_state" %>
+                  <label for="is_temporarily_out_of_state"><span><strong><%= l10n('insured.outside_dc') %></strong></span> <span><%= l10n('insured.outside_dc_extension') %></span></label>
                 </div>
               </div>
             <% end %>
             <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
               <div class="address_checkbox">
-                <%= f.check_box :is_homeless %>
-                <label for="checkbox"><span><strong><%= l10n('insured.dc_homeless') %></strong></span><span><%= l10n('insured.dc_homeless_extension') %></span></label>
+                <%= f.check_box :is_homeless, id: "is_homeless" %>
+                <label for="is_homeless"><span><strong><%= l10n('insured.dc_homeless') %></strong></span><span><%= l10n('insured.dc_homeless_extension') %></span></label>
               </div>
             </div>
           </div>
