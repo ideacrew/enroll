@@ -109,8 +109,7 @@
                 <% if @family.latest_active_sep %>
                   <p><%= l10n('insured.qualify_for_special_enrollment') %> "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
                     <br/>
-                    <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
-                    <div class="btn btn-default"><%= build_link_for_sep_type(@active_sep, l10n('insured.shop_now'), @family.id.to_s) %></div>
+                    <%= build_link_for_sep_type(@active_sep, l10n('insured.shop_now'), @family.id.to_s, link_class = "btn btn-default") %>
                   </p>
                   <p> <%= l10n('insured.start_your_coverage') %> </p>
                     <br/>
