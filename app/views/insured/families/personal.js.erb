@@ -11,7 +11,7 @@
 
   } else {
     //manage family/ my household page
-    $(".append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
+    $("#primary-person .append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
     $("a[id^=edit-member]").addClass('disabled');
     $("#add-new-member").addClass("hidden");
     $("#edit-member-<%= @family_members.first.id %>").addClass("hidden");
