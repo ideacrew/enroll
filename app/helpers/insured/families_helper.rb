@@ -306,7 +306,7 @@ module Insured::FamiliesHelper
     end
   end
 
-  def build_link_for_sep_type(sep, link_title = nil, family_id = nil)
+  def build_link_for_sep_type(sep, link_title = nil, family_id = nil, link_class = nil)
     return if sep.blank?
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
     return if qle.blank?
@@ -318,7 +318,7 @@ module Insured::FamiliesHelper
       # Use turbolinks: false, to avoid calling controller action twice.
       # TODO: Refactor Shop For Planss as a translation at some point
       link_path = family_id.present? ? insured_family_members_path(sep_id: sep.id, qle_id: qle.id, family_id: family_id) : insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
-      link_to link_title.presence || l10n("insured.shop_for_plans"), link_path, data: {turbolinks: false}
+      link_to link_title.presence || l10n("insured.shop_for_plans"), link_path, data: {turbolinks: false}, class: link_class
     end
   end
 
