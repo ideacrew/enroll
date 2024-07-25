@@ -1,7 +1,6 @@
 <% if @bs4 %>
   <tr
-
-    class='msg-inbox <%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>'
+    class='msg-inbox <%= message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread" %>'
     data-url="<%= retrieve_show_path(provider, message) %>">
 
     <td tabindex="0">
@@ -27,40 +26,6 @@
     <% end %>
   </tr>
 
-  <script>
-    $(document).ready(function() {
-      const msgs = document.querySelectorAll('[data-url]');
-
-      msgs.forEach((msg) => {
-        msg.querySelectorAll('td:not([data-msg-delete])').forEach((td) => {
-          td.addEventListener('click', () => {
-            showMessage(msg.getAttribute('data-url'));
-          });
-
-          td.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              // Prevent default action to avoid scrolling when space is pressed
-              event.preventDefault();
-              showMessage(msg.getAttribute('data-url'));
-            }
-          });
-        });
-
-        msg.querySelector('[data-msg-delete]').addEventListener('click', (event) => {
-          event.stopPropagation();
-          deleteMessage($(this).data('url'));
-        });
-
-        msg.querySelector('[data-msg-delete]').addEventListener('keydown', (event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            // Prevent default action to avoid scrolling when space is pressed
-            event.preventDefault();
-            deleteMessage($(this).data('url'));
-          }
-        });
-      });
-    });
-  </script>
 <% else %>
   <tr tabindex="0" onkeydown="handleButtonKeyDown(event, 'message_inbox')", id="message_inbox" class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
     <td style="font-weight:bold">
