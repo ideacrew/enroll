@@ -7,17 +7,19 @@
     <p><%= l10n("faa.health_coverage.desc") %></p>
 
     <div id="has_enrolled_health_coverage_question" class="pb-4 driver-question">
-      <span class="instruction-row"><%= applicant_currently_enrolled %></span>
-      <div class="focus d-flex mt-3 instruction-row">
-        <label class="radio mr-3" for="has_enrolled_health_coverage_true">
-          <input id="has_enrolled_health_coverage_true" type="radio" value="true" name="has_enrolled_health_coverage" <%='checked' if @applicant.has_enrolled_health_coverage == true %>>
-          <span><%= l10n("yes") %></span>
-        </label>
-        <label class="radio mr-3" for="has_enrolled_health_coverage_false">
-          <input id="has_enrolled_health_coverage_false" type="radio" value="false" name="has_enrolled_health_coverage" <%='checked'if @applicant.has_enrolled_health_coverage == false %>>
-          <span><%= l10n("no") %></span>
-        </label>
-      </div>
+      <fieldset>
+        <legend class="instruction-row weight-n required"><%= l10n(applicant_currently_enrolled_short_key) %></legend>
+        <div class="focus d-flex mt-3 instruction-row">
+          <label class="radio mr-3" for="has_enrolled_health_coverage_true">
+            <input id="has_enrolled_health_coverage_true" type="radio" value="true" name="has_enrolled_health_coverage" <%='checked' if @applicant.has_enrolled_health_coverage == true %>>
+            <span><%= l10n("yes") %></span>
+          </label>
+          <label class="radio mr-3" for="has_enrolled_health_coverage_false">
+            <input id="has_enrolled_health_coverage_false" type="radio" value="false" name="has_enrolled_health_coverage" <%='checked'if @applicant.has_enrolled_health_coverage == false %>>
+            <span><%= l10n("no") %></span>
+          </label>
+        </div>
+      </fieldset>
       <div class="instruction-row">
         <a href="#<%= applicant_currently_enrolled_key %>" data-toggle="modal" data-target="#<%= applicant_currently_enrolled_key %>" class="d-block"><%= l10n("not_sure") %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: applicant_currently_enrolled_key} %>
@@ -28,17 +30,19 @@
     </div>
 
     <div id="has_eligibility_changed_question" class="pb-4 driver-question">
-      <span class="instruction-row"><%= applicant_eligibly_enrolled %></span>
-      <div class="focus d-flex mt-3 instruction-row">
-        <label class="radio mr-3" for="has_eligible_health_coverage_true">
-          <input id="has_eligible_health_coverage_true" type="radio" value="true" name="has_eligible_health_coverage" <%='checked' if @applicant.has_eligible_health_coverage == true %>>
-          <span><%= l10n("yes") %></span>
-        </label>
-        <label class="radio mr-3" for="has_eligible_health_coverage_false">
-          <input id="has_eligible_health_coverage_false" type="radio" value="false" name="has_eligible_health_coverage" <%='checked'if @applicant.has_eligible_health_coverage == false %>>
-          <span><%= l10n("no") %></span>
-        </label>
-      </div>
+      <fieldset>
+        <legend class="instruction-row weight-n required"><%= l10n(applicant_eligibly_enrolled_short_key) %></legend>
+        <div class="focus d-flex mt-3 instruction-row">
+          <label class="radio mr-3" for="has_eligible_health_coverage_true">
+            <input id="has_eligible_health_coverage_true" type="radio" value="true" name="has_eligible_health_coverage" <%='checked' if @applicant.has_eligible_health_coverage == true %>>
+            <span><%= l10n("yes") %></span>
+          </label>
+          <label class="radio mr-3" for="has_eligible_health_coverage_false">
+            <input id="has_eligible_health_coverage_false" type="radio" value="false" name="has_eligible_health_coverage" <%='checked'if @applicant.has_eligible_health_coverage == false %>>
+            <span><%= l10n("no") %></span>
+          </label>
+        </div>
+      </fieldset>
       <div class="instruction-row">
         <a href="#<%= applicant_eligibly_enrolled_key%>" data-toggle="modal" data-target="#<%= applicant_eligibly_enrolled_key%>" class="d-block instruction-row"><%= l10n("not_sure") %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: applicant_eligibly_enrolled_key} %>
@@ -50,8 +54,8 @@
     </div>
 
     <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member  %>
-      <div id="ai_an_health_service_eligible_question" class="pb-4 driver-question">
-        <span class="instruction-row"><%= l10n("faa.indian_health_service_eligible") %></span>
+      <fieldset id="ai_an_health_service_eligible_question" class="pb-4 driver-question">
+        <legend class="weight-n instruction-row"><%= l10n("faa.indian_health_service_eligible") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="ai_an_health_service_eligible_true">
             <input id="ai_an_health_service_eligible_true" type="radio" value="true" name="ai_an_health_service_eligible" <%='checked' if @applicant.health_service_eligible == true %>>
@@ -64,8 +68,8 @@
         </div>
       </div>
 
-      <div id="ai_an_health_service_through_referral_question" class="pb-4 driver-question">
-        <span class="instruction-row"><%= l10n("faa.indian_health_service") %></span>
+      <fieldset id="ai_an_health_service_through_referral_question" class="pb-4 driver-question">
+        <legend class="weight-n instruction-row"><%= l10n("faa.indian_health_service") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="ai_an_health_service_through_referral_true">
             <input id="ai_an_health_service_through_referral_true" type="radio" value="true" name="ai_an_health_service_through_referral" <%='checked' if @applicant.health_service_through_referral == true %>>
@@ -76,12 +80,12 @@
             <span><%= l10n("no") %></span>
           </label>
         </div>
-      </div>
+      </fieldset>
     <% end %>
 
     <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
-      <div id="medicaid_chip_ineligible_question" class="pb-4 driver-question">
-        <span class="instruction-row"><%= l10n("faa.medicaid_chip_ineligible") %></span>
+      <fieldset id="medicaid_chip_ineligible_question" class="pb-4 driver-question">
+        <legend class="instruction-row weight-n"><%= l10n("faa.medicaid_chip_ineligible") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="medicaid_chip_ineligible_true">
             <input id="medicaid_chip_ineligible_true" type="radio" value="true" name="medicaid_chip_ineligible" <%='checked' if @applicant.medicaid_chip_ineligible == true %>>
@@ -92,10 +96,10 @@
             <span><%= l10n("no") %></span>
           </label>
         </div>
-      </div>
+      </fieldset>
 
-      <div id="immigration_status_changed_question" class="pb-4 driver-question">
-        <span class="instruction-row"><%= l10n("faa.immigration_status_changed") %></span>
+      <fieldset id="immigration_status_changed_question" class="pb-4 driver-question">
+        <legend class="instruction-row weight-n"><%= l10n("faa.immigration_status_changed") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="immigration_status_changed_true">
             <input id="immigration_status_changed_true" type="radio" value="true" name="immigration_status_changed" <%='checked' if @applicant.immigration_status_changed == true %>>
@@ -106,69 +110,75 @@
             <span><%= l10n("no") %></span>
           </label>
         </div>
-      </div>
+      </fieldset>
     <% end %>
 
     <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
       <div id="has_eligible_medicaid_cubcare_question" class="pb-4 driver-question">
-        <span class="instruction-row"><%= l10n("faa.medicaid_not_eligible") %></span>
-        <div class="focus d-flex mt-3 instruction-row">
-          <label class="radio mr-3" for="has_eligible_medicaid_cubcare_true">
-            <input id="has_eligible_medicaid_cubcare_true" type="radio" value="true" name="has_eligible_medicaid_cubcare" <%='checked' if @applicant.has_eligible_medicaid_cubcare == true %>>
-            <span><%= l10n("yes") %></span>
-          </label>
-          <label class="radio mr-3" for="has_eligible_medicaid_cubcare_false">
-            <input id="has_eligible_medicaid_cubcare_false" type="radio" value="false" name="has_eligible_medicaid_cubcare" <%='checked'if @applicant.has_eligible_medicaid_cubcare == false %>>
-            <span><%= l10n("no") %></span>
-          </label>
-        </div>
-        <a href="#has_eligible_medicaid_cubcare" data-toggle="modal" data-target="#has_eligible_medicaid_cubcare" class="d-block"><%= l10n("not_sure") %></a>
-        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_medicaid_cubcare"} %>
-
-        <div id="denied-medicaid" class="pt-4 instruction-row">
-            <span class="instruction-row"><%=l10n("faa.medicaid_cubcare_end_date")%></span>
-            <div class="mr-auto mt-3">
-              <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
-              <%= date_field_tag :medicaid_cubcare_due_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
-            </div>
-        </div>
-
-        <div id="eligibility-change-question" class="pt-4 instruction-row">
-          <span class="instruction-row"><%=l10n("faa.change_eligibility_status")%></span>
-          <div class="focus d-flex mt-3">
-            <label class="radio mr-3" for="has_eligibility_changed_true">
-              <input id="has_eligibility_changed_true" type="radio" value="true" name="has_eligibility_changed" <%='checked' if @applicant.has_eligibility_changed? %>>
+        <fieldset>
+          <legend class="instruction-row weight-n"><%= l10n("faa.medicaid_not_eligible") %></legend>
+          <div class="focus d-flex mt-3 instruction-row">
+            <label class="radio mr-3" for="has_eligible_medicaid_cubcare_true">
+              <input id="has_eligible_medicaid_cubcare_true" type="radio" value="true" name="has_eligible_medicaid_cubcare" <%='checked' if @applicant.has_eligible_medicaid_cubcare == true %>>
               <span><%= l10n("yes") %></span>
             </label>
-            <label class="radio mr-3" for="has_eligibility_changed_false">
-              <input id="has_eligibility_changed_false" type="radio" value="false" name="has_eligibility_changed" <%='checked'if @applicant.has_eligibility_changed == false %>>
+            <label class="radio mr-3" for="has_eligible_medicaid_cubcare_false">
+              <input id="has_eligible_medicaid_cubcare_false" type="radio" value="false" name="has_eligible_medicaid_cubcare" <%='checked'if @applicant.has_eligible_medicaid_cubcare == false %>>
               <span><%= l10n("no") %></span>
             </label>
           </div>
+        </fieldset>
+        <a href="#has_eligible_medicaid_cubcare" data-toggle="modal" data-target="#has_eligible_medicaid_cubcare" class="d-block"><%= l10n("not_sure") %></a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_medicaid_cubcare"} %>
+
+        <fieldset id="denied-medicaid" class="pt-4 instruction-row">
+          <legend class="weight-n instruction-row"><%=l10n("faa.medicaid_cubcare_end_date")%></legend>
+          <div class="mr-auto mt-3">
+            <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
+            <%= date_field_tag :medicaid_cubcare_due_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
+          </div>
+        </fieldset>
+
+        <div id="eligibility-change-question" class="pt-4 instruction-row">
+          <fieldset>
+            <legend class="weight-n instruction-row"><%=l10n("faa.change_eligibility_status")%></legend>
+            <div class="focus d-flex mt-3">
+              <label class="radio mr-3" for="has_eligibility_changed_true">
+                <input id="has_eligibility_changed_true" type="radio" value="true" name="has_eligibility_changed" <%='checked' if @applicant.has_eligibility_changed? %>>
+                <span><%= l10n("yes") %></span>
+              </label>
+              <label class="radio mr-3" for="has_eligibility_changed_false">
+                <input id="has_eligibility_changed_false" type="radio" value="false" name="has_eligibility_changed" <%='checked'if @applicant.has_eligibility_changed == false %>>
+                <span><%= l10n("no") %></span>
+              </label>
+            </div>
+          </fieldset>
           <a href="#has_eligibility_changed" data-toggle="modal" data-target="#has_eligibility_changed" class="d-block"><%= l10n("not_sure") %></a>
           <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligibility_changed"} %>
 
           <% status = @applicant.has_eligibility_changed == true ? "" : "hide" %>
-          <div id="medicaid-chip-coverage-last-day" class="<%= status %> pt-4">
-            <span class="instruction-row"><%=l10n("faa.person_medicaid_last_day")%></span>
+          <fieldset id="medicaid-chip-coverage-last-day" class="<%= status %> pt-4">
+            <legend class="weight-n instruction-row"><%=l10n("faa.person_medicaid_last_day")%></legend>
             <div class="mr-auto mt-3">
               <label class="required" for="person_coverage_end_on"><%=l10n("end_date")%></label>
               <%= date_field_tag :person_coverage_end_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
             </div>
-          </div>
+          </fieldset>
 
           <div id="household-income-size-changed" class="pt-4 instruction-row">
-            <span class="instruction-row"><%=l10n("faa.household_income_changed")%></span>
-            <div class="focus d-flex mt-3">
-              <label class="radio mr-3" for="has_household_income_changed_yes">
-                <input id="has_household_income_changed_yes" type="radio" value="true" name="has_household_income_changed" <%='checked' if @applicant.has_household_income_changed? %>>
-                <span><%= l10n("yes") %></span>
-              </label>
-              <label class="radio mr-3" for="has_household_income_changed_no">
-                <input id="has_household_income_changed_no" type="radio" value="false" name="has_household_income_changed" <%='checked'if @applicant.has_household_income_changed == false %>>
-                <span><%= l10n("no") %></span>
-              </label>
-            </div>
+            <fieldset>
+              <legend class="weight-n instruction-row"><%=l10n("faa.household_income_changed")%></legend>
+              <div class="focus d-flex mt-3">
+                <label class="radio mr-3" for="has_household_income_changed_yes">
+                  <input id="has_household_income_changed_yes" type="radio" value="true" name="has_household_income_changed" <%='checked' if @applicant.has_household_income_changed? %>>
+                  <span><%= l10n("yes") %></span>
+                </label>
+                <label class="radio mr-3" for="has_household_income_changed_no">
+                  <input id="has_household_income_changed_no" type="radio" value="false" name="has_household_income_changed" <%='checked'if @applicant.has_household_income_changed == false %>>
+                  <span><%= l10n("no") %></span>
+                </label>
+              </div>
+            <fieldset>
             <a href="#has_household_income_changed" data-toggle="modal" data-target="#has_household_income_changed" class="d-block"><%= l10n("not_sure") %></a>
             <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_household_income_changed"} %>
           </div>
@@ -179,28 +189,30 @@
 
     <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
       <div id="has_dependent_with_coverage_question" class="pb-4 driver-question">
-        <span class="instruction-row"><%= l10n("faa.has_dependent_with_coverage") %></span>
-        <div class="focus d-flex mt-3">
-          <label class="radio mr-3" for="has_dependent_with_coverage_true">
-            <input id="has_dependent_with_coverage_true" type="radio" value="true" name="has_dependent_with_coverage" <%='checked' if @applicant.has_dependent_with_coverage == true %>>
-            <span><%= l10n("yes") %></span>
-          </label>
-          <label class="radio mr-3" for="has_dependent_with_coverage_false">
-            <input id="has_dependent_with_coverage_false" type="radio" value="false" name="has_dependent_with_coverage" <%='checked'if @applicant.has_dependent_with_coverage == false %>>
-            <span><%= l10n("no") %></span>
-          </label>
-        </div>
+        <fieldset>
+          <legend class="weight-n instruction-row"><%= l10n("faa.has_dependent_with_coverage") %></legend>
+          <div class="focus d-flex mt-3">
+            <label class="radio mr-3" for="has_dependent_with_coverage_true">
+              <input id="has_dependent_with_coverage_true" type="radio" value="true" name="has_dependent_with_coverage" <%='checked' if @applicant.has_dependent_with_coverage == true %>>
+              <span><%= l10n("yes") %></span>
+            </label>
+            <label class="radio mr-3" for="has_dependent_with_coverage_false">
+              <input id="has_dependent_with_coverage_false" type="radio" value="false" name="has_dependent_with_coverage" <%='checked'if @applicant.has_dependent_with_coverage == false %>>
+              <span><%= l10n("no") %></span>
+            </label>
+          </div>
+        </fieldset>
 
         <a href="#has_dependent_with_coverage" data-toggle="modal" data-target="#has_dependent_with_coverage" class="d-block"><%= l10n("not_sure") %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_dependent_with_coverage"} %>
 
-        <div id="denied-job-end-on" class="pt-4">
-          <span class="instruction-row"><%=l10n("faa.dependent_job_end_on")%></span>
+        <fieldset id="denied-job-end-on" class="pt-4">
+          <legend class="weight-n instruction-row"><%=l10n("faa.dependent_job_end_on")%></legend>
           <div class="mr-auto mt-3">
             <label class="required" for="dependent_job_end_on"><%==l10n("end_date")%></label>
             <%= date_field_tag :dependent_job_end_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
           </div>
-        </div>
+        </fieldset>
       </div>
     <% end %>
 
