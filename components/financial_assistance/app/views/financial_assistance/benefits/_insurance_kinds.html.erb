@@ -11,10 +11,11 @@
 </div>
 
 <div id="new-benefit-form-<%= kind %>" class='new-benefit-form my-4 p-3 border rounded bg-white <%= 'hidden' if @applicant.benefits.where(kind: kind).any? %>'>
-  <%= label_tag :insurance_kind, l10n("faa.health_coverage.health_cov_type"), class:"required", for: "insurance_kind_#{kind}" %>
-  <%= select_tag :insurance_kind, options_for_select(insurance_kind_select_options(kind)), required:true, prompt: l10n("faa.health_coverage.health_cov_type"), class: "insurance-kind w-100", id: "insurance_kind_#{kind}", data: {kind: kind} %>
+  <% title = l10n(kind == "is_enrolled" ? "faa.health_coverage.health_cov_type" : "faa.health_coverage.other_health_cov_type") %>
+  <%= label_tag :insurance_kind, title, class:"required", for: "insurance_kind_#{kind}" %>
+  <%= select_tag :insurance_kind, options_for_select(insurance_kind_select_options(kind)), required:true, prompt: title, class: "insurance-kind w-100", id: "insurance_kind_#{kind}", data: {kind: kind} %>
   <a href="#health_cov_type_<%= kind %>" data-toggle="modal" data-target="#health_cov_type_<%= kind %>" class="d-block my-2"><%= l10n("not_sure") %></a>
-  <a tabindex="0" id="new-benefit-form-<%= kind %>_cancel" class="btn btn-error outline benefit-cancel-before-form mt-4 <%= 'hidden' unless @applicant.benefits.where(kind: kind).any? %>" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
+  <a tabindex="0" id="new-benefit-form-<%= kind %>_cancel" class="btn btn-error outline benefit-cancel-before-form mt-4" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
   <div class="modal" id="health_cov_type_<%= kind %>" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="container pt-2 pb-4 modal-content">
