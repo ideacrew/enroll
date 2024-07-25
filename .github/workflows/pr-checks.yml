@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - trunk
+      - clean-bootstrap-4-upgrade
 
 concurrency:
   group: pr-${{ github.ref }}

@@ -4,11 +4,7 @@
 class IvlIapHealthCoveragePage
 
   def self.has_enrolled_health_coverage_yes_radiobtn
-    if EnrollRegistry[:bs4_consumer_flow].enabled?
-
-    else
-    '#has_enrolled_health_coverage_true'
-    end
+    '#has_enrolled_health_coverage_true' unless EnrollRegistry[:bs4_consumer_flow].enabled?
   end
 
   def self.has_enrolled_health_coverage_no_radiobtn

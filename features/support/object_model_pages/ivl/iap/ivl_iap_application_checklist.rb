@@ -13,9 +13,9 @@ class IvlIapApplicationChecklist
 
   def self.continue_btn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     '.interaction-click-control-continue-to-next-step'
-    else 
-    '#btn-continue'
+      '.interaction-click-control-continue-to-next-step'
+    else
+      '#btn-continue'
     end
   end
 
