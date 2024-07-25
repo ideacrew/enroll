@@ -55,7 +55,7 @@
         <%= render 'users/security_question_responses/modal' %>
       <% end %>
 
-      <%= render_flash %>
+      <%= render_flash use_bs4: @bs4 %>
       <div class="container">
         <%= yield :horizontal_status %>
 

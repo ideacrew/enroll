@@ -10,7 +10,7 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
   end
 
   visit help_paying_coverage_insured_consumer_role_index_path
-  
+
   find(IvlIapHelpPayingForCoverage.yes_radiobtn).click
   sleep 2
   find(IvlIapApplicationChecklist.continue_btn).click
@@ -23,8 +23,8 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
     if EnrollRegistry[:bs4_consumer_flow].enabled?
       find(IvlIapApplicationChecklist.begin_application_btn).click
     else
-    find('.interaction-click-control-continue').click
-    sleep 2
+      find('.interaction-click-control-continue').click
+      sleep 2
     end
   end
 
@@ -118,7 +118,7 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     fill_in IvlIapJobIncomeInformationPage.income_employer_phone_number, with: '7898765676'
     find(IvlIapJobIncomeInformationPage.income_save_btn).click
     find(IvlIapJobIncomeInformationPage.has_self_employee_income_yes_radiobtn).click
-    
+
     fill_in IvlIapJobIncomeInformationPage.self_employee_income_amount, with: '100.00'
     find(IvlIapJobIncomeInformationPage.self_employee_how_often_dropdown).click
     find(IvlIapJobIncomeInformationPage.self_employed_yearly).click
@@ -138,10 +138,10 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     find(IvlIapOtherIncomePage.has_other_income_yes_radiobtn).click
     sleep 1
     find('.other-income-checkbox-interest.interaction-choice-control-value-other-income-kind').click
-  
+
     fill_in IvlIapOtherIncomePage.income_amount, with: '100'
     fill_in IvlIapOtherIncomePage.income_from, with: '1/1/2018'
-    
+
     find(IvlIapOtherIncomePage.interest_how_often_dropdown).click
     find(IvlIapOtherIncomePage.interest_select_yearly).click
 

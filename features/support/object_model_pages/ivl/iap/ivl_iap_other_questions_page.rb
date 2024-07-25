@@ -5,25 +5,25 @@ class IvlIapOtherQuestions
 
   def self.is_pregnant_no_radiobtn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     '.interaction-choice-control-value-is-pregnant-no'
+      '.interaction-choice-control-value-is-pregnant-no'
     else
-    '#is_pregnant_no'
+      '#is_pregnant_no'
     end
   end
 
   def self.is_post_partum_period_no_radiobtn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     '.interaction-choice-control-value-is-post-partum-period-no'
+      '.interaction-choice-control-value-is-post-partum-period-no'
     else
-    '#is_post_partum_period_no'
+      '#is_post_partum_period_no'
     end
   end
 
   def self.is_pregnant_yes_radiobtn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     '.interaction-choice-control-value-is-pregnant-yes'
+      '.interaction-choice-control-value-is-pregnant-yes'
     else
-    'input[id="is_pregnant_yes"]'
+      'input[id="is_pregnant_yes"]'
     end
   end
 
@@ -81,9 +81,9 @@ class IvlIapOtherQuestions
 
   def self.person_blind_no_radiobtn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     '.interaction-choice-control-value-is-self-attested-blind-no'
+      '.interaction-choice-control-value-is-self-attested-blind-no'
     else
-    '#is_self_attested_blind_no'
+      '#is_self_attested_blind_no'
     end
   end
 
@@ -97,9 +97,9 @@ class IvlIapOtherQuestions
 
   def self.has_daily_living_help_no_radiobtn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     '.interaction-choice-control-value-has-daily-living-help-no'
+      '.interaction-choice-control-value-has-daily-living-help-no'
     else
-    '#has_daily_living_no'
+      '#has_daily_living_no'
     end
   end
 
@@ -129,9 +129,9 @@ class IvlIapOtherQuestions
 
   def self.physically_disabled_no_radiobtn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     '.interaction-choice-control-value-radio-physically-disabled-no'
+      '.interaction-choice-control-value-radio-physically-disabled-no'
     else
-    '#radio_physically_disabled_no'
+      '#radio_physically_disabled_no'
     end
   end
 

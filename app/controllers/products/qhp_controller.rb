@@ -17,17 +17,7 @@ class Products::QhpController < ApplicationController
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @active_year = params[:active_year]
     if (@market_kind == 'aca_shop' || @market_kind == 'fehb') && (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
-      sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-      effective_on = @hbx_enrollment.sponsored_benefit_package.start_on
-      products = @hbx_enrollment.sponsored_benefit.products(effective_on)
-      @member_groups = sponsored_cost_calculator.groups_for_products(products)
-      employee_cost_hash = {}
-      @member_groups.each do |member_group|
-        employee_cost_hash[member_group.group_enrollment.product.hios_id] = (member_group.group_enrollment.product_cost_total.to_f - member_group.group_enrollment.sponsor_contribution_total.to_f).round(2)
-      end
-      @qhps = find_qhp_cost_share_variances.each do |qhp|
-        qhp[:total_employee_cost] = employee_cost_hash[qhp.product_for(@market_kind).hios_id]
-      end
+      build_shop_comparison_details
     else
       @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, 'individual')
       @qhps = find_qhp_cost_share_variances
@@ -135,6 +125,20 @@ class Products::QhpController < ApplicationController
 
   def find_qhp_cost_share_variances
     Products::QhpCostShareVariance.find_qhp_cost_share_variances(@standard_component_ids, @active_year.to_i, @coverage_kind)
+  end
+
+  def build_shop_comparison_details
+    sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
+    effective_on = @hbx_enrollment.sponsored_benefit_package.start_on
+    products = @hbx_enrollment.sponsored_benefit.products(effective_on)
+    @member_groups = sponsored_cost_calculator.groups_for_products(products)
+    employee_cost_hash = {}
+    @member_groups.each do |member_group|
+      employee_cost_hash[member_group.group_enrollment.product.hios_id] = (member_group.group_enrollment.product_cost_total.to_f - member_group.group_enrollment.sponsor_contribution_total.to_f).round(2)
+    end
+    @qhps = find_qhp_cost_share_variances.each do |qhp|
+      qhp[:total_employee_cost] = employee_cost_hash[qhp.product_for(@market_kind).hios_id]
+    end
   end
 
 end

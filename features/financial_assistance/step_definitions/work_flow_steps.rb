@@ -6,9 +6,9 @@ end
 
 When(/^the user clicks CONTINUE$/) do
   if EnrollRegistry[:bs4_consumer_flow].enabled?
-   ''
+    ''
   else
-  find(IvlChooseCoverage.continue_btn, wait: 5).click
+    find(IvlChooseCoverage.continue_btn, wait: 5).click
   end
 end
 
