@@ -23,31 +23,31 @@ class CreateAccount
     if EnrollRegistry[:bs4_consumer_flow].enabled?
       'user_password_confirmation'
     else
-    'user[password_confirmation]'
+      'user[password_confirmation]'
     end
   end
 
   def self.email
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     'user_email'
+      'user_email'
     else
-    'user[email]'
+      'user[email]'
     end
   end
 
   def self.create_account_btn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-    '#submit-button'
+      '#submit-button'
     else
-    '.create-account-btn'
+      '.create-account-btn'
     end
   end
 
   def self.sign_in_link
     if EnrollRegistry[:bs4_consumer_flow].enabled?
-     ''
+      ''
     else
-    '.btn-link'
+      '.btn-link'
     end
   end
 end
