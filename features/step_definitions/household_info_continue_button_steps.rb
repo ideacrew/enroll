@@ -145,14 +145,13 @@ end
 Then(/^Family Relationships left section WILL display$/) do
   sleep 2
   if EnrollRegistry[:bs4_consumer_flow].enabled?
-  expect(page).to have_content('FAMILY RELATIONSHIPS')
+    expect(page).to have_content('FAMILY RELATIONSHIPS')
   else
     expect(page).to have_content('Family Relationships')
   end
 end
 
 When(/^primary applicant is in Info Completed state$/) do
-if EnrollRegistry[:bs4_consumer_flow].enabled?
   find(IvlIapFamilyInformation.add_income_and_coverage_info_btn).click
   find(IvlIapTaxInformationPage.file_taxes_no_radiobtn).click
   find(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn).click
@@ -178,35 +177,6 @@ if EnrollRegistry[:bs4_consumer_flow].enabled?
   find(IvlIapOtherQuestions.physically_disabled_no_radiobtn).click
   find('.interaction-choice-control-value-is-primary-caregiver-no').click
   find(IvlIapOtherQuestions.continue_to_next_step).click
-else
-find(IvlIapFamilyInformation.add_income_and_coverage_info_btn).click
-find(IvlIapTaxInformationPage.file_taxes_no_radiobtn).click
-find(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn).click
-find(IvlIapTaxInformationPage.continue_btn).click
-find(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn).click
-find(IvlIapJobIncomeInformationPage.has_self_employee_income_no_radiobtn).click
-find(IvlIapJobIncomeInformationPage.continue_btn).click
-find(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn).click
-find(IvlIapOtherIncomePage.has_other_income_no_radiobtn).click
-find(IvlIapOtherIncomePage.continue_btn, wait:10).click
-sleep 2
-find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn).click
-find(IvlIapIncomeAdjustmentsPage.continue_btn).click
-sleep 2
-find(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn).click
-find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn).click
-find(IvlIapHealthCoveragePage.continue).click
-sleep 2
-find(IvlIapOtherQuestions.is_pregnant_no_radiobtn).click
-find(IvlIapOtherQuestions.is_post_partum_period_no_radiobtn).click
-find(IvlIapOtherQuestions.person_blind_no_radiobtn).click
-find(IvlIapOtherQuestions.has_daily_living_help_no_radiobtn).click
-find(IvlIapOtherQuestions.need_help_paying_bills_no_radiobtn).click
-find(IvlIapOtherQuestions.physically_disabled_no_radiobtn).click
-find(IvlIapOtherQuestions.continue_btn).click
-sleep 2
-end
-
 end
 
 When(/^all applicants are in Info Completed state$/) do

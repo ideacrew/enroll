@@ -160,25 +160,25 @@ Then(/^.+ sees form to enter personal information$/) do
   #find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
   fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
-  
+
   if EnrollRegistry[:bs4_consumer_flow].enabled?
     fill_in IvlPersonalInformation.city, with: 'Augusta'
     find(IvlPersonalInformation.select_me_state).click
     fill_in IvlPersonalInformation.zip, with: '04330'
     fill_in IvlPersonalInformation.mobile_phone, :with => "22075555555"
   else
-  fill_in IvlPersonalInformation.city, with: personal_information[:city]
-  find_all(IvlPersonalInformation.select_state_dropdown).first.click
-  fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
-  find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
-  fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
-end
+    fill_in IvlPersonalInformation.city, with: personal_information[:city]
+    find_all(IvlPersonalInformation.select_state_dropdown).first.click
+    fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+    find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
+    fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  end
   fill_in IvlPersonalInformation.home_phone, :with => "22075555555"
   sleep 30
 end
 
 Then(/the continue button has data disabled attribute$/) do
-  continue_button = find('button.interaction-click-control-continue', visible: false)['data-disable-with']
+  find('button.interaction-click-control-continue', visible: false)['data-disable-with']
   #expect(continue_button).to eql(l10n("please_wait")) inside a haml file data diasbled with attribute
 end
 
@@ -430,11 +430,7 @@ Then(/^Individual should be on verification page/) do
 end
 
 When(/^.+ clicks on the Continue button of the Family Information page$/) do
-  if EnrollRegistry[:bs4_consumer_flow].enabled?
-    
-  else
-    find_all(IvlIapFamilyInformation.continue_btn)[1].click
-  end
+  find_all(IvlIapFamilyInformation.continue_btn)[1].click unless EnrollRegistry[:bs4_consumer_flow].enabled?
   find(IvlIapFamilyInformation.continue_btn).click
   sleep 10
 end
@@ -459,18 +455,18 @@ Then(/^.+ answers the questions of the Identity Verification page and clicks on 
     find_all(IvlVerifyIdentity.continue_application_btn)[1].click
   else
     sleep 2
-   find(IvlVerifyIdentity.continue_application_btn).click
+    find(IvlVerifyIdentity.continue_application_btn).click
   end
 end
 
 Then(/^.+ is on the Help Paying for Coverage page/) do
   expect(page).to have_content IvlIapHelpPayingForCoverage.your_application_for_premium_reductions_text
-  if EnrollRegistry[:mainecare_cubcare_glossary].enabled?  
-  expect(find('.weight-n.required')).to_not be(nil)
-  expect(page).to have_css('.glossary', text:'Cub Care')
-  find('span[data-title="Cub Care"]').click
-  expect(page).to have_content(IvlIapHelpPayingForCoverage.cubcare_glossary_text)
-  find('div[class="mt-4 mb-4"]').click
+  if EnrollRegistry[:mainecare_cubcare_glossary].enabled?
+    expect(find('.weight-n.required')).to_not be(nil)
+    expect(page).to have_css('.glossary', text: 'Cub Care')
+    find('span[data-title="Cub Care"]').click
+    expect(page).to have_content(IvlIapHelpPayingForCoverage.cubcare_glossary_text)
+    find('div[class="mt-4 mb-4"]').click
   end
 end
 
@@ -568,9 +564,7 @@ When(/Individual enters the password$/) do
 end
 
 Then(/Individual does not see the error on tooltip indicating a password longer than 20 characters$/) do
-  if EnrollRegistry[:bs4_consumer_flow].enabled?
-
-  else
+  unless EnrollRegistry[:bs4_consumer_flow].enabled?
     wait_for_ajax
     script = "return document.querySelector('.longer').getAttribute('data-icon');"
     data_icon_value = page.execute_script(script)
@@ -1128,8 +1122,8 @@ Then(/the individual should see the elected APTC amount and click on the Confirm
   wait_for_ajax
   expect(page).to have_content '$50.00'
   find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
-  fill_in IvlConfirmYourPlanSelection.first_name, :with => ("Patrick")
-  fill_in IvlConfirmYourPlanSelection.last_name, :with => ("Doe")
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => "Patrick"
+  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Doe"
   screenshot("aptc_purchase")
   sleep 2
   find(IvlConfirmYourPlanSelection.confirm_btn).click
