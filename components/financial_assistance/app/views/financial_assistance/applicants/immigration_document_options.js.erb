@@ -34,10 +34,10 @@
 <% end %>
 
 <% if @target.present? %>
-  '<%= form_for @target, immigration_document_options_submission_url(@application, @target) do |f| %>'
-    $(".vlp_doc_area").html("<%= escape_javascript(render partial: partial_target, locals: {c: f}) %>")
+  '<%= form_for @target, immigration_document_options_submission_url(@application, @target, @bs4) do |f| %>'
+    $(".vlp_doc_area").html("<%= escape_javascript(render partial: partial_target, locals: {c: f, bs4: @bs4}) %>")
     <% if EnrollRegistry[:enroll_app].setting(:verifiable_immigration_statuses).item %>
-      $(".vlp_doc_area").append("<%= escape_javascript(render partial: 'immigration_statuses', locals: {c: f}) %>")
+      $(".vlp_doc_area").append("<%= escape_javascript(render partial: 'immigration_statuses', locals: {c: f, bs4: @bs4}) %>")
     <% end %>
   '<% end %>'
 <% end %>
