@@ -49,6 +49,7 @@
   &:hover {
     color: $hover;
     border-color: $hover;
+    background-color: transparent;
   }
   &:active {
     color: var(--button-default-active-color);
