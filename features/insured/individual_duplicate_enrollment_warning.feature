@@ -47,6 +47,7 @@ Feature: Individual market with duplicate enrollments
   Scenario: Individual adds dependent. Dependent creates account and shops for a plan, Individual shops for a plan including dependent and sees duplicate enrollment warning
     When Individual clicks on continue
     And Individual agrees to the privacy agreeement
+    And the person named Patrick Doe is RIDP verified
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
@@ -58,8 +59,8 @@ Feature: Individual market with duplicate enrollments
     And Dependent creates a new HBX account
     Then Dependent sees Your Information page
     When Dependent registers as an individual
-    And Individual clicks on continue
-    And Individual clicks on continue
+    And the individual clicks on the Continue button of the Account Setup page
+    And the individual clicks continue on the personal information page
     And Individual agrees to the privacy agreeement
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
