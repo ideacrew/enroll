@@ -67,7 +67,7 @@ class Insured::RidpDocumentsController < ApplicationController
     end
 
     respond_to do |format|
-      format.js { render (@bs4 ? "destroy_updated" : "destroy") }
+      format.js { render @bs4 ? "destroy_updated" : "destroy" }
     end
   end
 
@@ -147,7 +147,6 @@ class Insured::RidpDocumentsController < ApplicationController
     person_consumer_role.ridp_documents = existing_documents.uniq
     person_consumer_role.save
   end
-
 
   def enable_bs4_layout
     @bs4 = true

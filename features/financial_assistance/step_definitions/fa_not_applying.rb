@@ -20,7 +20,7 @@ And(/the primary member has filled mandatory information required$/) do
   expect(page).to have_content("Your Information")
   expect(page).to have_content("CONTINUE")
   find(YourInformation.continue_btn).click
-  fill_in IvlPersonalInformation.first_name , with: "Patrick"
+  fill_in IvlPersonalInformation.first_name, with: "Patrick"
   fill_in IvlPersonalInformation.last_name, with: "Doe"
   fill_in IvlPersonalInformation.dob, with: personal_information[:dob].to_s
   fill_in IvlPersonalInformation.ssn, with: personal_information[:ssn]
@@ -76,7 +76,7 @@ Given(/^the user navigates to the "Household Info" page with "no" selected$/) do
   find(:xpath, '//label[@for="radio2"]').click
   create_plan
   find('.btn', text: 'CONTINUE').click
-  expect(page).to have_content("#{l10n('family_information')}")
+  expect(page).to have_content(l10n('family_information').to_s)
 end
 
 When(/the user clicks on add member button/) do
@@ -102,7 +102,7 @@ And(/^the user fills the the add member form/) do
   find(:xpath, '//label[@for="radio_incarcerated_no"]').click
   # screenshot("add_member")
   all(:css, ".mz").last.click
-  expect(page).to have_content("#{l10n('family_information')}")
+  expect(page).to have_content(l10n('family_information').to_s)
 end
 
 And(/^the user fills the applicant add member form with indian member yes/) do
@@ -255,7 +255,7 @@ When(/^the user clicks on CONTINUE button/) do
 end
 
 Then(/^the user will navigate to FAA Household Info: Family Members page/) do
-  expect(page).to have_content("#{l10n('family_information')}")
+  expect(page).to have_content(l10n('family_information').to_s)
 end
 
 Given(/Contact method via dropdown feature is NOT enabled/) do
@@ -277,7 +277,7 @@ And(/Individual fills in info required and selects text only as contact option/)
   if EnrollRegistry[:bs4_consumer_flow].enabled?
     expect(page).to have_content("We need to verify if you or you and your family are eligible to enroll in coverage through CoverME.gov.")
   else
-  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
+    expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
   end
   find(IvlPersonalInformation.continue_btn_2).click
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
@@ -291,13 +291,13 @@ And(/Individual fills in info required and selects text only as contact option/)
     find(IvlPersonalInformation.select_me_state).click
     fill_in IvlPersonalInformation.zip, with: '04330'
   else
-  fill_in IvlPersonalInformation.city, with: personal_information[:city]
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
-  find('#address_info li', :text => 'DC', wait: 5).click
-  fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
-end
-    fill_in "person_phones_attributes_1_full_phone_number", with: "23424512343"
-  
+    fill_in IvlPersonalInformation.city, with: personal_information[:city]
+    find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
+    find('#address_info li', :text => 'DC', wait: 5).click
+    fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+  end
+  fill_in "person_phones_attributes_1_full_phone_number", with: "23424512343"
+
   if find('#contact_type_text').checked?
     find(IvlPersonalInformation.mail_checkbox).click
     find(IvlPersonalInformation.email_checkbox).click
@@ -314,11 +314,11 @@ And(/Individual fills in info required and selects no contact option/) do
   find(IvlPersonalInformation.male_radiobtn).click
   find(IvlPersonalInformation.need_coverage_yes).click
   find(IvlPersonalInformation.continue_btn).click
-  
+
   if EnrollRegistry[:bs4_consumer_flow].enabled?
     expect(page).to have_content("We need to verify if you or you and your family are eligible to enroll in coverage through CoverME.gov.")
   else
-  expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
+    expect(page).to have_content("Next, we need to verify if you or you and your family are eligible to enroll in coverage through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Select CONTINUE.")
   end
   find(IvlPersonalInformation.continue_btn_2).click
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
@@ -332,20 +332,18 @@ And(/Individual fills in info required and selects no contact option/) do
     find(IvlPersonalInformation.select_me_state).click
     fill_in IvlPersonalInformation.zip, with: '04330'
   else
-  fill_in IvlPersonalInformation.city, with: personal_information[:city]
-  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
-  find('#address_info li', :text => 'DC', wait: 5).click
-  fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+    fill_in IvlPersonalInformation.city, with: personal_information[:city]
+    find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
+    find('#address_info li', :text => 'DC', wait: 5).click
+    fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
   end
 
   fill_in "person_phones_attributes_1_full_phone_number", with: "23424512343"
-  
+
   if find('#contact_type_text').checked?
     find(IvlPersonalInformation.mail_checkbox).click
     find(IvlPersonalInformation.email_checkbox).click
     find(IvlPersonalInformation.text_checkbox).click
-  else
-    
   end
 end
 
@@ -358,5 +356,5 @@ end
 Then(/Individual should see an error message warning about no contact method/) do
   #text = page.driver.browser.switch_to.alert.text
   #expect(text).to eq 'Warning: You must select at least one contact method. An additional method must be checked if selecting Text.'
- # Need to update with expected message 
+ # Need to update with expected message
 end
