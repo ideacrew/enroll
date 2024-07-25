@@ -57,7 +57,7 @@
           </div>
           <div>
             <% if ridp_documents_list(@person, ridp_type).any? %>
-              <span><label class="my-0"><%= l10n("insured.consumer_roles.upload_ridp_documents.list_header", ridp_type: ridp_type) %></label></span>
+              <span><label class="my-0"><%= l10n("documents_list_title", document_type: ridp_type) %></label></span>
               <div class="ridp-doc-list col-sm-12 px-0">
                 <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
                   <div class="d-flex row py-1 px-0 m-0 align-items-center" id="doc_table_row_<%=ridp_doc.id%>">
