@@ -613,6 +613,10 @@ a.disabled {
   border: 1px solid var(--grey-060);
 }
 
+.msg-inbox {
+  cursor: pointer;
+}
+
 .msg-inbox:hover {
   background-color: var(--grey-020);
 }
