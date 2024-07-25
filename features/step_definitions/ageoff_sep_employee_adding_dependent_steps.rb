@@ -15,7 +15,11 @@ When(/(.*) selects a current qle date/) do |_person|
   # screenshot("past_qle_date")
   fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
   within '#qle-date-chose' do
+  
     find('.interaction-click-control-continue')
+    if !page.has_content?("Based on the information you entered, you may be eligible to enroll now but there is limited time")
+      find('.interaction-click-control-continue').click
+    end
   end
 end
 

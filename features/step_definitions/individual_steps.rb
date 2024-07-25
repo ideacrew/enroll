@@ -693,12 +693,15 @@ Then(/^Individual clicks on Add New Person$/) do
 end
 
 And(/^Admin updates the address to Non DC Address$/) do
+  sleep 2
   find(IvlHomepage.manage_family_btn).click
+  sleep 2
   find(IvlManageFamilyPage.personal_tab).click
   find(AdminHomepage.remove_mailing_address).click
   find(EmployeeFamilyInformation.save_btn).click
-  find(IvlPersonalInformation.select_state_dropdown).click
+  find('select[name="person[addresses_attributes][0][state]"]').click
   find(AdminHomepage.non_dc_state).click
+  sleep 2
   fill_in IvlPersonalInformation.zip, with: '30043'
   find(EmployeeFamilyInformation.save_btn).click
   find(EmployeeHomepage.my_dc_health_link).click
