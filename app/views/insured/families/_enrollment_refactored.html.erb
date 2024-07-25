@@ -1,4 +1,4 @@
-<% product = hbx_enrollment.product %>
+<% product = hbx_enrollment.product.present? ? hbx_enrollment.product : @plan %>
 <% if hbx_enrollment.is_coverage_waived? %>
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || hbx_enrollment.can_make_changes?, hbx_enrollment: hbx_enrollment } %>
 <% else %>
