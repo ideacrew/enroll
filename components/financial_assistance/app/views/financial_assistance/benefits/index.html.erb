@@ -53,7 +53,7 @@
       </div>
     </div>
 
-    <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member  %>
+    <% if true || EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member  %>
       <fieldset id="ai_an_health_service_eligible_question" class="pb-4 driver-question">
         <legend class="weight-n instruction-row"><%= l10n("faa.indian_health_service_eligible") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
@@ -83,7 +83,7 @@
       </fieldset>
     <% end %>
 
-    <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
+    <% if true || FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
       <fieldset id="medicaid_chip_ineligible_question" class="pb-4 driver-question">
         <legend class="instruction-row weight-n"><%= l10n("faa.medicaid_chip_ineligible") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
@@ -113,7 +113,7 @@
       </fieldset>
     <% end %>
 
-    <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
+    <% if true || FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
       <div id="has_eligible_medicaid_cubcare_question" class="pb-4 driver-question">
         <fieldset>
           <legend class="instruction-row weight-n"><%= l10n("faa.medicaid_not_eligible") %></legend>
@@ -187,7 +187,7 @@
       </div>
     <% end %>
 
-    <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
+    <% if true || @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
       <div id="has_dependent_with_coverage_question" class="pb-4 driver-question">
         <fieldset>
           <legend class="weight-n instruction-row"><%= l10n("faa.has_dependent_with_coverage") %></legend>
