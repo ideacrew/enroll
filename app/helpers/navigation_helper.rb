@@ -78,7 +78,7 @@ module NavigationHelper
     nav
   end
 
-  def sign_up_nav_options(step, show_help_button = false)
+  def sign_up_nav_options(step, show_help_button: false, dont_show_exit_button: false)
     nav = {}
 
     nav[:nav_options] = [
@@ -90,7 +90,7 @@ module NavigationHelper
     nav[:title] = l10n('account_setup')
 
     nav[:show_help_button] = show_help_button ? true : (step == 2)
-    nav[:show_exit_button] = !['match', 'search'].include?(action_name)
+    nav[:show_exit_button] = true unless dont_show_exit_button
     nav[:show_previous_button] = false
     nav[:show_account_button] = false
     nav[:is_complete] = false
