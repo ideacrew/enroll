@@ -18,7 +18,7 @@ class IvlAuthorizationAndConsent
   def self.continue_btn
     if EnrollRegistry[:bs4_consumer_flow].enabled?
       '.interaction-click-control-continue-to-next-step'
-    else 
+    else
       '.interaction-click-control-continue'
     end
   end
