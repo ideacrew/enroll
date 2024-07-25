@@ -761,7 +761,8 @@ Then(/^.+ should see ([^"]*) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  find(EmployeeFamilyInformation.add_new_person).click
+  find('interaction-click-control-add-new-person').click
+  #find(EmployeeFamilyInformation.add_new_person).click
 end
 
 Then(/^.+ should see the new dependent form$/) do
@@ -887,14 +888,14 @@ end
 
 When(/^.+ filters plans by Carrier/) do
   find_all('.interaction-choice-control-carrier').first.click
-  carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
+  carrier_option = find('li .interaction-choice-control-carrier-2', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
   find(".interaction-click-control-apply", match: :first, wait: 5).click
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do
-  sleep(2)
+  sleep(5)
   find_all('.plan-row', wait: 5).each do |row|
     expect(row.find('h3 small', wait: 5).text).to eq @carrier_selected
   end

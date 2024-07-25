@@ -62,10 +62,11 @@ Feature: Individual market with duplicate enrollments
     And the individual clicks on the Continue button of the Account Setup page
     And the individual clicks continue on the personal information page
     And Individual agrees to the privacy agreeement
+    And the person named Spouse Smith is RIDP verified
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
-    And Individual clicks on the Continue button of the Family Information page
+    And the Individual clicks CONTINUE
     And Individual clicks on continue button on Choose Coverage page
     And Individual selects a plan on plan shopping page
     And Dependent clicks on purchase button on confirmation page
