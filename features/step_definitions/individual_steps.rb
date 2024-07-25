@@ -1312,6 +1312,7 @@ When(/Individual clicks on Go To My Account button$/) do
 end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
+  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click 
 end
 

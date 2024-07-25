@@ -4,11 +4,7 @@
 class SignIn
 
   def self.username
-    if EnrollRegistry[:bs4_consumer_flow].enabled?
-
-    else
-    'user_oim_id'
-    end
+   'user[login]'
   end
 
   def self.password
