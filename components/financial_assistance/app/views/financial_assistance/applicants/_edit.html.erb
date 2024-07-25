@@ -66,6 +66,17 @@
         </div>
       </fieldset>
 
+      <% unless @applicant.is_primary_applicant? %>
+      <div class="d-flex mb-md-4">
+        <div class="">
+          <%= f.label :relationship, l10n("relationship_to_primary_member"), class: "required weight-n" %>
+          <%= f.select :relationship, faa_relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => ""}  %>
+          <a href="#relationship" data-toggle="modal" data-target="#relationship" class="d-block"><%= l10n("not_sure") %></a>
+          <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
+        </div>
+      </div>
+      <% end %>
+
       <h2 class="mt-4"><%= l10n("insured.consumer_roles.demo_info_for") %> <%= @applicant.full_name %></h2>
       <div id="consumer_fields_sets">
         <%= render 'financial_assistance/shared/consumer_fields', f: f %>
@@ -81,7 +92,7 @@
             <%=l10n("live_with_primary_subscriber") %>
           </label>
         </div>
-        <div id="applicant-home-address-area" class="<%= 'hidden' unless f.object.same_with_primary.present? and f.object.same_with_primary == true %>">
+        <div id="applicant-home-address-area" class="<%= 'hidden' unless f.object.same_with_primary.present? && f.object.same_with_primary != true %>">
           <%= render 'shared/consumer_home_address_fields', f: f %><br>
         </div>
       <% else %>
@@ -186,6 +197,27 @@
         processData: false,
       });
     }
+
+    $(document).off('click', '#confirm-member');
+    $(document).on('click', '#confirm-member', function(e) {
+      if ($("input#applicant_same_with_primary")) {
+        if($("input#applicant_same_with_primary").is(":checked")){
+          $("#applicant-home-address-area input.required, #applicant-home-address-area select.required, #applicant-home-address-area .address_required").removeAttr('required');
+        } else {
+          $("#applicant-home-address-area input.required, #applicant-home-address-area select.required, #applicant-home-address-area .address_required").attr('required', true);
+        }
+
+        $(".btn-confirmation").removeAttr('disabled');
+
+        var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
+        if (!$("input#applicant_same_with_primary").is(":checked")) {
+          $('#addressChangeConfirmation').modal('show');
+        }
+        else {
+          PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+        }
+      }
+    });
   </script>
 
 <% else %>

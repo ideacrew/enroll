@@ -349,7 +349,7 @@ module ApplicationHelper
             '#', class: "add_fields #{classes}", data: {id: id, fields: fields.gsub("\n", "")})
   end
 
-  def render_flash(use_bs4 = false)
+  def render_flash(use_bs4: false)
     rendered = []
     flash.each do |type, messages|
       next if messages.blank? || (messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string"))
