@@ -11,12 +11,11 @@
 
   } else {
     //manage family/ my household page
-    $("#primary-person .append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
+    var personContainer = $("#person-<%= @person.id %>")
+    $("#person-<%= @person.id %> .append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
+    personContainer.removeClass('hidden');
     $("a[id^=edit-member]").addClass('disabled');
-    $("#add-new-member").addClass("hidden");
-    $("#edit-member-<%= @family_members.first.id %>").addClass("hidden");
-    $("#cancel-edit-<%= @family_members.first.id %>").removeClass("hidden");
-    $("#save-member-<%= @family_members.first.id %>").removeClass("hidden");
+    $("a[id^=edit-member]").atrr('disabled', true);
   }
 <% else %>
   $(".append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");

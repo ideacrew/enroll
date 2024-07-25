@@ -18,20 +18,22 @@
       </thead>
       <tbody>
         <% @family.active_family_members.each do |member| %>
-          <tr class="member-<%= member.id%>-row">
+          <% person_id = member.person.id %>
+          <tr class="member-<%= person_id %>-row">
             <td><%= member.full_name.titleize %></td>
-            <td><%= member.hbx_id[0,10] %></td>
+            <td><%= member.person.hbx_id %></td>
             <td><%= member.age_on(TimeKeeper.date_of_record) %></td>
             <td><%= member.gender.humanize %></td>
             <td><%= member.relationship.try(:humanize) %></td>
             <td class="p-2 <%= pundit_class Family, :updateable? %>">
               <% edit_url = member.is_primary_applicant ? personal_insured_families_path({bs4: @bs4}) : main_app.edit_insured_family_member_path(member, {bs4: @bs4}) %>
               <span class="d-flex">
-                <%= h(link_to l10n("edit_member"), edit_url, remote: true, id: "edit-member-#{member.id}", class: 'btn button outline close-2') %>
-                <%= h(link_to l10n("cancel_edit"), insured_family_member_path(member, {bs4: @bs4}), remote: true, id: "cancel-edit-#{member.id}", class: 'hidden btn button outline close-2 text-nowrap') %>
-                <%# defers click to in-form submit button via JS, note primary & dependents have different forms %>
-                <%= h(link_to l10n("save_changes"), "", remote: true, id: "save-member-#{member.id}", class: 'hidden btn button close-2 ml-3 my-hh-save-member text-nowrap') %>
+                <%= h(link_to l10n("edit_member"), edit_url, remote: true, id: "edit-member-#{person_id}", class: 'btn button outline close-2') %>
               </span>
+            </td>
+          </tr>
+          <tr id="person-<%= person_id %>" class="hidden">
+            <td colspan="6" class="append_consumer_info">
             </td>
           </tr>
         <% end %>
