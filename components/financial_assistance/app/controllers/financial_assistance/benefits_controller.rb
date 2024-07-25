@@ -48,11 +48,8 @@ module FinancialAssistance
       @benefit = @applicant.benefits.build permit_params(params[:benefit])
       authorize @benefit, :create?
 
-      @benefit_kind = @benefit.kind
-      @benefit_insurance_kind = @benefit.insurance_kind
-
       if @benefit.save
-        render :create, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
+        render :create, :locals => { kind: @benefit.kind, insurance_kind: @benefit.insurance_kind }
       else
         render head: 'ok'
       end
@@ -65,7 +62,7 @@ module FinancialAssistance
 
       if @benefit.update_attributes permit_params(params[:benefit])
         respond_to do |format|
-          format.js { render :update, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] } }
+          format.js { render :update, :locals => { kind: @benefit.kind, insurance_kind: @benefit.insurance_kind } }
         end
       else
         respond_to do |format|
