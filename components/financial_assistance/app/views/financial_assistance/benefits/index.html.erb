@@ -187,7 +187,7 @@
       </div>
     <% end %>
 
-    <% if true || @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
+    <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
       <div id="has_dependent_with_coverage_question" class="pb-4 driver-question">
         <fieldset>
           <legend class="weight-n instruction-row"><%= l10n("faa.has_dependent_with_coverage") %></legend>
