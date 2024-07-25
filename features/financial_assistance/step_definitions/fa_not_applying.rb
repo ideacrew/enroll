@@ -212,7 +212,7 @@ end
 
 And(/^the user clicks the PREVIOUS link1/) do
   wait_for_ajax
-  find(IvlIapFamilyInformation.previous_link).click
+  find(IvlIapFamilyInformation.previous_link, wait: 5).click
 end
 
 Then(/^the user navigates to Help Paying for Coverage page/) do
