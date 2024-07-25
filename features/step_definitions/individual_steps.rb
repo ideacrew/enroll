@@ -440,6 +440,7 @@ When(/^Individual navigates to Sep Page$/) do
 end
 
 When(/^Individual clicks on the continue button$/) do
+  wait_for_ajax
   find_all('.interaction-click-control-continue')[0].click
 end
 
@@ -659,8 +660,8 @@ end
 
 And(/^Individual clicks on purchase button on confirmation page$/) do
   find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
-  fill_in IvlConfirmYourPlanSelection.first_name, :with => "John"
-  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Smith"
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => "Patrick"
+  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Doe"
   find(IvlConfirmYourPlanSelection.confirm_btn).click
 end
 
@@ -1311,7 +1312,7 @@ When(/Individual clicks on Go To My Account button$/) do
 end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
-  find(IvlChooseCoverage.continue_btn).click
+  find(IvlChooseCoverage.continue_btn).click 
 end
 
 And(/Individual clicks the Back to My Account button$/) do
@@ -1404,10 +1405,11 @@ And(/Individual should see Duplicate Enrollment warning in the Confirmation page
 end
 
 And(/^Primary member logs back in$/) do
+  wait_for_ajax
   find(CreateAccount.sign_in_link).click
   fill_in SignIn.username, :with => "testflow@test.com"
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
-  find(SignIn.sign_in_btn).click
+  find('.interaction-click-control-sign-in').click
 end
 When(/Individual creates an HBX account with SSN already in use$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow123"
