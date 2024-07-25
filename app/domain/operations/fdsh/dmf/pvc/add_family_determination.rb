@@ -163,8 +163,10 @@ module Operations
 
             message = "DMF Determination response for Family with hbx_id #{@family_hbx_id} received successfully"
             alive_status_verification_type.reload
+
+            event_response_record = EventResponse.create({received_at: Time.now, body: {job_id: @job.job_id, family_hbx_id: @family_hbx_id, death_confirmation_code: entity_validation_status, date_of_death: alive_status_entity.date_of_death}.to_json})
             alive_status_verification_type.add_type_history_element(action: "DMF Hub Response", modifier: "System", update_reason: message, from_validation_status: from_validation_status,
-                                                                    to_validation_status: alive_status_verification_type.validation_status)
+                                                                    to_validation_status: alive_status_verification_type.validation_status, event_response_record_id: event_response_record.id)
           end
 
           def update_validation_status(alive_status_verification_type, new_validation_status)
