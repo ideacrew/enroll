@@ -1,3 +1,14 @@
+<% if @bs4 %>
+  <div class="mt-4 mb-4">
+    <%= label_tag :naturalization_number, l10n("insured.consumer_roles.docs_shared.naturalization_number"), class: "weight-n" %>
+    <%= v.text_field :naturalization_number, :placeholder => l10n("insured.consumer_roles.docs_shared.naturalization_number"),
+                    :pattern => "[a-zA-Z0-9]{6,12}",
+                    :class => "doc_fields",
+                    :title => l10n("insured.consumer_roles.docs_shared.naturalization_number_req").gsub("-li-", ""),
+                    :id => "naturalization_number" %>
+    <%= render :partial => "financial_assistance/applicants/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.naturalization_number_req")} %>
+  </div>
+<% else %>
 <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
   <%= v.text_field :naturalization_number, :placeholder => l10n("insured.consumer_roles.docs_shared.naturalization_number"),
                    :pattern => "[a-zA-Z0-9]{6,12}",
@@ -5,3 +16,4 @@
                    :title => l10n("insured.consumer_roles.docs_shared.naturalization_number_req").gsub("-li-", "") %>
   <%= render :partial => "financial_assistance/applicants/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.naturalization_number_req")} %>
 </div>
+<% end %>
