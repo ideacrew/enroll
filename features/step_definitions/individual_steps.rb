@@ -610,6 +610,7 @@ end
 
 When(/^the individual clicks the Continue button of the Group Selection page$/) do
   expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
+  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
 end
 
@@ -1096,11 +1097,13 @@ And(/has valid csr 0 benefit package with silver plans/) do
 end
 
 And(/the individual sets APTC amount/) do
+  find('.interaction-field-control-elected-aptc').set("")
   fill_in IvlChoosePlan.aptc_monthly_amount, :with => "50.00"
   screenshot("aptc_setamount")
 end
 
 Then(/the individual clicks the Reset button/) do
+  sleep 5
   find_all(IvlChoosePlan.reset_btn).first.click
 end
 
@@ -1119,6 +1122,7 @@ Then(/the individual sees the new APTC tool UI changes/) do
 end
 
 And(/the individual selects a silver plan on Plan Shopping page/) do
+  binding.irb
   find_all(IvlChoosePlan.select_plan_btn)[1].click
 end
 
