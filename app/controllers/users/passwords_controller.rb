@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Users
+  # controller for password actions
   class PasswordsController < Devise::PasswordsController
     before_action :confirm_identity, only: [:create]
     layout 'bootstrap_4'
@@ -67,11 +68,10 @@ module Users
 
     def confirm_identity
       return true if current_user&.has_role?('hbx_staff')
-      if user.identity_confirmed_token.present? && user.identity_confirmed_token != params[:user][:identity_confirmed_token]
-        flash[:error] = "Something went wrong, please try again"
-        redirect_to new_user_password_path
-        false
-      end
+      return unless user.identity_confirmed_token.present? && user.identity_confirmed_token != params[:user][:identity_confirmed_token]
+      flash[:error] = "Something went wrong, please try again"
+      redirect_to new_user_password_path
+      false
     end
 
     protected
