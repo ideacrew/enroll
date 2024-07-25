@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div id="<%= dom_id benefit %>" class="benefit">
     <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="esi_benefit">
-      <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titlecase %></h2>
+      <h2><%= insurance_kind.humanize.titlecase %></h2>
       <h3><%= benefit.employer_name %></h3>
       <dl class="parent mb-4">
         <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
@@ -39,10 +39,10 @@
         <% else %>
           <dt><%= l10n("faa.health_coverage.esi.type_of_hra") %></dt>
           <dd><%= benefit.hra_type %>
-          <dt><%= l10n("start_on") %></dt>
+          <dt><%= l10n("start_date") %></dt>
           <dd><%= benefit.start_on %>
           <% if benefit.end_on %>
-            <dt><%= l10n("end_on") %></dt>
+            <dt><%= l10n("end_date") %></dt>
             <dd><%= benefit.end_on %>
           <% end %>
           <dt><%= l10n("faa.health_coverage.esi.hra_max_question") %></dt>
@@ -54,13 +54,13 @@
         <% end %>
       </dl>
       <div class="mt-4">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-edit-<%= dom_id benefit %>')" id="esi-edit-<%= dom_id benefit %>" class="btn btn-error outline edit-benefit" data-kind="<%= benefit.kind %>"><%= l10n("faa.health_coverage.edit") %></a>
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-delete-<%= dom_id benefit %>')" id="esi-delete-<%= dom_id benefit%>" class="btn btn-error delete-benefit" data-kind="<%= benefit.kind %>"><%= l10n("faa.health_coverage.delete") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-delete-<%= dom_id benefit %>')" id="esi-delete-<%= dom_id benefit%>" class="btn btn-error outline delete-benefit mr-2" data-kind="<%= benefit.kind %>"><%= l10n("faa.edit.remove") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-edit-<%= dom_id benefit %>')" id="esi-edit-<%= dom_id benefit %>" class="btn btn outline edit-benefit" data-kind="<%= benefit.kind %>"><%= l10n("edit") %></a>
       </div>
     </div>
 
     <div class="edit-benefit-form hidden">
-      <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
+      <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
     </div>
   </div>
 <% else %>
