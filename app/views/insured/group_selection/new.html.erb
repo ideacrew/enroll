@@ -67,7 +67,7 @@
               <label class="n-radio weight-n" for="market_kind_<%= kind %>">
                 <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'market_kind_<%= kind %>')">
                   <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind, @person), disabled: is_market_kind_disabled?(kind, @person) %>
-                  <% if kind=="individual"  %>
+                  <% if kind=="individual" %>
                     <%= l10n("insured.group_selection.new.individual_benefits") %>
                   <% end %>
                 </div>
@@ -101,14 +101,14 @@
         <div class="n-radio-group d-flex align-items-center my-2">
           <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'coverage_kind_health')" class="n-radio-row mr-3">
             <label class="n-radio weight-n" for="coverage_kind_health">
-              <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"), id: 'coverage_kind_health', class: 'n-radio' %>
+              <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"), id: 'coverage_kind_health', required: true, class: "n-radio" %>
               <%= l10n("health") %>
             </label>
           </div>
 
           <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'coverage_kind_dental')" id="dental-radio-button" class=" mr-3 n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_eligible_for_dental?(@employee_role, @change_plan, @hbx_enrollment, effective_date_for_display) %>">
             <label class="n-radio weight-n" for="coverage_kind_dental">
-              <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
+              <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', required: true, class: 'n-radio' %>
               <%= l10n("dental") %>
             </label>
           </div>
@@ -236,14 +236,16 @@
             <div class="n-radio-group">
               <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'coverage_kind_health')" class="n-radio-row">
                 <label class="n-radio" for="coverage_kind_health">
-                  <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"), id: 'coverage_kind_health', class: 'n-radio' %>
+                  <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"), id: 'coverage_kind_health', required: true, class: "n-radio" %>
+                  <span class="n-radio"></span>
                   <%= l10n(".health") %>
                 </label>
               </div>
 
               <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'coverage_kind_dental')" id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_eligible_for_dental?(@employee_role, @change_plan, @hbx_enrollment, effective_date_for_display) %>">
                 <label class="n-radio" for="coverage_kind_dental">
-                  <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
+                  <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', required: true, class: 'n-radio' %>
+                  <span class="n-radio"></span>
                   <%= l10n("dental") %>
                 </label>
               </div>
