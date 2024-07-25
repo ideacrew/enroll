@@ -1,3 +1,13 @@
+<% if @bs4 %>
+  <div class="mt-4 mb-4">
+    <%= label_tag :vlp_description, l10n("insured.consumer_roles.docs_shared.document_description"), class: "weight-n" %>
+    <%= v.text_field :vlp_description, :placeholder => l10n("insured.consumer_roles.docs_shared.document_description"),
+										:pattern => ".{1,35}",
+										:class => "doc_fields",
+										:title => l10n("insured.consumer_roles.docs_shared.document_description_req")%>
+	<%= render :partial => "financial_assistance/applicants/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.document_description_req")} %>
+  </div>
+<% else %>
 <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
   <%= v.text_field :vlp_description, :placeholder => l10n("insured.consumer_roles.docs_shared.document_description"),
 										:pattern => ".{1,35}",
@@ -5,3 +15,4 @@
 										:title => l10n("insured.consumer_roles.docs_shared.document_description_req")%>
 	<%= render :partial => "financial_assistance/applicants/docs_shared/vlp_doc_requirements", locals: {req: l10n("insured.consumer_roles.docs_shared.document_description_req")} %>
 </div>
+<% end %>
