@@ -106,7 +106,7 @@ module FinancialAssistance
     end
 
     def resolve_layout
-      return @bs4 ? 'financial_assistance_progress' : 'financial_assistance_nav'
+      @bs4 ? 'financial_assistance_progress' : 'financial_assistance_nav'
     end
   end
 end

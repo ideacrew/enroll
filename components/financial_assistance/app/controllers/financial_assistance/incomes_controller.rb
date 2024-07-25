@@ -138,8 +138,6 @@ module FinancialAssistance
 
     def resolve_layout
       case action_name
-      when "step", "new"
-        "financial_assistance_nav"
       when "index", "other"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
       else
