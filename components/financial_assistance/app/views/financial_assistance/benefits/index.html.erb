@@ -131,7 +131,7 @@
         <a href="#has_eligible_medicaid_cubcare" data-toggle="modal" data-target="#has_eligible_medicaid_cubcare" class="d-block"><%= l10n("not_sure") %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_medicaid_cubcare"} %>
 
-        <fieldset id="denied-medicaid" class="pt-4 instruction-row">
+        <fieldset id="denied-medicaid" class="mt-4 instruction-row">
           <legend class="weight-n instruction-row"><%=l10n("faa.medicaid_cubcare_end_date")%></legend>
           <div class="mr-auto mt-3">
             <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
@@ -157,7 +157,7 @@
           <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligibility_changed"} %>
 
           <% status = @applicant.has_eligibility_changed == true ? "" : "hide" %>
-          <fieldset id="medicaid-chip-coverage-last-day" class="<%= status %> pt-4">
+          <fieldset id="medicaid-chip-coverage-last-day" class="<%= status %> mt-4">
             <legend class="weight-n instruction-row"><%=l10n("faa.person_medicaid_last_day")%></legend>
             <div class="mr-auto mt-3">
               <label class="required" for="person_coverage_end_on"><%=l10n("end_date")%></label>
@@ -206,7 +206,7 @@
         <a href="#has_dependent_with_coverage" data-toggle="modal" data-target="#has_dependent_with_coverage" class="d-block"><%= l10n("not_sure") %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_dependent_with_coverage"} %>
 
-        <fieldset id="denied-job-end-on" class="pt-4">
+        <fieldset id="denied-job-end-on" class="mt-4">
           <legend class="weight-n instruction-row"><%=l10n("faa.dependent_job_end_on")%></legend>
           <div class="mr-auto mt-3">
             <label class="required" for="dependent_job_end_on"><%==l10n("end_date")%></label>
