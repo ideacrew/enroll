@@ -177,7 +177,9 @@ class BenefitCoveragePeriod
                    'csr_limited'
                  end
     end
-    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, american_indian_members: american_indian_members, hbx_enrollment: hbx_enrollment, effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids: shopping_family_member_ids, csr_kind: csr_kind }).uniq
+    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, american_indian_members: american_indian_members,
+                                    hbx_enrollment: hbx_enrollment,
+                                    effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids: shopping_family_member_ids, csr_kind: csr_kind }).uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
     market = market.nil? || market == 'coverall' ? 'individual' : market
     product_entries({market: market, coverage_kind: coverage_kind, csr_kind: csr_kind, elected_product_ids: elected_product_ids, subcriber: subcriber, effective_on: hbx_enrollment.effective_on})
