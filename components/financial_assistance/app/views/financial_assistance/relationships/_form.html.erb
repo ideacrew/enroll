@@ -14,14 +14,15 @@
       <%= form_for @application do |f| %>
       <div>
         <h3>
-          <label class="required" for="relationships-<%= er[:applicant] %>"><%= l10n("relationship_to_primary") %></label>
+          <label class="required" for="relationships-<%= er[:relative] %>"><%= l10n("relationship_to_primary") %></label>
         </h3>
-        <%= f.select :relationships, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), {:prompt => 'Select Option', required: true }, { "class": "focus input-field #{'invalid-relation' if er[:relation] == 'none'}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "relationships-#{er[:applicant]}" } %>
+        <%= f.select :relationships, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), {:prompt => 'Select Option', required: true }, { "class": "focus input-field #{'invalid-relation' if er[:relation] == 'none'}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "relationships-#{er[:relative]}" } %>
       </div>
       <br>
       <% end %>
     <% end %>
   <% end %>
+
   <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_and_submit_application_path(@application)} %>
 <% else %>
 <h1 class="darkblue">Family Relationships</h1>
@@ -66,9 +67,11 @@
 <script >
   $(function() {
     if(<%= missing_relationships.present? %>){
-      $('#btn-continue').addClass('disabled');
+      $('#btn-continue', '#continue_button').attr('disabled', true);
+      $('#btn-continue', '#continue_button').addClass('disabled');
     } else {
-      $('#btn-continue').removeClass('disabled');
+      $('#btn-continue', '#continue_button').removeAttr('disabled');
+      $('#btn-continue', "#continue_button").removeClass('disabled');
     }
   });
 </script>

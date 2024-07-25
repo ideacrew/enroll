@@ -11,16 +11,16 @@
       <div class="focus d-flex mt-3 instruction-row">
         <label class="radio mr-3" for="has_enrolled_health_coverage_true">
           <input id="has_enrolled_health_coverage_true" type="radio" value="true" name="has_enrolled_health_coverage" <%='checked' if @applicant.has_enrolled_health_coverage == true %>>
-          <%= l10n("yes") %>
+          <span><%= l10n("yes") %></span>
         </label>
         <label class="radio mr-3" for="has_enrolled_health_coverage_false">
           <input id="has_enrolled_health_coverage_false" type="radio" value="false" name="has_enrolled_health_coverage" <%='checked'if @applicant.has_enrolled_health_coverage == false %>>
-          <%= l10n("no") %>
+          <span><%= l10n("no") %></span>
         </label>
       </div>
       <div class="instruction-row">
-        <a href="#has_enrolled_health_coverage" data-toggle="modal" data-target="#has_enrolled_health_coverage" class="d-block"><%= l10n("not_sure") %></a>
-        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: 'has_enrolled_health_coverage'} %>
+        <a href="#<%= applicant_currently_enrolled_key %>" data-toggle="modal" data-target="#<%= applicant_currently_enrolled_key %>" class="d-block"><%= l10n("not_sure") %></a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: applicant_currently_enrolled_key} %>
       </div>
       <div class="benefit-kinds" id="enrolled-benefit-kinds">
         <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_enrolled" } %>
@@ -32,16 +32,16 @@
       <div class="focus d-flex mt-3 instruction-row">
         <label class="radio mr-3" for="has_eligible_health_coverage_true">
           <input id="has_eligible_health_coverage_true" type="radio" value="true" name="has_eligible_health_coverage" <%='checked' if @applicant.has_eligible_health_coverage == true %>>
-          <%= l10n("yes") %>
+          <span><%= l10n("yes") %></span>
         </label>
         <label class="radio mr-3" for="has_eligible_health_coverage_false">
           <input id="has_eligible_health_coverage_false" type="radio" value="false" name="has_eligible_health_coverage" <%='checked'if @applicant.has_eligible_health_coverage == false %>>
-          <%= l10n("no") %>
+          <span><%= l10n("no") %></span>
         </label>
       </div>
       <div class="instruction-row">
-        <a href="#has_eligible_health_coverage" data-toggle="modal" data-target="#has_eligible_health_coverage" class="d-block instruction-row"><%= l10n("not_sure") %></a>
-        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: 'has_eligible_health_coverage'} %>
+        <a href="#<%= applicant_eligibly_enrolled_key%>" data-toggle="modal" data-target="#<%= applicant_eligibly_enrolled_key%>" class="d-block instruction-row"><%= l10n("not_sure") %></a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: applicant_eligibly_enrolled_key} %>
       </div>
 
       <div class="benefit-kinds" id="eligible-benefit-kinds">
@@ -55,11 +55,11 @@
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="ai_an_health_service_eligible_true">
             <input id="ai_an_health_service_eligible_true" type="radio" value="true" name="ai_an_health_service_eligible" <%='checked' if @applicant.health_service_eligible == true %>>
-            <%= l10n("yes") %>
+            <span><%= l10n("yes") %></span>
           </label>
           <label class="radio mr-3" for="ai_an_health_service_eligible_false">
             <input id="ai_an_health_service_eligible_false" type="radio" value="false" name="ai_an_health_service_eligible" <%='checked'if @applicant.health_service_eligible == false %>>
-            <%= l10n("no") %>
+            <span><%= l10n("no") %></span>
           </label>
         </div>
       </div>
@@ -69,11 +69,11 @@
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="ai_an_health_service_through_referral_true">
             <input id="ai_an_health_service_through_referral_true" type="radio" value="true" name="ai_an_health_service_through_referral" <%='checked' if @applicant.health_service_through_referral == true %>>
-            <%= l10n("yes") %>
+            <span><%= l10n("yes") %></span>
           </label>
           <label class="radio mr-3" for="ai_an_health_service_through_referral_false">
             <input id="ai_an_health_service_through_referral_false" type="radio" value="false" name="ai_an_health_service_through_referral" <%='checked'if @applicant.health_service_through_referral == false %>>
-            <%= l10n("no") %>
+            <span><%= l10n("no") %></span>
           </label>
         </div>
       </div>
@@ -85,11 +85,11 @@
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="medicaid_chip_ineligible_true">
             <input id="medicaid_chip_ineligible_true" type="radio" value="true" name="medicaid_chip_ineligible" <%='checked' if @applicant.medicaid_chip_ineligible == true %>>
-            <%= l10n("yes") %>
+            <span><%= l10n("yes") %></span>
           </label>
           <label class="radio mr-3" for="medicaid_chip_ineligible_false">
             <input id="medicaid_chip_ineligible_false" type="radio" value="false" name="medicaid_chip_ineligible" <%='checked'if @applicant.medicaid_chip_ineligible == false %>>
-            <%= l10n("no") %>
+            <span><%= l10n("no") %></span>
           </label>
         </div>
       </div>
@@ -99,11 +99,11 @@
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="immigration_status_changed_true">
             <input id="immigration_status_changed_true" type="radio" value="true" name="immigration_status_changed" <%='checked' if @applicant.immigration_status_changed == true %>>
-            <%= l10n("yes") %>
+            <span><%= l10n("yes") %></span>
           </label>
           <label class="radio mr-3" for="immigration_status_changed_false">
             <input id="immigration_status_changed_false" type="radio" value="false" name="immigration_status_changed" <%='checked' if @applicant.immigration_status_changed == false %>>
-            <%= l10n("no") %>
+            <span><%= l10n("no") %></span>
           </label>
         </div>
       </div>
@@ -115,11 +115,11 @@
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="has_eligible_medicaid_cubcare_true">
             <input id="has_eligible_medicaid_cubcare_true" type="radio" value="true" name="has_eligible_medicaid_cubcare" <%='checked' if @applicant.has_eligible_medicaid_cubcare == true %>>
-            <%= l10n("yes") %>
+            <span><%= l10n("yes") %></span>
           </label>
           <label class="radio mr-3" for="has_eligible_medicaid_cubcare_false">
             <input id="has_eligible_medicaid_cubcare_false" type="radio" value="false" name="has_eligible_medicaid_cubcare" <%='checked'if @applicant.has_eligible_medicaid_cubcare == false %>>
-            <%= l10n("no") %>
+            <span><%= l10n("no") %></span>
           </label>
         </div>
         <a href="#has_eligible_medicaid_cubcare" data-toggle="modal" data-target="#has_eligible_medicaid_cubcare" class="d-block"><%= l10n("not_sure") %></a>
@@ -129,7 +129,7 @@
             <span class="instruction-row"><%=l10n("faa.medicaid_cubcare_end_date")%></span>
             <div class="mr-auto mt-3">
               <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
-              <%= date_field :medicaid_cubcare_due_on, {id: "medicaid_cubcare_due_on", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
+              <%= date_field_tag :medicaid_cubcare_due_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
             </div>
         </div>
 
@@ -138,11 +138,11 @@
           <div class="focus d-flex mt-3">
             <label class="radio mr-3" for="has_eligibility_changed_true">
               <input id="has_eligibility_changed_true" type="radio" value="true" name="has_eligibility_changed" <%='checked' if @applicant.has_eligibility_changed? %>>
-              <%= l10n("yes") %>
+              <span><%= l10n("yes") %></span>
             </label>
             <label class="radio mr-3" for="has_eligibility_changed_false">
               <input id="has_eligibility_changed_false" type="radio" value="false" name="has_eligibility_changed" <%='checked'if @applicant.has_eligibility_changed == false %>>
-              <%= l10n("no") %>
+              <span><%= l10n("no") %></span>
             </label>
           </div>
           <a href="#has_eligibility_changed" data-toggle="modal" data-target="#has_eligibility_changed" class="d-block"><%= l10n("not_sure") %></a>
@@ -152,8 +152,8 @@
           <div id="medicaid-chip-coverage-last-day" class="<%= status %> pt-4">
             <span class="instruction-row"><%=l10n("faa.person_medicaid_last_day")%></span>
             <div class="mr-auto mt-3">
-              <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
-              <%= date_field :person_coverage_end_on, {id: "medicaid-chip-person_coverage_end_on-last-day", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
+              <label class="required" for="person_coverage_end_on"><%=l10n("end_date")%></label>
+              <%= date_field_tag :person_coverage_end_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
             </div>
           </div>
 
@@ -162,11 +162,11 @@
             <div class="focus d-flex mt-3">
               <label class="radio mr-3" for="has_household_income_changed_yes">
                 <input id="has_household_income_changed_yes" type="radio" value="true" name="has_household_income_changed" <%='checked' if @applicant.has_household_income_changed? %>>
-                <%= l10n("yes") %>
+                <span><%= l10n("yes") %></span>
               </label>
               <label class="radio mr-3" for="has_household_income_changed_no">
                 <input id="has_household_income_changed_no" type="radio" value="false" name="has_household_income_changed" <%='checked'if @applicant.has_household_income_changed == false %>>
-                <%= l10n("no") %>
+                <span><%= l10n("no") %></span>
               </label>
             </div>
             <a href="#has_household_income_changed" data-toggle="modal" data-target="#has_household_income_changed" class="d-block"><%= l10n("not_sure") %></a>
@@ -183,11 +183,11 @@
         <div class="focus d-flex mt-3">
           <label class="radio mr-3" for="has_dependent_with_coverage_true">
             <input id="has_dependent_with_coverage_true" type="radio" value="true" name="has_dependent_with_coverage" <%='checked' if @applicant.has_dependent_with_coverage == true %>>
-            <%= l10n("yes") %>
+            <span><%= l10n("yes") %></span>
           </label>
           <label class="radio mr-3" for="has_dependent_with_coverage_false">
             <input id="has_dependent_with_coverage_false" type="radio" value="false" name="has_dependent_with_coverage" <%='checked'if @applicant.has_dependent_with_coverage == false %>>
-            <%= l10n("no") %>
+            <span><%= l10n("no") %></span>
           </label>
         </div>
 
@@ -197,8 +197,8 @@
         <div id="denied-job-end-on" class="pt-4">
           <span class="instruction-row"><%=l10n("faa.dependent_job_end_on")%></span>
           <div class="mr-auto mt-3">
-            <label class="required" for="dependent_job_end_on"><%=l10n("dependent_job_end_on")%></label>
-            <%= date_field :dependent_job_end_on, {id: "dependent_job_end_on", class: "date-field col-3 mt-3"}, :'data-date-max' => "+0" %>
+            <label class="required" for="dependent_job_end_on"><%==l10n("end_date")%></label>
+            <%= date_field_tag :dependent_job_end_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
           </div>
         </div>
       </div>

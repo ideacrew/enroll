@@ -111,7 +111,8 @@ module FinancialAssistance
         @application.assign_attributes(permit_params(params[:application]))
 
         if @application.save
-          redirect_to submit_and_publish_application_redirect_path[:path], flash: submit_and_publish_application_redirect_path[:flash]
+          submit_location = submit_and_publish_application_redirect_path
+          submit_location[:flash].present? ? redirect_to(submit_location[:path], flash: submit_location[:flash]) : redirect_to(submit_location[:path])
         else
           @application.save!(validate: false)
           flash[:error] = build_error_messages(@application).join(", ")
