@@ -7,9 +7,11 @@
   <section class="my-4 p-3 border rounded bg-white benefit-form-container" id="<%= form_id %>">
     <%= f.hidden_field :kind, value: kind %>
     <%= f.hidden_field :insurance_kind, value: kind %>
-    <% if insurance_kind.present? %>
-      <h2 class="insurance-kind-label"><%= insurance_kind.humanize.titleize %></h2>
-    <% end %>
+    <div class="insurance-kind-label-container">
+      <% if insurance_kind.present? %>
+        <h2><%= insurance_kind.humanize.titleize %></h2>
+      <% end %>
+    </div>
     <%= f.label :employer_name, l10n("faa.health_coverage.esi.employer_name"), required: false, class: "required mt-2", for: "employer_name|#{form_id}" %>
     <%= f.text_field :employer_name, placeholder: l10n("faa.health_coverage.esi.employer_name"), required: false, id: "employer_name|#{form_id}" %>
     <div class="d-flex mt-4">
@@ -132,9 +134,9 @@
     </div>
     <div class="mt-4">
       <% if edit %>
-        <a tabindex="0" id="benefit_edit_cancel_<%= kind %>|<%= form_id %>" class="btn btn-error outline benefit-edit-cancel mr-2" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
+        <a tabindex="0" id="benefit_edit_cancel_<%= kind %>|<%= form_id %>" class="btn outline benefit-edit-cancel mr-2" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
       <% else %>
-        <a tabindex="0" id="esi_cancel_<%= kind %>|<%= form_id %>" class="btn btn-error outline benefit-form-cancel mr-2" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
+        <a tabindex="0" id="esi_cancel_<%= kind %>|<%= form_id %>" class="btn outline benefit-form-cancel" data-kind="<%= kind %>"><%=l10n("cancel")%></a>
       <% end %>
       <%= f.submit l10n("faa.health_coverage.save"), class: 'btn btn-save' %>
     </div>
