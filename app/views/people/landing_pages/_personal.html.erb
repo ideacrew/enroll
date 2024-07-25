@@ -118,7 +118,8 @@
   <script>
     $('.remove-personal-form').off('click');
     $('.remove-personal-form').on('click', function (e) {
-      $(".append_consumer_info").empty()
+      $(".append_consumer_info").empty();
+      $("#person-<%= @person.id %>").addClass('hidden');
     });
   </script>
 
