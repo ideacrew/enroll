@@ -105,7 +105,7 @@ $(function () {
     var header = document.createElement("h3");
     if($(event_element).data('reason') == 'covid-19') {
       var underlined_title = $(document.createElement("u")).text(title);
-      $('.qle-details-title-container').html(header.html(underlined_title));
+      $('.qle-details-title-container').html($(header).html(underlined_title));
       $('.qle-details-title').html(underlined_title); // legacy
     } else {
       $('.qle-details-title-container').html($(header).text(title));
