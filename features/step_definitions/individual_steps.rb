@@ -1319,7 +1319,7 @@ end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   wait_for_ajax
-  find(IvlChooseCoverage.continue_btn).click 
+  find(IvlChooseCoverage.continue_btn).click
 end
 
 And(/Individual clicks the Back to My Account button$/) do

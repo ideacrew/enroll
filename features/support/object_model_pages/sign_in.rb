@@ -4,7 +4,7 @@
 class SignIn
 
   def self.username
-   'user[login]'
+    'user[login]'
   end
 
   def self.password

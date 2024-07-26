@@ -671,7 +671,7 @@ Then(/^the consumer will navigate to the Help Paying for Coverage page$/) do
 end
 
 Then(/^the consumer will navigate to the Family Members page$/) do
-  expect(page).to have_selector('h2', text: "#{l10n('family_information')}")
+  expect(page).to have_selector('h2', text: l10n('family_information').to_s)
 end
 
 Then(/^a family with financial application in (.*) state exists$/) do |state|
