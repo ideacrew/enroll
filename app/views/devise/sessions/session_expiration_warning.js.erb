@@ -14,7 +14,10 @@ function session_countdown (){
     $('#sessionExpirationWarningModal p').text("Your session has timed out due to inactivity. Please log back in.");
     $('h4.modal-title').text("Session Ended");
     $('.modal-footer .btn-default').hide();
+    $("#stay-logged-in").remove();
     $('.modal-footer .btn-primary').attr('tabindex', '0').text('<%= l10n("faa.login") %>').on('keydown', function(event) { handleButtonKeyDown(event, 'stay-logged-in'); });
+    $('.modal-footer .outline').attr('tabindex', '0').text(<%= l10n("go_to_login") %>).on('keydown', function(event) { handleButtonKeyDown(event, 'stay-logged-in'); });
+    $('.modal-footer .outline').removeClass('outline').addClass('primary');
   }
 }
 
