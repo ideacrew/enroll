@@ -21,7 +21,7 @@ Feature: Admin plan shopping via SEP
     When I click the "Had a baby" in qle carousel
     And I selects a current qle date
     Then I should see confirmation and continue
-    When the individual clicks on the Continue button of the Family Information page
+    And the Individual clicks CONTINUE
     Then I should see Shop for new plan button
 
   Scenario: Dual Role User will not see ivl warning message when shopping in Shop flow
