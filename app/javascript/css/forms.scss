@@ -158,19 +158,6 @@ select.button-select {
   color: var(--button-primary-color);
 }
 
-select.button-select {
-  -webkit-appearance: menulist-button;
-  box-sizing: border-box;
-  background-image: none;
-  padding: 0 10px;
-  font-weight: 600;
-  line-height: 40px;
-  height: 40px;
-  border-radius: 4px;
-  border: 2px solid var(--button-primary-color);
-  color: var(--button-primary-color);
-}
-
 input[type='checkbox'],
 input[type='radio'] {
   vertical-align: middle;
