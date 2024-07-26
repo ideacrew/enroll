@@ -3,13 +3,14 @@
 # Helper for constructing dropdown options for use in the `datatables/shared/_dropdown` partial
 module DropdownHelper
   def application_dropdowns(application)
-    construct_options([
+    option_args = [
       (['faa.applications.actions.update', edit_application_path(application), :default] if application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)),
       (['faa.applications.actions.copy', copy_application_path(application), :default] unless do_not_allow_copy?(application, current_user)),
       (['faa.applications.actions.view_eligibility', eligibility_results_application_path(application), :default] if application.is_determined? || application.is_terminated?),
       (['faa.applications.actions.review', review_application_path(application), :default] if application.is_reviewable?)
-    ])
-    add_hbx_only_dropdowns(application, construct_options)
+    ]
+    option_args = add_hbx_only_dropdowns(application, option_args)
+    construct_options(option_args)
   end
 
   private
