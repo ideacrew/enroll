@@ -41,7 +41,7 @@ function startEditing(parentContainer) {
 function stopEditing() {
   $('#nav-buttons a').removeClass('disabled');
   $('.driver-question, .instruction-row, .add_new_benefit_kind', '.benefit').removeClass('disabled');
-  $('.disabled a').removeAttr('tabindex');
+  $('.disabled a').attr('tabindex', 0);
   $('.disabled a').removeClass('disabled');
   $('.disabled input:not(input[type=submit]), .disabled a').removeAttr('disabled');
   $('.driver-question input:not(input[type=submit]), .disabled a').removeAttr('disabled');
