@@ -275,7 +275,7 @@ module FinancialAssistance
     def other_questions_hash(applicant, can_edit)
       helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
 
-      hash = build_other_questions_hash(applicant, can_edit, helper)
+      hash = build_other_questions_hash(applicant, helper)
 
       create_section_hash(
         title: l10n('faa.review.other_questions'),
