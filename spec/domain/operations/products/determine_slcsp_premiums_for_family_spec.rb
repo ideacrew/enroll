@@ -63,6 +63,10 @@ RSpec.describe ::Operations::Products::DetermineSlcspForTaxHouseholdMember, dbcl
       }
     end
 
+    before do
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+    end
+
     it 'should return success' do
       result = subject.call(params)
       expect(result.success?).to eq true
