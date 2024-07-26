@@ -211,10 +211,12 @@ Then(/the user should see the AI AN Details fields/) do
 end
 
 And(/^the user clicks the PREVIOUS link1/) do
-  find(IvlIapFamilyInformation.previous_link).click
+  wait_for_ajax
+  find(IvlIapFamilyInformation.previous_link, wait: 5).click
 end
 
 Then(/^the user navigates to Help Paying for Coverage page/) do
+  sleep 2
   expect(page).to have_content('Your Application for Premium Reductions')
 end
 
