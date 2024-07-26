@@ -761,8 +761,7 @@ Then(/^.+ should see ([^"]*) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  find('interaction-click-control-add-new-person').click
-  #find(EmployeeFamilyInformation.add_new_person).click
+  find(EmployeeFamilyInformation.add_new_person).click
 end
 
 Then(/^.+ should see the new dependent form$/) do
