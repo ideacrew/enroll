@@ -38,6 +38,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.assign_history" => "Assign History",
 	"en.start_on" => "start on",
 	"en.end_on" => "end on",
+  "en.broker_agencies.successfully_assigned" => "You have successfully selected this expert",
 	"en.broker_agencies.profiles.office_locations" => "Office Locations",
 	"en.broker_agencies.profiles.broker_agency_contacts" => "Contacts",
 	"en.broker_agencies.profiles.primary_broker_role_info" => "Primary Broker Role Info (npn / provider kind / active)",
