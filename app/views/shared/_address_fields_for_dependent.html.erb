@@ -21,12 +21,12 @@
             </div>
           </div>
         <% end %>
-
+        
+        <% required = "required" if kind == 'home' && f.object.same_with_primary != 'true' %>
         <% col_size = EnrollRegistry.feature_enabled?(:display_county) ? 3 : 4 %>
         <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
           <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
             <%= address.hidden_field :kind %>
-            <% required = "required" if kind == 'home' && f.object.same_with_primary != 'true' %>
             <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "required" %>
             <%= address.text_field :address_1, placeholder: "#{kind.upcase} ADDRESS LINE 1 (NUMBER, STREET, QUADRANT) #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
           </div>
@@ -51,7 +51,7 @@
           <div data-controller="zip-check">
             <div class="col-sm-<%= "#{col_size}" %> col-xs-12 form-group form-group-lg no-pd">
               <%= address.label :zip, l10n("zip_code"), class: "required" %>
-              <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
+              <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: required.present?, placeholder: 'ZIP', data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
             </div>
 
             <% if EnrollRegistry.feature_enabled?(:display_county) %>
