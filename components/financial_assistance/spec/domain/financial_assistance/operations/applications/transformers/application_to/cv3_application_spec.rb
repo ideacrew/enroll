@@ -54,6 +54,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
                                   is_post_partum_period: false,
+                                  is_gap_filling: true,
                                   is_veteran_or_active_military: true)
     applicant
   end
@@ -150,6 +151,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should have applicant with person hbx_id' do
       expect(result.value![:applicants].first[:person_hbx_id]).to eq person.hbx_id
+    end
+
+    it 'should add determination_reason_codes' do
+      expect(result.value!.dig(:applicants, 0, :determination_reason_codes)).to eq ["Full Determination", "Gap Filling"]
     end
 
     context 'application' do
