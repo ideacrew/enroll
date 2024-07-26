@@ -46,7 +46,7 @@ When(/^selects yes they would like help paying for coverage$/) do
   # should be on application year select page now
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    find('a.interaction-click-control-continue').click
+    find('.interaction-click-control-continue').click
     sleep 2
   end
   # should be on checklist page now
@@ -671,7 +671,7 @@ Then(/^the consumer will navigate to the Help Paying for Coverage page$/) do
 end
 
 Then(/^the consumer will navigate to the Family Members page$/) do
-  expect(page).to have_selector('h2', text: "#{l10n('family_information')}")
+  expect(page).to have_selector('h2', text: l10n('family_information').to_s)
 end
 
 Then(/^a family with financial application in (.*) state exists$/) do |state|

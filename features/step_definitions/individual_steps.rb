@@ -440,6 +440,7 @@ When(/^Individual navigates to Sep Page$/) do
 end
 
 When(/^Individual clicks on the continue button$/) do
+  wait_for_ajax
   find_all('.interaction-click-control-continue')[0].click
 end
 
@@ -609,6 +610,7 @@ end
 
 When(/^the individual clicks the Continue button of the Group Selection page$/) do
   expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
+  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
 end
 
@@ -659,8 +661,8 @@ end
 
 And(/^Individual clicks on purchase button on confirmation page$/) do
   find(IvlConfirmYourPlanSelection.i_agree_checkbox).click
-  fill_in IvlConfirmYourPlanSelection.first_name, :with => "John"
-  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Smith"
+  fill_in IvlConfirmYourPlanSelection.first_name, :with => "Patrick"
+  fill_in IvlConfirmYourPlanSelection.last_name, :with => "Doe"
   find(IvlConfirmYourPlanSelection.confirm_btn).click
 end
 
@@ -692,12 +694,15 @@ Then(/^Individual clicks on Add New Person$/) do
 end
 
 And(/^Admin updates the address to Non DC Address$/) do
+  sleep 2
   find(IvlHomepage.manage_family_btn).click
+  sleep 2
   find(IvlManageFamilyPage.personal_tab).click
   find(AdminHomepage.remove_mailing_address).click
   find(EmployeeFamilyInformation.save_btn).click
-  find(IvlPersonalInformation.select_state_dropdown).click
+  find('select[name="person[addresses_attributes][0][state]"]').click
   find(AdminHomepage.non_dc_state).click
+  sleep 2
   fill_in IvlPersonalInformation.zip, with: '30043'
   find(EmployeeFamilyInformation.save_btn).click
   find(EmployeeHomepage.my_dc_health_link).click
@@ -1092,11 +1097,13 @@ And(/has valid csr 0 benefit package with silver plans/) do
 end
 
 And(/the individual sets APTC amount/) do
+  find('.interaction-field-control-elected-aptc').set("")
   fill_in IvlChoosePlan.aptc_monthly_amount, :with => "50.00"
   screenshot("aptc_setamount")
 end
 
 Then(/the individual clicks the Reset button/) do
+  sleep 5
   find_all(IvlChoosePlan.reset_btn).first.click
 end
 
@@ -1311,6 +1318,7 @@ When(/Individual clicks on Go To My Account button$/) do
 end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
+  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
 end
 
@@ -1404,10 +1412,11 @@ And(/Individual should see Duplicate Enrollment warning in the Confirmation page
 end
 
 And(/^Primary member logs back in$/) do
+  wait_for_ajax
   find(CreateAccount.sign_in_link).click
   fill_in SignIn.username, :with => "testflow@test.com"
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
-  find(SignIn.sign_in_btn).click
+  find('.interaction-click-control-sign-in').click
 end
 When(/Individual creates an HBX account with SSN already in use$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow123"
