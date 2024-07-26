@@ -2,6 +2,7 @@
 
 Feature: Start a new Financial Assistance Application
   Background:
+    Given bs4_consumer_flow feature is disable
     Given the FAA feature configuration is enabled
     Given the date is within open enrollment
     Given a consumer, with a family, exists

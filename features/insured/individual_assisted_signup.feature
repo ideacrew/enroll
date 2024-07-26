@@ -21,7 +21,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual answers the questions of the Identity Verification page and clicks on submit
     When the individual is on the Help Paying for Coverage page
     And the individual does not apply for assistance and clicks continue
-    And the individual clicks on the Continue button of the Household Info page
+    And the Individual clicks CONTINUE
     And taxhousehold info is prepared for aptc user
     And has valid csr 0 benefit package with silver plans
     When the individual clicks the Continue button of the Group Selection page
