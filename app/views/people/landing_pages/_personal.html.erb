@@ -64,8 +64,10 @@
         <div id="consumer_fields_sets ">
           <%= render 'shared/consumer_fields', f: f %>
         </div>
+        <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
         <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
       <% else %>
+        <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
         <%= render 'shared/home_address_fields', f: f %>
       <% end %>
     </section>
@@ -120,6 +122,7 @@
     $('.remove-personal-form').on('click', function (e) {
       $(".append_consumer_info").empty();
       $("#person-<%= @person.id %>").addClass('hidden');
+      $("a[id^=edit-member]").removeClass('disabled');
     });
   </script>
 

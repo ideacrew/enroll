@@ -32,7 +32,7 @@ $('.remove-new-employee-dependent').each(function(idx, ele) {
 
 } else {
   //manage family/ my household page
-  $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent,person: @person) %>");
+  $("#append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent,person: @person) %>");
 
   $("a[id^=edit-member]").addClass('disabled');
   $("#add-new-member").addClass("hidden");

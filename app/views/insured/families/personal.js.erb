@@ -15,7 +15,6 @@
     $("#person-<%= @person.id %> .append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
     personContainer.removeClass('hidden');
     $("a[id^=edit-member]").addClass('disabled');
-    $("a[id^=edit-member]").attr('disabled', true);
   }
 <% else %>
   $(".append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
