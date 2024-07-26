@@ -24,7 +24,7 @@ Feature: Individual market with duplicate enrollments
     And Individual adds spouse dependent info
     Then Individual confirms dependent info
     When the Individual clicks CONTINUE
-    And Individual clicks on continue button on Choose Coverage page
+    And Individual clicks on the continue button
     And Individual selects a plan on plan shopping page
     And Individual clicks on purchase button on confirmation page
     Then Individual clicks on the Continue button to go to the Individual home page
@@ -33,20 +33,22 @@ Feature: Individual market with duplicate enrollments
     And Dependent creates a new HBX account
     And Dependent sees Your Information page
     When Dependent registers as an individual
-    When Individual clicks on continue
+    And the Individual clicks CONTINUE
     When Individual clicks on continue
     And Individual agrees to the privacy agreeement
+    And the person named Spouse Smith is RIDP verified
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
-    And Individual clicks on the Continue button of the Family Information page
-    And Individual clicks on continue button on Choose Coverage page
+    And the Individual clicks CONTINUE
+    And Individual clicks on the continue button
     And Individual selects a plan on plan shopping page
     Then Individual should see Duplicate Enrollment warning in the Confirmation page
 
   Scenario: Individual adds dependent. Dependent creates account and shops for a plan, Individual shops for a plan including dependent and sees duplicate enrollment warning
     When Individual clicks on continue
     And Individual agrees to the privacy agreeement
+    And the person named Patrick Doe is RIDP verified
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
@@ -58,14 +60,15 @@ Feature: Individual market with duplicate enrollments
     And Dependent creates a new HBX account
     Then Dependent sees Your Information page
     When Dependent registers as an individual
-    And Individual clicks on continue
-    And Individual clicks on continue
+    And the individual clicks on the Continue button of the Account Setup page
+    And the individual clicks continue on the personal information page
     And Individual agrees to the privacy agreeement
+    And the person named Spouse Smith is RIDP verified
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
-    And Individual clicks on the Continue button of the Family Information page
-    And Individual clicks on continue button on Choose Coverage page
+    And the Individual clicks CONTINUE
+    And Individual clicks on the continue button
     And Individual selects a plan on plan shopping page
     And Dependent clicks on purchase button on confirmation page
     Then Individual clicks on the Continue button to go to the Individual home page
