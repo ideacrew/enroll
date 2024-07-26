@@ -25,8 +25,23 @@ $.ajax({
     broker_status = JSON.parse(response)
     var status = broker_status['status']
     var broker = broker_status['broker']
-    $('#help_index_status').html(status).removeClass('hide')
-    $('#consumer_brokers_widget').html(broker)
+    var broker_id = broker_status['broker_id']
+    if (broker_id && broker_id != '') {
+      $('#consumer_brokers_widget', "#inbox_provider_form", "#active_broker_tab button").addClass('hide')
+      $('#consumer_brokers_widget').html(broker)
+      $("#inbox_provider_form").addClass('hide')
+      $("#active_broker_tab button").addClass('hide')
+      $("#broker_index_view").addClass('hide')
+      $(".warning-body").html(status)
+      $('#active_broker_tab .alert').removeClass('alert-warning').addClass('alert-success')
+      $('#active_broker_tab .icon').removeClass('warning-icon').addClass('success-icon')
+      $("#broker_show_" + broker_id).removeClass('hide')
+      $('#consumer_brokers_widget').removeClass('hide')
+      $('.go-to-expert').removeClass('hide')
+    } else {
+      $('#consumer_brokers_widget').html(broker)
+      $('#help_index_status').html(status).removeClass('hide')
+    }
   });
 })
 
