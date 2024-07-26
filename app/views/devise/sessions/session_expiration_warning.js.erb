@@ -9,7 +9,7 @@ function session_countdown (){
   new_time = time - 1;
   $('#sessionExpirationWarningModal p strong').text(new_time)
 
-  if ( parseInt(new_time) <= 80000 ) {
+  if ( parseInt(new_time) <= 0 ) {
     clearInterval(countdown_timer);
     $('#sessionExpirationWarningModal p').text("Your session has timed out due to inactivity. Please log back in.");
     $('h4.modal-title').text("Session Ended");
