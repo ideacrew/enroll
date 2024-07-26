@@ -278,10 +278,11 @@ end
 
 When(/Admin fills Create SEP Type form with(?: (.*))? start and end dates$/) do |date|
   sleep 1
-  if date == 'future'
+  case date
+  when 'future'
     fill_in "Start Date *", with: (sep_type_start_on + 2.months).strftime('%m/%d/%Y').to_s
     fill_in "End Date", with: (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
-  elsif date == 'past'
+  when 'past'
     fill_in "Start Date *", with: (sep_type_start_on - 2.months).strftime('%m/%d/%Y').to_s
     fill_in "End Date", with: (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
   else
@@ -524,7 +525,8 @@ When(/Admin clicks (.*) filter on SEP Types datatable$/) do |market_kind|
 end
 
 And(/Admin clicks on (.*) filter of (.*) market filter$/) do |state, market_kind|
-  if state == 'Draft'
+  case state
+  when 'Draft'
     filter_divs = page.all('div')
     if market_kind == 'individual' && is_individual_market_enabled?
       ivl_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:ivl_qles-ivl_draft_qles' }
@@ -536,7 +538,7 @@ And(/Admin clicks on (.*) filter of (.*) market filter$/) do |state, market_kind
       fehb_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:fehb_qles-fehb_draft_qles' }
       fehb_draft_filter.click
     end
-  elsif state == 'Active'
+  when 'Active'
     filter_divs = page.all('div')
     if market_kind == 'individual' && is_individual_market_enabled?
       ivl_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:ivl_qles-ivl_active_qles' }
@@ -548,7 +550,7 @@ And(/Admin clicks on (.*) filter of (.*) market filter$/) do |state, market_kind
       fehb_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:fehb_qles-fehb_active_qles' }
       fehb_active_filter.click
     end
-  elsif state == 'Inactive'
+  when 'Inactive'
     filter_divs = page.all('div')
     if market_kind == 'individual' && is_individual_market_enabled?
       ivl_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:ivl_qles-ivl_inactive_qles' }
@@ -665,11 +667,12 @@ Then("Admin should see failure title while publishing a new SEP Type") do
 end
 
 When(/Admin clicks on newly created SEP Type(?: for (.*))?/) do |market_kind|
-  if market_kind == 'individual'
+  case market_kind
+  when 'individual'
     find_link('Had a baby').click
-  elsif market_kind == 'shop'
+  when 'shop'
     find_link('Married').click
-  elsif market_kind == 'fehb'
+  when 'fehb'
     find_link('Adopted a child').click
   else
     find_link('Entered into a legal domestic partnership').click
