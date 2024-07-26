@@ -26,6 +26,29 @@
           <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
         <% end %>
 
+        <% readonly = dependent.id.present? %>
+
+        <%= token_tag form_authenticity_token %>
+        <p class="dependent-invalid-dob"></p>
+
+        <% if dependent.errors.any? %>
+          <div class="alert alert-error">
+            <h4>
+              <%= l10n("insured.consumer_roles.dependent_error.header") %>
+            </h4>
+            <ul>
+              <% dependent.errors.full_messages.each do |msg| %>
+                <% msg = (msg == l10n("insured.consumer_roles.dependent_error.gender") && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? l10n("insured.consumer_roles.dependent_error.sex") : msg %>
+                <li> <%= msg %> </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if @address_errors.present? %>
+          <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
+        <% end %>
+
         <%= token_tag form_authenticity_token %>
 
          <div id="personal_info" class="house">
@@ -53,7 +76,7 @@
           <div class="d-flex mb-md-4">
             <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
-              <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
+              <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true, disabled: readonly %>
             </div>
             <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :gender, l10n("gender"), class: 'required'  %>
@@ -67,12 +90,11 @@
             <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :ssn, "Social Security" %>
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
+                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
                   pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-                  oninput: "this.setCustomValidity('')", disabled: false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
+                  oninput: "this.setCustomValidity('')", disabled: readonly %>
               <% else %>
-                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: false,
-                  readonly: f.object.is_a?(Forms::EmployeeRole) %>
+                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: readonly %>
               <% end %>
             </div>
             <div class="col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
@@ -84,35 +106,26 @@
             </div>
           </div>
 
-          <% if @person.has_active_consumer_role? %>
-            <fieldset class="d-flex mb-md-4">
-              <legend class="required"><%= l10n("does_person_need_coverage", person: dependent.first_name.present? ? dependent.first_name : "this person") %></legend>
-              <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
-              <div class="d-flex align-items-center mt-2">
-                <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
-              </div>
-            </fieldset>
-          <% end %>
+          <fieldset class="d-flex mb-md-4">
+            <legend class="required weight-n"><%= l10n("does_person_need_coverage", person: dependent.first_name.present? ? dependent.first_name : "this person") %></legend>
+            <div class="d-flex align-items-center mt-0">
+              <%= render 'shared/is_applying_for_coverage', f: f, first_checked: dependent.is_applying_coverage, second_checked: !dependent.is_applying_coverage %>
+            </div>
+          </fieldset>
 
           <div class="d-flex mb-md-4">
             <div class="">
-              <%= f.label :relationship, l10n("relationship_to_primary_member"), class: "required" %>
+              <%= f.label :relationship, l10n("relationship_to_primary_member"), class: "required weight-n" %>
               <%= f.select :relationship, relationship_options(f.object, request.referer), {:prompt => 'choose'}, {:required => true, :class => ""}  %>
               <a href="#relationship" data-toggle="modal" data-target="#relationship" class="d-block"><%= l10n("not_sure") %></a>
               <%= render partial: 'shared/modal_support_text_household', locals: {key: "relationship"} %>
             </div>
           </div>
 
-          <% if current_user.does_not_have_any_staff_role? && !current_user.has_insured_role? %>
-            <%= render 'shared/age_off_excluded', f: f %>
-          <% end %>
-
-          <% if has_active_consumer_dependent?(@person,@dependent) %>
-            <%= render 'shared/ssn_coverage_msg' %>
-            <div id="consumer_fields_sets" >
-              <%= render 'shared/consumer_fields', f: f %>
-            </div>
-          <% end %>
+          <%= render 'shared/ssn_coverage_msg' %>
+          <div id="consumer_fields_sets" >
+            <%= render 'shared/consumer_fields', f: f %>
+          </div>
 
           <div id="dependent-address" class="my-3">
             <div class="row row-form-wrapper no-buffer">
@@ -134,7 +147,7 @@
             </div>
             <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
               <% if has_active_consumer_dependent?(@person, @dependent) %>
-                  <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
+                <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
               <% elsif @person.has_active_employee_role? %>
                 <%= render 'shared/address_fields_for_dependent', f: f %>
               <% end %>
@@ -143,63 +156,82 @@
 
           <%= f.hidden_field :family_id %>
           <div id="remove_confirm" class="hidden"></div>
-        </div>
+          <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
 
-        <div id="add_info_buttons_<%= dependent.id %>" class="pt-2">
           <% if !dependent.persisted? %>
-            <a href="#" class="btn button outline remove-new-employee-dependent" data-target="#new_employee_dependent_form">
-              <%= l10n("cancel") %>
+            <a href="#" class="btn btn-error remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled')" data-target="#new_employee_dependent_form">
+            <%= l10n("cancel") %>
             </a>
-            <a href="#" class="close-1 btn outline button-error remove-new-employee-dependent" data-target="#new_employee_dependent_form"><%= l10n('remove_member') %></span></a>
           <% else %>
-            <%= h(link_to l10n("cancel"), insured_family_member_path(dependent, {bs4: @bs4}), :remote => true, class: "btn button outline") %>
-            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button-error outline close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
+            <%= link_to(insured_family_member_path(dependent), :remote => true, class: 'btn outline mr-2') do %>
+              <%= l10n("cancel") %>
+            <% end %>
+          <% end %>
+          <%= f.button(id: 'confirm-member', class: "btn btn-primary", onclick: "$('#btn-continue').removeClass('disabled');") do %>
+            <%= l10n("confirm_member") %>
           <% end %>
 
-          <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden") do %>
+          <!-- hiding for now<span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')", id='confirm-dependent' class="btn btn-primary">
             <%= l10n("confirm_member") %>
-          <% end %>
-          <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')" id="confirm-dependent" class="btn btn-primary">
-            <%= l10n("confirm_member") %>
-          </span>
+          </span>-->
         </div>
+        </div>
+
+
 
       <% end %>
     </div>
-
-    <script>
-      $(document).ready(function() {
-        $.inputMasks();
-
-        $('.field_with_errors > *').unwrap();
-
-        if($("input#dependent_same_with_primary").is(":checked")){
-          $("#address_info .address_required").removeAttr('required');
-        };
-
-        $("#dependent_first_name").change(function() {
-          var text = $("#dependent_first_name").val() == '' ? "This person" : $("#dependent_first_name").val()
-          $("#is_applying_coverage_value_dep").text("Does "+ text +" need coverage? *");
-          $("#is_applying_coverage_value_dep_1").text(text);
-        });
-      });
-
-      $(document).off('click', '#confirm-dependent');
-      $(document).on('click', '#confirm-dependent', function(e) {
-        $(".btn-confirmation").removeAttr('disabled');
-
-        var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
-
-        if ( form.checkValidity() && !$("input#dependent_same_with_primary").is(":checked")) {
-          $('#addressChangeConfirmation').modal('show');
-        }
-        else {
-        PersonValidations.manageRequiredValidations($('#confirm-dependent'));
-        }
-
-      });
-    </script>
   </div>
+  <script>
+    $(document).ready(function() {
+      $.inputMasks();
+      applyListeners();
+
+      $('.field_with_errors > *').unwrap();
+
+      if ($("input#dependent_same_with_primary").is(":checked")){
+        $("#dependent-home-address-area input.required, #dependent-home-address-area select.required, #dependent-home-address-area .address_required").removeAttr('required');
+      } else {
+        $("#dependent-home-address-area input.required, #dependent-home-address-area select.required, #dependent-home-address-area .address_required").attr('required', true);
+      }
+
+      $("#dependent_first_name").change(function() {
+        var text = $("#dependent_first_name").val() == '' ? "This person" : $("#dependent_first_name").val()
+        $("#is_applying_coverage_value_dep").text("Does "+ text +" need coverage? *");
+        $("#is_applying_coverage_value_dep_1").text(text);
+      });
+    });
+
+    <% if dependent.id.present? %>
+      $('.remove-dependent-form').off('click');
+      $('.remove-personal-form').on('click', function (e) {
+        $(".append_consumer_info").empty();
+        $("#person-<%= dependent&.family_member&.person&.id %>").addClass('hidden');
+        $("a[id^=edit-member]").removeClass('disabled');
+        $("a[id^=edit-member]").removeAttr('disabled');
+      });
+    <% end %>
+
+    $(document).off('click', '#confirm-dependent');
+    $(document).on('click', '#confirm-dependent', function(e) {
+      if ($("input#dependent_same_with_primary").is(":checked")){
+        $("#dependent-home-address-area input.required, #dependent-home-address-area select.required, #dependent-home-address-area .address_required").removeAttr('required');
+      } else {
+        $("#dependent-home-address-area input.required, #dependent-home-address-area select.required, #dependent-home-address-area .address_required").attr('required', true);
+      }
+
+      $(".btn-confirmation").removeAttr('disabled');
+
+      var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
+
+      if ( form.checkValidity() && !$("input#dependent_same_with_primary").is(":checked")) {
+        $('#addressChangeConfirmation').modal('show');
+      } else {
+        PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+      }
+
+    });
+  </script>
 
 <% else %>
   <li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
