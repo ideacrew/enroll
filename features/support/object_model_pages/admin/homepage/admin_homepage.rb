@@ -133,7 +133,7 @@ class AdminHomepage
 
   # any non-dc state
   def self.non_dc_state
-    'div.selectric-open li[data-index="12"]'
+    '.interaction-choice-control-inputstate-1'
   end
 
   def self.shop_for_employer
