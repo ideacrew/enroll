@@ -157,6 +157,7 @@ module FinancialAssistance
             def applicants(application, benchmark_premiums)
               assistance_year = application.assistance_year
               applicants = application.applicants
+              determination_reasons = fetch_determination_reasons(application)
 
               applicants.inject([]) do |result, applicant|
                 mitc_eligible_incomes = eligible_incomes_for_mitc(applicant)
@@ -245,12 +246,22 @@ module FinancialAssistance
                            local_mec_evidence: evidence_info(applicant.local_mec_evidence),
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes, assistance_year),
+                           determination_reason_codes: determination_reason_codes(applicant, determination_reasons),
                            mitc_state_resident: mitc_state_resident(applicant, application.us_state)}
                 result
               end
             end
                         # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def determination_reason_codes(applicant, determination_reasons)
+              determination_reasons << 'Gap Filling' if applicant.is_gap_filling
+              determination_reasons
+            end
+
+            def fetch_determination_reasons(application)
+              application.previously_renewal_draft? ? ['Renewal'] : ['Full Determination']
+            end
 
             def evidence_info(applicant_evidence)
               return if applicant_evidence.nil?
