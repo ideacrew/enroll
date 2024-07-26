@@ -1122,7 +1122,6 @@ Then(/the individual sees the new APTC tool UI changes/) do
 end
 
 And(/the individual selects a silver plan on Plan Shopping page/) do
-  binding.irb
   find_all(IvlChoosePlan.select_plan_btn)[1].click
 end
 
