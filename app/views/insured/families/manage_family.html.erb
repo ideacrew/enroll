@@ -7,7 +7,7 @@
         <div class="info-icon icon align-self-start">&nbsp;</div>
         <div class="col px-0 pb-1">
           <p class="mb-1"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></p>
-          <a id="qle_continue_button" href="#"><%= l10n("insured.shop_for_plans") %></a>
+          <%= link_to l10n("insured.shop_for_plans"), find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan) %>
         </div>
       </div>
     </div>
