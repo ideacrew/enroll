@@ -634,7 +634,8 @@ end
 
 And(/.+ selects a plan on plan shopping page/) do
   screenshot("plan_shopping")
-  find_all(IvlChoosePlan.select_plan_btn)[0].click
+  wait_for_ajax
+  find_all(IvlChoosePlan.select_plan_btn, wait: 5)[0].click
 end
 
 When(/^the individual selects a non silver plan on Plan Shopping page$/) do
@@ -1413,7 +1414,9 @@ end
 
 And(/^Primary member logs back in$/) do
   wait_for_ajax
-  find(CreateAccount.sign_in_link).click
+  
+  find('.interaction-click-control-sign-in').click
+  #find(CreateAccount.sign_in_link).click
   fill_in SignIn.username, :with => "testflow@test.com"
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
   find('.interaction-click-control-sign-in').click
