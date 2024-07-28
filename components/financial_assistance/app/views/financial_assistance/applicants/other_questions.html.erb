@@ -14,7 +14,7 @@
       <label class="weight-n mb-3"><%= l10n('faa.other_ques.answer_questions', applicant_name: applicant_name) %></label>
       <div class="memo"><div>
 
-      <% def applicant_prompt(key) other_questions_prompt(key, true) end %>
+      <% def applicant_prompt(key) other_questions_prompt(key, use_applicant_name: true) end %>
       <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
         <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n required"><%= applicant_prompt('ssn_apply') %></legend>
