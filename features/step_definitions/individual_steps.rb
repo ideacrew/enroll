@@ -1415,9 +1415,7 @@ end
 
 And(/^Primary member logs back in$/) do
   wait_for_ajax
-
   find('.interaction-click-control-sign-in').click
-  #find(CreateAccount.sign_in_link).click
   fill_in SignIn.username, :with => "testflow@test.com"
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
   find('.interaction-click-control-sign-in').click
