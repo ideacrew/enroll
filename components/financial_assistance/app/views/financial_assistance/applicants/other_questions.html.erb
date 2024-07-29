@@ -14,7 +14,7 @@
       <label class="weight-n mb-3"><%= l10n('faa.other_ques.answer_questions', applicant_name: applicant_name) %></label>
       <div class="memo"><div>
 
-      <% def applicant_prompt(key) other_questions_prompt(key, true) end %>
+      <% def applicant_prompt(key) other_questions_prompt(key, use_applicant_name: true) end %>
       <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
         <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n required"><%= applicant_prompt('ssn_apply') %></legend>
@@ -27,7 +27,7 @@
           <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
         <fieldset class="mb-4 row-form-wrapper">
           <legend>
-            <label class="weight-n <%= 'required' if no_ssn_dropdown %>" for="no_ssn_reason"><%= applicant_prompt('why_no_ssn') %>"</label>
+            <label class="weight-n <%= 'required' if no_ssn_dropdown %>" for="no_ssn_reason"><%= applicant_prompt('why_no_ssn') %></label>
           </legend>
           <div class="col px-0" data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>">
             <% if no_ssn_dropdown %>
@@ -124,7 +124,7 @@
 
         <% if @applicant.display_student_question? %>
           <fieldset class="mb-4 row-form-wrapper">
-            <legend class="weight-n"><%= applicant_prompt("is_student") %></legend>
+            <legend class="weight-n required"><%= applicant_prompt("is_student") %></legend>
             <div class="focus d-inline-flex">
               <label class="weight-n"><%= f.radio_button :is_student, true, id: "is_student_yes" %> <%= l10n('yes') %></label>
               <label class="weight-n"><%= f.radio_button :is_student, false, id: "is_student_no" %> <%= l10n('no') %></label>
