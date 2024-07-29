@@ -24,7 +24,7 @@ Feature: Individual market with duplicate enrollments
     And Individual adds spouse dependent info
     Then Individual confirms dependent info
     When the Individual clicks CONTINUE
-    And Individual clicks on the continue button
+    And Individual clicks on continue button on Choose Coverage page
     And Individual selects a plan on plan shopping page
     And Individual clicks on purchase button on confirmation page
     Then Individual clicks on the Continue button to go to the Individual home page
@@ -75,7 +75,7 @@ Feature: Individual market with duplicate enrollments
     And the individual logs out
     When Primary member visits the Consumer portal during open enrollment
     And Primary member logs back in
-    And Individual clicks on the Continue button of the Family Information page
+    And the user clicks on CONTINUE button
     And Individual clicks on continue button on Choose Coverage page
     And Individual selects a plan on plan shopping page
     Then Individual should see Duplicate Enrollment warning in the Confirmation page
