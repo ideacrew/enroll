@@ -1282,9 +1282,8 @@ Then(/^Individual should see not qualify message$/) do
 end
 
 Then(/^Individual should see confirmation and continue$/) do
-  find_all('.interaction-click-control-continue')[0].click
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
-  find_all('.interaction-click-control-continue')[0].click
+  find('#sep_continue').click
 end
 
 Then(/^Individual should see successful sep message$/) do
