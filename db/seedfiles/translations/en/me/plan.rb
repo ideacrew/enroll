@@ -1,5 +1,8 @@
 PLAN_TRANSLATIONS = {
   'en.plans.plan_results' => 'Plan Results',
+  'en.plans.shop_now' => 'Shop Now',
+  'en.plans.if_you' => 'If you',
+  'en.plans.qualify_for_new_sep' => 'Qualify for New SEP',
   'en.plans.plan_contact_info' => 'Plan Contact Info',
   'en.plans.csl' => 'Customer Service Line',
   'en.plans.call' => 'Call:',
@@ -62,7 +65,7 @@ PLAN_TRANSLATIONS = {
   'en.plans.plan_shopping.receipt.metal_tier' => 'Metal Tier',
   'en.plans.plan_shopping.receipt.selected' => 'Selected Enrollment',
   'en.plans.plan_shopping.receipt.modal.start' => 'Start using your benefits.',
-  'en.plans.plan_shopping.receipt.modal.start_description' => 'Once ${legal_name} receives your first payment, they can provide the information you’ll need to start using your benefits (such as member number). They’ll also mail your insurance cards to you.',
+  'en.plans.plan_shopping.receipt.modal.start_description' => 'Once %{legal_name} receives your first payment, they can provide the information you’ll need to start using your benefits (such as member number). They’ll also mail your insurance cards to you.',
   'en.plans.plan_shopping.receipt.aetna.small' => 'For Small Business Employees',
   'en.plans.plan_shopping.receipt.aetna.brokers' => 'For Brokers and Employers',
   'en.plans.plan_shopping.receipt.aetna.customers' => 'For Customers Enrolled in Individual and Family Plans',
