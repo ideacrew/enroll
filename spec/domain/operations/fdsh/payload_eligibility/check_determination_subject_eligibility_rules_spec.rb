@@ -31,6 +31,7 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckDeterminationSubjectEl
   let(:family_entity) { AcaEntities::Operations::CreateFamily.new.call(cv3_family).value! }
 
   before do
+    BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
     allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
     primary.build_demographics_group
     spouse_person.build_demographics_group
