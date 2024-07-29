@@ -29,7 +29,7 @@
       </div>
     <% end %>
   </div>
-  
+
   <%# Main Content (right): Modal %>
   <div class="sep-modal modal fade" id="outside-open-enrollment" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -54,7 +54,7 @@
         </div>
         <div class="d-flex align-items-center mt-4 justify-content-end">
           <button type="button" class="btn outline mr-2" data-dismiss="modal"> <%= l10n("close") %> </button>
-          <%= link_to l10n('back_to_my_account_title'), family_account_path, class: 'btn btn-primary' %>
+          <%= h(link_to l10n('back_to_my_account_title'), family_account_path, class: 'btn btn-primary') %>
         </div>
       </div>
     </div>
