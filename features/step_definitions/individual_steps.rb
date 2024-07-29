@@ -635,6 +635,7 @@ end
 And(/.+ selects a plan on plan shopping page/) do
   screenshot("plan_shopping")
   wait_for_ajax(3, 2)
+  expect(page).to have_content "Choose Plan"
   find_all(IvlChoosePlan.select_plan_btn, wait: 5)[0].click
 end
 
@@ -1320,6 +1321,7 @@ end
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
+  find(IvlChooseCoverage.continue_btn).click unless page.has_content?('Choose Plan')
 end
 
 And(/Individual clicks the Back to My Account button$/) do
