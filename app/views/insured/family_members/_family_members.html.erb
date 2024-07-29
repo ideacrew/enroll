@@ -35,7 +35,7 @@
     </div>
     <%= h(link_to l10n("edit_member"), personal_insured_families_path({bs4: @bs4, person: @person.id}), remote: true, id: 'edit-primary-person', class: 'btn button outline close-2 my-3') %>
 
-    <div class="append_consumer_info"></div>
+    <div id="append_consumer_info"></div>
   </div>
 
   <%# FAA 'info needed' row - add income & coverage info buttons %>
