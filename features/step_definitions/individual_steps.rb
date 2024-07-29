@@ -634,7 +634,9 @@ end
 
 And(/.+ selects a plan on plan shopping page/) do
   screenshot("plan_shopping")
-  find_all(IvlChoosePlan.select_plan_btn)[0].click
+  wait_for_ajax(3, 2)
+  expect(page).to have_content "Choose Plan"
+  find_all(IvlChoosePlan.select_plan_btn, wait: 5)[0].click
 end
 
 When(/^the individual selects a non silver plan on Plan Shopping page$/) do
@@ -1281,9 +1283,8 @@ Then(/^Individual should see not qualify message$/) do
 end
 
 Then(/^Individual should see confirmation and continue$/) do
-  find_all('.interaction-click-control-continue')[0].click
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
-  find_all('.interaction-click-control-continue')[0].click
+  find('#sep_continue').click
 end
 
 Then(/^Individual should see successful sep message$/) do
@@ -1320,6 +1321,7 @@ end
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
+  find(IvlChooseCoverage.continue_btn).click unless page.has_content?('Choose Plan')
 end
 
 And(/Individual clicks the Back to My Account button$/) do
@@ -1413,7 +1415,7 @@ end
 
 And(/^Primary member logs back in$/) do
   wait_for_ajax
-  find(CreateAccount.sign_in_link).click
+  find('.interaction-click-control-sign-in').click
   fill_in SignIn.username, :with => "testflow@test.com"
   fill_in SignIn.password, :with => "aA1!aA1!aA1!"
   find('.interaction-click-control-sign-in').click
