@@ -10,7 +10,7 @@ Then(/^additional Enrollment Summary exists$/) do
   sleep(3)
   expect(page.has_css?(IvlHomepage.enrollment_tobacco_use)).to eq true
   expect(page.has_css?(IvlHomepage.enrollment_coverage_state_date)).to eq true
-  expect(page.has_css?(IvlHomepage.enrollment_detail)).to eq true
+  expect(page).to have_content("Enrollment Detail")
   expect(page.has_css?(IvlHomepage.enrollment_member_detail)).to eq true
 end
 
