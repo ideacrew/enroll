@@ -83,6 +83,7 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
   let(:dependent) { family.dependents.last.person }
 
   before do
+    BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
     allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
     primary.build_demographics_group
     spouse_person.build_demographics_group
