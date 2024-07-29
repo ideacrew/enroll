@@ -355,9 +355,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     else
       status_text = call_customer_service params[:firstname].strip, params[:lastname].strip
     end
-    if params[:broker].present?
-      status_text = l10n("broker_agencies.successfully_assigned")
-    end
+    status_text = l10n("broker_agencies.successfully_assigned") if params[:broker].present?
     @person = Person.find(params[:person])
     broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
     render :plain => {broker: broker_view, status: status_text, broker_id: broker_role_id}.to_json, layout: false
