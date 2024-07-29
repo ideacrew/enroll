@@ -257,13 +257,20 @@
     <% end %>
     <div class="d-flex mb-md-4 col-sm px-0">
       <div class="mr-auto col-sm col-md-6 col-lg-6 p-0 filter-input-block">
-        <label for="hsa_eligibility"><%= render partial:"shared/glossary", locals: {key: "hc4cc_eligible_title_info", term: l10n("hsa_eligible"), question_mark: true } %></label>
+      <fieldset class="filter-input-block d-block">
+        <legend ><%= render partial:"shared/glossary", locals: {key: "hc4cc_eligible_title_info", term: l10n("hsa_eligible"), question_mark: true } %></legend>
+
         <%= select_tag :hsa_eligibility, options_for_select(["Yes", "No"]), class: "plan-hsa-eligibility-selection-filter w-100", include_blank: "All", onchange:"filterHSAEligibility(this)" %>
+      </fieldset>
+
       </div>
       <div class="mr-auto col-sm col-md-6 col-lg-6 pr-0 filter-input-block">
-        <label for="carrier"><%= render partial:"shared/glossary", locals: {key: "filter_by_carrier", term: l10n("carrier"), question_mark: true } %></label>
-        <% issuer_names = (@market_kind == 'shop' || @market_kind == 'fehb') ? @carrier_names : @carriers %>
-        <%= select_tag :carrier, options_for_select(issuer_names), class: "plan-carrier-selection-filter w-100", include_blank: "All", onchange:"filterPlanCarriers(this)" %>
+        <fieldset>
+          <legend><%= render partial:"shared/glossary", locals: {key: "filter_by_carrier", term: l10n("carrier"), question_mark: true } %></legend>
+
+          <% issuer_names = (@market_kind == 'shop' || @market_kind == 'fehb') ? @carrier_names : @carriers %>
+          <%= select_tag :carrier, options_for_select(issuer_names), class: "plan-carrier-selection-filter w-100", include_blank: "All", onchange:"filterPlanCarriers(this)" %>
+        </fieldset>
       </div>
     </div>
     <div class="d-flex mb-md-4 col-sm px-0">
