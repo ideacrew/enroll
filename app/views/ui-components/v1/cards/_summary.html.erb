@@ -10,7 +10,7 @@
   <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
 <% end %>
 
-<% if @bs4 %>
+<% if !@bs4 %>
   <div class="enrollment-details">
     <% if qhp.present? %>
       <h1><%= @hbx_enrollment.coverage_year %> <%= @hbx_enrollment&.product&.kind.to_s.titleize %> <%= l10n('coverage').titleize %></h1>
@@ -132,17 +132,17 @@
                   <span class="ttu dg fourteen"><%= @plan.product_type ? @plan.product_type.upcase : "" %></span>
                 </td>
                 <td>
-                  <span class="ttu lg twelve" style="margin-left: -10px">Metal Level</span>
+                  <span class="ttu lg twelve">Metal Level</span>
 
-                  <span class="ttu dg fourteen" style="margin-left: -10px">
+                  <span class="ttu dg fourteen">
                     <% plan_level = @plan.metal_level.titleize %>
                     <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(@plan).titleize %>
                   </span>
                 </td>
                 <td>
-                  <span class="ttu lg twelve" style="margin-left: -10px">Network</span>
+                  <span class="ttu lg twelve">Network</span>
 
-                  <span class="ttu dg fourteen" style="margin-left: -10px">
+                  <span class="ttu dg fourteen">
                     <% if offers_nationwide_plans? %>
                       <%= @plan.network %>
                     <% else %>
@@ -154,7 +154,7 @@
                   </span>
                 </td>
                 <td>
-                  <span class="ttu lg twelve" style="margin-left: -10px">
+                  <span class="ttu lg twelve">
                     <% if @hbx_enrollment.hbx_enrollment_members.count > 1 %>
                       Family Deductible
                     <% else %>
@@ -162,7 +162,7 @@
                     <% end %>
                   </span>
 
-                  <span class="ttu dg fourteen" style="margin-left: -10px">
+                  <span class="ttu dg fourteen">
                     <%= deductible_display(@hbx_enrollment, @plan) %>
                   </span>
                 </td>
