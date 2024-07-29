@@ -53,7 +53,7 @@
       </div>
     </div>
 
-    <% if true || EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member  %>
+    <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member  %>
       <fieldset id="ai_an_health_service_eligible_question" class="pb-4 driver-question">
         <legend class="weight-n instruction-row"><%= l10n("faa.indian_health_service_eligible") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
@@ -83,7 +83,7 @@
       </fieldset>
     <% end %>
 
-    <% if true || FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
+    <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
       <fieldset id="medicaid_chip_ineligible_question" class="pb-4 driver-question">
         <legend class="instruction-row weight-n"><%= l10n("faa.medicaid_chip_ineligible") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
@@ -113,7 +113,7 @@
       </fieldset>
     <% end %>
 
-    <% if true || FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
       <div id="has_eligible_medicaid_cubcare_question" class="pb-4 driver-question">
         <fieldset>
           <legend class="instruction-row weight-n"><%= l10n("faa.medicaid_not_eligible") %></legend>
@@ -123,7 +123,7 @@
               <span><%= l10n("yes") %></span>
             </label>
             <label class="radio mr-3" for="has_eligible_medicaid_cubcare_false">
-              <input id="has_eligible_medicaid_cubcare_false" type="radio" value="false" name="has_eligible_medicaid_cubcare" <%='checked'if @applicant.has_eligible_medicaid_cubcare == false %>>
+              <input id="has_eligible_medicaid_cubcare_false" type="radio" value="false" name="has_eligible_medicaid_cubcare" <%='checked' if @applicant.has_eligible_medicaid_cubcare == false %>>
               <span><%= l10n("no") %></span>
             </label>
           </div>
@@ -135,7 +135,7 @@
           <legend class="weight-n instruction-row"><%=l10n("faa.medicaid_cubcare_end_date")%></legend>
           <div class="mr-auto mt-3">
             <label class="required" for="medicaid_cubcare_due_on"><%=l10n("end_date")%></label>
-            <%= date_field_tag :medicaid_cubcare_due_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
+            <%= date_field_tag :medicaid_cubcare_due_on, nil, class: "date-field mt-3", :'data-date-max' => "+0" %>
           </div>
         </fieldset>
 
@@ -161,7 +161,7 @@
             <legend class="weight-n instruction-row"><%=l10n("faa.person_medicaid_last_day")%></legend>
             <div class="mr-auto mt-3">
               <label class="required" for="person_coverage_end_on"><%=l10n("end_date")%></label>
-              <%= date_field_tag :person_coverage_end_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
+              <%= date_field_tag :person_coverage_end_on, nil, class: "date-field mt-3", :'data-date-max' => "+0" %>
             </div>
           </fieldset>
 
@@ -210,7 +210,7 @@
           <legend class="weight-n instruction-row"><%=l10n("faa.dependent_job_end_on")%></legend>
           <div class="mr-auto mt-3">
             <label class="required" for="dependent_job_end_on"><%==l10n("end_date")%></label>
-            <%= date_field_tag :dependent_job_end_on, nil, class: "date-field col-3 mt-3", :'data-date-max' => "+0" %>
+            <%= date_field_tag :dependent_job_end_on, nil, class: "date-field mt-3", :'data-date-max' => "+0" %>
           </div>
         </fieldset>
       </div>
