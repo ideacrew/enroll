@@ -614,12 +614,12 @@
               </div>
               <p class="pull-right">
                 <% if @market_kind == "individual" || @market_kind == 'coverall' %>
-                  <a class="btn btn-default ivl-compare-selected-plans-link" href="javascript:void(0);" style="display: none;" data-cuke="ivl-compare-selected-plans-link" data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+                  <a class="btn btn-default ivl-compare-selected-plans-link" id="compareBtn" href="javascript:void(0);" style="display: none;" data-cuke="ivl-compare-selected-plans-link" data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                     <%= l10n("compare_plans").to_s.upcase %>
                   </a>
                 <% end %>
                 <% if @market_kind == "shop" || @market_kind == 'fehb' %>
-                  <a class="btn btn-default compare-selected-plans-link" href="javascript:void(0);" style="display: none;" data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
+                  <a class="btn btn-default compare-selected-plans-link" id="compareBtn" href="javascript:void(0);" style="display: none;" data-uri="<%= comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind) %>">
                     <%= l10n("compare_plans").to_s.upcase %>
                   </a>
                 <% end %>
