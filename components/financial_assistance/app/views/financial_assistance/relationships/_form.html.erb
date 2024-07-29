@@ -64,14 +64,17 @@
 <%= submit_tag "", class: "" , :style => "display: none;" %>
 <% end %>
 
-<script >
+<script>
   $(function() {
     if(<%= missing_relationships.present? %>){
       $('#btn-continue', '#continue_button').attr('disabled', true);
       $('#btn-continue', '#continue_button').addClass('disabled');
+      $('#btn-continue').addClass('disabled');
+
     } else {
       $('#btn-continue', '#continue_button').removeAttr('disabled');
       $('#btn-continue', "#continue_button").removeClass('disabled');
+      $('#btn-continue').removeClass('disabled');
     }
   });
 </script>
