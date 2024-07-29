@@ -2,6 +2,26 @@
   <%= render partial: '/shared/family_side_nav' %>
 
   <div class="my-household-page">
+    <%# Add/Edit/Remove banners %>
+    <div id="qle_flow_info" class="hidden alert alert-info d-flex align-items-center justify-content-start" role="alert">
+      <div class="d-flex p-1">
+        <div class="info-icon icon align-self-start">&nbsp;</div>
+        <div class="col px-0 pb-1">
+          <p class="mb-1"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></p>
+          <%= link_to l10n("insured.shop_for_plans"), find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan) %>
+        </div>
+      </div>
+    </div>
+
+    <div id="faa_flow_info" class="hidden alert alert-info d-flex align-items-center justify-content-start" role="alert">
+      <div class="d-flex p-1">
+        <div class="info-icon icon align-self-start">&nbsp;</div>
+        <div class="col px-0 pb-1">
+          <p class="mb-1"><%= l10n("insured.families.financial_assistance_add_or_remove_family_member") %></p>
+          <%= link_to l10n("insured.families.go_to_applications"), financial_assistance.applications_path %>
+        </div>
+      </div>
+    </div>
     <h1><%= l10n("my_household") %></h1>
     <p><%= l10n("my_household_desc")%></p>
 
