@@ -1,4 +1,5 @@
 <% if @bs4 %>
+<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
 <% show_no_dc_address = (defined? show_no_dc_address) ? show_no_dc_address : false %>
 <div id="address_info" class="">
   <% mailing_addresses = f.object.addresses.select{|addr| addr.created_at.present? && addr.kind == "mailing" }%>
