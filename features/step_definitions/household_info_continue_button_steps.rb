@@ -159,24 +159,30 @@ When(/^primary applicant is in Info Completed state$/) do
   find(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn).click
   find(IvlIapJobIncomeInformationPage.has_self_employee_income_no_radiobtn).click
   find(IvlIapJobIncomeInformationPage.continue_btn).click
-  find(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn).click
+  find(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn, wait: 10).click
   find(IvlIapOtherIncomePage.has_other_income_no_radiobtn).click
   find(IvlIapOtherIncomePage.continue_btn).click
-  find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn).click
+  find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn, wait: 10).click
   find(IvlIapIncomeAdjustmentsPage.continue_btn).click
-  find(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn).click
+  find(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn, wait: 10).click
   find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn).click
-  find(IvlIapHealthCoveragePage.has_eligible_medicaid_cubcare_false).click
-  find(IvlIapHealthCoveragePage.has_eligibility_changed_false).click
+
+  if  EnrollRegistry[:bs4_consumer_flow].enabled?
+    find(IvlIapHealthCoveragePage.has_eligible_medicaid_cubcare_false).click
+    find(IvlIapHealthCoveragePage.has_eligibility_changed_false).click
+  end
   find(IvlIapHealthCoveragePage.continue).click
-  find(IvlIapOtherQuestions.is_pregnant_no_radiobtn).click
+  find(IvlIapOtherQuestions.is_pregnant_no_radiobtn, wait: 10).click
   find(IvlIapOtherQuestions.is_post_partum_period_no_radiobtn).click
   find(IvlIapOtherQuestions.person_blind_no_radiobtn).click
   find(IvlIapOtherQuestions.has_daily_living_help_no_radiobtn).click
   find(IvlIapOtherQuestions.need_help_paying_bills_no_radiobtn).click
   find(IvlIapOtherQuestions.physically_disabled_no_radiobtn).click
-  find('.interaction-choice-control-value-is-primary-caregiver-no').click
-  find(IvlIapOtherQuestions.continue_to_next_step).click
+  if  EnrollRegistry[:bs4_consumer_flow].enabled?
+    find('.interaction-choice-control-value-is-primary-caregiver-no').click
+    find(IvlIapOtherQuestions.continue_to_next_step).click
+  end
+  find(IvlIapOtherQuestions.continue_btn).click
 end
 
 When(/^all applicants are in Info Completed state$/) do
