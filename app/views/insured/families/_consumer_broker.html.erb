@@ -38,7 +38,7 @@
             <div class="warning-icon icon" alt="Info">&nbsp;</div>
           </div>
           <div class="col pl-0">
-            <h4 class="modal-title"><%= l10n("warning") %></h4>
+            <h3 class="modal-title"><%= l10n("warning") %></h3>
           </div>
           <div class="col-auto px-0">
             <button type="button" class="close" data-dismiss="modal" aria-label="<%= l10n("close") %>">
@@ -51,7 +51,7 @@
         </div>
         <div class="d-flex align-items-center mt-4 justify-content-end">
           <button type="button" class="btn outline modal-cancel-button mr-1" data-dismiss="modal"><%= l10n("cancel") %></button>
-          <%= h(link_to(l10n("insured.brokers.removal_confirm"), delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: l10n("confirm_delete_msg") }, class: 'button'+ pundit_class(Family,:updateable?))) %>
+          <%= h(link_to(l10n("insured.brokers.removal_confirm"), delete_consumer_broker_insured_family_path(@family), method: :delete, class: 'button'+ pundit_class(Family,:updateable?))) %>
         </div>
       </div>
     </div>
