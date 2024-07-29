@@ -634,7 +634,7 @@ end
 
 And(/.+ selects a plan on plan shopping page/) do
   screenshot("plan_shopping")
-  wait_for_ajax
+  wait_for_ajax(3, 2)
   find_all(IvlChoosePlan.select_plan_btn, wait: 5)[0].click
 end
 
@@ -1413,7 +1413,7 @@ end
 
 And(/^Primary member logs back in$/) do
   wait_for_ajax
-  
+
   find('.interaction-click-control-sign-in').click
   #find(CreateAccount.sign_in_link).click
   fill_in SignIn.username, :with => "testflow@test.com"
