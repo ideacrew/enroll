@@ -159,7 +159,7 @@ When(/^primary applicant is in Info Completed state$/) do
   find(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn).click
   find(IvlIapJobIncomeInformationPage.has_self_employee_income_no_radiobtn).click
   find(IvlIapJobIncomeInformationPage.continue_btn).click
-  find(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn).click
+  find(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn, wait:10).click
   find(IvlIapOtherIncomePage.has_other_income_no_radiobtn).click
   find(IvlIapOtherIncomePage.continue_btn).click
   find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn, wait: 10).click
