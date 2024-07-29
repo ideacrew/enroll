@@ -68,7 +68,7 @@
       <div class="dropdown-menu dropdown-glossary run-glossary" role="menu" aria-labelledby="dropdownmenuButton">
         <%# coverage details %>
         <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
-        <a onfocus="handleGlossaryFocus('view_coverage_details')" onblur="handleGlossaryBlur('view_coverage_details')" href="<%= summary_products_plans_path({plan_id: product.id, :standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, market_kind: hbx_enrollment.market_name&.downcase, coverage_kind: hbx_enrollment.coverage_kind, active_year: product.active_year, bs4: @bs4}) %>" class='btn-link btn-block dropdown-item' id='view-details-btn' style='padding: 6px 12px; margin: 4px 0;' data-remote='true'>
+        <a onfocus="handleGlossaryFocus('view_coverage_details')" onblur="handleGlossaryBlur('view_coverage_details')" href="<%= summary_products_plans_path({plan_id: hbx_enrollment.product.id, :standard_component_id => hbx_enrollment.product.hios_id, hbx_enrollment_id: hbx_enrollment.id, market_kind: hbx_enrollment.market_name&.downcase, coverage_kind: hbx_enrollment.coverage_kind, active_year: hbx_enrollment.product.active_year, bs4: @bs4}) %>" class='btn-link btn-block dropdown-item' id='view-details-btn' style='padding: 6px 12px; margin: 4px 0;' data-remote='true'>
           <%= render partial:"shared/glossary_hover", locals: {key: "view_coverage_details", title: "View my coverage details", term: sanitize(l10n("view_details")) } %>
         </a>
 
