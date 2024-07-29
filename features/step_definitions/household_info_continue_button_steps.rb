@@ -162,7 +162,7 @@ When(/^primary applicant is in Info Completed state$/) do
   find(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn).click
   find(IvlIapOtherIncomePage.has_other_income_no_radiobtn).click
   find(IvlIapOtherIncomePage.continue_btn).click
-  find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn).click
+  find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn, wait: 10).click
   find(IvlIapIncomeAdjustmentsPage.continue_btn).click
   find(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn, wait: 10).click
   find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn).click
@@ -172,7 +172,7 @@ When(/^primary applicant is in Info Completed state$/) do
     find(IvlIapHealthCoveragePage.has_eligibility_changed_false).click
   end
   find(IvlIapHealthCoveragePage.continue).click
-  find(IvlIapOtherQuestions.is_pregnant_no_radiobtn).click
+  find(IvlIapOtherQuestions.is_pregnant_no_radiobtn, wait: 10).click
   find(IvlIapOtherQuestions.is_post_partum_period_no_radiobtn).click
   find(IvlIapOtherQuestions.person_blind_no_radiobtn).click
   find(IvlIapOtherQuestions.has_daily_living_help_no_radiobtn).click
