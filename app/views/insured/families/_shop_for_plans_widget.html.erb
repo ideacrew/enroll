@@ -89,11 +89,11 @@
                   <% else %>
                     <% if @employee_role.present? && @employee_role.try(:is_under_open_enrollment?)  && is_shop_or_fehb_market_enabled? %>
                       <% new_options = @employee_role&.has_multiple_shop_oe_periods? ? options.merge(shop_under_future: true) : options %>
-                      <%= l10n('insured.if_you') %>
+                      <%= l10n('plans.if_you') %>
                       <%= h(link_to "#{l10n('insured.enroll_today')}", new_insured_group_selection_path(new_options)) %>
                       <%= l10n('insured.coverage_will_begin', date: format_date(@employee_role.benefit_begin_date)) %>
                     <%elsif (@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment? %>
-                      <%= l10n('insured.if_you') %>
+                      <%= l10n('plans.if_you') %>
                       <%= h(link_to "#{l10n('insured.enroll_today')}", new_insured_group_selection_path(options)) %>
                       <%= l10n('insured.coverage_will_begin', date: format_date(ivl_enrollment_effective_date)) %>
                     <% end %>
@@ -101,22 +101,22 @@
                 <% end %>
 
                 <% if @employee_role&.has_multiple_shop_oe_periods? && is_shop_or_fehb_market_enabled? %>
-                  <%= l10n('insured.if_you') %>
-                  <%= h(link_to "#{l10n('insured.enroll_as_new_hire')}", new_insured_group_selection_path(options.merge(shop_under_current: true))) %> 
+                  <%= l10n('plans.if_you') %>
+                  <%= h(link_to "#{l10n('insured.enroll_as_new_hire')}", new_insured_group_selection_path(options.merge(shop_under_current: true))) %>
                   <%= l10n('insured.coverage_will_begin', date: format_date(@employee_role.earliest_effective_on_for_new_hire_in_current_py)) %>
                 <% end %>
 
                 <% if @family.latest_active_sep %>
                   <p><%= l10n('insured.qualify_for_special_enrollment') %> "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
                     <br/>
-                    <%= build_link_for_sep_type(@active_sep, l10n('insured.shop_now'), @family.id.to_s, link_class = "btn btn-default") %>
+                    <%= build_link_for_sep_type(@active_sep, l10n('plans.shop_now'), @family.id.to_s, link_class = "btn btn-default") %>
                   </p>
                   <p> <%= l10n('insured.start_your_coverage') %> </p>
                     <br/>
-                    <%= h(link_to "#{l10n('insured.quaalify_for_new_sep')}", find_sep_insured_families_path(options), class: "btn btn-default pull-left") %></p>
+                    <%= h(link_to "#{l10n('plans.qualify_for_new_sep')}", find_sep_insured_families_path(options), class: "btn btn-default pull-left") %></p>
                 <% elsif !is_under_open_enrollment? %>
                   <p><%= l10n('insured.open_enrollment_is_over') %></p>
-                  <p><%= h(link_to "#{l10n('insured.shop_now')}", find_sep_insured_families_path(options), class: "btn btn-default pull-right") %></p>
+                  <p><%= h(link_to "#{l10n('plans.shop_now')}", find_sep_insured_families_path(options), class: "btn btn-default pull-right") %></p>
                 <% end %>
               <% else %>
                 <% msg = l10n('insured.you_have_no_employer_sponsored_insurance').to_s %>
@@ -235,11 +235,11 @@
                   <% else %>
                     <% if @employee_role.present? && @employee_role.try(:is_under_open_enrollment?)  && is_shop_or_fehb_market_enabled? %>
                       <% new_options = @employee_role&.has_multiple_shop_oe_periods? ? options.merge(shop_under_future: true) : options %>
-                      <%= l10n('insured.if_you') %>
+                      <%= l10n('plans.if_you') %>
                       <%= h(link_to "#{l10n('insured.enroll_today')}", new_insured_group_selection_path(new_options)) %>
                       <%= l10n('insured.coverage_will_begin', date: format_date(@employee_role.benefit_begin_date)) %>
                     <%elsif (@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment? %>
-                      <%= l10n('insured.if_you') %>
+                      <%= l10n('plans.if_you') %>
                       <%= h(link_to "#{l10n('insured.enroll_today')}", new_insured_group_selection_path(options)) %>
                       <%= l10n('insured.coverage_will_begin', date: format_date(ivl_enrollment_effective_date)) %>
                     <% end %>
@@ -247,8 +247,8 @@
                 <% end %>
 
                 <% if @employee_role&.has_multiple_shop_oe_periods? && is_shop_or_fehb_market_enabled? %>
-                  <%= l10n('insured.if_you') %>
-                  <%= h(link_to "#{l10n('insured.enroll_as_new_hire')}", new_insured_group_selection_path(options.merge(shop_under_current: true))) %> 
+                  <%= l10n('plans.if_you') %>
+                  <%= h(link_to "#{l10n('insured.enroll_as_new_hire')}", new_insured_group_selection_path(options.merge(shop_under_current: true))) %>
                   <%= l10n('insured.coverage_will_begin', date: format_date(@employee_role.earliest_effective_on_for_new_hire_in_current_py)) %>
                 <% end %>
 
@@ -256,14 +256,14 @@
                   <p><%= l10n('insured.qualify_for_special_enrollment') %> "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
                     <br/>
                     <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
-                    <div class="btn btn-default"><%= build_link_for_sep_type(@active_sep, l10n('insured.shop_now'), @family.id.to_s) %></div>
+                    <div class="btn btn-default"><%= build_link_for_sep_type(@active_sep, l10n('plans.shop_now'), @family.id.to_s) %></div>
                   </p>
                   <p> <%= l10n('insured.start_your_coverage') %> </p>
                     <br/>
                     <%= h(link_to "#{l10n('insured.quaalify_for_new_sep')}", find_sep_insured_families_path(options), class: "btn btn-default pull-left") %></p>
                 <% elsif !is_under_open_enrollment? %>
                   <p><%= l10n('insured.open_enrollment_is_over') %></p>
-                  <p><%= h(link_to "#{l10n('insured.shop_now')}", find_sep_insured_families_path(options), class: "btn btn-default pull-right") %></p>
+                  <p><%= h(link_to "#{l10n('plans.shop_now')}", find_sep_insured_families_path(options), class: "btn btn-default pull-right") %></p>
                 <% end %>
               <% else %>
                 <% msg = l10n('insured.you_have_no_employer_sponsored_insurance').to_s %>
