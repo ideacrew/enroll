@@ -164,7 +164,7 @@ When(/^primary applicant is in Info Completed state$/) do
   find(IvlIapOtherIncomePage.continue_btn).click
   find(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn).click
   find(IvlIapIncomeAdjustmentsPage.continue_btn).click
-  find(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn).click
+  find(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn, wait: 10).click
   find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn).click
 
   if  EnrollRegistry[:bs4_consumer_flow].enabled?
