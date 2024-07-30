@@ -29,6 +29,7 @@
             <div class="col-md-12 pl-0">
               <span><%= address.hidden_field :kind, value: address.object.kind %>
               <%= address.hidden_field :_destroy %></span>
+
               <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "required" %>
               <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} w-100", required: required.present? %>
             </div>
