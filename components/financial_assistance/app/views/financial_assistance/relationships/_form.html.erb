@@ -1,4 +1,3 @@
-
 <% if @bs4 %>
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 2} %>
   <h1><%= l10n("family_relationships") %></h1>
@@ -12,12 +11,12 @@
   <% @all_relationships.each do |er| %>
     <% if er[:relation].present? && (er[:applicant] == primary_applicant) %>
     <h2><%= @application.applicants.find(er[:relative]).full_name %></h2>
-      <%= form_for @application, remote: form_remote do |f| %>
+      <%= form_for @application do |f| %>
       <div>
         <h3>
           <label class="required" for="relationships-<%= er[:relative] %>"><%= l10n("relationship_to_primary") %></label>
         </h3>
-        <%= f.select :relationships, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), {:prompt => 'Select Option', required: true }, { "class": "selected_relationship focus input-field #{'invalid-relation' if er[:relation] == 'none'}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "relationships-#{er[:relative]}" } %>
+        <%= f.select :relationships, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), {:prompt => 'Select Option', required: true }, { "class": "focus input-field #{'invalid-relation' if er[:relation] == 'none'}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "relationships-#{er[:relative]}" } %>
       </div>
       <br>
       <% end %>
