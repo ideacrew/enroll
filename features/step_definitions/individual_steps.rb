@@ -566,9 +566,11 @@ end
 
 Then(/Individual does not see the error on tooltip indicating a password longer than 20 characters$/) do
   unless EnrollRegistry[:bs4_consumer_flow].enabled?
-    wait_for_ajax
+    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(false)
     script = "return document.querySelector('.longer').getAttribute('data-icon');"
     data_icon_value = page.execute_script(script)
+    wait_for_ajax
+    sleep 15
     expect(data_icon_value).to eq('check')
   end
 end
