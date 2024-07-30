@@ -10,7 +10,7 @@
   <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
 <% end %>
 
-<% if !@bs4 %>
+<% if @bs4 %>
   <div class="enrollment-details">
     <% if qhp.present? %>
       <h1><%= @hbx_enrollment.coverage_year %> <%= @hbx_enrollment&.product&.kind.to_s.titleize %> <%= l10n('coverage').titleize %></h1>
