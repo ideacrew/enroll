@@ -2,6 +2,7 @@ function isApplyingCoverage(target) {
   fields = "input[name='" + target + "[is_applying_coverage]']";
   $('#employer-coverage-msg').hide();
   $('#ssn-coverage-msg').hide();
+  $('.ssn-coverage-msg').hide();
   if ($(fields).length > 0) {
     addEventOnNoSsn(target);
     addEventOnSsn(target);
@@ -18,11 +19,13 @@ function isApplyingCoverage(target) {
         $('#employer-coverage-msg').show();
         if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
           $('#ssn-coverage-msg').show();
+          $('.ssn-coverage-msg').show();
         }
       } else {
         $('.consumer_fields_for_applying_coverage').show();
         $('#employer-coverage-msg').hide();
         $('#ssn-coverage-msg').hide();
+        $('.ssn-coverage-msg').hide();
       }
     });
   }
