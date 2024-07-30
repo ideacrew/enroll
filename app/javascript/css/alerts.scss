@@ -48,7 +48,7 @@
   &.alert-error {
     background-color: var(--error-tint);
     border-color: var(--error-color);
-    color: var(--error-shade);
+    color: var(--default-font-color);
   }
 
   &.alert-warning {
