@@ -114,12 +114,18 @@
       </span>
     </div>
   <% end %>
-
   <script>
     $('.remove-personal-form').off('click');
     $('.remove-personal-form').on('click', function (e) {
       $(".append_consumer_info").empty();
-      $("#person-<%= @person.id %>").addClass('hidden');
+      if ($(".my-household-page")) {
+        $("#person-<%= @person.id %>").addClass('hidden');
+        $("a[id^=edit-member]").removeClass('disabled');
+        $("a[id^=edit-member]").removeAttr('disabled');
+        // primary_family
+        var family_table = $("<%= escape_javascript(render 'insured/families/manage_family_table', members: @person.primary_family.active_family_members) %>");
+        $('#manage_family_content').html(family_table);
+      }
     });
   </script>
 
