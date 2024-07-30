@@ -75,15 +75,15 @@ function applyListenersFor(target) {
       false
     );
     if ($(this).val() == 'true') {
-      $('#naturalized_citizen_container').show();
-      $('#immigration_status_container').hide();
-      $('#' + target + '_naturalized_citizen_true').prop('required');
-      $('#' + target + '_naturalized_citizen_false').prop('required');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#naturalized_citizen_container').removeClass('hidden_field');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#immigration_status_container').addClass('hidden_field');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_true').attr('required', true);
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_false').attr('required', true);
     } else {
-      $('#naturalized_citizen_container').hide();
-      $('#immigration_status_container').show();
-      $('#' + target + '_naturalized_citizen_true').removeAttr('required');
-      $('#' + target + '_naturalized_citizen_false').removeAttr('required');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#naturalized_citizen_container').addClass('hidden_field');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#immigration_status_container').removeClass('hidden_field');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_true').removeAttr('required')
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_false').removeAttr('required')
     }
   });
 
