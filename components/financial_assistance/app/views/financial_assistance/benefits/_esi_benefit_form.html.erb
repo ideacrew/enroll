@@ -76,14 +76,14 @@
         <legend class="weight-n required"><%= l10n("faa.health_coverage.esi.mvs_amount_question") %></legend>
         <a href="#employee_cost" data-toggle="modal" data-target="#employee_cost_<%= benefit.id %>" id="employee_cost" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "employee_cost", id: "employee_cost_#{benefit.id}" } %>
-        <div class="d-flex mt-2">
-          <div class="mr-3">
+        <div class="d-flex mt-2 col-6 px-0">
+          <div class="col px-0 mr-3">
             <%= f.label :employee_cost, l10n("faa.health_coverage.esi.amount"), class: "required", for: "employee_cost|#{form_id}" %>
             <%= f.text_field :employee_cost, placeholder: '0.00', value: "", id: "employee_cost|#{form_id}" %>
           </div>
-          <div class="mr-3">
+          <div class="col px-0">
             <%= f.label :employee_cost_frequency, l10n("frequency"), class:"required", for: "employee_cost_frequency|#{form_id}" %>
-            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "employee_cost_frequency|#{form_id}"} %>
+            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "employee_cost_frequency|#{form_id}", class: "col"} %>
           </div>
         </div>
       </fieldset>
