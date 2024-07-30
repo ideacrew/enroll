@@ -10,7 +10,7 @@ end
 
 When(/^.+ visits the Consumer portal during open enrollment$/) do
   visit "/"
-  find(HomePage.consumer_family_portal_btn).click
+  find(HomePage.consumer_family_portal_btn, wait: 10).click
   FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
