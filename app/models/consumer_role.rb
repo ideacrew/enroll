@@ -235,6 +235,8 @@ class ConsumerRole
   embeds_many :local_residency_responses, class_name:"EventResponse"
   embeds_many :local_residency_requests, class_name:"EventRequest"
 
+  embeds_many :alive_status_responses, class_name:"EventResponse"
+
   after_initialize :setup_lawful_determination_instance
   after_create :create_initial_market_transition, :publish_created_event
   after_update :publish_updated_event

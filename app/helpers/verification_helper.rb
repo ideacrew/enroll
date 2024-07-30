@@ -306,10 +306,10 @@ module VerificationHelper
   end
 
   def show_deceased_verification_response(person, history)
-    if history.event_response_record_id
-      event_response = EventResponse.where(id: history.event_response_record_id).first
-      event_response.present? ? JSON.parse(event_response) : "no response record"
-    end
+    return unless history.event_response_record_id
+
+    event_response = person.consumer_role.alive_status_responses.select{ |response| response.id == BSON::ObjectId.from_string(history.event_response_record_id) }.first
+    event_response.present? ? JSON.parse(event_response.body) : "no response record"
   end
 
   def show_ssa_dhs_request(person, record)
