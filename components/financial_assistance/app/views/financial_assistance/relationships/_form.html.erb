@@ -1,5 +1,15 @@
 <% if @bs4 %>
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 2} %>
+  <% if @missing_relationships.any? %>
+    <div class="alert alert-error d-flex" role="alert">
+      <div>
+        <div class="error-icon icon mt-3" alt="error" aria-hidden="true">&nbsp;</div>
+      </div>
+      <div class="mt-2 mb-1">
+        <p><%= l10n("faa.review.your_household.relationships_error") %></p>
+      </div>
+    </div>
+  <% end %>
   <h1><%= l10n("family_relationships") %></h1>
   <p>
     <%= l10n("household_relationships") %>
@@ -7,23 +17,33 @@
       <%= l10n("continue_to_next_step") %>
     </b>
   </p>
-  <% primary_applicant = @all_relationships[0][:applicant] if @all_relationships[0].present? %>
-  <% @all_relationships.each do |er| %>
-    <% if er[:relation].present? && (er[:applicant] == primary_applicant) %>
-    <h2><%= @application.applicants.find(er[:relative]).full_name %></h2>
-      <%= form_for @application do |f| %>
-      <div>
-        <h3>
-          <label class="required" for="relationships-<%= er[:relative] %>"><%= l10n("relationship_to_primary") %></label>
-        </h3>
-        <%= f.select :relationships, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), {:prompt => 'Select Option', required: true }, { "class": "focus input-field #{'invalid-relation' if er[:relation] == 'none'}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "relationships-#{er[:relative]}" } %>
+  <%= form_tag application_relationships_path(@application), remote: form_remote do %>
+    <% @all_relationships.each do |er| %>
+      <div class="d-flex justify-items-between my-4 align-items-center" id="<%= "#{er[:applicant] }_#{er[:relative]}" %>">
+        <span><%= @application.applicants.find(er[:applicant]).first_name %> <%= l10n("faa.review.your_household.is") %></span>
+        <div class="mx-3">
+          <label for='<%= "#{er[:applicant] }_#{er[:relative]}_relationship" %>' class="sr-only"><%= l10n("faa.review.your_household.relationship_label") %></label>
+          <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: 'selected_relationship', "data-applicant": er[:applicant], "data-relative": er[:relative], id: "#{er[:applicant] }_#{er[:relative]}_relationship" %>
+        </div>
+        <span><%= l10n("faa.review.your_household.of") %> <%= @application.applicants.find(er[:relative]).first_name %></span>
       </div>
-      <br>
-      <% end %>
     <% end %>
   <% end %>
+  <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_and_submit_application_path(@application), disable_link: @missing_relationships.any?} %>
+  <script>
+    $(function() {
+      if(<%= @missing_relationships.any? %>){
+        $('#btn-continue', '#continue_button').attr('disabled', true);
+        $('#btn-continue', '#continue_button').addClass('disabled');
+        $('#btn-continue').addClass('disabled');
 
-  <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_and_submit_application_path(@application)} %>
+      } else {
+        $('#btn-continue', '#continue_button').removeAttr('disabled');
+        $('#btn-continue', "#continue_button").removeClass('disabled');
+        $('#btn-continue').removeClass('disabled');
+      }
+    });
+  </script>
 <% else %>
 <h1 class="darkblue">Family Relationships</h1>
 <p>We need to understand how members of your household are related. Select the relationship for each person listed
@@ -62,8 +82,6 @@
     <% end %>
 <% end %>
 <%= submit_tag "", class: "" , :style => "display: none;" %>
-<% end %>
-
 <script>
   $(function() {
     if(<%= missing_relationships.present? %>){
@@ -78,3 +96,4 @@
     }
   });
 </script>
+<% end %>
