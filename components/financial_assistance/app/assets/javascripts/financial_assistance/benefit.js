@@ -714,6 +714,10 @@ document.addEventListener("turbolinks:load", function() {
     $(this).mask('(000) 000-0000');
   });
 
+  $(document).on('focus', '.fien_field', function () {
+    $(this).mask('99-9999999');
+  });
+
   $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
       $(this).mask('(000) 000-0000');
       return (key == 8 ||
