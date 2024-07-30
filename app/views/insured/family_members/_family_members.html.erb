@@ -12,7 +12,7 @@
 
   <div id="primary-person" class="my-3">
     <h2><%= l10n('member') %> 1</h2>
-    <div id="primary-info-display" class="d-flex flex-row flex-wrap justify-content-between">
+    <div id="primary-info-display" class="d-flex flex-row flex-wrap justify-content-between my-household-page">
       <div>
         <label for="name"><%= l10n("name")%></label>
         <input id="name" type="text" value="<%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %>" disabled >
@@ -30,7 +30,9 @@
         <input id="relation" type="text" value="<%= l10n("self").humanize %>" disabled >
       </div>
     </div>
-
+    <div id="person-<%= @person.id %>" class="hidden my-4">
+      <div class="append_consumer_info"></div>
+    </div>
     <%= h(link_to l10n("edit_member"), personal_insured_families_path({bs4: @bs4, person: @person.id}), remote: true, id: 'edit-primary-person', class: 'btn button outline close-2 my-3') %>
 
     <div class="append_consumer_info"></div>
@@ -42,7 +44,9 @@
   <div id="dependent_ul">
     <% @family.active_family_members.reject(&:is_primary_applicant).each_with_index do |dependent, index| %>
       <%= render "insured/family_members/dependent", dependent: dependent, person: @person, member_number: index+2 %>
-      <div class="append_consumer_info" id="dependent-<%= dependent.id %>"></div>
+      <div id="person-<%= dependent.id %>" class="hidden my-4">
+        <div class="append_consumer_info"></div>
+      </div>
     <% end %>
   </div>
 
