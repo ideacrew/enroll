@@ -69,7 +69,7 @@
             <dd><span class="badge badge-pill badge-lg badge-<%= plan_level.downcase %>"><%= plan_level %></span></dd>
           </dl>
           <dl class="parent col-6 pl-0">
-            <dt class="plan-id"><%= HbxProfile::ShortName %> ID:</dt>
+            <dt class="plan-id"><%= HbxProfile::ShortName %> <%= l10n("enrollment_id") %>:</dt>
             <dd><%= hbx_enrollment.hbx_id %></dd>
             <dt class="enrollment-premium"><%= l10n("premium_you_pay") %>:</dt>
             <dd><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %> / <%= l10n("month").to_s.downcase %></dd>
