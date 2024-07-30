@@ -180,9 +180,7 @@ module Operations
             message = "DMF Determination response received successfully"
             consumer_role = person.consumer_role
             body = {job_id: @job.job_id, family_hbx_id: @family_hbx_id, death_confirmation_code: DEATH_CONFIRMATION_CODE_MAPPING[entity_validation_status], date_of_death: alive_status_entity.date_of_death}.to_json
-            event_response_record = EventResponse.new({received_at: Time.now, body: body})
-            consumer_role.alive_status_responses << event_response_record
-            consumer_role.save!
+            consumer_role.alive_status_responses.create({received_at: Time.now, body: body})
 
             alive_status_verification_type.add_type_history_element(action: "DMF Hub Response", modifier: "System", update_reason: message, from_validation_status: from_validation_status,
                                                                     to_validation_status: alive_status_verification_type.validation_status, event_response_record_id: event_response_record.id)
