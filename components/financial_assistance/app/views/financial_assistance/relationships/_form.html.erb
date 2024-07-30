@@ -30,6 +30,20 @@
     <% end %>
   <% end %>
   <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_and_submit_application_path(@application), disable_link: @missing_relationships.any?} %>
+  <script>
+    $(function() {
+      if(<%= @missing_relationships.any? %>){
+        $('#btn-continue', '#continue_button').attr('disabled', true);
+        $('#btn-continue', '#continue_button').addClass('disabled');
+        $('#btn-continue').addClass('disabled');
+
+      } else {
+        $('#btn-continue', '#continue_button').removeAttr('disabled');
+        $('#btn-continue', "#continue_button").removeClass('disabled');
+        $('#btn-continue').removeClass('disabled');
+      }
+    });
+  </script>
 <% else %>
 <h1 class="darkblue">Family Relationships</h1>
 <p>We need to understand how members of your household are related. Select the relationship for each person listed
@@ -68,10 +82,9 @@
     <% end %>
 <% end %>
 <%= submit_tag "", class: "" , :style => "display: none;" %>
-<% end %>
 <script>
   $(function() {
-    if(<%= @missing_relationships.any? %>){
+    if(<%= missing_relationships.present? %>){
       $('#btn-continue', '#continue_button').attr('disabled', true);
       $('#btn-continue', '#continue_button').addClass('disabled');
       $('#btn-continue').addClass('disabled');
@@ -83,3 +96,4 @@
     }
   });
 </script>
+<% end %>
