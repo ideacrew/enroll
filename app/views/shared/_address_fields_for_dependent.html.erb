@@ -1,124 +1,110 @@
 <% if @bs4 %>
+<%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
 <% show_no_dc_address = (defined? show_no_dc_address) ? show_no_dc_address : false %>
-<div id="address_info" class="row no-buffer focus_effect personal-info-row">
-  <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-    <% f.object.addresses.each_with_index do |addr, index| %>
+<div id="address_info" class="">
+  <% mailing_addresses = f.object.addresses.select{|addr| addr.created_at.present? && addr.kind == "mailing" }%>
+  <% f.object.addresses.each_with_index do |addr, index| %>
       <%= f.fields_for :addresses, addr, index: index, errors: {}, fieldset: true do |address| %>
         <% kind = address.object.kind %>
         <% style = "" %>
-        <% div_class = kind+"-div" %>
-        <% style = address.object.new_record? ? "display:none;" : "display:block;" if kind == 'mailing' %>
-        <% if kind == 'mailing' %>
-          <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
-            <br>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
-            <h4 class="gamma"><%= l10n("insured.mailing_address") %></h4>
-            </div>
-          </div>
-          <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
-              <i class="fa fa-info-circle"></i> <%=l10n("insured.dependent_mailing_address_info")%>
-            </div>
-          </div>
+      <% div_class = kind+"-div" %>
+      <% if kind != 'home' && address.object.new_record? %>
+        <% if f.object.addresses[1].present? %>
+          <% display_class="d-block" %>
+        <% else %>
+          <% display_class="d-none" %>
         <% end %>
+      <% end %>
+      <% required = kind =='home' ? "address_required" : '' %>
 
-        <% col_size = EnrollRegistry.feature_enabled?(:display_county) ? 3 : 4 %>
-        <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-          <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-            <%= address.hidden_field :kind %>
-            <% required = "required" if kind == 'home' && f.object.same_with_primary != 'true' %>
-            <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "required" %>
-            <%= address.text_field :address_1, placeholder: "#{kind.upcase} ADDRESS LINE 1 (NUMBER, STREET, QUADRANT) #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
-          </div>
-        </div>
-        <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-          <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.label :address_2, "#{l10n("address_2")} #{l10n("address_2_desc")}" %>
-            <%= address.text_field :address_2, placeholder: "#{kind.upcase} ADDRESS LINE 2 (APT, UNIT, ETC.)", class: "floatlabel form-control" %>
-          </div>
-        </div>
+      <div class="address-row <%= div_class %> <%= display_class %>">
+      <%# mailing-div inputs should default to unrequired because the mailing-div is hidden by default; required attrs on the fields are added in application.js on show %>
+        <div class="d-flex mb-md-2 row col-sm">
+          <div class="col-sm col-md-6 p-0">
+            <div class="col-md-12 pl-0">
+              <span><%= address.hidden_field :kind, value: address.object.kind %>
+              <%= address.hidden_field :_destroy %></span>
 
-        <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-          <div class=" col-sm-<%= "#{col_size}" %> col-xs-12 form-group form-group-lg no-pd">
-            <%= address.label :city, class:  "required" %>
-            <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
-          </div>
-          <div class=" col-sm-<%= "#{col_size}" %> col-xs-12 form-group form-group-lg no-pd">
-            <%= address.label :state, class: "required" %>
-            <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.state), {include_blank: "SELECT STATE #{'*' if required.present?}"}, { required: required.present?, id: "state_id_#{kind}" }) %>
-          </div>
-
-          <div data-controller="zip-check">
-            <div class="col-sm-<%= "#{col_size}" %> col-xs-12 form-group form-group-lg no-pd">
-              <%= address.label :zip, l10n("zip_code"), class: "required" %>
-              <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
-            </div>
-
-            <% if EnrollRegistry.feature_enabled?(:display_county) %>
-              <div id="county-select-<%= f.index %>" class="county-select col-sm-<%= "#{col_size}" %> col-xs-12 form-group form-group-lg no-pd">
-                <% @counties = fetch_counties_by_zip(address.object) %>
-                <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
-                <% @counties = [@empty_message] if @counties.empty? %>
-                <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg county-input no-selectric', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.county_names })%>
-              </div>
-            <% end %>
-          </div>
-        </div>
-
-        <% if kind == 'home' && show_no_dc_address %>
-          <% style="display:none;" if f.object.is_homeless.blank? || f.object.is_homeless == false || f.object.is_homeless == 'false' %>
-          <div style="<%= style %>" class="row no-buffer address-row show <%= div_class %> no-dc-address-reasons">
-            <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
-                <div class="address_checkbox">
-                  <%= f.check_box :is_moving_to_state, id: "is_moving_to_state" %>
-                  <label for="is_moving_to_state"><span><strong><%= l10n('insured.dependent_moving_to_dc') %></strong></span> <span><%= l10n('insured.moving_to_dc_extension') %></span></label>
-                </div>
-              </div>
-            <% end %>
-            <% if EnrollRegistry.feature_enabled?(:living_outside_state) %>
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
-                <div class="address_checkbox">
-                  <%= f.check_box :is_temporarily_out_of_state, id: "is_temporarily_out_of_state" %>
-                  <label for="is_temporarily_out_of_state"><span><strong><%= l10n('insured.dependent_outside_dc') %></strong></span> <span><%= l10n('insured.outside_dc_extension') %></span></label>
-                </div>
-              </div>
-            <% end %>
-            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
-              <div class="address_checkbox">
-                <%= f.check_box :is_homeless, id: "is_homeless" %>
-                <label for="is_homeless"><span><strong><%= l10n('insured.dependent_dc_homeless') %></strong></span><span><%= l10n('insured.dc_homeless_extension') %></span></label>
-              </div>
+              <%= address.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "required" %>
+              <%= address.text_field :address_1, placeholder: l10n("address_1"), class: "#{required} w-100", required: required.present? %>
             </div>
           </div>
-        <% end %>
-      <% end%>
+          <div class="mr col-sm col-md-6 p-0">
+            <div class="col-md-12 pr-0">
+              <%= address.label :address_2, "#{l10n("address_2")} #{l10n("address_2_desc")}" %>
+              <%= address.text_field :address_2, placeholder: l10n("address_2"), class: "w-100" %>
+            </div>
+          </div>
+        </div>
+        <div class="address-row <%= div_class %> <%= display_class %>" data-controller="zip-check">
+          <div class="d-flex mb-md-4 row col-sm">
+            <div class="d-flex col-sm col-md-6 pl-0">
+              <div class="mr-auto col-sm col-md-6 pl-0">
+                <%= address.label :city, class:  "required" %>
+                <%= address.text_field :city, placeholder: "City", class: "#{required} w-100", required: required.present? %>
+              </div>
+              <div class="col-sm col-md-6 pr-0">
+                <%= address.label :state, class: "required" %>
+                <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort, selected: address.object.try(:state)), {include_blank: "SELECT STATE"}, class:"w-100 stateInput required", required: true) %>
+              </div>
+            </div>
+            <div class="d-flex col-sm col-md-6 pr-0">
+              <div class="mr-auto col-sm col-md-6 pl-0">
+                <%= address.label :zip, l10n("zip_code"), class: "required" %>
+                <%= address.text_field :zip, class: "w-100 required", required: true, placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
+              </div>
+              <% if EnrollRegistry.feature_enabled?(:display_county) %>
+                <div id="county-select-<%= f.index %>" class="col-sm col-md-6 pr-0">
+                  <% @counties = fetch_counties_by_zip(address.object) %>
+                  <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
+                  <% @counties = [@empty_message] if @counties.empty? %>
+                  <%= address.label :county %>
+                  <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{},class:'w-100 required county-input', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.county_names })%>
+                </div>
+              <% else %>
+                <div class="col-sm col-md-6 pl-0 sm-hide"></div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% if kind == 'home' %>
+        <div class="address-row show no-dc-address-reasons mb-4">
+          <% if EnrollRegistry.feature_enabled?(:moving_to_state) %>
+            <label class="weight-n">
+                <%= f.check_box :is_moving_to_state %>
+                <strong><%= l10n('insured.moving_to_dc') %> </strong><%= l10n('insured.moving_to_dc_extension') %>
+            </label>
+          <% end %>
+          <% if EnrollRegistry.feature_enabled?(:living_outside_state) %>
+            <label class="weight-n">
+              <%= f.check_box :is_temporarily_out_of_state %>
+              <strong><%= l10n('insured.outside_dc') %></strong> <%= l10n('insured.outside_dc_extension') %>
+            </label>
+          <% end %>
+          <label class="weight-n">
+            <%= f.check_box :is_homeless, id: "is_homeless" %>
+            <strong><%= l10n('insured.dc_homeless') %></strong> <%= l10n('insured.dc_homeless_extension') %>
+          </label>
+        </div>
+      <% end %>
+    <% end %>
+    <% end %>
+    <% if f.object.addresses[1].present? %>
+      <button class="form-action btn-error <%= pundit_class Family, :updateable?%>" id="remove_mailing_address" data-cuke="remove_mailing_address">Remove Mailing Address</button>
+      <button id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-1 d-none">Add Mailing Address</button>
+    <% else %>
+      <button id="add_mailing_address" class="form-action btn-secondary <%= pundit_class Family, :updateable?%> mb-1">Add Mailing Address</button>
     <% end %>
 
   </div>
-  <div class="col-md-2 key col-sm-3 col-xs-12"></div>
 </div>
-
-<% if f.object.addresses[1].present? %>
-    <span class="bs4 form-action btn-error" id="remove_dependent_mailing_address" data-cuke="remove_dependent_mailing_address">Remove Mailing Address</span>
-    <span id="add_dependent_mailing_address" class="bs4 form-action btn btn-default mb-1 d-none">Add Mailing Address</span>
-  <% else %>
-    <span id="add_dependent_mailing_address" class="bs4 form-action btn btn-default mb-1">Add Mailing Address</span>
-  <% end %>
 <script>
-$(document).ready(function () {
-  $('#state_id').change(function(){
-    if (!$("#no_dc_address").is(':checked') && $(this).val() != 'DC') {alert('You have selected a Non DC state, please check No DC Address')}
+  $(document).ready(function () {
+    $('#state_id').change(function(){
+      if (!$("#no_dc_address").is(':checked') && $(this).val() != 'DC') {alert('You have selected a Non DC state, please check No DC Address')}
+    });
   });
-});
-
-  // $(function() {
-  //   $('select.county-input').selectric('destroy');
-  // });
-
-  // $(document).on('ready page:load turbolinks:load', function () {
-  //   $('select.county-input').selectric('destroy');
-  // })
 </script>
 <% else %>
 
