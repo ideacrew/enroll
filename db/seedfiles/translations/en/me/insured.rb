@@ -708,6 +708,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.thankyou.aptc_numbers_2' => ") has been applied to your premium.",
   :'en.insured.plan_shoppings.thankyou.update_amount' => "Update APTC Amount",
   :'en.insured.plan_shoppings.thankyou.aptc_instructions' => "Use the Percentage Applied or Amount Applied inputs below to tell us how much of your total tax credit you’d like to use. We’ll apply up to the maximum amount you can use for this plan.",
+  :'en.insured.plan_shoppings.thankyou.aptc_desc' => "You can decide if you want to use all, some, or none of your estimated APTC to lower your monthly premium. To change the amount of APTC applied, select 'Update APTC Amount.'",
   :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer.",
   :'en.insured.primary_home_address_info' => "<strong>Your home address is where you legally reside.</strong> If you prefer to receive mail at another address such as your office or a PO Box, select 'Add Mailing Address'.",
   :'en.insured.primary_mailing_address_info' => "This is the <strong>address where you want to have your mail delivered.</strong> It may be the same or different from your home address.",
