@@ -1,14 +1,14 @@
 <% if @bs4 %>
   <div class="container p-0">
-    <div class="alert alert-info d-flex align-items-center">
+    <div class="alert alert-<%= type %> d-flex align-items-start">
       <div class="d-flex pl-1">
-        <div class="info-icon icon" alt="info">&nbsp;</div>
+        <div class="<%= type %>-icon icon" alt="info">&nbsp;</div>
       </div>
-      <div class="col my-1 mr-auto p-0 align-self-center">
+      <div class="col mr-auto p-0 align-self-center">
         <%= raw message %>
       </div>
       <div class="d-flex pl-1">
-        <a class="close-icon icon pr-1" alt="Close" href="#">&nbsp;<span class="sr-only">Close</span></a>
+        <a class="close-icon icon icon-sm pr-1" alt="Close" href="#">&nbsp;<span class="sr-only">Close</span></a>
       </div>
     </div>
   </div>
