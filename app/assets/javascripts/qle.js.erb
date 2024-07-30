@@ -1,3 +1,5 @@
+var bs4 = document.documentElement.dataset.bs4;
+
 var QLE = ( function( window, undefined ) {
   function initialize() {
     $(document).on('change', 'input[type=radio][name=reason]', function() {
@@ -91,13 +93,15 @@ $(function () {
       defaultDate: cdate
 		});
 
-    $(".sep-date #qle_date").on("change", function(){
-      if ($(".sep-date #qle_date").val()) {
-        $('#qle_submit').removeAttr('disabled');
-      } else {
-        $('#qle_submit').attr('disabled', 'disabled');
-      }
-    });
+    if (bs4 == 'true') {
+      $("#qle_date").on("change", function(){
+        if ($("#qle_date").val()) {
+          $('#qle_submit').removeAttr('disabled');
+        } else {
+          $('#qle_submit').attr('disabled', 'disabled');
+        }
+      });
+    }
   }
 
   function set_details_title(event_element) {
@@ -124,7 +128,6 @@ $(function () {
     $('#qle_id').val($(this).data('id'));
     $('#qle_reason > *').addClass('hidden');
     $('#qle-date-chose').show();
-    $('.sep-date #qle_submit').attr('disabled', 'disabled');
     $('#qle-nav').addClass('hidden');
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
@@ -147,6 +150,10 @@ $(function () {
 
     $('#qle-details').removeClass('hidden');
     $('#qle-details-for-existing-sep').addClass('hidden');
+    if (bs4) {
+      $('#qle_submit').attr('disabled', 'disabled');
+      $("#qle-details").get(0).scrollIntoView({behavior: 'smooth'});
+    }
   });
 
 
@@ -193,7 +200,7 @@ $(function () {
   // Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keydown', function(e) {
     var code = e.keyCode || e.which;
-    if ($("#qle-nav").length > 0) {
+    if (bs4) {
       return;
     }
 
