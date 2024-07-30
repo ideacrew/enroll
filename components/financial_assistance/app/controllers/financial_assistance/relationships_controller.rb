@@ -21,7 +21,7 @@ module FinancialAssistance
 
     def create
       authorize @application, :create?
-
+      @bs4 = true if params[:bs4] == "true"
       applicant_id = params[:applicant_id]
       relative_id = params[:relative_id]
       predecessor = FinancialAssistance::Applicant.find(applicant_id)
