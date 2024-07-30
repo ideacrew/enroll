@@ -1,5 +1,4 @@
 <% if @bs4 %>
-
   <div id="add_member_list_<%= dependent.id %>" class="dependent_list py-4">
     <div class="d-flex flex-row">
       <h2><%= l10n('member') %> <%= local_assigns[:member_number] ? member_number : "" %></h2>
@@ -26,8 +25,7 @@
           <input id="relation" type="text" value="<%= dependent.relationship.try(:humanize)%>" disabled >
         </div>
       </div>
-
-      <%= h(link_to l10n("edit_member"), main_app.edit_insured_family_member_path(dependent, {bs4: @bs4}), id: 'edit-dependent-person', remote: true, class: 'btn button outline close-2') %>
+      <%= h(link_to l10n("edit_member"), main_app.edit_insured_family_member_path(dependent, {bs4: @bs4}), remote: true, id: "edit-member-#{dependent.id}", class: 'btn button outline mt-3') %>
 
     </div>
   </div>
