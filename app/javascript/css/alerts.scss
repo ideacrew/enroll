@@ -40,7 +40,7 @@
 }
 
 .alert {
-  padding: 0.25em;
+  padding: 0.75em;
   border-radius: 12px;
   border-width: 1px;
   border-style: solid;
@@ -48,7 +48,7 @@
   &.alert-error {
     background-color: var(--error-tint);
     border-color: var(--error-color);
-    color: var(--error-shade);
+    color: var(--default-font-color);
   }
 
   &.alert-warning {
