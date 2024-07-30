@@ -36,6 +36,10 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
                                               coverage_end_on: TimeKeeper.date_of_record.end_of_month)
   end
 
+  before do
+    ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+  end
+
   context 'failure' do
     let(:tax_household_enrollment) { FactoryBot.create(:tax_household_enrollment, enrollment_id: enrollment.id)}
 

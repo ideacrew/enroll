@@ -60,9 +60,13 @@ RSpec.describe ::Operations::Products::FetchSlcspPremiumForTaxHouseholdMember, d
       {
         effective_date: effective_on,
         tax_household_member: tax_household_member1,
-        rating_area_id: rating_area.id,
+        rating_area_exchange_provided_code: rating_area.exchange_provided_code,
         products: [product]
       }
+    end
+
+    before do
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
     end
 
     it 'should return success' do

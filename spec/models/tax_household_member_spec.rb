@@ -124,6 +124,10 @@ RSpec.describe TaxHouseholdMember, type: :model do
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let!(:household) { FactoryBot.create(:household, family: family) }
 
+    before do
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+    end
+
     it 'should return valid benchmark value' do
       expect(tax_household_member1.aptc_benchmark_amount(enrollment)).to eq 198.86
       expect(tax_household_member1.aptc_benchmark_amount(enrollment, Date.new(TimeKeeper.date_of_record.year, 1, 1))).to eq 198.86
