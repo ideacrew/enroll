@@ -117,7 +117,8 @@ $(function () {
     }
   };
 
-  $(document).on('click', 'a.qle-menu-item', function() {
+  $(document).on('click', 'a.qle-menu-item', function(e) {
+    e.preventDefault();
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
 

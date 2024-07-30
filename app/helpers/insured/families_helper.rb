@@ -135,7 +135,7 @@ module Insured::FamiliesHelper
 
     qle_title_html = sanitize_html("<u>#{qle.title}</u>") if qle.reason == 'covid-19'
 
-    link_to qle_title_html || qle.title, "javascript:void(0)", options
+    link_to qle_title_html || qle.title, @bs4 ? "#" : "javascript:void(0)", options
   end
 
   def qle_link_generator_for_an_existing_qle(qle, link_title=nil)
