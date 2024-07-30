@@ -714,39 +714,38 @@ document.addEventListener("turbolinks:load", function() {
     $(this).mask('(000) 000-0000');
   });
 
+  $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
+      $(this).mask('(000) 000-0000');
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
-        $(this).mask('(000) 000-0000');
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
+  });
 
-    });
+  $('body').on('keyup keydown keypress', '#benefit_employer_address_zip', function (e) {
+      var key = e.which || e.keyCode || e.charCode;
+      $(this).attr('maxlength', '5');
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
+  });
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_address_zip', function (e) {
-        var key = e.which || e.keyCode || e.charCode;
-        $(this).attr('maxlength', '5');
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
-    });
+  $('body').on('keyup keydown keypress', '#benefit_employer_id', function (e) {
+      var key = e.which || e.keyCode || e.charCode;
+      $(this).mask("00-0000000");
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_id', function (e) {
-        var key = e.which || e.keyCode || e.charCode;
-        $(this).mask("00-0000000");
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
-
-    });
+  });
 
 });
