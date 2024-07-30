@@ -131,10 +131,7 @@ document.addEventListener("turbolinks:load", function() {
             input.setAttribute('required', true);
           }
         });
-        clonedForm.querySelector('.hra-questions').classList.add('hidden');
-        clonedForm.querySelectorAll('.hra-questions input, .hra-questions select').forEach(function(input) {
-          input.removeAttribute('required');
-        });
+        $(clonedForm).find('.hra-questions').remove();
       } else {
         clonedForm.querySelector('.hra-questions').classList.remove('hidden');
         clonedForm.querySelectorAll('.hra-questions input, hra-questions select').forEach(function(input) {
@@ -143,10 +140,7 @@ document.addEventListener("turbolinks:load", function() {
             input.setAttribute('required', true);
           }
         });
-        clonedForm.querySelector('.non-hra-questions').classList.add('hidden');
-        clonedForm.querySelectorAll('.non-hra-questions input, .non-hra-questions select').forEach(function(input) {
-          input.removeAttribute('required');
-        });
+        $(clonedForm).find('.non-hra-questions').remove();
       }
 
       // show mvsq if msqv is true
@@ -715,6 +709,10 @@ document.addEventListener("turbolinks:load", function() {
       })
     });
   }
+
+  $(document).on('focus', '.phone_number', function () {
+    $(this).mask('(000) 000-0000');
+  });
 
 
     $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
