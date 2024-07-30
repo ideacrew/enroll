@@ -109,7 +109,14 @@
         <div class="d-flex align-items-center justify-content-between plan-footer">
           <div>
             <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product, custom_css: false, hbx_id: hbx_enrollment.hbx_id } %>
-            <a class="ml-4" id="plan_contact_info-<%= hbx_enrollment.hbx_id%>" data-toggle="modal" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>">
+            <a
+              class="ml-4"
+              id="plan_contact_info-<%= hbx_enrollment.hbx_id%>"
+              data-toggle="modal"
+              data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>"
+              tabindex="0"
+              onkeydown="handleContactInfoKeyDown(event, 'plan_contact_info-<%= hbx_enrollment.hbx_id%>', '#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>')">
+
               <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <title><%= l10n("phone") %></title>
                 <path d="M5.772.44L6.848.094c1.01-.322 2.087.199 2.52 1.218l.859 2.027c.374.883.167 1.922-.514 2.568L7.819 7.706c.116 1.076.478 2.135 1.084 3.177a8.678 8.678 0 002.271 2.595l2.275-.759c.863-.287 1.802.043 2.33.82l1.233 1.81c.615.904.505 2.15-.259 2.916l-.817.822c-.814.817-1.977 1.113-3.052.777-2.539-.791-4.873-3.143-7.003-7.053-2.133-3.916-2.886-7.239-2.258-9.968C3.887 1.695 4.704.78 5.772.44z" fill="currentColor"/>
@@ -122,6 +129,15 @@
         </div>
       </div>
     </div>
+
+    <script>
+      function handleContactInfoKeyDown(event, id, modalId) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          document.getElementById(id).click();
+          document.getElementById(modalId).focus();
+        }
+      }
+    </script>
   <% else %>
     <div class="hbx-enrollment-refactored-panel plan-tile panel panel-default module <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %>">
       <div class="plan-header">
