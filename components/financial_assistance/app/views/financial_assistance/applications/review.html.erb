@@ -46,14 +46,7 @@
                       <% amount = number_to_currency(embedded_document.amount.to_s) %>
                       <%= embedded_document.is_a?(FinancialAssistance::Deduction) ? "(#{amount})" : amount %>
                     </td>
-                    <td class="d-flex justify-content-between">
-                      <%= start_to_end_dates(embedded_document) %>
-                      <span>
-                        <%= h(link_to(income_and_deductions_edit(@application, applicant, embedded_document), id: 'edit-income-and-deductions-pencil') do %>
-                          <%= l10n("edit") %>
-                        <% end) %>
-                      </span>
-                    </td>
+                    <td><%= start_to_end_dates(embedded_document) %></td>
                   </tr>
                 <% end %>
                 <% unless FinancialAssistanceRegistry[:net_annual_income_display].disabled? || applicant.net_annual_income.nil? %>
