@@ -159,7 +159,7 @@
           <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
 
           <% if !dependent.persisted? %>
-            <a href="#" class="btn btn-error remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled')" data-target="#new_employee_dependent_form">
+            <a href="#" class="btn btn-error outline remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled')" data-target="#new_employee_dependent_form">
             <%= l10n("cancel") %>
             </a>
           <% else %>
@@ -167,10 +167,10 @@
               <%= l10n("cancel") %>
             <% end %>
           <% end %>
-          <%= f.button(id: 'confirm-member', class: "btn btn-primary", onclick: "$('#btn-continue').removeClass('disabled');") do %>
+         
+          <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>
             <%= l10n("confirm_member") %>
           <% end %>
-
           <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')", id='confirm-dependent' class="btn btn-primary">
             <%= l10n("confirm_member") %>
           </span>
