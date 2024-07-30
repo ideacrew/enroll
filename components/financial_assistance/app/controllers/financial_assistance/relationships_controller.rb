@@ -4,7 +4,7 @@ module FinancialAssistance
   class RelationshipsController < FinancialAssistance::ApplicationController
     before_action :find_application
     before_action :set_cache_headers, only: [:index]
-    before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:index, :create] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     layout :resolve_layout
 
@@ -31,6 +31,7 @@ module FinancialAssistance
       @matrix = @application.build_relationship_matrix
       @missing_relationships = @application.find_missing_relationships(@matrix)
       @all_relationships = @application.find_all_relationships(@matrix)
+
       @relationship_kinds = ::FinancialAssistance::Relationship::RELATIONSHIPS_UI
       @people = nil
 
