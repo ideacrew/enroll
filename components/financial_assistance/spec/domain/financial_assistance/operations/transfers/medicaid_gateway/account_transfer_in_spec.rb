@@ -293,7 +293,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
     end
   end
-  
+
   context 'AI/AN status' do
     context "when PersonAmericanIndianOrAlaskaNativeIndicator does not exists for any applicant" do
       let(:document) do
