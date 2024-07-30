@@ -26,6 +26,7 @@
     <div class="mb-4">
       <% is_ivl_osse_filter_eligible = ivl_osse_filtering_enabled? && @enrollment.ivl_osse_eligible? %>
       <h3><%= l10n('insured.plan_shoppings.thankyou.applied_credits') %></h3>
+      <p><%= l10n('insured.plan_shoppings.thankyou.aptc_desc') %></p>
       <div class="aptc hidden">
         <dl class="parent">
           <dt><%= l10n('insured.plan_shoppings.thankyou.total_credit') %>:</dt>
@@ -34,7 +35,7 @@
           <% per_plan_max = @plan.total_premium > @max_aptc ? @max_aptc : (@plan.total_premium - 1).round(2) %>
           <dd><%= number_to_currency(per_plan_max) %></dd>
         </dl>
-        <p><%= l10n("insured.plan_shoppings.thankyou.aptc_instructions") %></p>
+        <p id="aptcDesc"><%= l10n("insured.plan_shoppings.thankyou.aptc_instructions") %></p>
         <%= hidden_field_tag :max_aptc, @max_aptc %>
         <%= hidden_field_tag :plan, @plan.id %>
         <%= hidden_field_tag :enrollment, @enrollment.id %>
