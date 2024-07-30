@@ -1,4 +1,3 @@
-<% binding.irb %>
 <% if @bs4 %>
   <%= form_for @applicant, url: application_applicant_path(@application, @applicant), method: :patch do |f|%>
     <%= hidden_field_tag :is_dependent, @applicant.is_dependent? %>
