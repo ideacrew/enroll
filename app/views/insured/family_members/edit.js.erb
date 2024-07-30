@@ -1,5 +1,5 @@
 
-if (!$(".my-household-page")) {
+if ($(".my-household-page").length == 0) {
   <% if @dependent.errors.present? || @address_errors.present?  %>
     var dependent_response = $("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
     if($("#dependent_ul").find("form#edit_dependent .alert-error").length){
@@ -19,19 +19,26 @@ if (!$(".my-household-page")) {
 
 } else {
   //manage family/ my household page
-  var id = "<%= @dependent.family_member.person.id %>";
+  if ($("#family_information").length == 0) {
+    var id = "<%= @dependent.family_member.person.id %>";
+  } else {
+    var id = "<%= @dependent.id %>";
+  }
+
   var personContainer = $("#person-"+id)
   if (personContainer) {
     personContainer.find('.append_consumer_info').html("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
     personContainer.removeClass('hidden');
-    $("a[id^=edit-member]").addClass('disabled');
-    $("a[id^=edit-member]").attr('disabled', true);
+    if ($("#family_information").length == 0) {
+      $("a[id^=edit-member]").addClass('disabled');
+      $("a[id^=edit-member]").attr('disabled', true);
+    }
   } else {
     $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
   }
   applyListeners();
-    demographicValidations();
-    isApplyingCoverage("dependent");
+  demographicValidations();
+  isApplyingCoverage("dependent");
 }
 if (!disableSelectric) {
   $("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select, .no-selectric').selectric();
