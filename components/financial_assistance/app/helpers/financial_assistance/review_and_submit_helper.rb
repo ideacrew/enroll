@@ -237,6 +237,7 @@ module FinancialAssistance
     def build_dependent_coverage_questions(applicant, hash)
       hash[:has_dependent_with_coverage] = human_boolean(applicant.has_dependent_with_coverage)
       hash[:dependent_job_end_on] = applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : l10n('faa.not_applicable_abbreviation')
+      hash
     end
 
     def build_chip_questions(applicant, hash)
