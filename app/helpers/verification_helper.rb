@@ -288,7 +288,7 @@ module VerificationHelper
   end
 
   def request_response_details(person, record, v_type)
-    return show_deceased_verification_response(person, record) if v_type == "Alive Status"
+    return show_deceased_verification_response(person, record) if v_type == VerificationType::ALIVE_STATUS
 
     local_residency = EnrollRegistry[:enroll_app].setting(:state_residency).item
     if record.event_request_record_id
