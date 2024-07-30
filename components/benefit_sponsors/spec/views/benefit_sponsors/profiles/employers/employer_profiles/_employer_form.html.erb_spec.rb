@@ -8,9 +8,9 @@ class ApplicationHelperModStubber
   extend ::BenefitSponsors::Employers::EmployerHelper
 end
 
-RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", :type => :view, dbclean: :after_each do
+RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer_form", :type => :view, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
-  include L10nHelper
+  include ::L10nHelper
 
   let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
   let!(:general_org) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
@@ -42,7 +42,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
     view.extend BenefitSponsors::Engine.routes.url_helpers
     view.extend BenefitSponsors::Employers::EmployerHelper
     view.extend BenefitSponsors::ApplicationHelper
-    view.extend BenefitSponsors::RegistrationHelper
+    view.extend ::L10nHelper
     view.extend BenefitSponsors::PermissionHelper
     assign(:agency, agency)
   end
@@ -71,7 +71,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
 
       sign_in(user_with_hbx_staff_role)
       mock_form = ActionView::Helpers::FormBuilder.new(:agency, agency, view, {})
-      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", locals: {f: mock_form }
+      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form", locals: {f: mock_form }
     end
 
     it "should view the subsidies form" do
@@ -101,7 +101,7 @@ RSpec.describe "/benefit_sponsors/profiles/employers/employer_profiles/_employer
       allow(view).to receive(:employer_current_year_osse_status).and_return("Active for #{TimeKeeper.date_of_record}")
       sign_in(hbx_csr_tier1_user)
       mock_form = ActionView::Helpers::FormBuilder.new(:agency, agency, view, {})
-      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form.html.erb", locals: {f: mock_form }
+      render template: "benefit_sponsors/profiles/employers/employer_profiles/_employer_form", locals: {f: mock_form }
     end
 
     it "should view the subsidies form" do

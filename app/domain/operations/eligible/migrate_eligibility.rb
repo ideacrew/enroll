@@ -7,7 +7,7 @@ module Operations
   module Eligible
     # Operation to support eligibility creation
     class MigrateEligibility
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to build eligibility
       # @option opts [<String>]   :eligibility_type required

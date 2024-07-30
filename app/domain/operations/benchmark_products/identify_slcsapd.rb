@@ -4,7 +4,7 @@ module Operations
   module BenchmarkProducts
     # This Operation is used to identify the second lowest cost standalone dental plan.
     class IdentifySlcsapd
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # find all dental products
       #   Pediatric-only dental plans are offered in ME

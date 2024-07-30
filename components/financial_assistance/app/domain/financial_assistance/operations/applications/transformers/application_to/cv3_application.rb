@@ -13,7 +13,7 @@ module FinancialAssistance
           class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
             include Acapi::Notifiers
 
             FAA_MITC_RELATIONSHIP_MAP = {
@@ -84,7 +84,7 @@ module FinancialAssistance
             end
 
             def paper_notification(application)
-              family = find_family(application.family_id)
+              family = family(application.family_id)
               consumer_role = family.primary_person&.consumer_role
 
               # default to paper if we are unable to find out contact method
@@ -99,7 +99,7 @@ module FinancialAssistance
             end
 
             def construct_payload(application, notice_options, oe_start_on, benchmark_premiums)
-              payload = {family_reference: {hbx_id: find_family(application.family_id)&.hbx_assigned_id.to_s},
+              payload = {family_reference: {hbx_id: family(application.family_id)&.hbx_assigned_id.to_s},
                          assistance_year: application.assistance_year,
                          aptc_effective_date: application.effective_date,
                          years_to_renew: application.renewal_base_year,
@@ -120,8 +120,8 @@ module FinancialAssistance
               Success(payload)
             end
 
-            def find_family(family_id)
-              ::Family.find(family_id)
+            def family(id)
+              @family ||= ::Family.only(:hbx_assigned_id, :'family_members.is_primary_applicant', :'family_members.is_active', :'family_members.person_id', :'family_members._id', :'family_members.created_at').find(id)
             end
 
             def encrypt(value)
@@ -130,28 +130,35 @@ module FinancialAssistance
             end
 
             def applicant_qnc_code(applicant)
-              return true if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+              return true if use_defaults_for_qnc_and_five_year_bar_data?
               return applicant.qualified_non_citizen if applicant.qualified_non_citizen.present?
 
               applicant.eligible_immigration_status ? true : false
             end
 
             def applicant_five_year_bar_met(applicant)
-              return false if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+              return false if use_defaults_for_qnc_and_five_year_bar_data?
 
               applicant.five_year_bar_met.present?
             end
 
             def applicant_five_year_bar_applies(applicant)
-              return false if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+              return false if use_defaults_for_qnc_and_five_year_bar_data?
 
               applicant.five_year_bar_applies.present?
+            end
+
+            def use_defaults_for_qnc_and_five_year_bar_data?
+              @use_defaults_for_qnc_and_five_year_bar_data ||= EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
             end
 
             # rubocop:disable Metrics/AbcSize
             # rubocop:disable Metrics/MethodLength
             def applicants(application, benchmark_premiums)
-              application.applicants.inject([]) do |result, applicant|
+              assistance_year = application.assistance_year
+              applicants = application.applicants
+
+              applicants.inject([]) do |result, applicant|
                 mitc_eligible_incomes = eligible_incomes_for_mitc(applicant)
                 prior_insurance_benefit = prior_insurance(applicant)
                 enrolled_benefits = enrolled_health_coverage?(applicant)
@@ -183,7 +190,7 @@ module FinancialAssistance
                            is_filing_as_head_of_household: applicant.is_filing_as_head_of_household.present?,
                            is_joint_tax_filing: applicant.is_joint_tax_filing.present?,
                            is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent.present?,
-                           claimed_as_tax_dependent_by: applicant_reference_by_applicant_id(application, applicant.claimed_as_tax_dependent_by),
+                           claimed_as_tax_dependent_by: applicant_reference_by_applicant_id(applicants, applicant.claimed_as_tax_dependent_by),
                            tax_filer_kind: applicant.tax_filer_kind,
                            student: student_information(applicant),
                            is_refugee: applicant.is_refugee.present?,
@@ -237,7 +244,7 @@ module FinancialAssistance
                            non_esi_evidence: evidence_info(applicant.non_esi_evidence),
                            local_mec_evidence: evidence_info(applicant.local_mec_evidence),
                            mitc_relationships: mitc_relationships(applicant),
-                           mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes),
+                           mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes, assistance_year),
                            mitc_state_resident: mitc_state_resident(applicant, application.us_state)}
                 result
               end
@@ -285,7 +292,7 @@ module FinancialAssistance
               end
             end
 
-            def applicant_is_required_to_file_taxes(applicant, eligible_incomes)
+            def applicant_is_required_to_file_taxes(applicant, eligible_incomes, assistance_year)
               return true if applicant.is_required_to_file_taxes
 
               total_earned_income = mitc_eligible_earned_incomes(eligible_incomes).inject(0) do |tot, inc|
@@ -296,15 +303,14 @@ module FinancialAssistance
                 tot + inc.calculate_annual_income
               end.to_f
 
-              assistance_year = applicant.application.assistance_year
               unearned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("unearned_income_filing_threshold_#{assistance_year}").item
               earned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("earned_income_filing_threshold_#{assistance_year}").item
               (total_earned_income > earned_threshold_income) || (total_unearned_income > unearned_threshold_income)
             end
 
-            def applicant_reference_by_applicant_id(application, applicant_id)
+            def applicant_reference_by_applicant_id(applicants, applicant_id)
               return nil unless applicant_id
-              appli = application&.applicants&.find(applicant_id)
+              appli = applicants&.find(applicant_id)
               return nil unless appli
               applicant_reference(appli)
             end
@@ -784,7 +790,7 @@ module FinancialAssistance
             end
 
             def applicant_benchmark_premium(application)
-              family = find_family(application.family_id) if application.family_id.present?
+              family = family(application.family_id) if application.family_id.present?
               return unless family.present?
               # family_member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
               applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)

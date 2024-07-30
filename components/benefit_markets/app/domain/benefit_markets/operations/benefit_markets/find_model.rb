@@ -8,7 +8,7 @@ module BenefitMarkets
     module BenefitMarkets
       # include Dry::Monads::Do.for(:call)
       class FindModel
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [ Symbol ] market_kind Benefit Market Catalog for the given Effective Date
         def call(params)

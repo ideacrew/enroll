@@ -10,7 +10,7 @@ module Operations
       class RequestPrimaryDetermination
         # primary request from fdsh gateway
 
-        include Dry::Monads[:result, :do, :try]
+        include Dry::Monads[:do, :result]
         include Acapi::Notifiers
 
         # @param [ Hash ] params Applicant Attributes

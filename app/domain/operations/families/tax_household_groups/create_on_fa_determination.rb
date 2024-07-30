@@ -8,7 +8,7 @@ module Operations
     module TaxHouseholdGroups
       # This operation is for creating TaxHouseholdGroup on FinancialAssistanceApplication determination.
       class CreateOnFaDetermination
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(application)
           _deactivated = yield deactivate_current_thhg(application)

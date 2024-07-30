@@ -228,7 +228,13 @@ module FinancialAssistance
             # assign_citizen_status
             params = applicant_params.except("lawful_presence_determination")
             merge_params = params.merge(citizen_status: applicant_params["lawful_presence_determination"]["citizen_status"])
-            ::Operations::People::CreateOrUpdateConsumerRole.new.call(params: { applicant_params: merge_params, family_member: family_member })
+            ::Operations::People::CreateOrUpdateConsumerRole.new.call(
+              params: {
+                applicant_params: merge_params,
+                family_member: family_member,
+                optimistic_upstream_coverage_attestation_interpretation: EnrollRegistry.feature_enabled?(:optimistic_upstream_coverage_attestation)
+              }
+            )
           rescue StandardError => e
             Failure("create_or_update_consumer_role: #{e}")
           end
@@ -338,7 +344,7 @@ module FinancialAssistance
                 is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
                 is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
                 same_with_primary: address_result.value!,
-                is_incarcerated: applicant_hash["is_incarcerated"],
+                is_incarcerated: family_member.person.is_incarcerated,
                 is_physically_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_blind: applicant_hash['attestation']['is_self_attested_blind'],

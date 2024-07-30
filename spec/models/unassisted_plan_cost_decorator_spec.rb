@@ -154,9 +154,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       premium_table.premium_tuples.where(age: 60).first.update_attributes(cost: 846.72)
       premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 879.8)
       @product.save!
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 59, area, 'NA').and_return(814.85)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 60, area, 'NA').and_return(846.72)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 61, area, 'NA').and_return(879.8)
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
     end
 
     context 'for valid arguments' do
@@ -206,7 +204,6 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
           before :each do
             @upcd_2 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10)
             age = @upcd_2.age_of(hbx_enrollment_member1)
-            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, age, area, 'NA').and_return(0.0)
           end
 
           it 'should return the aptc amount of the member from individual member aptc hash' do
@@ -454,9 +451,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       premium_table.premium_tuples.where(age: 60).first.update_attributes(cost: 846.72)
       premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 879.8)
       @product.save!
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 59, area, 'NA').and_return(814.85)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 60, area, 'NA').and_return(846.72)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 61, area, 'NA').and_return(879.8)
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       person.update_attributes!(dob: (hbx_enrollment.effective_on - 61.years))
       person2.update_attributes!(dob: (hbx_enrollment.effective_on - 59.years))
       @upcd_1 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment, 1700.00, tax_household10)

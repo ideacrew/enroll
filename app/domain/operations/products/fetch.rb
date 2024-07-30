@@ -5,7 +5,7 @@ module Operations
     # This class is to fetch product premiums for given family & effective date
     # This considers rating address for each person in the given family & gives lcsp details for all the family members at given address.
     class Fetch
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
 
       # @param [Date] effective_date
@@ -71,15 +71,16 @@ module Operations
         rating_silver_products.each_pair do |hbx_ids, payload|
           member_premiums[hbx_ids] = {}
 
-          health_products = payload[:products].where(kind: :health)
-          premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_products, family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
+          health_products = payload[:products].select { |product| product.kind == :health }
+          premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_products, family: family, effective_date: effective_date,
+                                                                                rating_area_exchange_provided_code: payload[:rating_area_exchange_provided_code] })
 
           return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
           member_premiums[hbx_ids][:health_only] = premiums.value!
 
           if benchmark_product_model == :health_and_dental && min_age < 19
 
-            premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
+            premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: payload[:products], family: family, effective_date: effective_date, rating_area_exchange_provided_code: payload[:rating_area_exchange_provided_code]})
 
             return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
             member_premiums[hbx_ids][:health_and_dental] = premiums.value!
@@ -88,7 +89,8 @@ module Operations
           next unless benchmark_product_model == :health_and_ped_dental && min_age < 19
           health_and_ped_dental_products = payload[:products] # TODO: - filter child only ped dental products.
 
-          premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_and_ped_dental_products, family: family, effective_date: effective_date, rating_area_id: payload[:rating_area_id]})
+          premiums = Operations::Products::FetchSilverProductPremiums.new.call({products: health_and_ped_dental_products, family: family, effective_date: effective_date,
+                                                                                rating_area_exchange_provided_code: payload[:rating_area_exchange_provided_code]})
 
           return Failure("unable to fetch health only premiums for - #{hbx_ids}") if premiums.failure?
           member_premiums[hbx_ids][:health_and_ped_dental] = premiums.value!

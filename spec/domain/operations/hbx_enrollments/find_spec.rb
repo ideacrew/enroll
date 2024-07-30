@@ -8,8 +8,8 @@ RSpec.describe ::Operations::HbxEnrollments::Find, dbclean: :after_each do
   let!(:enrollment)            { FactoryBot.create(:hbx_enrollment, family: family) }
 
   describe 'find enrollment' do
-    let(:valid_params) { {id: enrollment.id} }
-    let(:invalid_params) { {id: '123456789' } }
+    let(:valid_params) { { id: enrollment.id.to_s } }
+    let(:invalid_params) { { id: BSON::ObjectId.new.to_s } }
 
     it 'should return enrollment record' do
       result = subject.call(valid_params)

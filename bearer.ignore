@@ -1,0 +1,542 @@
+{
+  "0031c03eb3312ff576b54a6909fec8b1_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T16:06:43Z"
+  },
+  "0076dcab0f42b73497f253eb9358937c_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T18:47:12Z"
+  },
+  "0382d1023e671565e59bfb00804979ea_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but the params are already sanitized in the above steps of the operation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T21:19:15Z"
+  },
+  "0db60b36f40793ab5237b33d08d4a09e_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this instance. The user input username is being properly sanitized with Regexp.escape(username) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T16:10:42Z"
+  },
+  "0db60b36f40793ab5237b33d08d4a09e_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input new_email is being properly sanitized with Regexp.escape(new_email) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T16:15:53Z"
+  },
+  "0de61b8c1cf1dcb30b6ecf54d2fda404_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but there is no user input.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T21:17:48Z"
+  },
+  "142d42d7d4a8f9321b8a6f128381fd87_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagges as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T21:30:11Z"
+  },
+  "142d42d7d4a8f9321b8a6f128381fd87_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'HIGH: Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV with sensitive data.",
+    "false_positive": true,
+    "ignored_at": "2024-06-07T15:18:04Z"
+  },
+  "166ebdf3adb10dd891a22568ec5f1a1f_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized external input in SQL query [CWE-89]', is a false positive in this case. The query_criteria is constructed using event source publisher without any user input, which means there's no risk of SQL injection from user-provided data.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T16:55:50Z"
+  },
+  "1c54580237ce2d2a715bf478bf6a70bc_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'HIGH: Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the content that is inserted here comes from the db and not from the user input.",
+    "false_positive": true,
+    "ignored_at": "2024-06-06T18:21:03Z"
+  },
+  "2083fb52647c60ef7701bbeeea0b0036_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized external input in SQL query [CWE-89]', is a false positive in this case. The query_criteria is constructed using event source publisher without any user input, which means there's no risk of SQL injection from user-provided data.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T19:10:39Z"
+  },
+  "218f24cab2d393b88605c63b725bfadf_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:52:47Z"
+  },
+  "218f24cab2d393b88605c63b725bfadf_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:53:12Z"
+  },
+  "306528f9fa20c7611275ed35b93bc7ad_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The use of 'guest' here is not a security issue. It's just a placeholder value that's used in non production environment like development and test. In the production environment, the RABBITMQ_PASSWORD environment variable will be set to a secure value.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T21:18:40Z"
+  },
+  "3d13ffead5a5f7be41998f5cb20b8cec_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized user input in file path [CWE-73]' but the user input is validated in the line before this.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T21:31:45Z"
+  },
+  "409b7fe60c72b1e43accae962119b1aa_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:05:27Z"
+  },
+  "4233b86a2f420636847e4886938025cc_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but there is no user input.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T21:23:11Z"
+  },
+  "4641c2edaed0f2faa5094d6b8a1dde31_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized external input in SQL query [CWE-89]', is a false positive in this case. The query_criteria is constructed using event source publisher without any user input, which means there's no risk of SQL injection from user-provided data.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T19:14:48Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:07:31Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:08:11Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:10:11Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_3": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:10:33Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_4": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:10:58Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_5": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:11:21Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_6": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:11:36Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_7": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:11:48Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_8": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:12:28Z"
+  },
+  "46679c005bf7ef0da3d36710c0096d6b_9": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:12:43Z"
+  },
+  "49dbefdc6dea881bb56c8f34f933af27_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:first_name] is being properly sanitized with Regexp.escape(params[:first_name]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T16:24:40Z"
+  },
+  "49dbefdc6dea881bb56c8f34f933af27_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:last_name] is being properly sanitized with Regexp.escape(params[:last_name]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T16:27:16Z"
+  },
+  "540988895fddb81a9e0061cd7332dd2d_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but the params are validated as part of a contract.",
+    "false_positive": true,
+    "ignored_at": "2024-05-29T19:08:42Z"
+  },
+  "56bf1733fc31b3b3a17467150c5967e6_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' . The use of 'dummy' here is not a security issue. It's just a placeholder value that's used when the real API key is not available. In the production environment, the WF_API_KEY environment variable will be set to a secure value.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T20:15:54Z"
+  },
+  "56bf1733fc31b3b3a17467150c5967e6_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The use of 'dummy' here is not a security issue. It's just a placeholder value that's used when the real API secret is not available. In the production environment, the WF_API_SECRET environment variable will be set to a secure value.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T20:23:32Z"
+  },
+  "58a6b586c4ca58e1c9803fa06222dbcf_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T19:45:40Z"
+  },
+  "58a6b586c4ca58e1c9803fa06222dbcf_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "58a6b586c4ca58e1c9803fa06222dbcf_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T20:06:43Z"
+  },
+  "58a6b586c4ca58e1c9803fa06222dbcf_3": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T19:45:40Z"
+  },
+  "58a6b586c4ca58e1c9803fa06222dbcf_4": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "58a6b586c4ca58e1c9803fa06222dbcf_5": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T20:06:43Z"
+  },
+  "60c6fff36eb3f4046d394a4c4a708cad_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but there is no User input.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T21:14:51Z"
+  },
+  "70a004cf777a1f00f2c34ba46c1e901c_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The warning 'Unsanitized input in NoSQL query [CWE-943]' is incorrect for the selected line of code. This line is creating a new instance of the FileSaver object, which is used for client-side file saving. It does not involve any NoSQL database operations, hence there's no possibility of a NoSQL injection vulnerability here.",
+    "false_positive": true,
+    "ignored_at": "2024-05-30T21:32:28Z"
+  },
+  "800a8691b4ab0422b23577f97f0d2a71_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This line is flagged as 'HIGH: Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but 'nodeName' is always one of the hardcoded strings 'row', 'c', 'v', 'is', 't', 'cols', 'col' and is not derived from user input.",
+    "false_positive": true,
+    "ignored_at": "2024-06-03T14:35:17Z"
+  },
+  "8dbb50137357262ff78f73c4560fc1c3_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T18:51:53Z"
+  },
+  "8dbb50137357262ff78f73c4560fc1c3_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "8dbb50137357262ff78f73c4560fc1c3_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T20:06:43Z"
+  },
+  "90044d583bc2c48f13dbe6af50dd996c_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:17:10Z"
+  },
+  "92fc8d572095844c1ec652cc66152003_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is data migration was supposed to be used for local development. All the data is dummy.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T16:52:04Z"
+  },
+  "9505e8551279157465c02d6131dc766a_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T18:54:42Z"
+  },
+  "9505e8551279157465c02d6131dc766a_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "9505e8551279157465c02d6131dc766a_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T20:06:43Z"
+  },
+  "a261fe84031c542c9d50b0d4fe1a9c0f_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:54:15Z"
+  },
+  "a261fe84031c542c9d50b0d4fe1a9c0f_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:54:32Z"
+  },
+  "a290b6d470201639b690a23c73c56181_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T19:45:40Z"
+  },
+  "a290b6d470201639b690a23c73c56181_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "a290b6d470201639b690a23c73c56181_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T20:06:43Z"
+  },
+  "a290b6d470201639b690a23c73c56181_3": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T21:01:12Z"
+  },
+  "a290b6d470201639b690a23c73c56181_4": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T21:11:12Z"
+  },
+  "a290b6d470201639b690a23c73c56181_5": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagges as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T21:30:11Z"
+  },
+  "a5ee3fb474f80f68f62bea8235642f55_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:06:19Z"
+  },
+  "a5ee3fb474f80f68f62bea8235642f55_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but this is not a SQL query.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T15:16:59Z"
+  },
+  "a7c2a674a2dacc984d1be4306d3458df_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T19:45:40Z"
+  },
+  "ab3d61d87e5909f285cd133b0586c9fa_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T18:52:09Z"
+  },
+  "ab3d61d87e5909f285cd133b0586c9fa_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "ab3d61d87e5909f285cd133b0586c9fa_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T20:06:43Z"
+  },
+  "b513de77a9efc0c21c839a00b5477815_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:47:28Z"
+  },
+  "b513de77a9efc0c21c839a00b5477815_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:50:18Z"
+  },
+  "be9f96c477dc9e6c89cb2f6ec726e3ee_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T18:48:23Z"
+  },
+  "be9f96c477dc9e6c89cb2f6ec726e3ee_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "be9f96c477dc9e6c89cb2f6ec726e3ee_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "The flagged issue, 'Unsanitized user input in regular expression [CWE-1287]', is a false positive in this case. The user input params[:q] is being properly sanitized with Regexp.escape(params[:q]) before it's used in a regular expression. This method escapes any special characters in the user input, preventing them from being interpreted as part of the regular expression and mitigating the risk of Regular Expression Denial of Service (ReDoS) attacks.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T20:06:43Z"
+  },
+  "be9f96c477dc9e6c89cb2f6ec726e3ee_3": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T21:01:12Z"
+  },
+  "c80ef62f6dc7e0a10c6cf21e205be731_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is a dummy value. The actual secret is picked from the environment variable 'ENROLL_JWT_SECRET' in the Docker environment. Refer to .docker/config/devise.rb for more details.",
+    "false_positive": true,
+    "ignored_at": "2024-05-31T18:17:58Z"
+  },
+  "d5f5bf4a6b1ec5af16b2f7cbe2056219_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:53:38Z"
+  },
+  "d5f5bf4a6b1ec5af16b2f7cbe2056219_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:53:58Z"
+  },
+  "d9803bec3afbf49ba0033f0d06acda80_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T19:45:40Z"
+  },
+  "d9803bec3afbf49ba0033f0d06acda80_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "dc369468d8a5d5bb522d023ae7485376_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but the value exists in development environment configuration file. This is a dummy value and only used in local development.",
+    "false_positive": true,
+    "ignored_at": "2024-05-21T19:12:52Z"
+  },
+  "dc369468d8a5d5bb522d023ae7485376_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]'. The value 'dchbx 2017' is a dummy value used for local development and testing, and does not represent a real API secret.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T20:37:12Z"
+  },
+  "df352fc34e516725803b4c4d0fcf954e_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T19:45:40Z"
+  },
+  "df352fc34e516725803b4c4d0fcf954e_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but the code is expected to generate CSV files with the given data with sensitive information.",
+    "false_positive": true,
+    "ignored_at": "2024-05-24T20:45:40Z"
+  },
+  "e20e516739cd3c5ce52de20620547521_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:51:15Z"
+  },
+  "e20e516739cd3c5ce52de20620547521_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this is a translation.",
+    "false_positive": true,
+    "ignored_at": "2024-05-20T19:51:49Z"
+  },
+  "e3a7e8a460c17513a7652ddf24bbd785_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the variable 'cost' is not user input it is a value from the reponse of the endpoint 'calculate_employer_contributions'.",
+    "false_positive": true,
+    "ignored_at": "2024-05-29T20:04:36Z"
+  },
+  "e3a7e8a460c17513a7652ddf24bbd785_1": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the variable 'cost' is not user input. It is a value from the reponse of the endpoint 'calculate_employer_contributions'.",
+    "false_positive": true,
+    "ignored_at": "2024-05-30T13:06:01Z"
+  },
+  "e3a7e8a460c17513a7652ddf24bbd785_2": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the variable 'estimate' is not user input. It is a value from the reponse of the endpoint 'calculate_employer_contributions'.",
+    "false_positive": true,
+    "ignored_at": "2024-05-30T13:12:25Z"
+  },
+  "e67e1a4c9599cd4747352f4bcad5f279_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'HIGH: Unsanitized user input in dynamic HTML insertion (XSS) [CWE-79]' but the content that is inserted here comes from the db and not from the user input.",
+    "false_positive": true,
+    "ignored_at": "2024-06-06T15:28:31Z"
+  },
+  "f0427f0b6b43e55b90e2e2ee5c122768_0": {
+    "author": "Sai Kumar Kotagiri",
+    "comment": "This is flagged as 'Unsanitized external input in SQL query [CWE-89]' but there is no user input.",
+    "false_positive": true,
+    "ignored_at": "2024-05-23T21:24:40Z"
+  },
+  "e3e26ab97eae216d706ff5df2d9b4d56_0": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but this is a script that will only be used internally and is supposed to write this data to a csv",
+    "false_positive": true,
+    "ignored_at": "2024-07-09T18:03:30Z"
+  },
+  "e3e26ab97eae216d706ff5df2d9b4d56_1": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but this is a script that will only be used internally and is supposed to write this data to a csv",
+    "false_positive": true,
+    "ignored_at": "2024-07-09T18:03:30Z"
+  },
+  "e3e26ab97eae216d706ff5df2d9b4d56_2": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but this is a script that will only be used internally and is supposed to write this data to a csv",
+    "false_positive": true,
+    "ignored_at": "2024-07-09T18:03:30Z"
+  },
+  "e3e26ab97eae216d706ff5df2d9b4d56_3": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but this is a script that will only be used internally and is supposed to write this data to a csv",
+    "false_positive": true,
+    "ignored_at": "2024-07-09T18:03:30Z"
+  }
+}

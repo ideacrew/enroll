@@ -6,9 +6,9 @@ module BenefitMarkets
         @rules ||= []
       end
 
-      def self.rule(*args)
+      def self.rule(name, **args)
         rules
-        add_rule(PolicyRule.new(*args))
+        add_rule(PolicyRule.new(name, **args))
       end
 
       def self.add_rule(rule)

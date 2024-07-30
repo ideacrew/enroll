@@ -11,11 +11,7 @@ module Operations
         class BuildCv3FamilyPayloadForDmf
           include Dry::Monads[:result, :do]
           include ::Operations::Transmittable::TransmittableUtils
-
-          VALID_ELIGIBLITY_STATES = [
-            'health_product_enrollment_status',
-            'dental_product_enrollment_status'
-          ].freeze
+          include DmfUtils
 
           # @return [ Cv3Family ] Job successfully completed
           def call(family, transmittable_params)
@@ -54,7 +50,7 @@ module Operations
               family_member = @family.family_members.detect { |fm| fm.hbx_id == aca_member.hbx_id }
 
               # check if member does not have an enrollment
-              unless member_has_dmf_determination_eligible_enrollment?(family_member)
+              unless member_dmf_determination_eligible_enrollments(family_member, @family)
                 vh_message = "Family Member with hbx_id #{aca_member.hbx_id} does not have a valid enrollment"
                 update_verification_type_histories(vh_message, [family_member])
                 next vh_message
@@ -77,20 +73,6 @@ module Operations
             message = "DMF Determination not sent: no family members are eligible"
             # 'false' as third param prevent updating verification histories -> have already been updated
             handle_dmf_failure(message, :build_cv3_family, update_histories: false)
-          end
-
-          def member_has_dmf_determination_eligible_enrollment?(family_member)
-            # first check if eligibility_determination has family member as a subject
-            subjects = @family.eligibility_determination.subjects
-            subject = subjects.detect { |sub| sub.hbx_id == family_member.hbx_id }
-            return false unless subject.present?
-
-            # then check if subject has any of the valid eligibility states
-            states = subject&.eligibility_states&.select { |state| VALID_ELIGIBLITY_STATES.include?(state.eligibility_item_key) }
-            return false unless states.present?
-
-            # last check if valid eligibility states have is_eligible as true
-            states.any?(&:is_eligible?)
           end
 
           def confirm_transmittable_payload(valid_cv3_family)

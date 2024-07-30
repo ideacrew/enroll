@@ -8,7 +8,7 @@ module FinancialAssistance
     module Applications
       # This operation can be used to handle needed retries of evidences
       class RetryEvidences
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [Hash] opts The options to retry evidences
         # @option opts [Array] :applicants
@@ -34,7 +34,7 @@ module FinancialAssistance
 
         def update_evidences(params)
           params[:applicants].each do |applicant|
-            evidence = applicant.send("#{params[:evidence_type]}_evidence")
+            evidence = applicant.fetch_evidence("#{params[:evidence_type]}_evidence")
             next unless evidence
             request = evidence.request_determination("retry", params[:update_reason], params[:modified_by])
             next if request

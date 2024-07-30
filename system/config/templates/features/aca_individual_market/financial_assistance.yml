@@ -174,6 +174,8 @@ registry:
       is_enabled: <%= ENV['LOAD_COUNTY_ON_INBOUND_TRANSFER_IS_ENABLED'] || false %>
     - key: :automatic_submission
       is_enabled: <%= ENV['AUTOMATIC_SUBMISSION_IS_ENABLED'] || false %>
+    - key: :optimistic_upstream_coverage_attestation
+      is_enabled: <%= ENV['OPTIMISTIC_UPSTREAM_COVERAGE_ATTESTATION_IS_ENABLED'] || false %>
   - namespace:
     - :documents
     features:
@@ -381,6 +383,10 @@ registry:
         - key: :earned_income_filing_threshold_2024
           item: 12_950
         - key: :unearned_income_filing_threshold_2024
+          item: 1_150
+        - key: :earned_income_filing_threshold_2025
+          item: 12_950
+        - key: :unearned_income_filing_threshold_2025
           item: 1_150
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

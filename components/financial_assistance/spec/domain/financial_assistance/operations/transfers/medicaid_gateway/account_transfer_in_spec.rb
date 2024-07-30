@@ -5,7 +5,7 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 require 'aca_entities/atp/transformers/cv/family'
 
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let(:xml_file_path) { ::FinancialAssistance::Engine.root.join('spec', 'shared_examples', 'medicaid_gateway', 'Simple_Test_Case_E_New.xml') }
   let(:xml) do
@@ -226,6 +226,70 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           attributes = attestation_vals.keys.map { |name| [name, application.attributes[name]] }.to_h
           expect(attributes).to eq attestation_vals
         end
+      end
+    end
+  end
+
+  context 'Incarceration status' do
+    context "when incarceration indicator does not exists for any applicant" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//hix-ee:InsuranceApplicantIncarceration', 'hix-ee' => "http://hix.cms.gov/0.1/hix-ee").each(&:remove)
+        document
+      end
+
+      it "should default the person/applicant incarceration status to false" do
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.is_incarcerated).to eq false
+        expect(Person.all.first.is_incarcerated).to eq false
+      end
+    end
+
+    context "when incarceration indicator is set to true for all applicants" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:IncarcerationIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core").each do |node|
+          node.content = 'true'
+        end
+        document
+      end
+
+      it "should default the person/applicant incarceration status to false" do
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.is_incarcerated).to eq true
+        expect(Person.all.first.is_incarcerated).to eq true
+      end
+    end
+
+    context "when person records exits and the payload has incarceration set to nil in the payload" do
+      let!(:person) do
+        FactoryBot.create(:person, first_name: "Junior", last_name: "Banfield",
+                                   dob: Date.new(2014,1,1), is_incarcerated: true)
+      end
+
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:IncarcerationIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core")[1].remove
+        document
+      end
+
+      it "should default the incarceration status to existing person value" do
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        family_member = @transformed["family"]["family_members"].detect do |member|
+          member if member["person"]["person_name"]["first_name"] == person.first_name
+        end
+        matching_person = Person.all.where(first_name: "Junior").first
+        expect(matching_person).to be_present
+        expect(matching_person.is_incarcerated).to eq true
+        expect(family_member["person"]["person_demographics"]["is_incarcerated"]).not_to eq matching_person.is_incarcerated
       end
     end
   end

@@ -197,8 +197,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           sponsor_contribution_prohibited: contribution_prohibited
         })
       ::BenefitSponsors::Members::MemberGroup.new(
-        member_entries,
-        {group_enrollment: group_enrollment}
+        member_entries, group_enrollment: group_enrollment
       )
     end
   end

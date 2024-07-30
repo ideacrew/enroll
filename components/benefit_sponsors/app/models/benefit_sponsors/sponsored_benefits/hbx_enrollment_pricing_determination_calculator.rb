@@ -164,8 +164,7 @@ module BenefitSponsors
               rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code
             })
           ::BenefitSponsors::Members::MemberGroup.new(
-            member_entries,
-            {group_enrollment: group_enrollment}
+            member_entries, group_enrollment: group_enrollment
           )
         end
       end

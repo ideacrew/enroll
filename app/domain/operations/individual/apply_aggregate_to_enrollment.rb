@@ -7,7 +7,7 @@ module Operations
   module Individual
     # Create new enrollment to apply available aggregate enrollment for an existing enrollment.
     class ApplyAggregateToEnrollment
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include FloatHelper
       include Config::AcaHelper
 

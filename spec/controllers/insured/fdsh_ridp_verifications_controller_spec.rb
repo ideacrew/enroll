@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 describe Insured::FdshRidpVerificationsController do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   describe 'find response' do
     let(:person) { FactoryBot.create(:person, :with_family) }

@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::PublishFaaTotalIneligibilityNotice, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
   include_context 'cms ME simple_scenarios test_case_d'
 
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
