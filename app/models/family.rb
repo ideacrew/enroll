@@ -1462,8 +1462,7 @@ class Family
 
   def benchmark_product_id
     bcp = HbxProfile.bcp_by_oe_dates || HbxProfile.bcp_by_effective_period
-    # bcp.slcsp_id
-    BSON::ObjectId('53e693d7eb899ad9ca01e734')
+    bcp.slcsp_id
   end
 
   def application_applicable_year

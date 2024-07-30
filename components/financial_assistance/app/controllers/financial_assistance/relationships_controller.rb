@@ -31,7 +31,6 @@ module FinancialAssistance
       @matrix = @application.build_relationship_matrix
       @missing_relationships = @application.find_missing_relationships(@matrix)
       @all_relationships = @application.find_all_relationships(@matrix)
-
       @relationship_kinds = ::FinancialAssistance::Relationship::RELATIONSHIPS_UI
       @people = nil
 
