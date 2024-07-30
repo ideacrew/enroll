@@ -6,9 +6,11 @@ require 'dry/monads/do'
 module Operations
   module QualifyingLifeEventKind
     class Persist
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
-      def call(params:)
+      def call(input_params)
+        params = input_params[:params]
+
         values            = yield validate(params)
         entity            = yield initialize_entity(values)
         qle               = yield persist_data(entity, params)

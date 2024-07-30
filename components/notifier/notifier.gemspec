@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency 'rails', '~> 6.1.7.6'
+  s.add_dependency 'rails', '~> 6.1.7.8'
   s.add_dependency "slim", "3.0.9"
   s.add_dependency 'mongoid', '~> 7.5.4'
   s.add_dependency "virtus", "~> 1.0.5"
@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency "combine_pdf"
   s.add_dependency "ckeditor", '4.2.4'
   s.add_dependency "non-stupid-digest-assets"
-  s.add_dependency "roo", "~> 2.7.0"
+  s.add_dependency "roo", '~> 2.10'
   s.add_dependency 'aasm', '~> 4.8'
   s.add_dependency 'config', '~> 2.0'
   s.add_dependency 'money-rails', '~> 1.13'

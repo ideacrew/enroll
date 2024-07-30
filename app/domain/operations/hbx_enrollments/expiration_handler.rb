@@ -5,7 +5,7 @@ module Operations
     # Publish events to expire IVL enrollment coverages
     class ExpirationHandler
       include EventSource::Command
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       attr_reader :job, :logger
 

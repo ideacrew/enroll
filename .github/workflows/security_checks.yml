@@ -1,0 +1,55 @@
+name: Security Checks
+on:
+  push:
+  schedule:
+    - cron: '30 5 * * *'
+
+jobs:
+  bundler-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: install bundler-audit
+        run: |
+          gem install bundler-audit && bundler-audit update
+      - name: run bundler-audit
+        run: |
+          bundler-audit --output=bundler_audit.txt
+      - name: upload bundler-audit failure report
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Security Reports
+          path: bundler_audit.txt
+  bearer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: install bearer
+        run: |
+          sudo apt-get install apt-transport-https
+          echo "deb [trusted=yes] https://apt.fury.io/bearer/ /" | sudo tee -a /etc/apt/sources.list.d/fury.list
+          sudo apt-get update
+          sudo apt-get install bearer
+      - name: run bearer
+        run: |
+          BEARER_DIFF_BASE_BRANCH=trunk bearer scan --quiet --config-file ./bearer.yml --diff . 
+      - name: build bearer report
+        if: failure() 
+        run: |
+          BEARER_DIFF_BASE_BRANCH=trunk bearer scan --quiet --config-file ./bearer.yml --diff .  > bearer_full.txt
+      - name: upload bearer failure report
+        uses: actions/upload-artifact@v4
+        if: failure() 
+        with:
+          name: bearer-pr-report
+          path: bearer_full.txt
+      - name: Write to Job Summary
+        if: failure() 
+        run: grep -A 10 '=====================================' bearer_full.txt >> $GITHUB_STEP_SUMMARY
+      

@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency 'rails', '~> 6.1.7.6'
+  s.add_dependency 'rails', '~> 6.1.7.8'
   s.add_dependency 'mongoid', '~> 7.5.4'
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
   s.add_dependency 'browser',                   '2.7.0'
@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'language_list',             '~> 1'
   s.add_dependency 'money-rails',               '~> 1.13'
   s.add_dependency 'pundit',                    '~> 2.0'
-  s.add_dependency 'roo',                       '~> 2.7.0'
+  s.add_dependency 'roo',                       '~> 2.10'
   s.add_dependency 'virtus',                    '~> 1.0'
   s.add_dependency "slim",                      "~> 3.0"
   s.add_dependency 'symmetric-encryption',      '3.9.1'
@@ -60,6 +60,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   s.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
-  s.add_development_dependency 'test-prof',                 '~> 0.5.0'
+  s.add_development_dependency 'test-prof',                 '~> 1.3'
   s.add_development_dependency 'climate_control',           '~> 0.2.0'
 end

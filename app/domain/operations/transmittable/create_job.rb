@@ -4,7 +4,7 @@ module Operations
   module Transmittable
     # create job operation that takes params of key (required), started_at(required), publish_on(required)
     class CreateJob
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate_params(params)

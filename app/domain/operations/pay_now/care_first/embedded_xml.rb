@@ -9,7 +9,7 @@ module Operations
     module CareFirst
       # Generate Pay Now custom embedded XML payload for CareFirst carrier
       class EmbeddedXml
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(enrollment)
           cv3_enrollment = yield transform_enrollment(enrollment)
@@ -24,7 +24,7 @@ module Operations
 
         def transform_enrollment(enrollment)
           cv3_enrollment = Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment)
-          cv3_enrollment.success? ? cv3_enrollment : Failure("unable to transform hbx enrollment #{hbx_enrollment.hbx_id} due to #{cv3_enrollment.failure}")
+          cv3_enrollment.success? ? cv3_enrollment : Failure("unable to transform hbx enrollment #{enrollment.hbx_id} due to #{cv3_enrollment.failure}")
         end
 
         def transform_member_array(enrollment)

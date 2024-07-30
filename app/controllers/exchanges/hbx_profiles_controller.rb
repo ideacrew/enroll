@@ -6,6 +6,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::SepAll
   include ::Config::AcaHelper
   include HtmlScrubberUtil
+  include StringScrubberUtil
 
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -972,7 +973,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def new_ba_params
-    params.merge!({ admin_datatable_action: true }).permit(:benefit_sponsorship_id, :admin_datatable_action)
+    { benefit_sponsorship_id: sanitize_to_hex(params[:benefit_sponsorship_id]), admin_datatable_action: true }
   end
 
   def create_ba_params
@@ -1053,7 +1054,9 @@ class Exchanges::HbxProfilesController < ApplicationController
       result.deliver_now
       puts result.to_s if Rails.env.development?
     else
-      Rails.logger.warn("No email found for #{full_name} with hbx_id #{hbx_id}")
+      Rails.logger.warn(
+        "No email found for person with hbx_id #{hbx_id}, person_id: #{params[:consumer_person_id] || params[:person]}"
+      )
     end
   end
 

@@ -9,7 +9,7 @@ module Operations
     # Operations are the classes that include EventSource::Command and Dry::Monads[:result, :do].
     module TransmittableUtils
       include EventSource::Command
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts The options to add errors
       # @option opts [Symbol, String, Hash]

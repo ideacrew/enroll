@@ -128,8 +128,7 @@ module BenefitSponsors
               eligible_child_care_subsidy: (eligible_childcare_subsidy || 0.0)
             })
           ::BenefitSponsors::Members::MemberGroup.new(
-            member_entries,
-            {group_enrollment: group_enrollment}
+            member_entries, group_enrollment: group_enrollment
           )
         end
       end

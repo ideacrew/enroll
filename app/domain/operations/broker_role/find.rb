@@ -7,7 +7,7 @@ module Operations
   module BrokerRole
     # Operation to find broker role.
     class Find
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(obj_id)
         broker_role_id = yield validate(obj_id)

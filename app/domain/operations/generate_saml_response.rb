@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   # Call SamlGenerator to generate a SAML response
   class GenerateSamlResponse
-    include Dry::Monads[:result, :do]
+    include Dry::Monads[:do, :result]
 
     def call(params)
       values               = yield validate(params)

@@ -73,7 +73,7 @@ module BradysAfterAll
       mike.save
 
       family = FactoryBot.build(:family)
-      family.add_family_member(mike, is_primary_applicant: true)
+      family.add_family_member(mike, { is_primary_applicant: true })
       (bradys - [mike]).each do |brady|
         family.add_family_member(brady)
       end
@@ -90,7 +90,7 @@ module BradysAfterAll
       carol.save
 
       family = FactoryBot.build(:family)
-      family.add_family_member(carol, is_primary_applicant: true)
+      family.add_family_member(carol, { is_primary_applicant: true })
       (bradys - [carol]).each do |brady|
         family.add_family_member(brady)
       end

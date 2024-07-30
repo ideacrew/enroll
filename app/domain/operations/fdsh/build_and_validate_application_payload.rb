@@ -7,7 +7,7 @@ module Operations
   module Fdsh
     # This class is responsible for validating an application object and constructing a payload entity for FDSH service.
     class BuildAndValidateApplicationPayload
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(application)
         cv3_application = yield construct_cv3_application(application)

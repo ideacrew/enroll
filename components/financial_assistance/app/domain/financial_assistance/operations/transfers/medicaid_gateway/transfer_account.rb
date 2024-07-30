@@ -9,7 +9,7 @@ module FinancialAssistance
       module MedicaidGateway
         # Publish class will build event and publish the payload
         class TransferAccount
-          send(:include, Dry::Monads[:result, :do, :try])
+          include Dry::Monads[:do, :result]
           include EventSource::Command
 
           def call(payload)

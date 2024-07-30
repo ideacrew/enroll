@@ -7,7 +7,7 @@ module Operations
   module Eligible
     # Operation to support eligibility creation
     class BuildEligibility
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
       include ::Operations::Eligible::EligibilityImport[
                 configuration: "eligibility_defaults"
               ]
@@ -60,7 +60,7 @@ module Operations
         options[:configuration] = values[:evidence_configuration] if values[
           :evidence_configuration
         ]
-        BuildEvidence.new(options).call(
+        ::Operations::Eligible::BuildEvidence.new(**options).call(
           values.merge(evidence_record: evidence_record)
         )
       end

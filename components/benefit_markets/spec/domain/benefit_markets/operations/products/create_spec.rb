@@ -57,8 +57,8 @@ RSpec.describe BenefitMarkets::Operations::Products::Create, dbclean: :after_eac
   context 'sending required parameters' do
 
     it 'should create Product' do
-      expect(subject.call(params).success?).to be_truthy
-      expect(subject.call(params).success).to be_a BenefitMarkets::Entities::Product
+      expect(subject.call(**params).success?).to be_truthy
+      expect(subject.call(**params).success).to be_a BenefitMarkets::Entities::Product
     end
   end
 end

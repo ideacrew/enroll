@@ -4,15 +4,15 @@ module Operations
   module Products
     # This class is to fetch silver product premiums for given products, family, effective date, rating area id.
     class FetchSlcspPremiumForTaxHouseholdMember
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Date] effective_date
-      # @param [RatingArea] rating_area_id
+      # @param [RatingArea] rating_area_exchange_provided_code
       # @param [TaxHouseholdMember] tax_household_member
       # @param [Product] products
       def call(params)
         values            = yield validate(params)
-        product_premiums  = yield fetch_product_premiums(values[:products], values[:tax_household_member], values[:effective_date], values[:rating_area_id].to_s)
+        product_premiums  = yield fetch_product_premiums(values[:products], values[:tax_household_member], values[:effective_date], values[:rating_area_exchange_provided_code].to_s)
 
         Success(product_premiums)
       end
@@ -23,12 +23,12 @@ module Operations
         return Failure('Missing Products') if params[:products].blank?
         return Failure('Missing TaxHouseholdMember') if params[:tax_household_member].blank?
         return Failure('Missing Effective Date') if params[:effective_date].blank?
-        return Failure('Missing rating area id') if params[:rating_area_id].blank?
+        return Failure('Missing rating area exchange code') if params[:rating_area_exchange_provided_code].blank?
 
         Success(params)
       end
 
-      def fetch_product_premiums(products, tax_household_member, effective_date, rating_area_id)
+      def fetch_product_premiums(products, tax_household_member, effective_date, rating_area_exchange_provided_code)
         family_member = tax_household_member.family_member
 
         product_hash = Operations::Products::FetchSilverProductPremiums.new.call(
@@ -37,7 +37,7 @@ module Operations
             family: tax_household_member.family,
             family_member_id: family_member.id,
             effective_date: effective_date,
-            rating_area_id: rating_area_id
+            rating_area_exchange_provided_code: rating_area_exchange_provided_code
           }
         )
 
@@ -45,7 +45,7 @@ module Operations
           values = product_hash.success[family_member.hbx_id]
           Success(values[1] || values[0])
         else
-          Failure("Unable to determine SLCSP premium for tax_household_member: #{tax_household_member.id} for effective_date: #{effective_date} and rating_area: #{rating_area_id}")
+          Failure("Unable to determine SLCSP premium for tax_household_member: #{tax_household_member.id} for effective_date: #{effective_date} and rating_area: #{rating_area_exchange_provided_code}")
         end
       end
     end

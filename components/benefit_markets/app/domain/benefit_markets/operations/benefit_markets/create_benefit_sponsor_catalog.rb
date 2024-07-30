@@ -8,19 +8,24 @@ module BenefitMarkets
     module BenefitMarkets
       # Creates benefit sponsor catalog entity
       class CreateBenefitSponsorCatalog
-        # send(:include, Dry::Monads::Do.for(:call))
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         attr_reader :enrollment_eligibility
 
-        # @param [ Date ] effective_date Effective date of the benefit application
-        # @param [ Array<BenefitMarkets::Entities::ServiceArea> ] service_areas Service Areas based on Benefit Sponsor primary office location
-        # @param [ Symbol ] market_kind Benefit Marketplace Type
-        # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog
-        def call(enrollment_eligibility:)
-          benefit_market_catalog = yield find_benefit_market_catalog(enrollment_eligibility)
-          sponsor_catalog_params = yield get_enrollment_policies(benefit_market_catalog, enrollment_eligibility)
-          product_packages       = yield build_product_packages(benefit_market_catalog, sponsor_catalog_params[:effective_period], enrollment_eligibility)
+        # Executes the creation process for a Benefit Sponsor Catalog.
+        # This method takes a hash of parameters, performs a series of operations
+        # to find the benefit market catalog, get enrollment policies, build product packages, and create the benefit sponsor catalog.
+        #
+        # @param params [Hash] A hash containing :enrollment_eligibility.
+        #   - :enrollment_eligibility [EnrollmentEligibility] The enrollment eligibility criteria.
+        #
+        # @return [Dry::Monads::Result] A Success or Failure monad.
+        #   - Success: Contains the created Benefit Sponsor Catalog.
+        #   - Failure: Contains an error message.
+        def call(params)
+          benefit_market_catalog = yield find_benefit_market_catalog(params[:enrollment_eligibility])
+          sponsor_catalog_params = yield get_enrollment_policies(benefit_market_catalog)
+          product_packages       = yield build_product_packages(benefit_market_catalog, sponsor_catalog_params[:effective_period])
           sponsor_catalog        = yield create(sponsor_catalog_params, product_packages)
 
           Success(sponsor_catalog)
@@ -28,7 +33,7 @@ module BenefitMarkets
 
         private
 
-        def get_enrollment_policies(benefit_market_catalog, enrollment_eligibility)
+        def get_enrollment_policies(benefit_market_catalog)
           benefit_market_catalog = benefit_market_catalog.value!
           effective_date = enrollment_eligibility.effective_date
           policies = {
@@ -50,10 +55,10 @@ module BenefitMarkets
           end
         end
 
-        def build_product_packages(benefit_market_catalog, application_period, enrollment_eligibility)
+        def build_product_packages(benefit_market_catalog, application_period)
           benefit_market_catalog = benefit_market_catalog.value!
           product_packages = eligible_product_packages(benefit_market_catalog).collect do |product_package|
-            product_package_entity_for(product_package, application_period, enrollment_eligibility)
+            product_package_entity_for(product_package, application_period)
           end
 
           if product_packages.none?(&:failure?)
@@ -63,14 +68,14 @@ module BenefitMarkets
           end
         end
 
-        def product_package_entity_for(product_package, application_period, enrollment_eligibility)
+        def product_package_entity_for(product_package, application_period)
           package_kind               = product_package[:package_kind]
           product_package_params     = product_package.serializable_hash.deep_symbolize_keys.except(:products)
           contribution_models_params = product_package_params.delete(:contribution_models) || []
           contribution_model_params  = product_package_params.delete(:contribution_model)
           pricing_units_params       = product_package_params[:pricing_model].delete(:pricing_units)
           product_package_params[:application_period]            = application_period
-          product_package_params[:products]                      = filter_products_by_service_areas(product_package, enrollment_eligibility).value!
+          product_package_params[:products]                      = filter_products_by_service_areas(product_package).value!
           # Skipping because we are not creating contribution models for dental as they don't have relaxed rules.
           product_package_params[:contribution_models]           = contribution_models_for(contribution_models_params) if product_package[:product_kind] == :health
           product_package_params[:contribution_model]            = build_contribution_model_entity(contribution_model_params)
@@ -103,7 +108,7 @@ module BenefitMarkets
           Success(market_catalog)
         end
 
-        def filter_products_by_service_areas(product_package, enrollment_eligibility)
+        def filter_products_by_service_areas(product_package)
           ::BenefitMarkets::Operations::Products::Find.new.call(effective_date: enrollment_eligibility.effective_date, service_areas: enrollment_eligibility.service_areas, product_package: product_package)
         end
 

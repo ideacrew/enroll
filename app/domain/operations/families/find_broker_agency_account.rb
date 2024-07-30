@@ -7,7 +7,7 @@ module Operations
   module Families
     # Operation to find broker agency account for a given family
     class FindBrokerAgencyAccount
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(params)
         valid_params = yield validate(params)

@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module People
     class CreateOrUpdate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
 
@@ -44,21 +44,38 @@ module Operations
       def match_or_update_or_create_person(person_entity)
         person = find_existing_person(person_entity.to_h)
         #create new person
-        if person.blank?
-          person = Person.new(person_entity.to_h) #if person_valid_params.success?
-          person.save!
-        else
-          return Success(person) if no_infomation_changed?({params: {attributes_hash: person_entity, person: person}})
-          person.assign_attributes(person_entity.except(:addresses, :phones, :emails, :hbx_id))
-          person.save!
-          create_or_update_associations(person, person_entity.to_h, :addresses)
-          create_or_update_associations(person, person_entity.to_h, :emails)
-          create_or_update_associations(person, person_entity.to_h, :phones)
-        end
-
-        Success(person)
+        person_record = if person.blank?
+                          create_new_person(person_entity)
+                        else
+                          return Success(person) if no_infomation_changed?(params: { attributes_hash: person_entity, person: person })
+                          update_existing_person(person, person_entity)
+                        end
+        Success(person_record)
       rescue StandardError => e
         Failure(person.errors.messages)
+      end
+
+      def create_new_person(person_entity)
+        person_params = person_entity.to_h
+        person_params[:is_incarcerated] = person_params[:is_incarcerated].nil? ? false : person_params[:is_incarcerated]
+
+        person = Person.new(person_params)
+        person.save!
+
+        person
+      end
+
+      def update_existing_person(person, person_entity)
+        attributes_to_exclude = %i[addresses phones emails hbx_id]
+        attributes_to_exclude << :is_incarcerated if person_entity.to_h[:is_incarcerated].nil?
+        person.assign_attributes(person_entity.except(*attributes_to_exclude))
+        person.save!
+
+        %i[addresses emails phones].each do |association|
+          create_or_update_associations(person, person_entity.to_h, association)
+        end
+
+        person
       end
 
       def create_or_update_associations(person, applicant_params, assoc)

@@ -10,7 +10,7 @@ module Operations
         module NonEsiEvidences
           # This operation is to build determination request for rrv non esi
           class BuildDeterminationRequest
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
             include EventSource::Command
             include EventSource::Logging
 

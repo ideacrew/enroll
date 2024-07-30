@@ -11,7 +11,7 @@ module Operations
       class Attestation
         # constructs cv3 payload for fdsh gateway.
 
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
         include Acapi::Notifiers
         require 'securerandom'
 

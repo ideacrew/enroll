@@ -4,7 +4,7 @@ module Operations
   module Products
     # This class is to fetch second lowest cost silver plan for a given tax household member.
     class DetermineSlcspForTaxHouseholdMember
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
 
       # @param [Date] effective_date
@@ -94,12 +94,12 @@ module Operations
         # min_age = family.family_members.map {|fm| fm.age_on(TimeKeeper.date_of_record) }.min
         # benchmark_product_model = EnrollRegistry[:enroll_app].setting(:benchmark_product_model).item
 
-        health_products = rating_silver_products_hash[:products].where(kind: :health)
+        health_products = rating_silver_products_hash[:products].select { |product| product.kind == :health }
         premium_hash = Operations::Products::FetchSlcspPremiumForTaxHouseholdMember.new.call(
           {
             products: health_products,
             effective_date: effective_date,
-            rating_area_id: rating_silver_products_hash[:rating_area_id],
+            rating_area_exchange_provided_code: rating_silver_products_hash[:rating_area_exchange_provided_code],
             tax_household_member: tax_household_member
           }
         )

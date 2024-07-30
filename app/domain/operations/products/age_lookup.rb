@@ -4,7 +4,7 @@ module Operations
   module Products
     # This class is to load county zip combinations.
     class AgeLookup
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(age)
         # TODO: read the lowest and highest ages from Settings/DB.
