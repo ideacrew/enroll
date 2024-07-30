@@ -19,17 +19,19 @@ if (!$(".my-household-page")) {
 
 } else {
   //manage family/ my household page
-  if ($("#dependent-<%= @dependent.id %>")) {
-    $("#dependent-<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
+  var id = "<%= @dependent.family_member.person.id %>";
+  var personContainer = $("#person-"+id)
+  if (personContainer) {
+    personContainer.find('.append_consumer_info').html("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
+    personContainer.removeClass('hidden');
+    $("a[id^=edit-member]").addClass('disabled');
+    $("a[id^=edit-member]").attr('disabled', true);
   } else {
     $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
   }
-
-  $("a[id^=edit-member]").addClass('disabled');
-  $("#add-new-member").addClass("hidden");
-  $("#edit-member-<%= @dependent.id %>").addClass("hidden");
-  $("#cancel-edit-<%= @dependent.id %>").removeClass("hidden");
-  $("#save-member-<%= @dependent.id %>").removeClass("hidden");
+  applyListeners();
+    demographicValidations();
+    isApplyingCoverage("dependent");
 }
 if (!disableSelectric) {
   $("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select, .no-selectric').selectric();
