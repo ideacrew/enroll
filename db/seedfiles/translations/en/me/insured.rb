@@ -715,6 +715,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.dependent_home_address_info' => "<strong>The home address is where this person legally resides.</strong> If they want to receive mail at another address such as an office or a PO Box, Select 'Add Mailing Address'",
   :'en.insured.dependent_mailing_address_info' => "This is the <strong>address where this person wants to have their mail delivered.</strong> It may be the same or different from their home address.",
   :'en.insured.enter_home_address' => "Enter your home address",
+  :'en.insured.ssn_coverage_msg' => "Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs.",
   :'en.insured.mailing_address' => "Mailing Address",
   :'en.insured.enter_mailing_address' => "Enter a mailing address",
   :'en.insured.review_information' => "I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I’m not truthful, there may be a penalty.",
