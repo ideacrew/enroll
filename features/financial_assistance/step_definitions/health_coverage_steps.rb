@@ -83,7 +83,6 @@ Then(/^the medicare have glossary link$/) do
 end
 
 Then(/^the medicare have glossary content$/) do
-  #bug logged for this, glossary text issue on health coverage page for medicare,medicaid, coverage and cobra
   find(IvlIapHealthCoveragePage.medicare_glossary_link).click
   expect(page).to have_content "The program helps with the cost of health care, but it doesn't cover all medical expenses or the cost of most"
 end

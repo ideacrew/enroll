@@ -951,7 +951,7 @@ end
 
 When("Patrick Doe clicked on Shop For Plans button") do
   find('.pull-right.interaction-click-control-shop-for-plans').click
-  find('.interaction-click-control-insuredshop-now').click
+  find('.interaction-click-control-plansshop-now').click
   find(IvlChooseCoverage.continue_btn).click
 end
 
