@@ -423,13 +423,15 @@ module FinancialAssistance
       id_map = {}
       applicant_ids = active_applicants.map(&:id)
       applicant_ids.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
+      invalid_ids = active_applicants.collect(&:invalid_family_relationships).flatten
       all_relationships = []
       matrix.each_with_index do |x, xi|
         x.each_with_index do |_y, yi|
           next unless xi < yi
           relation = relationships.where(applicant_id: id_map[xi], relative_id: id_map[yi]).first
           relation_kind = relation&.kind
-          all_relationships << {:applicant => id_map[xi], :relation => relation_kind,  :relative => id_map[yi]}
+          relation_has_error = invalid_ids.include?(relation&.id)
+          all_relationships << {:applicant => id_map[xi], :relation => relation_kind, :relative => id_map[yi], :error => relation_has_error}
         end
       end
       all_relationships
@@ -542,8 +544,11 @@ module FinancialAssistance
     end
 
     def validate_relationships(matrix)
+      invalid_relations = applicants.collect(&:invalid_family_relationships).flatten
+      return false if invalid_relations.present?
+
       # validates the child has relationship as parent for 'spouse of the primary'.
-      return false if applicants.any? { |applicant| !applicant.valid_family_relationships? }
+      return invalid_relations if invalid_relations.present?
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
@@ -1102,7 +1107,7 @@ module FinancialAssistance
       relationships.all?(&:valid_relationship_kind?)
     end
 
-    def valid_relations?
+    def invalid_relations
       matrix = build_relationship_matrix
       EnrollRegistry.feature_enabled?(:mitc_relationships) ? validate_relationships(matrix) : true
     end
