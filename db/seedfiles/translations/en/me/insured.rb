@@ -492,6 +492,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.household_relationships' => "We need to understand how members of your household are related. Select the relationship for each person listed below. When you're finished, select ",
   :'en.continue_to_next_step' => '\"Continue to Next Step\".',
   :'en.gender' => "Sex",
+  :'en.select_option' => "Select Option",
   :'en.does_person_need_coverage' => "Does %{person} need coverage?",
   :'en.kind' => "Kind",
   :'en.address_1' => "Address Line 1",
