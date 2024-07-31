@@ -86,8 +86,9 @@
 
       <% unless @applicant.is_primary_applicant? %>
         <div class="">
-          <% checked = f.object.same_with_primary.present? ? f.object.same_with_primary : true %>
+          <% checked = f.object.same_with_primary ? _ : true %>
           <label for="applicant_same_with_primary" class="weight-n required">
+            <% binding.irb %>
             <%= f.check_box :same_with_primary, {checked: checked}, "true", "false" %>
             <%=l10n("live_with_primary_subscriber") %>
           </label>
