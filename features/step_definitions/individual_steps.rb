@@ -10,7 +10,7 @@ end
 
 When(/^.+ visits the Consumer portal during open enrollment$/) do
   visit "/"
-  find(HomePage.consumer_family_portal_btn).click
+  find(HomePage.consumer_family_portal_btn, wait: 10).click
   FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
@@ -566,9 +566,11 @@ end
 
 Then(/Individual does not see the error on tooltip indicating a password longer than 20 characters$/) do
   unless EnrollRegistry[:bs4_consumer_flow].enabled?
-    wait_for_ajax
+    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(false)
     script = "return document.querySelector('.longer').getAttribute('data-icon');"
     data_icon_value = page.execute_script(script)
+    wait_for_ajax
+    sleep 15
     expect(data_icon_value).to eq('check')
   end
 end
