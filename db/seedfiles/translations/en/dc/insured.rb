@@ -482,6 +482,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.social_security' => "Social Security",
   :'en.relationship' => "Relationship",
   :'en.gender' => "Gender",
+  :'en.select_option' => "Select Option",
   :'en.kind' => "Kind",
   :'en.address_1' => "Address Line 1",
   :'en.address_2' => "Address Line 2",
