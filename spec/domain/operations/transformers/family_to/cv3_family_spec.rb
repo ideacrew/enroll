@@ -164,7 +164,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         :applicants, :eligibility_determinations,:relationships, :'workflow_state_transitions.from_state',
         :'workflow_state_transitions.transition_at', :full_medicaid_determination
       ).where(family_id: family.id).determined
-      
+
       state_transition = applications.last.workflow_state_transitions.last
       expect { state_transition.transition_at }.not_to raise_error(ActiveModel::MissingAttributeError)
     end
