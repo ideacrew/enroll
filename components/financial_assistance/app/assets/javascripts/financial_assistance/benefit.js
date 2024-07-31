@@ -131,10 +131,7 @@ document.addEventListener("turbolinks:load", function() {
             input.setAttribute('required', true);
           }
         });
-        clonedForm.querySelector('.hra-questions').classList.add('hidden');
-        clonedForm.querySelectorAll('.hra-questions input, .hra-questions select').forEach(function(input) {
-          input.removeAttribute('required');
-        });
+        $(clonedForm).find('.hra-questions').remove();
       } else {
         clonedForm.querySelector('.hra-questions').classList.remove('hidden');
         clonedForm.querySelectorAll('.hra-questions input, hra-questions select').forEach(function(input) {
@@ -143,10 +140,7 @@ document.addEventListener("turbolinks:load", function() {
             input.setAttribute('required', true);
           }
         });
-        clonedForm.querySelector('.non-hra-questions').classList.add('hidden');
-        clonedForm.querySelectorAll('.non-hra-questions input, .non-hra-questions select').forEach(function(input) {
-          input.removeAttribute('required');
-        });
+        $(clonedForm).find('.non-hra-questions').remove();
       }
 
       // show mvsq if msqv is true
@@ -716,39 +710,46 @@ document.addEventListener("turbolinks:load", function() {
     });
   }
 
+  $(document).on('focus', '.phone_number', function () {
+    $(this).mask('(000) 000-0000');
+  });
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
-        $(this).mask('(000) 000-0000');
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
+  $(document).on('focus', '.fien_field', function () {
+    $(this).mask('99-9999999');
+  });
 
-    });
+  $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
+      $(this).mask('(000) 000-0000');
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_address_zip', function (e) {
-        var key = e.which || e.keyCode || e.charCode;
-        $(this).attr('maxlength', '5');
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
-    });
+  });
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_id', function (e) {
-        var key = e.which || e.keyCode || e.charCode;
-        $(this).mask("00-0000000");
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
+  $('body').on('keyup keydown keypress', '#benefit_employer_address_zip', function (e) {
+      var key = e.which || e.keyCode || e.charCode;
+      $(this).attr('maxlength', '5');
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
+  });
 
-    });
+  $('body').on('keyup keydown keypress', '#benefit_employer_id', function (e) {
+      var key = e.which || e.keyCode || e.charCode;
+      $(this).mask("00-0000000");
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
+
+  });
 
 });
