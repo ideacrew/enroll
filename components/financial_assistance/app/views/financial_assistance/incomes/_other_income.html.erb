@@ -3,9 +3,9 @@
     <div class="other-income-show">
       <div class="d-flex row income-form-row p-0 m-0 mb-2">
         <% if other_income.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
-          <div class="mr-auto col-sm col-md-6 col-lg-3 p-0" id="ssi_type">
+          <div class="col-12 px-0" id="ssi_type">
             <div class="ss_benefit_type">
-              <%= f.label :ssi_type, l10n("faa.other_incomes.social_security_benefit_type"), class: "label-color required", for: "ssbenefit#{income_id}" %>
+              <label class="label-color required" for="ssbenefit<%='income_id'%>"><%= l10n("faa.other_incomes.social_security_benefit_type") %></label>
               <input class="fake-disabled-input" id="ssbenefit<%='income_id'%>" disabled="true" value="<%= FinancialAssistance::Income::SS_BENEFITS[other_income.ssi_type&.to_sym] %>">
             </div>
           </div>
