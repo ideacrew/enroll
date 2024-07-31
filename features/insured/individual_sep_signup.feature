@@ -29,7 +29,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should not see any plan which premium is 0
     When Individual selects a plan on plan shopping page
     And Individual clicks on purchase button on confirmation page
-    And Individual clicks on continue
+    Then Individual clicks on the Continue button to go to the Individual home page
     Then Individual should land on Home page
     
   Scenario: New insured user selects none of the situations listed in qle carousel
