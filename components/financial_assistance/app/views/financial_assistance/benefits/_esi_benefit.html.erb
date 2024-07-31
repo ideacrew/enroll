@@ -60,7 +60,7 @@
     </div>
 
     <div class="edit-benefit-form hidden">
-      <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
+      <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind, edit: true} %>
     </div>
   </div>
 <% else %>
