@@ -217,7 +217,7 @@ module Insured::FamiliesHelper
   #
   # @param enrollment [Object] The hbx enrollment object for which the label is generated.
   # @return [String, nil] An HTML string representing the label or nil if the enrollment is blank.
-  def enrollment_state_label(enrollment)
+  def enrollment_state_label(enrollment, bs4)
     return if enrollment.blank?
 
     # The colors correspond to those set in enrollment.scss as label-{color}. We use color as an indicator of the
@@ -263,7 +263,8 @@ module Insured::FamiliesHelper
     label = group[condition] || { text: enrollment.aasm_state.to_s.titleize, color: 'grey' }
     # Coverage reinstated is a special case where the aasm state is something else but we want to show it as reinstated in "green" (active) scenarios
     label = state_groups[:coverage_reinstated][:default] if enrollment.is_reinstated_enrollment? && label[:color] == 'green'
-    content_tag(:span, label[:text], class: "label label-#{label[:color]}")
+    return content_tag(:span, label[:text], class: "label label-#{label[:color]}") unless bs4
+    content_tag(:span, label[:text], class: "badge badge-pill badge-status badge-#{label[:color]}")
   end
 
   def determine_condition(enrollment, enrollment_state)
