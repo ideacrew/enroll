@@ -56,7 +56,7 @@
             <div class="d-flex col-sm col-md-6 pr-0">
               <div class="mr-auto col-sm col-md-6 pl-0">
                 <%= address.label :zip, l10n("zip_code"), class: "required" %>
-                <%= address.text_field :zip, class: "w-100 #{required}", required: required.present?, placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
+                <%= address.text_field :zip, class: "w-100 #{required}", required: required.present? || address.object.try(:zip), placeholder: l10n("zip_code"), data: { action: true ? 'change->zip-check#zipChange' : '', 'child-index': "#{address.index.to_s}" } %>
               </div>
               <% if EnrollRegistry.feature_enabled?(:display_county) %>
                 <div id="county-select-<%= f.index %>" class="col-sm col-md-6 pr-0">
