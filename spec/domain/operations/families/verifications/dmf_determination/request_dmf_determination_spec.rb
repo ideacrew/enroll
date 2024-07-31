@@ -255,4 +255,21 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::RequestDmf
       expect(family.transactions.count).to eq 1
     end
   end
+
+  context 'person without alive status' do
+    before do
+      family
+      person.verification_types.delete_all
+      job.create_process_status
+      Operations::Eligibilities::BuildFamilyDetermination.new.call({effective_date: Date.today, family: family})
+      family.eligibility_determination.subjects[0].eligibility_states.last.update(is_eligible: true)
+      @result = described_class.new.call(payload)
+    end
+
+    it "should not create a verification type history element for primary" do
+      person.reload
+      expect(person.verification_types.count).to eq 0
+      expect(@result.success?).to eq true
+    end
+  end
 end
