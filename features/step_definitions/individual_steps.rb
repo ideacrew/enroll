@@ -638,7 +638,13 @@ And(/.+ selects a plan on plan shopping page/) do
   screenshot("plan_shopping")
   wait_for_ajax(3, 2)
   expect(page).to have_content "Choose Plan"
-  find_all(IvlChoosePlan.select_plan_btn, wait: 5)[0].click
+  sleep 5
+  plan_rows = find_all('div.plan-row', wait: 5)
+  if plan_rows.any?
+    plan_rows[0].find('.plan-select').click
+  else
+    find_all(IvlChoosePlan.select_plan_btn, wait: 5)[0].click
+  end
 end
 
 When(/^the individual selects a non silver plan on Plan Shopping page$/) do
