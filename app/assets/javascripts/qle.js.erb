@@ -1,4 +1,4 @@
-var bs4 = document.documentElement.dataset.bs4;
+var bs4 = document.documentElement.dataset.bs4 == "true";
 
 var QLE = ( function( window, undefined ) {
   function initialize() {
@@ -93,7 +93,7 @@ $(function () {
       defaultDate: cdate
 		});
 
-    if (bs4 == 'true') {
+    if (bs4) {
       $("#qle_date").on("change", function(){
         if ($("#qle_date").val()) {
           $('#qle_submit').removeAttr('disabled');
