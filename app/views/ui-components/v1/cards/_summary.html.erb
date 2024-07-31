@@ -7,20 +7,18 @@
 
 <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
 
-<% unless @hbx_enrollment.shopping? %>
-  <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
-<% end %>
-
 <% if @bs4 %>
   <div class="enrollment-details">
     <% if qhp.present? %>
       <h1><%= @hbx_enrollment.coverage_year %> <%= @hbx_enrollment&.product&.kind.to_s.titleize %> <%= l10n('coverage').titleize %></h1>
 
-      <%= render partial: "insured/families/enrollment_refactored", :collection => [@hbx_enrollment], :as => :hbx_enrollment, locals: { read_only: false } %>
-
       <% unless @hbx_enrollment.shopping? %>
         <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
         <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
+      <% end %>
+
+      <% if @hbx_enrollment.shopping? %>
+        <%= render partial: "insured/families/enrollment_refactored", :collection => [@hbx_enrollment], :as => :hbx_enrollment, locals: { read_only: false } %>
       <% end %>
 
       <% if display_enr_summary_is_enabled(@hbx_enrollment) %>
@@ -79,6 +77,9 @@
   </div>
 
 <% else %>
+  <% unless @hbx_enrollment.shopping? %>
+    <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
+  <% end %>
   <% if qhp.present? %>
     <div class="plan module mt-0" >
       <div class="col-xs-12">
