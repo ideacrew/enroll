@@ -190,20 +190,15 @@ module FinancialAssistance
     end
 
     def format_date_params(model_params)
-      model_params["pregnancy_due_on"] = format_date_string(model_params["pregnancy_due_on"].to_s) if model_params["pregnancy_due_on"].present?
-      model_params["pregnancy_end_on"] = format_date_string(model_params["pregnancy_end_on"].to_s) if model_params["pregnancy_end_on"].present?
-      model_params["student_status_end_on"] = format_date_string(model_params["student_status_end_on"].to_s) if model_params["student_status_end_on"].present?
+      model_params["pregnancy_due_on"] = parse_date(model_params["pregnancy_due_on"].to_s) if model_params["pregnancy_due_on"].present?
+      model_params["pregnancy_end_on"] = parse_date(model_params["pregnancy_end_on"].to_s) if model_params["pregnancy_end_on"].present?
+      model_params["student_status_end_on"] = parse_date(model_params["student_status_end_on"].to_s) if model_params["student_status_end_on"].present?
 
-      model_params["person_coverage_end_on"] = format_date_string(model_params["person_coverage_end_on"].to_s) if model_params["person_coverage_end_on"].present?
-      model_params["medicaid_cubcare_due_on"] = format_date_string(model_params["medicaid_cubcare_due_on"].to_s) if model_params["medicaid_cubcare_due_on"].present?
+      model_params["person_coverage_end_on"] = parse_date(model_params["person_coverage_end_on"].to_s) if model_params["person_coverage_end_on"].present?
+      model_params["medicaid_cubcare_due_on"] = parse_date(model_params["medicaid_cubcare_due_on"].to_s) if model_params["medicaid_cubcare_due_on"].present?
       model_params = format_nil_for_blank_date(model_params)
 
-      model_params["dependent_job_end_on"] = format_date_string(model_params["dependent_job_end_on"].to_s) if model_params["dependent_job_end_on"].present?
-    end
-
-    def format_date_string(string)
-      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
-      Date.strptime(string, date_format)
+      model_params["dependent_job_end_on"] = parse_date(model_params["dependent_job_end_on"].to_s) if model_params["dependent_job_end_on"].present?
     end
 
     def build_error_messages_for_tax_info(model)
