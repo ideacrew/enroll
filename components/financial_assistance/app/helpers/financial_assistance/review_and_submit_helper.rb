@@ -139,7 +139,7 @@ module FinancialAssistance
 
     def personal_info_hash(applicant)
       hash = {age: applicant.age_of_the_applicant, gender: applicant.gender.humanize}
-      hash[:relationship] = applicant.relationship_kind_with_primary.humanize if @all_relationships.present?
+      hash[:relationship] = applicant.relationship_kind_with_primary.humanize
       hash[:status] = applicant.citizen_status.present? ? applicant.format_citizen : nil
       hash[:incarcerated] = human_boolean(applicant.is_incarcerated)
       hash[:needs_coverage] = human_boolean(applicant.is_applying_coverage)
