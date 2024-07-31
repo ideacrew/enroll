@@ -14,7 +14,12 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   #associated consumer role
   let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let(:consumer_user) { FactoryBot.create(:user, person: consumer_person) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: consumer_person) }
+  let!(:dependent_person) do
+    person = family.family_members.where(is_primary_applicant: false).first.person
+    FactoryBot.create(:consumer_role,  person: person, dob: person.dob)
+    person
+  end
   let!(:consumer_role) do
     consumer_person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
     consumer_person.consumer_role
@@ -24,6 +29,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   let(:local_type) { FactoryBot.build(:verification_type, type_name: EnrollRegistry[:enroll_app].setting(:state_residency).item) }
   let(:citizenship_type) { FactoryBot.build(:verification_type, type_name: 'Citizenship') }
   let(:immigration_type) { FactoryBot.build(:verification_type, type_name: 'Immigration status') }
+  let(:immigration_type_for_dependent) { dependent_person.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified') }
   let(:native_type) { FactoryBot.build(:verification_type, type_name: "American Indian Status") }
 
   # unauthorized consumer role
@@ -122,6 +128,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       request.env["HTTP_REFERER"] = "http://test.com"
       allow(consumer_role).to receive(:invoke_residency_verification!).and_return(true)
       consumer_person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      dependent_person.verification_types = [immigration_type_for_dependent]
       sign_in admin_user
     end
 
@@ -223,6 +230,8 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:alive_status).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_publish_updated_families).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
         consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
         consumer_person.consumer_role.vlp_documents = []
         consumer_person.save!
@@ -245,6 +254,16 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id }
         consumer_person.reload
         @immigration_type.reload
+        family.reload
+        family_due_date = family.eligibility_determination&.outstanding_verification_earliest_due_date
+        expect(family_due_date).to match(@immigration_type.due_date)
+      end
+
+      it 'change due date on family level for non-primary family member' do
+        immigration_type_for_dependent.pending_type
+        post :fed_hub_request, params: { verification_type: immigration_type_for_dependent.id, person_id: dependent_person.id }
+        dependent_person.reload
+        immigration_type_for_dependent.reload
         family.reload
         family_due_date = family.eligibility_determination&.outstanding_verification_earliest_due_date
         expect(family_due_date).to match(@immigration_type.due_date)
