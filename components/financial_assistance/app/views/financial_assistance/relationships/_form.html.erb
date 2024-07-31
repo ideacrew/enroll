@@ -23,7 +23,7 @@
         <span><%= @application.applicants.find(er[:applicant]).first_name %> <%= l10n("faa.review.your_household.is") %></span>
         <div class="mx-3">
           <label for='<%= "#{er[:applicant] }_#{er[:relative]}_relationship" %>' class="sr-only"><%= l10n("faa.review.your_household.relationship_label") %></label>
-          <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: 'selected_relationship', "data-applicant": er[:applicant], "data-relative": er[:relative], id: "#{er[:applicant] }_#{er[:relative]}_relationship" %>
+          <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: "selected_relationship #{'border-danger' if er[:error]}", "data-applicant": er[:applicant], "data-relative": er[:relative], id: "#{er[:applicant] }_#{er[:relative]}_relationship" %>
         </div>
         <span><%= l10n("faa.review.your_household.of") %> <%= @application.applicants.find(er[:relative]).first_name %></span>
       </div>
