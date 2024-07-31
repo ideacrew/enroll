@@ -891,6 +891,20 @@ $(document).on('click', '#address_info + span.form-action', function(){
   }
 });
 
+const mailingAddressInputFieldIds = () => {
+  return [
+    '#person_addresses_attributes_1_address_1',
+    '#person_addresses_attributes_1_city',
+    '#person_addresses_attributes_1_zip',
+    '#applicant_addresses_attributes_1_address_1',
+    '#applicant_addresses_attributes_1_city',
+    '#applicant_addresses_attributes_1_zip',
+    '#dependent_addresses_1_address_1',
+    '#dependent_addresses_1_city',
+    '#dependent_addresses_1_zip',
+  ].join(', ');
+};
+
 document.addEventListener('click', function(event) {
   if (event.target.matches('button#add_mailing_address')) {
     event.preventDefault();
@@ -906,7 +920,7 @@ document.addEventListener('click', function(event) {
       el.classList.remove('d-none');
       el.classList.add('d-block');
     });
-    document.querySelectorAll("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip, #dependent_addresses_1_city").forEach(function(element) {
+    document.querySelectorAll(mailingAddressInputFieldIds()).forEach(function(element) {
       element.required = true;
     });
   }
@@ -924,7 +938,7 @@ document.addEventListener('click', function(event) {
       el.classList.remove('d-block');
     });
     document.querySelector(".mailing-div #state_id_mailing").value = "";
-    document.querySelectorAll("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip, #dependent_addresses_1_city").forEach(function(element) {
+    document.querySelectorAll(mailingAddressInputFieldIds()).forEach(function(element) {
       element.required = false;
     });
     // Mailing address form may appear before or after home address form
