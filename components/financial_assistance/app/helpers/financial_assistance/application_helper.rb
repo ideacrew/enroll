@@ -409,8 +409,9 @@ module FinancialAssistance
       nav[:nav_options] = applicant.present? ? applicant_faa_nav_options(application, applicant) : no_applicant_faa_nav_options(application)
       nav[:links] = true
       nav[:step] = step
-      nav[:title] = l10n("faa.left_nav.my_household")
-      nav[:title_link] = edit_application_path(application)
+
+      nav[:title] = (applicant.present? || step != 1) ? l10n("faa.left_nav.my_household") : l10n("faa.results.view_my_applications")
+      nav[:title_link] = (applicant.present? || step != 1) ? edit_application_path(application) : financial_assistance.applications_path
       nav[:subheading] = l10n("faa.nav.applicant_subheader")
 
       nav[:show_help_button] = true
