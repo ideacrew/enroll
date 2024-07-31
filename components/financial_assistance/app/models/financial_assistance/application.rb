@@ -544,11 +544,8 @@ module FinancialAssistance
     end
 
     def validate_relationships(matrix)
-      invalid_relations = applicants.collect(&:invalid_family_relationships).flatten
-      return false if invalid_relations.present?
-
       # validates the child has relationship as parent for 'spouse of the primary'.
-      return invalid_relations if invalid_relations.present?
+      return false if applicants.collect(&:invalid_family_relationships).flatten.present?
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
@@ -1107,7 +1104,7 @@ module FinancialAssistance
       relationships.all?(&:valid_relationship_kind?)
     end
 
-    def invalid_relations
+    def valid_relations?
       matrix = build_relationship_matrix
       EnrollRegistry.feature_enabled?(:mitc_relationships) ? validate_relationships(matrix) : true
     end

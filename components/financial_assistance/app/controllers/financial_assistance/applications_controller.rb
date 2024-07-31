@@ -184,7 +184,7 @@ module FinancialAssistance
       @has_outstanding_local_mec_evidence = has_outstanding_local_mec_evidence?(@application) if EnrollRegistry.feature_enabled?(:mec_check)
       @shop_coverage = shop_enrollments_exist?(@application) if EnrollRegistry.feature_enabled?(:shop_coverage_check)
 
-      unless @application.invalid_relations
+      unless @application.valid_relations?
         redirect_to application_relationships_path(@application)
         flash[:error] = l10n("faa.errors.inconsistent_relationships_error")
       end
