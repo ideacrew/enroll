@@ -125,7 +125,7 @@ module ApplicationHelper
   end
   # rubocop:enable Style/OptionalBooleanParameter
 
-  def min_premium_with_aptc(plan_cost, plan_ehb_cost, subsidy_amount, can_use_aptc = true)
+  def min_premium_with_aptc(plan_cost, plan_ehb_cost, subsidy_amount, can_use_aptc: true)
     premium = shopping_group_premium(plan_cost, plan_ehb_cost, subsidy_amount, can_use_aptc)
     premium > 1 ? premium : 1
   end
