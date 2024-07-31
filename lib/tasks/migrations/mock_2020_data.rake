@@ -53,11 +53,20 @@ namespace :new_model do
     Rake::Task['new_model:rating_factors'].invoke(mock_year)
     Rake::Task['new_model:plan_cross_walk'].invoke(mock_year)
 
-    puts "loading #{mock_year} benefit market catalog" unless Rails.env.test?
-    Rake::Task['load:dc_benefit_market_catalog'].invoke(mock_year)
+    # Commenting these out since we need only in DC context
+
+    # puts "loading #{mock_year} benefit market catalog" unless Rails.env.test?
+    # Rake::Task['load:dc_benefit_market_catalog'].invoke(mock_year)
+
+    # puts "loading #{mock_year} ivl benefit pacakges" unless Rails.env.test?
+    # Rake::Task["import:create_ivl_packages_DC"].invoke(mock_year)
+
+    # Picking previous year's slcsp_id to create slcsp_id since this is mock data.
+    slcsp_id = HbxProfile&.current_hbx&.benefit_sponsorship&.benefit_coverage_periods&.by_year(mock_year - 1)&.first&.slcsp_id
+    hios_id = BenefitMarkets::Products::Product.find(slcsp_id).hios_id
 
     puts "loading #{mock_year} ivl benefit pacakges" unless Rails.env.test?
-    Rake::Task["import:create_ivl_packages_DC"].invoke(mock_year)
+    Rake::Task["import:create_ivl_packages_ME"].invoke(mock_year, hios_id)
 
     Rake::Task['new_model:map_sbc'].invoke(mock_year)
     puts "Mock Data for #{mock_year} completed" unless Rails.env.test?
