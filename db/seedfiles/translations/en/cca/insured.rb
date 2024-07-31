@@ -425,6 +425,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.household_relationships' => "We need to understand how members of your household are related. Select the relationship for each person listed below. When you're finished, select ",
   :'en.continue_to_next_step' => '\"Continue to Next Step\".',
   :'en.gender' => "Gender",
+  :'en.select_option' => "Select Option",
   :'en.kind' => "Kind",
   :'en.address_1' => "Address Line 1",
   :'en.address_2' => "Address Line 2",
