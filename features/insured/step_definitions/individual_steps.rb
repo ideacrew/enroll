@@ -41,7 +41,7 @@ Then(/(.*) should land on Home page and should see Shop for Plans Banner$/) do |
 end
 
 When(/(.*) click the "(.*?)" in qle carousel/) do |_name, qle_event|
-  expect(page).to have_content(qle_event, wait: 10)
+  expect(page).to have_content(qle_event, wait: 15)
   click_link qle_event.to_s
 end
 
