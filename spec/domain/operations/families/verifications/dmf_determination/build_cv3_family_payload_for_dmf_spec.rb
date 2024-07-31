@@ -5,8 +5,30 @@ require 'rails_helper'
 RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3FamilyPayloadForDmf, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let(:family) { FactoryBot.create(:individual_market_family_with_spouse) }
-  let(:primary) { family.primary_person }
+  let(:primary_dob){ Date.today - 57.years }
+  let(:family) do
+    FactoryBot.create(:family, :with_primary_family_member, :person => primary)
+  end
+
+  let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: 101_011_012) }
+  let!(:spouse) { FactoryBot.create(:family_member, person: spouse_person, family: family) }
+  let(:spouse_dob) { Date.today - 55.years }
+  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, metal_level_kind: :silver, benefit_market_kind: :aca_individual) }
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :with_enrollment_members,
+                      family: family,
+                      enrollment_members: enrolled_members,
+                      household: family.active_household,
+                      coverage_kind: :health,
+                      effective_on: Date.today,
+                      kind: "individual",
+                      product: product,
+                      rating_area_id: primary.consumer_role.rating_address.id,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      aasm_state: 'coverage_selected')
+  end
+
   let(:date) { DateTime.now }
 
   let(:job) do
@@ -58,47 +80,34 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
   end
 
   let(:transmittable_params) {{ job: job, transmission: transmission, transaction: transaction }}
-
-  # lambda to change member eligibility
-  let(:change_member_eligibility) do
-    lambda { |member_hbx_ids|
-      subjects = family.eligibility_determination.subjects
-      eligible_subjects = subjects.select { |sub| member_hbx_ids.include?(sub.hbx_id) }
-      eligible_subjects.each do |subject|
-        key = 'health_product_enrollment_status'
-        state = subject.eligibility_states.where(eligibility_item_key: key).first
-        state.update(is_eligible: true)
-      end
-    }
-  end
-
   let(:dependent) { family.dependents.last.person }
 
   before do
+    BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
     allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
-    # need to run this operation to accurately handle cv3 family
+    primary.build_demographics_group
+    spouse_person.build_demographics_group
     Operations::Eligibilities::BuildFamilyDetermination.new.call({ effective_date: Date.today, family: family })
   end
 
   context "success" do
-    context 'with all valid members with an enrollment' do
-      it "should pass" do
-        # everyone subject is made eligible for enrollment
-        all_member_ids = family.family_members.map(&:hbx_id)
-        change_member_eligibility[all_member_ids]
+    let(:primary) { FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, ssn: 101_011_011) }
 
+    context 'with all valid members with an enrollment' do
+      let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: 101_011_012) }
+      let(:enrolled_members) { family.family_members }
+
+      it "should pass" do
         result = described_class.new.call(family, transmittable_params)
         expect(result).to be_success
       end
     end
 
     context 'with some non-enrolled members' do
-      let(:check_eligibility_rules) { double(Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules) }
+      let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: 101_011_012) }
+      let(:enrolled_members) { [family.family_members.first] }
 
       before do
-        # dependent subject is not made eligible for enrollment
-        change_member_eligibility[primary.hbx_id]
-
         @result = described_class.new.call(family, transmittable_params)
       end
 
@@ -110,18 +119,16 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
         dependent.reload
         element = dependent.alive_status.type_history_elements.last
 
-        expect(element.action).to eq 'DMF Determination Request Failure'
-        expect(element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} does not have a valid enrollment"
+        expect(element.action).to eq 'DMF_Request_Failed'
+        expect(element.update_reason).to eq "Family Member is not eligible for DMF Determination due to errors: [\"No states found for the given subject/member hbx_id: #{dependent.hbx_id} \"]"
       end
     end
 
     context 'with some members with invalid ssns' do
-      before do
-        # everyone subject is made eligible for enrollment
-        all_member_ids = family.family_members.map(&:hbx_id)
-        change_member_eligibility[all_member_ids]
+      let(:spouse_person) { FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, ssn: nil) }
+      let(:enrolled_members) { family.family_members }
 
-        dependent.update(ssn: '999999999')
+      before do
         @result = described_class.new.call(family, transmittable_params)
       end
 
@@ -133,19 +140,17 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
         dependent.reload
         element = dependent.alive_status.type_history_elements.last
 
-        expect(element.action).to eq 'DMF Determination Request Failure'
-        expect(element.update_reason).to eq "Family Member with hbx_id #{dependent.hbx_id} is not valid: Invalid SSN"
+        expect(element.action).to eq 'DMF_Request_Failed'
+        expect(element.update_reason).to eq "Family Member is not eligible for DMF Determination due to errors: [\"No SSN for member #{dependent.hbx_id}\"]"
       end
     end
 
     context 'parsing cv3_family after being published' do
+      let(:enrolled_members) { family.family_members }
+
       it "should be able to be parsed from JSON and validate with AcaEntities::Operations::CreateFamily" do
-        # everyone subject is made eligible for enrollment
-        all_member_ids = family.family_members.map(&:hbx_id)
-        change_member_eligibility[all_member_ids]
         described_class.new.call(family, transmittable_params)
         transaction.reload
-
         # we will convert this to json and then parse with JSON to simulate FDSH handling the event
         payload = transaction.json_payload[:family_hash]
         json_payload = payload.to_json
@@ -158,6 +163,8 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
   end
 
   context "failure" do
+    let(:primary) { FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, ssn: 101_011_011) }
+    let(:enrolled_members) { [family.family_members.first] }
     let(:fake_cv3_transformer) { double(Operations::Transformers::FamilyTo::Cv3Family) }
 
     context 'cv3 transformation failure' do
@@ -229,6 +236,8 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
     end
 
     context 'with all members ineligible' do
+      let(:enrolled_members) { [] }
+
       before do
         @result = described_class.new.call(family, transmittable_params)
       end
@@ -241,7 +250,7 @@ RSpec.describe Operations::Families::Verifications::DmfDetermination::BuildCv3Fa
       it 'should add a history element to all alive_status verifications' do
         alive_status_elements = [primary.alive_status, dependent.alive_status].map(&:type_history_elements)
 
-        expect(alive_status_elements.all? { |elements| elements.last.update_reason.include?('does not have a valid enrollment') }).to be_truthy
+        expect(alive_status_elements.all? { |elements| elements.last.update_reason.match?("No states found for the given subject/member hbx_id") }).to be_truthy
       end
 
       it "should update the transmission" do

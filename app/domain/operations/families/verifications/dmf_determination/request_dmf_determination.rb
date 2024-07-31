@@ -24,7 +24,7 @@ module Operations
 
             @transmission = yield build_and_create_request_transmission(values)
             @transaction = yield build_and_create_request_transaction(values)
-
+            yield record_verification_history
             payload = yield build_cv3_family_payload
             event = yield build_event(payload)
             result = yield publish(event)
@@ -98,13 +98,20 @@ module Operations
             event('events.families.verifications.dmf_determination.requested', attributes: payload)
           end
 
-          def publish(event)
-            hbx_id = @transaction.json_payload[:family_hash][:hbx_id]
-            event.publish
+          def record_verification_history
+            @family.family_members.each do |member|
+              message = "DMF Determination request for Family with hbx_id #{@family.hbx_assigned_id} is submitted"
+              person = member.person
+              alive_status_type = person.verification_types.alive_status_type.first
+              alive_status_type.add_type_history_element(action: "DMF_Request_Submitted", modifier: "System", update_reason: message)
+            end
 
-            message = "DMF Determination request for Family with hbx_id #{hbx_id} sent successfully"
-            people = @family.family_members.map(&:person)
-            people.select(&:alive_status).each { |p| p.alive_status.add_type_history_element(action: "DMF Determination Request", modifier: "System", update_reason: message) }
+            Success(true)
+          end
+
+          def publish(event)
+            event.publish
+            message = "DMF Determination request for Family with hbx_id #{@family.hbx_assigned_id} is submitted"
             update_status(message, :succeeded, { transmission: @transmission, transaction: @transaction })
 
             Success(message)
