@@ -138,11 +138,7 @@ class Insured::ConsumerRolesController < ApplicationController
         text += "Please #{view_context.link_to('sign in', SamlInformation.iam_login_url)} with your username and password "
         text += "or #{view_context.link_to('click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
         flash[:alert] = text
-        if @bs4
-          format.html { redirect_to request.referrer }
-        else
-          format.html {redirect_to ssn_taken_insured_consumer_role_index_path}
-        end
+        format.html { redirect_to(@bs4 ? request.referrer : ssn_taken_insured_consumer_role_index_path) }
       else
         format.html { render 'search' }
       end
