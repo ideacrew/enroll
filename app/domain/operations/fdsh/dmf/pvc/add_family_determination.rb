@@ -12,6 +12,8 @@ module Operations
           include EventSource::Logging
           include ::Operations::Transmittable::TransmittableUtils
 
+          DEATH_CONFIRMATION_CODE_MAPPING = {"outstanding" => "Confirmed", "attested" => "Unconfirmed"}.freeze
+
           def call(params)
             encrypted_family_payload, job_id, @family_hbx_id = yield validate(params)
             @job = yield find_job(job_id)
@@ -21,6 +23,7 @@ module Operations
             @transaction = yield create_response_transaction(values.merge(transmission: @transmission, subject: @family), {job: @job, transmission: @transmission})
             decrypted_family_payload = yield decrypt_payload(encrypted_family_payload)
             parsed_family_payload = yield parse_json_payload(decrypted_family_payload)
+            yield store_payload_to_transaction(parsed_family_payload)
             @entity_family = yield validate_family(parsed_family_payload)
             yield add_determination
             trigger_family_determination(@family)
@@ -73,6 +76,19 @@ module Operations
             )
 
             Failure("Failed to parse JSON payload for family #{@family_hbx_id}")
+          end
+
+          def store_payload_to_transaction(parsed_family_payload)
+            @transaction.json_payload = parsed_family_payload
+            Success(@transaction.save!)
+          rescue StandardError => e
+            add_errors(
+              :store_payload_to_transaction,
+              "Failed to store family payload due to #{e.inspect}",
+              { transmission: @transmission, transaction: @transaction}
+            )
+
+            Failure("Failed to store payload #{@family_hbx_id}")
           end
 
           def validate_family(parsed_family_payload)
@@ -161,10 +177,12 @@ module Operations
               person.demographics_group.alive_status.update(is_deceased: true, date_of_death: alive_status_entity.date_of_death)
             end
 
-            message = "DMF Determination response for Family with hbx_id #{@family_hbx_id} received successfully"
-            alive_status_verification_type.reload
+            message = "DMF Determination response received successfully"
+            consumer_role = person.consumer_role
+            body = {job_id: @job.job_id, family_hbx_id: @family_hbx_id, death_confirmation_code: DEATH_CONFIRMATION_CODE_MAPPING[entity_validation_status], date_of_death: alive_status_entity.date_of_death}.to_json
+            event_response_record = consumer_role.alive_status_responses.create({received_at: Time.now, body: body})
             alive_status_verification_type.add_type_history_element(action: "DMF Hub Response", modifier: "System", update_reason: message, from_validation_status: from_validation_status,
-                                                                    to_validation_status: alive_status_verification_type.validation_status)
+                                                                    to_validation_status: alive_status_verification_type.validation_status, event_response_record_id: event_response_record.id)
           end
 
           def update_validation_status(alive_status_verification_type, new_validation_status)
