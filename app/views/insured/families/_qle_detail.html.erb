@@ -5,7 +5,7 @@
     <div class="hidden qle-label"></div>
     <div>
       <div class="col px-0">
-        <div id='qle-date-chose' class="sep-date">
+        <div id='qle-date-chose'>
           <div class="mb-2" onkeydown="handleButtonKeyDown(event, 'qle_submit')">
             <label class="weight-n" for="qle_date"><%= l10n("insured.qle_detail.event_date") %></label>
             <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", required: true %>
