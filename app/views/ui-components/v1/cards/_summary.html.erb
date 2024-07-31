@@ -5,7 +5,10 @@
   <% @plan = @member_group %>
 <% end %>
 
-<% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
+<% unless @hbx_enrollment.shopping? %>
+  <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
+  <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
+<% end %>
 
 <% if @bs4 %>
   <div class="enrollment-details">
@@ -64,12 +67,12 @@
         </tbody>
       </table>
 
-      <% if @hbx_enrollment.shopping? %>
-        <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
-      <% else %>
+
+
+
         <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
         <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
-      <% end %>
+
 
     <% else %>
       <%= l10n("enrollment.no_plans") %>
@@ -128,7 +131,6 @@
 
                   <span class="ttu dg fourteen"><%= @plan.product_type ? @plan.product_type.upcase : "" %></span>
                 </td>
-
                 <td>
                   <span class="ttu lg twelve">Metal Level</span>
 
