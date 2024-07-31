@@ -1,5 +1,5 @@
 <% if @person.primary_family.enrolled_hbx_enrollments.map(&:product).map(&:id).include?(plan.id) %>
-  <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i>YOUR CURRENT <%= plan.try(:active_year) %>PLAN </h5>
+  <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i><%= l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase %></h5>
 <% else %>
   <%= link_to("Select Plan",
       thankyou_insured_plan_shopping_path(@hbx_enrollment,
