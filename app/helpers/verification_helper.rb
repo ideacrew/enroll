@@ -316,6 +316,8 @@ module VerificationHelper
   end
 
   def request_response_details(person, record, v_type)
+    return show_deceased_verification_response(person, record) if v_type == VerificationType::ALIVE_STATUS
+
     local_residency = EnrollRegistry[:enroll_app].setting(:state_residency).item
     if record.event_request_record_id
       v_type == local_residency ? show_residency_request(person, record) : show_ssa_dhs_request(person, record)
@@ -329,6 +331,13 @@ module VerificationHelper
         |request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)
     }
     raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no request record"
+  end
+
+  def show_deceased_verification_response(person, history)
+    return unless history.event_response_record_id
+
+    event_response = person.consumer_role.alive_status_responses.select{ |response| response.id == BSON::ObjectId.from_string(history.event_response_record_id) }.first
+    event_response.present? ? JSON.parse(event_response.body) : "no response record"
   end
 
   def show_ssa_dhs_request(person, record)
