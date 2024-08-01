@@ -5,22 +5,19 @@
   <% @plan = @member_group %>
 <% end %>
 
-<% unless @hbx_enrollment.shopping? %>
-  <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
-  <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
-<% end %>
-
 <% if @bs4 %>
   <div class="enrollment-details">
+    <% if @hbx_enrollment.shopping? %>
+      <%= h(link_to l10n("back_to_enrollments"), request.referrer, class: 'btn outline all-plans') %>
+      <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+    <% else %>
+      <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
+      <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
+    <% end %>
     <% if qhp.present? %>
       <h1><%= @hbx_enrollment.coverage_year %> <%= @hbx_enrollment&.product&.kind.to_s.titleize %> <%= l10n('coverage').titleize %></h1>
 
-      <% unless @hbx_enrollment.shopping? %>
-        <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
-        <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
-      <% end %>
-
-      <% if @hbx_enrollment.shopping? %>
+      <% unless action_name == "home" %>
         <%= render partial: "insured/families/enrollment_refactored", :collection => [@hbx_enrollment], :as => :hbx_enrollment, locals: { read_only: false } %>
       <% end %>
 
@@ -68,11 +65,14 @@
       </table>
 
 
+      <% if @hbx_enrollment.shopping? %>
+        <%= h(link_to l10n("back_to_enrollments"), request.referrer, class: 'btn outline all-plans') %>
+        <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
 
-
+      <% else %>
         <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
         <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
-
+      <% end %>
 
     <% else %>
       <%= l10n("enrollment.no_plans") %>
