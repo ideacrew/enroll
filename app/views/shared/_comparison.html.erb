@@ -110,7 +110,7 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-default btn-default" id='btnPrint'><%= l10n("print") %></button>
     <% if @coverage_kind == "health" %>
-      <%= link_to l10n("plans.download"), comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind, standard_component_ids: @standard_component_ids, hbx_enrollment_id: @hbx_enrollment_id, active_year: @active_year, format: :csv), class: "btn btn-default" %>
+      <%= h(link_to l10n("plans.download"), comparison_products_plans_path(market_kind: @market_kind, coverage_kind: @coverage_kind, standard_component_ids: @standard_component_ids, hbx_enrollment_id: @hbx_enrollment_id, active_year: @active_year, format: :csv), class: "btn btn-default") %>
     <% end %>
     <button type="button" class="btn  btn-default btn-default" data-dismiss="modal" data-cuke="compare_selected_plans_close_btn"><%= l10n("close") %></button>
   </div>
