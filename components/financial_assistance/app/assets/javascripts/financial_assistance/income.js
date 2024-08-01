@@ -158,8 +158,13 @@ document.addEventListener('turbolinks:load', function () {
         var self = this;
 
         $('#unsavedIncomeChangesWarning').modal('show');
-        $('button#leave').click(function () {
-          window.location.href = $(self).attr('href');
+        $('button#leave').on('click', function() {
+          // these two lines are necessary to prevent the modal from showing again
+          $('.interaction-click-control-continue').removeClass('disabled');
+          $('#nav-buttons a').removeClass('disabled');
+
+          // re-triggering the click as navigating based on the href got flagged in security check
+          self.click();
         });
 
         return false;
