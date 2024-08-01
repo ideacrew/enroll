@@ -6,6 +6,7 @@
       <%= form_for @applicant, {url: application_applicants_path(@application), as: :applicant, remote: true} do |f| %>
         <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
         <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
+        <%= hidden_field_tag :is_dependent, true %>
 
         <p class="dependent-invalid-dob"></p>
 
@@ -58,7 +59,7 @@
             </div>
             <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :gender, l10n("gender"), class: 'required'  %>
-              <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], {prompt: l10n("select_option")}, autocomplete: :off, required: true%>
+              <%= f.select :gender, [ [l10n("Male"), 'male'], [l10n("Female"), 'female'] ], {prompt: l10n("select_option")}, autocomplete: :off, required: true %>
               <a href="#sex_gender" data-toggle="modal" data-target="#sex_gender" class="d-block"><%= l10n("not_sure") %></a>
               <%= render partial: 'shared/modal_support_text_household', locals: {key: "sex_gender"} %>
             </div>
