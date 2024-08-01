@@ -106,7 +106,11 @@ document.addEventListener("turbolinks:load", function() {
     var benefitForm = esi == "true" ? document.getElementById('new-benefit-esi-form-' + kind) : document.getElementById('new-benefit-non-esi-form-' + kind);
     var clonedForm = benefitForm.cloneNode(true);
     document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
-    $(clonedForm.querySelector('.insurance-kind-label-container')).html($(document.createElement("h2")).text(selected.innerText.split('$')[0]));
+    var newLabelText = selected.innerText.split('$')[0]
+    var newLabel = document.createElement("h2")
+    newLabel.textContent = newLabelText
+    clonedForm.querySelector('.insurance-kind-label-container').prepend(newLabel);
+    //$(clonedForm.querySelector('.insurance-kind-label-container')).html($(document.createElement("h2")).text(selected.innerText.split('$')[0]));
     clonedForm.querySelector('#benefit_insurance_kind').value = selected.value;
     clonedForm.removeAttribute('id');
     clonedForm.classList.remove('hidden');
