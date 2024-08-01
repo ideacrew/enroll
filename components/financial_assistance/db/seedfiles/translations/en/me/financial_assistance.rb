@@ -123,6 +123,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_incomes.description" => "Tell us about other income for %{name}, select “Continue to Next Step” when finished.",
   "en.faa.other_incomes.unemployment_question" => "Does %{name} receive unemployment compensation, or have they received it this year?",
   "en.faa.other_incomes.na_question" => "Is any of %{name}'s income from American Indian or Alaska Native tribal sources?",
+  "en.faa.other_incomes.alaska_native" => "Is any of this person's income from American Indian or Alaska Native tribal sources?",
   "en.faa.other_incomes.amount" => "Amount",
   "en.faa.other_incomes.net_amount" => "Net Amount",
   "en.faa.other_incomes.frequency" => "Frequency",
