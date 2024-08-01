@@ -905,6 +905,14 @@ const mailingAddressInputFieldIds = () => {
   ].join(', ');
 };
 
+const mailingAddressDestroyFieldIds = () => {
+  return [
+    '#person_addresses_attributes_1__destroy',
+    '#applicant_addresses_attributes_1__destroy',
+    '#dependent_addresses_1__destroy'
+  ].join(', ');
+};
+
 document.addEventListener('click', function(event) {
   if (event.target.matches('button#add_mailing_address')) {
     event.preventDefault();
@@ -937,16 +945,33 @@ document.addEventListener('click', function(event) {
       el.classList.add('d-none');
       el.classList.remove('d-block');
     });
-    document.querySelector(".mailing-div #state_id_mailing").value = "";
+
+    // NOTE: not sure if this #state_id_mailing id will still be used after bs4 updates, keeping for now
+    stateIdMailing = document.querySelector(".mailing-div #state_id_mailing");
+    stateIdMailing ? stateIdMailing.value = "" : null;
+
     document.querySelectorAll(mailingAddressInputFieldIds()).forEach(function(element) {
       element.required = false;
     });
+
     // Mailing address form may appear before or after home address form
-    if (document.querySelector("#person_addresses_attributes_1__destroy").nextElementSibling.id == "person_addresses_attributes_1_kind" && document.querySelector("#person_addresses_attributes_1__destroy").nextElementSibling.value == "mailing") {
-      document.querySelector("#person_addresses_attributes_1__destroy").value = true;
-    } else {
-      document.querySelector("#person_addresses_attributes_0__destroy").value = true;
-    }
+    document.querySelectorAll(mailingAddressDestroyFieldIds()).forEach(function(element) {
+      let previous = element.previousElementSibling;
+      let next = element.nextElementSibling;
+
+      if ((previous?.id?.includes('_1_kind') && previous?.value == 'mailing') ||
+          (next?.id?.includes('_1_kind') && next?.value == 'mailing')
+      ) {
+        element.value = true;
+      } else {
+        // NOTE: this second condition may not be necessary, 
+        // both family_member and applicant dependent controllers
+        // handle removing a dependent home address if the 'same_as_primary' param is true
+        let homeAddressId = element.id.replace('_1__', '_0__');
+        let homeAddressElement = document.querySelector(homeAddressId);
+		    if (homeAddressElement) homeAddressElement.value = true;
+      }
+    });
   }
 });
 
