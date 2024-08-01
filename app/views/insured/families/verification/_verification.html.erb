@@ -71,7 +71,7 @@
                 <% verif_type.type_documents.each do |vlp_doc| %>
                   <div class="d-flex row py-1 px-0 m-0 align-items-center" id="doc_table_row_<%=vlp_doc.id%>">
                     <div class="col-sm px-0 m-0">
-                      <%= vlp_doc.title.titleize %> 
+                      <%= vlp_doc.title.titleize %>
                     </div>
                     <div class="d-flex col-sm align-items-center justify-content-sm-end px-0 mt-1 mt-sm-0 mb-0">
                       <% if vlp_doc.identifier.present? %>
@@ -83,9 +83,9 @@
                         <% end) %>
                       <% end %>
                       <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
-                        <%= link_to document_path(vlp_doc, :person_id => person.id, :verification_type => verif_type.id, :doc_title => vlp_doc.title.titleize), method: :delete, class: "btn-error outline text-nowrap" do %>
+                        <%= h(link_to(document_path(vlp_doc, :person_id => person.id, :verification_type => verif_type.id, :doc_title => vlp_doc.title.titleize), method: :delete, class: "btn-error outline text-nowrap") do %>
                           <%= l10n("insured.consumer_roles.upload_ridp_documents.remove") %>
-                        <% end %>
+                        <% end) %>
                       </span>
                     </div>
                   </div>

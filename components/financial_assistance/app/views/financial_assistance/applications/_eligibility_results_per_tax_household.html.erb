@@ -174,14 +174,14 @@
               <p><%= l10n("faa.full_long_name_determination",
                   program_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
                   program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item) %></p>
-              <%= link_to l10n("faa.send_to_external_verification"), update_transfer_requested_application_url, method: :put, class: "button secondary", id: "btn-request-transfer", remote: true %>
+              <%= h(link_to l10n("faa.send_to_external_verification"), update_transfer_requested_application_url, method: :put, class: "button secondary", id: "btn-request-transfer", remote: true) %>
             </div>
           <% end %>
           <div class="w-100 pb-2">
             <p><%= l10n("faa.do_not_agree",
               appeal_link: EnrollRegistry[:enroll_app].setting(:appeal_link).item,
               find_expert_link: EnrollRegistry[:enroll_app].setting(:find_expert_link).item) %></p>
-            <%= link_to l10n("faa.results.view_my_applications"), applications_path, class: "button secondary" %>
+            <%= h(link_to l10n("faa.results.view_my_applications"), applications_path, class: "button secondary") %>
           </div>
         </div>
       </div>
