@@ -137,7 +137,7 @@
       var filterType = String;
       // Needs to be used for IVL too
       // var selectedPlans = document.getElementsByClassName("myfilteredPlans");
-      var carrierLogos = JSON.parse('<%= raw(digest_logos.to_json) %>');
+      var carrierLogos = JSON.parse('<%= h(digest_logos.to_json) %>');
       // Grabs available products as JSON for filtering onload
       (function () {
         document.getElementById('filteredPlans').classList.add('hidden');
