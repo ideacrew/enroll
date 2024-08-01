@@ -85,7 +85,7 @@
 
     <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
       <fieldset id="medicaid_chip_ineligible_question" class="pb-4 driver-question">
-        <legend class="instruction-row weight-n"><%= l10n("faa.medicaid_chip_ineligible") %></legend>
+        <legend class="instruction-row weight-n required"><%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>?</legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="medicaid_chip_ineligible_true">
             <input id="medicaid_chip_ineligible_true" type="radio" value="true" name="medicaid_chip_ineligible" <%='checked' if @applicant.medicaid_chip_ineligible == true %>>

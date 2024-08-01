@@ -527,12 +527,18 @@ document.addEventListener("turbolinks:load", function() {
       } else{
         $("#denied-medicaid").addClass('hide');
         $("#eligibility-change-question").removeClass('hide');
+        if ($('#has_eligibility_changed_true').is(':checked')) {
+          $("#medicaid-chip-coverage-last-day").removeClass('hide');
+        }
       }
     });
 
     $("body").on("change", "#has_eligible_medicaid_cubcare_false", function(){
       if ($('#has_eligible_medicaid_cubcare_false').is(':checked')) {
         $("#eligibility-change-question").removeClass('hide');
+        if ($('#has_eligibility_changed_true').is(':checked')) {
+          $("#medicaid-chip-coverage-last-day").removeClass('hide');
+        }
         $("#denied-medicaid").addClass('hide');
       } else{
         $("#eligibility-change-question").addClass('hide');
