@@ -40,7 +40,7 @@
       </tbody>
     </table>
 
-    <div class="append_consumer_info"></div>
+    <div id="append_consumer_info"></div>
     <%= h(link_to l10n("add_new_member"), new_insured_family_member_path({family_id: @family.id, bs4: @bs4}), remote: true, id: 'add-new-member', class: 'btn button close-2') %>
   </div>
 <% else %>

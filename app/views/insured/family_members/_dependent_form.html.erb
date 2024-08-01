@@ -167,7 +167,7 @@
               <%= l10n("cancel") %>
             <% end %>
           <% end %>
-          <%= f.button(id: 'confirm-member', class: "btn btn-primary", onclick: "$('#btn-continue').removeClass('disabled');") do %>
+          <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>
             <%= l10n("confirm_member") %>
           <% end %>
 
