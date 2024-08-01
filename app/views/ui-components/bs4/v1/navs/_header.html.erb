@@ -26,28 +26,27 @@
       <ul id="portal-type-home-link" class="navbar-nav mr-auto">
         <li class="nav-item-divider"></li>
         <li class="nav-item d-flex flex-column site-name-market">
-          <span><%= l10n('welcome.index.welcome_to_site_header')%></span>
           <%= bs4_portal_type(controller_name) %>
         </li>
       </ul>
       <ul class="navbar-nav">
-        <li class="nav-item d-flex flex-column align-items-md-end align-items-lg-end">
-          <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
-          <% contact_center_short_number = EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>
-          <a href="tel:<%= contact_center_short_number %>">
-            <%= "#{contact_center_short_number} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %>
-          </a>
-        </li>
         <% if signed_in? %>
-          <li class="nav-item-divider"></li>
-          <li class="nav-item d-flex flex-column align-items-md-end align-items-lg-end">
+          <li class="nav-item d-flex flex-column">
             <% user_id = current_user.try(:person).try(:hbx_id) %>
-            <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= " #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
-            <span class="horizontal-links">
-              <%= render partial: "shared/my_portal_links" %>
-              <span><%= h(link_to l10n('layout.header.help'), site_help_url, target: '_blank', rel: "noopener noreferrer") %></span>
-              <span><%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
-            </span>
+            <% user_name = current_user.try(:person).try(:full_name) %>
+            <div class="d-flex align-items-center">
+              <div class="mr-2">
+                <%= image_pack_tag "icons/user-small.svg", alt:"user icon", class: "user-icon" %>
+              </div>
+              <div>
+                <div class="bold m-0 p-0"><%= user_first_name_last_name_and_suffix %></div>
+                <div class="horizontal-links">
+                  <% unless user_id.blank? %><span><%= l10n("id").upcase %>: <%= user_id %></span><% end %>
+                  <% unless current_user.nil? %><span><%= my_portal_link(controller) %></span><% end %>
+                  <span><%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
+                </div>
+              </div>
+            </div>
           </li>
         <% end %>
       </ul>
