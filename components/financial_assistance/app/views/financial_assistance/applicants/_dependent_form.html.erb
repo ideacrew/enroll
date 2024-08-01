@@ -109,7 +109,6 @@
 
           <div id="dependent-address" class="my-3">
             <div class="">
-              <% binding.irb %>
               <% checked = (f.object.same_with_primary.present? && f.object.same_with_primary == false) ? "false" : "checked" %>
               <label for="applicant_same_with_primary" class="weight-n required">
                 <%= f.check_box :same_with_primary, {checked: checked, class: 'checked', id: 'applicant_same_with_primary'}, "true", "false" %>
