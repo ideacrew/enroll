@@ -214,6 +214,10 @@ module FinancialAssistance
       end
 
       def nested_parameters
+        @nested_parameters || build_nested_parameters
+      end
+
+      def build_nested_parameters
         address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
 
         # Removes mailing address if it is marked for destroy from the params
