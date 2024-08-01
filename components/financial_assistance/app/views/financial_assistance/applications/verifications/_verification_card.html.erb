@@ -66,9 +66,9 @@
                   <% end) %>
                 <% end %>
                 <span class="<%=pundit_class(Family, :updateable?)%> pl-1" >
-                  <%= link_to financial_assistance.application_applicant_verification_documents_destroy_path(document, :applicant_id => applicant.id, :evidence => evidence.id, :doc_key => key, :doc_title => document.title.titleize, evidence_kind: evidence_kind), method: :delete, class: "btn-error outline text-nowrap" do %>
+                  <%= h(link_to(financial_assistance.application_applicant_verification_documents_destroy_path(document, :applicant_id => applicant.id, :evidence => evidence.id, :doc_key => key, :doc_title => document.title.titleize, evidence_kind: evidence_kind), method: :delete, class: "btn-error outline text-nowrap") do %>
                     <%= l10n("insured.consumer_roles.upload_ridp_documents.remove") %>
-                  <% end %>
+                  <% end) %>
                 </span>
               </div>
             </div>

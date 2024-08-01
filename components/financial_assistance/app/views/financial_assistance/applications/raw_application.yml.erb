@@ -33,7 +33,7 @@
         This person will be claimed as a dependent by: <%= applicant.claimed_as_tax_dependent_by ? @applicants.find(applicant.claimed_as_tax_dependent_by).full_name : nil %>
     INCOME:
     INCOME ADJUSTMENTS:
-        <%= strip_tags(l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) %>*: <%= applicant.has_deductions %>
+        <%= sanitize(l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)) %>*: <%= applicant.has_deductions %>
     HEALTH COVERAGE:
         Is this person currently enrolled in health coverage?: <%= applicant.has_enrolled_health_coverage %>
         Does this person currently have access to other health coverage, including through another person?: <%=applicant.has_eligible_health_coverage %>
