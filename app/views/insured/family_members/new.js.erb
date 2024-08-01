@@ -44,7 +44,9 @@ if (bs4 == "true") {
     applyListeners();
     demographicValidations();
     isApplyingCoverage("dependent");
-    toggleDependentEdit(true, "<%= @dependent.id %>");
+    $("a[id^=edit-member]").addClass('disabled');
+    $("#add-new-member").addClass("hidden");
+    $("#edit-member-" + "<%= @dependent.id %>").addClass("hidden");
   }
 } else {
   $('#dependents_info_wrapper h4:first').text("Please enter the information requested below. When you\'re finished, select \'Confirm Member\' at the bottom of the page.");

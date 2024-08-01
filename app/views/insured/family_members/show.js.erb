@@ -6,19 +6,18 @@ if (!$(".my-household-page").length) {
   }
 
   $("#dependent_buttons").removeClass('hidden');
-} else {;
-  <% member = @dependent.family_member %>
-  toggleDependentEdit(false, "<%= member.person_id %>");
-  if ($(".member-<%= member.person_id %>-row").length) {
-    $(".member-<%= member.person_id %>-row").replaceWith("<%= escape_javascript(render 'insured/families/member_row', member: member) %>");
-  } else {
-    $('#manage_family_content tr:last').after("<%= escape_javascript(render 'insured/families/member_row', member: member) %>");
-  }
+} else {
+  $("a[id^=edit-member]").removeClass('disabled').removeClass('hidden');
+  $("#add-new-member").removeClass("hidden");
+  $("#new_employee_dependent_form").html($(document.createElement("div")).attr("id", "append_consumer_info"));
+  $('#manage_family_content').html("<%= escape_javascript(render partial: 'insured/families/manage_family_table', locals: {members: @family.active_family_members}) %>")
 }
 
 <% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['create', 'update', 'destroy'].include? controller.action_name) && (@person.consumer_role.present?) %>
   $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
+  $("#faa_flow_info").get(0).scrollIntoView({behavior: 'smooth'});
 <% end %>
 <% if @created %>
   $('#qle_flow_info').removeClass('hidden');
+  $("#qle_flow_info").get(0).scrollIntoView({behavior: 'smooth'});
 <% end %>
