@@ -34,8 +34,6 @@
       <div class="append_consumer_info"></div>
     </div>
     <%= h(link_to l10n("edit_member"), personal_insured_families_path({bs4: @bs4, person: @person.id}), remote: true, id: 'edit-primary-person', class: 'btn button outline close-2 my-3') %>
-
-    <div class="append_consumer_info"></div>
   </div>
 
   <%# FAA 'info needed' row - add income & coverage info buttons %>
@@ -49,6 +47,8 @@
       </div>
     <% end %>
   </div>
+
+  <div id="append_consumer_info"></div>
 
   <div id="dependent_buttons" class="<%= 'hidden' if @family.active_family_members.empty? %> <%= pundit_class Family, :updateable?%> d-flex flex-column flex-md-row mt-md-5">
       <%= hidden_field_tag 'origin_source', @source %>
