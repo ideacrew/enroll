@@ -1,4 +1,5 @@
 <% if @bs4 %>
+  <%= render partial: 'shared/family_side_nav' %>
   <div id="plan-summary">
     <%= render partial: "ui-components/v1/cards/summary", locals: {qhp: @qhp, plan: @plan} %>
   </div>

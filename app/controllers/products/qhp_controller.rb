@@ -69,8 +69,10 @@ class Products::QhpController < ApplicationController
       @plan ||= UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)
     end
 
+    summary_layout = @bs4 ? 'progress' : 'application'
+
     respond_to do |format|
-      format.html
+      format.html {render :layout => summary_layout}
       format.js
     end
   end
@@ -95,8 +97,8 @@ class Products::QhpController < ApplicationController
     if @hbx_enrollment.blank?
       error_message = {
         :error => {
-          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person.try(:id)}",
-        },
+          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person.try(:id)}"
+        }
       }
       log(JSON.dump(error_message), {:severity => 'critical'})
       render file: 'public/500.html', status: 500
@@ -113,10 +115,10 @@ class Products::QhpController < ApplicationController
                      "aca_individual"
                    end
     @coverage_kind = if @hbx_enrollment.product.present?
-      @hbx_enrollment.product.kind.to_s
-    else
-      (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
-    end
+                       @hbx_enrollment.product.kind.to_s
+                     else
+                       (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
+                     end
 
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
