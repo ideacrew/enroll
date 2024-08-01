@@ -97,7 +97,7 @@ class Products::QhpController < ApplicationController
     if @hbx_enrollment.blank?
       error_message = {
         :error => {
-          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person.try(:id)}"
+          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person&.id}"
         }
       }
       log(JSON.dump(error_message), {:severity => 'critical'})
