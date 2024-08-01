@@ -54,8 +54,8 @@
       </div>
     </div>
     <div class="panel-body bg-white p-2">
-      <div class="d-flex">
-        <div class="col-md-2 col-sm-2 align-self-center"><%= display_carrier_logo(Maybe.new(plan), {width: 100}) %></div>
+      <div class="d-flex align-items-start">
+        <div class="col-md-2 col-sm-2"><%= display_carrier_logo(Maybe.new(plan), {width: 100}) %></div>
         <div class="col-md-8">
           <h3 class="no-buffer">
             <%= link_to summary_products_plans_path({plan_id: plan.id, :standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year), bs4: @bs4}), {:remote => true} do %>
