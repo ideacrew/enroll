@@ -140,12 +140,33 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       end
     end
 
+    before do
+      FinancialAssistance::Application.all.each do |application|
+        application.workflow_state_transitions.create!(
+          from_state: 'submitted',
+          to_state: 'determined'
+        )
+      end
+    end
+
     it 'performs under 4 seconds' do
       ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 
       expect do
         ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
       end.to perform_under(4).sec
+    end
+
+    it "should not throw missing attribute error" do
+      applications = ::FinancialAssistance::Application.only(
+        :aasm_state, :family_id, :effective_date, :assistance_year, :renewal_base_year, :years_to_renew,
+        :is_ridp_verified, :is_renewal_authorized, :us_state, :hbx_id, :submitted_at,
+        :applicants, :eligibility_determinations,:relationships, :'workflow_state_transitions.from_state',
+        :'workflow_state_transitions.transition_at', :full_medicaid_determination
+      ).where(family_id: family.id).determined
+
+      state_transition = applications.last.workflow_state_transitions.last
+      expect { state_transition.transition_at }.not_to raise_error(ActiveModel::MissingAttributeError)
     end
   end
 
