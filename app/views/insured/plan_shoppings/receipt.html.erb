@@ -160,7 +160,7 @@
 
     <p><%= l10n("plans.plan_shopping.receipt.when_finished", action: EnrollRegistry.feature_enabled?(:back_to_account_all_shop) ? "CONTINUE" : "GO TO MY ACCOUNT") %></p>
     <div class="mt-4">
-      <%= link_to l10n("plans.plan_shopping.receipt.print"), '#', id: 'btnPrint', class: "btn outline interaction-click-control-print-purchase-confirmation mr-2" %>
+      <%= h(link_to l10n("plans.plan_shopping.receipt.print"), '#', id: 'btnPrint', class: "btn outline interaction-click-control-print-purchase-confirmation mr-2") %>
       <%= h(link_to l10n("go_to_my_account"), main_app.family_account_path, class: "btn secondary text-center", id: 'btn-continue') %>
     </div>
   </div>
