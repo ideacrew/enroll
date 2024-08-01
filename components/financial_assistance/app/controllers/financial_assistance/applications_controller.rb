@@ -501,15 +501,16 @@ module FinancialAssistance
     end
 
     def generate_income_hash(applicant)
+      assistance_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!.to_s
       income_hash = {
-        "#{l10n('faa.incomes.from_employer', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s)}*" => human_boolean(applicant.has_job_income),
+        "#{l10n('faa.incomes.from_employer', assistance_year: assistance_year)}*" => human_boolean(applicant.has_job_income),
         "jobs" => generate_employment_hash(applicant.incomes.jobs),
         l10n('faa.incomes.from_self_employment',
              assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) => human_boolean(applicant.has_self_employment_income),
-        l10n('faa.other_incomes.other_sources', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) => human_boolean(applicant.has_other_income)
+        l10n('faa.other_incomes.other_sources', assistance_year: assistance_year) => human_boolean(applicant.has_other_income)
       }
       if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-        income_hash.merge!(l10n('faa.other_incomes.unemployment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) => human_boolean(applicant.has_unemployment_income))
+        income_hash.merge!(l10n('faa.other_incomes.unemployment', assistance_year: assistance_year) => human_boolean(applicant.has_unemployment_income))
       end
       income_hash
     end

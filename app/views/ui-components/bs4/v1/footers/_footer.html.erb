@@ -51,10 +51,10 @@
               </li>
             <% end %>
             <li class="mr-3">
-              <%= link_to site_faqs_url, target: '_blank', rel: 'noopener noreferrer' do %>
+              <%= h(link_to(site_faqs_url, target: '_blank', rel: 'noopener noreferrer') do %>
                 <i class="fas fa-question fa-lg"></i>&nbsp;
                 <%= l10n("layout.footer.get_help").upcase %>
-              <% end %>
+              <% end) %>
             </li>
           </ul>
         </div>
