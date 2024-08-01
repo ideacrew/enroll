@@ -763,13 +763,13 @@
       var filterType = String;
       // Needs to be used for IVL too
       // var selectedPlans = document.getElementsByClassName("myfilteredPlans");
-      var carrierLogos = JSON.parse('#{raw(digest_logos.to_json)}');
+      var carrierLogos = JSON.parse('<%= raw(digest_logos.to_json) %>');
       // Grabs available products as JSON for filtering onload
       (function () {
         document.getElementById('filteredPlans').classList.add('hidden');
         getEnrollments()
       })();
-      var coverageKind = "#{@hbx_enrollment.coverage_kind}";
+      var coverageKind = "<%= @hbx_enrollment.coverage_kind %>";
       // Allow filtering from high to low
       if (coverageKind == "dental") {
         $(".plan-metal-level-selection-filter").filter(
@@ -1061,14 +1061,14 @@
           }
           var network = "";
           if (result.product.dc_in_network) {
-            network = "#{EnrollRegistry[:enroll_app].setting(:statewide_area).item}";
+            network = "<%= EnrollRegistry[:enroll_app].setting(:statewide_area).item %>";
           }
           if (result.product.nationwide) {
-            network = "#{EnrollRegistry[:enroll_app].setting(:nationwide_area).item}";
+            network = "<%= EnrollRegistry[:enroll_app].setting(:nationwide_area).item %>";
           }
           var standard_plan = "";
           if (result.product.is_standard_plan) {
-            standard_plan = "#{EnrollRegistry[:enroll_app].setting(:standard_plan_label).item}";
+            standard_plan = "<%= EnrollRegistry[:enroll_app].setting(:standard_plan_label).item %>";
           }
           var div = document.createElement('div')
           div.setAttribute('class', 'myfilteredPlans')
