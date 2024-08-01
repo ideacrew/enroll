@@ -6,6 +6,7 @@
       <%= form_for @applicant, {url: application_applicants_path(@application), as: :applicant, remote: true} do |f| %>
         <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
         <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
+        <%= hidden_field_tag :is_dependent, true %>
 
         <p class="dependent-invalid-dob"></p>
 
