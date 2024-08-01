@@ -84,12 +84,8 @@ class LawfulPresenceDetermination
 
       if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
         process_ssa_request_failure(result, ssa_verification_type)
-        if self.ivl_role.person.primary_family
-          ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.ivl_role.person.primary_family, effective_date: TimeKeeper.date_of_record)
-        else
-          self.ivl_role.person.families.each do |family|
-            ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
-          end
+        self.ivl_role.person.families.each do |family|
+          ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
         end
       else
         ssa_verification_type&.pending_type
@@ -114,12 +110,8 @@ class LawfulPresenceDetermination
           ivl_role.fail_lawful_presence(args)
         end
 
-        if self.ivl_role.person.primary_family
-          ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.ivl_role.person.primary_family, effective_date: TimeKeeper.date_of_record)
-        else
-          self.ivl_role.person.families.each do |family|
-            ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
-          end
+        self.ivl_role.person.families.each do |family|
+          ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
         end
       else
         verification_type.pending_type
