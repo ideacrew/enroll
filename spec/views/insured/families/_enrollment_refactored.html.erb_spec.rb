@@ -103,6 +103,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(hbx_enrollment).to receive(:market_name).and_return("Employer Sponsored")
       allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
       allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
@@ -147,6 +148,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
           allow(view).to receive(:enrollment_can_pay_now?).and_return(true)
           allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
           allow(hbx_enrollment).to receive(:terminate_reason).and_return 'non_payment'
+          allow(hbx_enrollment).to receive(:market_name).and_return("Individual")
           render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false, current_user: current_user }
         end
 
@@ -180,6 +182,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "Grouping is enabled" do
       before :each do
+        allow(hbx_enrollment).to receive(:market_name).and_return("Individual")
         allow(EnrollRegistry[:home_tiles_group_by_year].feature).to receive(:is_enabled).and_return(true)
       end
 
@@ -275,6 +278,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(hbx_enrollment).to receive(:market_name).and_return("Employer Sponsored")
 
       allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
@@ -342,6 +346,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
         allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
         allow(hbx_enrollment).to receive(:can_make_changes?).and_return(false)
+        allow(hbx_enrollment).to receive(:market_name).and_return("Employer Sponsored")
         allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
         allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
         allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
@@ -380,6 +385,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(true)
+      allow(hbx_enrollment).to receive(:market_name).and_return("Individual")
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -409,6 +415,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "when termination reason config is enabled and enrollment is IVL" do
       before :each do
+        allow(hbx_enrollment).to receive(:market_name).and_return("Individual")
         allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
       end
 
@@ -427,6 +434,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "when termination reason config is disabled and enrollment is IVL" do
       before :each do
+        allow(hbx_enrollment).to receive(:market_name).and_return("Individual")
         allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(false)
       end
 
@@ -447,6 +455,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     context "when termination reason config is enabled and enrollment is Shop" do
       before :each do
         hbx_enrollment.update_attributes(kind: 'shop')
+        allow(hbx_enrollment).to receive(:market_name).and_return("Employer Sponsored")
         allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(false)
       end
 
@@ -464,6 +473,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context 'enrollment_plan_tile_update feature enabled' do
       before do
+        allow(hbx_enrollment).to receive(:market_name).and_return("Individual")
         allow(hbx_enrollment).to receive(:can_make_changes?).and_call_original
       end
 
@@ -496,6 +506,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "when termination reason config is enabled and enrollment is IVL" do
       before :each do
+        allow(hbx_enrollment).to receive(:market_name).and_return("Individual")
         allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
       end
 
@@ -533,6 +544,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     before :each do
       allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(hbx_enrollment).to receive(:market_name).and_return("Individual")
       allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
@@ -586,6 +598,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       allow(view).to receive(:initially_hide_enrollment?).with(waived_hbx_enrollment).and_return(false)
       allow(waived_hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(waived_hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(waived_hbx_enrollment).to receive(:market_name).and_return("Employer Sponsored")
       allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
     end
 
@@ -668,6 +681,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return(double)
+      allow(hbx_enrollment).to receive(:market_name).and_return("Employer Sponsored")
       allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
     end
 
@@ -733,6 +747,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         allow(hbx_enrollment1).to receive(:is_cobra_status?).and_return(false)
         allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
         allow(hbx_enrollment1).to receive(:hbx_enrollment_members).and_return(double)
+        allow(hbx_enrollment1).to receive(:market_name).and_return("Employer Sponsored")
         allow(view).to receive(:covered_members_name_age).and_return(['Test(32)'])
         allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment1).and_return(false)
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
