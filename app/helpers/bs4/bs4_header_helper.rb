@@ -3,6 +3,7 @@
 # Here is a comment
 module Bs4
   # this is used with the new bs4 header
+  # rubocop:disable Metrics/ModuleLength
   module Bs4HeaderHelper
     include L10nHelper
     include ApplicationHelper
@@ -121,4 +122,5 @@ module Bs4
       end
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end
