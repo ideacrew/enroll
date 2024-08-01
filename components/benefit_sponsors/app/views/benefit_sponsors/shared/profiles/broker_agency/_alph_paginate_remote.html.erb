@@ -13,12 +13,12 @@
       <% if all %>
         <% all_url = all %>
         <% all_url += "&" + url_params.inject([]){|arr, (k,v)| arr << "#{k}=#{v}"}.join("&") if !url_params.empty? %>
-        <li class="page-item"><%= link_to "ALL", all_url, remote: true, class:"page-link" %></li>
+        <li class="page-item"><%= h(link_to l10n("all"), all_url, remote: true, class:"page-link") %></li>
       <% end %>
       <% alphs.each_with_index do |alph, index| %>
         <% alph_url = url + "&page=#{alph}" %>
         <% active = params[:page] ? alph == params[:page] : index == 0 %>
-        <li class="page-item <%= 'active' if active %>"><%= link_to alph, (alph_url), remote: true, class: 'page-link' %></li>
+        <li class="page-item <%= 'active' if active %>"><%= h(link_to alph, (alph_url), remote: true, class: 'page-link') %></li>
       <% end %>
       <% next_alph = next_page(alphs, current_page) %>
       <li class="page-item <%= 'disabled' if current_page == alphs.last %>"><%= h(link_to l10n("next"), (next_alph.present? ? url + "&page=#{next_alph}" : "#"), remote: true, class: 'page-link') %></li>

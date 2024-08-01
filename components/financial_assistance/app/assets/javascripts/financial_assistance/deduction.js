@@ -30,7 +30,7 @@ function deleteDeductions(kind) {
       }
     });
   });
-  
+
   $.when.apply($, requests).done(function() {
     const args = [].slice.apply(arguments);
     const responses = requests.length == 1 ? [args] : args;
@@ -105,8 +105,13 @@ $(document).on('turbolinks:load', function () {
         var self = this;
 
         $('#unsavedDeductionChangesWarning').modal('show');
-        $('button#leave').click(function() {
-          window.location.href = $(self).attr('href');
+        $('button#leave').on('click', function() {
+          // these two lines are necessary to prevent the modal from showing again
+          $('.interaction-click-control-continue').removeClass('disabled');
+          $('#nav-buttons a').removeClass('disabled');
+
+          // retriggering the click as navigating based on the href got flagged in security check
+          self.click();
         });
 
         return false;
@@ -148,7 +153,7 @@ $(document).on('turbolinks:load', function () {
         $("#destroyAllDeductions").modal();
         var deduction_kind_name = $(this).val().replace(/_/g, ' ');
         deduction_kind_name = deduction_kind_name.charAt(0).toUpperCase() + deduction_kind_name.slice(1);
-        $('#deduction_kind_modal').html("for <b>" + deduction_kind_name + "</b>");
+        $('#deduction_kind_modal').text(deduction_kind_name);
         $("#destroyAllDeductions .modal-cancel-button").click(function(e) {
           $("#destroyAllDeductions").modal('hide');
         });
