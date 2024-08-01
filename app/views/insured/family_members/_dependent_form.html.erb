@@ -9,7 +9,7 @@
         <p class="dependent-invalid-dob"></p>
 
         <% if dependent.errors.any? %>
-          <div class="alert alert-error">
+          <div class="dependent-error alert alert-error">
             <h4>
               <%= l10n("insured.consumer_roles.dependent_error.header") %>
             </h4>
@@ -23,31 +23,12 @@
         <% end %>
 
         <% if @address_errors.present? %>
-          <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
+          <div class="dependent-error">
+            <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
+          </div>
         <% end %>
 
         <% readonly = dependent.id.present? %>
-
-        <%= token_tag form_authenticity_token %>
-        <p class="dependent-invalid-dob"></p>
-
-        <% if dependent.errors.any? %>
-          <div class="alert alert-error">
-            <h4>
-              <%= l10n("insured.consumer_roles.dependent_error.header") %>
-            </h4>
-            <ul>
-              <% dependent.errors.full_messages.each do |msg| %>
-                <% msg = (msg == l10n("insured.consumer_roles.dependent_error.gender") && EnrollRegistry.feature_enabled?(:gender_to_sex)) ? l10n("insured.consumer_roles.dependent_error.sex") : msg %>
-                <li> <%= msg %> </li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
-        <% if @address_errors.present? %>
-          <%= render partial: 'shared/address_error_messages', locals: {address_errors: @address_errors} %>
-        <% end %>
 
         <%= token_tag form_authenticity_token %>
 
@@ -200,6 +181,10 @@
         $("#is_applying_coverage_value_dep").text("Does "+ text +" need coverage? *");
         $("#is_applying_coverage_value_dep_1").text(text);
       });
+
+      if($('.dependent-error').length) {
+        $(".dependent_list").get(0).scrollIntoView({behavior: 'smooth'});
+      }
     });
 
     <% if dependent.id.present? %>
