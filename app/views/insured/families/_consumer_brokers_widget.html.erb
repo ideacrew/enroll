@@ -4,10 +4,10 @@
   <div class="home-widget p-2">
     <h3 class="d-flex justify-content-between">
       <%= l10n("insured.get_help_signing_up") %>
-      <%= link_to '#', data: { toggle: 'modal', target: h('#read_only_modal_what_is_a_broker_or_assister') } do %>
+      <%= h(link_to('#', data: { toggle: 'modal', target: h('#read_only_modal_what_is_a_broker_or_assister') }) do %>
         <i class="fa fa-question-circle ml-4 mt-1" aria-hidden="true"></i>
         <span class="hide"><%= l10n("insured.what_is_a_broker_or_assister") %></span>
-      <% end %>
+      <% end) %>
     </h3>
     <div class="pr-2 pl-2 pb-2 w-100">
       <% if current_broker_agency && display_broker_info_for_consumer %>
