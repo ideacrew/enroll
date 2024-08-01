@@ -244,6 +244,20 @@ function showOnly(selected) {
   });
 }
 
+function toggleDependentEdit(enable, member_id) {
+  if (enable) {
+    $("a[id^=edit-member]").addClass('disabled');
+    $("#add-new-member").addClass("hidden");
+    $("#edit-member-" + member_id).addClass("hidden");
+  } else {
+    $("a[id^=edit-member]").removeClass('disabled').removeClass('hidden');
+    $("#add-new-member").removeClass("hidden");
+    $("#new_employee_dependent_form").html($(document.createElement("div")).attr("id", "append_consumer_info"));
+    $("#person-" + member_id).remove();
+    $(".append_consumer_info").empty();
+  }
+}
+
 function applyListeners() {
   if ($('form.edit_person').length > 0) {
     applyListenersFor('person');

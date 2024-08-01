@@ -1,19 +1,28 @@
-if (!$(".my-household-page")) {
+if (!$(".my-household-page").length) {
   if ($("#add_member_list_<%= @dependent.id %>").length) {
     $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent, person: @person) %>");
   } else {
     $("#new_employee_dependent_form").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent, person: @person) %>");
   }
 
-  <% if @created %>
-    $('#qle_flow_info').removeClass('hidden');
-  <% end %>
-
   $("#dependent_buttons").removeClass('hidden');
-  <% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['create', 'update', 'destroy'].include? controller.action_name) && (@person.consumer_role.present?) %>
-    $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
-  <% end %>
-} else {
-  //manage family/ my household page
-  location.reload();
+} else {;
+  <% member = @dependent.family_member %>
+  toggleDependentEdit(false, "<%= member.person_id %>");
+  if ($(".member-<%= member.person_id %>-row").length) {
+    $(".member-<%= member.person_id %>-row").replaceWith("<%= escape_javascript(render 'insured/families/member_row', member: member) %>");
+  } else {
+    $('#manage_family_content tr:last').after("<%= escape_javascript(render 'insured/families/member_row', member: member) %>");
+  }
 }
+
+<% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['create', 'update', 'destroy'].include? controller.action_name) && (@person.consumer_role.present?) %>
+  if (document.documentElement.dataset.bs4 == "true") {
+    $('#faa_flow_info').removeClass('hidden');
+  } else {
+    $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
+  }
+<% end %>
+<% if @created %>
+  $('#qle_flow_info').removeClass('hidden');
+<% end %>

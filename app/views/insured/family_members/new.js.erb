@@ -44,11 +44,7 @@ if (bs4 == "true") {
     applyListeners();
     demographicValidations();
     isApplyingCoverage("dependent");
-    $("a[id^=edit-member]").addClass('disabled');
-    $("#add-new-member").addClass("hidden");
-    $("#edit-member-<%= @dependent.id %>").addClass("hidden");
-    $("#cancel-edit-<%= @dependent.id %>").removeClass("hidden");
-    $("#save-member-<%= @dependent.id %>").removeClass("hidden");
+    toggleDependentEdit(true, "<%= @dependent.id %>");
   }
 } else {
   $('#dependents_info_wrapper h4:first').text("Please enter the information requested below. When you\'re finished, select \'Confirm Member\' at the bottom of the page.");
