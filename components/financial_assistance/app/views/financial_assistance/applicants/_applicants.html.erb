@@ -112,9 +112,9 @@
       <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel" for="relation">RELATIONSHIP</label>
         <span class="field_value floatlabel form-control active-floatlabel" id="relation"><%= l10n(".self").to_s.upcase %></span>
-        <%= link_to(edit_application_applicant_path(@application, @application.primary_applicant), remote: true, class: 'close close-2') do %>
+        <%= h(link_to(edit_application_applicant_path(@application, @application.primary_applicant), remote: true, class: 'close close-2') do %>
           <i class="fas fa-pencil-alt edit-applicant"><span class="hide"><%= l10n('edit') %></span></i>
-        <% end %>
+        <% end) %>
       </div>
     </div>
   </div>
