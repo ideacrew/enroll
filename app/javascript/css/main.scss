@@ -179,7 +179,7 @@ dl.parent.weight-n {
 }
 
 #personal_info {
-  input:not([type='checkbox']):not([type='radio']):not([type='email'].full-width):not(.phone_number.full-width),
+  input:not([type='checkbox']):not([type='radio']),
   select,
   .input {
     width: 180px;
