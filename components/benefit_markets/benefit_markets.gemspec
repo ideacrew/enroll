@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'virtus',                    '~> 1.0'
   s.add_dependency "slim",                      "~> 3.0"
   s.add_dependency 'symmetric-encryption',      '3.9.1'
+  s.add_dependency 'rexml',                     '3.3.3'
 
   s.add_dependency 'dry-types'
   s.add_dependency 'dry-validation'
