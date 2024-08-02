@@ -32,7 +32,7 @@
   <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: review_and_submit_application_path(@application), disable_link: @missing_relationships.any?} %>
   <script>
     $(function() {
-      if(<%= @missing_relationships.any? %>){
+      if(<%= @missing_relationships.any? || @all_relationships.detect{|applicant| app[:error]} %>){
         $('#btn-continue', '#continue_button').attr('disabled', true);
         $('#btn-continue', '#continue_button').addClass('disabled');
         $('#btn-continue').addClass('disabled');
