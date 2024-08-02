@@ -85,7 +85,7 @@
 
     <% if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status %>
       <fieldset id="medicaid_chip_ineligible_question" class="pb-4 driver-question">
-        <legend class="instruction-row weight-n required"><%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>?</legend>
+        <legend class="instruction-row weight-n required"><%= l10n("faa.medicaid_chip_ineligible", year: TimeKeeper.date_of_record.year - 5) %>?</legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="medicaid_chip_ineligible_true">
             <input id="medicaid_chip_ineligible_true" type="radio" value="true" name="medicaid_chip_ineligible" <%='checked' if @applicant.medicaid_chip_ineligible == true %>>
@@ -190,7 +190,7 @@
     <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
       <div id="has_dependent_with_coverage_question" class="pb-4 driver-question">
         <fieldset>
-          <legend class="weight-n instruction-row"><%= l10n("faa.has_dependent_with_coverage") %></legend>
+          <legend class="weight-n required instruction-row"><%= l10n("faa.has_dependent_with_coverage") %></legend>
           <div class="focus d-flex mt-3">
             <label class="radio mr-3" for="has_dependent_with_coverage_true">
               <input id="has_dependent_with_coverage_true" type="radio" value="true" name="has_dependent_with_coverage" <%='checked' if @applicant.has_dependent_with_coverage == true %>>
@@ -207,7 +207,7 @@
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_dependent_with_coverage"} %>
 
         <fieldset id="denied-job-end-on" class="mt-4">
-          <legend class="weight-n instruction-row"><%=l10n("faa.dependent_job_end_on")%></legend>
+          <legend class="weight-n required instruction-row"><%=l10n("faa.dependent_job_end_on")%></legend>
           <div class="mr-auto mt-3">
             <label class="required" for="dependent_job_end_on"><%==l10n("end_date")%></label>
             <%= date_field_tag :dependent_job_end_on, @applicant.dependent_job_end_on&.strftime("%Y-%m-%d"), class: "date-field mt-2", :'data-date-max' => "+0" %>
@@ -330,7 +330,7 @@
         <% if @applicant.eligible_immigration_status %>
           <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
             <div class="col-md-6 labelforcoverage">
-              <span class="fa-text-color"> <%= l10n("faa.medicaid_chip_ineligible") %> <%= TimeKeeper.date_of_record.year - 5 %>? *</span>
+              <span class="fa-text-color"> <%= l10n("faa.medicaid_chip_ineligible", year: TimeKeeper.date_of_record.year - 5) %>? *</span>
             </div>
             <div class="col-md-6 mt11">
               <div class="col-md-3 no-padding">
@@ -448,7 +448,7 @@
       <% if @applicant.age_on(TimeKeeper.date_of_record) < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
         <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
           <div class="col-md-6 labelforcoverage">
-            <span class="fa-text-color"><%=l10n("faa.has_dependent_with_coverage")%></span>
+            <span class="fa-text-color"><%=l10n("faa.has_dependent_with_coverage")%>*</span>
           </div>
           <div class="col-md-6 mt11">
             <div class="col-md-3 no-padding">
@@ -468,7 +468,7 @@
 
         <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements" id='denied-job-end-on'>
           <div class="col-md-10 labelforcoverage">
-            <span class="fa-text-color"><%=l10n("faa.dependent_job_end_on")%></span>
+            <span class="fa-text-color"><%=l10n("faa.dependent_job_end_on")%>*</span>
             <%= text_field_tag("dependent_job_end_on", @applicant.dependent_job_end_on, class: "jq-datepicker", placeholder: 'Select End Date', style: 'margin-left: 50px;') %>
           </div>
         </div>

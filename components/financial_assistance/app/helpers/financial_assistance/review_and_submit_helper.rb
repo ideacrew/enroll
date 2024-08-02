@@ -46,7 +46,7 @@ module FinancialAssistance
           city: 'city',
           state: 'state',
           zip: 'zip',
-          employer_phone: 'employer_phone',
+          employer_phone: 'faa.incomes.employer_phone',
           from_self_employment: ['faa.incomes.from_self_employment', {assistance_year: assistance_year}],
           unemployment: ['faa.other_incomes.unemployment', {assistance_year: assistance_year}],
           alaska_native: 'faa.other_incomes.alaska_native',
