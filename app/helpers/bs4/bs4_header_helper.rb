@@ -10,7 +10,7 @@ module Bs4
 
     def bs4_portal_type(controller) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       if current_user.nil?
-        nil
+        link_to(l10n("layout.header.role.individual_and_family"), privacy_insured_employee_index_path)
       elsif current_user.try(:has_hbx_staff_role?)
         link_to(l10n("layout.header.role.admin"), main_app.exchanges_hbx_profiles_root_path)
       elsif display_i_am_broker_for_consumer?(current_user.person) && controller_path.exclude?('general_agencies')

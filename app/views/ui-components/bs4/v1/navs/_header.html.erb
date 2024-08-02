@@ -1,5 +1,5 @@
 <span id='dchbx_enroll_date_of_record' class='hidden d-none'><%= TimeKeeper.date_of_record.iso8601 %></span>
-<header class="bg-white navbar-primary py-2 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
+<header class="bg-white navbar-primary py-1 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
 
   <nav class="top-nav navbar navbar-expand-lg container py-1 px-0">
     <a class="navbar-brand mr-0" href="#" title="<%= l10n('welcome.index.logo_title')%>">
@@ -36,7 +36,13 @@
             <% user_name = current_user.try(:person).try(:full_name) %>
             <div class="d-flex align-items-center">
               <div class="mr-2">
-                <%= image_pack_tag "icons/user-small.svg", alt:"user icon", class: "user-icon" %>
+                <% if current_user.try(:has_hbx_staff_role?) %>
+                  <%= image_pack_tag "icons/admin-icon.svg", alt:"admin icon", class: "user-icon" %>
+                <% elsif bs4_portal_type(controller_name) == "Broker" %>
+                  <%= image_pack_tag "icons/expert-icon.svg", alt:"expert icon", class: "user-icon" %>
+                <% else %>
+                  <%= image_pack_tag "icons/user-small.svg", alt:"user icon", class: "user-icon" %>
+                <% end %>
               </div>
               <div>
                 <div class="bold m-0 p-0"><%= user_first_name_last_name_and_suffix %></div>
