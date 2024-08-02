@@ -116,6 +116,7 @@ PATH
       mongoid (~> 7.5.4)
       pundit (~> 2.0)
       rails (~> 6.1.7.8)
+      rexml (= 3.3.3)
       slim (~> 3.0)
       symmetric-encryption (= 3.9.1)
       virtus (~> 1.0)
@@ -170,6 +171,7 @@ PATH
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 6.1.7.8)
+      rexml (= 3.3.3)
       slim (~> 3.0)
       symmetric-encryption (= 3.9.1)
 
@@ -186,6 +188,7 @@ PATH
       non-stupid-digest-assets
       pundit (~> 2.0)
       rails (~> 6.1.7.8)
+      rexml (= 3.3.3)
       roo (~> 2.10)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
@@ -227,6 +230,7 @@ PATH
       net-sftp (~> 2.1, >= 2.1.2)
       net-ssh (= 4.2.0)
       rails (~> 6.1.7.8)
+      rexml (= 3.3.3)
 
 PATH
   remote: components/transport_profiles
