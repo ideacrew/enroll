@@ -29,11 +29,11 @@ describe 'shared/_address_fields_for_dependent.html.erb' do
     end
 
     it 'should have is_moving_to_state checkbox' do
-      expect(rendered).to have_selector('input#person_is_moving_to_state')
+      expect(rendered).to have_selector('input#is_moving_to_state')
     end
 
     it 'should have is_temporarily_out_of_state checkbox' do
-      expect(rendered).to have_selector('input#person_is_temporarily_out_of_state')
+      expect(rendered).to have_selector('input#is_temporarily_out_of_state')
     end
   end
 
@@ -46,7 +46,7 @@ describe 'shared/_address_fields_for_dependent.html.erb' do
     end
 
     it 'should not have is_moving_to_state checkbox' do
-      expect(rendered).not_to have_selector('input#person_is_moving_to_state')
+      expect(rendered).not_to have_selector('input#is_moving_to_state')
     end
 
     it 'should not have is_temporarily_out_of_state checkbox' do
