@@ -100,9 +100,24 @@
           <h4 class="gamma"><%= l10n("insured.consumer_roles.home_address") %></h4>
           <%= render partial: 'shared/consumer_home_address_fields', locals: {f: f, bs4: true} %>
         </section>
-        <section class="mb-4">
-          <h4 class="gamma mb-0"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
+        <section class="mb-4 hidden">
+          <h4 class="gamma"><%= l10n("insured.consumer_roles.phone_and_email") %></h4>
+          <%
+            unless f.object.phones.nil?
+              ["home","mobile"].each do |kind|
+                f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
+              end
+            end
+          %>
           <%= render partial: 'shared/phone_fields', locals: {f: f, bs4: true} %>
+
+          <% unless f.object.emails.nil?
+              ["home","work"].each do |kind|
+                f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
+              end
+            end
+          %>
+
           <div id="email_info" class="">
             <div class="email d-flex mb-md-4 row col-sm">
               <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
