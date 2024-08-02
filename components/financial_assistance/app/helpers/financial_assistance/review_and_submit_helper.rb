@@ -186,12 +186,13 @@ module FinancialAssistance
     def build_job_incomes_hash(applicant, hash)
       applicant.incomes.jobs.each do |job|
         hash[:employer_name] = job.employer_name
-        next unless job.employer_address.present?
-        hash[:employer_address_line_1] = job.employer_address.address_1
-        hash[:employer_address_line_2] = job.employer_address.address_2 if job.employer_address.address_2.present?
-        hash[:city] = job.employer_address.city
-        hash[:state] = job.employer_address.state
-        hash[:zip] = job.employer_address.zip
+        if job.employer_address.present?
+          hash[:employer_address_line_1] = job.employer_address.address_1
+          hash[:employer_address_line_2] = job.employer_address.address_2 if job.employer_address.address_2.present?
+          hash[:city] = job.employer_address.city
+          hash[:state] = job.employer_address.state
+          hash[:zip] = job.employer_address.zip
+        end
         hash[:employer_phone] = format_phone(income.employer_phone.full_phone_number) if job.employer_phone.present?
       end
       hash
