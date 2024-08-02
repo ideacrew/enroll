@@ -33,8 +33,18 @@ module FinancialAssistance
           end
 
           def expiration_date=(val)
-            @expiration_date = Date.strptime(val, '%m/%d/%Y') if val.to_s.present?
+            if val.to_s.present?
+              begin
+                @expiration_date = Date.strptime(val, '%m/%d/%Y')
+              rescue ArgumentError => e
+                puts "Invalid date format: #{e.message}"
+                @expiration_date = nil
+              end
+            else
+              @expiration_date = nil
+            end
           end
+
 
           def us_citizen
             return @us_citizen unless @us_citizen.nil?
