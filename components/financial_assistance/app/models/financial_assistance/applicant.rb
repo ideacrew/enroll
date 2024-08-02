@@ -646,18 +646,18 @@ module FinancialAssistance
       return if domestic_partner_relationship.blank?
 
       domestic_partner_relationship_relative = relationships.where(relative_id: domestic_partner_relationship.relative.id).first
-      return domestic_partner_relationship_relative if ['domestic_partners_child', 'child'].include?(domestic_partner_relationship_relative.kind)
+      return domestic_partner_relationship_relative unless ['domestic_partners_child', 'child'].include?(domestic_partner_relationship_relative.kind)
     end
 
     def invalid_in_law_relationships
       unrelated_relationships = relationships.where(kind: 'unrelated')
       spouse_relationship = relationships.where(:kind => 'spouse').first
       return unless unrelated_relationships.present? && spouse_relationship.present?
-      spouse_sibling_relationships = spouse_relationship.relative.relationships.where(:kind.in => ['sibling', 'brother_or_sister_in_law'])
+      spouse_sibling_relationships = spouse_relationship&.relative&.relationships&.where(:kind.in => ['sibling', 'brother_or_sister_in_law'])
       return unless spouse_sibling_relationships.present?
 
       spouse_sibling_ids = spouse_sibling_relationships.collect(&:relative_id)
-      unrelated_relationships.select { |unrelated_relationship| unrelated_relationship if spouse_sibling_ids.include?(unrelated_relationships.relative_id) }
+      unrelated_relationships.select { |unrelated_relationship| unrelated_relationship if spouse_sibling_ids.include?(unrelated_relationship.relative_id) }
     end
 
     # Checks to see if there is a relationship for Application where current applicant is spouse to PrimaryApplicant.
