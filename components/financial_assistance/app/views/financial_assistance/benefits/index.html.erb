@@ -57,12 +57,12 @@
       <fieldset id="ai_an_health_service_eligible_question" class="pb-4 driver-question">
         <legend class="weight-n instruction-row"><%= l10n("faa.indian_health_service_eligible") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
-          <label class="radio mr-3" for="ai_an_health_service_eligible_true">
-            <input id="ai_an_health_service_eligible_true" type="radio" value="true" name="ai_an_health_service_eligible" <%='checked' if @applicant.health_service_eligible == true %>>
+          <label class="radio mr-3">
+            <%= radio_button_tag("health_service_eligible", true, @applicant.health_service_eligible) %>            
             <span><%= l10n("yes") %></span>
           </label>
-          <label class="radio mr-3" for="ai_an_health_service_eligible_false">
-            <input id="ai_an_health_service_eligible_false" type="radio" value="false" name="ai_an_health_service_eligible" <%='checked'if @applicant.health_service_eligible == false %>>
+          <label class="radio mr-3">
+            <%= radio_button_tag("health_service_eligible", false, @applicant.health_service_eligible == false) %>
             <span><%= l10n("no") %></span>
           </label>
         </div>
