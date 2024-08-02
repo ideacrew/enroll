@@ -19,7 +19,7 @@
     <dl>
       <% subsection[:rows].each do |(term_string, value)| %>
         <div class="d-flex justify-content-between align-items-center">
-          <dt class="col-8 px-0 <%= "required" if value.is_a?(Hash) && value[:is_required].present? ? value[:is_required] : false %>"><%= term_string %></dt>
+          <dt class="col-8 px-0"><%= term_string %></dt>
           <dd><%= value.is_a?(Hash) && value[:value].present? ? value[:value] : value %></dd>
         </div>
         <%# Review Benefits partial for Health Coverage subsection %>
