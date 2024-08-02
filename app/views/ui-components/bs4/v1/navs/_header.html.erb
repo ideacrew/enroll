@@ -1,5 +1,5 @@
 <span id='dchbx_enroll_date_of_record' class='hidden d-none'><%= TimeKeeper.date_of_record.iso8601 %></span>
-<header class="bg-white navbar-primary py-1 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
+<header class="bg-white navbar-primary py-2 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
 
   <nav class="top-nav navbar navbar-expand-lg container py-1 px-0">
     <a class="navbar-brand mr-0" href="#" title="<%= l10n('welcome.index.logo_title')%>">
@@ -23,9 +23,9 @@
     </button>
 
     <div id="desktop-navigation" class=" collapse navbar-collapse">
-      <ul id="portal-type-home-link" class="navbar-nav mr-auto">
+      <ul id="portal-type-home-link" class="navbar-nav mr-auto d-flex">
         <li class="nav-item-divider"></li>
-        <li class="nav-item d-flex flex-column site-name-market">
+        <li class="nav-item d-flex flex-column site-name-market align-self-center">
           <%= bs4_portal_type(controller_name) %>
         </li>
       </ul>
