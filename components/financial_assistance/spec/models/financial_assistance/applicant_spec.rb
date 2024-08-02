@@ -1075,7 +1075,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns false" do
-          expect(applicant.valid_spousal_relationship?).to eq false
+          expect(applicant.invalid_spousal_relationship.present?).to eq true
         end
       end
 
@@ -1097,7 +1097,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns true" do
-          expect(applicant.valid_spousal_relationship?).to eq true
+          expect(applicant.invalid_spousal_relationship.present?).to eq false
         end
       end
     end
@@ -1122,7 +1122,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns false" do
-          expect(applicant3.valid_family_relationships?).to eql(false)
+          expect(applicant3.invalid_family_relationships.present?).to eql(true)
         end
       end
 
@@ -1144,7 +1144,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns true" do
-          expect(applicant.valid_family_relationships?).to eql(true)
+          expect(applicant.invalid_family_relationships.present?).to eql(false)
         end
       end
     end
@@ -1188,7 +1188,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns false" do
-          expect(applicant5.valid_family_relationships?).to eql(false)
+          expect(applicant5.invalid_family_relationships.present?).to eql(true)
         end
       end
 
@@ -1214,7 +1214,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns true" do
-          expect(applicant5.valid_family_relationships?).to eql(true)
+          expect(applicant5.invalid_family_relationships.present?).to eql(false)
         end
       end
     end
@@ -1260,7 +1260,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         it "returns true" do
           application.applicants.each do |applicant|
-            expect(applicant.valid_family_relationships?).to eql(true)
+            expect(applicant.invalid_family_relationships.present?).to eql(false)
           end
         end
       end
@@ -1287,7 +1287,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns false" do
-          expect(applicant4.valid_family_relationships?).to eql(false)
+          expect(applicant4.invalid_family_relationships.present?).to eql(true)
         end
       end
     end
