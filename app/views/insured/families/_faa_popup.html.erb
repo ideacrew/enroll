@@ -1,14 +1,24 @@
-<div id='faa_flow_info'>
-  <div class='coverage-table'>
-    <div class='initial-info notification-error-wrapper'>
-      <div class='row no-buffer'>
-        <div class='col-md-8'>
-          <center><strong><%= l10n('insured.families.financial_assistance_add_or_remove_family_member') %></strong></center>
-        </div>
-        <div class='col-md-4'>
-          <%= link_to 'Continue', financial_assistance.applications_path, class: 'btn btn-default' %>
+<% if @bs4 %>
+  <div class="alert alert-info d-flex align-items-center justify-content-start p-3" role="alert">
+    <div class="info-icon icon align-self-start">&nbsp;</div>
+    <div class="col px-0 pb-1">
+      <p class="mb-1"><%= l10n("insured.families.financial_assistance_add_or_remove_family_member") %></p>
+      <%= link_to l10n("insured.families.go_to_applications"), financial_assistance.applications_path %>
+    </div>
+  </div>
+<% else %>
+  <div id='faa_flow_info'>
+    <div class='coverage-table'>
+      <div class='initial-info notification-error-wrapper'>
+        <div class='row no-buffer'>
+          <div class='col-md-8'>
+            <center><strong><%= l10n('insured.families.financial_assistance_add_or_remove_family_member') %></strong></center>
+          </div>
+          <div class='col-md-4'>
+            <%= link_to 'Continue', financial_assistance.applications_path, class: 'btn btn-default' %>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+<% end %>
