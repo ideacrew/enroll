@@ -12,7 +12,7 @@
 
   <div id="primary-person" class="my-3">
     <h2><%= l10n('member') %> 1</h2>
-    <div id="primary-info-display" class="d-flex flex-row flex-wrap justify-content-between my-household-page">
+    <div id="primary-info-display" class="d-flex flex-row flex-wrap justify-content-between">
       <div>
         <label for="name"><%= l10n("name")%></label>
         <input id="name" type="text" value="<%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %>" disabled >
