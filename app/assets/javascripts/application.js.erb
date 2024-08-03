@@ -959,9 +959,8 @@ document.addEventListener('click', function(event) {
       let previous = element.previousElementSibling;
       let next = element.nextElementSibling;
 
-      if ((previous?.id?.includes('_1_kind') && previous?.value == 'mailing') ||
-          (next?.id?.includes('_1_kind') && next?.value == 'mailing')
-      ) {
+      if ((previous && previous.id && previous.id.includes('_1_kind') && previous.value == 'mailing') ||
+        (next && next.id && next.id.includes('_1_kind') && next.value == 'mailing')) {
         element.value = true;
       } else {
         // NOTE: this second condition may not be necessary, 
