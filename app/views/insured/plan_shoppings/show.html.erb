@@ -12,8 +12,8 @@
     <div id="plan-summary"></div>
 
     <div id="all-plans" class="all-filters-row">
-      <details close id="plan-filter-container" class="my-3">
-        <summary data-open="Close Filters" data-close="Show Filters"></summary>
+      <details id="plan-filter-container" class="my-3">
+        <summary data-open="Hide Filters" data-close="Show Filters"></summary>
         <div class="mt-3">
           <%= render partial: './ui-components/v1/filters/plan_filters' %>
         </div>
@@ -74,19 +74,31 @@
     details#plan-filter-container > summary {
       list-style-type: none;
       font-weight: bold;
-      text-size: 18px;
+      font-size: 18px;
     }
 
     details#plan-filter-container > summary::-webkit-details-marker, details > summary::marker  {
       display: none;
     }
 
+    details#plan-filter-container[open] summary::before {
+      content: attr(data-open);
+    }
+
     details#plan-filter-container[open] summary::after {
-      content: attr(data-open) url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 13L9.29289 8.70711C9.68342 8.31658 10.3166 8.31658 10.7071 8.70711L15 13' stroke='%23323130' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+      content: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 8L10.7071 12.2929C10.3166 12.6834 9.68342 12.6834 9.29289 12.2929L5 8' stroke='%23323130' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+      position: relative;
+      top: 4px;
+    }
+
+    details#plan-filter-container:not([open]) summary::before {
+      content: attr(data-close);
     }
 
     details#plan-filter-container:not([open]) summary::after {
-      content: attr(data-close) url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 8L10.7071 12.2929C10.3166 12.6834 9.68342 12.6834 9.29289 12.2929L5 8' stroke='%23323130' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+      content: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 13L9.29289 8.70711C9.68342 8.31658 10.3166 8.31658 10.7071 8.70711L15 13' stroke='%23323130' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+      position: relative;
+      top: 4px;
     }
   </style>
 
