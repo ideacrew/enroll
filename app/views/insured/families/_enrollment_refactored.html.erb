@@ -107,6 +107,8 @@
         <div class="d-flex align-items-center justify-content-between plan-footer">
           <div>
             <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product, custom_css: false, hbx_id: hbx_enrollment.hbx_id } %>
+
+            <% if @hide %>
             <a
               class="ml-4"
               id="plan_contact_info-<%= hbx_enrollment.hbx_id%>"
@@ -121,6 +123,8 @@
               </svg>
               <span class="enrollment-tile-summary"><%= l10n("plan_contact_info") %></span>
             </a>
+            <% end %>
+
             <%= render partial: "shared/#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information", locals: { plan: product, hbx_enrollment: hbx_enrollment } unless product.issuer_profile.blank? %>
           </div>
           <%= render partial: "insured/families/enrollment_actions", locals: { read_only: read_only, hbx_enrollment: hbx_enrollment }  %>
