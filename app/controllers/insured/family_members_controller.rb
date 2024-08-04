@@ -6,7 +6,7 @@ class Insured::FamilyMembersController < ApplicationController
   include ::L10nHelper
 
   layout 'progress', only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-  before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:index, :destroy] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
