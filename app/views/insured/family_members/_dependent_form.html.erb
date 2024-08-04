@@ -147,6 +147,7 @@
             <%= link_to('#', class: 'btn outline mr-2') do %>
               <%= l10n("cancel") %>
             <% end %>
+            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button-error outline mr-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
           <% end %>
           <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>
             <%= l10n("confirm_member") %>
