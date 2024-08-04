@@ -90,7 +90,8 @@
           <fieldset class="d-flex mb-md-4">
             <legend class="required weight-n"><%= l10n("does_person_need_coverage", person: dependent.first_name.present? ? dependent.first_name : "this person") %></legend>
             <div class="d-flex align-items-center mt-0">
-              <%= render 'shared/is_applying_for_coverage', f: f, first_checked: dependent.is_applying_coverage, second_checked: !dependent.is_applying_coverage %>
+              <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
+              <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
             </div>
           </fieldset>
 
