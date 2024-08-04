@@ -620,11 +620,11 @@ module FinancialAssistance
     # Checks that an applicant cannot have more than one spousal relationship
     def invalid_spousal_relationship
       partner_relationships = application.relationships.where({
-        "$or" => [
-          { :applicant_id => id, :kind.in => ['spouse', 'domestic_partner'] },
-          { :relative_id => id, :kind.in => ['spouse', 'domestic_partner'] }
-        ]
-      })
+                                                                "$or" => [
+                                                                  { :applicant_id => id, :kind.in => ['spouse', 'domestic_partner'] },
+                                                                  { :relative_id => id, :kind.in => ['spouse', 'domestic_partner'] }
+                                                                ]
+                                                              })
       return partner_relationships.drop(1) if partner_relationships.size > 2
     end
 
