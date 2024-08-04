@@ -1,24 +1,20 @@
 <% if @bs4 %>
   <div class="special_qle_reasons hidden">
-    <label class="weight-n mb-2"><%= l10n("insured.qle_detail.special_reason.marriage", qle_start_date: @qle_date_calc, qle_date: @qle_date) %></label>
-    <div>
-      <div>
-        <div tabindex="0" onkeydown="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
-          <label class="weight-n" for="reason_accept1">
-            <%= radio_button_tag :reason, "no", false, id: 'reason_accept1' %>
-            <%= l10n("yes") %>
-          </label>
-        </div>
-        <div tabindex="0" onkeydown="handleSEPRadioButton('reason_accept')" class="n-radio-row">
-          <label class="weight-n" for="reason_accept">
-            <%= radio_button_tag :reason, "yes", true, id: 'reason_accept', class: "n-radio" %>
-            <%= l10n("no") %>
-          </label>
-        </div>
-        <div class="mt-4 <%= pundit_class Family,:updateable? %>">
-          <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit_reason"} %>
-        </div>
+    <fieldset>
+      <legend class="weight-n mb-2"><%= l10n("insured.qle_detail.special_reason.marriage", qle_start_date: @qle_date_calc, qle_date: @qle_date) %></legend>
+      <div class="focus" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')">
+        <label class="weight-n" class="radio">
+          <%= radio_button_tag :reason, "no", false %>
+          <%= l10n("yes") %>
+        </label>
+        <label class="weight-n" class="radio">
+          <%= radio_button_tag :reason, "yes", true %>
+          <%= l10n("no") %>
+        </label>
       </div>
+    </fieldset>
+    <div class="mt-4 <%= pundit_class Family,:updateable? %>">
+      <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit_reason"} %>
     </div>
   </div>
 <% else %>
