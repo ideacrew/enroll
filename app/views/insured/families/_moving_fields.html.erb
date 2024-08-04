@@ -1,25 +1,25 @@
 <% if @bs4 %>
   <div class="special_qle_reasons hidden">
     <label class="weight-n mb-2"><%= l10n("insured.indicate_following_circumstances_apply_to_you") %>: </label>
-    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
+    <div tabindex="0" onkeydown="handleSEPRadioButton('reason_accept')" class="n-radio-row">
       <label class="weight-n" for="reason_accept">
         <%= radio_button_tag :reason, "", true, id: 'reason_accept', class: "zip-check" %>
         <span><%= l10n('insured.qle_detail.special_reason.move', qle_start_date: @qle_date_calc, qle_date: @qle_date) %></span>
       </label>
     </div>
-    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
+    <div tabindex="0" onkeydown="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
       <label class="weight-n" for="reason_accept1">
         <%= radio_button_tag :reason, "I was living outside the US or in a US territory", false, id: 'reason_accept1' %>
         <%= l10n("insured.living_outside_the_US_or_in_US_territory") %>
       </label>
     </div>
-    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept2')" class="n-radio-row">
+    <div tabindex="0" onkeydown="handleSEPRadioButton('reason_accept2')" class="n-radio-row">
       <label class="weight-n" for="reason_accept2">
         <%= radio_button_tag :reason, "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)", false, id: 'reason_accept2', class: "zip-check"%>
         <span><%= l10n("insured.moving_fields_had_income_below_of_the_federal_poverty_level") %> <%= h(link_to(l10n("insured.qle_detail.special_reason.move.calculator"), 'http://www.healthcare.gov/lower-costs', target: :_blank, rel: "noopener noreferrer")) if individual_market_is_enabled? %></span>
       </label>
     </div>
-    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_reject')" class="n-radio-row">
+    <div tabindex="0" onkeydown="handleSEPRadioButton('reason_reject')" class="n-radio-row">
       <label class="weight-n" for="reason_reject">
         <%= radio_button_tag :reason, "None of the Above", false, id:'reason_reject' %>
         <%= l10n("none_of_the_above") %>

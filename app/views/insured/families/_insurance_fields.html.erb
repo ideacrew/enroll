@@ -8,13 +8,13 @@
         <%= l10n("insured.is_your_health_coverage_ending") %>
       <% end %>
     </label>
-    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
+    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" class="n-radio-row">
       <label class="weight-n" for="reason_accept">
         <%= radio_button_tag :reason, "yes", !EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept' %>
         <%= l10n("yes") %>
       </label>
     </div>
-    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
+    <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')" class="n-radio-row">
       <label class="weight-n" for="reason_accept1">
         <%= radio_button_tag :reason, "no", EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept1', class: "n-radio" %>
         <%= l10n("no") %>
