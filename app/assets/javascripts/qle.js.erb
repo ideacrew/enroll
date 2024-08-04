@@ -17,7 +17,7 @@ var QLE = ( function( window, undefined ) {
   }
 
   function check_qle_reason() {
-    switch ("Date of marriage"){
+    switch ($('.qle-label').html()){
       case "Coverage end date":
         QLE.qle_question("check_insurance_reason.js");
         test = false;
@@ -202,7 +202,6 @@ $(function () {
   $('#qle_form').on('keydown', function(e) {
     var code = e.keyCode || e.which;
     if (bs4) {
-      console.log("form keydown");
       if (e.key === 'Enter') {
         e.preventDefault();
       }
