@@ -39,6 +39,7 @@ if ($(".my-household-page").length == 0) {
   applyListeners();
   demographicValidations();
   isApplyingCoverage("dependent");
+  indicateRequiredFields()
 }
 if (!disableSelectric) {
   $("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select, .no-selectric').selectric();
@@ -47,3 +48,4 @@ semantic_class();
 applyJQDatePickers();
 demographicValidations();
 isApplyingCoverage("dependent");
+indicateRequiredFields()
