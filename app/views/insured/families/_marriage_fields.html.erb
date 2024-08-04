@@ -4,11 +4,11 @@
       <legend class="weight-n mb-2"><%= l10n("insured.qle_detail.special_reason.marriage", qle_start_date: @qle_date_calc, qle_date: @qle_date) %></legend>
       <div class="focus" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')">
         <label class="weight-n" class="radio">
-          <%= radio_button_tag :reason, "no", false %>
+          <%= radio_button_tag :reason, "no", false, id: "reason_accept1" %>
           <%= l10n("yes") %>
         </label>
         <label class="weight-n" class="radio">
-          <%= radio_button_tag :reason, "yes", true %>
+          <%= radio_button_tag :reason, "yes", true, id: "reason_accept" %>
           <%= l10n("no") %>
         </label>
       </div>

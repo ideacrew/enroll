@@ -11,11 +11,11 @@
       </legend>
       <div class="focus" onkeydown="handleButtonKeyDown(event, 'qle_submit_reason')">
         <label class="weight-n" class="radio">
-          <%= radio_button_tag :reason, "yes", !EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no) %>
+          <%= radio_button_tag :reason, "yes", !EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: "reason_accept" %>
           <%= l10n("yes") %>
         </label>
         <label class="weight-n" class="radio">
-          <%= radio_button_tag :reason, "no", EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no) %>
+          <%= radio_button_tag :reason, "no", EnrollRegistry.feature_enabled?(:default_is_your_health_coverage_ending_no), id: 'reason_accept1' %>
           <%= l10n("no") %>
         </label>
       </div>
