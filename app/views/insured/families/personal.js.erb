@@ -20,6 +20,7 @@
     }
   }
   applyListeners();
+  indicateRequiredFields()
 <% else %>
   $(".append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
   $("#jq_datepicker_ignore_person_dob").closest(".floatlabel-wrapper").hide();
