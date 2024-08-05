@@ -15,7 +15,7 @@ module Verifications
     end
 
     def alive_status_type?(verif_type)
-      verif_type&.type_name == 'Alive Status'
+      verif_type&.type_name == VerificationType::ALIVE_STATUS
     end
 
     def outstanding_status?(verif_type)
