@@ -3,7 +3,7 @@
   <% form_id = SecureRandom.random_number(10000000) %>
   <section class="my-4 p-3 border rounded bg-white benefit-form-container" id="<%= form_id %>">
     <%= f.hidden_field :kind, value: kind %>
-    <%= f.hidden_field :insurance_kind, value: kind %>
+    <%= f.hidden_field :insurance_kind, value: insurance_kind %>
     <div class="insurance-kind-label-container">
       <% if insurance_kind.present? %>
         <h2><%= insurance_kind.humanize.titleize %></h2>
@@ -79,7 +79,7 @@
         <div class="d-flex mt-2 col-6 px-0">
           <div class="col px-0 mr-3">
             <%= f.label :employee_cost, l10n("faa.health_coverage.esi.amount"), class: "required", for: "employee_cost|#{form_id}" %>
-            <%= f.text_field :employee_cost, placeholder: '0.00', value: "", id: "employee_cost|#{form_id}" %>
+            <%= f.text_field :employee_cost, placeholder: '0.00', value: benefit.employee_cost, id: "employee_cost|#{form_id}" %>
           </div>
           <div class="col px-0">
             <%= f.label :employee_cost_frequency, l10n("frequency"), class:"required", for: "employee_cost_frequency|#{form_id}" %>
