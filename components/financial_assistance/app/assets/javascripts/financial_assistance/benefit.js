@@ -48,6 +48,51 @@ function stopEditing() {
   $('.driver-question, .instruction-row, .disabled a, .benefits-list, #nav-buttons a, .benefit, .add_new_benefit_kind').removeClass('disabled');
 };
 
+function handleEsiFields(form, isEsi, isHra, isMvsq) {
+  // do all the esi specific hiding and showing
+  if (isEsi == "true") {
+    // show non-hra questions if non-hra is the selected insurance kind
+    // show hra questions if hra is the selected insurance kind
+    // make the inputs of the non-selected kind non-reqquired
+    // make the inputs of the selected kind required
+    if (isHra == "true") {
+      form.querySelector('.non-hra-questions').classList.remove('hidden');
+      form.querySelectorAll('.non-hra-questions input, non-hra-questions select').forEach(function(input) {
+        var label = form.querySelector("label[for='" + input.id + "']")
+        if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
+          input.setAttribute('required', true);
+        }
+      });
+      $(form).find('.hra-questions').remove();
+    } else {
+      form.querySelector('.hra-questions').classList.remove('hidden');
+      form.querySelectorAll('.hra-questions input, hra-questions select').forEach(function(input) {
+        var label = form.querySelector("label[for='" + input.id + "']")
+        if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
+          input.setAttribute('required', true);
+        }
+      });
+      $(form).find('.non-hra-questions').remove();
+    }
+
+    // show mvsq if msqv is true
+    if (isMvsq == "true") {
+      form.querySelector('.mvsq-questions').classList.remove('hidden');
+      form.querySelectorAll('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
+        var label = form.querySelector("label[for='" + input.id + "']")
+        if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
+          input.setAttribute('required', true);
+        }
+      });
+    } else {
+      form.querySelector('.mvsq-questions').classList.add('hidden');
+      form.querySelectorAll('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
+        input.removeAttribute('required');
+      });
+    }
+  }
+}
+
 // in order to make sure the input ids/labels are unique, we need to add a random string to the end
 // so we don't get WAVE errors
 function makeInputIdsUnique(formId, clonedForm) {
@@ -120,49 +165,7 @@ document.addEventListener("turbolinks:load", function() {
     $(clonedForm).find('input').removeAttr('disabled');
     let formId = clonedForm.querySelector('.benefit-form-container').id
     makeInputIdsUnique(formId, clonedForm)
-
-    // do all the esi specific hiding and showing
-    if (esi == "true") {
-      // show non-hra questions if non-hra is the selected insurance kind
-      // show hra questions if hra is the selected insurance kind
-      // make the inputs of the non-selected kind non-reqquired
-      // make the inputs of the selected kind required
-      if (selected.value !== "health_reimbursement_arrangement") {
-        clonedForm.querySelector('.non-hra-questions').classList.remove('hidden');
-        clonedForm.querySelectorAll('.non-hra-questions input, non-hra-questions select').forEach(function(input) {
-          var label = clonedForm.querySelector("label[for='" + input.id + "']")
-          if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
-            input.setAttribute('required', true);
-          }
-        });
-        $(clonedForm).find('.hra-questions').remove();
-      } else {
-        clonedForm.querySelector('.hra-questions').classList.remove('hidden');
-        clonedForm.querySelectorAll('.hra-questions input, hra-questions select').forEach(function(input) {
-          var label = clonedForm.querySelector("label[for='" + input.id + "']")
-          if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
-            input.setAttribute('required', true);
-          }
-        });
-        $(clonedForm).find('.non-hra-questions').remove();
-      }
-
-      // show mvsq if msqv is true
-      if (mvsq === "true") {
-        clonedForm.querySelector('.mvsq-questions').classList.remove('hidden');
-        clonedForm.querySelectorAll('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
-          var label = clonedForm.querySelector("label[for='" + input.id + "']")
-          if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
-            input.setAttribute('required', true);
-          }
-        });
-      } else {
-        clonedForm.querySelector('.mvsq-questions').classList.add('hidden');
-        clonedForm.querySelectorAll('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
-          input.removeAttribute('required');
-        });
-      }
-    }
+    handleEsiFields(clonedForm, esi, kind, mvsq);
 
     select.closest(".new-benefit-form").classList.add('hidden');
     benefitList.appendChild(clonedForm);
@@ -262,8 +265,9 @@ document.addEventListener("turbolinks:load", function() {
     var container = button.closest('.benefit');
     var benefitList = container.closest('.benefits-list');
     var show = container.querySelector('.benefit-show');
-    var form = container.querySelector('.edit-benefit-form');
     show.classList.add('hidden');
+    var form = container.querySelector('.edit-benefit-form');
+    handleEsiFields(form, show.dataset.esi, show.dataset.hra, show.dataset.mvsq);
     form.classList.remove('hidden');
     document.getElementById('new-benefit-form-' + kind).classList.add('hidden');
     document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
