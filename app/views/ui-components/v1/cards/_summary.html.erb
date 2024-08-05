@@ -8,19 +8,20 @@
 <% if @bs4 %>
   <div class="enrollment-details">
     <% if @hbx_enrollment.shopping? %>
-      <%= h(link_to l10n("back_to_enrollments"), request.referrer, class: 'btn outline all-plans') %>
-      <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
+      <%= h(link_to l10n("plans.back_to_all"), request.referrer, class: 'btn secondary all-plans mb-4') %>
     <% else %>
       <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
       <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
     <% end %>
     <% if qhp.present? %>
-      <h1><%= @hbx_enrollment.coverage_year %> <%= @hbx_enrollment&.product&.kind.to_s.titleize %> <%= l10n('coverage').titleize %></h1>
+      <% unless @hbx_enrollment.shopping? %>
+        <h1><%= @hbx_enrollment.coverage_year %> <%= @hbx_enrollment&.product&.kind.to_s.titleize %> <%= l10n('coverage').titleize %></h1>
+      <% end %>
       <% unless action_name == "home" %>
         <% if @hbx_enrollment.shopping? %>
           <%= render partial: "insured/plan_shoppings/plan_details", locals: { read_only: false, plan: @plan, details_page: true } %>
         <% else %>
-          <%= render partial: "insured/families/enrollment_refactored", :collection => [@hbx_enrollment], :as => :hbx_enrollment, locals: { read_only: false } %>
+          <%= render partial: "insured/families/enrollment_refactored", :collection => [@hbx_enrollment], :as => :hbx_enrollment, locals: { read_only: false, details_page: true, shopping: @hbx_enrollment.shopping? } %>
         <% end %>
       <% end %>
 
@@ -66,12 +67,8 @@
           <%= render partial: "shared/service_visit_details", locals: { qhp: qhp } %>
         </tbody>
       </table>
-
-
       <% if @hbx_enrollment.shopping? %>
-        <%= h(link_to l10n("back_to_enrollments"), request.referrer, class: 'btn outline all-plans') %>
         <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: @plan } %>
-
       <% else %>
         <% back_btn_text = request.referrer&.include?('enrollment_history') ? l10n("back_to_enrollments") : l10n("back_to_my_account") %>
         <%= h(link_to back_btn_text.to_s, request.referrer, class: 'btn btn-default all-plans mb-2') %>
