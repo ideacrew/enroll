@@ -1,6 +1,7 @@
 <% if @bs4 %>
   <div id="<%= dom_id benefit %>" class="benefit">
-    <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="esi_benefit">
+    <% is_hra = insurance_kind == "health_reimbursement_arrangement" %>
+    <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="esi_benefit" data-esi="true" data-hra=<%= display_esi_fields?(insurance_kind, kind) %> data-mvsq=<%= display_minimum_value_standard_question?(insurance_kind) %>>
       <h2><%= insurance_kind.humanize.titlecase %></h2>
       <h3><%= benefit.employer_name %></h3>
       <dl class="parent mb-4">
@@ -22,17 +23,17 @@
         <dd><%= benefit.employer_id %>
       </dl>
       <dl class="parent">
-        <% unless insurance_kind == 'health_reimbursement_arrangement' %>
+        <% unless is_hra %>
           <dt><%= l10n("faa.health_coverage.esi.waiting_label") %></dt>
           <dd><%= benefit.is_esi_waiting_period ? l10n("yes") : l10n("no") %>
           <dt><%= l10n("faa.health_coverage.esi.waiting_label") %></dt>
           <dd><%= benefit.is_esi_mec_met ? l10n("yes") : l10n("no") %>
           <dt><%= l10n("faa.health_coverage.esi.covered") %></dt>
           <dd><%= benefit.esi_covered&.titleize %></dd>
-          <dt><%= l10n("start_on") %></dt>
+          <dt><%= l10n("start_date") %></dt>
           <dd><%= benefit.start_on %>
           <% if benefit.end_on %>
-            <dt><%= l10n("end_on") %></dt>
+            <dt><%= l10n("end_date") %></dt>
             <dd><%= benefit.end_on %>
           <% end %>
           <dt><%= l10n("faa.health_coverage.esi.mvs_amount_question") %></dt>
