@@ -36,7 +36,7 @@
     </div>
 
     <fieldset class="my-4">
-      <legend class="weight-n"><%= l10n("faa.parent_living_outside_of_home_question") %></legend>
+      <legend class="weight-n required"><%= l10n("faa.parent_living_outside_of_home_question") %></legend>
       <div class="focus d-flex align-items-center mt-2 mb-2">
         <label class="radio-label radio" for="living_outside_yes">
           <%= f.radio_button("parent_living_out_of_home_terms", true, id: "living_outside_yes", checked: false) %>
