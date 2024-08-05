@@ -46,7 +46,7 @@ module FinancialAssistance
           city: 'city',
           state: 'state',
           zip: 'zip',
-          employer_phone: 'employer_phone',
+          employer_phone: 'faa.incomes.employer_phone',
           from_self_employment: ['faa.incomes.from_self_employment', {assistance_year: assistance_year}],
           unemployment: ['faa.other_incomes.unemployment', {assistance_year: assistance_year}],
           alaska_native: 'faa.other_incomes.alaska_native',
@@ -150,12 +150,12 @@ module FinancialAssistance
     def income_info_hash(applicant, can_edit)
       helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
 
-      hash = {from_employer: required_value(human_boolean(applicant.has_job_income))}
+      hash = {from_employer: human_boolean(applicant.has_job_income)}
       hash = build_job_incomes_hash(applicant, hash) if helper.displayable?(:incomes_jobs)
-      hash[:from_self_employment] = required_value(human_boolean(applicant.has_self_employment_income))
-      hash[:unemployment] = required_value(human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-      hash[:alaska_native] = required_value(human_boolean(applicant.has_american_indian_alaskan_native_income)) if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
-      hash[:other_sources] = required_value(human_boolean(applicant.has_other_income))
+      hash[:from_self_employment] = human_boolean(applicant.has_self_employment_income)
+      hash[:unemployment] = human_boolean(applicant.has_unemployment_income) if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
+      hash[:alaska_native] = human_boolean(applicant.has_american_indian_alaskan_native_income) if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income)
+      hash[:other_sources] = human_boolean(applicant.has_other_income)
 
       create_section_hash(
         title: l10n('faa.evidence_type_income'),
@@ -169,9 +169,9 @@ module FinancialAssistance
     def tax_info_hash(applicant, can_edit)
       helper = ApplicantDisplayableHelper.new(@cfl_service, applicant.id)
 
-      hash = {file_in_year: required_value(human_boolean(applicant.is_required_to_file_taxes))}
+      hash = {file_in_year: human_boolean(applicant.is_required_to_file_taxes)}
       hash[:filing_jointly] = human_boolean(applicant.is_joint_tax_filing) if helper.displayable?(:is_joint_tax_filing)
-      hash[:dependent] = required_value(human_boolean(applicant.is_claimed_as_tax_dependent))
+      hash[:dependent] = human_boolean(applicant.is_claimed_as_tax_dependent)
       hash[:dependent_by] = @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s).full_name if helper.displayable?(:claimed_as_tax_dependent_by)
 
       create_section_hash(
@@ -186,19 +186,20 @@ module FinancialAssistance
     def build_job_incomes_hash(applicant, hash)
       applicant.incomes.jobs.each do |job|
         hash[:employer_name] = job.employer_name
-        next unless job.employer_address.present?
-        hash[:employer_address_line_1] = job.employer_address.address_1
-        hash[:employer_address_line_2] = job.employer_address.address_2 if job.employer_address.address_2.present?
-        hash[:city] = job.employer_address.city
-        hash[:state] = job.employer_address.state
-        hash[:zip] = job.employer_address.zip
+        if job.employer_address.present?
+          hash[:employer_address_line_1] = job.employer_address.address_1
+          hash[:employer_address_line_2] = job.employer_address.address_2 if job.employer_address.address_2.present?
+          hash[:city] = job.employer_address.city
+          hash[:state] = job.employer_address.state
+          hash[:zip] = job.employer_address.zip
+        end
         hash[:employer_phone] = format_phone(income.employer_phone.full_phone_number) if job.employer_phone.present?
       end
       hash
     end
 
     def deductions_info_hash(applicant, can_edit)
-      row = {l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: assistance_year) => required_value(human_boolean(applicant.has_deductions))}
+      row = {l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: assistance_year) => human_boolean(applicant.has_deductions)}
       create_section_hash(
         title: l10n('faa.review.income_adjustments'),
         can_edit: can_edit,
@@ -223,7 +224,6 @@ module FinancialAssistance
       hash = build_medicaid_cubcare_questions(applicant, hash) if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
       hash = build_chip_questions(applicant, hash) if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && applicant.eligible_immigration_status
       hash = build_dependent_coverage_questions(applicant, hash) if applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage)
-      hash = mark_required_questions(hash)
 
       create_section_hash(
         title: l10n('health_coverage'),
@@ -259,18 +259,6 @@ module FinancialAssistance
       hash[:indian_health_service_eligible] = human_boolean(applicant.health_service_eligible)
       hash[:indian_health_service] = human_boolean(applicant.health_service_through_referral)
       hash
-    end
-
-    def mark_required_questions(hash)
-      # all coverage related questions are required
-      hash.transform_values do |value|
-        if value.is_a?(Hash)
-          value[:is_required] = true
-          value
-        else
-          required_value(value)
-        end
-      end
     end
 
     def other_questions_hash(applicant, can_edit)
@@ -428,11 +416,6 @@ module FinancialAssistance
         @class = FinancialAssistance::Application
         super
       end
-    end
-
-    # hash constructor helpers
-    def required_value(value)
-      {value: value, is_required: true}
     end
 
     def create_section_hash(title:, rows:, can_edit: true, edit_link: nil, map: nil)
