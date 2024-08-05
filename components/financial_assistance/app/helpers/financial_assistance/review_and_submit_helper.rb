@@ -193,7 +193,7 @@ module FinancialAssistance
           hash[:state] = job.employer_address.state
           hash[:zip] = job.employer_address.zip
         end
-        hash[:employer_phone] = format_phone(income.employer_phone.full_phone_number) if job.employer_phone.present?
+        hash[:employer_phone] = format_phone(job.employer_phone.full_phone_number) if job.employer_phone.present?
       end
       hash
     end
