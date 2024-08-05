@@ -621,12 +621,11 @@ module FinancialAssistance
     def invalid_spousal_relationship
       partner_relationships = application.relationships.where({
                                                                 "$or" => [
-                                                                { :applicant_id => id, :kind.in => ['spouse', 'domestic_partner'] },
-                                                                { :relative_id => id, :kind.in => ['spouse', 'domestic_partner'] }
+                                                                  { :applicant_id => id, :kind.in => ['spouse', 'domestic_partner'] },
+                                                                  { :relative_id => id, :kind.in => ['spouse', 'domestic_partner'] }
                                                                 ]
                                                               })
-      partner_relationships_for_applicant = partner_relationships.filter { |relationship| relationship.applicant_id == id }
-      return partner_relationships_for_applicant.drop(1) if partner_relationships_for_applicant.present?
+      return partner_relationships.drop(1) if partner_relationships.size > 2
     end
 
     def invalid_sibling_relationship
