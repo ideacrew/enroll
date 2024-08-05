@@ -90,7 +90,8 @@
           <fieldset class="d-flex mb-md-4">
             <legend class="required weight-n"><%= l10n("does_person_need_coverage", person: dependent.first_name.present? ? dependent.first_name : "this person") %></legend>
             <div class="d-flex align-items-center mt-0">
-              <%= render 'shared/is_applying_for_coverage', f: f, first_checked: dependent.is_applying_coverage, second_checked: !dependent.is_applying_coverage %>
+              <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
+              <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
             </div>
           </fieldset>
 
@@ -147,6 +148,7 @@
             <%= link_to('#', class: 'btn outline mr-2') do %>
               <%= l10n("cancel") %>
             <% end %>
+            <%= h(link_to l10n('remove_member'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button-error outline mr-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
           <% end %>
           <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>
             <%= l10n("confirm_member") %>
