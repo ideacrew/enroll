@@ -322,13 +322,11 @@ module ApplicationHelper
     "#{li_start}#{link_to(label, path)}</li>"
   end
 
-  # rubocop:disable Naming/MethodParameterName
   def active_dropdown_classes(*args)
     args.map(&:to_s).include?(params[:controller].to_s) ? "dropdown active" : "dropdown"
   end
-  # rubocop:enable Naming/MethodParameterName
 
-  # rubocop:disable Naming/MethodParameterName
+    # rubocop:disable Naming/MethodParameterName
   def link_to_add_fields(name, f, association, classes = '')
   # rubocop:enable Naming/MethodParameterName
     new_object = f.object.send(association).klass.new
@@ -766,6 +764,7 @@ module ApplicationHelper
   end
 
   def ivl_hsa_status(plan_hsa_status, plan)
+    return unless plan_hsa_status.present?
     (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
   end
 
@@ -990,7 +989,7 @@ module ApplicationHelper
     end
   end
 
-  def show_component(url) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+  def show_component(url)
     if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
       false
     else
