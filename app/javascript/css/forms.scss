@@ -59,7 +59,8 @@ button,
 
 label.required:after,
 legend.required:after,
-dt.required:after {
+dt.required:after,
+.applications .required:after {
   content: '*';
   margin-left: 0.25ch;
   color: var(--enrollment-status-red);
