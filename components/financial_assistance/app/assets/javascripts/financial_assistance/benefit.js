@@ -389,8 +389,7 @@ document.addEventListener("turbolinks:load", function() {
       e.preventDefault();
       var benefitEl = $(this).parents('.benefit');
       benefitEl.find('.benefit-show').addClass('hidden');
-      var form = benefitEl.find('.edit-benefit-form')
-      form.removeClass('hidden');
+      benefitEl.find('.edit-benefit-form').removeClass('hidden');
       benefitEl.find('select').selectric();
       $(benefitEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true, yearRange: "-110:+110"});
       startEditingBenefit($(this).parents('.benefit-kind').attr('id'));
