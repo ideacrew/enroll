@@ -676,3 +676,8 @@ a.disabled {
     color: var(--grey-100);
   }
 }
+
+.tooltip.fade.in {
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
