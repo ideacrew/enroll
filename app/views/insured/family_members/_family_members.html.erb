@@ -39,6 +39,8 @@
   <%# FAA 'info needed' row - add income & coverage info buttons %>
   <%= yield :primary_member_fa %>
 
+  <div id="append_consumer_info"></div>
+
   <div id="dependent_ul">
     <% @family.active_family_members.reject(&:is_primary_applicant).each_with_index do |dependent, index| %>
       <%= render "insured/family_members/dependent", dependent: dependent, person: @person, member_number: index+2 %>
@@ -47,8 +49,6 @@
       </div>
     <% end %>
   </div>
-
-  <div id="append_consumer_info"></div>
 
   <div id="dependent_buttons" class="<%= 'hidden' if @family.active_family_members.empty? %> <%= pundit_class Family, :updateable?%> d-flex flex-column flex-md-row mt-md-5">
       <%= hidden_field_tag 'origin_source', @source %>
