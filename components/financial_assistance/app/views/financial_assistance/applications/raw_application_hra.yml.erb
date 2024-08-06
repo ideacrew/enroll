@@ -34,7 +34,7 @@
     INCOME:
     INCOME ADJUSTMENTS:
       <% assistance_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!.to_s %>
-      <%= sanitize(l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: assistance_year)) %>*: <%= applicant.has_deductions %>
+      <%= sanitize(l10n('faa.deductions.income_adjustments', subject: l10n('faa.this_person'), assistance_year: assistance_year)) %>*: <%= applicant.has_deductions %>
     HEALTH COVERAGE:
         Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?: <%= applicant.has_enrolled_health_coverage %>
         <%= FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) ? 'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in?' : 'Does this person currently have access to health coverage or a Health Reimbursement Arrangement that they are not enrolled in (including through another person, like a spouse or parent)?' %>: <%=applicant.has_eligible_health_coverage %>
@@ -57,9 +57,9 @@
         Pregnancy due date?:  <%=applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A' %>
         How many children is this person expecting?:  <%=applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A' %>
         <% if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) %>
-        <%= l10n("faa.other_ques.pregnant_last_year", subject: l10n("faa.other_ques.this_person")) %>: <%= applicant.is_post_partum_period %>
+        <%= l10n("faa.other_ques.pregnant_last_year", subject: l10n("faa.this_person")) %>: <%= applicant.is_post_partum_period %>
         <% else %>
-        <%= l10n("faa.other_ques.pregnant_last_60d", subject: l10n("faa.other_ques.this_person")) %>: <%= applicant.is_post_partum_period %>
+        <%= l10n("faa.other_ques.pregnant_last_60d", subject: l10n("faa.this_person")) %>: <%= applicant.is_post_partum_period %>
         <% end %>
         Pregnancy end on date:  <%=applicant.pregnancy_end_on.to_s.present? ? applicant.pregnancy_end_on.to_s : 'N/A' %>
         Was this person on Medicaid during pregnancy?:  <%= applicant.is_enrolled_on_medicaid %>
