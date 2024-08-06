@@ -105,7 +105,7 @@
       </div>
       <fieldset class="mt-4 d-block">
         <legend class="weight-n required"><%= l10n("faa.health_coverage.esi.hra_max_question") %></legend>
-        <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit<%= benefit.id %>" id="hra_benefit" class="interaction-click-control-not-sure? benefit-support-modal mb-4">Not sure?</a>
+        <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit_<%= benefit.id %>" id="hra_benefit" class="interaction-click-control-not-sure? benefit-support-modal mb-4">Not sure?</a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "hra_benefit", id: "hra_benefit_#{benefit.id}" } %>
         <div class="d-flex mt-4">
            <div class="d-flex flex-column mr-3">
