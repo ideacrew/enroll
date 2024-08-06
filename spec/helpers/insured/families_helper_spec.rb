@@ -756,7 +756,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       end
 
       it "returns the #{expected_label} label" do
-        expect(enrollment_state_label(enrollment)).to include(*expected_label)
+        expect(enrollment_state_label(enrollment, false)).to include(*expected_label)
       end
     end
 
@@ -766,7 +766,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       end
 
       it 'returns nil' do
-        expect(enrollment_state_label(enrollment)).to be_nil
+        expect(enrollment_state_label(enrollment, false)).to be_nil
       end
     end
 
