@@ -1,15 +1,5 @@
 <% if @bs4 %>
   <%= render partial: '/financial_assistance/shared/faa_progress_options', locals: {step: 2} %>
-  <% if @missing_relationships.any? %>
-    <div class="alert alert-error d-flex" role="alert">
-      <div>
-        <div class="error-icon icon mt-3" alt="error" aria-hidden="true">&nbsp;</div>
-      </div>
-      <div class="mt-2 mb-1">
-        <p><%= l10n("faa.review.your_household.relationships_error") %></p>
-      </div>
-    </div>
-  <% end %>
   <h1><%= l10n("family_relationships") %></h1>
   <p>
     <%= l10n("household_relationships") %>
