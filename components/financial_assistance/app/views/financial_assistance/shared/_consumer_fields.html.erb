@@ -1,5 +1,6 @@
 <% if @bs4 %>
   <div id="consumer_fields" class="focus_effect">
+    <h2 class="mt-4"><%= l10n("insured.consumer_roles.demo_info_for") %> <%= @applicant.class == FinancialAssistance::Applicant ? @applicant.full_name : l10n('faa.this_person') %></h2>
     <% if FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) %>
       <%= render :partial => 'shared/optional_field_warning' %>
     <% end %>
