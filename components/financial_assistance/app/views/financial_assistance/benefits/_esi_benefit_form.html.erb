@@ -61,11 +61,11 @@
       <div class="d-flex mt-4">
         <div class="d-flex flex-column mr-3 col-6 px-0">
           <%= f.label :esi_covered, l10n("faa.health_coverage.esi.covered_question"), class: "required", for: "esi_covered|#{form_id}" %>
-          <%= f.select :esi_covered, options_for_select({l10n("faa.health_coverage.esi.self") => "self", l10n("faa.health_coverage.esi.self_and_spouse") => "self_and_spouse", l10n("faa.health_coverage.esi.family") => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:id => "esi_covered|#{form_id}", :required => true}%>
+          <%= f.select :esi_covered, options_for_select({l10n("faa.health_coverage.esi.self") => "self", l10n("faa.health_coverage.esi.self_and_spouse") => "self_and_spouse", l10n("faa.health_coverage.esi.family") => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:id => "esi_covered|#{form_id}", required: true}%>
         </div>
         <div class="d-flex flex-column mr-3">
           <%= f.label :start_on, l10n("start_date"), class:"required", for: "start_on|#{form_id}" %>
-          <%= f.date_field :start_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "start_on|#{form_id}"} %>
+          <%= f.date_field :start_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "start_on|#{form_id}", required: true} %>
         </div>
         <div class="d-flex flex-column">
           <%= f.label :end_on, l10n("end_date"), for: "end_on|#{form_id}" %>
@@ -79,7 +79,7 @@
         <div class="d-flex mt-2 col-6 px-0">
           <div class="col-6 px-0 mr-3">
             <%= f.label :employee_cost, l10n("faa.health_coverage.esi.amount"), class: "required", for: "employee_cost|#{form_id}" %>
-            <%= f.text_field :employee_cost, placeholder: '0.00', value: benefit.employee_cost, id: "employee_cost|#{form_id}" %>
+            <%= f.text_field :employee_cost, placeholder: '0.00', value: benefit.employee_cost, id: "employee_cost|#{form_id}", required: true %>
           </div>
           <div class="d-flex flex-column col-6 px-0">
             <%= f.label :employee_cost_frequency, l10n("frequency"), class:"required", for: "employee_cost_frequency|#{form_id}" %>
