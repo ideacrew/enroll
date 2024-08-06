@@ -430,7 +430,7 @@ module FinancialAssistance
           next unless xi < yi
           relation = relationships.where(applicant_id: id_map[xi], relative_id: id_map[yi]).first
           relation_kind = relation&.kind
-          relation_has_error = invalid_ids.include?(relation&.id)
+          relation_has_error = invalid_ids.include?(relation&.id) || relation_kind.nil?
           all_relationships << {:applicant => id_map[xi], :relation => relation_kind, :relative => id_map[yi], :error => relation_has_error}
         end
       end
