@@ -59,6 +59,12 @@
       </div>
     </div>
   </div>
+  <script>
+    $(".qle-menu-item ").tooltip({
+      // need to define template to add 'show' class to override the tooltip's default 'fade' class which sets opacity: 0
+      template: '<div class="tooltip show" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+    });
+  </script>
 <% else %>
   <div class="container">
     <div class="row">
