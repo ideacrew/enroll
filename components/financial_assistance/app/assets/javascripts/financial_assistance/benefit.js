@@ -49,16 +49,6 @@ function stopEditing() {
 };
 
 function handleEsiFields(form, isEsi, isHra, isMvsq) {
-  function showSection(form, section) {
-    const sectionClass = "." + section;
-    form.querySelector(sectionClass).classList.remove('hidden');
-    form.querySelectorAll(sectionClass + " input, " + sectionClass + " select").forEach(function(input) {
-      var label = form.querySelector("label[for='" + input.id + "']")
-      if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
-        input.setAttribute('required', true);
-      }
-    });
-  }
 
   // do all the esi specific hiding and showing
   if (isEsi == "true") {
@@ -67,16 +57,16 @@ function handleEsiFields(form, isEsi, isHra, isMvsq) {
     // make the inputs of the non-selected kind non-reqquired
     // make the inputs of the selected kind required
     if (isHra == "true") {
-      showSection(form, 'hra-questions');
+      form.querySelector('.hra-questions').classList.remove('hidden');
       $(form).find('.non-hra-questions').remove();
     } else {
-      showSection(form, 'non-hra-questions');
+      form.querySelector('.non-hra-questions').classList.remove('hidden');
       $(form).find('.hra-questions').remove();
     }
 
     // show mvsq if msqv is true
     if (isMvsq == "true") {
-      showSection(form, 'mvsq-questions');
+      form.querySelector('.mvsq-questions').classList.remove('hidden');
     } else {
       $(form).find('.mvsq-questions').remove();
     }
