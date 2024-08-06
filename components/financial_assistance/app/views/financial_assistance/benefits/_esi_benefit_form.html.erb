@@ -59,7 +59,7 @@
       <a href="#is_esi_mec_met" data-toggle="modal" data-target="#is_esi_mec_met_<%= benefit.id %>" id="is_esi_mec_met_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
       <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_mec_met", id: "is_esi_mec_met_#{benefit.id}" } %>
       <div class="d-flex row mx-0 mt-4">
-        <div class="d-flex flex-column col-xl-6 col-12 px-0 mb-xl-0 mb-2">
+        <div class="d-flex flex-column col-xl-6 col-12 px-0 mb-xl-0 mb-4">
           <div class="d-flex flex-column col-xl-12 col-6 px-0">
             <%= f.label :esi_covered, l10n("faa.health_coverage.esi.covered_question"), class: "required", for: "esi_covered|#{form_id}" %>
             <%= f.select :esi_covered, options_for_select({l10n("faa.health_coverage.esi.self") => "self", l10n("faa.health_coverage.esi.self_and_spouse") => "self_and_spouse", l10n("faa.health_coverage.esi.family") => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:id => "esi_covered|#{form_id}", required: true}%>
@@ -94,7 +94,7 @@
     </div>
     <div class="hra-questions hidden">
       <div class="d-flex row mx-0 mt-4">
-        <div class="d-flex flex-column col-xl-6 col-12 px-0 mb-xl-0 mb-2">
+        <div class="d-flex flex-column col-xl-6 col-12 px-0 mb-xl-0 mb-4">
           <div class="d-flex flex-column col-xl-12 col-6 px-0">
             <%= f.label :hra_type, l10n("faa.health_coverage.esi.type_of_hra"), class: "required", for: "hra_type|#{form_id}" %>
             <%= f.select :hra_type, options_for_select({l10n("faa.health_coverage.esi.individual_hra") => "Individual coverage HRA", l10n("faa.health_coverage.esi.qse_hra") => "Qualified Small Employer HRA"}, selected: benefit.hra_type), {prompt: l10n("faa.health_coverage.esi.choose") }, {id: "hra_type|#{form_id}", required: true} %>
