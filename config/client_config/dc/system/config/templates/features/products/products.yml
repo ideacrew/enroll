@@ -13,3 +13,5 @@ registry:
             item: <%= ENV['ATLEAST_ONE_SILVER_PLAN_DONOT_COVER_PEDIATRIC_DENTAL_COST_2023_IS_ENABLED'] || false %>
           - key: :"2024"
             item: <%= ENV['ATLEAST_ONE_SILVER_PLAN_DONOT_COVER_PEDIATRIC_DENTAL_COST_2024_IS_ENABLED'] || false %>
+          - key: :"2025"
+            item: <%= ENV['ATLEAST_ONE_SILVER_PLAN_DONOT_COVER_PEDIATRIC_DENTAL_COST_2025_IS_ENABLED'] || false %>
