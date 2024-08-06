@@ -13,6 +13,36 @@
       <%= f.label :employer_name, l10n("faa.health_coverage.esi.employer_name"), class: "mt-2 required", for: "employer_name|#{form_id}" %>
       <%= f.text_field :employer_name, placeholder: l10n("faa.health_coverage.esi.employer_name"), required: true, id: "employer_name|#{form_id}" %>
     </div>
+    <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
+      <%= f.fields_for :employer_address do |address_fields| %>
+        <%= address_fields.hidden_field :kind, value: 'work' %>
+        <% required = !EnrollRegistry[:skip_employer_address_validation].enabled? %>
+        <div class="d-flex row mx-0 mt-4">
+          <div class="d-flex flex-column col-xl-6 col-12 pr-xl-3 px-0">
+            <%= address_fields.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", for: "address_1|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.text_field :address_1, placeholder: l10n("address_1"), value: benefit.employer_address.try(:address_1), required: required, id: "address_1|#{form_id}" %>
+          </div>
+          <div class="d-flex flex-column col-xl-6 px-0 mt-xl-0 mt-4">
+            <%= address_fields.label :address_2, "#{l10n("address_2")} #{l10n("address_2_desc")}", for: "address_2|#{form_id}" %>
+            <%= address_fields.text_field :address_2, placeholder: l10n("address_2"), value: benefit.employer_address.try(:address_2), id: "address_2|#{form_id}" %>
+          </div>
+        </div>
+        <div class="d-flex mx-0 mt-4">
+          <div class="d-flex flex-column col-3 pl-0 pr-3">
+            <%= address_fields.label :city, l10n("city"), for: "city|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.text_field :city, placeholder: l10n("city"), required: required, value: benefit.employer_address.try(:city), id: "city|#{form_id}" %>
+          </div>
+          <div class="d-flex flex-column col-3 pl-0 pr-3">
+            <%= address_fields.label :state, l10n("state"), for: "state|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), {prompt: l10n("choose")}, {id: "state|#{form_id}", :required => required} %>
+          </div>
+          <div class="d-flex flex-column col-3 px-0">
+            <%= address_fields.label :zip, l10n("zip"), for: "zip|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.text_field :zip, placeholder: l10n('zip'), required: required, value: benefit.employer_address.try(:zip), class: "zip", id: "zip|#{form_id}" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
     <div class="d-flex col-xl-6 col-md-8 col-12 px-0 mt-4">
       <%= f.fields_for :employer_phone do |phone_fields| %>
       <%= phone_fields.hidden_field :kind, value: "work" %>
