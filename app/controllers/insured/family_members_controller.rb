@@ -153,8 +153,8 @@ class Insured::FamilyMembersController < ApplicationController
 
     @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
-      format.html
-      format.js
+      format.html { render 'edit.js.erb' }
+      format.js { render 'edit.js.erb' }
     end
   end
 
@@ -205,8 +205,8 @@ class Insured::FamilyMembersController < ApplicationController
       @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
       init_address_for_dependent
       respond_to do |format|
-        format.html { render 'edit' }
-        format.js { render 'edit' }
+        format.html { render 'edit.js.erb' }
+        format.js { render 'edit.js.erb' }
       end
     end
   end
