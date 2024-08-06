@@ -247,7 +247,7 @@ document.addEventListener("turbolinks:load", function() {
     var show = container.querySelector('.benefit-show');
     show.classList.add('hidden');
     var form = container.querySelector('.edit-benefit-form');
-    handleEsiFields(form, show.dataset.esi, show.dataset.hra, show.dataset.mvsq);
+    handleEsiFields(form, show.dataset.esi, show.dataset.hra == "true", show.dataset.mvsq);
     form.classList.remove('hidden');
     document.getElementById('new-benefit-form-' + kind).classList.add('hidden');
     document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
