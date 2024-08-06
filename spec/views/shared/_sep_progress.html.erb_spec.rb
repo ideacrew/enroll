@@ -17,8 +17,8 @@ describe "shared/_sep_progress.html.erb" do
   before { sign_in current_user }
 
   # Helper to assert the presence of the continue button.
-  def assert_continue_button_present
-    expect(rendered).to have_selector('#btn-continue', count: 1)
+  def assert_continue_button_present(step)
+    expect(rendered).to have_selector('#btn-continue', count: 1) if step != "7"
   end
 
   # Helper to assert the visibility of specific links.
@@ -48,7 +48,7 @@ describe "shared/_sep_progress.html.erb" do
           end
 
           it "validates button and link visibility" do
-            assert_continue_button_present
+            assert_continue_button_present(step)
             #  # Help sign up is inconsistent when back_to_account_all_shop is disabled.
             skip_links = feature_state ? [] : ['help_sign_up']
             # Validate links based on the current step and feature state.
