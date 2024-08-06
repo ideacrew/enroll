@@ -476,7 +476,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     it "should render the edit template" do
       expect(response).to have_http_status(:success)
-      expect(response).to render_template("edit")
+      expect(response).to render_template("edit.js.erb")
     end
   end
 
@@ -519,7 +519,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       it "should render the edit template" do
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: invalid_dependent_properties}
         expect(response).to have_http_status(:success)
-        expect(response).to render_template("edit")
+        expect(response).to render_template("edit.js.erb")
       end
 
       it "addresses should be an array" do
@@ -557,7 +557,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         allow(controller).to receive(:update_vlp_documents).and_return(false)
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
-        expect(response).to render_template("edit")
+        expect(response).to render_template("edit.js.erb")
       end
     end
 
@@ -575,7 +575,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       it "should render the edit template" do
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
-        expect(response).to render_template("edit")
+        expect(response).to render_template("edit.js.erb")
       end
 
       it "should assign the address_errors" do
@@ -648,7 +648,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
           expect(response).to have_http_status(:redirect)
           expect(response).to_not render_template("show")
-          expect(response).to_not render_template("edit")
+          expect(response).to_not render_template("edit.js.erb")
         end
 
         it "can't delete family members on behalf of another user" do
@@ -676,7 +676,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           get :edit, params: { id: dependent_id }
 
           expect(response).to have_http_status(:redirect)
-          expect(response).to_not render_template("edit")
+          expect(response).to_not render_template("edit.js.erb")
         end
       end
     end
@@ -809,7 +809,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             get :edit, params: { id: dependent_id }
 
             expect(response).to have_http_status(:success)
-            expect(response).to render_template("edit")
+            expect(response).to render_template("edit.js.erb")
           end
         end
 
@@ -822,7 +822,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
             expect(response).to have_http_status(:redirect)
             expect(response).to_not render_template("show")
-            expect(response).to_not render_template("edit")
+            expect(response).to_not render_template("edit.js.erb")
           end
 
           it "can't delete family members for a user" do
@@ -850,7 +850,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             get :edit, params: { id: dependent_id }
 
             expect(response).to have_http_status(:redirect)
-            expect(response).to_not render_template("edit")
+            expect(response).to_not render_template("edit.js.erb")
           end
         end
       end
@@ -996,7 +996,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             get :edit, params: { id: dependent_id }
 
             expect(response).to have_http_status(:success)
-            expect(response).to render_template("edit")
+            expect(response).to render_template("edit.js.erb")
           end
         end
 
@@ -1007,7 +1007,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
             expect(response).to have_http_status(:redirect)
             expect(response).to_not render_template("show")
-            expect(response).to_not render_template("edit")
+            expect(response).to_not render_template("edit.js.erb")
           end
 
           it "can't delete family members for a user" do
@@ -1035,7 +1035,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             get :edit, params: { id: dependent_id }
 
             expect(response).to have_http_status(:redirect)
-            expect(response).to_not render_template("edit")
+            expect(response).to_not render_template("edit.js.erb")
           end
         end
       end

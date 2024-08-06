@@ -122,14 +122,14 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
           census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record)
           allow(census_employee).to receive(:is_employee_in_term_pending?).and_return(true)
           render "insured/families/shop_for_plans_widget"
-          expect(rendered).to have_text "You have been terminated by your employer"
+          expect(rendered).to have_text l10n('insured.terminated_by_employer', employer_name: employee_role.employer_profile.legal_name, date: format_date(employee_role.census_employee.employment_terminated_on.end_of_month))
         end
 
         it 'should show link enroll today text if census employee is terminated with future sep which falls in renewal PY' do
           allow(census_employee).to receive(:is_employee_in_term_pending?).and_return(false)
           allow(employee_role).to receive(:benefit_begin_date).and_return(TimeKeeper.date_of_record)
           render "insured/families/shop_for_plans_widget"
-          expect(rendered).to have_content 'coverage will begin'
+          expect(rendered).to have_content l10n('insured.coverage_will_begin', date: format_date(employee_role.benefit_begin_date))
           expect(rendered).to have_link('enroll today')
           expect(rendered).not_to have_content 'for Open Enrollment Period.'
         end

@@ -774,5 +774,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.',
   :'en.insured.general_agency_index_disabled_warning' => 'The General Agency Index is Disabled',
   :'en.insured.employer_datatable_disabled_warning' => 'The Employer Data Table is Disabled',
-  :'en.insured.plan_shopping.thankyou.agreement_terms_conditions' => 'You must complete Agreement and Terms and Conditions sections to continue.'
+  :'en.insured.plan_shopping.thankyou.agreement_terms_conditions' => 'You must complete Agreement and Terms and Conditions sections to continue.',
+  :'en.insured.terminated_by_employer' => "You have been terminated by your employer %{employer_name} with an effective date of %{date}",
+  :'en.insured.coverage_will_begin' => "coverage will begin %{date}"
 }.freeze
