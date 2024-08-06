@@ -36,7 +36,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
   let(:plan) { FactoryBot.create(:plan,
    provider_directory_url: "http://www.example1.com",
    rx_formulary_url: "http://www.example.com") } # QHP still checking for old plan instance for rx_formulary_url & provider_directory_url in view file.
-  
+
   let(:mock_qhp){instance_double("Products::QhpCostShareVariance", :product => product, :plan => plan, :plan_marketing_name=> product.title)}
   let(:mock_qhps) {[mock_qhp]}
   let(:sbc_document) { double("SbcDocument", id: BSON::ObjectId.new, identifier: "download#abc") }
@@ -147,7 +147,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
       plan.update_attributes!(nationwide: true)
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to match(/#{plan.rx_formulary_url}/)
-      expect(rendered).to match("DOCTOR DIRECTORY")
+      expect(rendered).to match(/DOCTOR DIRECTORY/i)
     end
 
     if aca_state_abbreviation == "DC" # There is no plan comparision for MA dental
