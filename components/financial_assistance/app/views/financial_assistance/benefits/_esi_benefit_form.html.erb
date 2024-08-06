@@ -56,7 +56,7 @@
           </label>
         </div>
       </fieldset>
-      <a href="#is_esi_mec_met" data-toggle="modal" data-target="#is_esi_mec_met<%= benefit.id %>" id="is_esi_mec_met_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
+      <a href="#is_esi_mec_met" data-toggle="modal" data-target="#is_esi_mec_met_<%= benefit.id %>" id="is_esi_mec_met_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
       <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_mec_met", id: "is_esi_mec_met_#{benefit.id}" } %>
       <div class="d-flex mt-4">
         <div class="d-flex flex-column mr-3 col-6 px-0">
