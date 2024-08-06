@@ -2,7 +2,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-describe "shared/_comparison.html.erb", dbclean: :after_each do
+describe "shared/_comparison.html.erb", dbclean: :around_each do
 
   after :all do
     DatabaseCleaner.clean
@@ -144,6 +144,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     end
 
     it "should have rx formulary url coverage_kind = health" do
+
       plan.update_attributes!(nationwide: true)
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to match(/#{plan.rx_formulary_url}/)
