@@ -41,7 +41,7 @@
               <%= render partial:"shared/glossary_hover", locals: {key: "make_payment_before_effective_hover", title: "Make a first payment for my new plan", term: sanitize(l10n("plans.issuer.pay_now.make_first_payment")) } %>
               </a>
             <% else %> <%# after or on effective date %>
-              <a role="menuitem" onfocus="handleGlossaryFocus('make_payments_hover')" onblur="handleGlossaryBlur('make_payments_hover')" class="btn-link btn-block px-2 py-1" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" data-enrollment="<%= hbx_enrollment.hbx_id %>">
+              <a role="menuitem" onfocus="handleGlossaryFocus('make_payments_hover')" onblur="handleGlossaryBlur('make_payments_hover')" class="btn-link btn-block dropdown-item px-2 py-1" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" data-enrollment="<%= hbx_enrollment.hbx_id %>" href="#">
               <%= render partial:"shared/glossary_hover", locals: {key: "make_payments_hover", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payments")) } %>
               </a>
             <% end %>
