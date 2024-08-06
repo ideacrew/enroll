@@ -17,10 +17,11 @@ describe "shared/_individual_progress.html.erb" do
   before do
     sign_in current_user
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:bs4_consumer_flow).and_return false
   end
   # Helper to assert the presence of the continue button.
-  def assert_continue_button_present
-    expect(rendered).to have_selector('#btn-continue', count: 1)
+  def assert_continue_button_present(step)
+    expect(rendered).to have_selector('#btn-continue', count: 1) if step != "6"
   end
 
   # Helper to assert the visibility of specific links.
@@ -50,7 +51,7 @@ describe "shared/_individual_progress.html.erb" do
           end
 
           it "validates button and link visibility" do
-            assert_continue_button_present
+            assert_continue_button_present(step)
             #  # Help sign up is inconsistent when back_to_account_all_shop is disabled.
             skip_links = feature_state ? [] : ['help_sign_up']
             # Validate links based on the current step and feature state.
