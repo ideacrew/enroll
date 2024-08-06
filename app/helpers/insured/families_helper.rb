@@ -117,7 +117,7 @@ module Insured::FamiliesHelper
   end
 
   def qle_link_generator(qle, index)
-    options = {class: 'qle-menu-item'}
+    options = {class: "qle-menu-item #{'pr-3' if @bs4}"}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
@@ -127,7 +127,8 @@ module Insured::FamiliesHelper
     }
 
     if qle.tool_tip.present?
-      data.merge!(toggle: 'tooltip', placement: index > 2 ? 'top' : 'bottom')
+      legacy_placement = index > 2 ? 'top' : 'bottom'
+      data.merge!(toggle: 'tooltip', placement: @bs4 ? 'right' : legacy_placement, trigger: 'hover')
       options.merge!(data: data, title: qle.tool_tip)
     else
       options.merge!(data: data)
