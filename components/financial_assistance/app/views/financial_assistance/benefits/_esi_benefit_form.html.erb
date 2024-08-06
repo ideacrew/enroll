@@ -75,6 +75,7 @@
             <%= f.date_field :end_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "end_on|#{form_id}"} %>
           </div>
         </div>
+      </div>
       <fieldset class="mt-4 d-block">
         <legend class="weight-n required"><%= l10n("faa.health_coverage.esi.mvs_amount_question") %></legend>
         <a href="#employee_cost" data-toggle="modal" data-target="#employee_cost_<%= benefit.id %>" id="employee_cost" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>

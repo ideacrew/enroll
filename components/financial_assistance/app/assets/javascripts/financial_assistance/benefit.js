@@ -56,7 +56,7 @@ function handleEsiFields(form, isEsi, isHra, isMvsq) {
     // show hra questions if hra is the selected insurance kind
     // make the inputs of the non-selected kind non-reqquired
     // make the inputs of the selected kind required
-    if (isHra == "true") {
+    if (isHra || isHra == "true") {
       form.querySelector('.hra-questions').classList.remove('hidden');
       $(form).find('.non-hra-questions').remove();
     } else {
