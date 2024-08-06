@@ -70,15 +70,26 @@ RSpec.describe Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination, dbclean: :aft
       @result = described_class.new.call({encrypted_family_payload: encrypted_family_payload, job_id: job.job_id, family_hbx_id: family.hbx_assigned_id})
       person.reload
       family.reload
+      @alive_status = person.demographics_group.alive_status
+      @alive_status_type = person.verification_types.alive_status_type.last
+      @type_history_element = @alive_status_type.type_history_elements.first
     end
 
     it "should set the verification status to outstanding" do
-      alive_status = person.demographics_group.alive_status
-      alive_status_type = person.verification_types.alive_status_type.last
       expect(@result).to be_success
-      expect(alive_status_type.validation_status).to eq("outstanding")
-      expect(alive_status.is_deceased).to be_truthy
-      expect(alive_status.date_of_death.present?).to be_truthy
+      expect(@alive_status_type.validation_status).to eq("outstanding")
+      expect(@alive_status.is_deceased).to be_truthy
+      expect(@alive_status.date_of_death.present?).to be_truthy
+    end
+
+    it "should set verification history" do
+      expect(@alive_status_type.type_history_elements.count).to eq(1)
+      expect(@type_history_element.action).to eq("DMF Hub Response")
+      expect(@type_history_element.from_validation_status).to eq("unverified")
+      expect(@type_history_element.to_validation_status).to eq("outstanding")
+      expect(person.consumer_role.alive_status_responses.count).to eq(1)
+      expect(JSON.parse(person.consumer_role.alive_status_responses.first.body)).to eq({"job_id" => job.job_id, "family_hbx_id" => family.hbx_assigned_id.to_s, "death_confirmation_code" => "Confirmed", "date_of_death" => "2024-07-03"})
+      expect(person.consumer_role.alive_status_responses.first.id.to_s).to eq(@type_history_element.event_response_record_id)
     end
 
     it "should set the family eligibility determination objects" do

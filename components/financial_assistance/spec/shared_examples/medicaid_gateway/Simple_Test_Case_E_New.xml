@@ -200,7 +200,10 @@
         <ns2:PersonSexText>Female</ns2:PersonSexText>
         <ns2:PersonUSCitizenIndicator ns1:metadata="vm2009583325215611506">true</ns2:PersonUSCitizenIndicator>
         <ns4:TribalAugmentation>
-            <ns4:PersonAmericanIndianOrAlaskaNativeIndicator>false</ns4:PersonAmericanIndianOrAlaskaNativeIndicator>
+          <ns4:PersonRecognizedTribeIndicator>true</ns4:PersonRecognizedTribeIndicator>
+          <ns4:PersonAmericanIndianOrAlaskaNativeIndicator>true</ns4:PersonAmericanIndianOrAlaskaNativeIndicator>
+          <ns4:PersonTribeName>Eastern Band of Cherokee Indians of North Carolina</ns4:PersonTribeName>
+          <ns2:LocationStateUSPostalServiceCode>ME</ns2:LocationStateUSPostalServiceCode>
         </ns4:TribalAugmentation>
         <ns4:PersonAugmentation>
             <ns4:PersonAssociation>
@@ -463,9 +466,12 @@
             <ns2:IdentificationID>218725469</ns2:IdentificationID>
         </ns2:PersonSSNIdentification>
         <ns2:PersonUSCitizenIndicator ns1:metadata="vm2009583325215611506">true</ns2:PersonUSCitizenIndicator>
-        <ns4:TribalAugmentation>
-            <ns4:PersonAmericanIndianOrAlaskaNativeIndicator>false</ns4:PersonAmericanIndianOrAlaskaNativeIndicator>
-        </ns4:TribalAugmentation>
+      <ns4:TribalAugmentation>
+        <ns4:PersonRecognizedTribeIndicator>true</ns4:PersonRecognizedTribeIndicator>
+        <ns4:PersonAmericanIndianOrAlaskaNativeIndicator>true</ns4:PersonAmericanIndianOrAlaskaNativeIndicator>
+        <ns4:PersonTribeName>Eastern Band of Cherokee Indians of North Carolina</ns4:PersonTribeName>
+        <ns2:LocationStateUSPostalServiceCode>ME</ns2:LocationStateUSPostalServiceCode>
+      </ns4:TribalAugmentation>
         <ns4:PersonAugmentation>
             <ns4:PersonAssociation>
                 <ns2:AssociationBeginDate>
