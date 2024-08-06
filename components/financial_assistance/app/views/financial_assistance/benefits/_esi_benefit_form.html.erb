@@ -10,8 +10,8 @@
       <% end %>
     </div>
     <div class="d-flex flex-column col-6 px-0">
-      <%= f.label :employer_name, l10n("faa.health_coverage.esi.employer_name"), required: false, class: "required mt-2", for: "employer_name|#{form_id}" %>
-      <%= f.text_field :employer_name, placeholder: l10n("faa.health_coverage.esi.employer_name"), required: false, id: "employer_name|#{form_id}" %>
+      <%= f.label :employer_name, l10n("faa.health_coverage.esi.employer_name"), class: "mt-2 required", for: "employer_name|#{form_id}" %>
+      <%= f.text_field :employer_name, placeholder: l10n("faa.health_coverage.esi.employer_name"), required: true, id: "employer_name|#{form_id}" %>
     </div>
     <div class="d-flex col-6 px-0 mt-4">
       <%= f.fields_for :employer_phone do |phone_fields| %>
@@ -61,7 +61,7 @@
       <div class="d-flex mt-4">
         <div class="d-flex flex-column mr-3 col-6 px-0">
           <%= f.label :esi_covered, l10n("faa.health_coverage.esi.covered_question"), class: "required", for: "esi_covered|#{form_id}" %>
-          <%= f.select :esi_covered, options_for_select({l10n("faa.health_coverage.esi.self") => "self", l10n("faa.health_coverage.esi.self_and_spouse") => "self_and_spouse", l10n("faa.health_coverage.esi.family") => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:id => "esi_covered|#{form_id}"} %>
+          <%= f.select :esi_covered, options_for_select({l10n("faa.health_coverage.esi.self") => "self", l10n("faa.health_coverage.esi.self_and_spouse") => "self_and_spouse", l10n("faa.health_coverage.esi.family") => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:id => "esi_covered|#{form_id}", :required => true}%>
         </div>
         <div class="d-flex flex-column mr-3">
           <%= f.label :start_on, l10n("start_date"), class:"required", for: "start_on|#{form_id}" %>
@@ -83,7 +83,7 @@
           </div>
           <div class="col px-0">
             <%= f.label :employee_cost_frequency, l10n("frequency"), class:"required", for: "employee_cost_frequency|#{form_id}" %>
-            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "employee_cost_frequency|#{form_id}", class: "col"} %>
+            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "employee_cost_frequency|#{form_id}", required: true} %>
           </div>
         </div>
       </fieldset>
@@ -92,7 +92,7 @@
       <div class="d-flex mt-4">
         <div class="d-flex flex-column mr-3">
           <%= f.label :hra_type, l10n("faa.health_coverage.esi.type_of_hra"), class: "required", for: "hra_type|#{form_id}" %>
-          <%= f.select :hra_type, options_for_select({l10n("faa.health_coverage.esi.individual_hra") => "Individual coverage HRA", l10n("faa.health_coverage.esi.qse_hra") => "Qualified Small Employer HRA"}, selected: benefit.hra_type), {prompt: l10n("faa.health_coverage.esi.choose") }, {id: "hra_type|#{form_id}"} %>
+          <%= f.select :hra_type, options_for_select({l10n("faa.health_coverage.esi.individual_hra") => "Individual coverage HRA", l10n("faa.health_coverage.esi.qse_hra") => "Qualified Small Employer HRA"}, selected: benefit.hra_type), {prompt: l10n("faa.health_coverage.esi.choose") }, {id: "hra_type|#{form_id}", required: true} %>
         </div>
         <div class="d-flex flex-column mr-3">
           <%= f.label :start_on, l10n("start_date"), class:"required", for: "hra_start_on|#{form_id}" %>
@@ -114,7 +114,7 @@
           </div>
           <div class="d-flex flex-column mr-3">
             <%= f.label :employee_cost_frequency, l10n("frequency"), class:"required", for: "hra_employee_cost_frequency|#{form_id}" %>
-            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "hra_employee_cost_frequency|#{form_id}"} %>
+            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "hra_employee_cost_frequency|#{form_id}", required: true} %>
           </div>
         </div>
       </fieldset>
