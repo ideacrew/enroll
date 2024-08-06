@@ -49,6 +49,17 @@ function stopEditing() {
 };
 
 function handleEsiFields(form, isEsi, isHra, isMvsq) {
+  function showSection(form, section) {
+    const sectionClass = "." + section;
+    form.querySelector(sectionClass).classList.remove('hidden');
+    form.querySelectorAll(sectionClass + " input, " + sectionClass + " select").forEach(function(input) {
+      var label = form.querySelector("label[for='" + input.id + "']")
+      if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
+        input.setAttribute('required', true);
+      }
+    });
+  }
+
   // do all the esi specific hiding and showing
   if (isEsi == "true") {
     // show non-hra questions if non-hra is the selected insurance kind
@@ -56,39 +67,18 @@ function handleEsiFields(form, isEsi, isHra, isMvsq) {
     // make the inputs of the non-selected kind non-reqquired
     // make the inputs of the selected kind required
     if (isHra == "true") {
-      form.querySelector('.hra-questions').classList.remove('hidden');
-      form.querySelectorAll('.hra-questions input, hra-questions select').forEach(function(input) {
-        var label = form.querySelector("label[for='" + input.id + "']")
-        if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
-          input.setAttribute('required', true);
-        }
-      });
+      showSection(form, 'hra-questions');
       $(form).find('.non-hra-questions').remove();
     } else {
-      form.querySelector('.non-hra-questions').classList.remove('hidden');
-      form.querySelectorAll('.non-hra-questions input, non-hra-questions select').forEach(function(input) {
-        var label = form.querySelector("label[for='" + input.id + "']")
-        if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
-          input.setAttribute('required', true);
-        }
-      });
+      showSection(form, 'non-hra-questions');
       $(form).find('.hra-questions').remove();
     }
 
     // show mvsq if msqv is true
     if (isMvsq == "true") {
-      form.querySelector('.mvsq-questions').classList.remove('hidden');
-      form.querySelectorAll('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
-        var label = form.querySelector("label[for='" + input.id + "']")
-        if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
-          input.setAttribute('required', true);
-        }
-      });
+      showSection(form, 'mvsq-questions');
     } else {
-      form.querySelector('.mvsq-questions').classList.add('hidden');
-      form.querySelectorAll('.mvsq-questions input, mvsq-questions select').forEach(function(input) {
-        input.removeAttribute('required');
-      });
+      $(form).find('.mvsq-questions').remove();
     }
   }
 }
