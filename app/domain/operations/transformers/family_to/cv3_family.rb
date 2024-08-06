@@ -71,8 +71,13 @@ module Operations
           return Success(nil) unless EnrollRegistry.feature_enabled?(:financial_assistance)
           return Success([]) if exclude_applications
 
-          applications = ::FinancialAssistance::Application.only(:aasm_state, :family_id, :effective_date, :assistance_year, :renewal_base_year, :years_to_renew, :is_ridp_verified, :is_renewal_authorized, :us_state, :hbx_id, :submitted_at,
-                                                                 :applicants, :eligibility_determinations,:relationships, :'workflow_state_transitions.from_state', :full_medicaid_determination).where(family_id: family.id).determined
+          applications = ::FinancialAssistance::Application.only(
+            :aasm_state, :family_id, :effective_date, :assistance_year, :renewal_base_year, :years_to_renew,
+            :is_ridp_verified, :is_renewal_authorized, :us_state, :hbx_id, :submitted_at,
+            :applicants, :eligibility_determinations,:relationships, :'workflow_state_transitions.from_state',
+            :'workflow_state_transitions.transition_at', :full_medicaid_determination
+          ).where(family_id: family.id).determined
+
           transformed_applications = applications.collect do |application|
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end.compact

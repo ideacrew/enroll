@@ -158,7 +158,9 @@ class DocumentsController < ApplicationController
       @verification_type.add_type_history_element(action: "Hub Request Failed",
                                                   modifier: "System",
                                                   update_reason: "#{@verification_type.type_name} Request Failed due to #{message}")
-      ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: @person.primary_family, effective_date: TimeKeeper.date_of_record)
+      @person.families.each do |family|
+        ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
+      end
     end
 
     respond_to do |format|
