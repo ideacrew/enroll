@@ -453,7 +453,7 @@ module FinancialAssistance
     end
 
     def other_questions_prompt(key, use_applicant_name: false)
-      l10n("faa.other_ques.#{key}", subject: use_applicant_name ? @applicant.first_name.capitalize : l10n("faa.other_ques.this_person"))
+      l10n("faa.other_ques.#{key}", subject: use_applicant_name ? @applicant.first_name.capitalize : l10n("faa.this_person"))
     end
 
     def insurance_kind_select_options(kind)
