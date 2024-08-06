@@ -56,15 +56,6 @@ function handleEsiFields(form, isEsi, isHra, isMvsq) {
     // make the inputs of the non-selected kind non-reqquired
     // make the inputs of the selected kind required
     if (isHra == "true") {
-      form.querySelector('.non-hra-questions').classList.remove('hidden');
-      form.querySelectorAll('.non-hra-questions input, non-hra-questions select').forEach(function(input) {
-        var label = form.querySelector("label[for='" + input.id + "']")
-        if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
-          input.setAttribute('required', true);
-        }
-      });
-      $(form).find('.hra-questions').remove();
-    } else {
       form.querySelector('.hra-questions').classList.remove('hidden');
       form.querySelectorAll('.hra-questions input, hra-questions select').forEach(function(input) {
         var label = form.querySelector("label[for='" + input.id + "']")
@@ -73,6 +64,15 @@ function handleEsiFields(form, isEsi, isHra, isMvsq) {
         }
       });
       $(form).find('.non-hra-questions').remove();
+    } else {
+      form.querySelector('.non-hra-questions').classList.remove('hidden');
+      form.querySelectorAll('.non-hra-questions input, non-hra-questions select').forEach(function(input) {
+        var label = form.querySelector("label[for='" + input.id + "']")
+        if ((label && label.classList.contains('required')) || input.classList.contains('required')) {
+          input.setAttribute('required', true);
+        }
+      });
+      $(form).find('.hra-questions').remove();
     }
 
     // show mvsq if msqv is true
@@ -165,7 +165,7 @@ document.addEventListener("turbolinks:load", function() {
     $(clonedForm).find('input').removeAttr('disabled');
     let formId = clonedForm.querySelector('.benefit-form-container').id
     makeInputIdsUnique(formId, clonedForm)
-    handleEsiFields(clonedForm, esi, kind, mvsq);
+    handleEsiFields(clonedForm, esi, selected.value == 'health_reimbursement_arrangement', mvsq);
 
     select.closest(".new-benefit-form").classList.add('hidden');
     benefitList.appendChild(clonedForm);

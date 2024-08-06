@@ -91,7 +91,7 @@
     <div class="hra-questions hidden">
       <div class="d-flex mt-4">
         <div class="d-flex flex-column mr-3">
-          <%= f.label :hra_type, l10n("health_coverage.esi.type_of_hra"), class: "required", for: "hra_type|#{form_id}" %>
+          <%= f.label :hra_type, l10n("faa.health_coverage.esi.type_of_hra"), class: "required", for: "hra_type|#{form_id}" %>
           <%= f.select :hra_type, options_for_select({l10n("faa.health_coverage.esi.individual_hra") => "Individual coverage HRA", l10n("faa.health_coverage.esi.qse_hra") => "Qualified Small Employer HRA"}, selected: benefit.hra_type), {prompt: l10n("faa.health_coverage.esi.choose") }, {id: "hra_type|#{form_id}"} %>
         </div>
         <div class="d-flex flex-column mr-3">
