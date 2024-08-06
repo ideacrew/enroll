@@ -95,7 +95,8 @@ input.fake-disabled-input:not([type='submit']):disabled {
   color: var(--default-font-color);
 }
 
-input[type='checkbox'] {
+input[type='checkbox'],
+input[type='radio'] {
   &:active,
   &:focus {
     outline: 1px solid var(--grey-150);
