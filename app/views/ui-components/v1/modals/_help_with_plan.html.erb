@@ -63,8 +63,8 @@
               <li><%= h(link_to l10n("insured.plan_shoppings.help_from_an_inperson_assister"), main_app.assister_index_exchanges_hbx_profiles_path, remote: true) %></li>
             <% end %>
             <% if EnrollRegistry.feature_enabled?(:contact_customer_service_representative) %>
-              <li class="name_search_only" id="CSR"><%= h(link_to l10n("insured.plan_shoppings.help_from_a_customer_service_representative")) %></li>
-              <li class="name_search_only" id="CAC"><%= h(link_to l10n("insured.plan_shoppings.help_from_a_certified_applicant_counselor")) %></li>
+              <li class="name_search_only" id="CSR"><%= h(link_to l10n("insured.plan_shoppings.help_from_a_customer_service_representative"), "#") %></li>
+              <li class="name_search_only" id="CAC"><%= h(link_to l10n("insured.plan_shoppings.help_from_a_certified_applicant_counselor"), "#") %></li>
             <% end %>
           </ul>
         </div>
