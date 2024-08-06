@@ -199,7 +199,7 @@ module FinancialAssistance
     end
 
     def deductions_info_hash(applicant, can_edit)
-      row = {l10n('faa.deductions.income_adjustments', subject: l10n('faa.other_ques.this_person'), assistance_year: assistance_year) => human_boolean(applicant.has_deductions)}
+      row = {l10n('faa.deductions.income_adjustments', subject: l10n('faa.this_person'), assistance_year: assistance_year) => human_boolean(applicant.has_deductions)}
       create_section_hash(
         title: l10n('faa.review.income_adjustments'),
         can_edit: can_edit,
