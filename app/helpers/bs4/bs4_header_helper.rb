@@ -3,14 +3,13 @@
 # Here is a comment
 module Bs4
   # this is used with the new bs4 header
-  # rubocop:disable Metrics/ModuleLength
   module Bs4HeaderHelper
     include L10nHelper
     include ApplicationHelper
 
     def bs4_portal_type(controller) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       if current_user.nil?
-        link_to(l10n("layout.header.role.individual_and_family"), privacy_insured_employee_index_path)
+        nil
       elsif current_user.try(:has_hbx_staff_role?)
         link_to(l10n("layout.header.role.admin"), main_app.exchanges_hbx_profiles_root_path)
       elsif display_i_am_broker_for_consumer?(current_user.person) && controller_path.exclude?('general_agencies')
@@ -33,12 +32,11 @@ module Bs4
         else
           link_to(l10n("layout.header.role.employee"), main_app.family_account_path)
         end
-      elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?)) ||
-            (EnrollRegistry.feature_enabled?(:financial_assistance) && controller_path.include?("financial_assistance") && current_user.try(:has_consumer_role?))
+      elsif current_user.try(:has_consumer_role?)
         if current_user.identity_verified_date.present?
           link_to(l10n("layout.header.role.individual_and_family"), main_app.family_account_path)
         else
-          link_to(l10n("layout.header.role.individual_and_family"), 'javascript:;')
+          l10n("layout.header.role.individual_and_family")
         end
       # rubocop:disable Lint/DuplicateBranch
       elsif current_user.try(:has_broker_agency_staff_role?) && controller_path.exclude?('general_agencies') && controller_path.exclude?('employers')
@@ -81,13 +79,8 @@ module Bs4
         else
           link_to(ltext, main_app.family_account_path)
         end
-      elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?)) ||
-            (EnrollRegistry.feature_enabled?(:financial_assistance) && controller_path.include?("financial_assistance") && current_user.try(:has_consumer_role?))
-        if current_user.identity_verified_date.present?
-          link_to(ltext, main_app.family_account_path)
-        else
-          link_to(ltext, 'javascript:;')
-        end
+      elsif current_user.try(:has_consumer_role?)
+        link_to(ltext, main_app.family_account_path) if current_user.identity_verified_date.present?
       # rubocop:disable Lint/DuplicateBranch
       elsif current_user.try(:has_broker_agency_staff_role?) && controller_path.exclude?('general_agencies') && controller_path.exclude?('employers')
         link_to(ltext, get_broker_profile_path)
@@ -122,5 +115,4 @@ module Bs4
       end
     end
   end
-  # rubocop:enable Metrics/ModuleLength
 end
