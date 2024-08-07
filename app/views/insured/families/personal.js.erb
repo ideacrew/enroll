@@ -11,12 +11,16 @@
 
   } else {
     // manage family/ my household page
-    var personContainer = $("#person-<%= @person.id %>")
-    $("#person-<%= @person.id %> .append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
+    var id = "<%= @person.id %>";
+    var personContainer = $("#person-" + id);
+    $("#person-" + id + " .append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
     personContainer.removeClass('hidden');
     if ($("#family_information").length == 0) {
-      $("a[id^=edit-member]").addClass('disabled');
-      $("a[id^=edit-member]").attr('disabled', true);
+      var memberContainer = $(".member-" + id + "-row");
+      console.log(".member-" + id + "-row")
+      $(".edit-member").addClass('disabled');
+      memberContainer.find(".edit-member").addClass('hidden');
+      memberContainer.find(".edit-buttons").removeClass('hidden');
     }
   }
   applyListeners();

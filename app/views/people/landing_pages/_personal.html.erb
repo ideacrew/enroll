@@ -127,6 +127,11 @@
         $('#manage_family_content').html(family_table);
       }
     });
+
+    $(document).off('click', '.confirm-member'); 
+    $(document).on('click', '.confirm-member', function(e) {
+      $("#save_personal").click();
+    });
   </script>
 
 <% else %>
