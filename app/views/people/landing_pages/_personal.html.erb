@@ -106,11 +106,11 @@
     <% end %>
 
     <div class="mb-5 <%= pundit_class Family, :updateable? %>">
-      <%= link_to l10n("cancel"), '#', class: "btn button outline remove-personal-form" %>
+      <%= link_to l10n("discard_changes"), '#', class: "btn button outline remove-personal-form mr-2" %>
 
       <button type="submit" class="btn btn-primary btn-br hidden"><%= l10n("confirm_member") %></button>
       <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'save_personal')" id="save_personal" class='btn btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));' data-cuke="personal-save">
-        <%= l10n("confirm_member") %>
+        <%= l10n("save_changes") %>
       </span>
     </div>
   <% end %>

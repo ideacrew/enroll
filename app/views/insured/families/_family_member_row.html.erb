@@ -10,12 +10,12 @@
       <span class="d-flex">
         <%= h(link_to l10n("edit_member"), edit_url, remote: true, class: 'edit-member btn button outline close-2') %>
         <span class="d-flex hidden edit-buttons">
-            <%= link_to('#', class: 'btn outline mr-2') do %>
-              <%= l10n("cancel") %>
+            <%= link_to('#', class: 'btn outline mr-2 text-nowrap') do %>
+              <%= l10n("cancel_edit") %>
             <% end %>
             <% confirm_id = "member-#{person_id}-confirm" %>
             <span tabindex="0", onkeydown="handleButtonKeyDown(event, '<%= confirm_id %>')", id=<%= confirm_id %> class="confirm-member btn btn-primary text-nowrap">
-              <%= l10n("confirm_member") %>
+              <%= l10n("save_changes") %>
             </span>
         </span>
       </span>
