@@ -1411,6 +1411,10 @@ Given(/^the warning duplicate enrollment feature configuration is enabled$/) do
   allow(EnrollRegistry[:existing_coverage_warning].feature).to receive(:is_enabled).and_return(true)
 end
 
+Given(/^the temporary_configuration_enable_multi_tax_household_feature feature is disabled$/) do
+  allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
+end
+
 And(/Dependent sees Your Information page$/) do
   expect(page).to have_content YourInformation.your_information_text
   find(YourInformation.continue_btn).click

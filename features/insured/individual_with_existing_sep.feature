@@ -1,6 +1,7 @@
 Feature: Consumer shops for plan with existing seps
   Background: Setup IVL benefit packages and benefit coverage periods
     Given bs4_consumer_flow feature is disable
+    Given the temporary_configuration_enable_multi_tax_household_feature feature is disabled
     Given the FAA feature configuration is enabled
     And Individual market is not under open enrollment period
   
