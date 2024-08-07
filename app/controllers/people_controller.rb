@@ -12,7 +12,7 @@ class PeopleController < ApplicationController
     @family = @person.primary_family
 
     @person.updated_by = current_user.oim_id unless current_user.nil?
-    if @person.is_consumer_role_active? && request.referer.include?("insured/families/personal")
+    if @person.is_consumer_role_active? && (request.referer.include?("insured/families/personal") || request.referer.include?("insured/families/manage_family"))
       @valid_vlp = update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
