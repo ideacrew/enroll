@@ -3,7 +3,7 @@
     <% form_id = SecureRandom.random_number(10000000) %>
     <div class="my-4 p-3 border rounded bg-white benefit-form-container" data-cuke="non_esi_benefit" id="<%= form_id %>">
       <%= f.hidden_field :kind, value: kind %>
-      <%= f.hidden_field :insurance_kind, value: "" %>
+      <%= f.hidden_field :insurance_kind, value: insurance_kind %>
       <div class="insurance-kind-label-container">
         <% if insurance_kind.present? %>
           <h2><%= insurance_kind.humanize.titleize %></h2>
@@ -14,7 +14,7 @@
         <div class="d-flex">
           <div class="d-flex flex-column mr-3">
             <%= f.label :start_on, l10n("start_date"), class:"required", for: "start_on|#{form_id}" %>
-            <%= f.date_field :start_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "start_on|#{form_id}"} %>
+            <%= f.date_field :start_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "start_on|#{form_id}", required: true} %>
           </div>
           <div class="d-flex flex-column">
             <%= f.label :end_on, l10n("end_date"), for: "end_on|#{form_id}" %>
