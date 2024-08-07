@@ -15,8 +15,7 @@
     $("#person-<%= @person.id %> .append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
     personContainer.removeClass('hidden');
     if ($("#family_information").length == 0) {
-      $("a[id^=edit-member]").addClass('disabled');
-      $("a[id^=edit-member]").attr('disabled', true);
+      $("a[id^=edit-member]").addClass('disabled').attr('tabindex', -1).blur();
     }
   }
   applyListeners();
