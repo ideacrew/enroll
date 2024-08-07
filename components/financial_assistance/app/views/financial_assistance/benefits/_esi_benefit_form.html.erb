@@ -10,10 +10,40 @@
       <% end %>
     </div>
     <div class="d-flex flex-column col-6 px-0">
-      <%= f.label :employer_name, l10n("faa.health_coverage.esi.employer_name"), required: false, class: "required mt-2", for: "employer_name|#{form_id}" %>
-      <%= f.text_field :employer_name, placeholder: l10n("faa.health_coverage.esi.employer_name"), required: false, id: "employer_name|#{form_id}" %>
+      <%= f.label :employer_name, l10n("faa.health_coverage.esi.employer_name"), class: "mt-2 required", for: "employer_name|#{form_id}" %>
+      <%= f.text_field :employer_name, placeholder: l10n("faa.health_coverage.esi.employer_name"), required: true, id: "employer_name|#{form_id}" %>
     </div>
-    <div class="d-flex col-6 px-0 mt-4">
+    <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
+      <%= f.fields_for :employer_address do |address_fields| %>
+        <%= address_fields.hidden_field :kind, value: 'work' %>
+        <% required = !EnrollRegistry[:skip_employer_address_validation].enabled? %>
+        <div class="d-flex row mx-0 mt-4">
+          <div class="d-flex flex-column col-xl-6 col-12 pr-xl-3 px-0">
+            <%= address_fields.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", for: "address_1|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.text_field :address_1, placeholder: l10n("address_1"), value: benefit.employer_address.try(:address_1), required: required, id: "address_1|#{form_id}" %>
+          </div>
+          <div class="d-flex flex-column col-xl-6 px-0 mt-xl-0 mt-4">
+            <%= address_fields.label :address_2, "#{l10n("address_2")} #{l10n("address_2_desc")}", for: "address_2|#{form_id}" %>
+            <%= address_fields.text_field :address_2, placeholder: l10n("address_2"), value: benefit.employer_address.try(:address_2), id: "address_2|#{form_id}" %>
+          </div>
+        </div>
+        <div class="d-flex mx-0 mt-4">
+          <div class="d-flex flex-column col-3 pl-0 pr-3">
+            <%= address_fields.label :city, l10n("city"), for: "city|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.text_field :city, placeholder: l10n("city"), required: required, value: benefit.employer_address.try(:city), id: "city|#{form_id}" %>
+          </div>
+          <div class="d-flex flex-column col-3 pl-0 pr-3">
+            <%= address_fields.label :state, l10n("state"), for: "state|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), {prompt: l10n("choose")}, {id: "state|#{form_id}", :required => required} %>
+          </div>
+          <div class="d-flex flex-column col-3 px-0">
+            <%= address_fields.label :zip, l10n("zip"), for: "zip|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.text_field :zip, placeholder: l10n('zip'), required: required, value: benefit.employer_address.try(:zip), class: "zip", id: "zip|#{form_id}" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+    <div class="d-flex col-xl-6 col-md-8 col-12 px-0 mt-4">
       <%= f.fields_for :employer_phone do |phone_fields| %>
       <%= phone_fields.hidden_field :kind, value: "work" %>
       <div class="d-flex flex-column col-5 px-0 mr-3">
@@ -56,65 +86,73 @@
           </label>
         </div>
       </fieldset>
-      <a href="#is_esi_mec_met" data-toggle="modal" data-target="#is_esi_mec_met<%= benefit.id %>" id="is_esi_mec_met_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
+      <a href="#is_esi_mec_met" data-toggle="modal" data-target="#is_esi_mec_met_<%= benefit.id %>" id="is_esi_mec_met_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
       <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_mec_met", id: "is_esi_mec_met_#{benefit.id}" } %>
-      <div class="d-flex mt-4">
-        <div class="d-flex flex-column mr-3 col-6 px-0">
-          <%= f.label :esi_covered, l10n("faa.health_coverage.esi.covered_question"), class: "required", for: "esi_covered|#{form_id}" %>
-          <%= f.select :esi_covered, options_for_select({l10n("faa.health_coverage.esi.self") => "self", l10n("faa.health_coverage.esi.self_and_spouse") => "self_and_spouse", l10n("faa.health_coverage.esi.family") => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:id => "esi_covered|#{form_id}"} %>
+      <div class="d-flex row mx-0 mt-4">
+        <div class="d-flex flex-column col-xl-6 col-12 px-0 mb-xl-0 mb-4">
+          <div class="d-flex flex-column col-xl-12 col-6 px-0">
+            <%= f.label :esi_covered, l10n("faa.health_coverage.esi.covered_question"), class: "required", for: "esi_covered|#{form_id}" %>
+            <%= f.select :esi_covered, options_for_select({l10n("faa.health_coverage.esi.self") => "self", l10n("faa.health_coverage.esi.self_and_spouse") => "self_and_spouse", l10n("faa.health_coverage.esi.family") => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:id => "esi_covered|#{form_id}", required: true}%>
+          </div>
         </div>
-        <div class="d-flex flex-column mr-3">
-          <%= f.label :start_on, l10n("start_date"), class:"required", for: "start_on|#{form_id}" %>
-          <%= f.date_field :start_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "start_on|#{form_id}"} %>
-        </div>
-        <div class="d-flex flex-column">
-          <%= f.label :end_on, l10n("end_date"), for: "end_on|#{form_id}" %>
-          <%= f.date_field :end_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "end_on|#{form_id}"} %>
+        <div class="d-flex col-6 px-0 pl-xl-3">
+          <div class="d-flex flex-column col pl-0">
+            <%= f.label :start_on, l10n("start_date"), class:"required", for: "start_on|#{form_id}" %>
+            <%= f.date_field :start_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "start_on|#{form_id}", required: true} %>
+          </div>
+          <div class="d-flex flex-column col px-0">
+            <%= f.label :end_on, l10n("end_date"), for: "end_on|#{form_id}" %>
+            <%= f.date_field :end_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "end_on|#{form_id}"} %>
+          </div>
         </div>
       </div>
       <fieldset class="mt-4 d-block">
         <legend class="weight-n required"><%= l10n("faa.health_coverage.esi.mvs_amount_question") %></legend>
         <a href="#employee_cost" data-toggle="modal" data-target="#employee_cost_<%= benefit.id %>" id="employee_cost" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "employee_cost", id: "employee_cost_#{benefit.id}" } %>
-        <div class="d-flex mt-2 col-6 px-0">
-          <div class="col px-0 mr-3">
+        <div class="d-flex col-xl-6 col-md-8 col-12 px-0 mt-2">
+          <div class="d-flex flex-column col-6 px-0 mr-3">
             <%= f.label :employee_cost, l10n("faa.health_coverage.esi.amount"), class: "required", for: "employee_cost|#{form_id}" %>
-            <%= f.text_field :employee_cost, placeholder: '0.00', value: benefit.employee_cost, id: "employee_cost|#{form_id}" %>
+            <%= f.text_field :employee_cost, placeholder: '0.00', value: benefit.employee_cost, id: "employee_cost|#{form_id}", required: true %>
           </div>
-          <div class="col px-0">
+          <div class="d-flex flex-column col-6">
             <%= f.label :employee_cost_frequency, l10n("frequency"), class:"required", for: "employee_cost_frequency|#{form_id}" %>
-            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "employee_cost_frequency|#{form_id}", class: "col"} %>
+            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "employee_cost_frequency|#{form_id}", required: true} %>
           </div>
         </div>
       </fieldset>
     </div>
     <div class="hra-questions hidden">
-      <div class="d-flex mt-4">
-        <div class="d-flex flex-column mr-3">
-          <%= f.label :hra_type, l10n("health_coverage.esi.type_of_hra"), class: "required", for: "hra_type|#{form_id}" %>
-          <%= f.select :hra_type, options_for_select({l10n("faa.health_coverage.esi.individual_hra") => "Individual coverage HRA", l10n("faa.health_coverage.esi.qse_hra") => "Qualified Small Employer HRA"}, selected: benefit.hra_type), {prompt: l10n("faa.health_coverage.esi.choose") }, {id: "hra_type|#{form_id}"} %>
+      <div class="d-flex row mx-0 mt-4">
+        <div class="d-flex flex-column col-xl-6 col-12 px-0 mb-xl-0 mb-4">
+          <div class="d-flex flex-column col-xl-12 col-6 px-0">
+            <%= f.label :hra_type, l10n("faa.health_coverage.esi.type_of_hra"), class: "required", for: "hra_type|#{form_id}" %>
+            <%= f.select :hra_type, options_for_select({l10n("faa.health_coverage.esi.individual_hra") => "Individual coverage HRA", l10n("faa.health_coverage.esi.qse_hra") => "Qualified Small Employer HRA"}, selected: benefit.hra_type), {prompt: l10n("faa.health_coverage.esi.choose") }, {id: "hra_type|#{form_id}", required: true} %>
+          </div>
         </div>
-        <div class="d-flex flex-column mr-3">
-          <%= f.label :start_on, l10n("start_date"), class:"required", for: "hra_start_on|#{form_id}" %>
-          <%= f.date_field :start_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "hra_start_on|#{form_id}"} %>
-        </div>
-        <div class="d-flex flex-column">
-          <%= f.label :end_on, l10n("end_date"), for: "hra_end_on|#{form_id}" %>
-          <%= f.date_field :end_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "hra_end_on|#{form_id}"} %>
+        <div class="d-flex col-6 px-0 pl-xl-3">
+          <div class="d-flex flex-column col pl-0">
+            <%= f.label :start_on, l10n("start_date"), class:"required", for: "hra_start_on|#{form_id}" %>
+            <%= f.date_field :start_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "hra_start_on|#{form_id}", required: true} %>
+          </div>
+          <div class="d-flex flex-column col px-0">
+            <%= f.label :end_on, l10n("end_date"), for: "hra_end_on|#{form_id}" %>
+            <%= f.date_field :end_on, {class: "date-field", placeholder: "MM/DD/YYYY", id: "hra_end_on|#{form_id}"} %>
+          </div>
         </div>
       </div>
       <fieldset class="mt-4 d-block">
         <legend class="weight-n required"><%= l10n("faa.health_coverage.esi.hra_max_question") %></legend>
-        <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit<%= benefit.id %>" id="hra_benefit" class="interaction-click-control-not-sure? benefit-support-modal mb-4">Not sure?</a>
+        <a href="#hra_benefit" data-toggle="modal" data-target="#hra_benefit_<%= benefit.id %>" id="hra_benefit" class="interaction-click-control-not-sure? benefit-support-modal mb-4">Not sure?</a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "hra_benefit", id: "hra_benefit_#{benefit.id}" } %>
-        <div class="d-flex mt-4">
-           <div class="d-flex flex-column mr-3">
+        <div class="d-flex col-xl-6 col-md-8 col-12 px-0 mt-2">
+          <div class="d-flex flex-column col-6 px-0 mr-3">
             <%= f.label :employee_cost, l10n("faa.health_coverage.esi.amount"), class: "required", for: "hra_employee_cost|#{form_id}" %>
-            <%= f.text_field :employee_cost, placeholder: '0.00', value: "", id: "hra_employee_cost|#{form_id}" %>
+            <%= f.text_field :employee_cost, placeholder: '0.00', value: benefit.employee_cost, id: "hra_employee_cost|#{form_id}", required: true %>
           </div>
-          <div class="d-flex flex-column mr-3">
+          <div class="d-flex flex-column col-6">
             <%= f.label :employee_cost_frequency, l10n("frequency"), class:"required", for: "hra_employee_cost_frequency|#{form_id}" %>
-            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "hra_employee_cost_frequency|#{form_id}"} %>
+            <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {id: "hra_employee_cost_frequency|#{form_id}", required: true} %>
           </div>
         </div>
       </fieldset>
