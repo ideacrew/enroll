@@ -169,12 +169,12 @@
             <fieldset>
               <legend class="weight-n instruction-row"><%=l10n("faa.household_income_changed")%></legend>
               <div class="focus d-flex mt-3">
-                <label class="radio mr-3" for="has_household_income_changed_yes">
-                  <input id="has_household_income_changed_yes" type="radio" value="true" name="has_household_income_changed" <%='checked' if @applicant.has_household_income_changed? %>>
+                <label class="radio mr-3">
+                  <input id="has_household_income_changed_true" type="radio" value="true" name="has_household_income_changed" <%='checked' if @applicant.has_household_income_changed? %>>
                   <span><%= l10n("yes") %></span>
                 </label>
-                <label class="radio mr-3" for="has_household_income_changed_no">
-                  <input id="has_household_income_changed_no" type="radio" value="false" name="has_household_income_changed" <%='checked'if @applicant.has_household_income_changed == false %>>
+                <label class="radio mr-3">
+                  <input id="has_household_income_changed_false" type="radio" value="false" name="has_household_income_changed" <%='checked'if @applicant.has_household_income_changed == false %>>
                   <span><%= l10n("no") %></span>
                 </label>
               </div>
