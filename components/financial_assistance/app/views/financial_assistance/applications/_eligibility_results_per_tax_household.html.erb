@@ -163,15 +163,13 @@
 
     <div id="other-accordion" data-cuke='other_actions'>
       <div class="card">
-        <div class="card-header" id="otherActionsHeading">
-          <h5 class="mb-0">
-            <button class="btn btn-link" data-toggle="collapse" data-target="#otherActions" aria-expanded="true" aria-controls="otherActions">
-              <%= l10n("other_actions") %>
-            </button>
-          </h5>
+        <div id="otherActionsHeading">
+          <button class="accordion-action" data-toggle="collapse" data-target="#otherActions" aria-controls="otherActions" aria-expanded="false">
+            <%= l10n("other_actions") %>
+          </button>
         </div>
 
-        <div id="otherActions" class="collapse show" aria-labelledby="otherActionsHeading" data-parent="#other-accordion">
+        <div id="otherActions" class="collapse" aria-labelledby="otherActionsHeading" data-parent="#other-accordion">
           <div class="card-body">
             <% if FinancialAssistanceRegistry.feature_enabled?(:fa_send_to_external_verification) && !@application.is_transferrable? %>
               <div class="w-100 pb-4">
