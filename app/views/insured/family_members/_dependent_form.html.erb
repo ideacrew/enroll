@@ -199,6 +199,11 @@
       });
     <% end %>
 
+    $(document).off('click', '#confirm-dependent-2'); 
+    $(document).on('click', '#confirm-dependent-2', function(e) {
+      $("#confirm-dependent").click();
+    });
+
     $(document).off('click', '#confirm-dependent');
     $(document).on('click', '#confirm-dependent', function(e) {
       if ($("input#dependent_same_with_primary").is(":checked")){
