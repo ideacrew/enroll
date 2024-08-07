@@ -1,6 +1,5 @@
 <span id='dchbx_enroll_date_of_record' class='hidden d-none'><%= TimeKeeper.date_of_record.iso8601 %></span>
 <header class="bg-white navbar-primary py-2 <%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == true %>">
-
   <nav class="top-nav navbar navbar-expand-lg container py-1 px-0">
     <a class="navbar-brand mr-0" href="#" title="<%= l10n('welcome.index.logo_title')%>">
       <%= image_pack_tag "logo_bs4_#{ENV['CLIENT'] || 'ic'}.svg", alt: "#{ENV['CLIENT']} logo"%>
@@ -23,31 +22,39 @@
     </button>
 
     <div id="desktop-navigation" class=" collapse navbar-collapse">
-      <ul id="portal-type-home-link" class="navbar-nav mr-auto">
+      <ul id="portal-type-home-link" class="navbar-nav mr-auto d-flex">
+
+        <% if bs4_portal_type(controller_name) %>
         <li class="nav-item-divider"></li>
-        <li class="nav-item d-flex flex-column site-name-market">
-          <span><%= l10n('welcome.index.welcome_to_site_header')%></span>
+        <li class="nav-item d-flex flex-column site-name-market align-self-center">
           <%= bs4_portal_type(controller_name) %>
         </li>
+        <% end %>
       </ul>
       <ul class="navbar-nav">
-        <li class="nav-item d-flex flex-column align-items-md-end align-items-lg-end">
-          <span><%= image_pack_tag "icons/phone.svg", alt: "phone icon" %><%= l10n("layout.header.customer_service") %></span>
-          <% contact_center_short_number = EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item %>
-          <a href="tel:<%= contact_center_short_number %>">
-            <%= "#{contact_center_short_number} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %>
-          </a>
-        </li>
         <% if signed_in? %>
-          <li class="nav-item-divider"></li>
-          <li class="nav-item d-flex flex-column align-items-md-end align-items-lg-end">
+          <li class="nav-item d-flex flex-column">
             <% user_id = current_user.try(:person).try(:hbx_id) %>
-            <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%= " #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
-            <span class="horizontal-links">
-              <%= render partial: "shared/my_portal_links" %>
-              <span><%= h(link_to l10n('layout.header.help'), site_help_url, target: '_blank', rel: "noopener noreferrer") %></span>
-              <span><%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
-            </span>
+            <% user_name = current_user.try(:person).try(:full_name) %>
+            <div class="d-flex align-items-center">
+              <div class="mr-2">
+                <% if current_user.try(:has_hbx_staff_role?) %>
+                  <%= image_pack_tag "icons/admin-icon.svg", alt:"admin icon", class: "user-icon" %>
+                <% elsif bs4_portal_type(controller_name) == "Broker" %>
+                  <%= image_pack_tag "icons/expert-icon.svg", alt:"expert icon", class: "user-icon" %>
+                <% else %>
+                  <%= image_pack_tag "icons/user-small.svg", alt:"user icon", class: "user-icon" %>
+                <% end %>
+              </div>
+              <div>
+                <div class="bold m-0 p-0"><%= user_first_name_last_name_and_suffix %></div>
+                <div class="horizontal-links">
+                  <% unless user_id.blank? %><span><%= l10n("id").upcase %>: <%= user_id %></span><% end %>
+                  <% unless my_portal_link(controller) %><span><%= my_portal_link(controller) %></span><% end %>
+                  <span><%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
+                </div>
+              </div>
+            </div>
           </li>
         <% end %>
       </ul>
@@ -57,7 +64,7 @@
 
   <nav id="nav-drawer-collapsible" class="mobile-drawer collapse" >
     <ul id="portal-type-home-link" class="list-unstyled">
-      <% if signed_in? %>
+      <% if bs4_portal_type(controller_name) %>
         <li class="nav-item-divider"></li>
         <li class="nav-item d-flex flex-column site-name-market">
           <%= bs4_portal_type(controller_name) %>
@@ -70,7 +77,16 @@
         <li class="nav-item-divider"></li>
         <li class=" nav-item d-flex flex-column align-items-md-end">
           <% user_id = current_user.try(:person).try(:hbx_id) %>
-          <span><%= image_pack_tag "icons/user-small.svg", alt:"user icon" %><%=" #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %></span>
+          <span>
+            <% if current_user.try(:has_hbx_staff_role?) %>
+              <%= image_pack_tag "icons/admin-icon.svg", alt:"admin icon", class: "user-icon" %>
+            <% elsif bs4_portal_type(controller_name) == "Broker" %>
+              <%= image_pack_tag "icons/expert-icon.svg", alt:"expert icon", class: "user-icon" %>
+            <% else %>
+              <%= image_pack_tag "icons/user-small.svg", alt:"user icon", class: "user-icon" %>
+            <% end %>
+            <%=" #{user_first_name_last_name_and_suffix}#{" #{l10n('layout.header.id')} #{user_id}" unless user_id.blank?}" %>
+          </span>
         </li>
       <% end %>
       <li><% if signed_in? %><%= render partial: "shared/my_portal_links" %><% end %></li>
