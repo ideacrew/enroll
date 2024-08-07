@@ -275,16 +275,8 @@ module ApplicationHelper
   # Formats a number into a US Social Security Number string (nnn-nn-nnnn), hiding all but last 4 digits
   def number_to_obscured_ssn(number)
     return unless number
-    # check if ff set, if so, return number_to_fully_obscured_ssn(number)
     number_to_ssn(number)
-
     number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
-  end
-
-  def number_to_fully_obscured_ssn(number)
-    return unless number
-    number_to_ssn(number)
-    number.to_s.gsub!('***-**-****')
   end
 
   # Formats a number into a nine-digit US Federal Entity Identification Number string (nn-nnnnnnn)
@@ -773,6 +765,7 @@ module ApplicationHelper
   end
 
   def ivl_hsa_status(plan_hsa_status, plan)
+    return unless plan_hsa_status.present?
     (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
   end
 
