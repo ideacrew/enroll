@@ -7,7 +7,7 @@ if (!$(".my-household-page").length) {
 
   $("#dependent_buttons").removeClass('hidden');
 } else {
-  $(".edit-member").removeClass('disabled').removeClass('hidden');
+  $(".edit-member").removeClass('disabled').attr('tabindex', 0);
   $("#add-new-member").removeClass("hidden");
   $("#new_employee_dependent_form").html($(document.createElement("div")).attr("id", "append_consumer_info"));
   <% member = @dependent.family_member %>
