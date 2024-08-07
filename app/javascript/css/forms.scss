@@ -79,7 +79,7 @@ select,
   &:hover {
     border-color: var(--grey-120);
   }
-  &:disabled {
+  &:disabled, &[readonly] {
     background: var(--grey-030);
     color: var(--input-text-color);
   }
