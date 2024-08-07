@@ -30,8 +30,7 @@ if ($(".my-household-page").length == 0) {
     personContainer.find('.append_consumer_info').html("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
     personContainer.removeClass('hidden');
     if ($("#family_information").length == 0) {
-      $("a[id^=edit-member]").addClass('disabled');
-      $("a[id^=edit-member]").attr('disabled', true);
+      $("a[id^=edit-member]").addClass('disabled').attr('tabindex', -1).blur();
     }
   } else {
     $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
