@@ -1,4 +1,9 @@
-@mixin solid-button($button-color: var(--button-primary-color), $color: var(--grey-000), $hover: var(--button-primary-hover-color), $active: var(--button-primary-active-color)) {
+@mixin solid-button(
+  $button-color: var(--button-primary-color),
+  $color: var(--grey-000),
+  $hover: var(--button-primary-hover-color),
+  $active: var(--button-primary-active-color)
+) {
   background-color: $button-color;
   font-weight: 600;
   line-height: 20px;
@@ -25,7 +30,8 @@
     outline-offset: 2px;
     color: $color;
   }
-  &:disabled, &.disabled {
+  &:disabled,
+  &.disabled {
     background-color: var(--grey-040);
     border-color: var(--grey-040);
     color: var(--grey-090);
@@ -33,7 +39,11 @@
   }
 }
 
-@mixin ghost-button($button-color: var(--button-primary-color), $hover: var(--button-primary-hover-color), $active: var(--button-primary-active-color)) {
+@mixin ghost-button(
+  $button-color: var(--button-primary-color),
+  $hover: var(--button-primary-hover-color),
+  $active: var(--button-primary-active-color)
+) {
   background-color: transparent;
   font-weight: 600;
   padding: 8px 12px;
@@ -61,7 +71,8 @@
     outline-offset: 2px;
     color: $hover;
   }
-  &:disabled, &.disabled {
+  &:disabled,
+  &.disabled {
     background-color: var(--grey-040);
     border-color: var(--grey-040);
     color: var(--grey-090);
@@ -70,28 +81,66 @@
   }
 }
 
-.button, button, .button-primary, .btn, .btn-primary {
+.button,
+button,
+.button-primary,
+.btn,
+.btn-primary {
   @include solid-button;
 }
 
-button.secondary, .button.secondary, .btn.secondary, .btn-secondary {
-  @include solid-button(var(--button-secondary-color), var(--grey-000), var(--button-secondary-hover-color), var(--button-secondary-active-color));
+button.secondary,
+.button.secondary,
+.btn.secondary,
+.btn-secondary {
+  @include solid-button(
+    var(--button-secondary-color),
+    var(--grey-000),
+    var(--button-secondary-hover-color),
+    var(--button-secondary-active-color)
+  );
 }
 
-button.tertiary, .button.tertiary, .btn.tertiary, .btn-tertiary {
-  @include solid-button(var(--button-tertiary-color), var(--grey-000), var(--button-tertiary-hover-color), var(--button-tertiary-active-color));
+button.tertiary,
+.button.tertiary,
+.btn.tertiary,
+.btn-tertiary {
+  @include solid-button(
+    var(--button-tertiary-color),
+    var(--grey-000),
+    var(--button-tertiary-hover-color),
+    var(--button-tertiary-active-color)
+  );
 }
 
-button.error, .button.error, .btn.error, .btn-error {
-  @include solid-button(var(--button-error-color), var(--grey-000), var(--button-error-hover-color), var(--button-error-active-color));
+button.error,
+.button.error,
+.btn.error,
+.btn-error {
+  @include solid-button(
+    var(--button-error-color),
+    var(--grey-000),
+    var(--button-error-hover-color),
+    var(--button-error-active-color)
+  );
 }
 
-.button.outline, button.outline, .button-primary.outline, .btn.outline, .btn-primary.outline {
+.button.outline,
+button.outline,
+.button-primary.outline,
+.btn.outline,
+.btn-primary.outline {
   @include ghost-button;
 }
 
-.button-error.outline, .btn-error.outline, .button.outline.error {
-  @include ghost-button(var(--button-error-color), var(--button-error-hover-color), var(--button-error-active-color));
+.button-error.outline,
+.btn-error.outline,
+.button.outline.error {
+  @include ghost-button(
+    var(--button-error-color),
+    var(--button-error-hover-color),
+    var(--button-error-active-color)
+  );
 }
 
 a.button:hover {
@@ -99,7 +148,8 @@ a.button:hover {
   cursor: pointer;
 }
 
-button.unstyled, button.close {
+button.unstyled,
+button.close {
   background-color: transparent;
   border: none;
   color: var(--button-primary-color);
@@ -113,6 +163,44 @@ button.unstyled, button.close {
   }
 }
 
-button.short, .button.short, .btn.short {
+button.short,
+.button.short,
+.btn.short {
   padding: 6px 12px;
+}
+
+button.accordion-action {
+  background: inherit;
+  border: none;
+  color: inherit;
+  font-weight: 700;
+  font-size: 18px;
+  text-align: left;
+  line-height: 27px;
+  width: 100%;
+  position: relative;
+
+  &:after {
+    content: url("data:image/svg+xml,%3Csvg width='12' height='6' viewBox='0 0 12 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 5.5L5.29289 1.20711C5.68342 0.816583 6.31658 0.816582 6.70711 1.20711L11 5.5' stroke='%23323130' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+    position: absolute;
+    right: 16px;
+  }
+
+  &[aria-expanded='true']:after {
+    display: inline-block;
+    translate: 0px -2px;
+    rotate: 0deg;
+  }
+
+  &[aria-expanded='false']:after {
+    display: inline-block;
+    translate: 0px 4px;
+    rotate: 180deg;
+  }
+
+  &:hover,
+  &:focus {
+    color: inherit;
+    background: inherit;
+  }
 }
