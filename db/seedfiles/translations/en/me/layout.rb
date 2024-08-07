@@ -13,6 +13,7 @@ LAYOUT_TRANSLATIONS = {
   "en.layout.header.role.employer" => "Employer",
   "en.layout.header.role.employee" => "Employee",
   "en.layout.header.role.individual_and_family" => "Individual and Family",
+  "en.layout.header.portal" => "My Portal",
   "en.layout.footer.all_rights" => "All Rights Reserved.",
   "en.layout.footer.get_help" => "Get Help",
 }
