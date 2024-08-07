@@ -155,8 +155,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       expect(result.value![:applicants].first[:person_hbx_id]).to eq person.hbx_id
     end
 
-    it 'should add determination_reason_codes' do
-      expect(result.value!.dig(:applicants, 0, :determination_reason_codes)).to eq ["Full Determination", "Gap Filling"]
+    context "when multiple determination reasons is enabled" do
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:multiple_determination_submission_reasons).and_return(true)
+      end
+
+      it 'should add additional_reason_codes' do
+        expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq ["Full Determination", "Gap Filling"]
+      end
     end
 
     context 'application' do
