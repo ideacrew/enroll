@@ -97,6 +97,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:multiple_determination_submission_reasons).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
