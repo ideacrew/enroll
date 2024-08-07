@@ -4,23 +4,24 @@
   <p><%= l10n('insured.family_members.index.continue_to_get_insurance') %></p>
 
   <div id="primary-person" class="py-3">
+    <% primary_person = @application.primary_applicant %>
     <div class="d-flex flex-row">
       <h2><%= l10n('member') %> 1</h2>
-      <%= render '/financial_assistance/shared/info_needed', applicant: @application.primary_applicant %>
+      <%= render '/financial_assistance/shared/info_needed', applicant: primary_person %>
     </div>
 
-    <div id="member-<%= @application.primary_applicant.id %>-info-display" class="d-flex flex-row flex-wrap justify-content-between">
+    <div id="member-<%= primary_person.id %>-info-display" class="d-flex flex-row flex-wrap justify-content-between">
       <div>
         <label for="primary-name"><%= l10n("name")%></label>
-        <input id="primary-name" type="text" value="<%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %>" disabled >
+        <input id="primary-name" type="text" value="<%= "#{primary_person.first_name} #{primary_person.middle_name} #{primary_person.last_name}" %>" disabled >
       </div>
       <div>
         <label for="primary-age"><%= l10n("age")%></label>
-        <input id="primary-age" type="text" value="<%= @person.age_on(TimeKeeper.date_of_record) %>" disabled >
+        <input id="primary-age" type="text" value="<%= primary_person.age_on(TimeKeeper.date_of_record) %>" disabled >
       </div>
       <div>
         <label for="primary-gender"><%= l10n("gender")%></label>
-        <input id="primary-gender" type="text" value="<%= "#{@person.gender&.humanize}" %>" disabled >
+        <input id="primary-gender" type="text" value="<%= "#{primary_person.gender&.humanize}" %>" disabled >
       </div>
       <div>
         <label for="primary-relation"><%= l10n("relationship")%></label>
