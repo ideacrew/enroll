@@ -231,7 +231,7 @@
             <div class="warning-icon icon" alt="Info">&nbsp;</div>
           </div>
           <div class="col pl-0">
-              <h4 class="modal-title"><%= l10n('faa.other_incomes.confirm_deletion') %></h4>
+              <h4 class="modal-title"><%= l10n('faa.edit.confirm_deletion') %></h4>
           </div>
           <div class="col-auto px-0">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -240,12 +240,12 @@
           </div>
         </div>
         <div class="modal-body">
-          <p><%= l10n('faa.edit.sure_remove') %></p>
+          <p><%= l10n('faa.edit.sure_remove', income_type: l10n('faa.incomes.benefit')) %></p>
           <strong><%= l10n('faa.edit.remove_warning') %></strong>
         </div>
         <div class="d-flex align-items-center mt-4 justify-content-end">
-          <button type="button" class="btn outline modal-cancel-button mr-1" data-dismiss="modal"><%= l10n("faa.edit.do_not_remove") %></button>
-          <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.remove") %></button>
+          <button type="button" class="btn outline modal-cancel-button mr-1" data-dismiss="modal"><%= l10n("faa.cancel") %></button>
+          <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.confirm_deletion") %></button>
         </div>
       </div>
     </div>
@@ -260,7 +260,7 @@
             <div class="warning-icon icon" alt="Info">&nbsp;</div>
           </div>
           <div class="col pl-0">
-              <h4 class="modal-title"><%= l10n('faa.other_incomes.confirm_deletion') %></h4>
+              <h4 class="modal-title"><%= l10n('faa.edit.confirm_deletion') %></h4>
           </div>
           <div class="col-auto px-0">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -269,12 +269,12 @@
           </div>
         </div>
         <div class="modal-body">
-          <p><%= l10n("faa.other_incomes.delete_all") %></p>
+          <p><%= l10n("faa.edit.sure_remove_all", income_type: l10n("faa.incomes.benefit")) %></p>
           <strong><%= l10n('faa.edit.remove_warning') %></strong>
         </div>
         <div class="d-flex align-items-center mt-4 justify-content-end">
-          <button type="button" class="btn outline modal-cancel-button mr-1" data-dismiss="modal"><%= l10n('faa.edit.do_not_remove') %></button>
-          <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.remove") %></button>
+          <button type="button" class="btn outline modal-cancel-button mr-1" data-dismiss="modal"><%= l10n('faa.cancel') %></button>
+          <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.confirm_deletion") %></button>
         </div>
       </div>
     </div>
