@@ -123,19 +123,19 @@
               <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
             </div>
             <div class="mt-1 mb-1">
-              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.incomes.confirm_deletion") %></h4>
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.edit.confirm_deletion") %></h4>
             </div>
             <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           </div>
           <div class="pl-3">
-            <%= l10n("faa.incomes.remove_all") %>
+            <%= l10n("faa.edit.sure_remove", income_type: l10n('faa.incomes.job_income').downcase) %>
           </div>
           <div class="pl-3 pt-3 pb-3">
-            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+            <strong><%= l10n("faa.edit.remove_warning") %></strong>
           </div>
           <div class="pr-3 pt-3 pb-3 align-self-end">
             <button type="button" class="mr-2 btn btn-default outline modal-cancel-button"><%= l10n("cancel") %></button>
-            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.incomes.confirm_deletion") %></button>
+            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.confirm_deletion") %></button>
           </div>
         </div>
       </div>
@@ -150,19 +150,19 @@
               <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
             </div>
             <div class="mt-1 mb-1">
-              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.incomes.confirm_deletion") %></h4>
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.edit.confirm_deletion") %></h4>
             </div>
             <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           </div>
           <div class="pl-3">
-            <%= l10n("faa.incomes.remove_all") %>
+            <%= l10n("faa.edit.sure_remove", income_type: l10n('faa.incomes.income')) %>
           </div>
           <div class="pl-3 pt-3 pb-3">
-            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+            <strong><%= l10n("faa.edit.remove_warning") %></strong>
           </div>
           <div class="pr-3 pt-3 pb-3 align-self-end">
             <button type="button" class="mr-2 btn btn-default outline modal-cancel-button"><%= l10n("cancel") %></button>
-            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.incomes.confirm_deletion") %></button>
+            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.confirm_deletion") %></button>
           </div>
         </div>
       </div>
@@ -177,23 +177,24 @@
               <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
             </div>
             <div class="mt-1 mb-1">
-              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.incomes.confirm_deletion") %></h4>
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.edit.confirm_deletion") %></h4>
             </div>
             <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           </div>
           <div class="pl-3">
-            <%= l10n("faa.incomes.remove_all") %>
+            <%= l10n("faa.edit.sure_remove_all", income_type: l10n('faa.incomes.job_income').downcase) %>
           </div>
           <div class="pl-3 pt-3 pb-3">
-            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+            <strong><%= l10n("faa.edit.remove_warning") %></strong>
           </div>
           <div class="pr-3 pt-3 pb-3 align-self-end">
             <button type="button" class="mr-2 btn btn-default outline modal-cancel-button"><%= l10n("cancel") %></button>
-            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.incomes.confirm_deletion") %></button>
+            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.confirm_deletion") %></button>
           </div>
         </div>
       </div>
     </div>
+
     <!-- Destroy all Exsting Self Employment Incomes (modal) -->
     <div class="modal" id="destroyAllSelfEmploymentIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
@@ -203,19 +204,19 @@
               <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
             </div>
             <div class="mt-1 mb-1">
-              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.incomes.confirm_deletion") %></h4>
+              <h4 class="modal-title darkblue" id="myModalLabel"><%= l10n("faa.edit.confirm_deletion") %></h4>
             </div>
             <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           </div>
           <div class="pl-3">
-            <%= l10n("faa.incomes.remove_all") %>
+            <%= l10n("faa.edit.sure_remove_all", income_type: l10n('faa.incomes.income').downcase) %>
           </div>
           <div class="pl-3 pt-3 pb-3">
-            <strong><%= l10n("faa.other_incomes.cannot_be_undone") %></strong>
+            <strong><%= l10n("faa.edit.remove_warning") %></strong>
           </div>
           <div class="pr-3 pt-3 pb-3 align-self-end">
             <button type="button" class="mr-2 btn btn-default outline modal-cancel-button"><%= l10n("cancel") %></button>
-            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.incomes.confirm_deletion") %></button>
+            <button type="button" class="btn error modal-continue-button"><%= l10n("faa.edit.confirm_deletion") %></button>
           </div>
         </div>
       </div>
