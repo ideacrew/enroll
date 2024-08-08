@@ -33,7 +33,7 @@ module Bs4
           link_to(l10n("layout.header.role.employee"), main_app.family_account_path)
         end
       elsif current_user.try(:has_consumer_role?)
-        if current_user.identity_verified_date.present?
+        if current_user.try(:has_consumer_role?).try(:identity_validation) == "valid"
           link_to(l10n("layout.header.role.individual_and_family"), main_app.family_account_path)
         else
           l10n("layout.header.role.individual_and_family")
@@ -80,7 +80,7 @@ module Bs4
           link_to(ltext, main_app.family_account_path)
         end
       elsif current_user.try(:has_consumer_role?)
-        link_to(ltext, main_app.family_account_path) if current_user.identity_verified_date.present?
+        link_to(ltext, main_app.family_account_path) if current_user.try(:has_consumer_role?).try(:identity_validation) == "valid"
       # rubocop:disable Lint/DuplicateBranch
       elsif current_user.try(:has_broker_agency_staff_role?) && controller_path.exclude?('general_agencies') && controller_path.exclude?('employers')
         link_to(ltext, get_broker_profile_path)
