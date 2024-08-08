@@ -360,6 +360,7 @@ Rails.application.routes.draw do
       get :new_resident_dependent, on: :collection
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
+      get :show_ssn, on: :member
     end
 
     resources :group_selections, format: false, controller: "group_selection", only: [:new, :create] do

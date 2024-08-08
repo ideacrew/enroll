@@ -69,7 +69,8 @@ dt.required:after,
 
 input:not([type='submit']),
 select,
-.input {
+.input,
+#ssn-input-container {
   box-sizing: border-box;
   height: 36px;
   padding: 6px 8px;
@@ -87,6 +88,38 @@ select,
   &:focus {
     border: 1px solid var(--grey-150);
     outline: none;
+  }
+}
+
+#ssn-input-container {
+  width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .ssn-input {
+    padding: 0px;
+    border: unset;
+    width: 120px !important;
+    height: 34px;
+
+    &:hover {
+      border-color: unset;
+    }
+  }
+
+  img {
+    cursor: pointer;
+  }
+}
+
+#ssn-input-container.div-disabled {
+  background: var(--grey-030);
+  color: var(--input-text-color);
+
+  .ssn-input {
+    background: var(--grey-030);
+    color: var(--input-text-color);
   }
 }
 
