@@ -120,6 +120,7 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               end
             end
+
             @person_params = encrypt_pii(@person_params)
             return
           end
@@ -131,6 +132,7 @@ class Insured::ConsumerRolesController < ApplicationController
             format.html { render 'no_match' }
           end
         end
+
       elsif @consumer_candidate.errors[:ssn_dob_taken].present?
         format.html { render 'search' }
       elsif @consumer_candidate.errors[:ssn_taken].present?
@@ -471,6 +473,15 @@ class Insured::ConsumerRolesController < ApplicationController
     return if contact_method.empty?
 
     params.dig("person", "consumer_role_attributes").merge!("contact_method" => ConsumerRole::CONTACT_METHOD_MAPPING[contact_method])
+  end
+
+  def existing_personal_parameters_list
+    if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+      # NOTE: with this update, the only place ssn/dob/no_ssn can be updated is the edit ssn dob feature, which is restricted to admin
+      person_parameters_list - [:dob, :ssn, :no_ssn]
+    else
+      person_parameters_list
+    end
   end
 
   def person_parameters_list
