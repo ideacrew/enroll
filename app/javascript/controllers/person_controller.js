@@ -2,8 +2,7 @@ import { Controller } from "stimulus"
 import axios from 'axios'
 
 export default class extends Controller {
-  // static targets = ['metadata']
-  
+
   showSsn(event) {
     const target = $(event.target);
     const personId = target.data('id');
