@@ -1,3 +1,19 @@
+#personal_info {
+  input:not([type='checkbox']):not([type='radio']):not(.ssn-input),
+  select,
+  .input {
+    width: 180px;
+  }
+
+  .no-ssn-container {
+    width: 180px;
+
+    label {
+      font-weight: normal;
+    }
+  }
+}
+
 #new_user {
   #pass_strength,
   #pass_match {
@@ -100,7 +116,7 @@ select,
   .ssn-input {
     padding: 0px;
     border: unset;
-    width: 120px !important;
+    width: 120px;
     height: 34px;
 
     &:hover {
@@ -113,19 +129,15 @@ select,
   }
 }
 
+input.fake-disabled-input:not([type='submit']):disabled,
 #ssn-input-container.div-disabled {
   background: var(--grey-030);
-  color: var(--input-text-color);
+  color: var(--default-font-color);
 
   .ssn-input {
-    background: var(--grey-030);
-    color: var(--input-text-color);
+    background: inherit;
+    color: inherit;
   }
-}
-
-input.fake-disabled-input:not([type='submit']):disabled {
-  background: var(--grey-030);
-  color: var(--default-font-color);
 }
 
 input[type='checkbox'],
