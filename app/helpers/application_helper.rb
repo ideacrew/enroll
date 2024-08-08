@@ -276,7 +276,7 @@ module ApplicationHelper
   def number_to_obscured_ssn(number)
     return unless number
     number_to_ssn(number)
-    if EnrollRegistry.feature_enabled?(:ssn_ui_fields)
+    if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
       number.to_s.gsub!(/\w{3}-\w{2}-\w{4}/, '●●●●●●●●●')
     else
       number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
