@@ -1,4 +1,9 @@
 document.addEventListener("turbolinks:load", function() {
+  $('label.required, legend.required, p.required').each(function() {
+    if ($(this).find('.sr-only').length == 0) {
+      $(this).append('<span class="sr-only sr-required-indicator">*</span>');
+    }
+  });
   $('.step-tabs, .interaction-click-control-my-household').on('click', function(e) {
     //Leave without saving for all side nav items - this gathers all items
     $('.btn.btn-primary').click(function() {
