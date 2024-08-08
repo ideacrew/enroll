@@ -19,6 +19,11 @@ module Subscribers
 
           ack(delivery_info.delivery_tag)
         rescue StandardError, SystemStackError => e
+          subscriber_logger.error "ValidateCvRequestedSubscriber, response: #{
+            response}, metadata: #{
+              metadata}, error message: #{
+                e.message}, backtrace: #{
+                  e.backtrace}"
           ack(delivery_info.delivery_tag)
         end
 
@@ -34,13 +39,13 @@ module Subscribers
           )
         end
 
-        # Processes the message payload and logs the result.
+        # Processes the message response and logs the result.
         #
         # @param subscriber_logger [Logger] The logger instance.
-        # @param payload [String] The message payload.
+        # @param response [String] The message response.
         # @param metadata [Bunny::MessageProperties] Metadata associated with the message.
         # @return [void]
-        def process_message(subscriber_logger, payload, metadata)
+        def process_message(subscriber_logger, response, metadata)
           payload = JSON.parse(response, symbolize_names: true)
 
           result = ::Operations::Private::Families::ValidateCvRequested.new.call(
