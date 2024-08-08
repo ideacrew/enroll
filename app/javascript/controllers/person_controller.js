@@ -31,7 +31,7 @@ export default class extends Controller {
           $(`.ssn-eye-on-${personId}`).removeClass('hidden');
           $(`.ssn-eye-off-${personId}`).addClass('hidden');
         } else {
-          console.log("Oh nooooo!!!!")
+          console.log(response.data.message);
         }
       }).catch((error) => {
         console.log('Error retrieving info');

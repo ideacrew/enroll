@@ -69,7 +69,7 @@ class FamilyPolicy < ApplicationPolicy
 
   def can_show_ssn?
     return true if individual_market_admin?
-    return true if individual_market_primary_family_member?
+    return true if individual_market_non_ridp_primary_family_member?
 
     false
   end
