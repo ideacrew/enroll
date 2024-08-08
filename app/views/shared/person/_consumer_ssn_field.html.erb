@@ -1,34 +1,44 @@
-<% if f.object.ssn.blank? || !family_id %>
+<% if f.object.ssn.blank? %>
   <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
     pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-    oninput: "this.setCustomValidity('')", disabled: readonly_status, readonly: f.object.is_a?(Forms::EmployeeRole) %>
+    oninput: "this.setCustomValidity('')" %>
 <% else %>
-  <div id='ssn-input-container' class='div-disabled' data-controller='person'>
-    <span class="ssn-facade ssn-facade-<%= f.object.id.to_s %>"><%= number_to_obscured_ssn(f.object.ssn) %></span>
+  <% non_disabled_status = defined?(primary_can_edit) && primary_can_edit %>
+  <% person_id = f.object.is_a?(Forms::ConsumerCandidate) ? 'temp' : f.object.id.to_s %>
+  <div id='ssn-input-container' class="<%= non_disabled_status ? '' : 'div-disabled' %>" data-controller='person'>    
     <%= f.text_field :ssn,
-      value: '000-00-0000',
-      disabled: true,
-      class: "keep-label mask-ssn hidden ssn-input ssn-input-#{f.object.id.to_s}",
+      value: person_id == 'temp' ? number_to_ssn(f.object.ssn) : '',
+      disabled: non_disabled_status ? false : true,
+      class: "keep-label mask-ssn hidden ssn-input ssn-input-#{person_id}",
       target: 'person.ssn',
       pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
       oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
       oninput: "this.setCustomValidity('')"
     %>
+    <span class="ssn-facade ssn-facade-<%= person_id %>"><%= number_to_obscured_ssn(f.object.ssn) %></span>
     <%= image_pack_tag "icons/eye-off.svg", 
-      class: "ssn-eye-off-#{f.object.id.to_s}",
+      class: "ssn-eye-off-#{person_id}",
       alt: "view ssn icon",
-      tabindex: 0, 
-      data: { type: f.object.class.to_s, id: f.object.id.to_s, family_id: family_id.to_s, action: "click->person#showSsn keydown.enter->person#showSsn" }
+      tabindex: 0,
+      data: { type: f.object.class.to_s, id: person_id, family_id: family_id&.to_s, action: "click->person#showSsn" }
     %>
     <%= image_pack_tag "icons/eye-on.svg",
-      class: "hidden ssn-eye-on-#{f.object.id.to_s}",
+      class: "hidden ssn-eye-on-#{person_id}",
       alt: "hide ssn icon",
       tabindex: 0,
-      data: { id: f.object.id.to_s, action: "click->person#hideSsn space->person#hideSsn" }
+      data: { id: person_id, action: "click->person#hideSsn" }
     %>
   </div>
+
+  <script>
+    // For accessibility
+    $('#ssn-input-container > img').on('keydown', function(e) {
+      e.preventDefault();
+
+      if (e.keyCode == 13 || e.keyCode == 32) {
+        $(this).trigger('click');
+      }
+    })
+  </script>
 <% end %>
 
-<script>
-
-</script>

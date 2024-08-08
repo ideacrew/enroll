@@ -178,22 +178,6 @@ dl.parent.weight-n {
   }
 }
 
-#personal_info {
-  input:not([type='checkbox']):not([type='radio']),
-  select,
-  .input {
-    width: 180px;
-  }
-
-  .no-ssn-container {
-    width: 180px;
-
-    label {
-      font-weight: normal;
-    }
-  }
-}
-
 .ethnicity-container {
   label {
     font-weight: 400;
