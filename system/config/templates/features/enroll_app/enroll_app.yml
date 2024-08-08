@@ -14,249 +14,268 @@ registry:
           is_visible: true
         settings:
           - key: :application_name
-            item: "enroll_dc"
+            item: 'enroll_me'
           - key: :copyright_period_start
-            item: "2013"
+            item: ''
           - key: :login_url
             item: <%= ENV['ENROLL_LOGIN_URL'] %>
           - key: :policies_url
-            item: "https://dchealthlink.com/"
+            item: ''
           - key: :faqs_url
-            item: "https://dchealthlink.com/help"
+            item: 'https://www.coverme.gov/get-help'
           - key: :help_url
-            item: "https://www.dchealthlink.com/help"
+            item: 'https://www.coverme.gov/help/'
           - key: :business_resource_center_url
-            item: "https://dchealthxlink.com/smallbusiness/"
+            item: ''
           - key: :nondiscrimination_notice_url
-            item: "https://www.dchealthlink.com/nondiscrimination"
+            item: ''
           - key: :submit_docs_url
-            item: "https://www.dchealthlink.com/submit-docs"
-          - key: :site_key
-            item: :dc
-          - key: :state_abbreviation
-            item: "DC"
+            item: 'https://www.CoverME.gov/forms'
           - key: :state_residency
-            item: "DC Residency"
+            item: 'ME Residency'
+          - key: :site_key
+            item: :me
+          - key: :state_abbreviation
+            item: 'ME'
           - key: :subdomain
-            item: "dchbx"
+            item: 'cme'
           - key: :domain_name
-            item: "dchealthlink.com"
+            item: 'cme.enroll.openhbx.org'
           - key: :site_title
-            item: "DC's Online Health Insurance Marketplace"
+            item: 'CoverME.gov'
           - key: :home_url
-            item: "https://www.dchealthlink.com/"
+            item: 'https://cme.enroll.openhbx.org/'
           - key: :home_business_url
-            item: "https://www.dchealthlink.com/smallbusiness/overview"
+            item: 'https://www.coverme.gov'
           - key: :help_url
-            item: "https://www.dchealthlink.com/help"
+            item: 'https://www.coverme.gov/help/'
           - key: :main_web_address_url
-            item: "https://www.dchealthlink.com/"
+            item: 'https://www.coverme.gov'
           - key: :invoice_bill_url
-            item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
+            item: ''
           - key: :payment_pdf_url
-            item: "pdf/employers_paying_your_premiums_online.pdf"
+            item: 'pdf/employers_paying_your_premiums_online.pdf'
           - key: :user_sign_in_url
-            item: "https://www.dchealthlink.com/"
+            item: 'https://www.coverme.gov'
           - key: :website_name
-            item: "www.DCHealthLink.com"
+            item: https://www.coverme.gov"
           - key: :main_web_address
-            item: "www.DCHealthLink.com"
-          - key: :health_care_website
-            item: "www.healthcare.gov"
-          - key: :health_care_website_url
-            item: "https://www.healthcare.gov"
+            item: 'https://www.coverme.gov'
+          - key: :main_web_address
+            item: 'https://www.coverme.gov'
+          - key: :state_name
+            item: 'Maine'
           - key: :short_name
-            item: "DC Health Link"
+            item: 'CoverME.gov'
           - key: :byline
-            item: "Welcome to the District's Health Insurance Marketplace"
+            item: "Maine's Official Health Insurance Marketplace"
           - key: :long_name
-            item: "District of Columbia Health Link"
+            item: 'CoverME.gov'
           - key: :header_message
-            item: "Welcome to the District's Health Insurance Marketplace"
+            item: "Maine's Official Health Insurance Marketplace"
+          - key: :byline
+            item: "Welcome to Maine's Health Insurance Marketplace"
           - key: :logo_file_name
-            item: "logo.png"
+            item: 'logo_me.svg'
           - key: :make_their_premium_payments_online
-            item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
+            item: ''
           - key: :tab_icon
-            item: "favicon.ico"
-          - key: :mailer_logo_file_name
-            item: "dchealthlink.jpg"
+            item: 'favicon.ico'
           - key: :employer_application_deadline_link
-            item: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
+            item: ''
           - key: :s3_prefix
-            item: "dchbx"
+            item: 'cme'
           - key: :broker_quoting_enabled
             item: false
           - key: :broker_claim_quoting_enabled
             item: true
           - key: :guidance_for_business_owners_url
-            item: "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
+            item: ''
           - key: :use_default_devise_path
             item: true
           - key: :plan_options_title_for_ma
             item: true
           - key: :create_routes
-            item: ["/insured/employee/privacy", "/employers/employer_profiles/new", "/insured/consumer_role/privacy"]
+            item:
+              [
+                '/insured/employee/privacy',
+                '/employers/employer_profiles/new',
+                '/insured/consumer_role/privacy',
+              ]
           - key: :sign_in_routes
-            item: ["/families/home"]
+            item: ['/families/home']
           - key: :shop_find_your_doctor_url
-            item: "https://dc.checkbookhealth.org/dc/"
+            item: 'https://staging.checkbookhealth.org/me/'
           - key: :document_verification_checklist_url
-            item: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
+            item: ''
           - key: :terms_and_conditions_url
-            item: "https://www.dchealthlink.com/terms"
+            item: ''
           - key: :certification_url
-            item: "https://www.dchealthlink.com/brokers/overview"
+            item: ''
+          - key: :document_verification_checklist_url
+            item: ''
+          - key: :terms_and_conditions_url
+            item: ''
+          - key: :certification_url
+            item: ''
           - key: :registration_path
-            item: "https://www.dchealthlink.com/smallbusiness"
+            item: ''
           - key: :broker_registration_path
-            item: "https://enroll.dchealthlink.com/broker_registration"
+            item: ''
           - key: :broker_registration_guide
-            item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
+            item: ''
           - key: :home_forms_url
-            item: "https://dchealthlink.com/forms"
+            item: ''
           - key: :forms_name
-            item: "DCHealthLink.com/forms"
-          - key: :short_url
-            item: "dchealthlink.com"
+            item: ''
           - key: :forms
-            item: "https://dchealthlink.com/forms#en"
+            item: ''
+          - key: :forms_name
+            item: ''
+          - key: :short_url
+            item: ''
+          - key: :forms
+            item: ''
           - key: :website_url
-            item: "https://www.healthcare.gov"
+            item: 'https://www.healthcare.gov'
           - key: :healthcare_name
-            item: "www.healthcare.gov"
+            item: 'www.healthcare.gov'
           - key: :healthcare_url
-            item: "https://www.healthcare.gov/"
+            item: 'https://www.healthcare.gov/'
           - key: :irs_url
-            item: "https://www.irs.gov/"
+            item: 'https://www.irs.gov/'
           - key: :exchange_hbx_id
-            item: "DC0"
-          - key: :no_reply_email
-            item: "noreply@dchealthlink.com"
+            item: 'ME0'
           - key: :mail_address
-            item: "info@dchealthlink.com"
+            item: 'info@coverme.gov'
+          - key: :no_reply_email
+            item: 'noreply@coverme.gov'
+          - key: :mail_address
+            item: 'info@coverme.gov'
           - key: :producer_email_address
-            item: 'dchl.producer@dc.gov'
+            item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
-            item: "https://dchealthlink.com/"
+            item: ''
           - key: :late_rates_message
-            item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
+            item: 'Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help.'
           - key: :faa_enabled
             item: false
           - key: :county_fips_code_enabled
-            item: false
+            item: true
           - key: :ivl_responsibility_url
-            item: "https://dchealthlink.com/individual-responsibility-requirement"
+            item: 'https://dchealthlink.com/individual-responsibility-requirement'
           - key: :curam_enabled?
             item: true
           - key: :support_for_ie_browser
-            item: true
-          - key: :block_ie_browser
             item: false
+          - key: :block_ie_browser
+            item: true
           - key: :block_ie_browser_after
             item: Mon, 01 Jun 2020
           - key: :publisher
-            item: "dchl"
+            item: 'mehl'
           - key: :prod_tax_info
-            item: "https://dchealthlink.com/individuals/tax-documents"
+            item: 'https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020'
           - key: :staging_tax_info_url
-            item: "https://staging.dchealthlink.com/individuals/tax-documents"
-          - key: :statewide_area
-            item: "DC-Metro"
+            item: 'https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020'
           - key: :nationwide_area
-            item: "Nationwide"
+            item: 'Nationwide'
+          - key: :statewide_area
+            item: 'Maine/Regional'
           - key: :standard_plan_label
-            item: "STANDARD PLAN"
+            item: 'CLEAR CHOICE PLAN'
           - key: :exchange_name
-            item: "Washington DC Health Benefit Exchange"
+            item: 'CoverME.gov Health Benefit Exchange'
           - key: :social_media
             item: ''
-          - key: :state_name
-            item: "District of Columbia"
           - key: :state_long_title
-            item: "the District of Columbia"
+            item: 'the state of Maine'
           - key: :state_dmv_link
-            item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
-          - key: :health_benefit_exchange_authority_phone_number
-            item: '(855) 532-5465 TTY: 711'
-          - key: :contact_center_name
-            item: "DC Health Link's Customer Care Center"
+            item: 'https://www.maine.gov/sos/bmv/'
           - key: :contact_center_po_box
-            item: "PO Box 97022"
-          - key: :contact_center_state_and_city
-            item: "Washington, DC"
-          - key: :area_code
-            item: "202"
+            item: 'PO Box 616'
           - key: :contact_center_city
-            item: "Washington"
+            item: 'Augusta'
           - key: :contact_center_county
-            item: 'District of Columbia'
+            item: 'Kennebec'
+          - key: :contact_center_state_and_city
+            item: 'Augusta, ME'
+          - key: :area_code
+            item: '207'
           - key: :contact_center_zip_code
-            item: "20090" # For DC loading rating areas, the zip uses this zip code 20090
+            item: '04332-6626'
           - key: :contact_center_email_address
-            item: "info@dchealthlink.com"
+            item: 'smallbusiness@coverme.gov'
+          - key: :social_media
+            item: ''
+          - key: :health_benefit_exchange_authority_phone_number
+            item: '(866) 636-0355'
+          - key: :contact_center_name
+            item: 'CoverME.gov Customer Assistance Center'
           - key: :contact_center_short_number
-            item: "1-855-532-5465"
-          - key: :contact_center_tty_number
-            item: "711"
+            item: '(866) 636-0355'
+          - key: :contact_center_tty_number # Need to figure out what this should be for Maine
+            item: '711'
           - key: :producer_advisory_committee_url
-            item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
+            item: ''
           - key: :mailer_logo_file_name
-            item: "dchealthlink.jpg"
+            item: 'coverme.jpg'
           - key: :broker_course_administering_organization_number
             item: '(877) 880-1335'
           - key: :broker_course_administering_organization
-            item: "NAHU"
+            item: 'NAHU'
           - key: :broker_course_administering_organization_link
             item: 'https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e'
           - key: :privacy_url
-            item: "https://www.dchealthlink.com/privacy"
+            item: ''
           - key: :privacy_act_statement
-            item: "https://www.dchealthlink.com/privacy-act-statement"
+            item: ''
           - key: :site_broker_attestation_link
-            item: "https://hbx.dc.gov/page/dc-health-link-broker-attestations"
+            item: ''
+          - key: :site_broker_attestation_link
+            item: ''
           - key: :rating_areas
-            item: "single"
+            item: 'county'
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
-            item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
+            item: 'https://www.healthcare.gov/immigrants/immigration-status/'
           - key: :geographic_rating_area_model
-            item: 'single'
+            item: 'county'
+          - key: :assistance_estimate_url
+            item: 'https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page'
           - key: :benchmark_product_model
             item: :health_only
-          - key: :assistance_estimate_url
-            item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
           - key: :dental_plan_years_available
-            item: [""]
+            item: ['']
           - key: :sole_source_carriers_available
-            item: ['2017','2018', '2019']
+            item: ['']
           - key: :metal_level_carriers_available
-            item: ['2018', '2019']
+            item: ['']
           - key: :single_carriers_available
-            item: ['2018', '2019']
+            item: ['']
           - key: :plan_year_tooltip
-            item: "Employer premium contribution for Employee Only Health Plans must be at least"
+            item: ''
           - key: :sep_moved_out_zip_compare
-            item: false
+            item: true
           - key: :send_rating_area_for_ivl_policy_to_edi
-            item: false
+            item: true
           - key: :medicaid_agency_phone_ttd
-            item: "(800) 877-8339"
+            item: ''
           - key: :medicaid_agency_phone
-            item: "(202) 727-5355"
+            item: '(855) 797-4357'
           - key: :medicaid_agency_url
-            item: "https://districtdirect.dc.gov"
+            item: ''
           - key: :verifiable_immigration_statuses
-            item: false
+            item: true
           - key: :appeal_link
-            item: "https://www.dchealthlink.com/sites/default/files/v2/forms/Appeals_Rights_IVL.pdf"
+            item: ''
           - key: :find_expert_link
-            item: "https://www.dchealthlink.com/find-expert"
+            item: ''
           - key: :binder_payment_default_date
             item: 12
           - key: :default_aptc_percentage
-            item: 85
+            item: 100
           - key: :child_age_limit
             item: 20
           - key: :default_password_length_range
@@ -264,20 +283,20 @@ registry:
           - key: :employees_template_key
             item: "b4c0e3e6-cf9b-4b00-8194-403b110b4e01"
       - key: :data_seeds_ui
-        item: :data_seed_ui
+        item: :data_seeds_ui
         is_enabled: true
       - key: :rating_area
         item: :rating_area
         is_enabled: false
         settings:
           - key: :areas
-            item: ["R-DC001"]
+            item: ['R-ME001', 'R-ME002', 'R-ME003', 'R-ME004']
       - key: :service_area
         item: :service_area
         is_enabled: true
         settings:
           - key: :service_area_model
-            item: 'single'
+            item: 'county'
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
@@ -286,13 +305,13 @@ registry:
             item: true
       - key: :agency_staff
         item: :agency_staff
-        is_enabled: true
+        is_enabled: false
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true
       - key: :sep_carousel_message
         item: :sep_carousel
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
@@ -301,13 +320,13 @@ registry:
         is_enabled: <%= ENV['VERBOSE_SEP_MESSAGE_IS_ENABLED'] || false %>
       - key: :special_cover_header
         item: :special_cover_header
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :filename
-            item: "CoverME_WebsiteHeader_01.jpg"
+            item: 'CoverME_WebsiteHeader_01.jpg'
       - key: :tobacco_cost
         item: :tobacco_cost
-        is_enabled: false
+        is_enabled: true
       - key: :choose_coverage_medicaid_warning
         item: :choose_coverage_medicaid_warning
         is_enabled: <%= ENV['CHOOSE_COVERAGE_MEDICAID_WARNING_IS_ENABLED'] || false %>
@@ -318,10 +337,10 @@ registry:
         item: :ssn_ui_validation
         is_enabled: <%= ENV['SSN_UI_VALIDATION_IS_ENABLED'] || false %>
       - key: :counties_import
-        is_enabled: false
-        item: ""
+        is_enabled: true
+        item: 'SHOP_ZipCode_CY2021_FINAL_ME.xlsx'
       - key: :change_end_date
-        is_enabled: false
+        is_enabled: true
         item: Operations::HbxEnrollments::EndDateChange.new
         settings:
           - key: :expired_enrollments
@@ -335,13 +354,13 @@ registry:
           - key: :upcoming_effective_period
             item: <%= Date.new(2023,11,1)..Date.new(2024,01,31) %>
           - key: :contact_center_number_for_display
-            item: "(855) 532-5465"
+            item: '(855) 532-5465'
           - key: :mailing_address_1
-            item: "1225 I Street NW, Suite 400"
+            item: ''
           - key: :mailing_address_city
-            item: "Washington"
+            item: ''
           - key: :mailing_address_zip
-            item: "20005"
+            item: ''
       - key: :ivl_enrollment_renewal_begin_date
         item: :enrollment_renewal_date
         is_enabled: true
@@ -352,10 +371,10 @@ registry:
             item: <%= ENV['IVL_ENROLLMENT_RENEWAL_BEGIN_EFFECTIVE_MONTH'] || 11 %>
       - key: :exclude_child_only_offering
         item: :exclude_child_only_offering
-        is_enabled: false
+        is_enabled: true
       - key: :exclude_adult_and_child_only_offering
         item: :exclude_adult_and_child_only_offering
-        is_enabled: false
+        is_enabled: true
       - key: :hide_enrollment_market_type
         item: :hide_enrollment_market_type
         is_enabled: <%= ENV['HIDE_ENROLLMENT_MARKET_TYPE'] || false %>
@@ -517,49 +536,49 @@ registry:
           - key: :connect_test
             item: false
       - key: :northeast_delta_dental_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
-            item: false
+            item: true
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Northeast Delta Dental'
           - key: :connect_test
             item: false
       - key: :anthem_blue_cross_and_blue_shield_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
-            item: false
+            item: true
           - key: :enrollment_tile
             item: false
           - key: :carriers_long_name
             item: 'Anthem Blue Cross and Blue Shield'
           - key: :connect_test
-            item: false
+            item: true
       - key: :harvard_pilgrim_health_care_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
-            item: false
+            item: true
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Harvard Pilgrim Health Care'
           - key: :connect_test
-            item: false
+            item: true
       - key: :community_health_options_pay_now
-        is_enabled: false
+        is_enabled: true
         settings:
           - key: :plan_shopping
-            item: false
+            item: true
           - key: :enrollment_tile
-            item: false
+            item: true
           - key: :carriers_long_name
             item: 'Community Health Options'
           - key: :connect_test
-            item: false
+            item: true
       - key: :taro_health_pay_now
         is_enabled: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_IS_ENABLED'] || false %>
         settings:
@@ -576,7 +595,7 @@ registry:
           - key: :taro_health_home_page_url
             item: <%= ENV['TARO_HEALTH_HOME_PAGE_URL'] || false %>
       - key: :carrier_abbrev_list
-        item: ["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"]
+        item: ['CHO', 'HPHC', 'ANTHM', 'NEDD', 'TARO']
         is_enabled: true
   - namespace:
       - :features
@@ -621,7 +640,7 @@ registry:
       - key: employee_datable_waiver_bulk_actions
         is_enabled: false
       - key: :automatic_quote_validation # This needs refactoring, see employer_profile_builder.rb
-        is_enabled: true
+        is_enabled: false
       - key: :validate_effective_date_employer
         is_enabled: false # Should return true for MA, see employer_profile_builder.rb
       - key: :hmo_ppo_plan_type # Should be true for MA
@@ -629,25 +648,25 @@ registry:
       - key: :dental_market
         is_enabled: true
       - key: :general_agency
-        is_enabled: true
-      - key: :display_county
         is_enabled: false
+      - key: :display_county
+        is_enabled: true
       - key: :moving_to_state
         is_enabled: false
       - key: :living_outside_state
-        is_enabled: true
+        is_enabled: false
       - key: :import_network_data
-        is_enabled: false
+        is_enabled: true
       - key: :import_standard_plan
-        is_enabled: false
+        is_enabled: true
       - key: :validate_quadrant
         item: :validate_quadrant
         is_enabled: false
         settings:
           - key: :exclusions
-            item: ["20515"]
+            item: []
           - key: :inclusions
-            item: ["DC"]
+            item: ['ME']
       - key: :qle_within_sixty_days
         item: :qle_within_sixty_days
         is_enabled: true
@@ -657,49 +676,49 @@ registry:
       - key: :checkbook_integration
         is_enabled: true
       - key: :immigration_status_checkbox
-        is_enabled: false
+        is_enabled: true
       - key: :gender_to_sex
-        is_enabled: false
+        is_enabled: true
       - key: :mainecare_cubcare_glossary
-        is_enabled: false
+        is_enabled: true
       - key: :legacy_enrollment_trigger
         is_enabled: false
       - key: :document_reminder_notice_trigger
-        is_enabled: false
+        is_enabled: true
       - key: :account_transfer_notice_trigger
-        is_enabled: <%= ENV['ACCOUNT_TRANSFER_NOTICE_IS_ENABLED'] || false %>
+        is_enabled: <%= ENV['ACCOUNT_TRANSFER_NOTICE_IS_ENABLED'] || true %>
       - key: :verification_type_income_verification
+        is_enabled: true
+      - key: :tobacco_user_field
+        item: :tobacco_user_field
+        is_enabled: true
+      - key: :in_person_application_enabled
+        item: :in_person_application_enabled
         is_enabled: false
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
         is_enabled: <%= ENV['SHOW_DOWNLOAD_TAX_DOCUMENTS_IS_ENABLED'] || false %>
-      - key: :tobacco_user_field
-        item: :tobacco_user_field
-        is_enabled: false
-      - key: :in_person_application_enabled
-        item: :in_person_application_enabled
-        is_enabled: true
       - key: :show_upload_notices
         item: :show_upload_notices
-        is_enabled: true
+        is_enabled: false
       - key: :contact_email_header_footer_feature
         item: :contact_email_header_footer_feature
-        is_enabled: true
+        is_enabled: false
       - key: :contact_customer_service_representative
         item: :contact_customer_service_representative
-        is_enabled: true
+        is_enabled: false
       - key: :location_residency_verification_type
         item: :location_residency_verification_type
-        is_enabled: true
+        is_enabled: false
       - key: :complete_verification_for_enrollment
         item: :complete_verification_for_enrollment
         is_enabled: false
       - key: :trigger_verifications_before_enrollment_purchase
         item: trigger_verifications_before_enrollment_purchase
-        is_enabled: <%= ENV['TRIGGER_VERIFICATIONS_BEFORE_ENROLLMENT_PURCHASE_IS_ENABLED'] || false %>
+        is_enabled: <%= ENV['TRIGGER_VERIFICATIONS_BEFORE_ENROLLMENT_PURCHASE_IS_ENABLED'] || true %>
       - key: :use_defaults_for_qnc_and_five_year_bar_data
         item: use_defaults_for_qnc_and_five_year_bar_data
-        is_enabled: <%= ENV['USE_DEFAULTS_FOR_QNC_AND_FIVE_YEAR_BAR_DATA_IS_ENABLED'] || true %>
+        is_enabled: <%= ENV['USE_DEFAULTS_FOR_QNC_AND_FIVE_YEAR_BAR_DATA_IS_ENABLED'] || false %>
       - key: :saml_info_keys
         is_enabled: true
         settings:
@@ -725,36 +744,18 @@ registry:
                 'pay_now_issuer',
                 'pay_now_private_key_location',
                 'pay_now_x509_cert_location',
-                'kaiser_permanente_pay_now_url',
-                'kaiser_permanente_pay_now_relay_state',
-                'kaiser_permanente_pay_now_audience',
-                'kaiser_pay_now_url',
-                'kaiser_pay_now_relay_state',
-                'kaiser_pay_now_audience',
-                'delta_dental_pay_now_url',
-                'delta_dental_pay_now_audience',
-                'delta_dental_pay_now_relay_state',
-                'dentegra_pay_now_url',
-                'dentegra_pay_now_audience',
-                'dentegra_pay_now_relay_state',
-                'dominion_national_pay_now_url',
-                'dominion_national_pay_now_audience',
-                'dominion_national_pay_now_relay_state',
-                'best_life_pay_now_url',
-                'best_life_pay_now_audience',
-                'best_life_pay_now_relay_state',
-                'metlife_pay_now_url',
-                'metlife_pay_now_audience',
-                'metlife_pay_now_relay_state',
-                'carefirst_pay_now_url',
-                'carefirst_pay_now_audience',
-                'carefirst_pay_now_relay_state',
-                'aetna_pay_now_url',
-                'aetna_pay_now_audience',
-                'aetna_pay_now_relay_state',
-                'unitedhealthcare_pay_now_url',
-                'unitedhealthcare_pay_now_audience',
-                'unitedhealthcare_pay_now_relay_state'
+                'northeast_delta_dental_pay_now_url',
+                'northeast_delta_dental_pay_now_audience',
+                'northeast_delta_dental_pay_now_relay_state',
+                'anthem_blue_cross_and_blue_shield_pay_now_url',
+                'anthem_blue_cross_and_blue_shield_pay_now_audience',
+                'anthem_blue_cross_and_blue_shield_pay_now_relay_state',
+                'harvard_pilgrim_health_care_pay_now_url',
+                'harvard_pilgrim_health_care_pay_now_audience',
+                'harvard_pilgrim_health_care_pay_now_relay_state',
+                'community_health_options_pay_now_url',
+                'community_health_options_pay_now_audience',
+                'community_health_options_pay_now_relay_state',
               ]
       - key: :crm_update_family_save
         item: :crm_update_family_save
@@ -764,16 +765,16 @@ registry:
         is_enabled: <%= ENV['CRM_PUBLISH_PRIMARY_SUBSCRIBER_IS_ENABLED'] || false %>
       - key: :pii_match_success_message
         item: :pii_match_success_message
-        is_enabled: false
+        is_enabled: true
       - key: :disable_documents_we_accept_list
         item: :disable_documents_we_accept_list
-        is_enabled: false
+        is_enabled: true
       - key: :show_sep_attestation_options
         item: :show_sep_attestation_options
         is_enabled: true
       - key: :live_chat_widget
         item: :live_chat_widget
-        is_enabled: false
+        is_enabled: true
       - key: :external_qna_bot
         item: :external_qna_bot
         is_enabled: <%= ENV['EXTERNAL_QNA_BOT_IS_ENABLED'] || false %>
@@ -782,18 +783,18 @@ registry:
         is_enabled: <%= ENV['LIVECHAT_ERROR_LOGGING_IS_ENABLED'] || false %>
       - key: :in_person_assister
         item: :in_person_assister
-        is_enabled: true
+        is_enabled: false
       - key: :email_validation_notifications
         item: :email_validation_notifications
-        is_enabled: false
+        is_enabled: true
       - key: :find_my_doctor_options
         item: :find_my_doctor_options
-        is_enabled: true
+        is_enabled: false
       - key: :go_to_plan_compare_link
-        item: :go_to_plan_compare_link
-        is_enabled: false
+        item: :go_to_plan_compare
+        is_enabled: true
       - key: :zero_permium_policy
-        is_enabled: false
+        is_enabled: true
       - key: :send_ivl_secure_purchase_confirmation_email
         item: :send_ivl_secure_purchase_confirmation_email
         is_enabled: false
@@ -802,10 +803,10 @@ registry:
         is_enabled: true
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
-        is_enabled: false
+        is_enabled: true
       - key: :existing_coverage_warning
         item: :existing_coverage_warning
-        is_enabled: false
+        is_enabled: true
   - namespace:
       - :person_matching_feature
     features:
@@ -813,7 +814,7 @@ registry:
         is_enabled: true
         settings:
           - key: :ssn_present
-            item: ['dob', 'encrypted_ssn']
+            item: ['first_name', 'last_name', 'dob', 'encrypted_ssn']
           - key: :dob_present
             item: ['first_name', 'last_name', 'dob']
           - key: :name_present
@@ -826,12 +827,12 @@ registry:
       - key: :mitc_relationships
         is_enabled: true
       - key: :staff_list_back
-        is_enabled: true
+        is_enabled: false
   - namespace:
       - :enrollments
     features:
       - key: :display_enr_summary
-        is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || false %>
+        is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || true %>
       - key: :silent_transition_enrollment
         is_enabled: <%= ENV['SILENT_TRANSITION_ENROLLMENT_IS_ENABLED'] || false %>
       - key: :cancel_superseded_terminated_enrollments
@@ -839,10 +840,10 @@ registry:
       - key: :domestic_partner_rating
         is_enabled: <%= ENV['DOMESTIC_PARTNER_RATING_IS_ENABLED'] || false %>
       - key: issuer_provided_code
-        item: 'DCS002'
+        item: 'MES002'
         is_enabled: true
       - key: exchange_provided_code
-        item: 'R-DC001'
+        item: 'R-ME001'
         is_enabled: true
       - key: :osse_eligibility_history
         is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] || false %>
@@ -922,4 +923,7 @@ registry:
       - key: :mask_ssn_ui_fields
         item: :mask_ssn_ui_fields
         is_enabled: <%= ENV['MASK_SSN_UI_FIELDS'] || false %>
+      - key: :ssn_ui_fields
+        item: :ssn_ui_fields
+        is_enabled: <%= ENV['SSN_UI_FIELDS'] || false %>
 
