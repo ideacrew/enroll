@@ -48,12 +48,11 @@ function stopEditing() {
   $('.driver-question, .instruction-row, .disabled a, .benefits-list, #nav-buttons a, .benefit, .add_new_benefit_kind').removeClass('disabled');
 };
 
-function deleteAllBenefits(target, kind) {
+function deleteAllBenefits(e, kind) {
   benefitList = $('.benefits-list.is_' + kind + ' .benefit');
   if (benefitList.length) {
-    console.log(target);
-    target.preventDefault();
-    // prompt to delete all these dedcutions
+    e.preventDefault();
+    // prompt to delete all these benefits
     $("#destroyAllBenefits").modal();
 
     $("#destroyAllBenefits .modal-cancel-button").click(function(e) {
