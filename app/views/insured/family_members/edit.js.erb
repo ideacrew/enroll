@@ -25,12 +25,15 @@ if ($(".my-household-page").length == 0) {
     var id = "<%= @dependent.id %>";
   }
 
-  var personContainer = $("#person-"+id)
-  if (personContainer) {
+  var personContainer = $("#person-" + id)
+  if (personContainer.length) {
     personContainer.find('.append_consumer_info').html("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
     personContainer.removeClass('hidden');
+    var memberContainer = $(".member-" + id + "-row");
     if ($("#family_information").length == 0) {
-      $("a[id^=edit-member]").addClass('disabled').attr('tabindex', -1).blur();
+      $(".edit-member").addClass('disabled').attr('tabindex', -1);
+      memberContainer.find(".edit-member").addClass('hidden');
+      memberContainer.find(".edit-buttons").removeClass('hidden');
     }
   } else {
     $(".append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
