@@ -63,10 +63,10 @@ namespace :new_model do
 
     # Picking previous year's slcsp_id to create slcsp_id since this is mock data.
     slcsp_id = HbxProfile&.current_hbx&.benefit_sponsorship&.benefit_coverage_periods&.by_year(mock_year - 1)&.first&.slcsp_id
-    hios_id = BenefitMarkets::Products::Product.find(slcsp_id).hios_id
+    mock_hios_id = BenefitMarkets::Products::Product.find(slcsp_id).hios_id
 
     puts "loading #{mock_year} ivl benefit pacakges" unless Rails.env.test?
-    Rake::Task["import:create_ivl_packages_ME"].invoke(mock_year, hios_id)
+    Rake::Task["import:create_ivl_packages_ME"].invoke(mock_year, mock_hios_id)
 
     Rake::Task['new_model:map_sbc'].invoke(mock_year)
     puts "Mock Data for #{mock_year} completed" unless Rails.env.test?
