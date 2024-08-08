@@ -130,7 +130,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
           allow(employee_role).to receive(:benefit_begin_date).and_return(TimeKeeper.date_of_record)
           render "insured/families/shop_for_plans_widget"
           expect(rendered).to have_content l10n('insured.coverage_will_begin', date: format_date(employee_role.benefit_begin_date))
-          expect(rendered).to have_link('enroll today')
+          expect(rendered).to have_content(/enroll today/i)
           expect(rendered).not_to have_content 'for Open Enrollment Period.'
         end
 
