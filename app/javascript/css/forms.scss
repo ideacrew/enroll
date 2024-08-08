@@ -85,7 +85,8 @@ dt.required:after,
 
 input:not([type='submit']),
 select,
-.input {
+.input,
+#ssn-input-container {
   box-sizing: border-box;
   height: 36px;
   padding: 6px 8px;
