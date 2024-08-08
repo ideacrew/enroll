@@ -27,6 +27,10 @@ describe FamilyPolicy, "given a user who is the primary member" do
   it "can show" do
     expect(subject.legacy_show?).to be_truthy
   end
+
+  it "can show ssn" do
+    expect(subject.can_show_ssn?).to be_truthy
+  end
 end
 
 describe FamilyPolicy, "given a family with an active broker agency account", :dbclean => :after_each do
@@ -441,6 +445,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:person) { FactoryBot.create(:person, :with_resident_role, :with_active_resident_role) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
+    before do
+      allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
+    end
+
     permissions :upload_paper_application? do
       context 'when the user is a hbx staff' do
         let(:hbx_profile) do
@@ -480,6 +488,97 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it 'denies access' do
             expect(subject).not_to permit(logged_in_user, family)
           end
+        end
+      end
+
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, family)
+        end
+      end
+    end
+
+    permissions :can_show_ssn? do
+      context 'when the user is a hbx staff' do
+        let(:hbx_profile) do
+          FactoryBot.create(
+            :hbx_profile,
+            :normal_ivl_open_enrollment,
+            us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+            cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+          )
+        end
+        let(:hbx_staff_person) { FactoryBot.create(:person) }
+        let(:hbx_staff_role) do
+          hbx_staff_person.create_hbx_staff_role(
+            permission_id: permission.id,
+            subrole: permission.name,
+            hbx_profile: hbx_profile
+          )
+        end
+        let(:hbx_admin_user) do
+          FactoryBot.create(:user, person: hbx_staff_person)
+          hbx_staff_role.person.user
+        end
+
+        let(:logged_in_user) { hbx_admin_user }
+
+        context 'when the hbx staff has the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it 'grants access' do
+            expect(subject).to permit(logged_in_user, family)
+          end
+        end
+
+        context 'when the hbx staff does not have the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it 'denies access' do
+            expect(subject).not_to permit(logged_in_user, family)
+          end
+        end
+      end
+
+      context 'when the user is the primary' do
+        let(:logged_in_primary_user) { FactoryBot.create(:user, person: person) }
+
+        it 'allows access' do
+          expect(subject).not_to permit(logged_in_primary_user, family)
+        end
+      end
+
+      context 'when the user is the primary of another family' do
+        let(:person2) { FactoryBot.create(:person, :with_consumer_role) }
+        let(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: person2) }
+        let(:logged_in_other_primary_user) { FactoryBot.create(:user, person: person2) }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_other_primary_user, family)
+        end
+      end
+
+      context 'when the broker is affiliated with the family' do
+        let(:broker_person_id) { double }
+        let(:broker_agency_profile_id) { double }
+        let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+        let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
+        let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
+        let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id) }
+        let(:broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
+        let(:broker_agency_profile_id_account) { broker_agency_profile.id }
+        let(:broker_user) { FactoryBot.create(:user, :person => broker_person)}
+
+        before(:each) do
+          allow(broker_person).to receive(:broker_role).and_return nil
+        end
+
+        it 'denies access' do
+          expect(subject).not_to permit(broker_user, family)
         end
       end
 
