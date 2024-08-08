@@ -144,6 +144,23 @@ class Insured::FamilyMembersController < ApplicationController
     end
   end
 
+  # NOTE: ensure that current user is either
+  # 1.) hbx admin, or
+  # 2.) the primary for the family AND that the subject is a member of that family
+  def show_ssn
+    set_type_role_and_family
+    authorize @family, :can_show_ssn?
+
+    if @family.person_is_family_member?(@person)
+      payload = number_to_ssn(@person.ssn)
+      render json: { payload: payload, status: 200 }
+    else
+      render json: { message: "Unauthorized", status: 404 }
+    end
+  rescue Pundit::NotAuthorizedError, Pundit::NotDefinedError
+    render json: { message: "Unauthorized", status: 404 }
+  end
+
   def edit
     authorize @family, :edit?
 
