@@ -922,7 +922,7 @@ registry:
       - key: :enable_call_hub_for_ai_an
         item: :enable_call_hub_for_ai_an
         is_enabled: <%= ENV['ENABLE_CALL_HUB_FOR_AI_AN'] || false %>
-      - key: :ssn_ui_fields
-        item: :ssn_ui_fields
-        is_enabled: <%= ENV['SSN_UI_FIELDS'] || false %>
+      - key: :mask_ssn_ui_fields
+        item: :mask_ssn_ui_fields
+        is_enabled: <%= ENV['MASK_SSN_UI_FIELDS'] || false %>
 

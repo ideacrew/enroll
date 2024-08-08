@@ -37,8 +37,10 @@
     <div class="d-flex mb-md-4 row col-sm">
       <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
         <%= f.label :ssn, "Social Security" %>
-        <% if EnrollRegistry.feature_enabled?(:ssn_ui_fields) %>
-          <%= render partial: 'shared/person/consumer_ssn_field', locals: { f: f, readonly_status: readonly_status, family_id: @person.try(:primary_family)&.id } %>
+        <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+          <%= render partial: 'shared/person/consumer_ssn_field',
+            locals: { f: f, family_id: @person.try(:primary_family)&.id, temp_ssn: @temp_ssn } 
+          %>
         <% else %>
           <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
             <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
@@ -52,7 +54,7 @@
       </div>
       <div class="col-sm col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
         <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
-          <%= f.check_box :no_ssn, disabled: @person.try(:primary_family) %><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %>
+          <%= f.check_box :no_ssn, disabled: readonly_status %><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %>
           <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
           <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
         <% end %><span>
