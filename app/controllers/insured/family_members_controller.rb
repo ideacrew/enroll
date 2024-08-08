@@ -146,19 +146,21 @@ class Insured::FamilyMembersController < ApplicationController
 
   # NOTE: ensure that current user is either
   # 1.) hbx admin, or
-  # 2.) the primary for the family AND that the subject is a member of that family
+  # 2.) the current user is the primary for the family AND the subject is a member of that family
   def show_ssn
-    set_type_role_and_family
+    @family = Family.find(params[:family_id]) if params[:family_id]
+
     authorize @family, :can_show_ssn?
+    @person = Person.find(params[:id]) unless @person.id == params[:id]
 
     if @family.person_is_family_member?(@person)
       payload = number_to_ssn(@person.ssn)
       render json: { payload: payload, status: 200 }
     else
-      render json: { message: "Unauthorized", status: 404 }
+      render json: { message: "Unauthorized" }, status: 401
     end
-  rescue Pundit::NotAuthorizedError, Pundit::NotDefinedError
-    render json: { message: "Unauthorized", status: 404 }
+  rescue Pundit::NotAuthorizedError, Mongoid::Errors::DocumentNotFound
+    render json: { message: "Unauthorized" }, status: 401
   end
 
   def edit
@@ -318,8 +320,8 @@ class Insured::FamilyMembersController < ApplicationController
                        end
       @family = @person.primary_family
     when 'consumer'
-      @consumer_role = @person.consumer_role
-      @family = @consumer_role.person.primary_family
+      @consumer_role = @person&.consumer_role
+      @family = @consumer_role&.person&.primary_family
     end
 
     @family = Family.find(params[:family_id]) if params[:family_id]
