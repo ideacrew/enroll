@@ -50,7 +50,7 @@
                 <div class="bold m-0 p-0"><%= user_first_name_last_name_and_suffix %></div>
                 <div class="horizontal-links">
                   <% unless user_id.blank? %><span><%= l10n("id").upcase %>: <%= user_id %></span><% end %>
-                  <% unless my_portal_link(controller) %><span><%= my_portal_link(controller) %></span><% end %>
+                  <% if my_portal_link(controller).present? %><span><%= my_portal_link(controller) %></span><% end %>
                   <span><%= h(link_to l10n('layout.header.logout'), main_app.destroy_user_session_path, method: 'delete') %></span>
                 </div>
               </div>
