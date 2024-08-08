@@ -42,6 +42,7 @@ if (bs4 == "true") {
       $("#append_consumer_info").replaceWith("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
     <% end %>
     applyListeners();
+    indicateRequiredFields()
     demographicValidations();
     isApplyingCoverage("dependent");
     $("a[id^=edit-member]").addClass('disabled');
@@ -83,5 +84,6 @@ if (!disableSelectric) {
 }
 applyJQDatePickers();
 applyListeners();
+indicateRequiredFields()
 demographicValidations();
 isApplyingCoverage("dependent");
