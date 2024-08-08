@@ -140,8 +140,8 @@
           <div id="remove_confirm" class="hidden"></div>
           <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
             <% if !dependent.persisted? %>
-              <a href="#" class="btn btn-error remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled')" data-target="#new_employee_dependent_form">
-              <%= l10n("discard_changes") %>
+              <a href="#" class="btn outline remove-new-employee-dependent mr-2" data-target="#new_employee_dependent_form">
+                <%= l10n("cancel") %>
               </a>
             <% else %>
               <%= h(link_to l10n('remove_member_from_household'), insured_family_member_path(dependent, {bs4: @bs4}), class: 'btn button-error outline mr-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")}) %>
