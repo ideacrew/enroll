@@ -15,7 +15,7 @@ function startEditingBenefit(benefit_kind) {
 };
 
 function currentlyEditing() {
-  return $('.interaction-click-control-continue').hasClass('disabled');
+  return $('.interaction-click-control-continue').hasClass('disabled') || $('#nav-buttons a').hasClass('disabled');
 };
 
 function afterDestroyHide(selector_id, kind){
@@ -47,6 +47,35 @@ function stopEditing() {
   $('.driver-question input:not(input[type=submit]), .disabled a').removeAttr('disabled');
   $('.driver-question, .instruction-row, .disabled a, .benefits-list, #nav-buttons a, .benefit, .add_new_benefit_kind').removeClass('disabled');
 };
+
+function deleteAllBenefits(e, kind) {
+  benefitList = $('.benefits-list.is_' + kind + ' .benefit');
+  if (benefitList.length) {
+    e.preventDefault();
+    // prompt to delete all these benefits
+    $("#destroyAllBenefits").modal();
+
+    $("#destroyAllBenefits .modal-cancel-button").click(function(e) {
+      $("#destroyAllBenefits").modal('hide');
+      $('#has_' + kind + '_health_coverage_true').prop('checked', true).trigger('change');
+    });
+
+    $("#destroyAllBenefits .modal-continue-button").click(function(e) {
+      $("#destroyAllBenefits").modal('hide');
+
+      benefitList.each(function(i, benefit) {
+        var url = $(benefit).attr('id').replace('benefit_', 'benefits/');
+        $(benefit).remove();
+        $.ajax({
+          type: 'DELETE',
+          url: url
+        });
+      });
+
+      $('select#insurance_kind_is_' + kind).prop('selectedIndex', 0);
+    });
+  }
+}
 
 function handleEsiFields(form, isEsi, isHra, isMvsq) {
 
@@ -260,27 +289,54 @@ document.addEventListener("turbolinks:load", function() {
     if (event.type === 'keydown' && event.key !== 'Enter') {
       return;
     }
+    
+    event.preventDefault();
+    var self = this;
+    $("#destroyBenefit").modal();
 
-    var benefit = $(event.target).parents('.benefit')
-    var benefitList = benefit.parents('.benefits-list')[0];
-    var url = $(benefit).attr('id').replace('benefit_', 'benefits/');
-    var kind = $(event.target).data('kind')
-
-    $(benefit).remove();
-
-    $.ajax({
-      type: 'DELETE',
-      url: url
+    $("#destroyBenefit .modal-cancel-button").off('click');
+    $("#destroyBenefit .modal-cancel-button").on('click', function() {
+      $("#destroyBenefit").modal('hide');
     });
 
-    if (benefitList.querySelectorAll('.benefit').length == 0) {
-      document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
-      $('select#insurance_kind_' + kind).prop('selectedIndex', 0);
-      document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
-    } else {
-      document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
-    }
-    stopEditing()
+    $("#destroyBenefit .modal-continue-button").off('click');
+    $("#destroyBenefit .modal-continue-button").on('click', function() {
+      $("#destroyBenefit").modal('hide');
+      
+      var benefit = $(self).parents('.benefit');
+      var url = $(benefit).attr('id').replace('benefit_', 'benefits/');
+      $.ajax({
+        type: 'DELETE',
+        url: url,
+        success: function() {
+          var benefitList = benefit.parents('.benefits-list')[0];
+          var kind = $(self).data('kind')
+      
+          $(benefit).remove();
+
+          if (benefitList.querySelectorAll('.benefit').length == 0) {
+            document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
+            $('select#insurance_kind_' + kind).prop('selectedIndex', 0);
+            document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
+          } else {
+            document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
+          }
+          stopEditing()
+        }
+      });
+    });
+  });
+
+  /* DELETING all enrolled benefits on selcting 'no' on Driver Question */
+  $(document).off('change', '#has_enrolled_health_coverage_false');
+  $(document).on('change', '#has_enrolled_health_coverage_false', function(e) {
+    deleteAllBenefits(e, 'enrolled');
+  });
+
+  /* DELETING all eligible benefits on selcting 'no' on Driver Question */
+  $(document).off('change', '#has_eligible_health_coverage_false');
+  $(document).on('change', '#has_eligible_health_coverage_false', function(e) {
+    deleteAllBenefits(e, 'eligible');
   });
 
   // stop bs4 code ----------------------------------
@@ -299,7 +355,7 @@ document.addEventListener("turbolinks:load", function() {
         var self = this;
 
         $('#unsavedBenefitChangesWarning').modal('show');
-        $('.btn.btn-danger').click(function() {
+        $('.btn.btn-danger, #leave').click(function() {
           window.location.href = $(self).attr('href');
         });
 
