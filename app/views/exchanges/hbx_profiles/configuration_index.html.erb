@@ -1,63 +1,107 @@
 <%= render "ui-components/v1/navs/primary_nav.html.slim" %>
 <div class="container">
   <div class="bottom-pd">
-      <h1 class="heading-text">Configuration</h1>
+    <h1 class="heading-text">Configuration</h1>
     <div class="input-no-pd">
       <%= link_to 'Announcements', exchanges_announcements_path, {class: 'btn btn-default'} %>
       <% if aca_security_questions %>
         <%= link_to 'Security Questions', exchanges_security_questions_path, {class: 'btn btn-default'} %>
       <% end %>
 
-      <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f|%>
-        <h4 class="d-inline-block border border-dark"><strong>Time Travel<strong></h4>
-        <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
+      <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f| %>
+        <h4 class="d-inline-block border border-dark">
+          <strong><%= l10n("admin_actions.time_travel.title") %></strong>
+        </h4>
+        <span><%= l10n("admin_actions.time_travel.info") %></span>
+        <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs? %>">
           <tbody>
-          <td width="50%" style="padding: 18px;font-weight: bold;">Current Date: <%= @time_keeper.date_of_record %>
-          </td>
-          <td>
-            <%= datepicker_control f, :date_of_record, {:class => "form-control", :placeholder => "DATE OF RECORD",:'data-date-min' => "0d", required: true, id: "set_date_date_of_record" } %>
-            <button type="submit" class="btn btn-primary pull-right display-on-mobile" <%=  policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button>
-          </td>
-          <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button></td>
+            <tr>
+              <td width="50%" style="padding: 18px; font-weight: bold;">
+                Current Date: <%= @time_keeper.date_of_record %>
+              </td>
+              <td class="col-md-2">
+                <%= datepicker_control f, :date_of_record, { class: "form-control", placeholder: "DATE OF RECORD", :'data-date-min' => "0d", required: true, id: "set_date_date_of_record" } %>
+              </td>
+              <td class="col-md-4">
+                <button type="submit" class="btn btn-primary pull-right" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>
+                  Set Current Date
+                </button>
+              </td>
+            </tr>
+          </tbody>
         </table>
       <% end %>
 
-      <%if EnrollRegistry.feature_enabled?(:time_jump) %>
+      <% if EnrollRegistry.feature_enabled?(:time_jump) %>
         <%= form_for @time_keeper, url: hop_to_date_exchanges_time_keeper_path, method: "post", class: "form" do |f| %>
-          <div class="mb-3">
-            <h4 class="d-inline-block border border-dark"><strong>Time Jump<strong> <span class="badge badge-warning">Caution !!!</span></h4>
-            <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs? %>">
-              <tbody>
-                <tr>
-                  <td width="50%" style="padding: 18px; font-weight: bold;">Current Date: <%= @time_keeper.date_of_record %></td>
-                  <td> Choose future date:</td>
-                  <td>
-                    <%= datepicker_control f, :date_of_record, { class: "form-control", placeholder: "DATE OF RECORD", 'data-date-min' => "0d", required: true, id: "hop_to_date_date_of_record" } %>
-                    <button type="submit" class="btn btn-primary pull-right display-on-mobile" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button>
-                  </td>
-                  <td class="hide-on-mobile">
-                    <button type="submit" class="btn btn-primary pull-right" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>Select</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <h4 class="d-inline-block border border-dark">
+            <strong><%= l10n("admin_actions.time_jump.title") %></strong>
+          </h4>
+          <span><%= l10n("admin_actions.time_jump.info") %></span>
+          <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs? %>">
+            <tbody>
+              <tr>
+                <td width="50%" style="padding: 18px; font-weight: bold;">
+                  <%= l10n("admin_actions.time_jump.current_date") %>: <%= @time_keeper.date_of_record %>
+                </td>
+                <td class="col-md-2">
+                  <%= datepicker_control f, :date_of_record, { class: "form-control", placeholder: "DATE OF RECORD", :'data-date-min' => "0d", required: true, id: "hop_to_date_date_of_record" } %>
+                </td>
+                <td class="col-md-4">
+                  <button type="button" id='submit' class="btn btn-primary pull-right" data-toggle="modal" data-target="#setDateModal" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>
+                    <%= l10n("admin_actions.time_jump.select") %>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Modal Popup -->
+          <div class="modal fade" id="setDateModal" tabindex="-1" role="dialog" aria-labelledby="setDateModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="setDateModalLabel"><%= l10n("admin_actions.time_jump.title") %></h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p><%= l10n("admin_actions.time_jump.are_you_sure") %> <span id="selectedDate"></span>?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary modal-close" data-dismiss="modal"><%= l10n("admin_actions.time_jump.cancel") %></button>
+                  <%= f.hidden_field :date_of_record, id: 'hiddenDateField' %>
+                  <%= f.submit l10n("admin_actions.time_jump.confirm"), class: 'btn btn-primary', id: 'confirmSetDate' %>
+                </div>
+              </div>
+            </div>
           </div>
         <% end %>
       <% end %>
 
-      <%= form_for Setting.get_individual_market_monthly_enrollment_due_on, {url: update_setting_exchanges_hbx_profiles_path, method: :post, class: 'form'} do |f| %>
-        <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
-          <tbody>
-            <td width="50%" style="padding: 18px;font-weight: bold;">individual_market_monthly_enrollment_due_on: <%= Setting.individual_market_monthly_enrollment_due_on %>
-            </td>
-            <td>
-              <%= f.hidden_field :name %>
-              <%= f.number_field :value, {class: 'form-control', required: true, min: 1, max: 31, step: 1} %>
-              <button type="submit" class="btn btn-primary pull-right display-on-mobile">Update</button>
-            </td>
-            <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right">Update</button></td>
-          </tbody>
-        </table>
+      <%= form_for Setting.get_individual_market_monthly_enrollment_due_on, {url: update_setting_exchanges_hbx_profiles_path, method: :post, class: 'form mb-3'} do |f| %>
+          <h4 class="d-inline-block border border-dark">
+            <strong> Individual Market Monthly Enrollment Due On</strong>
+          </h4>
+          <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs? %>">
+            <tbody>
+              <tr>
+                <td width="50%" style="padding: 18px; font-weight: bold;">
+                  individual_market_monthly_enrollment_due_on: <%= Setting.individual_market_monthly_enrollment_due_on %>
+                </td>
+                <td>
+                  <%= f.hidden_field :name %>
+                  <%= f.number_field :value, {class: 'form-control', required: true, min: 1, max: 31, step: 1} %>
+                  <button type="submit" class="btn btn-primary pull-right display-on-mobile">Update</button>
+                </td>
+                <td class="hide-on-mobile">
+                  <button type="submit" class="btn btn-primary pull-right">Update</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
       <% end %>
     </div>
   </div>
