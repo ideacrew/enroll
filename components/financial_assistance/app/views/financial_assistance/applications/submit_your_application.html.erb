@@ -72,11 +72,11 @@
       <div class="focus d-flex align-items-center mt-2 mb-2">
         <label class="radio-label radio" for="medicaid_determination_yes">
           <%= f.radio_button("full_medicaid_determination", true, id: "medicaid_determination_yes", checked: false) %>
-          <%= l10n("insured.preferences.i_agree") %>
+          <%= l10n("yes") %>
         </label>
         <label class="radio-label radio" for="medicaid_determination_no">
           <%= f.radio_button("full_medicaid_determination", false, id: "medicaid_determination_no", checked: false) %>
-          <%= l10n("insured.preferences.i_disagree") %>
+          <%= l10n("no") %>
         </label>
       </div>
     </fieldset>
