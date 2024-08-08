@@ -15,3 +15,5 @@ paths-ignore:
 packs:
   ruby:
     - codeql/ruby-queries
+  javascript:
+    - codeql/javascript-queries

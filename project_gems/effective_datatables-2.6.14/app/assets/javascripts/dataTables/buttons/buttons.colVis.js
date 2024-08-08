@@ -144,7 +144,7 @@ $.extend( DataTable.ext.buttons, {
 			var idx = dt.column( col ).index();
 			return dt.settings()[0].aoColumns[ idx ].sTitle
 				.replace(/\n/g," ")        // remove new lines
-				.replace( /<.*?>/g, "" )   // strip HTML
+				.replace( /<|>/g, "" )   // strip HTML
 				.replace(/^\s+|\s+$/g,""); // trim
 		}
 	},
