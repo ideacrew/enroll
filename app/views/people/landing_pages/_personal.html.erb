@@ -1,5 +1,6 @@
 <% if @bs4 %>
   <%= form_for @person do |f| %>
+    <%= hidden_field_tag :bs4, true %>
     <div id="personal_info" class="module new_person_wrapper">
       <div class="d-flex mb-md-4 row col-sm">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
