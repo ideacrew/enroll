@@ -5,16 +5,19 @@ module Exchanges
     include EventSource::Command
 
     def hop_to_date
-      binding.irb
       authorize HbxProfile, :modify_admin_tabs? # Rename this to something more meaningful for this action
-      binding.irb
-      date = Date.parse(params[:forms_time_keeper][:date_of_record])
-      binding.irb
-      TimeKeeper.instance.set_date_of_record(date)
-      flash[:notice] = "Time Hop to #{TimeKeeper.date_of_record.strftime('%m/%d/%Y')}"
+      new_date = Date.parse(params[:forms_time_keeper][:date_of_record])
+
+      if new_date > Date.today && new_date > TimeKeeper.date_of_record
+        TimeKeeper.instance.set_date_of_record(date)
+        flash[:notice] = "Time Hop is successful, Date is advanced to #{TimeKeeper.date_of_record.strftime('%m/%d/%Y')}"
+      else
+        flash[:error] = "Invalid date, please select a future date"
+      end
 
       redirect_to configuration_exchanges_hbx_profiles_path
+    rescue StandardError => e
+      flash[:error] = e.message
     end
-
   end
 end

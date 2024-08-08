@@ -122,7 +122,7 @@ Rails.application.routes.draw do
     end
 
     resource :time_keeper, :controller => "time_keeper" do
-      post :hop_to_date
+      post :hop_to_date if EnrollRegistry.feature_enabled?(:time_jump)
       post :set_date
     end
 

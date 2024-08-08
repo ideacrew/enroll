@@ -29,3 +29,5 @@ registry:
           is_enabled: <%= ENV['RESEND_BROKER_EMAIL_BUTTON_IS_ENABLED'] || false %>
         - key: :admin_account_autolock
           is_enabled: <%= ENV['ADMIN_ACCOUNT_AUTOLOCK_IS_ENABLED'] || false %>
+        - key: :time_jump
+          is_enabled: <%= ENV['TIME_JUMP_IS_ENABLED'] || false %>
