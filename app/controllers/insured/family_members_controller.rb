@@ -148,11 +148,8 @@ class Insured::FamilyMembersController < ApplicationController
   # 1.) hbx admin, or
   # 2.) the primary for the family AND that the subject is a member of that family
   def show_ssn
-    binding.irb
     set_type_role_and_family
-    binding.irb
     authorize @family, :can_show_ssn?
-    binding.irb
 
     if @family.person_is_family_member?(@person)
       payload = number_to_ssn(@person.ssn)
