@@ -6,7 +6,7 @@ module Exchanges
     include EventSource::Command
 
     def hop_to_date
-      authorize HbxProfile, :modify_admin_tabs? # Rename this to something more meaningful for this action
+      authorize HbxProfile, :hop_to_date?
 
       result = Operations::HbxAdmin::TimeJump.new.call({new_date: permit_params.to_h["date_of_record"]})
 

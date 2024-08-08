@@ -303,7 +303,9 @@ class HbxProfilePolicy < ApplicationPolicy
     staff_view_login_history?
   end
 
-
+  def hop_to_date?
+    can_submit_time_travel_request?
+  end
 
   # Acts as the entire Pundit Policy for app/controllers/translations_controller.rb
   def can_view_or_change_translations?
