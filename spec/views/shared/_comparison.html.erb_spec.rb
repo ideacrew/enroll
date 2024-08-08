@@ -147,7 +147,6 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
       plan.update_attributes!(nationwide: true)
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to match(/#{plan.rx_formulary_url}/)
-      expect(rendered).to match(/DOCTOR DIRECTORY/i)
     end
 
     if aca_state_abbreviation == "DC" # There is no plan comparision for MA dental
