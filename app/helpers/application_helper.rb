@@ -276,7 +276,11 @@ module ApplicationHelper
   def number_to_obscured_ssn(number)
     return unless number
     number_to_ssn(number)
-    number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
+    if EnrollRegistry.feature_enabled?(:ssn_ui_fields)
+      number.to_s.gsub!(/\w{3}-\w{2}-\w{4}/, '●●●●●●●●●')
+    else
+      number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
+    end
   end
 
   # Formats a number into a nine-digit US Federal Entity Identification Number string (nn-nnnnnnn)
