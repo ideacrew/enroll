@@ -1412,6 +1412,8 @@ Given(/^the warning duplicate enrollment feature configuration is enabled$/) do
 end
 
 Given(/^the temporary_configuration_enable_multi_tax_household_feature feature is disabled$/) do
+  # This is not a long term solution, but it is a quick fix to get the tests passing. This feature should be disabled for DC, but the tests
+  # using this step definition are having environment leakage issues. This should be fixed in the future.
   allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
 end
 
