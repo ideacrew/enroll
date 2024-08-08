@@ -2,6 +2,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Background:
     Given bs4_consumer_flow feature is disable
+    Given the temporary_configuration_enable_multi_tax_household_feature feature is disabled
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     When Individual visits the Consumer portal during open enrollment
@@ -28,7 +29,6 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual clicks on the Continue button to go to the Individual home page
 
   Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
-    Given the temporary_configuration_enable_multi_tax_household_feature feature is disabled
     When the individual clicks continue on the personal information page
     And Individual agrees to the privacy agreeement
     And the person named Patrick Doe is RIDP verified
