@@ -120,7 +120,6 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               end
             end
-
             @person_params = encrypt_pii(@person_params)
             return
           end
@@ -132,7 +131,6 @@ class Insured::ConsumerRolesController < ApplicationController
             format.html { render 'no_match' }
           end
         end
-
       elsif @consumer_candidate.errors[:ssn_dob_taken].present?
         format.html { render 'search' }
       elsif @consumer_candidate.errors[:ssn_taken].present?
