@@ -55,6 +55,13 @@
         <div class="mr-auto col-sm col-md-6 p-0 sm-hide"></div>
       </div>
     </div>
+    <fieldset class="d-flex mb-md-4">
+      <legend class="required weight-n"><%= l10n("does_person_need_coverage", person: @person.first_name.present? ? @person.first_name : l10n("faa.this_person")) %></legend>
+      <div class="d-flex align-items-center mt-0">
+        <% first_checked, second_checked = is_applying_coverage_value_personal(@person) %>
+        <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+      </div>
+    </fieldset>
 
     <% if current_user.does_not_have_any_staff_role? && !current_user.has_insured_role? %>
       <%= render 'shared/age_off_excluded', f: f %>
