@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div id="<%= dom_id benefit %>" class="benefit">
     <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="non_esi_benefit">
-      <h2><%= insurance_kind.humanize.titlecase %></h2>
+      <h2><%= hr_kind(kind, insurance_kind) %></h2>
       <dl class="parent">
         <dt><%= l10n("start_date") %></dt>
         <dd><%= benefit.start_on %>
