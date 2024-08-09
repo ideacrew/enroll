@@ -23,6 +23,10 @@ module Operations
 
       private
 
+      # Validates the family object.
+      #
+      # @param family [Object] The family object to be validated.
+      # @return [Dry::Monads::Result::Success, Dry::Monads::Result::Failure] The result of the validation.
       def validate_family(family)
         return Success(family) if family.is_a?(::Family)
 
