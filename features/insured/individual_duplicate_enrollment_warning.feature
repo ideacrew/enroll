@@ -41,8 +41,8 @@ Feature: Individual market with duplicate enrollments
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
-    And the Individual continues again
-    And the Individual continues again
+    And Individual continues again
+    And Individual continues again
     And Individual selects a plan on plan shopping page
     Then Individual should see Duplicate Enrollment warning in the Confirmation page
 
