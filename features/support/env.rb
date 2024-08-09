@@ -89,7 +89,7 @@ Selenium::WebDriver::Chrome.path = ENV['WD_CHROME_PATH'] if ENV['WD_CHROME_PATH'
 
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument("headless")
+  #options.add_argument("headless")
   options.add_argument("--window-size=1920,1080")
   options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
 
