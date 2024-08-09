@@ -639,6 +639,11 @@ And(/.+ selects a plan on plan shopping page/) do
   wait_for_ajax(3, 2)
   expect(page).to have_content "Choose Plan"
   sleep 5
+  continue_btn = find_all(EmployeePersonalInformation.continue_btn)
+  if continue_btn.any? && !continue_btn.first&.disabled?
+    find(EmployeePersonalInformation.continue_btn).click
+    wait_for_ajax(3, 2)
+  end
   plan_rows = find_all('div.plan-row', wait: 5)
   if plan_rows.any?
     plan_rows[0].find('.plan-select').click
@@ -973,6 +978,7 @@ Then(/^\w+ continues$/) do
 end
 
 Then(/^\w+ continues again$/) do
+  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
 end
 
