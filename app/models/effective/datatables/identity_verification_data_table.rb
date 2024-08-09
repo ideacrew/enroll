@@ -6,7 +6,6 @@ module Effective
 
       datatable do
         table_column :name, :label => 'Name', :proc => proc { |row| link_to_with_noopener_noreferrer(h(row.full_name), resume_enrollment_exchanges_agents_path(person_id: row.id)) }, :filter => false, :sortable => false
-        table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => proc { |row| row.dob }, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false

@@ -86,7 +86,6 @@
         <thead>
         <tr>
           <th><%= l10n("name")%></th>
-          <th><%= l10n("ssn")%></th>
           <th><%= l10n("dob")%></th>
           <th><%= l10n("hbx_id")%></th>
           <th><%= l10n("family")%></th>
@@ -104,7 +103,7 @@
 
     <script type="text/javascript" charset="utf-8">
 
-        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
+        var columnList = [{ data: 'name'}, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
         var market_enabled = document.getElementById("market_enabled_check").value;
         if (market_enabled == 'true') {
           columnList.push({data: 'consumer'}, {data: 'employee'})
