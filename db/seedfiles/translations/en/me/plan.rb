@@ -100,5 +100,12 @@ PLAN_TRANSLATIONS = {
   'en.plans.dependents_modal.relationship' => "Relationship",
   'en.plans.more_plan_details.available' => "Available Plans",
   'en.plans.coverage_start_date' => "Coverage Start Date",
-  'en.plans.compare_selected' => "Compare Selected Plans"
+  'en.plans.compare_selected' => "Compare Selected Plans",
+  'en.plans.plan_shopping_options.header' => "Plan Shopping Options",
+  'en.plans.plan_shopping_options.description' => "There are multiple ways to shop for plans on CoverME.gov, read the description of each and after you’ve made your choice, select “Continue to Next Step”.",
+  'en.plans.plan_shopping_options.question' => "Do you want plan shopping guidance?",
+  'en.plans.plan_shopping_options.question.compare' => "I want to compare plans while plan shopping",
+  'en.plans.plan_shopping_options.question.know' => "I know the plan I want",
+  'en.plans.plan_shopping_options.modal.go_back' => "Go Back",
+  'en.plans.plan_shopping_options.modal.proceed' => "Yes, Compare Plans"
 }

@@ -10,8 +10,12 @@ module Services
       CONGRESS_URL = Rails.application.config.checkbook_services_congress_url
       IVL_PATH = Rails.application.config.checkbook_services_ivl_path
       SHOP_PATH = Rails.application.config.checkbook_services_shop_path
+      REMOTE_ACCESS_KEY = Rails.application.config.checkbook_services_remote_access_key
+      CS_REFERENCE_ID = Rails.application.config.checkbook_services_reference_id
 
-      def initialize(hbx_enrollment, is_congress=false)
+      def initialize(hbx_enrollment, plans = nil, is_congress = nil)
+        is_congress ||= false
+        @plans = plans
         @hbx_enrollment = hbx_enrollment
         if @hbx_enrollment.kind.downcase == "individual"
           @person = @hbx_enrollment.consumer_role.person
@@ -26,7 +30,6 @@ module Services
       def generate_url
         #return @url if is_congress
         return "http://checkbook_url" if Rails.env.test?
-
         begin
           construct_body =
             if is_congress
@@ -35,9 +38,7 @@ module Services
               @hbx_enrollment.kind.downcase == "individual" ? construct_body_ivl : construct_body_shop
             end
 
-          @result = HTTParty.post(@url,
-                :body => construct_body.to_json,
-                :headers => { 'Content-Type' => 'application/json' } )
+          @result = HTTParty.post(@url, :body => construct_body.to_json, :headers => { 'Content-Type' => 'application/json' })
           uri =
             if @result.parsed_response.is_a?(String)
               JSON.parse(@result.parsed_response)["URL"]
@@ -45,14 +46,14 @@ module Services
               @result.parsed_response["URL"] || @result.parsed_response["url"]
             end
           if uri.present?
-            return uri
+            uri
           else
             raise "Unable to generate url"
           end
         rescue Exception => e
           Rails.logger.error { "Unable to generate url for hbx_enrollment_id #{@hbx_enrollment.id} due to #{e.backtrace}" }
           # redirects to plan shopping show page if url generation is failed.
-          return "/insured/plan_shoppings/#{@hbx_enrollment.id}?market_kind=#{@hbx_enrollment.kind}&coverage_kind=#{@hbx_enrollment.coverage_kind}"
+          "/insured/plan_shoppings/#{@hbx_enrollment.id}?market_kind=#{@hbx_enrollment.kind}&coverage_kind=#{@hbx_enrollment.coverage_kind}"
         end
       end
 
@@ -93,7 +94,7 @@ module Services
           "employer":
           {
             "state": 11,
-            "county": 001
+            "county": 0o01
           },
           "family": build_family,
           "contribution": employer_contributions,
@@ -106,17 +107,25 @@ module Services
 
       def construct_body_ivl
         address = @person&.rating_address
-
-        {
+        ivl_body = {
           "county": address&.county,
           "zipcode": address&.zip,
-          "remote_access_key": Rails.application.config.checkbook_services_remote_access_key,
-          "reference_id": Rails.application.config.checkbook_services_reference_id,
+          "remote_access_key": REMOTE_ACCESS_KEY,
+          "reference_id": CS_REFERENCE_ID,
           "enrollment_year": enrollment_year,
           "family": consumer_build_family,
           "aptc": elected_aptc.to_s,
           "csr": csr_value,
           "enrollmentId": @hbx_enrollment.id.to_s # Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
+        }
+        ivl_body.merge!(extra_ivl_body) if EnrollRegistry.feature_enabled?(:send_extra_fields_to_checkbook)
+      end
+
+      def extra_ivl_body
+        current_plan = build_current_plan(@hbx_enrollment)
+        {
+          "coverageStartDate": @hbx_enrollment.effective_on.strftime("%m-%d-%Y"),
+          "currentPlan": current_plan
         }
       end
 
@@ -219,13 +228,21 @@ module Services
         family
       end
 
+      def build_current_plan(enrollment)
+        return "" unless @plans
+        available_plans = @plans.map(&:hios_id)
+        enrolled_plan = enrollment.family.current_enrolled_or_termed_products_by_subscriber(enrollment)&.map(&:hios_id)&.first
+        return "" unless available_plans&.include?(enrolled_plan)
+        enrolled_plan
+      end
+
       def build_family
         family = []
         # family = [{'dob': @census_employee.dob.strftime("%Y-%m-%d") ,'relationship': 'self'}]
         # @census_employee.census_dependents.each do |dependent|
         @hbx_enrollment.hbx_enrollment_members.each do |dependent|
           next if dependent.primary_relationship == "nephew_or_niece"
-          family << {'dob': dependent.family_member.person.dob.strftime("%Y-%m-%d") ,'relationship': dependent.primary_relationship}
+          family << {'dob': dependent.family_member.person.dob.strftime("%Y-%m-%d"),'relationship': dependent.primary_relationship}
         end
         family
       end

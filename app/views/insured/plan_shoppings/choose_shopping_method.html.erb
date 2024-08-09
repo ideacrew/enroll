@@ -1,0 +1,92 @@
+<%= render partial: 'shared/plan_shopping_progress', locals: { current_page: :choose_plan, nav_options: plan_shopping_progress_hash } %>
+<h1><%= l10n("plans.plan_shopping_options.header") %></h1>
+<p><%= l10n("plans.plan_shopping_options.description") %></p>
+<fieldset class="mb-4 d-block">
+  <legend class="required"><%= l10n("plans.plan_shopping_options.question") %></legend>
+  <label for="guidance_true" class="radio mt-2">
+    <%= radio_button_tag :guidance, true %>
+    <%= l10n("plans.plan_shopping_options.question.compare") %>
+  </label>
+  <label for="guidance_false" class="radio mt-2">
+    <%= radio_button_tag :guidance, false %>
+    <%= l10n("plans.plan_shopping_options.question.know") %>
+  </label>
+</fieldset>
+<!-- logic for the next link: if yes, it should show appropriate modal, if no, go to plan shopping -->
+<% content_for :submit_button do %>
+  <%= link_to(l10n("continue_next"), insured_plan_shopping_path(:id => @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @hbx_enrollment.coverage_kind, enrollment_kind: @hbx_enrollment.enrollment_kind), class: "button disabled hidden", id: "plan-shopping-link") %>
+  <% if @market_kind == "individual" && @coverage_kind == "health" %>
+    <%= h(link_to l10n("continue_next"), "", data: {toggle: "modal", target: "#plan_match_redirection"}, class: "button disabled", disabled: true, id: "checkbook-link") %>
+  <% end %>
+  <% if @market_kind == "individual" && @coverage_kind == "dental" %>
+    <%= h(link_to l10n("continue_next"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"}, class: "button disabled", disabled: true, id: "checkbook-link") %>
+  <% end %>
+<% end %>
+<div class="my-4">
+  <%= render partial: "shared/progress_navigation_buttons", locals: {disable_link: true} %>
+</div>
+<!-- the modals -->
+<div id="plan_match_redirection" class="modal fade" role="document" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+        <div class="bold">
+          <%= l10n("warning") %>
+        </div>
+        <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body border-0">
+        <p><%= l10n("modal_onscreen") %> <%= l10n("modal_onscreen1") %> <%= l10n("modal_onscreen2") %></p>
+      </div>
+      <div class="modal-footer border-0">
+        <div>
+          <button class="btn outline" data-dismiss="modal" type="button"><%= l10n("plans.plan_shopping_options.modal.go_back") %></button>
+          <%= h(link_to l10n("plans.plan_shopping_options.modal.proceed"), @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url") %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="plan_match_dental_redirection" class="modal fade" role="document" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
+        <div class="bold">
+          <%= l10n("warning") %>
+        </div>
+        <button class="close" aria-label="Close" data-dismiss="modal" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body border-0">
+        <p><%= l10n("modal_onscreen") %> <%= l10n("modal_onscreen1") %> <%= l10n("modal_onscreen2") %></p>
+      </div>
+      <div class="modal-footer border-0">
+        <div>
+          <button class="btn outline" data-dismiss="modal" type="button"><%= l10n("plans.plan_shopping_options.modal.go_back") %></button>
+          <%= h(link_to l10n("plans.plan_shopping_options.modal.proceed"), l10n("sadpi_url"), class: "btn btn-primary checkbook_url") %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).on('change', 'input[name="guidance"]', function(){
+    if($(this).val() == "false"){
+      $('#plan-shopping-link').removeClass('hidden disabled');
+      $('#plan-shopping-link').removeAttr('disabled');
+      $('#checkbook-link').addClass('hidden disabled');
+      $('#checkbook-link').attr('disabled', true);
+    } else {
+      $('#checkbook-link').removeClass('hidden disabled');
+      $('#plan-shopping-link').addClass('hidden disabled');
+      $('#checkbook-link').removeAttr('disabled');
+      $('#plan-shopping-link').attr('disabled', true);
+    }
+  });
+</script>
