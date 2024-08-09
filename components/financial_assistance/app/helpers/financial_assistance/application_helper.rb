@@ -456,15 +456,16 @@ module FinancialAssistance
       l10n("faa.other_ques.#{key}", subject: use_applicant_name ? @applicant.first_name.capitalize : l10n("faa.this_person"))
     end
 
+    def hr_kind(kind, insurance_kind)
+      eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
+      term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}"
+      l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
+    end
+
     def insurance_kind_select_options(kind)
-      insurance_kind_options = []
-      FinancialAssistance::Benefit.valid_insurance_kinds.each do |insurance_kind|
-        eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question)
-        term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}"
-        hr_kind = l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)
-        insurance_kind_options << [hr_kind, insurance_kind, {:'data-esi' => display_esi_fields?(insurance_kind, kind), :'data-mvsq' => display_minimum_value_standard_question?(insurance_kind)}]
-      end
-      insurance_kind_options
+      FinancialAssistance::Benefit.valid_insurance_kinds.map { |insurance_kind|
+        [hr_kind(kind, insurance_kind), insurance_kind, {:'data-esi' => display_esi_fields?(insurance_kind, kind), :'data-mvsq' => display_minimum_value_standard_question?(insurance_kind)}]
+      }
     end
   end
 end

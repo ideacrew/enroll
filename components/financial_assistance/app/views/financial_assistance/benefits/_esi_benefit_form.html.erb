@@ -6,7 +6,7 @@
     <%= f.hidden_field :insurance_kind, value: insurance_kind %>
     <div class="insurance-kind-label-container">
       <% if insurance_kind.present? %>
-        <h2><%= insurance_kind.humanize.titleize %></h2>
+        <h2><%= hr_kind(kind, insurance_kind) %></h2>
       <% end %>
     </div>
     <div class="d-flex flex-column col-6 px-0">
