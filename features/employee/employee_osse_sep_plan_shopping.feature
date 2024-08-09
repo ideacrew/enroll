@@ -1,9 +1,10 @@
 Feature: Employees plan shopping using QLE
   Employee DOB is after plan year start date but before the SEP effective date
   Employees can change plan or keep same plan with plan shopping using SEP
-  
+
   Background: Setup site, employer, and benefit application
     Given the shop market configuration is enabled
+    Given choose_shopping_method feature is disabled
     Given the osse subsidy feature is enabled
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
