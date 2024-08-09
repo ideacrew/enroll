@@ -24,10 +24,11 @@ Feature: Create Primary Broker and Broker Agency
   #  And Primary Broker enters broker agency information for SHOP markets
   #  And Primary Broker enters office location for default_office_location
   #  Then Primary Broker should see broker registration successful message
-  
-  
+
+
   Scenario: Broker purchase insurance for a family
     Given the shop market configuration is enabled
+    Given choose_shopping_method feature is disabled
     And a CCA site exists with a benefit market
     And benefit market catalog exists for active initial employer with health benefits
     And there is a Broker Agency exists for District Brokers Inc
