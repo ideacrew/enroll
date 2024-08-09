@@ -640,7 +640,6 @@ And(/.+ selects a plan on plan shopping page/) do
   expect(page).to have_content "Choose Plan"
   sleep 5
   plan_rows = find_all('div.plan-row', wait: 5)
-  binding.irb
   if plan_rows.any?
     plan_rows[0].find('.plan-select').click
   else
