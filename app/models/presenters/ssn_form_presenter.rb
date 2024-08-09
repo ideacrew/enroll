@@ -9,7 +9,8 @@ module Presenters
                 :object_type,
                 :disabled,
                 :person_id,
-                :family_id
+                :family_id,
+                :display_icon
 
     def initialize(form_object, current_user)
       @form_object = form_object
@@ -20,6 +21,10 @@ module Presenters
       @family_id = nil
       @person_id = nil
       @disabled = nil
+      @display_icon = nil
+
+      # include something here to determine if icons should be displayed or not
+      # for lower-level admins, brokers, broker agency staff etc.
     end
 
     def sanitize_ssn_params
@@ -31,8 +36,7 @@ module Presenters
       when 'Person'
         sanitize_person
       when 'FinancialAssistance::Applicant'
-        sanitize_application_dependent unless @form_object.is_primary_applicant?
-        sanitize_application_primary if @form_object.is_primary_applicant?
+        sanitize_applicant
       end
 
       self
@@ -46,6 +50,7 @@ module Presenters
 
     def sanitize_new_consumer
       obscure_ssn
+
       @person_id = 'temp'
       @disabled = true
     end
@@ -60,6 +65,7 @@ module Presenters
 
     def sanitize_family_dependent
       obscure_ssn
+
       @family_id = @form_object.family_id.to_s
       family_member = @form_object.family_member
 
@@ -67,16 +73,19 @@ module Presenters
       @disabled = family_member.is_primary_applicant
     end
 
-    def sanitize_application_primary
-      puts "application dependent"
+    def sanitize_applicant
+      family = @form_object.family
+      @family_id = family.id.to_s
+
+      person = Person.by_hbx_id(@form_object.person_hbx_id).first
+      @person_id = person.id.to_s
+
+      obscure_ssn(person)
+      @disabled = @form_object.is_primary_applicant?
     end
 
-    def sanitize_application_dependent
-      puts "application dependent"
-    end
-
-    def obscure_ssn
-      clone_ssn = @form_object.ssn.dup
+    def obscure_ssn(subject = @form_object)
+      clone_ssn = subject.ssn.dup
       @obscured_ssn = number_to_obscured_ssn(clone_ssn)
     end
   end
