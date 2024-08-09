@@ -639,7 +639,7 @@ And(/.+ selects a plan on plan shopping page/) do
   wait_for_ajax(3, 2)
   expect(page).to have_content "Choose Plan"
   sleep 5
-  if !find(EmployeePersonalInformation.continue_btn).disabled?
+  unless find(EmployeePersonalInformation.continue_btn).disabled?
     find(EmployeePersonalInformation.continue_btn).click
     wait_for_ajax(3, 2)
   end
