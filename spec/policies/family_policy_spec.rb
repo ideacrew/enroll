@@ -26,6 +26,7 @@ describe FamilyPolicy, "given a user who is the primary member" do
 
   before do
     allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+    allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
   end
 
   subject { FamilyPolicy.new(user, family) }
