@@ -17,7 +17,6 @@
     personContainer.removeClass('hidden');
     if ($("#family_information").length == 0) {
       var memberContainer = $(".member-" + id + "-row");
-      console.log(".member-" + id + "-row")
       $(".edit-member").addClass('disabled').attr('tabindex', -1);
       memberContainer.find(".edit-member").addClass('hidden');
       memberContainer.find(".edit-buttons").removeClass('hidden');
@@ -25,6 +24,7 @@
   }
   applyListeners();
   indicateRequiredFields()
+  demographicValidations();
 <% else %>
   $(".append_consumer_info").html("<%= escape_javascript(render partial: "personal")%>");
   $("#jq_datepicker_ignore_person_dob").closest(".floatlabel-wrapper").hide();
