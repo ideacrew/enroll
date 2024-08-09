@@ -13,7 +13,9 @@
 
     <div id="all-plans" class="all-filters-row">
       <details id="plan-filter-container" class="my-3">
-        <summary data-open="Hide Filters" data-close="Show Filters"></summary>
+        <summary data-open="Hide Filters" data-close="Show Filters">
+          <span><%= l10n("plans.filter_sort") %></span>
+        </summary>
         <div class="mt-3">
           <%= render partial: './ui-components/v1/filters/plan_filters' %>
         </div>
@@ -77,7 +79,16 @@
       font-size: 18px;
     }
 
-    details#plan-filter-container > summary::-webkit-details-marker, details > summary::marker  {
+    details#plan-filter-container > summary {
+      list-style-type: none;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    details#plan-filter-container > summary::-webkit-details-marker,
+    details#plan-filter-container > summary span,
+    details > summary::marker
+    {
       display: none;
     }
 
