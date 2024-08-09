@@ -21,6 +21,13 @@ describe FamilyPolicy, "given a user who is the primary member" do
   let(:person) { instance_double(Person, :id => primary_person_id) }
   let(:user) { instance_double(User, :person => person) }
   let(:primary_member) { instance_double(FamilyMember, :person_id => primary_person_id) }
+  let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => permission) }
+  let(:permission) { instance_double(Permission, :modify_family => true) }
+
+  before do
+    allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+    allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
+  end
 
   subject { FamilyPolicy.new(user, family) }
 
