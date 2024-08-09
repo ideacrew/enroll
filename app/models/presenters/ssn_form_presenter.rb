@@ -58,10 +58,6 @@ module Presenters
       @disabled = true
     end
 
-    def sanitize_family_primary
-      puts 'sanitize family primary'
-    end
-
     def sanitize_family_dependent
       obscure_ssn
       @family_id = @form_object.family_id.to_s
