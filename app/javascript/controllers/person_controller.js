@@ -29,11 +29,10 @@ export default class extends Controller {
 
           this.showSsnInput(personId);
         } else {
-          console.log(response.data.message);
+          console.log("Unauthorized.");
         }
-      }).catch((error) => {
+      }).catch(() => {
         console.log('Error retrieving info');
-        console.log(error);
       })
     }
   }
