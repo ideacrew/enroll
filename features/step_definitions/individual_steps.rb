@@ -978,6 +978,7 @@ Then(/^\w+ continues$/) do
 end
 
 Then(/^\w+ continues again$/) do
+  wait_for_ajax
   find(IvlChooseCoverage.continue_btn).click
 end
 
