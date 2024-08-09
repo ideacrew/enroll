@@ -9,8 +9,7 @@ module Presenters
                 :object_type,
                 :disabled,
                 :person_id,
-                :family_id,
-                :display_icon
+                :family_id
 
     def initialize(form_object, current_user)
       @form_object = form_object
@@ -21,10 +20,6 @@ module Presenters
       @family_id = nil
       @person_id = nil
       @disabled = nil
-      @display_icon = nil
-
-      # include something here to determine if icons should be displayed or not
-      # for lower-level admins, brokers, broker agency staff etc.
     end
 
     def sanitize_ssn_params
@@ -49,7 +44,6 @@ module Presenters
 
     def sanitize_new_consumer
       obscure_ssn
-
       @person_id = 'temp'
       @disabled = true
     end
