@@ -1,6 +1,7 @@
 Feature:  Employee passive renewal should be canceled when Employee waived coverage
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
+    Given choose_shopping_method feature is disabled
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer ABC Widgets
     And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
@@ -18,6 +19,6 @@ Feature:  Employee passive renewal should be canceled when Employee waived cover
       And Employee should not see any plan which premium is 0
       When Employee selects waiver on the plan shopping page
       And Employee submits waiver reason
-      Then Employee should see waiver summary page 
+      Then Employee should see waiver summary page
       When Employee clicks continue on waiver summary page
       Then Employee should see Waiver tile

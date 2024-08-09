@@ -3,6 +3,7 @@ Feature: Individual market with duplicate enrollments
   Background: Individual account creation and enabling duplicate enrollment warning setting
     Given the temporary_configuration_enable_multi_tax_household_feature feature is disabled
     Given bs4_consumer_flow feature is disable
+    Given choose_shopping_method feature is disabled
     Given an Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     Given the warning duplicate enrollment feature configuration is enabled
@@ -13,7 +14,7 @@ Feature: Individual market with duplicate enrollments
     And user registers as an individual
     And Individual clicks on the Continue button of the Account Setup page
     Then Individual sees form to enter personal information
-    
+
   Scenario: Individual adds dependent and shops for a plan. Dependent creates account, shops for a plan and sees duplicate enrollment warning
     When the individual clicks continue on the personal information page
     And Individual agrees to the privacy agreeement
