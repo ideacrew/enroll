@@ -3,30 +3,30 @@
     pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
     oninput: "this.setCustomValidity('')" %>
 <% else %>
-  <% non_disabled_status = defined?(primary_can_edit) && primary_can_edit %>
-  <% person_id = f.object.is_a?(Forms::ConsumerCandidate) ? 'temp' : f.object.id.to_s %>
-  <div id='ssn-input-container' class="<%= non_disabled_status ? '' : 'div-disabled' %>" data-controller='person'>    
+  <div id='ssn-input-container' class="<%= 'div-disabled' if presenter.disabled %>" data-controller='person'> 
     <%= f.text_field :ssn,
-      value: person_id == 'temp' ? number_to_ssn(f.object.ssn) : '',
-      disabled: non_disabled_status ? false : true,
-      class: "keep-label mask-ssn hidden ssn-input ssn-input-#{person_id}",
+      value: presenter.formatted_ssn,
+      disabled: presenter.disabled,
+      class: "keep-label mask-ssn hidden ssn-input ssn-input-#{presenter.person_id}",
       target: 'person.ssn',
       pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
       oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
       oninput: "this.setCustomValidity('')"
     %>
-    <span class="ssn-facade ssn-facade-<%= person_id %>"><%= number_to_obscured_ssn(f.object.ssn) %></span>
+    <span class="ssn-facade ssn-facade-<%= presenter.person_id %>">
+      <%= presenter.obscured_ssn %>
+    </span>
     <%= image_pack_tag "icons/eye-off.svg", 
-      class: "ssn-eye-off-#{person_id}",
+      class: "ssn-eye-off-#{presenter.person_id}",
       alt: "view ssn icon",
       tabindex: 0,
-      data: { type: f.object.class.to_s, id: person_id, family_id: family_id&.to_s, action: "click->person#showSsn" }
+      data: { type: presenter.object_type, id: presenter.person_id, family_id: presenter.family_id, action: "click->person#showSsn" }
     %>
     <%= image_pack_tag "icons/eye-on.svg",
-      class: "hidden ssn-eye-on-#{person_id}",
+      class: "hidden ssn-eye-on-#{presenter.person_id}",
       alt: "hide ssn icon",
       tabindex: 0,
-      data: { id: person_id, action: "click->person#hideSsn" }
+      data: { id: presenter.person_id, action: "click->person#hideSsn" }
     %>
   </div>
 
