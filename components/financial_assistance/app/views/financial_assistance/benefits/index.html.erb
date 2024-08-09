@@ -55,10 +55,10 @@
 
     <% if EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member  %>
       <fieldset id="ai_an_health_service_eligible_question" class="pb-4 driver-question">
-        <legend class="weight-n instruction-row"><%= l10n("faa.indian_health_service_eligible") %></legend>
+        <legend class="weight-n instruction-row required"><%= l10n("faa.indian_health_service_eligible") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3">
-            <%= radio_button_tag("health_service_eligible", true, @applicant.health_service_eligible) %>            
+            <%= radio_button_tag("health_service_eligible", true, @applicant.health_service_eligible) %>
             <span><%= l10n("yes") %></span>
           </label>
           <label class="radio mr-3">
@@ -69,7 +69,7 @@
       </div>
 
       <fieldset id="ai_an_health_service_through_referral_question" class="pb-4 driver-question">
-        <legend class="weight-n instruction-row"><%= l10n("faa.indian_health_service") %></legend>
+        <legend class="weight-n instruction-row required"><%= l10n("faa.indian_health_service") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3">
             <%= radio_button_tag("health_service_through_referral", true, @applicant.health_service_through_referral) %>
@@ -99,7 +99,7 @@
       </fieldset>
 
       <fieldset id="immigration_status_changed_question" class="pb-4 driver-question">
-        <legend class="instruction-row weight-n"><%= l10n("faa.immigration_status_changed") %></legend>
+        <legend class="instruction-row weight-n required"><%= l10n("faa.immigration_status_changed") %></legend>
         <div class="focus d-flex mt-3 instruction-row">
           <label class="radio mr-3" for="immigration_status_changed_true">
             <input id="immigration_status_changed_true" type="radio" value="true" name="immigration_status_changed" <%='checked' if @applicant.immigration_status_changed == true %>>
@@ -116,7 +116,7 @@
     <% if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible) %>
       <div id="has_eligible_medicaid_cubcare_question" class="pb-4 driver-question">
         <fieldset>
-          <legend class="instruction-row weight-n"><%= l10n("faa.medicaid_not_eligible") %></legend>
+          <legend class="instruction-row weight-n required"><%= l10n("faa.medicaid_not_eligible") %></legend>
           <div class="focus d-flex mt-3 instruction-row">
             <label class="radio mr-3" for="has_eligible_medicaid_cubcare_true">
               <input id="has_eligible_medicaid_cubcare_true" type="radio" value="true" name="has_eligible_medicaid_cubcare" <%='checked' if @applicant.has_eligible_medicaid_cubcare == true %>>
@@ -141,7 +141,7 @@
 
         <div id="eligibility-change-question" class="pt-4 instruction-row">
           <fieldset>
-            <legend class="weight-n instruction-row"><%=l10n("faa.change_eligibility_status")%></legend>
+            <legend class="weight-n instruction-row required"><%=l10n("faa.change_eligibility_status")%></legend>
             <div class="focus d-flex mt-3">
               <label class="radio mr-3" for="has_eligibility_changed_true">
                 <input id="has_eligibility_changed_true" type="radio" value="true" name="has_eligibility_changed" <%='checked' if @applicant.has_eligibility_changed? %>>
@@ -167,7 +167,7 @@
 
           <div id="household-income-size-changed" class="pt-4 instruction-row">
             <fieldset>
-              <legend class="weight-n instruction-row"><%=l10n("faa.household_income_changed")%></legend>
+              <legend class="weight-n instruction-row required"><%=l10n("faa.household_income_changed")%></legend>
               <div class="focus d-flex mt-3">
                 <label class="radio mr-3">
                   <input id="has_household_income_changed_true" type="radio" value="true" name="has_household_income_changed" <%='checked' if @applicant.has_household_income_changed? %>>
