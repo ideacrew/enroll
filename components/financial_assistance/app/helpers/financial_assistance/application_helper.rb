@@ -463,9 +463,9 @@ module FinancialAssistance
     end
 
     def insurance_kind_select_options(kind)
-      FinancialAssistance::Benefit.valid_insurance_kinds.map { |insurance_kind|
+      FinancialAssistance::Benefit.valid_insurance_kinds.map do |insurance_kind|
         [hr_kind(kind, insurance_kind), insurance_kind, {:'data-esi' => display_esi_fields?(insurance_kind, kind), :'data-mvsq' => display_minimum_value_standard_question?(insurance_kind)}]
-      }
+      end
     end
   end
 end
