@@ -22,7 +22,7 @@
     <dd><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></dd>
   </dl>
 
-  <% if @person.has_active_consumer_role? && (@tax_household.present? || @aptc_grants.present?) && @market_kind == "individual" %>
+  <% if @person.has_active_consumer_role? && (@tax_household.present? || @aptc_grants.present?) && @market_kind == "individual" && @plan.metal_level != "catastrophic" && @plan.kind&.to_s != "dental" %>
     <div class="mb-4">
       <% is_ivl_osse_filter_eligible = ivl_osse_filtering_enabled? && @enrollment.ivl_osse_eligible? %>
       <h3><%= l10n('insured.plan_shoppings.thankyou.applied_credits') %></h3>
@@ -32,7 +32,8 @@
           <dt><%= l10n('insured.plan_shoppings.thankyou.total_credit') %>:</dt>
           <dd><%= number_to_currency(@max_aptc, precision: 2) %></dd>
           <dt><%= l10n('insured.plan_shoppings.thankyou.max_credit') %>:</dt>
-          <% per_plan_max = @plan.total_premium > @max_aptc ? @max_aptc : (@plan.total_premium - 1).round(2) %>
+          <% shopping_premium = shopping_group_premium(@plan.total_employee_cost, @plan.total_ehb_premium, @plan.total_childcare_subsidy_amount, @plan.can_use_aptc?) %>
+          <% per_plan_max = shopping_premium > @max_aptc ? @max_aptc : shopping_premium %>
           <dd><%= number_to_currency(per_plan_max) %></dd>
         </dl>
         <p><%= l10n("insured.plan_shoppings.thankyou.aptc_instructions") %></p>
@@ -48,7 +49,7 @@
             <% step = is_ivl_osse_filter_eligible ? 1 : 1 %>
             <% pct = @max_aptc > 0 ? (@elected_aptc/@max_aptc).round(2) : 0 %>
             <label for="elected_aptc_pct" class="required"><%= l10n('insured.plan_shoppings.thankyou.percent_applied') %></label>
-            <input max="100" min="<%= min_aptc %>" name="elected_aptc_pct" id="elected_aptc_pct" step="<%= step %>" type="number" value="<%= number_with_precision(pct * 100, precision: 2) %>" class="w-100 thankyou">
+            <input max="100" min="<%= min_aptc %>" name="elected_aptc_pct" id="elected_aptc_pct" step="<%= step %>" type="number" value="<%= number_with_precision(pct * 100, precision: 0) %>" class="w-100 thankyou">
           </div>
           <div class="mr-3">
             <label for="elected_aptc_value" class="required"><%= l10n('insured.plan_shoppings.thankyou.amount_applied') %></label>
