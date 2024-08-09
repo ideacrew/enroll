@@ -13,7 +13,7 @@ Feature: Individual market with duplicate enrollments
     And user registers as an individual
     And Individual clicks on the Continue button of the Account Setup page
     Then Individual sees form to enter personal information
-    
+
   Scenario: Individual adds dependent and shops for a plan. Dependent creates account, shops for a plan and sees duplicate enrollment warning
     When the individual clicks continue on the personal information page
     And Individual agrees to the privacy agreeement
@@ -41,8 +41,8 @@ Feature: Individual market with duplicate enrollments
     And Individual answers the questions of the Identity Verification page and clicks on submit
     Then Individual is on the Help Paying for Coverage page
     When Individual does not apply for assistance and clicks continue
-    And the Individual clicks CONTINUE
-    And Individual clicks on the continue button
+    And Individual continues again
+    And Individual continues again
     And Individual selects a plan on plan shopping page
     Then Individual should see Duplicate Enrollment warning in the Confirmation page
 
