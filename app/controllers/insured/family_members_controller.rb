@@ -13,6 +13,8 @@ class Insured::FamilyMembersController < ApplicationController
   before_action :set_dependent_and_family, only: [:destroy, :show, :edit, :update]
   before_action :set_cache_headers, only: [:edit, :new]
 
+  helper_method :organize_ssn_params
+
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
   def index
@@ -171,6 +173,7 @@ class Insured::FamilyMembersController < ApplicationController
     set_view_person
 
     @bs4 = true if params[:bs4] == "true"
+
     respond_to do |format|
       format.html { render 'edit.js.erb' }
       format.js { render 'edit.js.erb' }
