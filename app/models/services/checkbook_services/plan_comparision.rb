@@ -13,7 +13,8 @@ module Services
       REMOTE_ACCESS_KEY = Rails.application.config.checkbook_services_remote_access_key
       CS_REFERENCE_ID = Rails.application.config.checkbook_services_reference_id
 
-      def initialize(hbx_enrollment, plans = nil, is_congress = false)
+      def initialize(hbx_enrollment, plans = nil, is_congress = nil)
+        is_congress ||= false
         @plans = plans
         @hbx_enrollment = hbx_enrollment
         if @hbx_enrollment.kind.downcase == "individual"

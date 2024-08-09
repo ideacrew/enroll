@@ -376,6 +376,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
   end
 
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
   def show_shop(_hbx_enrollment_id)
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
     @hbx_enrollment.update_osse_childcare_subsidy
@@ -413,6 +414,7 @@ class Insured::PlanShoppingsController < ApplicationController
     render "show"
     ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
   def fix_member_dates(enrollment, plan)
     return if enrollment.parent_enrollment.present? && plan.id == enrollment.parent_enrollment.product_id
@@ -527,9 +529,10 @@ class Insured::PlanShoppingsController < ApplicationController
 
   # no dental as of now
   def sort_member_groups(products)
-    products.select { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s } + products.select do |prod|
-                                                                                                                         prod.group_enrollment.product.id.to_s != @enrolled_hbx_enrollment_plan_ids.first.to_s
-                                                                                                                       end.sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
+    unsorted = products.select { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s } + products.reject do |prod|
+      prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s
+    end
+    unsorted.sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
   end
 
   def sort_by_standard_plans(plans)
