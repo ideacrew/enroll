@@ -1,6 +1,7 @@
 Feature: Insured Plan Shopping on Individual market
   Background:
     Given bs4_consumer_flow feature is disable
+    Given choose_shopping_method feature is disabled
     Given the FAA feature configuration is enabled
     Given individual Qualifying life events are present
     Given Individual has not signed up as an HBX user
@@ -31,7 +32,7 @@ Feature: Insured Plan Shopping on Individual market
     And Individual clicks on purchase button on confirmation page
     Then Individual clicks on the Continue button to go to the Individual home page
     Then Individual should land on Home page
-    
+
   Scenario: New insured user selects none of the situations listed in qle carousel
     When the individual clicks continue on the personal information page
     And the person named Patrick Doe is RIDP verified
@@ -43,7 +44,7 @@ Feature: Insured Plan Shopping on Individual market
     When Individual clicks on None of the situations listed above apply checkbox
     And Individual clicks Back to my account button
     Then Individual should land on Home page
-  
+
   Scenario: New insured user selects qle
     Given is your health coverage expanded question is disable
     When the individual clicks continue on the personal information page
