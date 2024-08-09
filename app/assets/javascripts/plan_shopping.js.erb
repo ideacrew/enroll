@@ -257,8 +257,8 @@ $(function() {
     var max = parseFloat($('input#elected_aptc_value').attr('max'));
     var elected_pct = $("input[name='elected_aptc_pct']").val() / 100;
     var elected_amount = parseFloat($('#max_aptc').attr('value')).toFixed(2) * parseFloat(elected_pct).toFixed(2);
-    if (elected_amount <= 1) {
-      elected_amount = 1.00;
+    if (elected_amount <= 0) {
+      elected_amount = 0;
     }
     if (elected_amount > max) {
       elected_amount = max;
@@ -272,13 +272,13 @@ $(function() {
     var elected_aptc = $(this).val();
     var max = $('input#elected_aptc_value').attr('max');
     var max_aptc = $('input#max_aptc').val();
-    elected_pct = (elected_aptc/max_aptc).toFixed(2) * 100;
+    elected_pct = (elected_aptc/max_aptc).toFixed(1) * 100;
     if (elected_pct <= 0) {
       elected_amount = 0;
     }
     if (elected_pct > 100) {
       elected_pct = 100;
-      $('#elected_aptc_value').val(max);
+      $('#elected_aptc_value').val(max_aptc);
     }
     $("input[name='elected_aptc_pct']").val(elected_pct);
   });

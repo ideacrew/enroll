@@ -11,12 +11,12 @@ class Insured::PlanShoppingsController < ApplicationController
   include L10nHelper
 
   before_action :find_hbx_enrollment
-  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback]
-  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback]
-  before_action :validate_rating_address, only: [:show]
-  before_action :check_enrollment_state, only: [:show, :thankyou]
-  before_action :set_cache_headers, only: [:show, :thankyou]
-  before_action :enable_bs4_layout, only: [:show, :plans, :receipt, :thankyou] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :set_current_person, :only => [:receipt, :thankyou, :waive, :show, :plans, :checkout, :terminate, :plan_selection_callback, :choose_shopping_method]
+  before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt, :set_elected_aptc, :plan_selection_callback, :choose_shopping_method]
+  before_action :validate_rating_address, only: [:show, :choose_shopping_method]
+  before_action :check_enrollment_state, only: [:show, :thankyou, :choose_shopping_method]
+  before_action :set_cache_headers, only: [:show, :thankyou, :choose_shopping_method]
+  before_action :enable_bs4_layout, only: [:show, :plans, :receipt, :thankyou, :choose_shopping_method] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
   layout :resolve_layout
 
@@ -37,11 +37,9 @@ class Insured::PlanShoppingsController < ApplicationController
 
     qle = (plan_selection.hbx_enrollment.enrollment_kind == "special_enrollment")
 
-    if !plan_selection.hbx_enrollment.can_select_coverage?(qle: qle)
-      if plan_selection.hbx_enrollment.errors.present?
-        flash[:error] = plan_selection.hbx_enrollment.errors.full_messages
-      end
-        redirect_back(fallback_location: :back)
+    unless plan_selection.hbx_enrollment.can_select_coverage?(qle: qle)
+      flash[:error] = plan_selection.hbx_enrollment.errors.full_messages if plan_selection.hbx_enrollment.errors.present?
+      redirect_back(fallback_location: :back)
       return
     end
 
@@ -97,7 +95,7 @@ class Insured::PlanShoppingsController < ApplicationController
       get_aptc_info_from_session(@enrollment)
     end
 
-    # TODO Fix this stub
+    # TODO: Fix this stub
     if @enrollment.is_shop?
       @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
       @enrollment.verify_and_reset_osse_subsidy_amount(@member_group)
@@ -111,7 +109,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @family = @person.primary_family
 
-    #FIXME need to implement can_complete_shopping? for individual
+    #FIXME: need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
     @change_plan =
@@ -293,6 +291,21 @@ class Insured::PlanShoppingsController < ApplicationController
   end
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
+  def choose_shopping_method
+    authorize @hbx_enrollment, :show?
+
+    set_consumer_bookmark_url(family_account_path)
+    set_admin_bookmark_url(family_account_path)
+
+    hbx_enrollment_id = params.require(:id)
+    @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+
+    set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
+    generate_eligibility_data
+    generate_checkbook_service
+  end
+
   private
 
 
@@ -363,7 +376,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
   end
 
-  def show_shop(hbx_enrollment_id)
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+  def show_shop(_hbx_enrollment_id)
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
     @hbx_enrollment.update_osse_childcare_subsidy
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
@@ -400,6 +414,7 @@ class Insured::PlanShoppingsController < ApplicationController
     render "show"
     ::Caches::CustomCache.release(::BenefitSponsors::Organizations::Organization, :plan_shopping)
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
   def fix_member_dates(enrollment, plan)
     return if enrollment.parent_enrollment.present? && plan.id == enrollment.parent_enrollment.product_id
@@ -443,7 +458,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def generate_checkbook_service
-    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment)
+    plan_comparision_obj = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, @plans)
     plan_comparision_obj.elected_aptc = session[:elected_aptc]
     @dc_individual_checkbook_url = plan_comparision_obj.generate_url
   end
@@ -514,7 +529,10 @@ class Insured::PlanShoppingsController < ApplicationController
 
   # no dental as of now
   def sort_member_groups(products)
-    products.select { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s } + products.select { |prod| prod.group_enrollment.product.id.to_s != @enrolled_hbx_enrollment_plan_ids.first.to_s }.sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
+    unsorted = products.select { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s } + products.reject do |prod|
+      prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s
+    end
+    unsorted.sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
   end
 
   def sort_by_standard_plans(plans)
@@ -621,9 +639,9 @@ class Insured::PlanShoppingsController < ApplicationController
       if @hbx_enrollment.is_shop?
         ref_plan = (@hbx_enrollment.coverage_kind == "health" ? @benefit_group.reference_plan : @benefit_group.dental_reference_plan)
 
-        @enrolled_plans = enrolled_plans.collect{|plan|
+        @enrolled_plans = enrolled_plans.collect do |plan|
           @benefit_group.decorated_plan(plan, same_plan_enrollment, ref_plan)
-        }
+        end
       else
         @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       end

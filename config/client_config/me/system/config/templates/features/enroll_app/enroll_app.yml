@@ -413,18 +413,6 @@ registry:
       - key: :bs4_consumer_flow
         item: :bs4_consumer_flow
         is_enabled: <%= ENV['BS4_CONSUMER_FLOW_IS_ENABLED'] || false %>
-      - key: :bs4_broker_flow
-        item: :bs4_broker_flow
-        is_enabled: <%= ENV['BS4_BROKER_FLOW_IS_ENABLED'] || false %>
-      - key: :bs4_admin_flow
-        item: :bs4_admin_flow
-        is_enabled: <%= ENV['BS4_ADMIN_FLOW_IS_ENABLED'] || false %>
-  - namespace:
-      - :bootstrap_4
-    features:
-      - key: :bs4_consumer_flow
-        item: :bs4_consumer_flow
-        is_enabled: <%= ENV['BS4_CONSUMER_FLOW_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
@@ -932,10 +920,4 @@ registry:
       - key: :enable_call_hub_for_ai_an
         item: :enable_call_hub_for_ai_an
         is_enabled: <%= ENV['ENABLE_CALL_HUB_FOR_AI_AN'] || false %>
-      - key: :mask_ssn_ui_fields
-        item: :mask_ssn_ui_fields
-        is_enabled: <%= ENV['MASK_SSN_UI_FIELDS'] || false %>
-      - key: :ssn_ui_fields
-        item: :ssn_ui_fields
-        is_enabled: <%= ENV['SSN_UI_FIELDS'] || false %>
 

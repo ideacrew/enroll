@@ -1,5 +1,6 @@
 Feature: Employee products sorted when employee click on Plan name, Premium Amount, Deductible and Carrier.
     Given bs4_consumer_flow feature is disable
+    Given choose_shopping_method feature is disabled
     Given Employer exists with enrolling plan year
     Given New Employee is on Census Employee Roster
     Given New Employee claimed his employee role

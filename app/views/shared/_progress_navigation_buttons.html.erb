@@ -18,7 +18,9 @@
   <% end %>
 
   <% unless dont_show_next_button %>
-    <% if confirmation_link %>
+    <% if content_for? :submit_button %>
+      <%= yield :submit_button %>
+    <% elsif confirmation_link %>
       <%= h(link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), class: "btn disabled confirm-button", id: 'btn-continue', method: :post, disabled: !@enrollable) %>
     <% elsif !button_type.nil? %>
       <button id=<%= button_id %> <%= "disabled=#{disable_link}" if disable_link == true %> type="<%= button_type %>" method="<%= link_method %>">

@@ -119,16 +119,14 @@ module Services
           "enrollmentId": @hbx_enrollment.id.to_s # Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
         }
         ivl_body.merge!(extra_ivl_body) if EnrollRegistry.feature_enabled?(:send_extra_fields_to_checkbook)
-        ivl_body
       end
 
       def extra_ivl_body
-        fields = {
-          "enrollmentDate": @hbx_enrollment.effective_on&.strftime("%m/%d/%Y")
-        }
         current_plan = build_current_plan(@hbx_enrollment)
-        fields[:currentPlan] = current_plan if current_plan.present?
-        fields
+        {
+          "coverageStartDate": @hbx_enrollment.effective_on.strftime("%m-%d-%Y"),
+          "currentPlan": current_plan
+        }
       end
 
       def construct_body_congress
@@ -233,8 +231,8 @@ module Services
       def build_current_plan(enrollment)
         return "" unless @plans
         available_plans = @plans.map(&:hios_id)
-        enrolled_plan = enrollment.family.checkbook_enrollments(enrollment)&.map(&:hios_id)&.first
-        return "" unless enrolled_plan && available_plans&.include?(enrolled_plan)
+        enrolled_plan = enrollment.family.current_enrolled_or_termed_products_by_subscriber(enrollment)&.map(&:hios_id)&.first
+        return "" unless available_plans&.include?(enrolled_plan)
         enrolled_plan
       end
 
