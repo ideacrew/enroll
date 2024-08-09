@@ -52,7 +52,7 @@
               <%= plan.standard_plan_label.titleize %>
             </span>
           <% end %>
-          <% @person.primary_family.enrolled_hbx_enrollments.map(&:product).map(&:id).include?(plan.id) %>
+          <% if @person.primary_family.enrolled_hbx_enrollments.map(&:product).map(&:id).include?(plan.id) %>
             <span class="badge badge-pill badge-lg badge-current-plan ml-2 d-flex align-items-center">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <title>Star</title>
@@ -136,7 +136,7 @@
           <% end %>
         </div>
         <% if details_page %>
-            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: plan } %>
+          <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: plan } %>
         <% else %>
           <% if (@tax_household || @aptc_grants) && params[:market_kind]=='individual' && params[:coverage_kind] == 'health' %>
             <% if @csr_available && plan.metal_level != "silver" %>
@@ -175,7 +175,7 @@
       </div>
       <div class="row">
         <% if @enrolled_hbx_enrollment_plan_ids.include?(plan.id) %>
-            <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i><%= l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase %></h5>
+          <h5 class="col-md-12 current bg-title"><i class="fa fa-star fa-lg enrolling"></i><%= l10n("your_current_plan", year: plan.try(:active_year)).to_s.upcase %></h5>
         <% end %>
       </div>
       <div class="row">
