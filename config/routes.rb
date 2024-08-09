@@ -260,6 +260,7 @@ Rails.application.routes.draw do
         post 'terminate'
         post 'set_elected_aptc'
         get 'plan_selection_callback'
+        get 'choose_shopping_method'
       end
     end
 
