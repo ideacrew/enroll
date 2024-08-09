@@ -760,12 +760,17 @@ document.addEventListener("turbolinks:load", function() {
     });
   }
 
+  // masks from `application.js.erb` seem to be broken on the cloned forms, redefining the masks on the focus events seems to be the only reliable fix
   $(document).on('focus', '.phone_number', function () {
     $(this).mask('(000) 000-0000');
   });
 
   $(document).on('focus', '.fien_field', function () {
     $(this).mask('99-9999999');
+  });
+
+  $(document).on('focus', '.zip', function () {
+    $(this).mask("99999");
   });
 
   $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
