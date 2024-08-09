@@ -1,6 +1,7 @@
 PLAN_TRANSLATIONS = {
   'en.plans.plan_results' => 'Plan Results',
   'en.plans.shop_now' => 'Shop Now',
+  'en.plans.filter_sort' => 'Filter & Sort',
   'en.plans.if_you' => 'If you',
   'en.plans.qualify_for_new_sep' => 'Qualify for New SEP',
   'en.plans.plan_contact_info' => 'Plan Contact Info',
