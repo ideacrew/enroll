@@ -2,6 +2,7 @@ Feature: Ability for employer to create an off-cycle benefit application and all
 
   Background: Setup site, employer, and benefit market catalogs
     Given the shop market configuration is enabled
+    Given choose_shopping_method feature is disabled
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     And benefit market catalog exists for enrollment_open renewal employer with health benefits
@@ -66,7 +67,7 @@ Feature: Ability for employer to create an off-cycle benefit application and all
     Then employee should see the "my account" page
     And employee Patrick Doe of employer ABC Widgets most recent HBX Enrollment should be under the off cycle benefit application
 
-    
+
   Scenario: Renewal Employer is terminated. Employer is able to create off-cycle benefit application and employees are able to plan shop
     Given Qualifying life events are present
     And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
