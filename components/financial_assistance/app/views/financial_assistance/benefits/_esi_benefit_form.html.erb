@@ -39,7 +39,7 @@
             <%= address_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), {prompt: l10n("choose")}, {id: "state|#{form_id}", :required => required} %>
           </div>
           <div class="d-flex flex-column col-3 px-0">
-            <%= address_fields.label :zip, l10n("zip"), for: "zip|#{form_id}", class: "#{"required" if required}" %>
+            <%= address_fields.label :zip, l10n("zip"), for: "zip|#{form_id}", class: "zip #{"required" if required}" %>
             <%= address_fields.text_field :zip, placeholder: l10n('zip'), required: required, value: benefit.employer_address.try(:zip), class: "zip", id: "zip|#{form_id}" %>
           </div>
         </div>
