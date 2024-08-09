@@ -4,8 +4,9 @@
   }
 }
 @media print {
-  html, body {
-    height:100vh;
+  html,
+  body {
+    height: 100vh;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden;
@@ -17,13 +18,14 @@
   body * {
     visibility: hidden;
   }
-  #printSection, #printSection * {
+  #printSection,
+  #printSection * {
     visibility: visible;
   }
   #printSection {
-    position:absolute;
-    left:0;
-    top:0;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
   #printArea {
     display: none !important;
@@ -31,7 +33,15 @@
   #printSection #printArea {
     display: block !important;
   }
-  #btnPrint, nav, header, footer, .progress-nav-container  {
-    display: none  !important;
+  #btnPrint,
+  nav,
+  header,
+  footer,
+  .progress-nav-container {
+    display: none !important;
+  }
+
+  .no-print {
+    display: none !important;
   }
 }
