@@ -283,6 +283,15 @@ module ApplicationHelper
     end
   end
 
+  def organize_ssn_params(form_object)
+    if form_object.ssn
+      presenter = ::Presenters::SsnFormPresenter.new(form_object, current_user)
+      presenter.sanitize_ssn_params
+    else
+      {}
+    end
+  end
+
   # Formats a number into a nine-digit US Federal Entity Identification Number string (nn-nnnnnnn)
   def number_to_fein(number)
     return unless number
