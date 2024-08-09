@@ -54,6 +54,12 @@ table {
   }
 }
 
+#plan-details-modal {
+  .modal-footer {
+    border-top-width: 0;
+  }
+}
+
 .compare-table.table {
   // th, td {
   //   border-top: none;
