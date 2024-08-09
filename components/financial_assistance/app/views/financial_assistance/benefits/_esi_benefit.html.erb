@@ -2,7 +2,7 @@
   <div id="<%= dom_id benefit %>" class="benefit">
     <% is_hra = insurance_kind == "health_reimbursement_arrangement" %>
     <div class="my-4 p-3 border rounded bg-white benefit-show" data-cuke="esi_benefit" data-esi="true" data-hra=<%= is_hra %> data-mvsq=<%= display_minimum_value_standard_question?(insurance_kind) %>>
-      <h2><%= insurance_kind.humanize.titlecase %></h2>
+      <h2><%= hr_kind(kind, insurance_kind) %></h2>
       <h3><%= benefit.employer_name %></h3>
       <dl class="parent mb-4">
         <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
