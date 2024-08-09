@@ -55,27 +55,27 @@ table {
 }
 
 .compare-table.table {
-  th, td {
-    border-top: none;
-    border-bottom: none;
-  }
-  tr.left-border-all td:not(.th):nth-child(1n+1) {
-    border-right: 1px solid var(--grey-060);
-  }
-  tr:not(.left-border-all) td:not(.th):nth-child(1n+1) {
-    border-right: 1px solid var(--grey-030);
-  }
-  tr:not(.left-border-all) td:not(.th):nth-child(2n+1) {
-    border-right: 1px solid var(--grey-060);
-  }
-  tr.left-border-all td:last-of-type, tr:not(.left-border-all) td:last-of-type {
-    border-right: none;
-  }
-  th, .th {
-    background: var(--grey-010);
-    font-weight: 600;
-  }
-  tr:not(.left-border-all) .th {
-    border-right: 1px solid var(--grey-030);
-  }
+  // th, td {
+  //   border-top: none;
+  //   border-bottom: none;
+  // }
+  // tr.left-border-all td:not(.th):nth-child(1n+1) {
+  //   border-right: 1px solid var(--grey-060);
+  // }
+  // tr:not(.left-border-all) td:not(.th):nth-child(1n+1) {
+  //   border-right: 1px solid var(--grey-030);
+  // }
+  // tr:not(.left-border-all) td:not(.th):nth-child(2n+1) {
+  //   border-right: 1px solid var(--grey-060);
+  // }
+  // tr.left-border-all td:last-of-type, tr:not(.left-border-all) td:last-of-type {
+  //   border-right: none;
+  // }
+  // th, .th {
+  //   background: var(--grey-010);
+  //   font-weight: 600;
+  // }
+  // tr:not(.left-border-all) .th {
+  //   border-right: 1px solid var(--grey-030);
+  // }
 }
