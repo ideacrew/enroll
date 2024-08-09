@@ -7,10 +7,14 @@ RSpec.describe ::Operations::HbxAdmin::TimeJump, dbclean: :after_each do
   let(:params) { { new_date: new_date.strftime('%Y-%m-%d').to_s } }
   let(:result) { subject.call(params) }
 
+  after :each do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
   describe 'with valid params' do
     it 'advances the date of record to the new date' do
       expect(result.success?).to be_truthy
-      expect(result.value!).to eq("Time Hop is successful, Date is advanced to #{new_date.strftime('%m/%d/%Y')}")
+      expect(result.value!).to eq("Time Jump is successful, Date is advanced to #{new_date.strftime('%m/%d/%Y')}")
     end
   end
 
