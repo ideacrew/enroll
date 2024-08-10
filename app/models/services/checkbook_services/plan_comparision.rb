@@ -119,6 +119,7 @@ module Services
           "enrollmentId": @hbx_enrollment.id.to_s # Host Name will be static as Checkbook suports static URL's and hostname should be changed before going to production.
         }
         ivl_body.merge!(extra_ivl_body) if EnrollRegistry.feature_enabled?(:send_extra_fields_to_checkbook)
+        ivl_body
       end
 
       def extra_ivl_body
