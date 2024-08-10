@@ -20,8 +20,8 @@
       <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Plan Shopping", hbx_enrollment: @enrollment }%>
     </div>
     <!-- modal -->
-    <div id="how_to_pay" class="modal" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
-        <div class="modal-dialog">
+    <div id="how_to_pay" class="modal" role="dialog" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
+        <div class="modal-dialog no-print">
           <div class="modal-content">
             <div class="d-flex mb-4 align-items-center modal-header">
               <div class="col pl-0">
@@ -159,9 +159,9 @@
     <% end %>
 
     <p><%= l10n("plans.plan_shopping.receipt.when_finished")%></p>
-    <div class="mt-4">
+    <div class="mt-4 no-print">
       <%= h(link_to l10n("plans.plan_shopping.receipt.print"), '#', id: 'btnPrint', class: "btn outline interaction-click-control-print-purchase-confirmation mr-2") %>
-      <%= h(link_to l10n("go_to_my_account"), main_app.family_account_path, class: "btn secondary text-center", id: 'btn-continue') %>
+      <%= h(link_to l10n("exceptions.go_to_my_account"), main_app.family_account_path, class: "btn secondary text-center", id: 'btn-continue') %>
     </div>
   </div>
 <% else %>
