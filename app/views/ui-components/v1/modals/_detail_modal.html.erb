@@ -1,38 +1,38 @@
 <% if @bs4 %>
-<div class="modal" id="plan-details-modal">
-  <div class="modal-dialog modal-lg">
-    <div class="container pt-2 pb-4 modal-content">
-      <div class="modal-header d-flex mb-4 align-items-center">
-        <div class="col-auto px-0">
-          <div class="info-icon icon" alt="Info">&nbsp;</div>
+  <div class="modal" id="plan-details-modal">
+    <div class="modal-dialog modal-xl">
+      <div class="container pt-2 pb-4 modal-content">
+        <div class="modal-header d-flex mb-4 align-items-center">
+          <div class="col-auto px-0">
+            <div class="info-icon icon" alt="Info"></div>
+          </div>
+          <div class="col pr-0">
+            <h5 class="m-0"><%= l10n("plans.compare_selected") %></h5>
+          </div>
+          <div class="col-auto px-0 d-flex align-items-center">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
+            </button>
+          </div>
         </div>
-        <div class="col pr-0">
-          <h5 class="m-0"><%= l10n("plans.compare_selected") %></h5>
+        <div class="container-fluid" id="plan-details-modal-body">
         </div>
-        <div class="col-auto px-0 d-flex align-items-center">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <div class="close-icon icon align-self-start m-0" aria-hidden="true">&nbsp;</div>
-          </button>
-        </div>
-      </div>
-      <div class="container-fluid" id="plan-details-modal-body">
       </div>
     </div>
   </div>
-</div>
 <% else %>
-<div class="modal" id="plan-details-modal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header border-bottom-0">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h4 class="modal-title"><%= l10n("plan_details") %></h4>
-      </div>
-      <div class="container-fluid" id="plan-details-modal-body">
+  <div class="modal" id="plan-details-modal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-bottom-0">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title"><%= l10n("plan_details") %></h4>
+        </div>
+        <div class="container-fluid" id="plan-details-modal-body">
+        </div>
       </div>
     </div>
   </div>
-</div>
 <% end %>
