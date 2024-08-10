@@ -23,7 +23,7 @@
       <div class="d-flex mb-md-4 row col-sm">
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
-          <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
+          <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true, disabled: true, readonly: f.object.is_a?(Forms::EmployeeRole) || f.object.is_a?(Person) %>
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :gender, l10n("gender"), class: 'required'  %>
@@ -37,9 +37,9 @@
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
           <%= f.label :ssn, "Social Security" %>
           <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label",
+            <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label disabled",
               pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-              oninput: "this.setCustomValidity('')", disabled: true, readonly: f.object.is_a?(Forms::EmployeeRole) %>
+              oninput: "this.setCustomValidity('')", disabled: true, readonly: f.object.is_a?(Forms::EmployeeRole) || f.object.is_a?(Person) %>
           <% else %>
             <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: true,
               readonly: f.object.is_a?(Forms::EmployeeRole) %>
@@ -136,7 +136,7 @@
       }
     });
 
-    $(document).off('click', '.confirm-member'); 
+    $(document).off('click', '.confirm-member');
     $(document).on('click', '.confirm-member', function(e) {
       $("#save_personal").click();
     });
