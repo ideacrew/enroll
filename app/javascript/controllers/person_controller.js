@@ -7,7 +7,7 @@ export default class extends Controller {
     const target = $(event.target);
     const personId = target.data('id');
     const familyId = target.data('family-id');
-    const subjectType = target.data('type');
+    console.log("HULLO!!!");
 
     if (personId == 'temp') {
       this.showSsnInput(personId);
@@ -16,8 +16,7 @@ export default class extends Controller {
         method: 'GET',
         url: `/insured/family_members/${personId}/show_ssn`,
         params: {
-          family_id: familyId,
-          type: subjectType
+          family_id: familyId
         },
         headers: {
           'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content

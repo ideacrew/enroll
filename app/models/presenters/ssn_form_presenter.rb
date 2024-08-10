@@ -38,7 +38,6 @@ module Presenters
       when 'FinancialAssistance::Applicant'
         sanitize_applicant
       end
-
       self
     end
 

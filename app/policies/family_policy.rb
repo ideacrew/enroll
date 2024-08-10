@@ -70,9 +70,11 @@ class FamilyPolicy < ApplicationPolicy
   def can_show_ssn?
     if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
       return true if individual_market_admin?
-      return true if shop_market_admin?
-
       return true if individual_market_non_ridp_primary_family_member?
+      return true if active_associated_individual_market_family_broker?
+
+      return true if shop_market_admin?
+      return true if shop_market_primary_family_member?
     end
 
     false
