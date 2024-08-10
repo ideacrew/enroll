@@ -54,6 +54,10 @@ $(document).on('page:load turbolinks:load', function () {
   indicateRequiredFields();
 });
 
+$(document).ready(function() {
+  console.log("So uhhh hey does this work?");
+})
+
 function indicateRequiredFields() {
   $('label.required, legend.required').each(function() {
     if ($(this).find('.sr-only').length == 0) {

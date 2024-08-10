@@ -1,6 +1,7 @@
 initializeCharts = ->
   $('.effective-datatables-chart').each ->
     $chart = $(this)
+    console.log('ayo whatup')
 
     data = $chart.data('data') || []
     type = $chart.data('type') || 'BarChart'
