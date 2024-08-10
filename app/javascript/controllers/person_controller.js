@@ -7,7 +7,6 @@ export default class extends Controller {
     const target = $(event.target);
     const personId = target.data('id');
     const familyId = target.data('family-id');
-    console.log("HULLO!!!");
 
     if (personId == 'temp') {
       this.showSsnInput(personId);
