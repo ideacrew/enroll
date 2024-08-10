@@ -32,8 +32,7 @@
           <dt><%= l10n('insured.plan_shoppings.thankyou.total_credit') %>:</dt>
           <dd><%= number_to_currency(@max_aptc, precision: 2) %></dd>
           <dt><%= l10n('insured.plan_shoppings.thankyou.max_credit') %>:</dt>
-          <% shopping_premium = shopping_group_premium(@plan.total_employee_cost, @plan.total_ehb_premium, @plan.total_childcare_subsidy_amount, @plan.can_use_aptc?) %>
-          <% per_plan_max = shopping_premium > @max_aptc ? @max_aptc : shopping_premium %>
+          <% per_plan_max = @plan.total_premium > @max_aptc ? @max_aptc : (@plan.total_premium - 1).round(2) %>
           <dd><%= number_to_currency(per_plan_max) %></dd>
         </dl>
         <p><%= l10n("insured.plan_shoppings.thankyou.aptc_instructions") %></p>
