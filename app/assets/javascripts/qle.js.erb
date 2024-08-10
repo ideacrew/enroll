@@ -199,12 +199,18 @@ $(function () {
     //$('#qle_flow_info #qle-menu').show();
   });
 
+  // Disable form submit on Enter - the user must manually use the Continue button to submit
   $(document).on('keydown', '#qle_form', function(e) {
+    if (bs4 && e.key == 'Enter') {
+      e.preventDefault();
+      return;
+    }
+  });
+
+  // Override above `#qle_form listener` to allow default Enter behavior for buttons and links within the form
+  $(document).on('keydown', '#qle_form a, #qle_form button', function(e) {
     if (bs4) {
       e.stopImmediatePropagation();
-      if (e.key == 'Enter') {
-        e.preventDefault();
-      }
       return;
     }
   });
