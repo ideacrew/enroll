@@ -28,8 +28,6 @@
           </div>
         <% end %>
 
-        <% readonly = dependent.id.present? %>
-
         <%= token_tag form_authenticity_token %>
 
          <div id="personal_info" class="house">
@@ -57,7 +55,7 @@
           <div class="d-flex mb-md-4">
             <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :dob, l10n("date_of_birth"), class: "required" %>
-              <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true, disabled: readonly %>
+              <%= f.date_field :dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
             </div>
             <div class="col-md-6 col-lg-3 p-0">
               <%= f.label :gender, l10n("gender"), class: 'required'  %>
@@ -73,9 +71,9 @@
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
                 <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
                   pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-                  oninput: "this.setCustomValidity('')", disabled: readonly %>
+                  oninput: "this.setCustomValidity('')" %>
               <% else %>
-                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: readonly %>
+                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required" %>
               <% end %>
             </div>
             <div class="col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
@@ -149,7 +147,7 @@
                 <%= l10n("discard_changes") %>
               <% end %>
             <% end %>
-            
+
             <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") %>
             <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')", id='confirm-dependent' class="btn btn-primary">
               <%= l10n("save_changes") %>
@@ -196,7 +194,7 @@
       });
     <% end %>
 
-    $(document).off('click', '.confirm-member'); 
+    $(document).off('click', '.confirm-member');
     $(document).on('click', '.confirm-member', function(e) {
       $("#confirm-dependent").click();
     });
