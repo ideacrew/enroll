@@ -561,7 +561,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:logged_in_primary_user) { FactoryBot.create(:user, person: person) }
 
         it 'allows access' do
-          expect(subject).not_to permit(logged_in_primary_user, family)
+          expect(subject).to permit(logged_in_primary_user, family)
         end
       end
 
