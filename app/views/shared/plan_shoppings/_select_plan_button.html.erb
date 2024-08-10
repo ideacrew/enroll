@@ -10,7 +10,6 @@
         class: 'btn btn-primary  mz plan-select interaction-click-control-select-plan'
       )
   %>
-  &nbsp;
 <% end %>
 <% else %>
   <% if @person.primary_family.enrolled_hbx_enrollments.map(&:product).map(&:id).include?(plan.id) %>
