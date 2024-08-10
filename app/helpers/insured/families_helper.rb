@@ -56,7 +56,7 @@ module Insured::FamiliesHelper
       cost = float_fix(hbx_enrollment.total_premium - [hbx_enrollment.total_ehb_premium, hbx_enrollment.applied_aptc_amount.to_f].min - hbx_enrollment.eligible_child_care_subsidy.to_f)
       cost > 0 ? cost.round(2) : 0
     end
-  rescue Exception => e
+  rescue StandardError => _e
     exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id}"
     Rails.logger.error(exception_message) unless Rails.env.test?
     puts(exception_message) unless Rails.env.test?
