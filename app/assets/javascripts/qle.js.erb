@@ -199,16 +199,22 @@ $(function () {
     //$('#qle_flow_info #qle-menu').show();
   });
 
-  // Disable form submit on pressing Enter, instead click Submit link
-  $('#qle_form').on('keydown', function(e) {
-    var code = e.keyCode || e.which;
+  $(document).on('keydown', '#qle_form', function(e) {
     if (bs4) {
-      if (e.key === 'Enter') {
+      e.stopImmediatePropagation();
+      if (e.key == 'Enter') {
         e.preventDefault();
       }
       return;
     }
+  });
 
+  // Disable form submit on pressing Enter, instead click Submit link
+  $('#qle_form').on('keydown', function(e) {
+    if (bs4) {
+      return;
+    }
+    var code = e.keyCode || e.which;
     if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
       e.preventDefault();
       $("#qle_submit").click();
@@ -226,7 +232,6 @@ $(function () {
     if(validate_qle_date_input()) {
       $('#qle_date').removeClass('input-error');
 
-      $('#date-nav').addClass('hidden');
       if(QLE.check_qle_reason()){
         check_qle_date();
       }
