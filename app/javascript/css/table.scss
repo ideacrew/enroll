@@ -34,7 +34,7 @@ table {
       padding: 0.75rem;
 
       &:first-of-type {
-        font-size: 14px;
+        font-size: 12px;
         line-height: 20px;
         font-weight: 400;
       }
@@ -61,27 +61,83 @@ table {
 }
 
 .compare-table.table {
-  // th, td {
-  //   border-top: none;
-  //   border-bottom: none;
-  // }
-  // tr.left-border-all td:not(.th):nth-child(1n+1) {
-  //   border-right: 1px solid var(--grey-060);
-  // }
-  // tr:not(.left-border-all) td:not(.th):nth-child(1n+1) {
-  //   border-right: 1px solid var(--grey-030);
-  // }
-  // tr:not(.left-border-all) td:not(.th):nth-child(2n+1) {
-  //   border-right: 1px solid var(--grey-060);
-  // }
-  // tr.left-border-all td:last-of-type, tr:not(.left-border-all) td:last-of-type {
-  //   border-right: none;
-  // }
-  // th, .th {
-  //   background: var(--grey-010);
-  //   font-weight: 600;
-  // }
-  // tr:not(.left-border-all) .th {
-  //   border-right: 1px solid var(--grey-030);
-  // }
+  /* Remove the default table properties */
+
+  border-collapse: collapse; /* Merge table borders */
+  border-spacing: 0; /* Remove spacing between cells */
+  width: 100%; /* Optional: Make table full-width */
+
+  /* Remove padding and margin from table cells */
+  th,
+  td {
+    padding: 12px;
+    margin: 0;
+    border: none; /* Optional: Remove default border */
+    text-align: left; /* Optional: Left-align text */
+    font-size: 1rem;
+  }
+
+  /* Optional: Reset table header styles */
+  th {
+    font-weight: normal;
+    background-color: transparent; /* Remove background color */
+    color: inherit; /* Inherit text color */
+  }
+
+  /* Optional: Set consistent border and background for table rows */
+  tr {
+    border: none; /* Remove default border */
+    background-color: transparent; /* Remove background color */
+  }
+
+  th {
+    background-color: var(--grey-010);
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .logo {
+    vertical-align: bottom;
+
+    img {
+      display: block;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 200px;
+      min-width: 150px;
+    }
+  }
+
+  .rb1 {
+    border-right: 1px solid var(--grey-030);
+  }
+
+  .rb2 {
+    border-right: 1px solid var(--grey-050);
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  .select-area {
+    vertical-align: middle;
+
+    a,
+    h5 {
+      display: block;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    a {
+      max-width: 260px;
+    }
+  }
+
+  .spacer {
+    height: 48px;
+  }
 }
