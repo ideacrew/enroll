@@ -26,14 +26,9 @@ describe FamilyPolicy, "given a user who is the primary member" do
   let(:permission) { instance_double(Permission, :modify_family => true) }
 
   before do
-<<<<<<< HEAD
-    allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
-    allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
-=======
     allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
     allow(person).to receive(:primary_family).and_return(family)
     allow(person).to receive(:consumer_role).and_return(consumer_role)
->>>>>>> 188071990_remove_ssn_from_admin_tables
   end
 
   subject { FamilyPolicy.new(user, family) }
@@ -566,11 +561,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:logged_in_primary_user) { FactoryBot.create(:user, person: person) }
 
         it 'allows access' do
-<<<<<<< HEAD
-          expect(subject).not_to permit(logged_in_primary_user, family)
-=======
           expect(subject).to permit(logged_in_primary_user, family)
->>>>>>> 188071990_remove_ssn_from_admin_tables
         end
       end
 
@@ -585,24 +576,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
 
       context 'when the broker is affiliated with the family' do
-<<<<<<< HEAD
-        let(:broker_person_id) { double }
-        let(:broker_agency_profile_id) { double }
-        let(:site)  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-        let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: 'shop', legal_name: 'Legal Name1', assigned_site: site) }
-        let(:broker_person) { instance_double(Person, :id => broker_person_id, :active_broker_staff_roles => [broker_agency_staff_role], :active_general_agency_staff_roles => [], :hbx_staff_role => nil) }
-        let(:broker_agency_staff_role) { instance_double(BrokerAgencyStaffRole, :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id) }
-        let(:broker_agency_account) {FactoryBot.create(:broker_agency_account, broker_agency_profile_id: broker_agency_profile_id_account, writing_agent_id: broker_role.id, is_active: true)}
-        let(:broker_agency_profile_id_account) { broker_agency_profile.id }
-        let(:broker_user) { FactoryBot.create(:user, :person => broker_person)}
-
-        before(:each) do
-          allow(broker_person).to receive(:broker_role).and_return nil
-        end
-
-        it 'denies access' do
-          expect(subject).not_to permit(broker_user, family)
-=======
         let(:person) { FactoryBot.create(:person, :with_family) }
         let(:user) { FactoryBot.create(:user, person: person) }
         let(:family) { person.primary_family }
@@ -623,7 +596,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it 'allows access' do
             expect(subject).to permit(broker_user, family)
           end
->>>>>>> 188071990_remove_ssn_from_admin_tables
         end
       end
 
