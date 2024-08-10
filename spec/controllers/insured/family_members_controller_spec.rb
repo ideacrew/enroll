@@ -1058,10 +1058,14 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             expect(response).to render_template("edit.js.erb")
           end
 
-          it ":show_ssn will not return the ssn" do
+          it ":show_ssn will return ssn" do
             get :show_ssn, params: { id: test_family.primary_person.id, family_id: test_family.id }
 
-            expect(response).to have_http_status(:unauthorized)
+            expect(response).to have_http_status(:success)
+
+            parsed_response = JSON.parse(response.body)
+            sanitized_response = parsed_response["payload"].gsub('-', '')
+            expect(test_family.primary_person.ssn).to eq(sanitized_response)
           end
         end
 
