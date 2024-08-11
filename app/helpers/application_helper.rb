@@ -1135,4 +1135,8 @@ module ApplicationHelper
       :coast_guard => "U.S. Coast Guard Merchant Mariner card"
     }
   end
+
+  def imm_docs_requried_class
+    FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required"
+  end
 end
