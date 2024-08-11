@@ -2,7 +2,7 @@
   <div class="modal-body">
     <div id="printArea">
       <p><%= l10n("plans.comparison_table.description") %></p>
-      <%= render "shared/plan_shoppings/more_plan_details" %>
+      <%= render partial: "shared/plan_shoppings/more_plan_details", locals: {dependent_modal: "false"} %>
 
       <div class="table-responsive">
         <table class="table compare-table">
