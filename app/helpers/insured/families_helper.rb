@@ -48,7 +48,7 @@ module Insured::FamiliesHelper
         render(partial: "shared/dependents_list_table", locals: {subscriber: subscriber, dependents: dependents})
     end
   end
-  
+
   # rubocop:disable Lint/RescueException, Lint/UselessAssignment
   def current_premium(hbx_enrollment)
     if hbx_enrollment.is_shop?
