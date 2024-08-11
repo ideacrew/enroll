@@ -32,23 +32,7 @@ module Insured::FamiliesHelper
     end
   end
 
-  def plan_shopping_dependent_text_without_modal(hbx_enrollment)
-    subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
-    if subscriber.present? && dependents.count == 0
-      sanitize_html("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>")
-    elsif subscriber.blank? && dependents.count == 1
-      sanitize_html("<span class='dependent-text'>#{dependents.first.person.full_name}</span>")
-    elsif subscriber.blank? && dependents.count > 1
-      sanitize_html("<span class='dependent-text'>#{dependents.first.person.full_name}</span>") +
-        link_to(pluralize(dependents.count, "dependent"), "#", id: 'dependentList') +
-        render(partial: "shared/dependents_list_table", locals: {subscriber: subscriber, dependents: dependents})
-    else
-      sanitize_html("<span class='dependent-text'>#{subscriber.first.person.full_name}</span> + ") +
-        link_to(pluralize(dependents.count, "dependent"), "#", id: 'dependentList') +
-        render(partial: "shared/dependents_list_table", locals: {subscriber: subscriber, dependents: dependents})
-    end
-  end
-
+  # rubocop:disable Lint/RescueException, Lint/UselessAssignment
   def current_premium(hbx_enrollment)
     if hbx_enrollment.is_shop?
       hbx_enrollment.total_employee_cost
@@ -56,12 +40,13 @@ module Insured::FamiliesHelper
       cost = float_fix(hbx_enrollment.total_premium - [hbx_enrollment.total_ehb_premium, hbx_enrollment.applied_aptc_amount.to_f].min - hbx_enrollment.eligible_child_care_subsidy.to_f)
       cost > 0 ? cost.round(2) : 0
     end
-  rescue StandardError => _e
+  rescue Exception => e
     exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id}"
     Rails.logger.error(exception_message) unless Rails.env.test?
     puts(exception_message) unless Rails.env.test?
     'Not Available.'
   end
+  # rubocop:enable Lint/RescueException, Lint/UselessAssignment
 
   def hide_policy_selected_date?(hbx_enrollment)
     return true if hbx_enrollment.created_at.blank?
