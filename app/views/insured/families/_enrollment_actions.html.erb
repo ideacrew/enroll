@@ -2,7 +2,7 @@
 
 <% if @bs4 %>
 <div class="enrollment-actions-ddl">
-  <% key_index = (0...8).map { (65 + rand(26)).chr }.join %>
+  <% key_index = hbx_enrollment.id %>
   <% unless read_only || !can_make_changes_for_enrollment %>
     <div class="dropdown">
       <button class="btn btn-default dropdown-toggle interaction-click-control-actions button outline " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
