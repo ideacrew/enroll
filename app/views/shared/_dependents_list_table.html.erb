@@ -1,0 +1,31 @@
+<div class="table-responsive hidden" id="dependentTable">
+  <table class="table">
+    <thead class="thead-default">
+      <tr>
+        <th>
+          <%= l10n("plans.comparison_table.name") %>
+        </th>
+        <th>
+          <%= l10n("plans.dependents_modal.relationship") %>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% dependentslist = subscriber + dependents %>
+      <% dependentslist.each do |d| %>
+      <tr>
+        <td>
+          <%= d.person.full_name %>
+        </td>
+        <td>
+          <% if subscriber.blank? %>
+            <%= @hbx_enrollment.consumer_role.person.find_relationship_with(d.person) %>
+          <% else %>
+            <%= subscriber.first.person.find_relationship_with(d.person) %>
+          <% end %>
+        </td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
