@@ -541,9 +541,9 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   # drop action
   def drop_enrollment_member
-    # authorize HbxProfile, :drop_enrollment_member?
+    authorize HbxProfile, :drop_enrollment_member?
 
-    @admin_permission = true
+    @admin_permission = params[:admin_permission]
     @hbxs = Family.find(params[:family]).all_enrollments.individual_market.can_terminate.select{ |enr| enr.hbx_enrollment_members.count > 1 }
     @row = params[:family_actions_id]
     respond_to do |format|
