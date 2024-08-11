@@ -283,13 +283,11 @@ module ApplicationHelper
     end
   end
 
-  def organize_ssn_params(form_object)
-    if form_object.ssn
-      presenter = ::Presenters::SsnFormPresenter.new(form_object, current_user)
-      presenter.sanitize_ssn_params
-    else
-      {}
-    end
+  def organize_ssn_params(form_object, family_member_id = nil)
+    return unless form_object.ssn
+
+    presenter = ::Presenters::SsnFormPresenter.new(form_object, family_member_id)
+    presenter.sanitize_ssn_params
   end
 
   # Formats a number into a nine-digit US Federal Entity Identification Number string (nn-nnnnnnn)

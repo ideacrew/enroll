@@ -12,13 +12,12 @@ module Presenters
                 :family_id,
                 :display_icon
 
-    def initialize(form_object, current_user)
+    def initialize(form_object, family_id = nil)
       @form_object = form_object
-      @user_person = current_user.person
 
       @object_type = @form_object.class.to_s
       @obscured_ssn = nil
-      @family_id = nil
+      @family_id = family_id ? family_id.to_s : nil
       @person_id = nil
       @disabled = nil
       @display_icon = nil
@@ -38,7 +37,6 @@ module Presenters
       when 'FinancialAssistance::Applicant'
         sanitize_applicant
       end
-
       self
     end
 
@@ -57,9 +55,8 @@ module Presenters
 
     def sanitize_person
       obscure_ssn
-
       @person_id = @form_object.id.to_s
-      @family_id = @form_object.primary_family.id.to_s
+      @family_id ||= @form_object.primary_family.id.to_s
       @disabled = true
     end
 
