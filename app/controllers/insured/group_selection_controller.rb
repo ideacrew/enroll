@@ -166,7 +166,7 @@ class Insured::GroupSelectionController < ApplicationController
         hbx_enrollment.update_osse_childcare_subsidy
         redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
       elsif @change_plan.present?
-        if EnrollRegistry.feature_enabled?(:choose_shopping_method)
+        if EnrollRegistry.feature_enabled?(:choose_shopping_method) && @adapter.coverage_kind == 'health'
           redirect_to choose_shopping_method_insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
         else
           redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
