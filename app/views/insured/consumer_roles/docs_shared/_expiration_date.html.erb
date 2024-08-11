@@ -1,6 +1,5 @@
 <% if @bs4 %>
   <div class="mt-4 mb-4">
-    OOOOF
     <%= v.label :expiration_date, l10n("insured.consumer_roles.docs_shared.expiration_date", name: name), class: "weight-n #{!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "required" : ""} doc_fields" %>
     <%= v.date_field :expiration_date, {class: "#{!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "required" : "" } date-field doc_fields", placeholder: l10n("insured.consumer_roles.docs_shared.expiration_date", name: name)} %>
   </div>
