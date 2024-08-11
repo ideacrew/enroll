@@ -98,7 +98,6 @@ function applyPlanFilters() {
     applyPlanFilterCBs("plan-metal-network-selection-filter", "data-plan-network", "data-plan-metal-network")
   ];
   combineAllPlanSelectors(all_selectors);
-  $("#filter-sidebar input[type='radio']").prop("checked", false);
   $("strong#plans-count").text($(".plan-row:visible").length);
   $("dd#plans-count").text($(".plan-row:visible").length);
 }
@@ -325,6 +324,9 @@ $(function() {
   $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();
 
+    const sort_by = $('#sort_by input:checked').data('sort-by');
+    applyPlanSort(sort_by);
+
     if ($('.aptc').length > 0){
       var elected_aptc = $("input#elected_aptc").val();
       var coverage_kind = $("input#coverage_kind").val();
@@ -382,10 +384,6 @@ $(function() {
       $("#filter-sidebar select.plan-osse-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
     }
   }
-
-  $(document).on('change', '#sort_by input', function(){
-    applyPlanSort($(this).data('sort-by'));
-  });
 
   $(document).on('click', "#ivl_plans .plan-select.btn-default.select", function(e){
     var url = $(this).data('url');
