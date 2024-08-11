@@ -1,9 +1,8 @@
 <div class="alert alert-message">
-  <a href="#" data-dismiss="alert" ></a>
   <div class="row">
     <div class="col-md-11 col-sm-12 col-xs-12">
         <div class="container">
-        	<p data-cuke="coverage_info_msg"><i class="fa fa-exclamation-triangle" style="font-size:20px;color:#ffb11a"></i> 
+        	<p data-cuke="coverage_info_msg"><i class="fa fa-exclamation-triangle" style="font-size:20px;color:#ffb11a"></i>
         		<%= l10n("coverage_info_msg") %> <%= @enrollment.coverage_kind %> <%= l10n("coverage_on") %> <%= l10n("site_name") %>:</p>
 					<ul>
 					  <% @dependent_members&.each do |member| %>
