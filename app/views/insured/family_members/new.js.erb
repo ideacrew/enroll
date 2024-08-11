@@ -45,7 +45,7 @@ if (bs4 == "true") {
     indicateRequiredFields()
     demographicValidations();
     isApplyingCoverage("dependent");
-    $("a[id^=edit-member]").addClass('disabled');
+    $(".edit-member").addClass('disabled').attr('tabindex', -1);
     $("#add-new-member").addClass("hidden");
   }
 } else {
