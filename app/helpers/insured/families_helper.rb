@@ -47,7 +47,13 @@ module Insured::FamiliesHelper
         link_to(pluralize(dependents.count, "dependent"), "#", id: 'dependentList') +
         render(partial: "shared/dependents_list_table", locals: {subscriber: subscriber, dependents: dependents})
     end
+  rescue Exception => e
+    exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id}"
+    Rails.logger.error(exception_message) unless Rails.env.test?
+    puts(exception_message) unless Rails.env.test?
+    'Not Available.'
   end
+  # rubocop:enable Lint/RescueException, Lint/UselessAssignment
 
   # rubocop:disable Lint/RescueException, Lint/UselessAssignment
   def current_premium(hbx_enrollment)
