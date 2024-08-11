@@ -1,18 +1,15 @@
 <% if @bs4 %>
   <fieldset class="d-block mb-4">
     <legend class="weight-n"><%= l10n("insured.consumer_roles.docs_shared.other_status_question") %></legend>
-    <% ::FinancialAssistance::Applicant::IMMIGRATION_DOCUMENT_STATUSES.each do |status| %>
-      <div class="d-block">
-        <div class="d-inline-flex align-items-center">
-          <label class="weight-n">
-            <%= c.check_box :immigration_doc_statuses, { multiple: true }, status, false %>
-            <%= status %>
-            <%= "(Select this if this person doesn't have a listed document. You can continue the application without selecting a document or status type)" if status == 'None of these' %>
-          </label>
-        </div>
-      </div>
-    <% end %>
-  </fieldset>
+    <div>
+      <% ::ConsumerRole::IMMIGRATION_DOCUMENT_STATUSES.each_with_index do |status, index| %>
+        <label class="mb-3">
+          <%= c.check_box :immigration_doc_statuses, { multiple: true }, status, false %>
+          <span class="weight-n"><%= status %></span>
+          <% if index == ::ConsumerRole::IMMIGRATION_DOCUMENT_STATUSES.length - 1 %><small class="muted-text"><%= l10n("insured.consumer_roles.docs_shared.none_of_above_note") %></small><% end %>
+        </label>
+      <% end %>
+    </div>
 <% else %>
   <div id="immigration_doc_statuses" class="col col-md-12">
     <div>
