@@ -1,9 +1,28 @@
+<% if @bs4 %>
+<div class="alert alert-warning d-flex" role="alert">
+  <div>
+    <div class="warning-icon icon mt-2" alt="warning" aria-hidden="true">&nbsp;</div>
+  </div>
+  <div class="mt-2 mb-1">
+    <p data-cuke="coverage_info_msg"><%= l10n("coverage_info_msg") %> <%= @enrollment.coverage_kind %> <%= l10n("coverage_on") %> <%= l10n("site_name") %>:</p>
+    <ul class="my-4">
+      <% @dependent_members&.each do |member| %>
+        <li>
+          <p><%= member.person.full_name %> (<%= l10n("age")%>: <%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %> <%= l10n("years")%>) </p>
+        </li>
+      <% end %>
+    </ul>
+    <p data-cuke="coverage_info_msg_2"><b><%= l10n("coverage_info_msg_2") %></b></p>
+	  <p><%= l10n('coverage_info_support_message_1') %> <%= l10n("site_name") %> at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %> TTY:  <%=EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item%> <%= l10n('coverage_info_support_message_2') %></p>
+  </div>
+</div>
+<% else %>
 <div class="alert alert-message">
   <a href="#" data-dismiss="alert" ></a>
   <div class="row">
     <div class="col-md-11 col-sm-12 col-xs-12">
         <div class="container">
-        	<p data-cuke="coverage_info_msg"><i class="fa fa-exclamation-triangle" style="font-size:20px;color:#ffb11a"></i> 
+        	<p data-cuke="coverage_info_msg"><i class="fa fa-exclamation-triangle" style="font-size:20px;color:#ffb11a"></i>
         		<%= l10n("coverage_info_msg") %> <%= @enrollment.coverage_kind %> <%= l10n("coverage_on") %> <%= l10n("site_name") %>:</p>
 					<ul>
 					  <% @dependent_members&.each do |member| %>
@@ -21,4 +40,5 @@
   </div>
 </div>
 
+<% end %>
 
