@@ -32,6 +32,23 @@ module Insured::FamiliesHelper
     end
   end
 
+  def plan_shopping_dependent_text_without_modal(hbx_enrollment)
+    subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
+    if subscriber.present? && dependents.count == 0
+      sanitize_html("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>")
+    elsif subscriber.blank? && dependents.count == 1
+      sanitize_html("<span class='dependent-text'>#{dependents.first.person.full_name}</span>")
+    elsif subscriber.blank? && dependents.count > 1
+      sanitize_html("<span class='dependent-text'>#{dependents.first.person.full_name}</span>") +
+        link_to(pluralize(dependents.count, "dependent"), "#", id: 'dependentList') +
+        render(partial: "shared/dependents_list_table", locals: {subscriber: subscriber, dependents: dependents})
+    else
+      sanitize_html("<span class='dependent-text'>#{subscriber.first.person.full_name}</span> + ") +
+        link_to(pluralize(dependents.count, "dependent"), "#", id: 'dependentList') +
+        render(partial: "shared/dependents_list_table", locals: {subscriber: subscriber, dependents: dependents})
+    end
+  end
+  
   # rubocop:disable Lint/RescueException, Lint/UselessAssignment
   def current_premium(hbx_enrollment)
     if hbx_enrollment.is_shop?
