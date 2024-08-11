@@ -15,7 +15,11 @@
       </div>
       <div class="modal-footer">
 				<%= link_to 'Cancel', "", class: 'btn btn-default', data: {'dismiss': 'modal' } %>
-  				<%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-primary pull-right btn-right  mtz plan-select select', onclick: "$(\'.panel[data-plan-id=\"#{plan.id}\"]\').find(\'.btn-default.dn\').trigger(\'click\')"}) %> &nbsp;
+        <% if @bs4 %>
+          <%= link_to("Select Plan", "#", {class: 'btn btn-primary pull-right btn-right  mtz plan-select select', onclick: "$(\'.plan-card[data-plan-id=\"#{plan.id}\"]\').find(\'.btn-default.hidden\').trigger(\'click\'); return false;"}) %> &nbsp;
+        <% else %>
+          <%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-primary pull-right btn-right  mtz plan-select select', onclick: "$(\'.panel[data-plan-id=\"#{plan.id}\"]\').find(\'.btn-default.dn\').trigger(\'click\')"}) %> &nbsp;
+        <% end %>
       </div>
     </div>
   </div>
