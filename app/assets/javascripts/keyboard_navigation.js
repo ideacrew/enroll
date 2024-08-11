@@ -1,7 +1,7 @@
 // keyboard_navigation.js
 function handleRadioKeyDown(event, radioId) {
-  if (event.key === 'Enter') { 
-    document.getElementById(radioId).click(); 
+  if (event.key === 'Enter') {
+    document.getElementById(radioId).click();
   }
 }
 
@@ -19,8 +19,8 @@ function handleCitizenKeyDown(event, radioIdBase) {
 }
 
 function handleContactInfoKeyDown(event, radioId, modifyDiv) {
-  if (event.key === 'Enter') { 
-    document.getElementById(radioId).click(); 
+  if (event.key === 'Enter') {
+    document.getElementById(radioId).click();
     hidden_div = document.getElementById(modifyDiv);
     if (hidden_div.style.display === "block") {
       hidden_div.style.display = "none";
@@ -32,18 +32,18 @@ function handleContactInfoKeyDown(event, radioId, modifyDiv) {
 }
 
 function handleButtonKeyDown(event, buttonId) {
-  if (event.key === 'Enter') { 
-    document.getElementById(buttonId).click(); 
+  if (event.key === 'Enter') {
+    document.getElementById(buttonId).click();
   }
 }
 
 function handleSEPRadioButton(buttonId) {
-  document.getElementById(buttonId).click(); 
+  document.getElementById(buttonId).click();
 }
 
 function handleCancelButtonKeyDown(event, buttonId, hideForm) {
-  if (event.key === 'Enter') { 
-    document.getElementById(buttonId).click(); 
+  if (event.key === 'Enter') {
+    document.getElementById(buttonId).click();
     document.getElementById(hideForm).classList.add('hidden');
   }
 }
@@ -54,4 +54,12 @@ function handleGlossaryFocus(glossaryId) {
 
 function handleGlossaryBlur(glossaryId) {
   $("#" + glossaryId).popover('hide');
+}
+
+function handleGlossaryKeydown(event, glossaryId) {
+  if (event.key === 'Tab' || event.key === 'Enter') {
+    $("#" + glossaryId).popover('show');
+  } else {
+    $("#" + glossaryId).popover('hide');
+  }
 }
