@@ -32,7 +32,7 @@
           <dt><%= l10n('insured.plan_shoppings.thankyou.total_credit') %>:</dt>
           <dd><%= number_to_currency(@max_aptc, precision: 2) %></dd>
           <dt><%= l10n('insured.plan_shoppings.thankyou.max_credit') %>:</dt>
-          <% max_credit = @plan.total_premium > @max_aptc ? @max_aptc : @plan.total_aptc_amount %>
+          <% max_credit = @plan.total_premium > @max_aptc ? @max_aptc : @plan.total_aptc_amount.round(2) %>
           <dd><%= number_to_currency(max_credit) %></dd>
         </dl>
         <p><%= l10n("insured.plan_shoppings.thankyou.aptc_instructions") %></p>
