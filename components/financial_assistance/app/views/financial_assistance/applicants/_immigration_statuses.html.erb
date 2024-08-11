@@ -1,14 +1,31 @@
-<div id="immigration_doc_statuses" class="col col-md-12">
-  <div>
-    <strong>Does this person also have any of these document types or statuses?</strong>
-  </div>
-  <div style="padding: 5px;">
+<% if @bs4 %>
+  <fieldset class="d-block mb-4">
+    <legend class="weight-n"><%= l10n("insured.consumer_roles.docs_shared.other_status_question") %></legend>
     <% ::FinancialAssistance::Applicant::IMMIGRATION_DOCUMENT_STATUSES.each do |status| %>
-      <div style="margin: 2px;">
-        <%= c.check_box :immigration_doc_statuses, { multiple: true }, status, false %>
-        <%= status %>
-        <%= "(Select this if this person doesn't have a listed document. You can continue the application without selecting a document or status type)" if status == 'None of these' %>
+      <div class="d-block">
+        <div class="d-inline-flex align-items-center">
+          <label class="weight-n">
+            <%= c.check_box :immigration_doc_statuses, { multiple: true }, status, false %>
+            <%= status %>
+            <%= "(Select this if this person doesn't have a listed document. You can continue the application without selecting a document or status type)" if status == 'None of these' %>
+          </label>
+        </div>
       </div>
     <% end %>
+  </fieldset>
+<% else %>
+  <div id="immigration_doc_statuses" class="col col-md-12">
+    <div>
+      <strong>Does this person also have any of these document types or statuses?</strong>
+    </div>
+    <div style="padding: 5px;">
+      <% ::FinancialAssistance::Applicant::IMMIGRATION_DOCUMENT_STATUSES.each do |status| %>
+        <div style="margin: 2px;">
+          <%= c.check_box :immigration_doc_statuses, { multiple: true }, status, false %>
+          <%= status %>
+          <%= "(Select this if this person doesn't have a listed document. You can continue the application without selecting a document or status type)" if status == 'None of these' %>
+        </div>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>
