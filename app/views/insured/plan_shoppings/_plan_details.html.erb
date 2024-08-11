@@ -1,12 +1,18 @@
 <% plan_carrier = Caches::MongoidCache.lookup(BenefitSponsors::Organizations::Organization.issuer_profiles, plan.issuer_profile_id) { plan.issuer_profile } %>
 <% details_page = (defined? details_page) ? details_page : false %>
 <% if @bs4 %>
+  <% if session[:elected_aptc] && session[:elected_aptc] != 0 %>
+    <% premium = shopping_group_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.total_childcare_subsidy_amount, plan.can_use_aptc?) %>
+  <% else %>
+    <% premium = plan.total_employee_cost - plan.total_childcare_subsidy_amount %>
+  <% end %>
+
   <div class="plan-card plan-row border my-2  rounded-lg"
     data-plan-id="<%= plan.id %>"
     data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>"
     data-plan-metal-level="<%= plan.metal_level.downcase %>"
     data-plan-metal-network="<%= plan.network&.downcase %>"
-    data-plan-metal-premium="<%= plan.total_employee_cost %>"
+    data-plan-metal-premium="<%= premium %>"
     data-plan-metal-ehb-premium="<%= plan.total_ehb_premium %>"
     data-plan-childcare-subsidy-eligible="<%= plan_childcare_subsidy_eligible(plan) %>"
     data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>"
@@ -87,12 +93,7 @@
         <div class="col-md-2">
           <div class="price-wrapper text-right">
             <strong class="text-secondary"><%= l10n("premium") %></strong>
-            <% if session[:elected_aptc] && session[:elected_aptc] != 0 %>
-              <% premium = shopping_group_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.total_childcare_subsidy_amount, plan.can_use_aptc?) %>
-              <p class="bold beta m-0"><%= number_to_currency(premium) %></p>
-            <% else %>
-              <p class="bold beta m-0"><%= number_to_currency(plan.total_employee_cost - plan.total_childcare_subsidy_amount) %></p>
-            <% end %>
+            <p class="bold beta m-0"><%= number_to_currency(premium) %></p>
             <small class="weight-n">per <%= l10n("month") %></small>
           </div>
         </div>
