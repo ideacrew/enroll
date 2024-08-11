@@ -1,7 +1,12 @@
+<% dependent_modal = local_assigns[:dependent_modal] ? dependent_modal : true %>
 <% if @bs4 %>
   <dl class="parent mt-2">
     <dt><%= l10n("plans.dependents_modal.title")%>:</dt>
-    <dd><%= plan_shopping_dependent_text(@hbx_enrollment) %></dd>
+    <% if dependent_modal == true %>
+      <dd><%= plan_shopping_dependent_text(@hbx_enrollment) %></dd>
+    <% else %>
+      <dd><%= plan_shopping_dependent_text_without_modal(@hbx_enrollment) %></dd>
+    <% end %>
     <dt><%= l10n("plans.more_plan_details.available")%>:</dt>
     <% products = (['shop','employer_sponsored','fehb'].include?(@market_kind)) ? @member_groups : @plans %>
     <dd id='plans-count'><%= products_count(products)%></dd>
