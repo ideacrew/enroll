@@ -3,6 +3,7 @@ $('#inbox').removeClass("hide")
 $('#help_list').addClass('hide')
 $('#help_sign_up_title').addClass('hide')
 $('#help_from_expert_title').removeClass('hide')
+$('#bottom_expert_link').addClass("hide");
 $('#help_type').html('Broker')
 <% if EnrollRegistry.feature_enabled?(:staff_list_back) %>
   $('#back_to_help').removeClass('hide')
@@ -27,13 +28,12 @@ $('.close_broker_select').click(function(){
 })
 
 $(document).on('click', '#help_list a.expert_link', function(){
-  console.log('clicked expert link');
   $('#help_sign_up_title').addClass("hide");
   $('#help_from_expert_title').removeClass("hide");
 })
 
 $(document).on('click', '#close_help_modal', function(){
-  console.log('clicked close_help_modal');
   $('#help_sign_up_title').removeClass("hide");
   $('#help_from_expert_title').addClass("hide");
+  $('#bottom_expert_link').removeClass("hide");
 })
