@@ -34,7 +34,7 @@ module Operations
       if params[:person][:ssn].blank?
         if ssn_require
           dont_update_ssn = true
-        elsif params[:person][:ssn] == '' #meaning they have deliberately been set to blank vs. not updating them
+        elsif params[:person][:ssn] == '' # meaning they have deliberately been set to blank vs. not updating them
           person.unset(:encrypted_ssn)
         end
       else
