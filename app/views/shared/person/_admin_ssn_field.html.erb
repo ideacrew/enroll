@@ -1,113 +1,55 @@
-<div data-controller='person' id='#ssn-input-controller'>
-  New SSN
-  <%= f.text_field :ssn,
-    value: presenter.formatted_ssn,
-    required: f.object.no_ssn ? false : true,
-    class: "keep-label hidden mask-ssn ssn-input ssn-input-#{presenter.person_id}",
-    target: 'person.ssn',
-    pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
-    oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-    oninput: "this.setCustomValidity('')"
-  %>
-  <input
-    type="text"
-    name="facade"
-    placeholder="<%= presenter.obscured_ssn %>"
-    class="keep-label mask-ssn ssn-input <%= "ssn-facade-#{presenter.person_id}" %>"
-    target='person.ssn'
-    readonly='true'
-  >
-  <%= image_pack_tag "icons/eye-off.svg", 
-    class: "ssn-eye-off ssn-eye-off-#{presenter.person_id}",
-    alt: "view ssn icon",
-    tabindex: 0,
-    data: { type: presenter.object_type, id: presenter.person_id, family_id: presenter.family_id, action: "click->person#showSsn" }
-  %>
-  <%= image_pack_tag "icons/eye-on.svg",
-    class: "hidden ssn-eye-on ssn-eye-on-#{presenter.person_id}",
-    alt: "hide ssn icon",
-    tabindex: 0,
-    data: { id: presenter.person_id, action: "click->person#hideSsn" }
-  %>
-</div>
+<% if f.object.ssn.blank? %>
+  <%= f.text_field :ssn, placeholder: "#{l10n("social_security").to_s.upcase}", class: "required mask-ssn input_txt",
+                  pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')", oninput: "this.setCustomValidity('')",
+                  :value => params[:new_ssn].present? ? params[:new_ssn] : @person.ssn, required: params[:new_ssn].present? ? true : false, :input_html => {:maxlength => 15, :size => 40, :width => '100%'} %>
+<% else %>
+  <div data-controller='person' id='#admin-ssn-input-field'>
+    <%= javascript_pack_tag 'effective_table_add_ons' %>
 
-<script>
-  
-  $(document).ready(function() {
-    console.log('page loaded successfully');
-    $('.ssn-eye-off, .ssn-eye-on').css('cursor', 'pointer');
+    New SSN
+    <%= f.text_field :ssn,
+      disabled: true,
+      class: "hidden mask-ssn ssn-input-#{presenter.person_id}",
+      target: 'person.ssn',
+      pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
+      oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+      oninput: "this.setCustomValidity('')",
+      data: { :"admin-can-enable" => true }
+    %>
+    <input
+      type="text"
+      placeholder="<%= presenter.obscured_ssn %>"
+      class="mask-ssn <%= "ssn-facade-#{presenter.person_id}" %>"
+      readonly='true'
+    >
+    <%= image_pack_tag "icons/eye-off.svg", 
+      class: "ssn-eye-off ssn-eye-off-#{presenter.person_id}",
+      alt: "view ssn icon",
+      tabindex: 0,
+      remote: true,
+      data: { type: presenter.object_type, id: presenter.person_id, family_id: presenter.family_id, action: "click->person#showSsn" }
+    %>
+    <%= image_pack_tag "icons/eye-on.svg",
+      class: "hidden ssn-eye-on ssn-eye-on-#{presenter.person_id}",
+      alt: "hide ssn icon",
+      tabindex: 0,
+      remote: true,
+      data: { id: presenter.person_id, action: "click->person#hideSsn" }
+    %>
+  </div>
 
-    // For accessibility
-    $('#ssn-input-container > img').on('click', function(e) {
-      console.log('TESTING');
-      e.preventDefault();
-  
-      if (e.keyCode == 13 || e.keyCode == 32) {
-        $(this).trigger('click');
-      }
-    })
+  <script>
+    $(document).ready(function() {
+      $('.ssn-eye-off, .ssn-eye-on').css('cursor', 'pointer');
 
-    $('.ssn-eye-off').on('click', function(e) {
-      adminShowSsn(e);
-    })
-
-    $('.ssn-eye-on').on('click', function(e) {
-      adminHideSsn(e);
-    })
-  })
-
-  function adminShowSsn(event) {
-    const target = $(event.target);
-    const personId = target.data('id');
-    const familyId = target.data('family-id');
-    console.log('Hey did this work?')
-
-    if (personId == 'temp') {
-      this.showSsnInput(personId);
-    } else {
-      axios({
-        method: 'GET',
-        url: `/insured/family_members/${personId}/show_ssn`,
-        params: {
-          family_id: familyId,
-          type: subjectType
-        },
-        headers: {
-          'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
+      // For accessibility
+      $('#ssn-input-container > img').on('keydown', function(e) {
+        e.preventDefault();
+    
+        if (e.keyCode == 13 || e.keyCode == 32) {
+          $(this).trigger('click');
         }
-      }).then((response) => {
-        if (response.data.status == 200) {
-          let payload = response.data.payload;
-          $(`.ssn-input-${personId}`).val(payload);
-
-          this.showSsnInput(personId);
-        } else {
-          console.log("Unauthorized.");
-        }
-      }).catch(() => {
-        console.log('Error retrieving info');
       })
-    }
-  }
-
-  function hideSsn(event) {
-    const target = $(event.target);
-    const personId = target.data('id');
-
-    $(`.ssn-input-${personId}`).addClass('hidden');
-    $(`.ssn-facade-${personId}`).removeClass('hidden');
-    $(`.ssn-eye-on-${personId}`).addClass('hidden');
-    $(`.ssn-eye-off-${personId}`).removeClass('hidden');
-
-    $(`.ssn-eye-off-${personId}`).focus();
-  }
-
-  function showSsnInput(personId) {
-    $(`.ssn-input-${personId}`).removeClass('hidden');
-    $(`.ssn-facade-${personId}`).addClass('hidden');
-    $(`.ssn-eye-on-${personId}`).removeClass('hidden');
-    $(`.ssn-eye-off-${personId}`).addClass('hidden');
-
-    $(`.ssn-eye-on-${personId}`).focus();
-  }
-</script>
+    })
+  </script>
+<% end %>
