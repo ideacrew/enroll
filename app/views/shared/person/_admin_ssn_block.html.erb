@@ -1,0 +1,45 @@
+
+<% if presenter&.obscured_ssn&.size %>
+  <%= javascript_pack_tag 'effective_table_add_ons' %>
+
+  <div data-controller='person' id='#admin-ssn-input-field'>
+    <h5>
+      <% if include_label %>
+        <b>SSN:</b>
+      <% end %>
+      <span class="hidden ssn-input ssn-input-<%= presenter.person_id %>"></span>
+      <span class="ssn-facade ssn-facade-<%= presenter.person_id %>"><b>•••••••••</b></span>
+      <%= image_pack_tag "icons/eye-off.svg", 
+        class: "ssn-eye-off ssn-eye-off-#{presenter.person_id}",
+        alt: "view ssn icon",
+        tabindex: 0,
+        remote: true,
+        data: { type: presenter.object_type, id: presenter.person_id, family_id: presenter.family_id, action: "click->person#showSsn" }
+      %>
+      <%= image_pack_tag "icons/eye-on.svg",
+        class: "hidden ssn-eye-on ssn-eye-on-#{presenter.person_id}",
+        alt: "hide ssn icon",
+        tabindex: 0,
+        remote: true,
+        data: { id: presenter.person_id, action: "click->person#hideSsn" }
+      %>
+    </h5>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $('.ssn-eye-off, .ssn-eye-on').css('cursor', 'pointer');
+
+      // For accessibility
+      $('#ssn-input-container > img').on('keydown', function(e) {
+        e.preventDefault();
+    
+        if (e.keyCode == 13 || e.keyCode == 32) {
+          $(this).trigger('click');
+        }
+      })
+    })
+  </script>
+<% elsif include_label %>
+  <h5><b>SSN:</b></h5>
+<% end %>

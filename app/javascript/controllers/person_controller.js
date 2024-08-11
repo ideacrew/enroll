@@ -23,7 +23,7 @@ export default class extends Controller {
       }).then((response) => {
         if (response.data.status == 200) {
           let payload = response.data.payload;
-          $(`.ssn-input-${personId}`).val(payload);
+          this.populateHtmlElement(personId, payload);
 
           this.showSsnInput(personId);
         } else {
@@ -32,6 +32,15 @@ export default class extends Controller {
       }).catch(() => {
         console.log('Error retrieving info');
       })
+    }
+  }
+
+  populateHtmlElement(personId, payload) {
+    if ($(`.ssn-input-${personId}`).is('input')) {
+      $(`.ssn-input-${personId}`).val(payload);
+    } else {
+      console.log('I am updating correctly');
+      $(`.ssn-input-${personId}`).text(payload);
     }
   }
 
@@ -45,6 +54,9 @@ export default class extends Controller {
     $(`.ssn-eye-off-${personId}`).removeClass('hidden');
 
     $(`.ssn-eye-off-${personId}`).focus();
+    if ($(`.ssn-input-${personId}`).data('admin-can-enable')) {
+      $(`.ssn-input-${personId}`)?.prop('disabled', true);
+    }
   }
 
   showSsnInput(personId) {
@@ -54,5 +66,8 @@ export default class extends Controller {
     $(`.ssn-eye-off-${personId}`).addClass('hidden');
 
     $(`.ssn-eye-on-${personId}`).focus();
+    if ($(`.ssn-input-${personId}`).data('admin-can-enable')) {
+      $(`.ssn-input-${personId}`)?.prop('disabled', false);
+    }
   }
 }

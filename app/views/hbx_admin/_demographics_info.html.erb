@@ -9,8 +9,16 @@
     <tbody>
       <tr>
         <td><%=@person.hbx_id%></td> 
-        <td><%=@person.full_name%></td> 
-        <td><%=@person.dob%></td> 
+        <td><%=@person.full_name%></td>
+        <td>
+          <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+            <%= render partial: 'shared/person/admin_ssn_block',
+              locals: { presenter: organize_ssn_params(@person, @family.id), include_label: false }
+            %>
+          <% else %>
+            <%=@person.dob%>
+          <% end %>
+        </td>
         <td><%=@person.ssn%></td>
       </tr>
     </tbody>

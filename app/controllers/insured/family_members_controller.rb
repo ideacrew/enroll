@@ -149,7 +149,7 @@ class Insured::FamilyMembersController < ApplicationController
   # 2.) the current user is the primary for the family AND the subject is a member of that family
   def show_ssn
     @family = Family.find(params[:family_id]) if params[:family_id]
-
+    puts "OOOOOOOOOOOOOF"
     authorize @family, :can_show_ssn?
     @person = Person.find(params[:id]) unless @person.id == params[:id]
 
