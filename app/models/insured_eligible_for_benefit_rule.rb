@@ -57,7 +57,7 @@ class InsuredEligibleForBenefitRule
             @errors << ["eligibility failed on market kind"]
           elsif FinancialAssistanceRegistry[:consumer_validations].enabled?
             @errors << [eligibility_errors(element)]
-          elsif "#{element}" == "family_relationships"
+          elsif element == "family_relationships"
             @errors << ["Ineligible due to family relationships"]
           else
             @errors << ["eligibility failed on #{element}"]
@@ -85,6 +85,8 @@ class InsuredEligibleForBenefitRule
       "Since #{name} is not currently a state resident,#{pronoun} is not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
     when "incarceration_status"
       "Since #{name} is currently incarcerated, #{pronoun} is not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
+    when "family_relationships"
+      "Ineligible due to family relationships"
     else
       "eligibility failed on #{element}"
     end
