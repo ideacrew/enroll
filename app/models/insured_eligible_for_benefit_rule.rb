@@ -57,6 +57,8 @@ class InsuredEligibleForBenefitRule
             @errors << ["eligibility failed on market kind"]
           elsif FinancialAssistanceRegistry[:consumer_validations].enabled?
             @errors << [eligibility_errors(element)]
+          elsif "#{element}" == "family_relationships"
+            @errors << ["Ineligible due to family relationships"]
           else
             @errors << ["eligibility failed on #{element}"]
           end
