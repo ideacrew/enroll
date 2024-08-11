@@ -93,11 +93,7 @@
         <div class="col-md-2">
           <div class="price-wrapper text-right">
             <strong class="text-secondary"><%= l10n("premium") %></strong>
-            <% if session[:elected_aptc] && session[:elected_aptc] != 0 %>
-              <p class="bold beta m-0"><%= number_to_currency(premium) %></p>
-            <% else %>
-              <p class="bold beta m-0"><%= number_to_currency(plan.total_employee_cost - plan.total_childcare_subsidy_amount) %></p>
-            <% end %>
+            <p class="bold beta m-0"><%= number_to_currency(premium) %></p>
             <small class="weight-n">per <%= l10n("month") %></small>
           </div>
         </div>
