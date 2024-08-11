@@ -70,7 +70,7 @@
               <%= f.label :ssn, "Social Security" %>
               <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
                 <%= render partial: 'shared/person/consumer_ssn_field',
-                  locals: { f: f, presenter: organize_ssn_params(f.object) }
+                  locals: { f: f, presenter: organize_ssn_params(f.object, @person.primary_family.id) }
                 %>
               <% else %>
                 <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
