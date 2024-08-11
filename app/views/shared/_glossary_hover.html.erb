@@ -1,4 +1,7 @@
-<span id= "<%= key %>" class="glossary"
+<!-- added random string to make duplicate instances on a page work -->
+<% key_index = local_assigns[:key_index] ? key_index : "" %>
+
+<span id="<%= key %><%= key_index %>" class="glossary"
       data-toggle="popover"
       data-animation="false"
       data-placement="auto top"
