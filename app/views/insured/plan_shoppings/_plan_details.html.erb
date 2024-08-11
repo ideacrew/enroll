@@ -12,7 +12,7 @@
     data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>"
     data-plan-metal-level="<%= plan.metal_level.downcase %>"
     data-plan-metal-network="<%= plan.network&.downcase %>"
-    data-plan-metal-premium="<%= plan.total_employee_cost %>"
+    data-plan-metal-premium="<%= premium %>"
     data-plan-metal-ehb-premium="<%= plan.total_ehb_premium %>"
     data-plan-childcare-subsidy-eligible="<%= plan_childcare_subsidy_eligible(plan) %>"
     data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>"
