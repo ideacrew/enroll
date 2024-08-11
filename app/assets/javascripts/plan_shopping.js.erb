@@ -407,3 +407,9 @@ function disableSelectricInModal() {
     $('select#waiver_reason_selection_dropdown').selectric('destroy');
   })
 }
+
+// show the dependent table when the primary's name is clicked
+$(document).on("click", "#dependentList", function(event) {
+  event.preventDefault();
+  $("#dependentTable").toggleClass('hidden');
+});
