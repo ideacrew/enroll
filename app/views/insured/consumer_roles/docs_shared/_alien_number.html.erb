@@ -2,10 +2,10 @@
   <div class="mt-4 mb-4">
     <% cert = (name == 'certificate_citizenship' || name == 'naturalization_certificate') %>
     <% description = cert ? l10n("insured.consumer_roles.docs_shared.certificate_alien_number_req") : l10n("insured.consumer_roles.docs_shared.alien_number_req") %>
-    <%= v.label :alien_number, l10n("insured.consumer_roles.docs_shared.alien_number"), class: "weight-n #{!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "required" : ""} doc_fields" %>
+    <%= v.label :alien_number, l10n("insured.consumer_roles.docs_shared.alien_number"), class: "weight-n #{imm_docs_requried_class} doc_fields" %>
     <%= v.text_field :alien_number, :placeholder => l10n("insured.consumer_roles.docs_shared.alien_number"),
                    :pattern => "\\d{9}",
-                   :class => "#{!FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "required" : "" } doc_fields",
+                   :class => "#{imm_docs_requried_class} doc_fields",
                    :title => description.gsub("-li-", ""), id: "alien_number" %>
     <%= render :partial => "insured/consumer_roles/docs_shared/vlp_doc_requirements", locals: {req: description} %>
   </div>
