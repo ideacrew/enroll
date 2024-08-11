@@ -57,7 +57,9 @@ function handleGlossaryBlur(glossaryId) {
 }
 
 function handleGlossaryKeydown(event, glossaryId) {
-  if (event.key === 'Tab') {
+  if (event.key === 'Tab' || event.key === 'Enter') {
     $("#" + glossaryId).popover('show');
+  } else {
+    $("#" + glossaryId).popover('hide');
   }
 }
