@@ -39,7 +39,6 @@ export default class extends Controller {
     if ($(`.ssn-input-${personId}`).is('input')) {
       $(`.ssn-input-${personId}`).val(payload);
     } else {
-      console.log('I am updating correctly');
       $(`.ssn-input-${personId}`).text(payload);
     }
   }
