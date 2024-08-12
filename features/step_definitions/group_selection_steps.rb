@@ -313,7 +313,7 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
   if person&.active_employee_roles.present?
     expect(page).to have_content "Employer sponsored coverage is not available"
   else
-    expect(page).to have_content "eligibility failed on family_relationships"
+    expect(page).to have_content "Ineligible due to family relationships"
   end
 end
 
