@@ -12,9 +12,9 @@ module BenefitSponsors
       # TODO: Let's just doo this for now
       before_action :redirect_if_general_agency_disabled, only: %i[new create edit update destroy]
       before_action :set_cache_headers, only: [:edit, :new]
-      before_action :enable_bs4_layout, only: [:new, :create] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+      before_action :enable_bs4_layout, only: [:new, :create] if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
 
-      layout 'bs4_application'
+      layout :resolve_layout
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
@@ -194,6 +194,8 @@ module BenefitSponsors
       def enable_bs4_layout
         @bs4 = true
       end
+
+      def resolve_layout; end
     end
   end
 end
