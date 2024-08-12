@@ -52,7 +52,7 @@
           </div>
           <div class="mr-3">
             <label for="elected_aptc_value" class="required"><%= l10n('insured.plan_shoppings.thankyou.amount_applied') %></label>
-            <input id="elected_aptc_value" max="<%= max_credit %>" type="number" value="<%= number_with_precision(@elected_aptc, precision: 2) %>" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>" class="thankyou">
+            <input id="elected_aptc_value" max="<%= max_credit %>" type="number" value="<%= number_with_precision(max_credit, precision: 2) %>" data-elected="<%= number_with_precision(@elected_aptc, precision: 2) %>" class="thankyou">
           </div>
           <div class="">
             <button id="aptc_submit" class="short"><%= l10n('insured.plan_shoppings.thankyou.update_applied') %></button>
