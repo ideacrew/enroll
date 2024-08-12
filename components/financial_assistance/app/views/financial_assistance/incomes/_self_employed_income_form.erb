@@ -36,7 +36,7 @@
 
       <div class="row mb-2">
         <div class="pull-right mt-1 mb-2 pl-3">
-          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income-cancel-<%= income_id %>')" id="self-employed-income-cancel-<%= income_id %>" class="button btn-default outline income-cancel"><%= l10n("faa.other_incomes.cancel") %></a>
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'self-employed-income-cancel-<%= income_id %>')" id="self-employed-income-cancel-<%= income_id %>" class="button btn-default outline income-cancel"><%= l10n("cancel") %></a>
           <%= f.submit l10n("faa.other_incomes.save"), class: "button btn-save ml-1", :data => { :cuke => "self-employed-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
         </div>
       </div>
