@@ -4,11 +4,11 @@
 <fieldset class="mb-4 d-block">
   <legend class="required"><%= l10n("plans.plan_shopping_options.question") %></legend>
   <label for="guidance_true" class="radio mt-2">
-    <%= radio_button_tag :guidance, true %>
+    <%= radio_button_tag :guidance, true, true %>
     <%= l10n("plans.plan_shopping_options.question.compare") %>
   </label>
   <label for="guidance_false" class="radio mt-2">
-    <%= radio_button_tag :guidance, false %>
+    <%= radio_button_tag :guidance, false, false %>
     <%= l10n("plans.plan_shopping_options.question.know") %>
   </label>
 </fieldset>
