@@ -1,7 +1,7 @@
 <% if @bs4 %>
 <% @folder = (params[:folder] || 'Inbox').capitalize %>
 <% sorted_inbox_messages = provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
-<div id="inbox-messages">
+<div id="inbox-messages" class="mx-0 px-0">
 <div id="inbox-headers" class="tab-holder">
   <h1><%= l10n("messages") %></h1>
 

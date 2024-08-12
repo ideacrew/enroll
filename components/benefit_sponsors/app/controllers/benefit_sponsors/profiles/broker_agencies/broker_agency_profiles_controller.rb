@@ -16,7 +16,7 @@ module BenefitSponsors
         before_action :set_current_person, only: [:staff_index]
         before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
         before_action :set_cache_headers, only: [:show]
-        before_action :enable_bs4_layout, only: [:show, :messages, :inbox, :family_datatable] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        before_action :enable_bs4_layout, only: [:show, :messages, :inbox, :family_index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
         skip_before_action :verify_authenticity_token, only: :create
 
