@@ -15,7 +15,7 @@ module Subscribers
         subscribe(:on_validate_cv_requested) do |delivery_info, metadata, response|
           subscriber_logger = subscriber_logger_for(:on_validate_cv_requested)
 
-          # process_message(subscriber_logger, response, metadata) unless Rails.env.test?
+          process_message(subscriber_logger, response) unless Rails.env.test?
 
           ack(delivery_info.delivery_tag)
         rescue StandardError, SystemStackError => e
@@ -45,17 +45,17 @@ module Subscribers
         # @param response [String] The message response.
         # @param metadata [Bunny::MessageProperties] Metadata associated with the message.
         # @return [void]
-        def process_message(subscriber_logger, response, metadata)
+        def process_message(subscriber_logger, response)
           payload = JSON.parse(response, symbolize_names: true)
 
-          result = ::Operations::Private::Families::ValidateCvRequested.new.call(
-            payload: payload,
-            headers: metadata.headers
+          result = ::Operations::Private::Families::ValidateCv.new.call(
+            payload.slice(:family_hbx_id, :family_updated_at, :job_id)
           )
 
           message = result.success? ? "----- SUCCESS: #{result.value!}" : "----- FAILURE: #{result.failure}"
-
           subscriber_logger.info "ValidateCvRequestedSubscriber, result: #{message}"
+        rescue StandardError => e
+          subscriber_logger.error "ValidateCvRequestedSubscriber, response: #{response}, error message: #{e.message}, backtrace: #{e.backtrace}"
         end
       end
     end
