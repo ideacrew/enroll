@@ -14,7 +14,7 @@ module BenefitSponsors
       before_action :set_cache_headers, only: [:edit, :new]
       before_action :enable_bs4_layout, only: [:new, :create] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-      layout 'two_column', :only => :edit
+      layout 'bs4_application'
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
@@ -34,8 +34,8 @@ module BenefitSponsors
         begin
           saved, result_url = verify_recaptcha_if_needed && @agency.save
           if saved && is_employer_profile?
-              create_sso_account(current_user, current_person, 15, "employer") do
-              end
+            create_sso_account(current_user, current_person, 15, "employer") do
+            end
           elsif saved && is_general_agency_profile?
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
           end
@@ -47,7 +47,7 @@ module BenefitSponsors
           if is_broker_profile? && saved
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
             respond_to do |format|
-              format.html { render template_filename, :layout => 'single_column' }
+              format.html { render template_filename, :layout => 'bs4_application' }
             end
             return
           elsif saved
@@ -68,7 +68,7 @@ module BenefitSponsors
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit(profile_id: params[:id])
         authorize @agency
 
-        render layout: 'single_column' if @agency.organization.is_broker_profile? || @agency.organization.is_general_agency_profile?
+        render layout: 'bs4_application' if @agency.organization.is_broker_profile? || @agency.organization.is_general_agency_profile?
       end
 
       def update

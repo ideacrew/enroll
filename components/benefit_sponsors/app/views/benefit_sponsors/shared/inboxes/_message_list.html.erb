@@ -1,3 +1,128 @@
+<% if @bs4 %>
+<% @folder = (params[:folder] || 'Inbox').capitalize %>
+<% sorted_inbox_messages = provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
+<div id="inbox-messages">
+<div id="inbox-headers" class="tab-holder">
+  <h1><%= l10n("messages") %></h1>
+
+  <div class="pl-3 inbox-sender row">
+    <%= l10n("unread_messages")%>
+    <div class="pl-2"><%= provider.inbox.unread_messages.size %></div>
+  </div>
+</div>
+<div class="mt-4 mb-1" id="inbox-nav-tabs">
+  <%= link_to(retrieve_inbox(provider, folder: 'Inbox'), remote: true, class: "text-decoration-none tabs tab tab-content #{'active' if @folder.try(:capitalize) == 'Inbox'}") do %>
+    <% if @folder == 'Inbox' %>
+      <strong><%= l10n("inbox") %></strong>
+    <% else %>
+      <%= l10n("inbox") %>
+    <% end %>
+  <% end %>
+
+  <% if @sent_box == true %>
+    <%= link_to(retrieve_inbox(provider, folder: 'Sent'), remote: true, class: "text-decoration-none tabs tab tab-content #{'active' if @folder.try(:capitalize) == 'Sent'}") do %>
+      <% if @folder == 'Sent' %>
+        <strong>Sent</strong>
+      <% else %>
+        Sent
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= link_to(retrieve_inbox(provider, folder: 'Deleted'), remote: true, class: "text-decoration-none tabs tab tab-content #{'active' if @folder.try(:capitalize) == 'Deleted'}") do %>
+    <% if @folder == 'Deleted' %>
+      <strong><%= l10n("deleted") %></strong>
+    <% else %>
+      <%= l10n("deleted") %>
+    <% end %>
+  <% end %>
+</div>
+
+  <% if sorted_inbox_messages.size == 0 %>
+    <div class="rounded-end bg-white mb-4 tab-container">
+      <section>
+        <div class="pl-2 pr-2 pt-3">
+          <p><%= l10n("zero_deleted_messages").gsub("deleted", @folder.downcase) %></p>
+        </div>
+      </section>
+    </div>
+  <% else %>
+    <div id="message_list_form" class="rounded-end bg-white mb-4 tab-container">
+      <section>
+        <div class="pl-2 pr-2">
+          <table>
+            <thead>
+              <tr>
+                <th><%= l10n("from") %></th>
+
+                <th><%= l10n("subject") %></th>
+
+                <th>
+                  <%= l10n("date") %>
+                  <i class="fa fa-arrow-down fa-sm ml-2" aria-hidden="true"></i>
+                </th>
+
+                <%- if @folder != 'Deleted' %>
+                <th><%= l10n("delete") %></th>
+                <%- end %>
+              </tr>
+            </thead>
+
+            <tbody>
+              <%- if provider.try(:inbox).try(:messages) %>
+                <%= render partial: "shared/inboxes/individual_message", :collection => sorted_inbox_messages, :as => :message, locals: {provider: provider} %>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  <% end %>
+
+  <div id="show_message_form"></div>
+
+<script>
+    $(document).ready(function() {
+      const msgs = $('#message_list_form').find('tr.msg-inbox');
+
+      msgs.each(function() {
+        // Add event listeners to each message for click
+        $(this).on('click', function() {
+          const url = $(this).data('url');
+          $.ajax({type: "GET", url: url, dataType: 'script'});
+        });
+
+        // Add event listeners to each message for enter / spacebar key
+        $(this).on('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            const url = $(this).data('url');
+            $.ajax({type: "GET", url: url, dataType: 'script'});
+          }
+        });
+
+        // Add event listeners to each message delete icon for click of td with data-msg-delete
+        $(this).find('td[data-msg-delete]').on('click', function(e) {
+          e.stopPropagation();
+          const url = $(this).closest('tr').data('url');
+          $.ajax({type: "DELETE", url: url, dataType: 'script'});
+        });
+
+        // Add event listeners to each message delete icon for enter / spacebar key
+        $(this).find('td[data-msg-delete]').on('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            const url = $(this).closest('tr').data('url');
+            $.ajax({type: "DELETE", url: url, dataType: 'script'});
+          }
+        });
+      });
+
+    })
+  </script>
+</div>
+<% else %>
+
 <div class="bottom-pd" id='inbox-messages'>
   <div class="no_margin">
     <div class="col-xs-12 no-pd">
@@ -77,3 +202,4 @@
     </div>
   </div>
 </div>
+<% end %>
