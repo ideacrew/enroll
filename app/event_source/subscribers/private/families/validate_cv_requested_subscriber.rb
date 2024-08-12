@@ -48,7 +48,7 @@ module Subscribers
         def process_message(subscriber_logger, response)
           payload = JSON.parse(response, symbolize_names: true)
 
-          result = ::Operations::Private::Families::ValidateCv.new.call(
+          result = ::Operations::Families::ValidateCv.new.call(
             payload.slice(:family_hbx_id, :family_updated_at, :job_id)
           )
 
