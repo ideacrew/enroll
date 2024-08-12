@@ -38,7 +38,7 @@
                     locals: { presenter: organize_ssn_params(person, member.family.id), include_label: false }
                   %>
                 <% else %>
-                  <%= number_to_obscured_ssn(person.ssn, member) %>
+                  <%= number_to_obscured_ssn(person.ssn) %>
                 <% end %>
               </td>
               <td><%= person.dob %></td>
