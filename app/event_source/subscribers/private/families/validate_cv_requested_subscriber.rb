@@ -46,6 +46,8 @@ module Subscribers
         # @param metadata [Bunny::MessageProperties] Metadata associated with the message.
         # @return [void]
         def process_message(subscriber_logger, response)
+          # This response does not have any PII, so it is safe to log. It only contains the family_hbx_id, family_updated_at, and job_id.
+          subscriber_logger.info "ValidateCvRequestedSubscriber, Processing response: #{response}"
           payload = JSON.parse(response, symbolize_names: true)
 
           result = ::Operations::Families::ValidateCv.new.call(
