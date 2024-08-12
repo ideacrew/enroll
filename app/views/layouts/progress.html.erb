@@ -41,6 +41,7 @@
   </head>
   <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm d-flex flex-column justify-content-between min-vh-100">
     <%= render partial: './ui-components/bs4/v1/navs/header' %>
+    <%= yield :horizontal_menu %>
     <main class="pb-5 <%= controller_name %> flex-grow-1">
       <% if aca_security_questions %>
         <%= render 'users/security_question_responses/modal' %>

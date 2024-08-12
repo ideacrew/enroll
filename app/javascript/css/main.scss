@@ -589,7 +589,7 @@ a.disabled {
   margin-bottom: 6px;
 }
 
-.tab {
+.tab, .ui-tabs-tab {
   border: none;
   padding: 1.25ch 1ch 1.1ch;
   font-size: 1rem;
@@ -599,7 +599,7 @@ a.disabled {
   border-radius: 5px 5px 0 0;
 }
 
-.tab.active {
+.tab.active, .ui-tabs-tab.ui-tabs-active {
   background: #ffffff;;
   color: var(--primary-color);
   border-top: 1px solid var(--grey-060);

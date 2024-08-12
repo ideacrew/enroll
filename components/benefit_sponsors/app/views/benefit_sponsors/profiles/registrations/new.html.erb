@@ -1,18 +1,18 @@
 <% if @bs4 %>
 <% if @profile_type == "broker_agency" %>
   <div id="broker_agency_form">
-    <ul class="">
-      <li class="list-unstyled">
+    <ul class="list-inline list-unstyled mb-0">
+      <li class="d-inline-block mx-0">
         <a href="#broker_registration"><%= l10n("broker") %> Agency</a>
       </li>
-      <li class="">
+      <li class="d-inline-block mx-0">
         <a href="#broker_agency_staff"><%= l10n("broker_agency_staff") %></a>
       </li>
     </ul>
-    <div id="broker_registration" class="tab-content">
+    <div id="broker_registration" class="tab-content tab-container mt-0">
       <%= render partial: "benefit_sponsors/profiles/registrations/broker_registration_form" %>
     </div>
-    <div id="broker_agency_staff" class="tab-content"></div>
+    <div id="broker_agency_staff" class="tab-content tab-container mt-0"></div>
   </div>
 <% elsif @profile_type == "general_agency" %>
   <div id="general_agency_form">
