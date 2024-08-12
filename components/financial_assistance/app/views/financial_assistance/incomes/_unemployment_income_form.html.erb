@@ -26,7 +26,8 @@
         </div>
       </div>
       <div class="d-flex mb-2">
-        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-cancel-<%= income_id %>')" id="unemployment-cancel-<%= income_id %>" class="button outline mr-2 unemployment-income-cancel"><%= l10n("faa.other_incomes.cancel") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'ai-an-income-cancel-<%= income_id %>')" id="ai-an-income-cancel-<%= income_id %>" class="btn outline ai-an-income-cancel mr-1"><%= l10n("cancel") %></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-cancel-<%= income_id %>')" id="unemployment-cancel-<%= income_id %>" class="button outline mr-2 unemployment-income-cancel"><%= l10n("cancel") %></a>
         <%= f.submit l10n("faa.other_incomes.save"), class: "button btn-save", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
       </div>
     </div>
