@@ -40,6 +40,10 @@ module Operations
             Success(SecureRandom.uuid)
           end
 
+          # Creates a logger instance for the job.
+          #
+          # @param job_id [String] the job ID
+          # @return [Dry::Monads::Result::Success<Logger>]
           def create_logger(job_id)
             Success(Logger.new("#{Rails.root}/bulk_cv_validation_logger_#{job_id}.log"))
           end
