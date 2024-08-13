@@ -156,6 +156,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           expect(@applicant.csr_eligibility_kind).to eq("csr_limited")
         end
 
+        it 'should update is_gap_filling' do
+          expect(@applicant.is_gap_filling).to eq(true)
+        end
+
         context 'member_determinations' do
           before do
             ped = response_payload[:tax_households].first[:tax_household_members].first[:product_eligibility_determination]
