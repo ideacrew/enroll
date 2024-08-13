@@ -1,11 +1,81 @@
 <% model_class = Family %>
 <%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
+<%= hidden_field_tag :market_enabled_check, is_shop_or_fehb_market_enabled? %>
+<% if @bs4 %>
+  <h1><%= @broker_agency_profile.organization.legal_name %></h1>
+  <h2><%= l10n("families")%></h2>
+  <div id="families">
+    <div class="module">
+    <table class="table" id="Broker-Family-dataTable">
+      <thead>
+      <tr>
+        <th><%= l10n("name")%></th>
+        <th><%= l10n("dob")%></th>
+        <th><%= l10n("hbx_id")%></th>
+        <th><%= l10n("family")%></th>
+        <th><%= l10n("registered?")%></th>
+        <% if is_shop_or_fehb_market_enabled? %>
+          <th><%= l10n("broker_agencies.consumer") %>?</th>
+          <th><%= l10n("broker_agencies.employee") %>?</th>
+        <% end %>
+      </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    </div>
+    <script type="text/javascript" charset="utf-8">
+
+        var columnList = [{ data: 'name'}, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
+        var market_enabled = document.getElementById("market_enabled_check").value;
+        if (market_enabled == 'true') {
+          columnList.push({data: 'consumer'}, {data: 'employee'})
+          var filteredColumnList = columnList
+        } else {
+          var filteredColumnList = columnList
+        }
+
+      // datatables setup
+      $(document).ready(function() {
+        $('#Broker-Family-dataTable').DataTable( {
+          "processing": true,
+          "serverSide": true,
+          "ordering" : false,
+          "paging": true,
+          "lengthMenu": [ 10, 25, 50, 100],
+          "searchDelay" : 500,
+          "ajax": {
+            url: "<%= family_datatable_profiles_broker_agencies_broker_agency_profile_path(id: @broker_agency_profile.id, :format => :json) %>",
+            type: "POST",
+            data: function ( d ) {
+              console.log("Broker-Family-dataTable datatable")
+            }
+          },
+          "columns": filteredColumnList,
+          'dom': "<'d-flex align-items-center w-100 justify-content-between mb-4'" +
+          "Bf" +
+          ">" +
+          "<'d-flex align-items-center w-100 '" +
+          "<'col-sm-12 col-md-12'>" +
+          ">" +
+          "<'d-flex align-items-center w-100 '" +
+          "<'col-sm-12 col-md-12 px-0'tr>"+
+          ">" +
+          "<'d-flex justify-content-between align-items-center w-100'" +
+          "il" +
+          ">" +
+          "<'d-flex align-items-center justify-content-center w-100 my-4'" +
+          "p" +
+          ">"
+        } );
+      });
+  </script>
+  </div>
+<% else %>
 
 <div class="container">
   <h3 class="title-inline"><%= l10n("families")%></h3>
 </div>
-
-<%= hidden_field_tag :market_enabled_check, is_shop_or_fehb_market_enabled? %>
 
 <div class="container">
   <div id="families">
@@ -79,3 +149,4 @@
     </script>
   </div>
 </div>
+<% end %>
