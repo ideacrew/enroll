@@ -121,6 +121,11 @@ Rails.application.routes.draw do
       resources :products, only: [:index]
     end
 
+    resource :time_keeper, :controller => "time_keeper" do
+      post :hop_to_date if EnrollRegistry.feature_enabled?(:time_jump)
+      post :set_date
+    end
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
