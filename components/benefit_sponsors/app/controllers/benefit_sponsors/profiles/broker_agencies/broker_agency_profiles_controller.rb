@@ -99,7 +99,7 @@ module BenefitSponsors
 
           respond_to do |format|
             format.js
-            format.html { render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_datatable.html.erb", layout: "progress" }
+            format.html { render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_datatable.html.erb" }
           end
         end
 
