@@ -116,6 +116,7 @@ RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :
                                                                       :is_uqhp_eligible => nil,
                                                                       :is_csr_eligible => true,
                                                                       is_eligible_for_non_magi_reasons: true,
+                                                                      :is_gap_filling => true,
                                                                       :csr => "limited",
                                                                       :is_non_magi_medicaid_eligible => false,
                                                                       :is_without_assistance => false,
