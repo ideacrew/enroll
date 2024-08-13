@@ -1,16 +1,66 @@
 <% if @bs4 %>
   <div class="confirmation hidden" id="cancel-plan-form">
-    <h2><%= l10n("cancel_plan") %></h2>
-    <p id="cancel-msg" class="action-msg hidden"><%= l10n("do_you_want_to_cancel_this_plan") %></p>
+    <h2><%= l10n("plan_cancelation") %></h2>
+    <p id="cancel-msg" class="action-msg hidden"><%= l10n("cancel_plan_confirmation") %></p>
+    <label class="required" for="cancel_plan"> <%= l10n("cancel_your_plan") %></label>
     <div class="form-group row focus">
       <div class="col-auto">
-        <%= radio_button_tag :agreement, "action-confirm-yes" %>&nbsp;<%= l10n("yes") %><br>
+        <%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %><br>
       </div>
       <div class="col-auto">
-        <%= radio_button_tag :agreement, "action-confirm-no" %>&nbsp;<%= l10n("no") %>
+        <%= radio_button_tag :cancel_plan, "no" %>&nbsp;<%= l10n("no") %>
+      </div>
+    </div>
+    <div id="cancellation_section" class="hidden">
+      <p><%= l10n("choose_last_day") %></p>
+      <label class="required" for="coverage_end_date"><%= l10n("coverage_end_date") %></label>
+      <%= date_field_tag :coverage_end_date, class: "date-field mt-2", :'data-date-max' => "+0", required: true %>
+
+      <p class="mt-4"><%= l10n("why_are_you_canceling") %><p>
+      <label class="required" for="cancelation_reasons"><%= l10n("cancelation_reason") %></label>
+      <%= select_tag :cancelation_reasons, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: true %>
+      <div class="mt-4">
+        <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", disabled: false %>
+        <%= button_tag l10n("cancel_plan"), class: "btn btn-error", id: "btn-cancel-plan", disabled: true %>
       </div>
     </div>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var radioButton = document.getElementById("cancel_plan_yes");
+      var section = document.getElementById("cancellation_section");
+
+      radioButton.addEventListener("change", function() {
+        if (radioButton.checked) {
+          section.classList.remove("hidden");
+        } else {
+          section.classList.remove("hidden");
+        }
+      });
+
+      // Initial check in case the radio button is already selected
+      if (radioButton.checked) {
+        section.style.display = "block";
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      var field1 = document.getElementById("coverage_end_date");
+      var selectField = document.getElementById("cancelation_reasons");
+      var button = document.getElementById("btn-cancel-plan");
+
+    function checkFields() {
+      if (field1.value.trim() !== "" && selectField.value !== "") {
+        console.log("Fields are filled");
+        button.disabled = false;
+      } else {
+        button.disabled = true;
+      }
+    }
+      field1.addEventListener("input", checkFields);
+      selectField.addEventListener("change", checkSelectField);
+    });
+  </script>
 <% else %>
   <div class="col-md-4 confirmation hidden" id="cancel-plan-form">
     <h3><%= l10n("cancel_plan") %></h3>

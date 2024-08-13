@@ -4,6 +4,19 @@ class Insured::GroupSelectionController < ApplicationController
   include L10nHelper
   include Insured::FamiliesHelper
 
+  CANCELATION_REASONS = [
+    "medicare_cancel",
+    "medicaid_cancel",
+    "employer_cancel",
+    "spouse_cancel",
+    "parents_cancel",
+    "other_coverage_cancel",
+    "move_cancel",
+    "cost_cancel",
+    "unwanted_cancel",
+    "other_cancel"
+  ].freeze
+
 
   layout 'progress', only: [:new, :edit_plan] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :enable_bs4_layout, only: [:new, :edit_plan] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
@@ -12,6 +25,9 @@ class Insured::GroupSelectionController < ApplicationController
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
   before_action :is_user_authorized?
+
+  helper_method :cancelation_reasons
+
 
   def new
     set_bookmark_url
@@ -520,6 +536,10 @@ class Insured::GroupSelectionController < ApplicationController
       member = members.where(applicant_id: id).first
       member.update_attributes(tobacco_use: params["is_tobacco_user_#{id}"])
     end
+  end
+
+  def cancelation_reasons
+    CANCELATION_REASONS.map { |reason| l10n(reason) }
   end
 
   def enable_bs4_layout
