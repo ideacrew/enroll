@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Operations::Families::ValidateCv do
+RSpec.describe Operations::Private::Families::ValidateCv do
   after :all do
     DatabaseCleaner.clean
   end
