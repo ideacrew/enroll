@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <% if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %>
+      <% if handle_tobacco_field %>
         <div class="tobacco_user_container">
           <fieldset>
             <legend class="required"><%= l10n("insured.group_selection.is_tobacco_user") %></legend>
@@ -105,7 +105,7 @@
                     </div>
                   </div>
                 <% else %>
-                  <div class="row <%= 'row-form-wrapper' if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %> no-buffer">
+                  <div class="row <%= 'row-form-wrapper' if handle_tobacco_field %> no-buffer">
                     <div class="col-xs-1 top-buffer pb-1" style="width: 0;">
                       <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
                     </div>
@@ -126,7 +126,7 @@
                   </div>
                 <% end %>
 
-                <% if ::EnrollRegistry.feature_enabled?(:tobacco_cost) %>
+                <% if handle_tobacco_field %>
                   <div class="row row-form-wrapper no-buffer tobacco_user_container">
                     <div class="col-sm-6 col-xs-12 top-buffer pb-1">
                       <label class="required no-pd"><%= l10n("insured.group_selection.is_tobacco_user") %> *</label>

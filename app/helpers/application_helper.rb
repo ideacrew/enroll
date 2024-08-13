@@ -1128,4 +1128,8 @@ module ApplicationHelper
   def imm_docs_requried_class
     FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required"
   end
+
+  def handle_tobacco_field
+    ::EnrollRegistry.feature_enabled?(:tobacco_cost) && !::EnrollRegistry.feature_enabled?(:default_tobacco_question_true)
+  end
 end
