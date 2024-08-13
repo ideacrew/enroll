@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe CvValidationJob, type: :model do
+  after :all do
+    DatabaseCleaner.clean
+  end
+
+  let!(:success_job)            { FactoryBot.create(:cv_validation_job, result: :success) }
+  let!(:failure_job)            { FactoryBot.create(:cv_validation_job, result: :failure) }
+  let!(:job_with_id)            { FactoryBot.create(:cv_validation_job, job_id: '12345') }
+  let!(:job_with_family_hbx_id) { FactoryBot.create(:cv_validation_job, family_hbx_id: '67890') }
+  let!(:latest_job)             { FactoryBot.create(:cv_validation_job, created_at: 1.day.from_now, job_id: '123723678247') }
 
   describe 'fields' do
     it { is_expected.to have_field(:cv_payload).of_type(String) }
@@ -20,12 +29,6 @@ RSpec.describe CvValidationJob, type: :model do
   end
 
   describe 'scopes' do
-    let!(:success_job)            { FactoryBot.create(:cv_validation_job, result: :success) }
-    let!(:failure_job)            { FactoryBot.create(:cv_validation_job, result: :failure) }
-    let!(:job_with_id)            { FactoryBot.create(:cv_validation_job, job_id: '12345') }
-    let!(:job_with_family_hbx_id) { FactoryBot.create(:cv_validation_job, family_hbx_id: '67890') }
-    let!(:latest_job)             { FactoryBot.create(:cv_validation_job, created_at: 1.day.from_now) }
-
     context '.success' do
       it 'returns jobs with result success' do
         expect(CvValidationJob.success).to include(success_job)
@@ -139,6 +142,12 @@ RSpec.describe CvValidationJob, type: :model do
       it 'returns nil' do
         expect(cv_validation_job.cv_validation_job_time).to be_nil
       end
+    end
+  end
+
+  describe '.latest_job_id' do
+    it 'returns the latest job ID' do
+      expect(CvValidationJob.latest_job_id).to eq(latest_job.job_id)
     end
   end
 end
