@@ -132,4 +132,13 @@ class CvValidationJob
 
     ((end_datetime - start_datetime) * 24 * 60 * 60).to_i
   end
+
+  class << self
+    # Returns the job ID of the latest job.
+    #
+    # @return [Integer, nil] the job ID of the latest job, or nil if there are no jobs.
+    def latest_job_id
+      latest.first&.job_id
+    end
+  end
 end
