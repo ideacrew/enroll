@@ -465,10 +465,6 @@ Then(/consumer should be able to toggle tobacco use question/) do
   expect(find("#is_tobacco_user_Y_0", visible: false).checked?).to be_truthy
 end
 
-Then(/consumer should not see tobacco use question/) do
-  expect(page).not_to have_selector('.tobacco_user_container')
-end
-
 When(/(.*) (.*) the primary person/) do |_role, checked|
   if checked == "checks"
     find("#family_member_ids_0", wait: 5).set(true)

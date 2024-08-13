@@ -117,9 +117,12 @@ When(/^validate SSN feature is (.*)$/) do |feature|
   end
 end
 
-
 Given(/^sensor_tobacco_carrier_usage feature is enabled$/) do
   allow(EnrollRegistry[:ssn_ui_validation].feature).to receive(:is_enabled).and_return(true)
+end
+
+Then(/consumer should not see tobacco use question/) do
+  expect(page).not_to have_selector('.tobacco_user_container')
 end
 
 And(/the user will have to accept alert pop up for missing field$/) do
