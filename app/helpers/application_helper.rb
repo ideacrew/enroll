@@ -276,7 +276,18 @@ module ApplicationHelper
   def number_to_obscured_ssn(number)
     return unless number
     number_to_ssn(number)
-    number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
+    if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+      number.to_s.gsub!(/\w{3}-\w{2}-\w{4}/, '●●●●●●●●●')
+    else
+      number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
+    end
+  end
+
+  def organize_ssn_params(form_object, family_member_id = nil)
+    return unless form_object.ssn
+
+    presenter = ::Presenters::SsnFormPresenter.new(form_object, family_member_id)
+    presenter.sanitize_ssn_params
   end
 
   # Formats a number into a nine-digit US Federal Entity Identification Number string (nn-nnnnnnn)

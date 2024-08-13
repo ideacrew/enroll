@@ -1,0 +1,55 @@
+<% if f.object.ssn.blank? %>
+  <%= f.text_field :ssn, placeholder: "#{l10n("social_security").to_s.upcase}", class: "required mask-ssn input_txt",
+                  pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')", oninput: "this.setCustomValidity('')",
+                  :value => params[:new_ssn].present? ? params[:new_ssn] : @person.ssn, required: params[:new_ssn].present? ? true : false, :input_html => {:maxlength => 15, :size => 40, :width => '100%'} %>
+<% else %>
+  <div data-controller='person' id='#admin-ssn-input-field'>
+    <%= javascript_pack_tag 'effective_table_add_ons' %>
+
+    New SSN
+    <%= f.text_field :ssn,
+      disabled: true,
+      class: "hidden mask-ssn ssn-input-#{presenter.person_id}",
+      target: 'person.ssn',
+      pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
+      oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+      oninput: "this.setCustomValidity('')",
+      data: { :"admin-can-enable" => true }
+    %>
+    <input
+      type="text"
+      placeholder="<%= presenter.obscured_ssn %>"
+      class="mask-ssn <%= "ssn-facade-#{presenter.person_id}" %>"
+      readonly='true'
+    >
+    <%= image_pack_tag "icons/eye-off.svg", 
+      class: "ssn-eye-off ssn-eye-off-#{presenter.person_id}",
+      alt: "view ssn icon",
+      tabindex: 0,
+      remote: true,
+      data: { type: presenter.object_type, id: presenter.person_id, family_id: presenter.family_id, action: "click->person#showSsn" }
+    %>
+    <%= image_pack_tag "icons/eye-on.svg",
+      class: "hidden ssn-eye-on ssn-eye-on-#{presenter.person_id}",
+      alt: "hide ssn icon",
+      tabindex: 0,
+      remote: true,
+      data: { id: presenter.person_id, action: "click->person#hideSsn" }
+    %>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $('.ssn-eye-off, .ssn-eye-on').css('cursor', 'pointer');
+
+      // For accessibility
+      $('#ssn-input-container > img').on('keydown', function(e) {
+        e.preventDefault();
+    
+        if (e.keyCode == 13 || e.keyCode == 32) {
+          $(this).trigger('click');
+        }
+      })
+    })
+  </script>
+<% end %>

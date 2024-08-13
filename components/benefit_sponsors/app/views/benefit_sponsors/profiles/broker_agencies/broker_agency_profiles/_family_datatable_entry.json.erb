@@ -1,7 +1,6 @@
 <% pp = @primary_member_cache[family_datatable_entry.primary_family_member.person_id] %>
 {
   "name": <%= raw (@display_family_link ? (link_to_with_noopener_noreferrer(pp.full_name, main_app.resume_enrollment_exchanges_agents_path(person_id: pp.id))) : pp.full_name).to_json %>,
-  "ssn": <%= raw (begin; number_to_obscured_ssn(pp.ssn); rescue; end).to_json %>,
   "dob" : <%= raw format_date(pp.dob).to_json %>,
   "hbx_id": <%= raw pp.hbx_id.to_json %>,
   "family_count" : <%= raw family_datatable_entry.active_family_members.size.to_json %>,

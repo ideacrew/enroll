@@ -1,0 +1,44 @@
+<% if f.object.ssn.blank? %>
+  <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
+    pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+    oninput: "this.setCustomValidity('')" %>
+<% else %>
+  <div id='ssn-input-container' class="<%= 'div-disabled' if presenter.disabled %>" data-controller='person'> 
+    <%= f.text_field :ssn,
+      value: presenter.formatted_ssn,
+      disabled: presenter.disabled,
+      class: "keep-label mask-ssn hidden ssn-input ssn-input-#{presenter.person_id}",
+      target: 'person.ssn',
+      pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
+      oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+      oninput: "this.setCustomValidity('')"
+    %>
+    <span class="ssn-facade ssn-facade-<%= presenter.person_id %>">
+      <%= presenter.obscured_ssn %>
+    </span>
+    <%= image_pack_tag "icons/eye-off.svg", 
+      class: "ssn-eye-off-#{presenter.person_id}",
+      alt: "view ssn icon",
+      tabindex: 0,
+      data: { type: presenter.object_type, id: presenter.person_id, family_id: presenter.family_id, action: "click->person#showSsn" }
+    %>
+    <%= image_pack_tag "icons/eye-on.svg",
+      class: "hidden ssn-eye-on-#{presenter.person_id}",
+      alt: "hide ssn icon",
+      tabindex: 0,
+      data: { id: presenter.person_id, action: "click->person#hideSsn" }
+    %>
+  </div>
+
+  <script>
+    // For accessibility
+    $('#ssn-input-container > img').on('keydown', function(e) {
+      e.preventDefault();
+
+      if (e.keyCode == 13 || e.keyCode == 32) {
+        $(this).trigger('click');
+      }
+    })
+  </script>
+<% end %>
+
