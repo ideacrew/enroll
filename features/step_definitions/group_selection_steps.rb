@@ -684,10 +684,6 @@ Given(/^enable change tax credit button is enabled$/) do
   enable_change_tax_credit_button
 end
 
-Given(/^enable change tax credit button is enabled$/) do
-  enable_change_tax_credit_button
-end
-
 When(/^\w+ clicks on the make changes to my coverage button/) do
   # enable_change_tax_credit_button
   page.execute_script("document.querySelector('#make-changes-btn').click()")
