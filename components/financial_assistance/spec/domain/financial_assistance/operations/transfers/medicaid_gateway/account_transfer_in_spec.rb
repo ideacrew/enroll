@@ -331,6 +331,72 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
     end
 
+    context "when PersonAmericanIndianOrAlaskaNativeIndicator is set to true for all applicants" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core").each do |node|
+          node.content = 'true'
+        end
+        document
+      end
+
+      it "should default the person/applicant indian_tribe_member to true" do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.indian_tribe_member).to eq true
+        expect(Person.all.first.indian_tribe_member).to eq true
+        expect(Person.all.first.tribe_codes).to eq ["OT"]
+      end
+    end
+
+    context "when tribe is set to Houlton Maliseets for an applicants" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator',
+                       'ns4' => "http://hix.cms.gov/0.1/hix-core")[0].content = 'true'
+        document.xpath('//ns4:PersonTribeName',
+                       'ns4' => "http://hix.cms.gov/0.1/hix-core")[0].content = 'Houlton Maliseets'
+        document
+      end
+
+      it "should default the person/applicant indian_tribe_member to true" do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.indian_tribe_member).to eq true
+        expect(Person.all.first.indian_tribe_member).to eq true
+        expect(Person.all.first.tribe_codes).to eq ["HM"]
+      end
+    end
+
+    context "when PersonAmericanIndianOrAlaskaNativeIndicator is set to true but no tribe name and tribe state" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator',
+                       'ns4' => "http://hix.cms.gov/0.1/hix-core")[0].content = 'true'
+        document.xpath('//ns4:PersonTribeName',
+                       'ns4' => "http://hix.cms.gov/0.1/hix-core")[0].content = ''
+        document.xpath('//ns2:LocationStateUSPostalServiceCode',
+                       'ns2' => "http://niem.gov/niem/niem-core/2.0")[0].content = ''
+        document
+      end
+
+      it "should default the person/applicant indian_tribe_member to false" do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        person = Person.all.where(first_name: "Junior").first
+        expect(person.indian_tribe_member).to eq false
+        expect(person.tribe_codes).to eq nil
+      end
+    end
+
     context "when person records exits and the payload is missing PersonAmericanIndianOrAlaskaNativeIndicator element" do
       let!(:person) do
         FactoryBot.create(:person, first_name: "Junior", last_name: "Banfield",

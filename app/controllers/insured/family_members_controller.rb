@@ -170,7 +170,6 @@ class Insured::FamilyMembersController < ApplicationController
     set_view_person
 
     @bs4 = true if params[:bs4] == "true"
-
     respond_to do |format|
       format.html { render 'edit.js.erb' }
       format.js { render 'edit.js.erb' }
