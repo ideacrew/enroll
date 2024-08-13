@@ -99,7 +99,7 @@ module BenefitSponsors
 
           respond_to do |format|
             format.js
-            format.html { render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_datatable.html.erb", layout: "progress" }
+            format.html { render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_datatable.html.erb" }
           end
         end
 
@@ -187,7 +187,7 @@ module BenefitSponsors
           notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
           flash[:notice] = notice
           UserMailer.broker_registration_guide(params).deliver_now
-          render 'benefit_sponsors/profiles/registrations/confirmation', :layout => 'single_column'
+          render 'benefit_sponsors/profiles/registrations/confirmation'
         end
 
         private

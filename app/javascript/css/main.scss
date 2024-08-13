@@ -517,6 +517,29 @@ ul.plain {
       border-color: var(--primary-color);
       color: var(--grey-000);
     }
+    // these are for datatable pagination
+    &.paginate_button {
+      a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        padding: $spacer / 2 $spacer;
+      }
+
+      &.active:hover a {
+        background-color: var(--primary-color-darker);
+      }
+
+      &:hover:not(.active):not(.disabled) a {
+        background-color: var(--grey-020);
+      }
+    }
+
+    &.active.paginate_button a {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: var(--grey-000);
+    }
   }
 }
 
