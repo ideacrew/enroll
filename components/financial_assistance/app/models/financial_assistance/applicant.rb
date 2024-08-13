@@ -194,6 +194,7 @@ module FinancialAssistance
     field :is_physically_disabled, type: Boolean
     field :is_medicaid_chip_eligible, type: Boolean, default: false
     field :is_non_magi_medicaid_eligible, type: Boolean, default: false
+    field :is_gap_filling, type: Boolean
     field :is_totally_ineligible, type: Boolean, default: false
     field :is_without_assistance, type: Boolean, default: false
     field :has_income_verification_response, type: Boolean, default: false

@@ -54,6 +54,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
                                   is_post_partum_period: false,
+                                  is_gap_filling: true,
                                   is_veteran_or_active_military: true)
     applicant
   end
@@ -96,6 +97,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:multiple_determination_submission_reasons).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
@@ -150,6 +153,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should have applicant with person hbx_id' do
       expect(result.value![:applicants].first[:person_hbx_id]).to eq person.hbx_id
+    end
+
+    context "when multiple determination reasons is enabled" do
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:multiple_determination_submission_reasons).and_return(true)
+      end
+
+      it 'should add additional_reason_codes' do
+        expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq ["Full Determination", "Gap Filling"]
+      end
     end
 
     context 'application' do

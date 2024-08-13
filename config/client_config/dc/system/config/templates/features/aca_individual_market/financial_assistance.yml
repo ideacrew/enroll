@@ -176,6 +176,8 @@ registry:
       is_enabled: <%= ENV['AUTOMATIC_SUBMISSION_IS_ENABLED'] || false %>
     - key: :optimistic_upstream_coverage_attestation
       is_enabled: <%= ENV['OPTIMISTIC_UPSTREAM_COVERAGE_ATTESTATION_IS_ENABLED'] || false %>
+    - key: :multiple_determination_submission_reasons
+      is_enabled: <%= ENV['MULTIPLE_DETERMINATION_SUBMISSION_REASONS_IS_ENABLED'] || false %>
   - namespace:
     - :documents
     features:
