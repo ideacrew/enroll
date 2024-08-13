@@ -50,16 +50,20 @@
       var button = document.getElementById("btn-cancel-plan");
 
     function checkFields() {
-      if (field1.value.trim() !== "" && selectField.value !== "") {
-        console.log("Fields are filled");
+      if ((field1.value.trim() !== "" && isValidDate(field1.value)) && selectField.value !== "") {
         button.disabled = false;
       } else {
         button.disabled = true;
       }
     }
       field1.addEventListener("input", checkFields);
-      selectField.addEventListener("change", checkSelectField);
+      selectField.addEventListener("change", checkFields);
     });
+
+    function isValidDate(dateString) {
+      var date = new Date(dateString);
+      return !isNaN(date.getTime());
+    }
   </script>
 <% else %>
   <div class="col-md-4 confirmation hidden" id="cancel-plan-form">
