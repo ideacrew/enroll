@@ -21,7 +21,6 @@ RSpec.describe ::Operations::HbxAdmin::TimeJump, dbclean: :after_each do
   describe 'with invalid params' do
     context 'when the new date is not a future date' do
       let(:new_date) { TimeKeeper.date_of_record - 1.day }
-      let(:params) { { new_date: new_date.to_s } }
 
       it 'returns failure monad' do
         expect(result.failure).to eq('Invalid date, please select a future date')
