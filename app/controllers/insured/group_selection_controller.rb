@@ -125,7 +125,7 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
-    update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+    update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if handle_tobacco_field
 
     if @market_kind == 'shop' || @market_kind == 'fehb'
       raise @adapter.no_employer_benefits_error_message(hbx_enrollment) unless hbx_enrollment.sponsored_benefit_package.shoppable?
