@@ -329,7 +329,7 @@ module Insured
     end
 
     def show_tobacco_field
-      ::EnrollRegistry.feature_enabled?(:tobacco_cost) && !::EnrollRegistry.feature_enabled?(:default_tobacco_question_true)
+      ::EnrollRegistry.feature_enabled?(:tobacco_cost) && !::EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
     end
   end
 end
