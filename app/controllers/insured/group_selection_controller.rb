@@ -5,8 +5,8 @@ class Insured::GroupSelectionController < ApplicationController
   include Insured::FamiliesHelper
 
 
-  layout 'progress', only: [:new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-  before_action :enable_bs4_layout, only: [:new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  layout 'progress', only: [:new, :edit_plan] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:new, :edit_plan] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
