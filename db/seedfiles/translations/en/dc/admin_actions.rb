@@ -28,5 +28,15 @@ ADMIN_ACTIONS_TRANSLATIONS = {
   'en.admin_actions.time_jump.are_you_sure' => 'Are you sure you want to set the current date to',
   'en.admin_actions.time_jump.confirm' => 'Confirm',
   'en.admin_actions.time_jump.cancel' => 'Cancel',
-  'en.admin_actions.time_jump.select' => 'Select'
+  'en.admin_actions.time_jump.select' => 'Select',
+  'en.admin_actions.dry_run.application_renewal_status' => 'Application Renewal Status',
+  'en.admin_actions.dry_run.eligible_families' => 'Total families eligible for %{year} application renewals:',
+  'en.admin_actions.dry_run.renewal_benefit_coverage_values' => 'Renewal Benefit Coverage Values',
+  'en.admin_actions.dry_run.oe_determined_notices' => 'OE Determined Notices',
+  'en.admin_actions.dry_run.status' => 'status',
+  'en.admin_actions.dry_run.notice' => 'Notice',
+  'en.admin_actions.dry_run.count' => 'Count',
+  'en.admin_actions.dry_run.category' => 'Category',
+  'en.admin_actions.dry_run.value' => 'Value',
+  'en.admin_actions.dry_run.errored' => 'Errored'
 }
