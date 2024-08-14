@@ -106,7 +106,7 @@ class Person
   field :tribal_name, type: String
   field :tribe_codes, type: Array
 
-  field :is_tobacco_user, type: String, default: "unknown"
+  field :is_tobacco_user, type: String, default: "U"
   field :tobacco_use, type: Boolean # TODO: use above field
   field :language_code, type: String
 

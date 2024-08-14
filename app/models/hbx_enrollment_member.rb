@@ -132,7 +132,7 @@ class HbxEnrollmentMember
 
   def self.new_from(coverage_household_member:)
     is_tobacco_user = coverage_household_member&.family_member&.person&.is_tobacco_user
-    tobacco_use = is_tobacco_user == 'unknown' ? 'NA' : is_tobacco_user
+    tobacco_use = is_tobacco_user == 'U' ? 'NA' : is_tobacco_user
 
     new(
       applicant_id: coverage_household_member.family_member_id,
