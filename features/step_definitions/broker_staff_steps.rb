@@ -40,7 +40,7 @@ When(/^the Broker clicks on the approve button$/) do
 end
 
 Then(/^Broker should see the staff successfully approved message$/) do
-  expect(page).to have_content('Role approved successfully', wait: 10)
+  expect(page).to have_content('has been approved.', wait: 10)
 end
 
 Then(/^Broker Staff should receive an invitation email from his Employer$/) do
@@ -57,7 +57,7 @@ Then(/^Broker should see the staff successfully removed message$/) do
 end
 
 And(/^the Broker clicks on the “Add Broker Staff Role” button$/) do
-  find('.interaction-click-control-add-broker-staff-role').click
+  find('#add_staff').click
 end
 
 And(/^a form appears that requires the Broker to input First Name, Last Name, and DOB to submit$/) do
