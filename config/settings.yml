@@ -1,59 +1,75 @@
 site:
-  tab_icon: 'favicon.ico'
-  broker_quoting_enabled: false
-  broker_claim_quoting_enabled: true
-  use_default_devise_path: true
-  plan_options_title_for_ma: true
+  # copyright_period_start: "2013"
+  # faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
+  # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
+  # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
+  # policies_url: "https://dchealthlink.com/"
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
-  block_ie_browser: false
+  block_ie_browser: true
+  broker_claim_quoting_enabled: true
+  broker_quoting_enabled: false
   curam_enabled?: true
-  exchange_hbx_id: 'DC0'
+  exchange_hbx_id: 'ME0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
-  support_for_ie_browser: true
+  plan_options_title_for_ma: true
+  support_for_ie_browser: false
+  tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
+  use_default_devise_path: true
+
 contact_center:
-  alt_fax: '617-722-4033'
-  alt_name: 'DC Health Link Customer Service'
-  alt_phone_number: '1-855-532-LINK'
-  appeals: 'info@dchealthlink.com'
-  board_of_elections_address: '1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>'
-  board_of_elections_email: ''
-  board_of_elections_entity: 'DC Board of Elections'
-  board_of_elections_phone_number: '(202) 727-2525'
-  email_address: 'info@dchealthlink.com'
+  alt_name: 'CoverME.gov Customer Service'
+  phone_number: '(866) 636-0355'
   fax: '1-617-933-3099'
+  alt_fax: '617-722-4033'
+  tty: '771'
+  alt_phone_number: '1-855-532-LINK'
+  payment_phone_number: '855-532-LINK'
   ivl_number: '1-877-623-6765'
   ivl_phone_number: '1-877-623-6765'
-  non_discrimination_email: 'info@dchealthlink.com'
-  payment_phone_number: '855-532-LINK'
-  phone_number: '1-855-532-5465'
-  state: 'DC'
-  tty: '771'
+  email_address: 'smallbusiness@coverme.gov'
+  state: 'ME'
+  non_discrimination_email: 'info@coverme.gov'
+
+  appeals: 'info@coverme.gov'
+
+  # Voting Info for FA Engine Steps
+  # TOOD: This needs to be updated. These are pulled of Maine government website.
+  # # https://www.maine.gov/sos/cec/elec/voter-info/index.html
+  board_of_elections_entity: 'Elections Division<br>Department of the Secretary of State'
+  board_of_elections_address: 'Burton M. Cross Building<br>111 Sewall St (101 SHS)<br>Augusta, ME 04333-0101'
+  board_of_elections_email: 'cec.elections@maine.gov'
+  board_of_elections_phone_number: '(207) 624-7650'
+
   mailing_address:
-    name: 'DC Health Link'
+    name: 'CoverME.gov'
     address_1: 'PO Box 97022'
     address_2:
     city: 'Washington'
     state: 'DC'
     zip_code: '20090'
+
   appeal_center:
-    name: 'DC Health Link'
+    name: 'CoverME.gov'
     address_1: 'PO Box 97022'
     address_2:
     city: 'Washington'
     state: 'DC'
     zip_code: '20090'
+
   non_discrimination:
     email: 'info@dchealthlink.com'
     phone_1: '1-855-532-5465'
     phone_2: '1-855-532-5465'
     phone_3: '1-855-532-5465'
     complaint_url: 'https://www.hhs.gov/civil-rights/filing-a-complaint'
+
 plan_option_titles:
   sole_source: 'One Plan'
   metal_level: 'By Metal Level'
   single_carrier: 'By Carrier'
   single_plan: 'Single Plan'
   single_issuer: 'By Carrier'
+
 plan_option_descriptions:
   sole_source: 'Choose one plan and your contribution amount. All employees can enroll in that plan.'
   metal_level: 'Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.'
@@ -63,53 +79,63 @@ plan_option_descriptions:
     single_plan: 'For Dental coverage, you will choose one dental plan from one carrier as the option that all of your employees can enroll in.'
     single_issuer: 'Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.'
     multi_product: 'Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.'
+
 invoices:
   addendum: 'ma_non_discrimination_and_language_tags.pdf'
   minimum_invoice_display_year: 2015
+
 aca:
-  address_query_county: false
-  broker_carrier_appointments_enabled: true
-  broker_routing_information: false
-  default_dental_option_kind: 'multi_product'
-  dental_market_enabled: true
-  dental_plan_options_available: ['multi_product', 'single_issuer']
-  dental_plan_years_available: ['']
-  enabled_metal_levels_for_single_carrier:
-    ['bronze', 'silver', 'gold', 'platinum', 'dental']
-  general_agency_enabled: true
-  market_kinds: ['shop', 'individual', 'fehb']
+  state_key: 'me'
+  state_name: 'Maine'
+  state_abbreviation: 'ME'
+  market_kinds: ['individual']
   nationwide_markets: true
-  plan_options_available: ['single_plan', 'single_carrier', 'metal_level']
+  general_agency_enabled: false # Soon to be deprrecated
+  broker_carrier_appointments_enabled: true
+  dental_market_enabled: true
+  dental_plan_years_available: ['']
+  address_query_county: false
+  display_county: true
+  broker_routing_information: false
   recaptcha_enabled: false
   security_questions: false
-  state_abbreviation: 'DC'
-  state_key: 'dc'
-  state_name: 'District of Columbia'
   user_accounts_enabled: true
+  plan_options_available: ['single_plan', 'single_carrier', 'metal_level']
+  dental_plan_options_available: ['multi_product', 'single_issuer']
+  default_dental_option_kind: 'multi_product'
+  ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
+  enabled_metal_levels_for_single_carrier:
+    ['bronze', 'silver', 'gold', 'platinum', 'dental']
   carrier_hios_logo_variant:
     '': ''
+  ## acceptable options are ["platinum", "gold", "silver", "dental"]
+
   plan_option_years:
     single_carriers_available: ['2018', '2019']
     sole_source_carriers_available: ['2017', '2018', '2019']
     metal_level_carriers_available: ['2018', '2019']
   qle:
     with_in_sixty_days: 60
+  #
   individual_market:
-    monthly_enrollment_due_on: 15
+    monthly_enrollment_due_on: 16
     verification_outstanding_window:
       days: 0
     verification_due:
       days: 95
     open_enrollment:
       start_on: <%= Date.new(2020,11,1) %>
-      end_on: <%= Date.new(2022,2,4) %>
+      end_on: <%= Date.new(2021,10,31) %>
     dc_resident_application: true
-    transition_family_members_link: true
+    transition_family_members_link:
+      true
+      # dc_resident_application: true
+      # transition_family_members_link: true
     upcoming_open_enrollment:
       start_on: <%= Date.new(2021,11,1) %>
       end_on: <%= Date.new(2022,01,31) %>
   shop_market:
-    valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
+    valid_employer_attestation_documents_url: 'https://www.coverme.gov/business/business-resource-center/employer-verification-checklist'
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
     employer_dental_contribution_percent_minimum: 0
@@ -194,25 +220,33 @@ aca:
   employer_has_sic_field: false
   employer_registration_has_referred_by_field: false
   validate_county: false
-  use_simple_employer_calculation_model: true
+
+  use_simple_employer_calculation_model: false
   carrier_special_plan_identifier_namespace: 'urn:MA:terms:v1:plan:super_group_id#'
   offerings_constrained_to_service_areas: false
   employer_attestation: false
   enforce_employer_attestation: false
   plan_match_tool: true
+
   rating_areas:
-    - R-DC001
+    - R-ME001
+    - R-ME002
+    - R-ME003
+    - R-ME004
+
 notices:
   individual_market:
     mail_address:
       address_1: 'PO Box 44018'
       city: 'Washington'
       zip_code: '20026'
+
   shop_market:
     mail_address:
       address_1: '1225 I Street, NW'
       address_2: 'Suite 400'
       zip_code: '20005'
+
   shop:
     store_paper_notice: false
     attachments:
@@ -224,6 +258,7 @@ notices:
       header: 'notices/shared/shop_header.html.erb'
       footer: 'notices/shared/shop_footer.html.erb'
       layout: 'notifier/pdf_layout.html.erb'
+
   individual:
     store_paper_notice: true
     attachments:
@@ -236,6 +271,7 @@ notices:
       header: 'notices/shared/header_ivl.html.erb'
       footer: 'notices/shared/footer_ivl.html.erb'
       layout: 'notifier/ivl_pdf_layout.html.erb'
+
 paper_notice: 'paper-notices'
 # Note: Remote Aceess keys ad URL's Provided by DC checkbook
 checkbook_services:
@@ -248,6 +284,7 @@ checkbook_services:
   plan_match: 'DC'
   current_year: 2019
   previous_year: 2018
+
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
   enrollment_max_smaller_than_applied: 'Max Applied APTC for any Enrollment cannot be smaller than the Applied APTC.'
@@ -257,21 +294,24 @@ aptc_errors:
   max_aptc_too_big: 'Max APTC should be less than 9999.99'
   cat_plan_error: 'APTC cannot be applied to a catastrophic plan.'
   below_85_for_osse: 'Applied APTC cannot be below 85% for an OSSE plan.'
+
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
+
 style:
-  primary_orange: '#333333'
-  brand_primary: '#007bc4'
-  primary_color: '#007bc4'
-  primary_notification: '#333333'
-  primary_panel: '#69A30D'
-  primary_button: '#e72b2d'
-  primary_button_color: '#286090'
-  primary_button_disabled: '#337ab7'
-  primary_button_border_disabled: '#2e6da4'
-  alternate_header_color: '#333333'
-  primary_icon_color: '#333333'
-  qle_header_color: '#333333'
+  primary_orange: '#487ba2'
+  brand_primary: '#487ba2'
+  primary_color: '#487ba2'
+  primary_notification: '#487ba2'
+  primary_panel: '#487ba2'
+  primary_button: '#F7B319'
+  primary_button_color: '#F7B319'
+  primary_button_disabled: '#487ba2'
+  primary_button_border_disabled: '#487ba2'
+  alternate_header_color: '#487ba2'
+  primary_icon_color: '#487ba2'
+  qle_header_color: '#487ba2'
+
 external_applications:
   admin:
     url: <%= ENV['ANGULAR_ADMIN_APPLICATION_URL'] %>
