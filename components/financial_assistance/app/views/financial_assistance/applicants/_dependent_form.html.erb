@@ -1,7 +1,8 @@
 <% if @bs4 %>
   <% dependent = @applicant %>
   <div id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
-    <h2><%= dependent.id.present? ? l10n("edit_member") : l10n("add_member") %></h2>
+    <% is_editing = dependent.id.present? %>
+    <h2><%= is_editing ? l10n("edit_member") : l10n("add_member") %></h2>
     <div id="add_info_<%= dependent.id %>" class="<%= pundit_class Family, :updateable? %>">
       <%= form_for @applicant, {url: application_applicants_path(@application), as: :applicant, remote: true} do |f| %>
         <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
@@ -65,7 +66,7 @@
             </div>
           </div>
 
-          <div class="d-flex mb-md-4 new_dependent">
+          <div class="d-flex mb-md-4 <%= 'new_dependent' unless is_editing %>">
             <div class="col-md-6 col-lg-3 p-0 ">
               <%= f.label :ssn, "Social Security" %>
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
