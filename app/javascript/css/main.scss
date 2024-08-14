@@ -519,6 +519,14 @@ ul.plain {
     }
     // these are for datatable pagination
     &.paginate_button {
+      position: relative;
+      display: block;
+      padding: 0.5rem 0.75rem;
+      margin-left: -1px;
+      line-height: 1.25;
+      background-color: var(--grey-000);
+      border-color: var(--grey-020);
+
       a {
         color: var(--primary-color);
         font-weight: 600;
@@ -540,6 +548,12 @@ ul.plain {
       border-color: var(--primary-color);
       color: var(--grey-000);
     }
+
+    .next {
+      border-top-right-radius: 0.25rem;
+      border-bottom-right-radius: 0.25rem;
+    }
+
   }
 }
 

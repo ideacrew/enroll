@@ -19,8 +19,8 @@
       <%= hidden_field_tag :profile_id, params[:profile_id] %>
     </div>
     <div class="mt-4">
-      <%= link_to l10("broker_agencies.cancel_new_staff"), profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id]), class:'btn-error outline' %>
-      <button type="submit" class="primary"><%= l10("broker_agencies.create_new_staff") %></button>
+      <%= link_to l10n("broker_agencies.cancel_new_staff"), profiles_broker_agencies_broker_agency_profile_path(id:params[:profile_id]), class:'btn-error outline' %>
+      <button type="submit" class="primary"><%= l10n("broker_agencies.create_new_staff") %></button>
     </div>
     </section>
   <% end %>
