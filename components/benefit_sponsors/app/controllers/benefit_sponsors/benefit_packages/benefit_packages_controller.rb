@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitPackages
-    class BenefitPackagesController < ApplicationController
+    # This controller is used to create and update benefit packages
+    class BenefitPackagesController < ::BenefitSponsors::ApplicationController
 
       before_action :check_for_late_rates, only: [:new]
 
@@ -11,6 +14,10 @@ module BenefitSponsors
 
       def new
         authorize @benefit_package_form, :updateable?
+
+        respond_to do |format|
+          format.html
+        end
       end
 
       def create
@@ -28,13 +35,20 @@ module BenefitSponsors
           end
         else
           flash[:error] = error_messages(@benefit_package_form)
-          render :new
+
+          respond_to do |format|
+            format.html { render :new }
+          end
         end
       end
 
       def edit
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_edit(params.permit(:id, :benefit_application_id), true)
         authorize @benefit_package_form, :updateable?
+
+        respond_to do |format|
+          format.html
+        end
       end
 
       def update
@@ -54,18 +68,27 @@ module BenefitSponsors
           end
         else
           flash[:error] = error_messages(@benefit_package_form)
-          render :edit
+
+          respond_to do |format|
+            format.html { render :edit }
+          end
         end
       end
 
       def calculate_employer_contributions
         @employer_contributions = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employer_contributions(benefit_package_params)
-        render json: @employer_contributions
+
+        respond_to do |format|
+          format.json { rrender json: @employer_contributions }
+        end
       end
 
       def calculate_employee_cost_details
         @employee_cost_details = BenefitSponsors::Forms::BenefitPackageForm.for_calculating_employee_cost_details(benefit_package_params)
-        render json: @employee_cost_details.to_json
+
+        respond_to do |format|
+          format.json { render json: @employee_cost_details.to_json }
+        end
       end
 
       def destroy
@@ -73,16 +96,21 @@ module BenefitSponsors
         authorize @benefit_package_form, :updateable?
         if @benefit_package_form.destroy
           flash[:notice] = "Benefit Package successfully deleted."
-          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits').to_json}"
         else
           flash[:error] = error_messages(@benefit_package_form)
-          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits').to_json}"
+        end
+
+        respond_to do |format|
+          format.js { render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab => 'benefits').to_json}" }
         end
       end
 
       def reference_product_summary
         @product_summary = BenefitSponsors::Forms::BenefitPackageForm.for_reference_product_summary(reference_product_params, params[:details])
-        render json: @product_summary
+
+        respond_to do |format|
+          format.json {  render json: @product_summary }
+        end
       end
 
       private

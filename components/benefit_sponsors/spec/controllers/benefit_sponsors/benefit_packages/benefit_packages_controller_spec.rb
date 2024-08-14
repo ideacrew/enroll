@@ -134,6 +134,16 @@ module BenefitSponsors
         get :new, params: { benefit_application_id: benefit_application_id, benefit_sponsorship_id: benefit_sponsorship_id }
       end
 
+      context "when request format is js" do
+        it "should not render new template" do
+          sign_in user
+          get :new, params: { benefit_application_id: benefit_application_id, benefit_sponsorship_id: benefit_sponsorship_id }, format: :js
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+          expect(response.media_type).to eq "text/plain"
+        end
+      end
+
       it "should route to benefits tab if rates are not present" do
         future_date = TimeKeeper.date_of_record + 1.year
         benefit_application.effective_period = future_date.beginning_of_year..future_date.end_of_year
@@ -230,13 +240,23 @@ module BenefitSponsors
         sign_in_and_do_edit
         expect(response).to render_template("edit")
       end
+
+      context "when request format is js" do
+        it "should not render edit template" do
+          sign_in user
+          get :edit, params: { benefit_sponsorship_id: benefit_sponsorship_id, benefit_application_id: benefit_application_id, id: benefit_package.id.to_s }, format: :js
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+          expect(response.media_type).to eq "text/plain"
+        end
+      end
     end
 
     describe "GET reference_product_summary details" do
 
       def sign_in_and_get_ref_prod
         sign_in user
-        get :reference_product_summary, params: { :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id }
+        get :reference_product_summary, params: { :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id }, format: :json
       end
 
       before do
@@ -252,6 +272,16 @@ module BenefitSponsors
       it "should initialize form" do
         sign_in_and_get_ref_prod
         expect(form_class).to respond_to(:for_reference_product_summary)
+      end
+
+      context "when request format is js" do
+        it "should not render reference_product_summary template" do
+          sign_in user
+          get :reference_product_summary, params: { :reference_plan_id => product.id, :benefit_application_id => benefit_application_id, :benefit_sponsorship_id => benefit_sponsorship_id }, format: :js
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+          expect(response.media_type).to eq "text/plain"
+        end
       end
     end
 
@@ -318,6 +348,16 @@ module BenefitSponsors
               :reference_plan_id => nil
             }
           }
+        end
+
+        context "when request format is js" do
+          it "should not render update template" do
+            sign_in user
+            post :update, params: { :benefit_sponsorship_id => benefit_sponsorship_id, :benefit_application_id => benefit_application_id, :id => benefit_package.id.to_s, :benefit_package => benefit_package_params }, format: :js
+            expect(response.status).to eq 406
+            expect(response.body).to eq "Unsupported format"
+            expect(response.media_type).to eq "text/plain"
+          end
         end
 
         it "should redirect to edit" do
