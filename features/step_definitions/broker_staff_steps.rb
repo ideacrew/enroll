@@ -74,7 +74,7 @@ When(/^the Broker enters the First Name, Last Name, and DOB of existing user (.*
 end
 
 Then(/^the Broker will be given a broker staff role with the given Broker Agency$/) do
-  find(:xpath, '//*[@id="myTabContent"]/div/form/button').click
+  find('#addStaff').click
 end
 
 And(/^the Broker will now appear within the “Broker Staff” table as Active and Linked$/) do
@@ -89,6 +89,6 @@ When(/^the Broker enters the First Name, Last Name, and DOB of an non existing u
 end
 
 Then(/^the Broker will not be given a broker staff role with the given Broker Agency$/) do
-  find(:xpath, '//*[@id="myTabContent"]/div/form/button').click
+  find('#addStaff').click
   expect(page).to have_content('Role was not added because Person does not exist on the Exchange')
 end
