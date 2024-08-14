@@ -4,57 +4,61 @@
       <%= l10n("your_tax_credit") %>
     </h2>
     <p><%= l10n("make_change_tax_credit") %></p>
-    <label class="required" for="update_tax_credit"> <%= l10n("are_you_sure_tax_credit") %></label>
+    <label class="required" for="update_tax_credit_section"> <%= l10n("are_you_sure_tax_credit") %></label>
     <div class="form-group row focus">
       <div class="col-auto">
-        <%= radio_button_tag :update_tax_credit, "yes" %>&nbsp;<%= l10n("yes") %><br>
+        <label for="update_tax_credit_section_yes"><%= radio_button_tag :update_tax_credit_section, "yes" %>&nbsp;<%= l10n("yes") %></label><br>
       </div>
       <div class="col-auto">
-        <%= radio_button_tag :update_tax_credit, "no" %>&nbsp;<%= l10n("no") %>
+        <label for="update_tax_credit_section_no"><%= radio_button_tag :update_tax_credit_section, "no" %>&nbsp;<%= l10n("no") %></label>
       </div>
     </div>
     <div id="update_tax_credit_section" class="hidden">
-      <div id="max-tax-credit" data-max-tax-credit="<%= @self_term_or_cancel_form[:max_tax_credit].to_i %>"></div>
-      <p class="d-flex">
-        <label for="effective_date" class="mr-2"><%= l10n("enrollment.effective_on") %></label>
-        <%= locals[:new_effective_on_date] %>
-      </p>
-      <p><%= l10n("total_tax_credit_amount") %>: $<span id="max_tax_credit" name="max_tax_credit"><%= '%.2f' % @self_term_or_cancel_form[:max_tax_credit]  %></span></p>
-      <div class="d-flex mb-2 mt-2">
-        <div class="mr-4">
-          <label class="required" for="update_tax_credit_amount"> <%= l10n("amount") %></label>
-          <input type="text" name="update_tax_credit" id="update_tax_credit_amount" class="form-control tax_credit_field_container" value="<%= @self_term_or_cancel_form[:default_tax_credit_value] %>" placeholder="0" required>
+      <%= form_for @self_term_or_cancel_form,
+        as: :self_term_or_cancel_form,
+        url: term_or_cancel_insured_group_selections_path do |f| %>        
+        <div id="max-tax-credit" data-max-tax-credit="<%= @self_term_or_cancel_form[:max_tax_credit].to_i %>"></div>
+        <p class="d-flex">
+          <label for="effective_date" class="mr-2"><%= l10n("enrollment.effective_on") %></label>
+          <%= locals[:new_effective_on_date] %>
+        </p>
+        <%# l10n("total_tax_credit_amount"): <span id="max_tax_credit" name="max_tax_credit"><%= number_to_currency(locals[:hbx_enrollment][:aggregate_aptc_amount])</span></p> %>
+        <p><%= l10n("total_tax_credit_amount") %>: $<span id="max_tax_credit" name="max_tax_credit"><%= '%.2f' % @self_term_or_cancel_form[:max_tax_credit]  %></span></p>
+        <div class="d-flex mb-2 mt-2">
+          <div class="mr-4">
+            <label class="required" for="aptc_applied_total"> <%= l10n("amount") %></label>
+            <input type="text" name="aptc_applied_total" id="aptc_applied_total" class="form-control tax_credit_field_container" value="<%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit].to_i * @self_term_or_cancel_form[:elected_aptc_pct].to_i) %>" placeholder="0" required>
+          </div>
+          <div class="mr-4">
+            <label class="required" for="update_tax_credit_percentage"> <%= l10n("percentage") %></label>
+            <input type="text" name="update_tax_credit_percentage" id="update_tax_credit_percentage" class="form-control tax_credit_field_container" value="<%= @self_term_or_cancel_form[:elected_aptc_pct].to_i %>" placeholder="0" required>
+          </div>
+          <div class="mt-4">
+            <div class="d-flex">
+              <label for="effective_date" class="mr-2"><%= l10n("available_monthly") %></label>
+              <%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit]) %>
+            </div>
+            <div class="d-flex">
+              <label for="effective_date" class="mr-3"><%= l10n("amount_applied") %></label>
+              <%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit].to_i * @self_term_or_cancel_form[:elected_aptc_pct].to_i) %>
+            </div>
+          </div>
         </div>
-        <div class="mr-4">
-          <label class="required" for="update_tax_credit_percentage"> <%= l10n("percentage") %></label>
-          <input type="text" name="update_tax_credit" id="update_tax_credit_percentage" class="form-control tax_credit_field_container" value="<%= @self_term_or_cancel_form[:elected_aptc_pct] %>" placeholder="0" required>
-        </div>
+        <p class="d-flex">
+          <label for="new_enrollment_premium" class="mr-1"> <%= l10n("new_monthly_premium") %></label>
+          <%= number_to_currency(float_fix(locals[:hbx_enrollment].total_premium - (locals[:available_aptc] * locals[:hbx_enrollment].elected_aptc_pct))) %>
+        </p>
         <div class="mt-4">
-          <div class="d-flex">
-            <label for="effective_date" class="mr-2"><%= l10n("available_monthly") %></label>
-            <%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit]) %>
-          </div>
-          <div class="d-flex">
-            <label for="effective_date" class="mr-3"><%= l10n("amount_applied") %></label>
-            <%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit].to_i * @self_term_or_cancel_form[:elected_aptc_pct].to_i) %>
-          </div>
+          <%= button_tag l10n("discard_changes"), class: "btn outline mr-2", id: "btn-discard-tax-credit", disabled: false %>
+          <%= submit_tag l10n("save_changes"), class: "btn", id: "btn-save-tax-credit", disabled: true %>
         </div>
       </div>
-      <p class="d-flex">
-        <label for="new_enrollment_premium" class="mr-1"> <%= l10n("new_monthly_premium") %></label>
-        <%= number_to_currency(float_fix(locals[:hbx_enrollment].total_premium - (locals[:available_aptc] * locals[:hbx_enrollment].elected_aptc_pct))) %>
-      </p>
-      <div class="mt-4">
-        <%= button_tag l10n("discard_changes"), class: "btn outline mr-2", id: "btn-discard-tax-credit", disabled: false %>
-        <%= button_tag l10n("save_changes"), class: "btn", id: "btn-save-tax-credit", disabled: true %>
-      </div>
-      <%# set min_aptc and step %>
-    </div>
+    <% end %>
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      var radioButtonYes = document.getElementById("update_tax_credit_yes");
-      var radioButtonNo = document.getElementById("update_tax_credit_no");
+      var radioButtonYes = document.getElementById("update_tax_credit_section_yes");
+      var radioButtonNo = document.getElementById("update_tax_credit_section_no");
       var section = document.getElementById("update_tax_credit_section");
 
       function toggleSection() {
@@ -74,13 +78,13 @@
     });
 
     document.addEventListener("DOMContentLoaded", function() {
-      var inputField = document.getElementById("update_tax_credit_amount");
+      var inputField = document.getElementById("aptc_applied_total");
       var saveButton = document.getElementById("btn-save-tax-credit");
       var maxTaxCreditElement = document.getElementById("max-tax-credit");
       var maxAmount = parseInt(maxTaxCreditElement.getAttribute("data-max-tax-credit"), 10);
 
       inputField.addEventListener("input", function() {
-        var inputValue = parseFloat(inputField.value);
+        var inputValue = parseFloat(inputField.value.substring(1));
         if (!isNaN(inputValue) && inputValue <= maxAmount) {
           saveButton.disabled = false;
         } else {

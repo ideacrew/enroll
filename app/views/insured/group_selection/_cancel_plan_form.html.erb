@@ -5,10 +5,10 @@
     <label class="required" for="cancel_plan"> <%= l10n("cancel_your_plan") %></label>
     <div class="form-group row focus">
       <div class="col-auto">
-        <%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %><br>
+        <label for="cancel_plan_yes"><%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %></label><br>
       </div>
       <div class="col-auto">
-        <%= radio_button_tag :cancel_plan, "no" %>&nbsp;<%= l10n("no") %>
+        <label for="cancel_plan_no"><%= radio_button_tag :cancel_plan, "no" %>&nbsp;<%= l10n("no") %></label>
       </div>
     </div>
     <div id="cancellation_section" class="hidden">
