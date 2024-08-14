@@ -65,21 +65,21 @@
             </div>
           </div>
 
-          <div class="d-flex mb-md-4">
-            <div class="col-md-6 col-lg-3 p-0">
+          <div class="d-flex mb-md-4 new_dependent">
+            <div class="col-md-6 col-lg-3 p-0 ">
               <%= f.label :ssn, "Social Security" %>
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
+                <%= f.text_field :ssn, placeholder: "000-00-0000", id: "dependent_ssn", class: "required keep-label mask-ssn",
                   pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
                   oninput: "this.setCustomValidity('')", disabled: false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
               <% else %>
-                <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: false,
+                <%= f.text_field :ssn, placeholder: "000-00-0000", "dependent_ssn", class: "required", disabled: false,
                   readonly: f.object.is_a?(Forms::EmployeeRole) %>
               <% end %>
             </div>
             <div class="col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
               <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
-                <%= f.check_box :no_ssn %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
+                <%= f.check_box :no_ssn, id: "dependent_no_ssn", %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
                 <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
                 <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
               <% end %>
