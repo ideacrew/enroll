@@ -4,7 +4,7 @@ module Operations
   module HbxAdmin
     module DryRun
       # This Operation is responsible for advancing the date of record to a future date.
-      class IndividualBenefits
+      class IndividualMarketBenefits
         include Dry::Monads[:do, :result]
         include L10nHelper
 

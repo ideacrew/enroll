@@ -40,7 +40,7 @@ module FinancialAssistance
           private
 
           def fetch_benefits
-            result = ::Operations::HbxAdmin::DryRun::IndividualBenefits.new.call
+            result = ::Operations::HbxAdmin::DryRun::IndividualMarketBenefits.new.call
 
             if result.success?
               Success(result.value!)
@@ -97,7 +97,14 @@ module FinancialAssistance
           def oe_determined_notices_count(year, person_hbx_ids)
             return Success(skeleton_for_notices) if person_hbx_ids.blank?
 
-            start_date = Date.new(year, 1, 1) - 4.months
+            notices = fetch_notices(year, person_hbx_ids)
+            result = notices.count.zero? ? map_notices(notices) : skeleton_for_notices
+
+            Success(result)
+          end
+
+          def fetch_notices(year, person_hbx_ids)
+            start_date = Date.new(year, 1, 1) - 6.months
             end_date = Date.new(year, 1, 1)
 
             pipeline = ::Operations::HbxAdmin::DryRun::NoticeQuery.new.call(
@@ -106,15 +113,12 @@ module FinancialAssistance
               end_date: end_date,
               title_codes: NOTICE_TITLE_MAPPING
             )
-            notices = aggregate_collection(Person.collection, pipeline)
+            aggregate_collection(Person.collection, pipeline)
+          end
 
-            if notices.count.zero?
-              Success(skeleton_for_notices)
-            else
-              notice_hash = notices.each_with_object({}) do |notice, result|
-                result[NOTICE_TITLE_MAPPING[notice["title"]]] = notice["count"]
-              end
-              Success(notice_hash)
+          def map_notices(notices)
+            notices.each_with_object({}) do |notice, result|
+              result[NOTICE_TITLE_MAPPING[notice["title"]]] = notice["count"]
             end
           end
 

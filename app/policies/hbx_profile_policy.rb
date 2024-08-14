@@ -506,6 +506,10 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_view_audit_log
   end
 
+  def dry_run_dashboard?
+    individual_market_admin?
+  end
+
   private
 
   def user_hbx_staff_role

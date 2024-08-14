@@ -341,11 +341,7 @@ module FinancialAssistance
     end
 
     def dry_run_dashboard
-      unless current_user.has_hbx_staff_role?
-        flash[:error] = 'You are not authorized to access'
-        redirect_to applications_path
-        return
-      end
+      authorize HbxProfile, :dry_run_dashboard?
 
       result = ::FinancialAssistance::Operations::Applications::DryRun::Analyzer.new.call
 
