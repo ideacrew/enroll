@@ -33,7 +33,7 @@ module BenefitSponsors
           begin
             @status,@result = @staff.save
             unless @staff.is_broker_registration_page
-              flash[:notice] = "Staff member #{@staff.first_name} #{@staff.last_name} has been added." if @status
+              flash[:notice] = "Staff member #{broker_staff_params[:first_name]} #{broker_staff_params[:last_name]} has been added." if @status
               flash[:warning] = "Role was not added because #{@result}" unless @status
             end
           rescue Exception => e
@@ -51,7 +51,8 @@ module BenefitSponsors
           begin
             @status, @result = @staff.approve
             if @status
-              flash[:notice] = "Staff member #{@staff.first_name} #{@staff.last_name} has been approved."
+              person = Person.find(@staff.person_id)
+              flash[:notice] = "Staff member #{person.first_name} #{person.last_name} has been approved."
             else
               flash[:error] = "Role was not approved because #{@result}"
             end

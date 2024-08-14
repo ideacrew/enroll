@@ -33,8 +33,7 @@ module BenefitSponsors
         begin
           saved, result_url = verify_recaptcha_if_needed && @agency.save
           if saved && is_employer_profile?
-            create_sso_account(current_user, current_person, 15, "employer") do
-            end
+            create_sso_account(current_user, current_person, 15, "employer")
           elsif saved && is_general_agency_profile?
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
           end
