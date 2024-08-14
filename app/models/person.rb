@@ -536,7 +536,7 @@ class Person
   end
 
   def set_default_tobacco_use
-    is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
+    self.is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
   end
 
   def strip_empty_fields

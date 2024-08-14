@@ -383,7 +383,7 @@ module FinancialAssistance
     end
 
     def set_default_tobacco_use
-      is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
+      self.is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
     end
 
     def accept(visitor)
