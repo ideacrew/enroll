@@ -2,10 +2,12 @@
 
 <% if @bs4 %>
   <% if edit_plan %>
-    <div>
-      <button type="button" id="cancel-button" class="btn btn-error outline"><%= l10n("cancel_plan")%></button>
-      <button type="button" id="aptc-button" class="btn outline"><%= l10n("change_tax_credit")%></button>
-    </div>
+    <% if !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) %>
+      <div>
+        <button type="button" id="cancel-button" class="btn btn-error outline"><%= l10n("cancel_plan")%></button>
+        <button type="button" id="aptc-button" class="btn outline"><%= l10n("change_tax_credit")%></button>
+      </div>
+    <% end %>
   <% else %>
     <div class="enrollment-actions-ddl">
       <% key_index = hbx_enrollment.id %>

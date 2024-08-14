@@ -12,41 +12,51 @@
       </div>
     </div>
     <div id="cancellation_section" class="hidden">
-      <p><%= l10n("choose_last_day") %></p>
-      <label class="required" for="coverage_end_date"><%= l10n("coverage_end_date") %></label>
-      <%= date_field_tag :coverage_end_date, class: "date-field mt-2", :'data-date-max' => "+0", required: true %>
+      <%= form_for @self_term_or_cancel_form,
+        as: :self_term_or_cancel_form,
+        url: term_or_cancel_insured_group_selections_path do |f| %>
+        <%= hidden_field_tag :hbx_enrollment_id, locals[:hbx_enrollment][:id] %>
+        <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
+        <%= hidden_field_tag :family_id, locals[:family_id] %>
+        <p><%= l10n("choose_last_day") %></p>
+        <label class="required" for="term_date"><%= l10n("coverage_end_date") %></label>
+        <%= date_field_tag :term_date, class: "date-field mt-2", :'data-date-max' => "+0", required: true %>
 
-      <p class="mt-4"><%= l10n("why_are_you_canceling") %><p>
-      <label class="required" for="cancelation_reasons"><%= l10n("cancelation_reason") %></label>
-      <%= select_tag :cancelation_reasons, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: true %>
-      <div class="mt-4">
-        <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", disabled: false %>
-        <%= button_tag l10n("cancel_plan"), class: "btn btn-error", id: "btn-cancel-plan", disabled: true %>
-      </div>
+        <p class="mt-4"><%= l10n("why_are_you_canceling") %><p>
+        <label class="required" for="cancellation_reason"><%= l10n("cancelation_reason") %></label>
+        <%= select_tag :cancellation_reason, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: true %>
+        <div class="mt-4">
+          <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", disabled: false %>
+          <%= submit_tag l10n("cancel_plan"), class: "btn btn-error", id: "btn-cancel-plan", disabled: true %>
+        </div>
+      <% end %>
     </div>
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      var radioButton = document.getElementById("cancel_plan_yes");
+      var radioButtonYes = document.getElementById("cancel_plan_yes");
+      var radioButtonNo = document.getElementById("cancel_plan_no");
       var section = document.getElementById("cancellation_section");
 
-      radioButton.addEventListener("change", function() {
-        if (radioButton.checked) {
+      function toggleSection() {
+        if (radioButtonYes.checked) {
           section.classList.remove("hidden");
         } else {
-          section.classList.remove("hidden");
+          section.classList.add("hidden");
         }
-      });
-
-      // Initial check in case the radio button is already selected
-      if (radioButton.checked) {
-        section.style.display = "block";
       }
+
+      // Add event listeners for change events
+      radioButtonYes.addEventListener("change", toggleSection);
+      radioButtonNo.addEventListener("change", toggleSection);
+
+      // Initial check in case one of the radio buttons is already selected
+      toggleSection();
     });
 
     document.addEventListener("DOMContentLoaded", function() {
-      var field1 = document.getElementById("coverage_end_date");
-      var selectField = document.getElementById("cancelation_reasons");
+      var field1 = document.getElementById("term_date");
+      var selectField = document.getElementById("cancellation_reason");
       var button = document.getElementById("btn-cancel-plan");
 
     function checkFields() {
