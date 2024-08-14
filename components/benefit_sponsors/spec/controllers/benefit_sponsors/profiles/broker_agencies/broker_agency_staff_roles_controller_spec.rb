@@ -609,7 +609,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           end
 
           it "should get a notice" do
-            expect(flash[:notice]).to eq 'Role approved successfully'
+            expect(flash[:notice]).to eq "Staff member #{new_person_for_staff2.first_name} #{new_person_for_staff2.last_name} has been approved."
           end
 
           it "should update broker_agency_staff_role2 aasm_state to active" do
@@ -723,7 +723,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           end
 
           it "should get a notice" do
-            expect(flash[:notice]).to eq 'Role approved successfully'
+            expect(flash[:notice]).to eq "Staff member #{new_person_for_staff2.first_name} #{new_person_for_staff2.last_name} has been approved."
           end
 
           it "should update broker_agency_staff_role2 aasm_state to active" do
