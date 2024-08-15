@@ -65,7 +65,7 @@ module Operations
                 csv << build_and_publish_event(family, job_id, logger)
                 logger.info "***** Processed family hbx_assigned_id: #{family.hbx_assigned_id}"
               rescue StandardError => e
-                logger.error "***** Failed to process family hbx_assigned_id: #{family.hbx_assigned_id}"
+                logger.error "***** Failed to process family hbx_assigned_id: #{family.hbx_assigned_id}, error: #{e.message}"
               end
             end
 
