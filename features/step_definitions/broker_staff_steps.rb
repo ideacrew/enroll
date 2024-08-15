@@ -78,7 +78,7 @@ Then(/^the Broker will be given a broker staff role with the given Broker Agency
 end
 
 And(/^the Broker will now appear within the “Broker Staff” table as Active and Linked$/) do
-  expect(page).to have_content('Role added successfully')
+  expect(page).to have_content('has been added.')
   expect(page).to have_content('Active Linked')
 end
 
