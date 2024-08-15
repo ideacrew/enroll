@@ -5,7 +5,7 @@
     </h2>
     <p><%= l10n("make_change_tax_credit") %></p>
     <label class="required" for="update_tax_credit_section"> <%= l10n("are_you_sure_tax_credit") %></label>
-    <div class="form-group row focus">
+    <div class="row focus">
       <div class="col-auto">
         <label for="update_tax_credit_section_yes"><%= radio_button_tag :update_tax_credit_section, "yes" %>&nbsp;<%= l10n("yes") %></label><br>
       </div>
@@ -60,6 +60,10 @@
       var radioButtonYes = document.getElementById("update_tax_credit_section_yes");
       var radioButtonNo = document.getElementById("update_tax_credit_section_no");
       var section = document.getElementById("update_tax_credit_section");
+      var inputField = document.getElementById("aptc_applied_total");
+      var saveButton = document.getElementById("btn-save-tax-credit");
+      var maxTaxCreditElement = document.getElementById("max-tax-credit");
+      var maxAmount = parseInt(maxTaxCreditElement.getAttribute("data-max-tax-credit"), 10);
 
       function toggleSection() {
         if (radioButtonYes.checked) {
@@ -69,20 +73,6 @@
         }
       }
 
-      // Add event listeners for change events
-      radioButtonYes.addEventListener("change", toggleSection);
-      radioButtonNo.addEventListener("change", toggleSection);
-
-      // Initial check in case one of the radio buttons is already selected
-      toggleSection();
-    });
-
-    document.addEventListener("DOMContentLoaded", function() {
-      var inputField = document.getElementById("aptc_applied_total");
-      var saveButton = document.getElementById("btn-save-tax-credit");
-      var maxTaxCreditElement = document.getElementById("max-tax-credit");
-      var maxAmount = parseInt(maxTaxCreditElement.getAttribute("data-max-tax-credit"), 10);
-
       inputField.addEventListener("input", function() {
         var inputValue = parseFloat(inputField.value.substring(1));
         if (!isNaN(inputValue) && inputValue <= maxAmount) {
@@ -91,6 +81,13 @@
           saveButton.disabled = true;
         }
       });
+
+      // Add event listeners for change events
+      radioButtonYes.addEventListener("change", toggleSection);
+      radioButtonNo.addEventListener("change", toggleSection);
+
+      // Initial check in case one of the radio buttons is already selected
+      toggleSection();
     });
   </script>
 <% else %>

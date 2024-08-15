@@ -83,7 +83,6 @@ module Insured
       end
 
       def self.is_term_or_cancel_date_in_future?(attrs)
-        binding.irb
         return true unless attrs[:term_or_cancel] == 'terminate'
 
         date = Date.strptime(attrs[:term_date].to_s, "%m/%d/%Y")

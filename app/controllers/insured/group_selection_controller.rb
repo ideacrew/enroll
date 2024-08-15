@@ -257,13 +257,18 @@ class Insured::GroupSelectionController < ApplicationController
     # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
     # Redirects to root path unless RIDP is verified for the given market kind and family.
     (redirect_to(root_path) and return) unless ridp_verified?(hbx_enrollment.kind, hbx_enrollment.family)
-    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel]})
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel], cancellation_reason: params[:cancellation_reason]})
 
     if @self_term_or_cancel_form.errors.present?
       flash[:error] = @self_term_or_cancel_form.errors.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
       redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
     else
-      redirect_to family_account_path
+      if ENV['BS4_CONSUMER_FLOW_IS_ENABLED']
+        redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
+        flash[:success] = l10n("plan_canceled")
+      else
+        redirect_to family_account_path
+      end
     end
   end
 
@@ -277,15 +282,19 @@ class Insured::GroupSelectionController < ApplicationController
     aptc_applied_total = revise_aptc_applied_total(params, enrollment_id)
     applied_aptc_pct = calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f)
     attrs = {enrollment_id: enrollment_id, elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
-
     begin
-      message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
-      flash[:notice] = message
+      if ENV['BS4_CONSUMER_FLOW_IS_ENABLED']
+        flash[:success] = l10n("aptc_updated")
+        redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
+      else
+        message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
+        flash[:notice] = message
+        redirect_to family_account_path
+      end
     rescue StandardError => e
       flash[:error] = "Unable to update tax credits for enrollment"
+      redirect_to family_account_path
     end
-
-    redirect_to family_account_path
   end
 
   private

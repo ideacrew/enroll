@@ -13,7 +13,7 @@
     <% end %>
   </div>
   <div class="pt-4 pb-4">
-    <%= h(link_to "Back to Enrollment History", main_app.enrollment_history_insured_families_path, class: "btn btn-primary #{'active' if action_name == 'enrollment_history'}") %>
+    <%= h(link_to l10n("back_to_my_account"), main_app.family_account_path(tab: 'home'), class: "btn outline btn-primary #{'active' if action_name == 'enrollment_history'}") %>
   </div>
   <!-- Cancel Plan Form -->
   <%= render 'insured/group_selection/cancel_plan_form',

@@ -172,6 +172,9 @@ class HbxEnrollment
   field :special_verification_period, type: DateTime
   field :termination_submitted_on, type: DateTime
 
+  # Stores the enrollment plan cancellation reason
+  field :cancellation_reason, type: String
+
   # Checkbook url
   field :checkbook_url , type: String
 
@@ -1030,7 +1033,7 @@ class HbxEnrollment
     waiver.waive_coverage! if waiver.errors.blank? && waiver.may_waive_coverage?
   end
 
-  def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil)
+  def term_or_cancel_enrollment(enrollment, coverage_end_date, cancellation_reason = nil, term_reason = nil)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
     elsif coverage_end_date >= TimeKeeper.date_of_record && enrollment.is_shop?
@@ -1038,6 +1041,7 @@ class HbxEnrollment
     elsif enrollment.may_terminate_coverage?
       enrollment.terminate_coverage!(coverage_end_date)
     end
+    enrollment.update(cancellation_reason: cancellation_reason) if cancellation_reason.present?
     enrollment.update(terminate_reason: term_reason, termination_submitted_on: TimeKeeper.datetime_of_record) if term_reason.present?
   end
 

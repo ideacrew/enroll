@@ -3,7 +3,7 @@
     <h2><%= l10n("plan_cancelation") %></h2>
     <p id="cancel-msg" class="action-msg hidden"><%= l10n("cancel_plan_confirmation") %></p>
     <label class="required" for="cancel_plan"> <%= l10n("cancel_your_plan") %></label>
-    <div class="form-group row focus">
+    <div class="row focus">
       <div class="col-auto">
         <label for="cancel_plan_yes"><%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %></label><br>
       </div>
@@ -21,7 +21,6 @@
         <p><%= l10n("choose_last_day") %></p>
         <label class="required" for="term_date"><%= l10n("coverage_end_date") %></label>
         <%= date_field_tag :term_date, class: "date-field mt-2", :'data-date-max' => "+0", required: true %>
-
         <p class="mt-4"><%= l10n("why_are_you_canceling") %><p>
         <label class="required" for="cancellation_reason"><%= l10n("cancelation_reason") %></label>
         <%= select_tag :cancellation_reason, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: true %>
@@ -37,7 +36,16 @@
       var radioButtonYes = document.getElementById("cancel_plan_yes");
       var radioButtonNo = document.getElementById("cancel_plan_no");
       var section = document.getElementById("cancellation_section");
+      var form = document.getElementById("cancel-plan-form");
+      var field1 = document.getElementById("term_date");
+      var selectField = document.getElementById("cancellation_reason");
+      var button = document.getElementById("btn-cancel-plan");
 
+      form.addEventListener("submit", function(event) {
+        location.reload();
+      });
+
+      // Toggle the section based on the selected radio button
       function toggleSection() {
         if (radioButtonYes.checked) {
           section.classList.remove("hidden");
@@ -46,34 +54,39 @@
         }
       }
 
+      // Check if the neccessary fields are filled
+      function checkFields() {
+        console.log(selectField.value);
+        if ((field1.value.trim() !== "" && isValidDate(field1.value)) && selectField.value !== "") {
+          button.disabled = false;
+        } else {
+          button.disabled = true;
+        }
+      }
+
+      function isValidDate(dateString) {
+        console.log(formatDateToMMDDYYYY(dateString));
+        var date = new Date(formatDateToMMDDYYYY(dateString));
+        return !isNaN(date.getTime());
+      }
+
+      // When pulling the date from the date field, it is in the format YYYY-MM-DD
+      function formatDateToMMDDYYYY(dateString) {
+        const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+        const [year, month, day] = dateString.split("-");
+        const date = new Date(year, month - 1, day);
+        return `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${year}`;
+      }
+
       // Add event listeners for change events
       radioButtonYes.addEventListener("change", toggleSection);
       radioButtonNo.addEventListener("change", toggleSection);
+      field1.addEventListener("input", checkFields);
+      selectField.addEventListener("change", checkFields);
 
       // Initial check in case one of the radio buttons is already selected
       toggleSection();
     });
-
-    document.addEventListener("DOMContentLoaded", function() {
-      var field1 = document.getElementById("term_date");
-      var selectField = document.getElementById("cancellation_reason");
-      var button = document.getElementById("btn-cancel-plan");
-
-    function checkFields() {
-      if ((field1.value.trim() !== "" && isValidDate(field1.value)) && selectField.value !== "") {
-        button.disabled = false;
-      } else {
-        button.disabled = true;
-      }
-    }
-      field1.addEventListener("input", checkFields);
-      selectField.addEventListener("change", checkFields);
-    });
-
-    function isValidDate(dateString) {
-      var date = new Date(dateString);
-      return !isNaN(date.getTime());
-    }
   </script>
 <% else %>
   <div class="col-md-4 confirmation hidden" id="cancel-plan-form">
