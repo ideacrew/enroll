@@ -194,10 +194,6 @@ module BenefitSponsors
       def enable_bs4_layout
         @bs4 = true
       end
-
-      def resolve_layout
-        
-      end
     end
   end
 end
