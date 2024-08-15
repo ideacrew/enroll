@@ -195,7 +195,9 @@ module BenefitSponsors
         @bs4 = true
       end
 
-      def resolve_layout; end
+      def resolve_layout
+        
+      end
     end
   end
 end
