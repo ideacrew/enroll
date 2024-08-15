@@ -111,15 +111,16 @@ module Insured
 
       context "#term_or_cancel" do
         it "should cancel an enrollment if it is not yet effective" do
-          subject.term_or_cancel(enrollment_to_cancel.id, TimeKeeper.date_of_record, 'cancel')
+          subject.term_or_cancel(enrollment_to_cancel.id, TimeKeeper.date_of_record, 'cancel', nil)
           enrollment_to_cancel.reload
           expect(enrollment_to_cancel.aasm_state).to eq 'coverage_canceled'
         end
 
         it "should terminate an enrollment if it is already effective" do
-          subject.term_or_cancel(enrollment_to_term.id, TimeKeeper.date_of_record, 'terminate')
+          subject.term_or_cancel(enrollment_to_term.id, TimeKeeper.date_of_record, 'terminate', "I don't want health insurance anymore")
           enrollment_to_term.reload
           expect(enrollment_to_term.aasm_state).to eq 'coverage_terminated'
+          expect(enrollment_to_term.cancellation_reason).to eq "I don't want health insurance anymore"
         end
       end
     end

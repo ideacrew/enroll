@@ -36,7 +36,7 @@ module Insured
 
       def self.term_or_cancel(enrollment_id, term_date, term_or_cancel, cancellation_reason)
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
-        enrollment.term_or_cancel_enrollment(enrollment, term_date, cancellation_reason)
+        enrollment.term_or_cancel_enrollment(enrollment, term_date, nil, cancellation_reason)
         return unless term_or_cancel == 'cancel'
 
         transmit_flag = true

@@ -1033,7 +1033,7 @@ class HbxEnrollment
     waiver.waive_coverage! if waiver.errors.blank? && waiver.may_waive_coverage?
   end
 
-  def term_or_cancel_enrollment(enrollment, coverage_end_date, cancellation_reason = nil, term_reason = nil)
+  def term_or_cancel_enrollment(enrollment, coverage_end_date, term_reason = nil, cancellation_reason = nil)
     if enrollment.effective_on >= coverage_end_date
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage? # cancel coverage if enrollment is future effective
     elsif coverage_end_date >= TimeKeeper.date_of_record && enrollment.is_shop?

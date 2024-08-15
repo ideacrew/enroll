@@ -48,7 +48,7 @@ module Insured
 
       def self.for_post(attrs)
         form = self.new
-        attrs[:term_date] = format_date(attrs[:term_date])
+        attrs[:term_date] = format_date(attrs[:term_date]) if attrs[:term_date].present?
         unless is_term_or_cancel_date_in_future?(attrs)
           form.errors.add(:base, 'Date cannot be in the past')
           return form
