@@ -61,11 +61,13 @@ module Operations
               csv << ['Family HBX ID', 'Family Updated At', 'Job ID', 'Publish Result']
 
               families.each do |family|
+                logger.info "***** Processing family hbx_assigned_id: #{family.hbx_assigned_id}"
                 csv << build_and_publish_event(family, job_id, logger)
+                logger.info "***** Processed family hbx_assigned_id: #{family.hbx_assigned_id}"
               end
             end
 
-            msg = "Events triggered for all the families. CSV file named #{file_name} is generated with the results."
+            msg = "----- Events triggered for all the families. CSV file named #{file_name} is generated with the results. -----"
             logger.info msg
             Success(msg)
           end
