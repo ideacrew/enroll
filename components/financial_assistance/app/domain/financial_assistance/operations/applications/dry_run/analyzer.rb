@@ -111,7 +111,7 @@ module FinancialAssistance
               person_hbx_ids: person_hbx_ids,
               start_date: start_date,
               end_date: end_date,
-              title_codes: NOTICE_TITLE_MAPPING
+              title_codes: NOTICE_TITLE_MAPPING.keys
             )
             aggregate_collection(Person.collection, pipeline)
           end
