@@ -4,9 +4,11 @@
   <div id="inbox-headers" class="tab-holder">
     <h1><%= l10n("messages") %></h1>
 
-    <div class="pl-3 inbox-sender row">
-      <%= l10n("unread_messages")%>
-      <div class="pl-2"><%= @person.inbox.unread_messages.size %></div>
+    <div>
+      <strong>
+        <%= l10n("unread_messages")%>
+        <span class="pl-2"><%= @person.inbox.unread_messages.size %></span>
+      </strong>
     </div>
   </div>
 
