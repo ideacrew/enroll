@@ -481,7 +481,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.coverage_end_date' => "Coverage End Date",
   :'en.why_are_you_canceling' => "Why are you canceling your plan?",
   :'en.cancelation_reason' => "Cancelation Reason",
-  :'en.back_to_my_account' => "Return to My Account",
+  :'en.return_to_my_account' => "Return to My Account",
   :'en.plan_cancelation' => "Plan Cancelation",
   :'en.cancel_your_plan' => "Cancel Your Plan?",
   :'en.medicare_cancel' => "I'm on Medicare",

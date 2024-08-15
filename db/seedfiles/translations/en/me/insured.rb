@@ -571,7 +571,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.why_are_you_canceling' => "Why are you canceling your plan?",
   :'en.cancelation_reason' => "Cancelation Reason",
   :'en.cancel_your_plan' => "Cancel Your Plan?",
-  :'en.back_to_my_account' => "Return to My Account",
+  :'en.return_to_my_account' => "Return to My Account",
   :'en.plan_cancelation' => "Plan Cancelation",
   :'en.medicare_cancel' => "I'm on Medicare",
   :'en.medicaid_cancel' => "I'm on Medicaid",
