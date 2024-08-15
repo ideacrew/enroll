@@ -28,7 +28,6 @@ class Insured::GroupSelectionController < ApplicationController
 
   helper_method :cancelation_reasons
 
-
   def new
     set_bookmark_url
     set_admin_bookmark_url
