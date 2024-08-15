@@ -12,7 +12,7 @@ module BenefitSponsors
       # TODO: Let's just doo this for now
       before_action :redirect_if_general_agency_disabled, only: %i[new create edit update destroy]
       before_action :set_cache_headers, only: [:edit, :new]
-      before_action :enable_bs4_layout, only: [:new, :create] if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
+      before_action :enable_bs4_layout, only: [:new, :create, :edit] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
       layout :resolve_layout
 
@@ -22,7 +22,7 @@ module BenefitSponsors
         authorize @agency, :redirect_home?
         set_ie_flash_by_announcement unless is_employer_profile?
         respond_to do |format|
-          format.html
+          format.html { render layout: 'bs4_application' if @bs4 }
           format.js
           format.json { head :ok }
         end
@@ -34,8 +34,10 @@ module BenefitSponsors
         begin
           saved, result_url = verify_recaptcha_if_needed && @agency.save
           if saved && is_employer_profile?
+            #rubocop:disable Lint/EmptyBlock
             create_sso_account(current_user, current_person, 15, "employer") do
             end
+            #rubocop:enable Lint/EmptyBlock
           elsif saved && is_general_agency_profile?
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
           end
@@ -192,7 +194,7 @@ module BenefitSponsors
       end
 
       def enable_bs4_layout
-        @bs4 = true
+        @bs4 = EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
       end
     end
   end
