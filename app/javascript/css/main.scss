@@ -549,11 +549,6 @@ a.disabled {
   color: var(--status-red);
 }
 
-.inbox-sender {
-  font-size: 16px;
-  font-weight: 600;
-}
-
 .nav-stacked li {
   padding: $spacer;
   margin-bottom: ($spacer * .25);
@@ -615,10 +610,26 @@ a.disabled {
 
 .msg-inbox {
   cursor: pointer;
-}
 
-.msg-inbox:hover {
-  background-color: var(--grey-020);
+  .sender {
+    font-size: 14px;
+  }
+
+  &.msg-inbox-read {
+    td {
+      font-weight: 400;
+    }
+  }
+
+  &.msg-inbox-unread {
+    td {
+      font-weight: 600;
+    }
+  }
+
+  &:hover {
+    background-color: var(--grey-020);
+  }
 }
 
 .msg-active {
