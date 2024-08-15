@@ -257,18 +257,20 @@ class Insured::GroupSelectionController < ApplicationController
     # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
     # Redirects to root path unless RIDP is verified for the given market kind and family.
     (redirect_to(root_path) and return) unless ridp_verified?(hbx_enrollment.kind, hbx_enrollment.family)
-    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel], cancellation_reason: params[:cancellation_reason]})
-
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post(
+      enrollment_id: params.require(:hbx_enrollment_id),
+      term_date: params[:term_date],
+      term_or_cancel: params[:term_or_cancel],
+      cancellation_reason: params[:cancellation_reason]
+    )
     if @self_term_or_cancel_form.errors.present?
       flash[:error] = @self_term_or_cancel_form.errors.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
       redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
+    elsif ENV['BS4_CONSUMER_FLOW_IS_ENABLED']
+      redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
+      flash[:success] = l10n("plan_canceled")
     else
-      if ENV['BS4_CONSUMER_FLOW_IS_ENABLED']
-        redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
-        flash[:success] = l10n("plan_canceled")
-      else
-        redirect_to family_account_path
-      end
+      redirect_to family_account_path
     end
   end
 
