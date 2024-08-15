@@ -486,7 +486,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.social_security' => "Social Security",
   :'en.member' => "Member",
   :'en.edit_member' => "Edit Member",
-  :'en.add_new_member' => "Add New Member",
   :'en.member' => "Member",
   :'en.relationship' => "Relationship",
   :'en.family_relationships' => "Family Relationships",
