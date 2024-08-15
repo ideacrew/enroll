@@ -1,4 +1,5 @@
 <div class="container">
+  <h1 class="display-4 text-center my-4 bg-primary text-white p-3"><%= l10n("admin_actions.dry_run.applications.title") %></h1>
   <div class="row">
     <div class="col-md-6">
       <table class="table table-bordered">
@@ -64,7 +65,7 @@
           <% benefit_coverage_values.each do |category, value| %>
             <tr>
               <td><%= category.humanize %></td>
-              <td><%= value %></td>
+              <td><%= value.nil? ? '-' : value %></td>
             </tr>
           <% end %>
         </tbody>

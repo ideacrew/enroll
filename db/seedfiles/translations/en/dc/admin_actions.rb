@@ -29,6 +29,7 @@ ADMIN_ACTIONS_TRANSLATIONS = {
   'en.admin_actions.time_jump.confirm' => 'Confirm',
   'en.admin_actions.time_jump.cancel' => 'Cancel',
   'en.admin_actions.time_jump.select' => 'Select',
+  'en.admin_actions.dry_run.applications.title' => 'Dry Run Dashboard - Applications',
   'en.admin_actions.dry_run.application_renewal_status' => 'Application Renewal Status',
   'en.admin_actions.dry_run.eligible_families' => 'Total families eligible for %{year} application renewals:',
   'en.admin_actions.dry_run.renewal_benefit_coverage_values' => 'Renewal Benefit Coverage Values',

@@ -98,7 +98,7 @@ module FinancialAssistance
             return Success(skeleton_for_notices) if person_hbx_ids.blank?
 
             notices = fetch_notices(year, person_hbx_ids)
-            result = notices.count.zero? ? map_notices(notices) : skeleton_for_notices
+            result = notices.count.zero? ? skeleton_for_notices : map_notices(notices)
 
             Success(result)
           end
