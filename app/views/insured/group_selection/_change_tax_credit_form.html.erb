@@ -14,9 +14,8 @@
       </div>
     </div>
     <div id="update_tax_credit_section" class="hidden">
-      <%= form_for @self_term_or_cancel_form,
-        as: :self_term_or_cancel_form,
-        url: term_or_cancel_insured_group_selections_path do |f| %>        
+      <%= form_for locals[:hbx_enrollment], 
+        url: edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), method: :post do |f| %>       
         <div id="max-tax-credit" data-max-tax-credit="<%= @self_term_or_cancel_form[:max_tax_credit].to_i %>"></div>
         <p class="d-flex">
           <label for="effective_date" class="mr-2"><%= l10n("enrollment.effective_on") %></label>

@@ -56,7 +56,6 @@
 
       // Check if the neccessary fields are filled
       function checkFields() {
-        console.log(selectField.value);
         if ((field1.value.trim() !== "" && isValidDate(field1.value)) && selectField.value !== "") {
           button.disabled = false;
         } else {
@@ -65,12 +64,11 @@
       }
 
       function isValidDate(dateString) {
-        console.log(formatDateToMMDDYYYY(dateString));
         var date = new Date(formatDateToMMDDYYYY(dateString));
         return !isNaN(date.getTime());
       }
 
-      // When pulling the date from the date field, it is in the format YYYY-MM-DD
+      // When pulling the date from the date field, it is in the format YYYY-MM-DD. This function converts it to MM-DD-YYYY for more accurate validation.
       function formatDateToMMDDYYYY(dateString) {
         const datePattern = /^\d{4}-\d{2}-\d{2}$/;
         const [year, month, day] = dateString.split("-");
