@@ -283,11 +283,11 @@ class Insured::GroupSelectionController < ApplicationController
     applied_aptc_pct = calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f)
     attrs = {enrollment_id: enrollment_id, elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
     begin
+      message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
       if ENV['BS4_CONSUMER_FLOW_IS_ENABLED']
         flash[:success] = l10n("aptc_updated")
         redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
       else
-        message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
         flash[:notice] = message
         redirect_to family_account_path
       end
