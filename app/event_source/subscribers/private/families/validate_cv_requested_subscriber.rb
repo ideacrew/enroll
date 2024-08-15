@@ -50,7 +50,7 @@ module Subscribers
           subscriber_logger.info "ValidateCvRequestedSubscriber, Processing response: #{response}"
           payload = JSON.parse(response, symbolize_names: true)
 
-          result = ::Operations::Families::ValidateCv.new.call(
+          result = ::Operations::Private::Families::ValidateCv.new.call(
             payload.slice(:family_hbx_id, :family_updated_at, :job_id)
           )
 
