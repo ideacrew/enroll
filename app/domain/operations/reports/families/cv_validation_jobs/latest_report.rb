@@ -100,7 +100,7 @@ module Operations
                 'Job Id',
                 'Result',
                 'CV Errors',
-                'CV Payload Transform Time',
+                'CV Payload Transform Time'
               ]
 
               jobs.each do |job|
