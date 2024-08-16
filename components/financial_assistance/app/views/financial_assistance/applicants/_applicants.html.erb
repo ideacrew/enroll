@@ -3,10 +3,27 @@
   <h2><%= l10n("application_for_coverage", year: @application.assistance_year )%></h2>
   <p><%= l10n('insured.family_members.index.continue_to_get_insurance') %></p>
 
-  <div id="primary-person" class="py-3">
+  <div id="dependent_buttons" class="d-flex flex-column flex-md-row my-md-4 <%= pundit_class Family, :updateable?%> <%= 'hidden' if @family.active_family_members.empty? %>">
+    <%= hidden_field_tag 'origin_source', @source %>
+    <%= h(link_to(new_application_applicant_path(@application, bs4: @bs4), :remote => true, :id => "household_info_add_member", class:"button secondary d-flex") do %>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.99978 5.99982V9.99976H5.99985" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10.0001 13.9997L10.0001 9.99976L14.0001 9.99976" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="10" cy="10" r="9" stroke="#FFFFFF" stroke-width="2"/>
+      </svg>
+      <span class="ml-2"><%= l10n("add_member_to_household") %></span>
+    <% end) %>
+
+    <div class="help-to-decide align-content-around ml-3">
+      <a href="#help_me_decide" data-toggle="modal" data-target="#help_me_decide" class="d-block"><%= l10n("help_me_decide_title") %></a>
+      <%= render partial: 'shared/modal_support_text_household', locals: {key: "help_me_decide"} %>
+    </div>
+  </div>
+  
+  <div id="primary-person" class="pt-3 pb-5">
     <% primary_person = @application.primary_applicant %>
-    <div class="d-flex flex-row">
-      <h2><%= l10n('member') %> 1</h2>
+    <div class="d-flex flex-row align-items-center">
+      <h2 class="mb-0"><%= l10n('member') %> 1</h2>
       <%= render '/financial_assistance/shared/info_needed', applicant: primary_person %>
     </div>
 
@@ -29,14 +46,14 @@
       </div>
     </div>
 
-    <div class="mt-3 member-<%= @application.primary_applicant.id %>-buttons">
-      <% if @application.primary_applicant.applicant_validation_complete? %>
-        <%= h(link_to l10n('edit_income_coverage_info'), financial_assistance.go_to_step_application_applicant_path(@application, @application.primary_applicant, 1), class: "btn button button-primary mr-3") %>
+    <div class="mt-3 member-<%= primary_person.id %>-buttons">
+      <% if primary_person.applicant_validation_complete? %>
+        <%= h(link_to l10n('edit_income_coverage_info'), financial_assistance.go_to_step_application_applicant_path(@application, @application.primary_applicant, 1), class: "btn button button-primary outline mr-3") %>
       <% else %>
         <%= h(link_to l10n('add_income_coverage_info'), financial_assistance.go_to_step_application_applicant_path(@application, @application.primary_applicant, 1), class: "btn button button-primary add mr-3") %>
       <% end %>
 
-      <%= h(link_to l10n("edit_member"), edit_application_applicant_path(@application, @application.primary_applicant), remote: true, id: 'edit-primary-applicant', class: 'btn button outline close-2') %>
+      <%= h(link_to l10n("edit_member"), edit_application_applicant_path(@application, @application.primary_applicant), remote: true, id: 'edit-primary-applicant', class: 'btn btn-tertiary outline close-2') %>
     </div>
 
     <div class="append_consumer_info"></div>
@@ -48,23 +65,6 @@
     <% end %>
   </div>
 
-  <div id="dependent_buttons" class="d-flex flex-column flex-md-row mt-md-2 <%= pundit_class Family, :updateable?%> <%= 'hidden' if @family.active_family_members.empty? %>">
-    <%= hidden_field_tag 'origin_source', @source %>
-    <%= h(link_to(new_application_applicant_path(@application, bs4: @bs4), :remote => true, :id => "household_info_add_member", class:"button secondary d-flex") do %>
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9.99978 5.99982V9.99976H5.99985" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M10.0001 13.9997L10.0001 9.99976L14.0001 9.99976" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="10" cy="10" r="9" stroke="#FFFFFF" stroke-width="2"/>
-      </svg>
-      <span class="ml-2"><%= l10n("add_member_to_household") %></span>
-    <% end) %>
-
-    <div class="help-to-decide align-content-around ml-3">
-      <a href="#help_me_decide" data-toggle="modal" data-target="#help_me_decide" class="d-block"><%= l10n("help_me_decide_title") %></a>
-      <%= render partial: 'shared/modal_support_text_household', locals: {key: "help_me_decide"} %>
-    </div>
-  </div>
-
   <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
     <p class="fail"><%= l10n("insured.family_members.index.add_member_info_html") %></p>
     <div class="<%= pundit_class Family, :updateable? %>">
@@ -72,7 +72,7 @@
     </div>
   </div>
 
-  <div class="mt-md-4">
+  <div class="mt-md-5">
     <% if @change_plan.present? %>
       <% group_selection_url = main_app.new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
       <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: group_selection_url, disable_link: @application.incomplete_applicants? } %>
