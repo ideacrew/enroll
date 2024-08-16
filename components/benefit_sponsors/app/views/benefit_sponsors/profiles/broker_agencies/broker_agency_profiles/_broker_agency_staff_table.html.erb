@@ -1,3 +1,56 @@
+<% if @bs4 %>
+  <h2 class="pt-4"><%= l10n("broker_agencies.staff") %></h2>
+  <% if broker_staff&.any? %>
+    <table class="table border-top-0 col-9 px-0">
+      <thead>
+        <tr>
+          <th><%= l10n("name") %></th>
+          <th><%= l10n("email") %></th>
+          <th><%= l10n("phone") %></th>
+          <th><%= l10n("status") %></th>
+          <th class="numeric"><%= l10n("broker_agencies.remove_staff_role") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% broker_staff.each do |staff_member| %>
+          <tr>
+            <td><%= staff_member.first_name.capitalize %> <%= staff_member.last_name.capitalize %></td>
+            <td><%= staff_member.work_email_or_best %></td>
+            <td><%= staff_member.work_phone %></td>
+            <td>
+              <%= staff_member.has_pending_broker_staff_role?(@broker_agency_profile.id) ? l10n("broker_agencies.pending") : l10n("broker_agencies.active") %>
+              <%= staff_member.user_id ? " #{l10n('broker_agencies.linked')} " : " #{l10n('broker_agencies.unlinked')} " %>
+                <% if staff_member.has_pending_broker_staff_role?(@broker_agency_profile.id) %>
+                <%=  link_to(
+                        approve_profiles_broker_agencies_broker_agency_staff_role_path(
+                            profile_id: @broker_agency_profile.id,
+                            person_id: staff_member.id
+                        ),
+                        :class => "approve") do %>
+                    <%= l10n("broker_agencies.approve") %>
+                <% end %>
+              <% end %>
+            </td>
+            <td class="numeric">
+              <% if current_user.has_hbx_staff_role? || current_user.person.broker_role.present? %>
+                <%= link_to(
+                    profiles_broker_agencies_broker_agency_staff_role_path(
+                    profile_id: @broker_agency_profile.id, person_id: staff_member.id
+                  ),
+                  :id => "destroy",
+                  hidden: !can_show_destroy_for_brokers?(staff_member, broker_staff.count, @broker_agency_profile),
+                  method: 'delete', class: "btn btn-error") do %>
+                    <%= l10n("broker_agencies.remove") %>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+  <%= link_to "Add New Staff", new_profiles_broker_agencies_broker_agency_staff_role_path(profile_id:@broker_agency_profile.id), id: "add_staff", remote: true, class: 'btn' %>
+<% else %>
 <h3><%= l10n("broker_agency_staff") %></h3>
 
 <% if broker_staff %>
@@ -54,3 +107,4 @@
 
 
 <%= link_to l10n("add_broker_staff_role"), new_profiles_broker_agencies_broker_agency_staff_role_path(profile_id:@broker_agency_profile.id), id: "add_staff", remote: true, class: 'btn btn-default pull-left col-12' %>
+<% end %>

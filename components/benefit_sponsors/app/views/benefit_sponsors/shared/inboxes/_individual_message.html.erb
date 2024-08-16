@@ -1,5 +1,5 @@
 <tr class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show(provider, message) %>');">
-  <td style="font-weight:bold">
+  <td>
     <%= message.try(:from) if @folder == 'Inbox' %>
     <%= message.try(:to)   if @folder == 'Sent'%>
   </td>
