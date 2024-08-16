@@ -41,6 +41,7 @@
   </head>
   <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm d-flex flex-column justify-content-between min-vh-100">
     <%= render partial: './ui-components/bs4/v1/navs/header' %>
+    <%= yield :horizontal_menu %>
     <main class="pb-5 <%= controller_name %> flex-grow-1">
       <% if aca_security_questions %>
         <%= render 'users/security_question_responses/modal' %>
@@ -68,7 +69,7 @@
           </div>
         </div>
       <% else %>
-        <div class="container">
+        <div class="container px-0">
           <div class=<%= "mt-4" if @bs4 %>>
             <%= render_flash use_bs4: @bs4 %>
           </div>
