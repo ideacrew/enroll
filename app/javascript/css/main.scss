@@ -703,7 +703,7 @@ a.disabled {
     color: inherit;
     text-decoration: inherit;
 
-    &:hover {
+    &:hover, &:focus {
       background-color: var(--complete-tint);
       font-weight: 600;
     }

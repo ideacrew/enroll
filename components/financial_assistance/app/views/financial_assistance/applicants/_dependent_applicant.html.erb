@@ -1,8 +1,8 @@
 <% if @bs4 %>
-  <div id="add_member_list_<%= dependent.id %>" class="dependent_list py-4">
+  <div id="add_member_list_<%= dependent.id %>" class="dependent_list py-5">
     <div id="add_info_<%= dependent.id %>">
-      <div class="d-flex flex-row">
-        <h2><%= l10n('member') %> <%= local_assigns[:member_number] ? member_number : "" %></h2>
+      <div class="d-flex flex-row align-items-center">
+        <h2 class="mb-0"><%= l10n('member') %> <%= local_assigns[:member_number] ? member_number : "" %></h2>
         <%= render '/financial_assistance/shared/info_needed', applicant: dependent %>
       </div>
       <div class="dependent_notice_div_<%= dependent.id%>"></div>
@@ -27,7 +27,7 @@
       </div>
 
       <div class="mt-3 member-<%= dependent.id %>-buttons">
-        <% if @application.workflow.present? %>
+        <% if dependent.applicant_validation_complete? %>
           <%= h(link_to l10n('edit_income_coverage_info'), financial_assistance.go_to_step_application_applicant_path(@application, dependent, 1), class: "btn button button-primary mr-3") %>
         <% else %>
           <%= h(link_to l10n('add_income_coverage_info'), financial_assistance.go_to_step_application_applicant_path(@application, dependent, 1), class: "btn button button-primary add mr-3") %>
