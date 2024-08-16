@@ -20,7 +20,7 @@ module Operations
           family_hbx_id             = yield validate_params(params)
           family                    = yield find_family(family_hbx_id)
           family_entity             = yield transform_to_entity(family)
-          cv_validation_job_params  = yield construct_cv_validation_job_params(family_hbx_id, family_entity)
+          cv_validation_job_params  = yield construct_cv_validation_job_params(family, family_hbx_id, family_entity)
           cv_validation_job         = yield create_cv_validation_job(cv_validation_job_params)
 
           Success(cv_validation_job)
@@ -73,16 +73,18 @@ module Operations
         end
 
         # Constructs the CV validation job parameters
+        # @param family [Family] the family object
         # @param family_hbx_id [String] the family HBX ID
         # @param family_entity [Object] the family entity
         # @return [Dry::Monads::Result] the result of the construction
-        def construct_cv_validation_job_params(family_hbx_id, family_entity)
+        def construct_cv_validation_job_params(family, family_hbx_id, family_entity)
           Success(
             {
               cv_payload: family_entity.present? ? family_entity.to_json : nil,
               cv_version: 3,
               aca_version: AcaEntities::VERSION,
               aca_entities_sha: GemUtils.aca_entities_sha,
+              primary_person_hbx_id: family.primary_person&.hbx_id,
               family_hbx_id: family_hbx_id,
               family_updated_at: @family_updated_at,
               job_id: @job_id,
