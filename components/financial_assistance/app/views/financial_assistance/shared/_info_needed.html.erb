@@ -1,11 +1,11 @@
 <% if @bs4 %>
     <% if applicant.applicant_validation_complete? %>
-      <div class="alert alert-success alert-sm d-flex align-items-center ml-4" role="alert">
+      <div class="alert alert-success alert-sm d-flex align-items-center p-2 mb-0 ml-4" role="alert">
         <div class="success-icon icon icon-sm" alt="success" aria-hidden="true">&nbsp;</div>
         <%=l10n("information_complete")%>
       </div>
     <% else %>
-      <div class="alert alert-warning d-flex align-items-center ml-4" role="alert">
+      <div class="alert alert-warning d-flex align-items-center p-2 mb-0 ml-4" role="alert">
         <div class="warning-icon icon" alt="warning" aria-hidden="true">&nbsp;</div>
         <%= l10n("additional_info_needed") %>
         <%= ": (#{l10n("ssn_not_present")}" if applicant.is_applying_coverage && !applicant.ssn_present? %>
