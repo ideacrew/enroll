@@ -249,11 +249,9 @@ module FinancialAssistance
                   mitc_relationships: mitc_relationships(applicant),
                   mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes, assistance_year),
                   mitc_state_resident: mitc_state_resident(applicant, application.us_state),
-                  reason_code: 'FullDetermination',
+                  reason_code: 'FullDetermination'
                 }
-                if EnrollRegistry.feature_enabled?(:multiple_determination_submission_reasons) && applicant.is_gap_filling
-                  applicant_hash[:additional_reason_codes] = %w[FullDetermination GapFilling]
-                end
+                applicant_hash[:additional_reason_codes] = %w[FullDetermination GapFilling] if EnrollRegistry.feature_enabled?(:multiple_determination_submission_reasons) && applicant.is_gap_filling
                 result << applicant_hash
                 result
               end
