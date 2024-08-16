@@ -1,8 +1,12 @@
 <div class="container">
-  <h3 class="display-4 text-center my-4 bg-primary text-white p-3"><%= l10n("admin_actions.dry_run.applications.title") %></h3>
+  <h3 class="display-4 text-center my-4 bg-primary text-white p-3">
+    <%= l10n("admin_actions.dry_run.applications.title") %>
+  </h3>
   <div class="row">
     <div class="col-md-6">
-      <h3><%= l10n("admin_actions.dry_run.renewal_benefit_coverage_values") %></h3>
+      <h3>
+        <%= l10n("admin_actions.dry_run.renewal_benefit_coverage_values") %>
+      </h3>
       <table class="table table-bordered">
         <thead>
           <tr>
@@ -20,12 +24,18 @@
         </tbody>
       </table>
 
-      <h3><%= l10n("admin_actions.dry_run.application_renewal_status") %></h3>
+      <h3>
+        <%= l10n("admin_actions.dry_run.application_renewal_status") %>
+      </h3>
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th><%= l10n('admin_actions.dry_run.eligible_families', year: benefit_coverage_values["renewal benefit start date"]&.year) %></th>
-            <th><%= eligible_families.present? ? eligible_families["families_eligible_for_application_renewal"] : l10n("admin_actions.dry_run.errored") %></th>
+            <th>
+              <%= l10n('admin_actions.dry_run.eligible_families', year: benefit_coverage_values["renewal benefit start date"]&.year) %>
+            </th>
+            <th>
+              <%= eligible_families.present? ? eligible_families["families_eligible_for_application_renewal"] : l10n("admin_actions.dry_run.errored") %>
+            </th>
           </tr>
         </thead>
       </table>
@@ -52,8 +62,13 @@
         </tbody>
       </table>
 
-      <h3><%= l10n("admin_actions.dry_run.oe_determined_notices") %></h3>
-      <h5><strong>Note:</strong> Displaying the last 6 months of OE-generated notices. Currently, there is no one-to-one mapping between these notices and applications.</h5>
+      <h3>
+        <%= l10n("admin_actions.dry_run.oe_determined_notices") %>
+      </h3>
+      <h5>
+        <strong><%= l10n("admin_actions.dry_run.notices.note") %></strong>
+        <%= l10n("admin_actions.dry_run.notices.note_info") %>
+      </h5>
       <table class="table table-bordered">
         <thead>
           <tr>
