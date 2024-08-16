@@ -14,21 +14,11 @@ document.addEventListener('DOMContentLoaded', function () {
   enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
 
   function toggleDisplayEnrollments(event) {
-    if (event.target.type == 'submit') {
-      enrollmentToggleCheckbox.checked = !enrollmentToggleCheckbox.checked;
+    for (const panel of initiallyHiddenEnrollmentPanels) {
+      panel.classList.remove('hidden');
     }
 
-    if (enrollmentToggleCheckbox.checked) {
-      for (let i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
-        initiallyHiddenEnrollmentPanels[i].classList.remove('hidden');
-        enrollmentToggleButton.innerText = l10n('');
-      }
-    } else {
-      for (let i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
-        initiallyHiddenEnrollmentPanels[i].classList.add('hidden');
-        enrollmentToggleButton.innerText = 'Show All Enrollments';
-      }
-    }
+    enrollmentToggleButton.remove();
   }
 
   // For when family home page loaded through clicking off of the families index page
