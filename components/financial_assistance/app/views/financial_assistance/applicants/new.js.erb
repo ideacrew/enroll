@@ -14,6 +14,7 @@ $('#btn-continue').addClass('disabled');
       $(ele).remove();
   });
   $("#dependent_ul").append("<%= escape_javascript(render 'dependent_form') %>");
+  $('#' + $("#dependent_ul").children().last().attr('id')).get(0).scrollIntoView({behavior: 'smooth'});
 <% end %>
 
 $("#add_member_list_<%= @applicant.id %>").attr('data-confirm', '');
