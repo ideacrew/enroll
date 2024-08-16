@@ -1334,7 +1334,6 @@ end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   wait_for_ajax
-  binding.irb
   find(IvlChooseCoverage.continue_btn).click
   find(IvlChooseCoverage.continue_btn).click unless page.has_content?('Choose Plan')
 end
