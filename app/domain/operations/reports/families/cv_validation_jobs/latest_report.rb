@@ -123,7 +123,7 @@ module Operations
             end
 
             Success(
-              "Latest CV Validation Job report generated: #{csv_file_name} and log file: #{logger}"
+              "Latest CV Validation Job report generated: #{csv_file_name} and log file: #{logger_name}"
             )
           end
         end
