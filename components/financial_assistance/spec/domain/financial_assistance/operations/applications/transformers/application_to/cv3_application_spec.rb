@@ -126,7 +126,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:result) { subject.call(application) }
 
     before :each do
-      applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination_id: eligibility_determination.id)
+      applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present',
+                                  eligibility_determination_id: eligibility_determination.id)
     end
 
     it 'should pass' do
@@ -160,8 +161,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:multiple_determination_submission_reasons).and_return(true)
       end
 
-      it 'should add additional_reason_codes' do
-        expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq ["Full Determination", "Gap Filling"]
+      context "when applicant is gap filling eligible" do
+        it 'should add additional_reason_codes' do
+          applicant.update_attributes(is_gap_filling: true)
+          expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq %w[FullDetermination GapFilling]
+        end
+      end
+
+      context "when applicant is not gap filling eligible" do
+        it 'should add reason_codes' do
+          applicant.update_attributes(is_gap_filling: false)
+          expect(result.value!.dig(:applicants, 0, :reason_code)).to eq "FullDetermination"
+          expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq nil
+        end
       end
     end
 
