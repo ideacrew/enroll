@@ -40,6 +40,6 @@ ADMIN_ACTIONS_TRANSLATIONS = {
   'en.admin_actions.dry_run.category' => 'Category',
   'en.admin_actions.dry_run.value' => 'Value',
   'en.admin_actions.dry_run.errored' => 'Errored',
-  'en.admin_actions.dry_run.notices.note' => 'Note',
+  'en.admin_actions.dry_run.notices.note' => 'Note:',
   'en.admin_actions.dry_run.notices.note_info' => 'Displaying the last 6 months of OE-generated notices. Currently, there is no one-to-one mapping between these notices and applications.'
 }
