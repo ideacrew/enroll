@@ -16,7 +16,7 @@ module BenefitSponsors
         before_action :set_current_person, only: [:staff_index]
         before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
         before_action :set_cache_headers, only: [:show]
-        before_action :enable_bs4_layout, only: [:show, :messages, :inbox, :family_index] if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
+        before_action :enable_bs4_layout, only: [:show, :messages, :inbox, :family_index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
         skip_before_action :verify_authenticity_token, only: :create
 
@@ -50,12 +50,7 @@ module BenefitSponsors
           @q = params.permit(:q)[:q]
 
           @staff = eligible_brokers
-          @page_alphabets = if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-                              grouped_alphabet(@staff, "last_name")
-                            else
-                              page_alphabets(@staff, "last_name")
-                            end
-          @alph_labels = @page_alphabets.map{|alph| [alph.first, alph.last].join("–")} if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+          @page_alphabets = page_alphabets(@staff, "last_name")
           page_no = cur_page_no(@page_alphabets.first)
           @staff = if @q.nil?
                      @staff.where(last_name: /^#{page_no}/i)
@@ -104,7 +99,7 @@ module BenefitSponsors
 
           respond_to do |format|
             format.js
-            format.html { render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_datatable.html.erb" } if @bs4
+            format.html { render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_datatable.html.erb" }
           end
         end
 
@@ -258,7 +253,7 @@ module BenefitSponsors
         end
 
         def resolve_layout
-          return "single_column" unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
+          return "single_column" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
           "progress"
         end
       end

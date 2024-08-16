@@ -394,6 +394,9 @@ registry:
       - key: :bs4_consumer_flow
         item: :bs4_consumer_flow
         is_enabled: <%= ENV['BS4_CONSUMER_FLOW_IS_ENABLED'] || false %>
+      - key: :bs4_broker_flow
+        item: :bs4_broker_flow
+        is_enabled: <%= ENV['BS4_BROKER_FLOW_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:

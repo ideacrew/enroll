@@ -10,9 +10,7 @@
       <thead>
       <tr>
         <th><%= l10n("name")%></th>
-        <% unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
-          <th><%= l10n("ssn")%></th>
-        <% end %>
+        <th><%= l10n("ssn")%></th>
         <th><%= l10n("dob")%></th>
         <th><%= l10n("hbx_id")%></th>
         <th><%= l10n("family")%></th>
@@ -28,20 +26,15 @@
     </table>
     </div>
     <script type="text/javascript" charset="utf-8">
-      var ssnRemoved = "<%= EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>";
-      if (ssnRemoved) {
-        var columnList = [{ data: 'name'}, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
-      } else {
-        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
-      }
 
-      var market_enabled = document.getElementById("market_enabled_check").value;
-      if (market_enabled == 'true') {
-        columnList.push({data: 'consumer'}, {data: 'employee'})
-        var filteredColumnList = columnList
-      } else {
-        var filteredColumnList = columnList
-      }
+        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
+        var market_enabled = document.getElementById("market_enabled_check").value;
+        if (market_enabled == 'true') {
+          columnList.push({data: 'consumer'}, {data: 'employee'})
+          var filteredColumnList = columnList
+        } else {
+          var filteredColumnList = columnList
+        }
 
       // datatables setup
       $(document).ready(function() {
@@ -76,17 +69,6 @@
           "p" +
           ">"
         } );
-
-        var logoLink = document.getElementById("link-home-logo");
-    
-        logoLink.addEventListener("click", function(e) {
-          e.preventDefault();
-          const urlParams = new URLSearchParams(window.location.search);
-          const id = urlParams.get('id');
-          const homeUrl = `/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/${id}`;
-
-          window.location.replace(homeUrl);
-        });
       });
   </script>
   </div>
@@ -104,9 +86,7 @@
         <thead>
         <tr>
           <th><%= l10n("name")%></th>
-          <% unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
-            <th><%= l10n("ssn")%></th>
-          <% end %>
+          <th><%= l10n("ssn")%></th>
           <th><%= l10n("dob")%></th>
           <th><%= l10n("hbx_id")%></th>
           <th><%= l10n("family")%></th>
@@ -123,19 +103,15 @@
     </div>
 
     <script type="text/javascript" charset="utf-8">
-      var ssnRemoved = "<%= EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>";
-      if (ssnRemoved) {
-        var columnList = [{ data: 'name'}, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
-      } else {
+
         var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
-      }
-      var market_enabled = document.getElementById("market_enabled_check").value;
-      if (market_enabled == 'true') {
-        columnList.push({data: 'consumer'}, {data: 'employee'})
-        var filteredColumnList = columnList
-      } else {
-        var filteredColumnList = columnList
-      }
+        var market_enabled = document.getElementById("market_enabled_check").value;
+        if (market_enabled == 'true') {
+          columnList.push({data: 'consumer'}, {data: 'employee'})
+          var filteredColumnList = columnList
+        } else {
+          var filteredColumnList = columnList
+        }
 
       // datatables setup
       $(document).ready(function() {

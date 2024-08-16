@@ -517,6 +517,43 @@ ul.plain {
       border-color: var(--primary-color);
       color: var(--grey-000);
     }
+    // these are for datatable pagination
+    &.paginate_button {
+      position: relative;
+      display: block;
+      padding: 0.5rem 0.75rem;
+      margin-left: -1px;
+      line-height: 1.25;
+      background-color: var(--grey-000);
+      border-color: var(--grey-020);
+
+      a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        padding: $spacer / 2 $spacer;
+      }
+
+      &.active:hover a {
+        background-color: var(--primary-color-darker);
+      }
+
+      &:hover:not(.active):not(.disabled) a {
+        background-color: var(--grey-020);
+      }
+    }
+
+    &.active.paginate_button a {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: var(--grey-000);
+    }
+
+    .next {
+      border-top-right-radius: 0.25rem;
+      border-bottom-right-radius: 0.25rem;
+    }
+
   }
 }
 
@@ -584,7 +621,7 @@ a.disabled {
   margin-bottom: 6px;
 }
 
-.tab {
+.tab, .ui-tabs-tab {
   border: none;
   padding: 1.25ch 1ch 1.1ch;
   font-size: 1rem;
@@ -594,7 +631,7 @@ a.disabled {
   border-radius: 5px 5px 0 0;
 }
 
-.tab.active {
+.tab.active, .ui-tabs-tab.ui-tabs-active {
   background: #ffffff;;
   color: var(--primary-color);
   border-top: 1px solid var(--grey-060);
