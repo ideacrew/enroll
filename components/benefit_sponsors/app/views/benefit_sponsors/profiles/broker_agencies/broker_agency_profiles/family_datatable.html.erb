@@ -1,0 +1,8 @@
+<%= render partial: 'benefit_sponsors/shared/profiles/broker_agency/menu', :locals => { broker_profile_id: @broker_agency_profile.id, :active_tab => "families-tab", families: true } %>
+<div class="profile-content">
+  <div class="tab-row">
+    <div class="tab-content" id="myTabContent">
+      <%= render "families" %>
+    </div>
+  </div>
+</div>

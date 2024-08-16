@@ -1,3 +1,6 @@
 setTabContent("<%= escape_javascript render partial: 'benefit_sponsors/shared/inboxes/message_list', locals: { provider: @provider } %>");
 set_active_ontab("#inbox-tab");
-$('#inbox-messages').addClass('container');
+var bs4 = document.documentElement.dataset.bs4 == "true";
+if (!bs4) {
+  $('#inbox-messages').addClass('container');
+}
