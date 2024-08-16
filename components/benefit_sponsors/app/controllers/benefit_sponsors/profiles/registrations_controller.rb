@@ -12,8 +12,9 @@ module BenefitSponsors
       # TODO: Let's just doo this for now
       before_action :redirect_if_general_agency_disabled, only: %i[new create edit update destroy]
       before_action :set_cache_headers, only: [:edit, :new]
+      before_action :enable_bs4_layout, only: [:create] if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
 
-      layout 'two_column', :only => :edit
+      layout :resolve_layout
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
@@ -48,7 +49,7 @@ module BenefitSponsors
           if is_broker_profile? && saved
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
             respond_to do |format|
-              format.html { render template_filename, :layout => 'single_column' }
+              format.html { render template_filename }
             end
             return
           elsif saved
@@ -190,6 +191,16 @@ module BenefitSponsors
       def verify_recaptcha_if_needed
         return true unless helpers.registration_recaptcha_enabled?(profile_type)
         verify_recaptcha(model: @agency)
+      end
+
+      def enable_bs4_layout
+        @bs4 = true
+      end
+
+      def resolve_layout
+        return "progress" if (action_name == "create") && EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        return "two_column" if action_name == "edit"
+        "bs4_application"
       end
     end
   end

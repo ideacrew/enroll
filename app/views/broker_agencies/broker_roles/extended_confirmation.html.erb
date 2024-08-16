@@ -1,13 +1,21 @@
-<div id="broker_confimation_panel">
-  <div class="container">
-    <h2>We Received Your Broker Application</h2>
-    <p>Now that you’ve registered, we will review your application and confirm that you have:</p>
-    <ul>
-      <li>Completed the <a target="_blank" rel='noopener noreferrer' href='https://coverme.inquisiqlms.com/'><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> training</a> provided by <%=EnrollRegistry[:enroll_app].setting(:short_name).item %> Consumer Assistance Center</li>
-      <li>Have an active producer license with health authority with the Maine Bureau of Insurance</li>
-    </ul>
-    <p>If you have met all of the requirements, you’ll get an email from <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> in the next 7-10 business days with a link to set up your <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> password.</p>
-    <p>Registration and certification with <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> does not guarantee appointments with carriers. You still need to work with carriers to secure appointments.</p>
-    <p>If you have any questions call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %> TTY:  <%=EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item%></p>
+<% if @bs4 %>
+  <h1><%= l10n("broker_agencies.broker_roles.confirmation.heading") %></h1>
+  <p><%= l10n("broker_agencies.broker_roles.confirmation.description1") %></p>
+  <ul>
+    <li><%= l10n("broker_agencies.broker_roles.confirmation.li1")%> <a target="_blank" rel='noopener noreferrer' href='https://coverme.inquisiqlms.com/'><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> training</a> provided by <%=EnrollRegistry[:enroll_app].setting(:short_name).item %></li>
+  </ul>
+<% else %>
+  <div id="broker_confimation_panel">
+    <div class="container">
+      <h2>We Received Your Broker Application</h2>
+      <p>Now that you’ve registered, we will review your application and confirm that you have:</p>
+      <ul>
+        <li>Completed the <a target="_blank" rel='noopener noreferrer' href='https://coverme.inquisiqlms.com/'><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> training</a> provided by <%=EnrollRegistry[:enroll_app].setting(:short_name).item %> Consumer Assistance Center</li>
+        <li>Have an active producer license with health authority with the Maine Bureau of Insurance</li>
+      </ul>
+      <p>If you have met all of the requirements, you’ll get an email from <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> in the next 7-10 business days with a link to set up your <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> password.</p>
+      <p>Registration and certification with <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> does not guarantee appointments with carriers. You still need to work with carriers to secure appointments.</p>
+      <p>If you have any questions call <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %> TTY:  <%=EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item%></p>
+    </div>
   </div>
-</div>
+<% end %>
