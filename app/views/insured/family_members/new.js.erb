@@ -1,7 +1,6 @@
 var bs4 = document.documentElement.dataset.bs4;
 if (bs4 == "true") {
   if ($(".my-household-page").length == 0) {
-    console.log("ADD MEM - NON-MH");
     $('#dependents_info_wrapper h4:first').text("Please enter the information requested below. When you\'re finished, select \'Confirm Member\' at the bottom of the page.");
     $('#btn-continue').addClass('disabled');
     <% if @dependent.errors.present? || @address_errors.present?  %>
@@ -31,7 +30,6 @@ if (bs4 == "true") {
     });
 
   } else {
-    console.log("ADD MEM - MH");
     //manage family/ my household page
     <% if @dependent.errors.present? || @address_errors.present?  %>
       var dependent_response = $("<%= escape_javascript(render 'dependent_form', dependent: @dependent, person: @person) %>");
