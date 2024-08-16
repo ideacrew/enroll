@@ -852,6 +852,32 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   end
 
+  def ivl_dry_run_dashboard
+    authorize HbxProfile, :dry_run_dashboard?
+
+    result = ::Operations::HbxAdmin::DryRun::Individual::Analyzer.new.call
+
+    if result.failure?
+      flash[:error], application_states = result.failure
+      eligible_families = {}
+      benefit_coverage_values = {}
+      oe_determined_notices = {}
+    else
+      eligible_families, application_states, benefit_coverage_values, oe_determined_notices = result.success
+    end
+
+    respond_to do |format|
+      format.html do
+        render 'dry_run_dashboard', locals: {
+          eligible_families: eligible_families,
+          application_states: application_states,
+          benefit_coverage_values: benefit_coverage_values,
+          oe_determined_notices: oe_determined_notices
+        }
+      end
+    end
+  end
+
   private
 
   def find_email(agent, role)

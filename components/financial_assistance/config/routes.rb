@@ -26,7 +26,6 @@ FinancialAssistance::Engine.routes.draw do
     put :update_transfer_requested, on: :member
     get :transfer_history, on: :member
     patch :update_application_year, on: :member
-    get :dry_run_dashboard, on: :collection
 
     resources :relationships, only: [:index, :create]
 

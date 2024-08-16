@@ -2,57 +2,6 @@
   <h3 class="display-4 text-center my-4 bg-primary text-white p-3"><%= l10n("admin_actions.dry_run.applications.title") %></h3>
   <div class="row">
     <div class="col-md-6">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th><%= l10n('admin_actions.dry_run.eligible_families', year: benefit_coverage_values["renewal benefit start date"]&.year) %></th>
-            <th><%= eligible_families.present? ? eligible_families["families_eligible_for_application_renewal"] : l10n("admin_actions.dry_run.errored") %></th>
-          </tr>
-        </thead>
-      </table>
-
-      <h3><%= l10n("admin_actions.dry_run.application_renewal_status") %></h3>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th><%= l10n("admin_actions.dry_run.status") %></th>
-            <% application_states.keys.each do |year| %>
-              <th><%= year %></th>
-            <% end %>
-          </tr>
-        </thead>
-        <tbody>
-          <% statuses = ::FinancialAssistance::Operations::Applications::DryRun::Analyzer::APPLICATION_STATES %>
-          <% statuses.each do |status| %>
-            <tr>
-              <td><%= status.humanize %></td>
-              <% application_states.each do |year, status_counts| %>
-                <td><%= status_counts[status] || 0 %></td>
-              <% end %>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-
-      <h3><%= l10n("admin_actions.dry_run.oe_determined_notices") %></h3>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th><%= l10n("admin_actions.dry_run.notice") %></th>
-            <th><%= l10n("admin_actions.dry_run.count") %></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% oe_determined_notices.each do |notice, value| %>
-            <tr>
-              <td><%= notice.upcase %></td>
-              <td><%= value %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-    <div class="col-md-6">
       <h3><%= l10n("admin_actions.dry_run.renewal_benefit_coverage_values") %></h3>
       <table class="table table-bordered">
         <thead>
@@ -66,6 +15,57 @@
             <tr>
               <td><%= category.humanize %></td>
               <td><%= value.nil? ? '-' : value %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <h3><%= l10n("admin_actions.dry_run.application_renewal_status") %></h3>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th><%= l10n('admin_actions.dry_run.eligible_families', year: benefit_coverage_values["renewal benefit start date"]&.year) %></th>
+            <th><%= eligible_families.present? ? eligible_families["families_eligible_for_application_renewal"] : l10n("admin_actions.dry_run.errored") %></th>
+          </tr>
+        </thead>
+      </table>
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th><%= l10n("admin_actions.dry_run.status") %></th>
+            <% application_states.keys.each do |year| %>
+              <th><%= year %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% statuses = ::Operations::HbxAdmin::DryRun::Individual::Analyzer::APPLICATION_STATES %>
+          <% statuses.each do |status| %>
+            <tr>
+              <td><%= status.humanize %></td>
+              <% application_states.each do |year, status_counts| %>
+                <td><%= status_counts[status] || 0 %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <h3><%= l10n("admin_actions.dry_run.oe_determined_notices") %></h3>
+      <h5><strong>Note:</strong> Displaying the last 6 months of OE-generated notices. Currently, there is no one-to-one mapping between these notices and applications.</h5>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th><%= l10n("admin_actions.dry_run.notice") %></th>
+            <th><%= l10n("admin_actions.dry_run.count") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% oe_determined_notices.each do |notice, value| %>
+            <tr>
+              <td><%= notice.upcase %></td>
+              <td><%= value %></td>
             </tr>
           <% end %>
         </tbody>

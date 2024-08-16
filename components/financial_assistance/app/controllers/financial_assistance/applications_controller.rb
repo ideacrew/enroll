@@ -6,7 +6,7 @@ module FinancialAssistance
 
     before_action :set_current_person
     before_action :set_family
-    before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application, :dry_run_dashboard]
+    before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -338,32 +338,6 @@ module FinancialAssistance
       @application.update_attributes(assistance_year: new_year) if new_year && new_year != @application.assistance_year
 
       redirect_to application_checklist_application_path(@application)
-    end
-
-    def dry_run_dashboard
-      authorize HbxProfile, :dry_run_dashboard?
-
-      result = ::FinancialAssistance::Operations::Applications::DryRun::Analyzer.new.call
-
-      if result.failure?
-        flash[:error], application_states = result.failure
-        eligible_families = {}
-        benefit_coverage_values = {}
-        oe_determined_notices = {}
-      else
-        eligible_families, application_states, benefit_coverage_values, oe_determined_notices = result.success
-      end
-
-      respond_to do |format|
-        format.html do
-          render 'dry_run_dashboard', locals: {
-            eligible_families: eligible_families,
-            application_states: application_states,
-            benefit_coverage_values: benefit_coverage_values,
-            oe_determined_notices: oe_determined_notices
-          }
-        end
-      end
     end
 
     private
