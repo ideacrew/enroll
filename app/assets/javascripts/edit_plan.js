@@ -1,4 +1,4 @@
-var bs4 = document.documentElement.dataset.bs4;
+var bs4 = document.documentElement.dataset.bs4 == "true"
 if (bs4) {
   $(document).on('turbolinks:load', function() {
     // Cancel Plan Form

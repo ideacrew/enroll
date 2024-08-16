@@ -18,12 +18,15 @@
         <%= hidden_field_tag :hbx_enrollment_id, locals[:hbx_enrollment][:id] %>
         <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
         <%= hidden_field_tag :family_id, locals[:family_id] %>
+        <%= hidden_field_tag :bs4, true %>
         <p><%= l10n("choose_last_day") %></p>
         <label class="required" for="term_date"><%= l10n("coverage_end_date") %></label>
         <%= date_field_tag :term_date, class: "date-field mt-2", :'data-date-max' => "+0", required: true %>
-        <p class="mt-4"><%= l10n("why_are_you_canceling") %><p>
-        <label class="required" for="cancellation_reason"><%= l10n("cancelation_reason") %></label>
-        <%= select_tag :cancellation_reason, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: true %>
+        <% if show_cancellation_reason %>
+          <p class="mt-4"><%= l10n("why_are_you_canceling") %><p>
+          <label class="required" for="cancellation_reason"><%= l10n("cancelation_reason") %></label>
+          <%= select_tag :cancellation_reason, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: show_cancellation_reason %>
+        <% end %>
         <div class="mt-4">
           <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", disabled: false %>
           <%= submit_tag l10n("cancel_plan"), class: "btn btn-error", id: "btn-cancel-plan", disabled: true %>
@@ -42,7 +45,10 @@
       var button = document.getElementById("btn-cancel-plan");
 
       form.addEventListener("submit", function(event) {
-        location.reload();
+        // Prevent form submission if the button is disabled
+        if (button.disabled) {
+          event.preventDefault();
+        }
       });
 
       // Toggle the section based on the selected radio button
@@ -54,12 +60,19 @@
         }
       }
 
-      // Check if the neccessary fields are filled
       function checkFields() {
-        if ((field1.value.trim() !== "" && isValidDate(field1.value)) && selectField.value !== "") {
-          button.disabled = false;
+        if (selectField) {
+          if ((field1.value.trim() !== "" && isValidDate(field1.value)) && selectField.value !== "") {
+            button.disabled = false;
+          } else {
+            button.disabled = true;
+          }
         } else {
-          button.disabled = true;
+          if (field1.value.trim() !== "" && isValidDate(field1.value)) {
+            button.disabled = false;
+          } else {
+            button.disabled = true;
+          }
         }
       }
 
@@ -70,9 +83,7 @@
 
       // When pulling the date from the date field, it is in the format YYYY-MM-DD. This function converts it to MM-DD-YYYY for more accurate validation.
       function formatDateToMMDDYYYY(dateString) {
-        const datePattern = /^\d{4}-\d{2}-\d{2}$/;
         const [year, month, day] = dateString.split("-");
-        const date = new Date(year, month - 1, day);
         return `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${year}`;
       }
 
@@ -80,10 +91,12 @@
       radioButtonYes.addEventListener("change", toggleSection);
       radioButtonNo.addEventListener("change", toggleSection);
       field1.addEventListener("input", checkFields);
-      selectField.addEventListener("change", checkFields);
+      if (selectField) {
+        selectField.addEventListener("change", checkFields);
+      }
 
-      // Initial check in case one of the radio buttons is already selected
-      toggleSection();
+      toggleSection(); // Initial check in case one of the radio buttons is already selected
+      checkFields(); // Initial check for field values
     });
   </script>
 <% else %>

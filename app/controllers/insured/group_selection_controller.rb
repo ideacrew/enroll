@@ -27,6 +27,7 @@ class Insured::GroupSelectionController < ApplicationController
   before_action :is_user_authorized?
 
   helper_method :cancelation_reasons
+  helper_method :show_cancellation_reason
 
   def new
     set_bookmark_url
@@ -265,7 +266,7 @@ class Insured::GroupSelectionController < ApplicationController
     if @self_term_or_cancel_form.errors.present?
       flash[:error] = @self_term_or_cancel_form.errors.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
       redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
-    elsif ENV['BS4_CONSUMER_FLOW_IS_ENABLED']
+    elsif params[:bs4]
       redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
       flash[:success] = l10n("plan_canceled")
     else
@@ -284,9 +285,9 @@ class Insured::GroupSelectionController < ApplicationController
     applied_aptc_pct = calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f)
     attrs = {enrollment_id: enrollment_id, elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
     begin
-      message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
-      if ENV['BS4_CONSUMER_FLOW_IS_ENABLED']
-        flash[:success] = l10n("aptc_updated")
+      message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs, bs4: params[:bs4])
+      if params[:bs4]
+        flash[:success] = message
         redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
       else
         flash[:notice] = message
@@ -550,6 +551,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   def cancelation_reasons
     CANCELATION_REASONS.map { |reason| l10n(reason) }
+  end
+
+  def show_cancellation_reason
+    ::EnrollRegistry.feature_enabled?(:cancellation_reason)
   end
 
   def enable_bs4_layout
