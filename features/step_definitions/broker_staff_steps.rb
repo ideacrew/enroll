@@ -40,7 +40,7 @@ When(/^the Broker clicks on the approve button$/) do
 end
 
 Then(/^Broker should see the staff successfully approved message$/) do
-  expect(page).to have_content('Role approved successfully', wait: 10)
+  expect(page).to have_content('has been approved.', wait: 10)
 end
 
 Then(/^Broker Staff should receive an invitation email from his Employer$/) do
@@ -57,7 +57,7 @@ Then(/^Broker should see the staff successfully removed message$/) do
 end
 
 And(/^the Broker clicks on the “Add Broker Staff Role” button$/) do
-  find('.interaction-click-control-add-broker-staff-role').click
+  find('#add_staff').click
 end
 
 And(/^a form appears that requires the Broker to input First Name, Last Name, and DOB to submit$/) do
@@ -74,11 +74,11 @@ When(/^the Broker enters the First Name, Last Name, and DOB of existing user (.*
 end
 
 Then(/^the Broker will be given a broker staff role with the given Broker Agency$/) do
-  find(:xpath, '//*[@id="myTabContent"]/div/form/button').click
+  find('#addStaff').click
 end
 
 And(/^the Broker will now appear within the “Broker Staff” table as Active and Linked$/) do
-  expect(page).to have_content('Role added successfully')
+  expect(page).to have_content('has been added.')
   expect(page).to have_content('Active Linked')
 end
 
@@ -89,6 +89,6 @@ When(/^the Broker enters the First Name, Last Name, and DOB of an non existing u
 end
 
 Then(/^the Broker will not be given a broker staff role with the given Broker Agency$/) do
-  find(:xpath, '//*[@id="myTabContent"]/div/form/button').click
+  find('#addStaff').click
   expect(page).to have_content('Role was not added because Person does not exist on the Exchange')
 end
