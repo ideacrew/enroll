@@ -285,18 +285,16 @@ class Insured::GroupSelectionController < ApplicationController
     applied_aptc_pct = calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f)
     attrs = {enrollment_id: enrollment_id, elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
     begin
-      message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs, bs4: params[:bs4])
+      message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
       if params[:bs4]
         flash[:success] = l10n('aptc_updated')
-        redirect_to family_account_path
       else
         flash[:notice] = message
-        redirect_to family_account_path
       end
     rescue StandardError => e
       flash[:error] = "Unable to update tax credits for enrollment"
-      redirect_to family_account_path
     end
+    redirect_to family_account_path
   end
 
   private
