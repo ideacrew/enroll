@@ -63,11 +63,8 @@ module Insured
 
         service = self_term_or_cancel_service(attrs)
         service.update_aptc
-        if bs4
-          l10n("aptc_updated")
-        else
-          'Tax credit updated successfully.'
-        end
+
+        'Tax credit updated successfully.'
       end
 
       def self.self_term_or_cancel_service(attrs)

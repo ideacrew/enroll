@@ -17,17 +17,16 @@
       <%= form_for locals[:hbx_enrollment], 
         url: edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), method: :post do |f| %>  
         <%= hidden_field_tag :bs4, true %>   
-        <%= hidden_field_tag 'max_tax_credit', @self_term_or_cancel_form[:max_tax_credit], id: "max_tax_credit" %>
+        <%= hidden_field_tag 'max_aptc', @self_term_or_cancel_form[:max_tax_credit] %>
         <p class="d-flex">
           <label for="effective_date" class="mr-2"><%= l10n("enrollment.effective_on") %></label>
           <%= locals[:new_effective_on_date] %>
         </p>
-        <%# l10n("total_tax_credit_amount"): <span id="max_tax_credit" name="max_tax_credit"><%= number_to_currency(locals[:hbx_enrollment][:aggregate_aptc_amount])</span></p> %>
         <p><%= l10n("total_tax_credit_amount") %>: $<span id="max_tax_credit" name="max_tax_credit"><%= '%.2f' % @self_term_or_cancel_form[:max_tax_credit]  %></span></p>
         <div class="d-flex mb-2 mt-2">
           <div class="mr-4">
             <label class="required" for="aptc_applied_total"> <%= l10n("amount") %></label>
-            <input type="text" name="aptc_applied_total" id="aptc_applied_total" class="form-control tax_credit_field_container" value="<%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit].to_i * @self_term_or_cancel_form[:elected_aptc_pct].to_i) %>" placeholder="0" required>
+            <input type="text" name="aptc_applied_total" id="aptc_applied_total" class="form-control tax_credit_field_container" value="<%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit].to_i * locals[:hbx_enrollment].elected_aptc_pct) %>" placeholder="0" required>
           </div>
           <div class="mr-4">
             <label class="required" for="update_tax_credit_percentage"> <%= l10n("percentage") %></label>
@@ -40,62 +39,78 @@
             </div>
             <div class="d-flex">
               <label for="amount_applied" class="mr-3"><%= l10n("amount_applied") %></label>
-              <%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit].to_i * @self_term_or_cancel_form[:elected_aptc_pct].to_i) %>
+              <%= number_to_currency(@self_term_or_cancel_form[:max_tax_credit].to_i * locals[:hbx_enrollment].elected_aptc_pct) %>
             </div>
           </div>
         </div>
         <p class="d-flex">
           <label for="new_enrollment_premium" class="mr-1"> <%= l10n("new_monthly_premium") %></label>
-          <span id="calculated_amount_applied"><%= number_to_currency(float_fix(locals[:hbx_enrollment].total_premium) - (@self_term_or_cancel_form[:max_tax_credit] * @self_term_or_cancel_form[:elected_aptc_pct].to_i)) %></span>
+          <span id="calculated_amount_applied"><%= number_to_currency(float_fix(locals[:hbx_enrollment].total_premium) - (locals[:available_aptc] * locals[:hbx_enrollment].elected_aptc_pct)) %></span>
         </p>
         <div class="mt-4">
           <%= button_tag l10n("discard_changes"), class: "btn outline mr-2", id: "btn-discard-tax-credit", disabled: false %>
           <%= submit_tag l10n("save_changes"), class: "btn", id: "btn-save-tax-credit", disabled: true %>
         </div>
       </div>
+      <%= hidden_field_tag 'enrollment_premium', @self_term_or_cancel_form[:new_enrollment_premium], id: 'enrollment_premium' %>
     <% end %>
   </div>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      var radioButtonYes = document.getElementById("update_tax_credit_section_yes");
-      var radioButtonNo = document.getElementById("update_tax_credit_section_no");
-      var section = document.getElementById("update_tax_credit_section");
-      var inputField = document.getElementById("aptc_applied_total");
-      var saveButton = document.getElementById("btn-save-tax-credit");
-      var aptcAppliedTotal = document.getElementById('aptc_applied_total');
-      var updateTaxCreditPercentage = document.getElementById('update_tax_credit_percentage');
-      var maxTaxCredit = parseFloat(document.getElementById('max_tax_credit').value);
-      var calculatedAmountApplied = document.getElementById('calculated_amount_applied');
+    document.addEventListener('DOMContentLoaded', function() {
+      const enrollmentPremium = parseFloat(document.getElementById('enrollment_premium').value);
+      const aptcAppliedTotal = document.getElementById('aptc_applied_total');
+      const updateTaxCreditPercentage = document.getElementById('update_tax_credit_percentage');
+      const calculatedAmountApplied = document.getElementById('calculated_amount_applied');
+      const saveButton = document.getElementById('btn-save-tax-credit');
+      const radioButtonYes = document.getElementById('update_tax_credit_section_yes');
+      const radioButtonNo = document.getElementById("update_tax_credit_section_no");
+      const section = document.getElementById('update_tax_credit_section');
 
-      updateTaxCreditPercentage.addEventListener('input', function() {
+      function updateCalculatedAmount() {
+        const maxTaxCredit = parseFloat('<%= locals[:hbx_enrollment].total_premium %>');
         const percentageValue = parseFloat(updateTaxCreditPercentage.value.replace('%', ''));
-        console.log(percentageValue);
+        const totalValue = parseFloat(aptcAppliedTotal.value.replace(/[^0-9.-]+/g,""));
+        if (!isNaN(totalValue) && !isNaN(percentageValue)) {
+          const calculatedValue = maxTaxCredit - totalValue;
+          calculatedAmountApplied.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(calculatedValue);
+        } else {
+          calculatedAmountApplied.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(maxTaxCredit);
+        }
+      }
+
+      function handlePercentageInput() {
+        const percentageValue = parseFloat(updateTaxCreditPercentage.value.replace('%', ''));
+        const maxTaxCredit = parseFloat('<%= @self_term_or_cancel_form[:max_tax_credit] %>');
         if (!isNaN(percentageValue)) {
           const newTotal = maxTaxCredit * (percentageValue / 100);
           aptcAppliedTotal.value = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(newTotal);
         } else {
-          aptcAppliedTotal.value = '';
+          aptcAppliedTotal.value = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(0);
         }
-      });
 
-      aptcAppliedTotal.addEventListener('input', function() {
-        const totalValue = parseFloat(aptcAppliedTotal.value.replace(/[^0-9.-]+/g,""));
+        if (!isNaN(percentageValue) && percentageValue <= 100) {
+          saveButton.disabled = false;
+        } else {
+          saveButton.disabled = true;
+        }
+      }
+
+      function handleTotalInput() {
+        const totalValue = parseFloat(aptcAppliedTotal.value.replace('$', ''));
+        const maxTaxCredit = parseFloat('<%= @self_term_or_cancel_form[:max_tax_credit] %>');
         if (!isNaN(totalValue) && maxTaxCredit !== 0) {
           const newPercentage = (totalValue / maxTaxCredit) * 100;
           updateTaxCreditPercentage.value = newPercentage.toFixed(2) + '%';
         } else {
           updateTaxCreditPercentage.value = '';
         }
-      });
 
-      inputField.addEventListener("input", function() {
-        var inputValue = parseFloat(inputField.value.substring(1));
-        if (!isNaN(inputValue) && inputValue <= maxTaxCredit) {
+        if (!isNaN(totalValue) && totalValue <= maxTaxCredit) {
           saveButton.disabled = false;
         } else {
           saveButton.disabled = true;
         }
-      });
+      }
 
       function toggleSection() {
         if (radioButtonYes.checked) {
@@ -105,26 +120,13 @@
         }
       }
 
-      function updateCalculatedAmount() {
-        const totalValue = parseFloat(aptcAppliedTotal.value.replace(/[^0-9.-]+/g,""));
-        const percentageValue = parseFloat(updateTaxCreditPercentage.value.replace('%', ''));
-        if (!isNaN(totalValue) && !isNaN(percentageValue)) {
-          const newTotal = enrollmentPremium * (percentageValue / 100);
-          aptcAppliedTotal.value = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(newTotal);
-          calculatedAmountApplied.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(newTotal);
-        } else {
-          calculatedAmountApplied.textContent = '';
-        }
-      }
-
+      updateTaxCreditPercentage.addEventListener('input', handlePercentageInput);
       updateTaxCreditPercentage.addEventListener('input', updateCalculatedAmount);
+      aptcAppliedTotal.addEventListener('input', handleTotalInput);
       aptcAppliedTotal.addEventListener('input', updateCalculatedAmount);
-
-      // Add event listeners for change events
       radioButtonYes.addEventListener("change", toggleSection);
       radioButtonNo.addEventListener("change", toggleSection);
 
-      // Initial check in case one of the radio buttons is already selected
       toggleSection();
     });
   </script>

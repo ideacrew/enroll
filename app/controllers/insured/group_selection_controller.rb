@@ -287,8 +287,8 @@ class Insured::GroupSelectionController < ApplicationController
     begin
       message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs, bs4: params[:bs4])
       if params[:bs4]
-        flash[:success] = message
-        redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
+        flash[:success] = l10n('aptc_updated')
+        redirect_to family_account_path
       else
         flash[:notice] = message
         redirect_to family_account_path
@@ -349,7 +349,12 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)
-    (aptc_applied_amount / aggregate_aptc_amount).round(2)
+    return 0.00 if aggregate_aptc_amount.zero?
+    if params[:bs4]
+      (aptc_applied_amount / aggregate_aptc_amount).round(4)
+    else
+      (aptc_applied_amount / aggregate_aptc_amount).round(2)
+    end
   end
 
   def is_user_authorized?
