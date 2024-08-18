@@ -242,15 +242,6 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     end
   end
 
-  # describe "#current_plan", dbclean: :after_each do
-
-  #   subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,plans, false) }
-
-  #   it "should return current plan" do
-  #     expect(subject.current_plan).to eq hbx_enrollment.plan.hios_id
-  #   end
-  # end
-
   describe "#aptc_value", dbclean: :after_each do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
     context "when active household is present" do
