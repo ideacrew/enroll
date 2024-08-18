@@ -3,6 +3,7 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 describe ".current_enrolled_or_termed_products_by_subscriber", dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person)}
@@ -251,6 +252,155 @@ describe ".current_enrolled_or_termed_coverages", dbclean: :after_each do
           end
         end
       end
+    end
+  end
+end
+
+describe ".checkbook_enrollments", dbclean: :after_each do
+  include_context "setup families enrollments"
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_renewal_product,
+                      benefit_market_kind: :aca_individual,
+                      kind: :health,
+                      csr_variant_id: '01',
+                      service_area: service_area,
+                      renewal_service_area: renewal_service_area)
+  end
+  let(:renewal_product) { product.renewal_product }
+  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
+  let!(:subscriber_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
+
+  let!(:active_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      product: product,
+                      aasm_state: 'coverage_selected',
+                      hbx_enrollment_members: [subscriber_enrollment_member])
+  end
+
+  let!(:shopping_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      effective_on: effective_on,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      aasm_state: 'shopping',
+                      hbx_enrollment_members: [subscriber_enrollment_member])
+  end
+
+  context "when consumer has has existing enrollment" do
+    it 'should return renewal_enrollment' do
+      current_coverages = family.checkbook_enrollments(shopping_enrollment)
+
+      expect(current_coverages).to include(active_enrollment.product)
+      expect(current_coverages).not_to include(shopping_enrollment)
+    end
+  end
+
+  context "when consumer has has a renewal" do
+    let!(:renewal_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        effective_on: effective_on,
+                        household: family.active_household,
+                        product: renewal_product,
+                        coverage_kind: "health",
+                        aasm_state: 'auto_renewing',
+                        hbx_enrollment_members: [subscriber_enrollment_member])
+    end
+
+    it 'should return renewal_enrollment' do
+      current_coverages = family.checkbook_enrollments(shopping_enrollment)
+
+      expect(current_coverages).to include(renewal_enrollment.product)
+      expect(current_coverages).not_to include(shopping_enrollment)
+    end
+  end
+
+  context "when consumer no contionus coverage" do
+    let!(:term_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        terminated_on: effective_on - 2.day,
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [subscriber_enrollment_member])
+    end
+
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return nil" do
+      expect(family.checkbook_enrollments(shopping_enrollment)).to be_nil
+    end
+  end
+
+  context "when consumer has terminated covage that ends after new enrollment effective date" do
+    let!(:term_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        terminated_on: effective_on + 2.day,
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [subscriber_enrollment_member])
+    end
+
+    it "should return the terminated enrollment" do
+      current_coverages = family.checkbook_enrollments(shopping_enrollment)
+
+      expect(current_coverages).to include(term_enrollment.product)
+    end
+  end
+
+  context "when consumer has expired covage with an effective date greater than the beginning of the new enrollments effective on year" do
+    let!(:expired_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        effective_on: shopping_enrollment.effective_on.beginning_of_year + 2.day,
+                        aasm_state: 'coverage_expired',
+                        hbx_enrollment_members: [subscriber_enrollment_member])
+    end
+
+    it "should return the expired enrollment" do
+      current_coverages = family.checkbook_enrollments(shopping_enrollment)
+
+      expect(current_coverages).to include(expired_enrollment.product)
+    end
+  end
+
+  context "when consumer has expired covage with an effective date greater than the end of the new enrollments effective on year" do
+    let!(:expired_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        effective_on: shopping_enrollment.effective_on.end_of_year + 2.day,
+                        aasm_state: 'coverage_expired',
+                        hbx_enrollment_members: [subscriber_enrollment_member])
+    end
+
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should not return the expired enrollment" do
+      current_coverages = family.checkbook_enrollments(shopping_enrollment)
+
+      expect(current_coverages).to be_nil
     end
   end
 end

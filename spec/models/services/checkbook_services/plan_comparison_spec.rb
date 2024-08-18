@@ -242,6 +242,15 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     end
   end
 
+  # describe "#current_plan", dbclean: :after_each do
+
+  #   subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,plans, false) }
+
+  #   it "should return current plan" do
+  #     expect(subject.current_plan).to eq hbx_enrollment.plan.hios_id
+  #   end
+  # end
+
   describe "#aptc_value", dbclean: :after_each do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
     context "when active household is present" do
@@ -273,6 +282,82 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
         allow(subject).to receive(:construct_body_shop).and_return({})
         expect(subject.generate_url).to eq checkbook_url
       end
+    end
+  end
+
+  describe "when ivl and send_extra_fields_to_checkbook enabled", dbclean: :after_each do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:household) { FactoryBot.create(:household, family: family) }
+    let(:year) {TimeKeeper.date_of_record.year}
+    let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
+    let(:start_on) {TimeKeeper.date_of_record.beginning_of_month}
+
+    let(:product1) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        hios_id: '11111111122301-01',
+                        csr_variant_id: '01',
+                        metal_level_kind: :silver,
+                        benefit_market_kind: :aca_individual,
+                        application_period: Date.new(year, 1, 1)..Date.new(year, 12, 31))
+    end
+
+    let(:product2) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        hios_id: '21111111122301-01',
+                        csr_variant_id: '01',
+                        metal_level_kind: :silver,
+                        benefit_market_kind: :aca_individual,
+                        application_period: Date.new(year, 1, 1)..Date.new(year, 12, 31))
+    end
+
+    let!(:active_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product1,
+                        aasm_state: 'coverage_selected',
+                        kind: "individual",
+                        consumer_role_id: person.consumer_role.id,
+                        hbx_enrollment_members: [
+                          FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: effective_on, coverage_start_on: effective_on, is_subscriber: true)
+                        ])
+    end
+
+    let!(:shopping_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        effective_on: effective_on,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        aasm_state: 'shopping',
+                        kind: "individual",
+                        consumer_role_id: person.consumer_role.id,
+                        hbx_enrollment_members: [
+                        FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, eligibility_date: effective_on, coverage_start_on: effective_on, is_subscriber: true)
+                      ])
+    end
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:send_extra_fields_to_checkbook).and_return(true)
+    end
+
+    subject { ::Services::CheckbookServices::PlanComparision.new(active_enrollment,[product1, product2]) }
+
+    it "ivl body should have a current start date" do
+      body = subject.construct_body_ivl
+      expect(body[:coverageStartDate]).to_not be_nil
+      expect(body[:coverageStartDate]).to eq effective_on.beginning_of_year.strftime("%Y-%m-%d")
+    end
+
+    it "ivl body should have a current plan" do
+      body = subject.construct_body_ivl
+      expect(body[:currentPlan]).to_not be_nil
+      expect(body[:currentPlan]).to eq product1.hios_id
     end
   end
 end

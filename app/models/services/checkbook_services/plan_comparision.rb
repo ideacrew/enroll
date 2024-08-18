@@ -232,7 +232,7 @@ module Services
       def build_current_plan(enrollment)
         return "" unless @plans
         available_plans = @plans.map(&:hios_id)
-        enrolled_plan = enrollment.family.current_enrolled_or_termed_products_by_subscriber(enrollment)&.map(&:hios_id)&.first
+        enrolled_plan = enrollment.family.checkbook_enrollments(enrollment)&.map(&:hios_id)&.first
         return "" unless available_plans&.include?(enrolled_plan)
         enrolled_plan
       end
