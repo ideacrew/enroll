@@ -450,24 +450,6 @@ class Family
     current_enrolled_or_termed_coverages(enrollment).map(&:product)
   end
 
-  def existing_coverage_query_expr(enrollment, include_matching_effective_date)
-    query_criteria = { :_id.ne => enrollment.id, :kind => enrollment.kind }
-
-    if include_matching_effective_date
-      query_criteria.merge!({:effective_on.lte => enrollment.effective_on})
-    else
-      query_criteria.merge!({:effective_on.lt => enrollment.effective_on})
-    end
-
-    if enrollment.is_shop?
-      application = enrollment.sponsored_benefit_package&.benefit_application
-      return query_criteria unless application
-      query_criteria.merge({:sponsored_benefit_package_id.in => application.benefit_packages.pluck(:id)})
-    else
-      query_criteria.merge({:effective_on.gte => enrollment.effective_on.beginning_of_year})
-    end
-  end
-
   def checkbook_enrollments(enrollment)
     coverages = active_household.hbx_enrollments.by_coverage_kind("health")
 
@@ -484,6 +466,24 @@ class Family
       next unless enr.subscriber&.applicant_id
       enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
     end&.map(&:product)
+  end
+
+  def existing_coverage_query_expr(enrollment, include_matching_effective_date)
+    query_criteria = { :_id.ne => enrollment.id, :kind => enrollment.kind }
+
+    if include_matching_effective_date
+      query_criteria.merge!({:effective_on.lte => enrollment.effective_on})
+    else
+      query_criteria.merge!({:effective_on.lt => enrollment.effective_on})
+    end
+
+    if enrollment.is_shop?
+      application = enrollment.sponsored_benefit_package&.benefit_application
+      return query_criteria unless application
+      query_criteria.merge({:sponsored_benefit_package_id.in => application.benefit_packages.pluck(:id)})
+    else
+      query_criteria.merge({:effective_on.gte => enrollment.effective_on.beginning_of_year})
+    end
   end
 
   # fetch the current active or terminated enrollments for continous coverage
@@ -1608,12 +1608,14 @@ class Family
     households.build(irs_group: irs_group, effective_starting_on: irs_group.effective_starting_on, submitted_at: DateTime.current)
   end
 
+  # rubocop:disable Style/SymbolProc
   def no_duplicate_family_members
     family_members.group_by { |appl| appl.person_id }.select { |_k, v| v.size > 1 }.each_pair do |k, v|
       errors.add(:family_members, "Duplicate family_members for person: #{k}\n" +
                           "family_members: #{v.inspect}")
     end
   end
+  # rubocop:enable Style/SymbolProc
 
   # This method will return true only if all the family_members in tax_household_members and coverage_household_members are present in self.family_members
   def integrity_of_family_member_objects
