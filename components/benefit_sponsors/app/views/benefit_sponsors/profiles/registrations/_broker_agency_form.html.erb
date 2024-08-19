@@ -10,7 +10,7 @@
 
           <%= f.fields_for :organization, @agency.organization, errors: {}, fieldset: false do |f| %>
             <%= f.hidden_field(:entity_kind, value: f.object.entity_kind) %>
-            <legend class='mb-3'><%= l10n("broker_agency_info") %></legend>
+            <legend class='mb-3'><%= l10n("broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information") %></legend>
             <%= render partial: './ui-components/bs4/v1/forms/broker/agency_information', locals: {f: f} %>
             <%= f.fields_for :profile, @agency.organization.profile, errors: {}, fieldset: false do |f| %>
               <%= f.hidden_field :id, value: f.object.id %>

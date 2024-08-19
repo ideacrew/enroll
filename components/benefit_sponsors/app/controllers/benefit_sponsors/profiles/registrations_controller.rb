@@ -22,7 +22,7 @@ module BenefitSponsors
         authorize @agency, :redirect_home?
         set_ie_flash_by_announcement unless is_employer_profile?
         respond_to do |format|
-          format.html { render layout: 'bs4_application' if @bs4 }
+          format.html
           format.js
           format.json { head :ok }
         end

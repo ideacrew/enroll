@@ -8,7 +8,7 @@
         <%= render partial: './ui-components/bs4/v1/forms/broker/personal_information', locals: {f: f, npn_disabled: false} %>
       <% end %>
       <%= f.fields_for :organization, f.object.organization, errors: {}, field_set: false do |f| %>
-        <legend class='beta mb-3'><%= l10n("broker_agency_info") %></legend>
+        <legend class='beta mb-3'><%= l10n("broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information") %></legend>
         <%= render partial: './ui-components/bs4/v1/forms/broker/agency_information', locals: {f: f} %>
         <%= f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f| %>
           <%= render partial: './ui-components/bs4/v1/forms/broker/profile_information', locals: { f: f } %>

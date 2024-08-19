@@ -32,7 +32,6 @@ module BenefitSponsors
         end
 
         def update?
-          return true # REMOVE THIS LINE
           return true if can_update?
           return true unless role = user && user.person && user.person.hbx_staff_role
           if is_employer_profile?

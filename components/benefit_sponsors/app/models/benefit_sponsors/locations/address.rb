@@ -108,21 +108,6 @@ module BenefitSponsors
         sanitize_html([address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>'))
       end
 
-      # Get the full address formatted as a single-line string
-      #
-      # @example Get the full address formatted as a single-line string
-      #   model.to_html_string
-      #
-      # @return [ String ] the full address
-      def to_broker_home_page_html_string
-        string_address_2 = address_2.present? ? address_2 : nil
-        string_address_3 = address_3.present? ? address_3 : nil
-        city.present? ? city_delim = city + "," : city_delim = city
-
-        line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
-        sanitize_html([address_1, string_address_2, string_address_3, line3].compact.reject(&:nil? || empty?).join(', '))
-      end
-
       def to_a
         [kind, address_1, address_2.to_s, city, state, zip]
       end

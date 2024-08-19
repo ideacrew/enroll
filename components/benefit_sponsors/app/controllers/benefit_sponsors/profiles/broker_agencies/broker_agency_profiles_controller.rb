@@ -249,7 +249,7 @@ module BenefitSponsors
         end
 
         def enable_bs4_layout
-          @bs4 = EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+          @bs4 = true
         end
 
         def resolve_layout
