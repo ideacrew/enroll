@@ -1,5 +1,5 @@
 When(/^Broker staff enters his personal information$/) do
-  find('a', :text => "Broker Agency Staff", wait: 5).click
+  find('a', :text => "Broker Staff", wait: 5).click
   fill_in 'staff[first_name]', with: 'Ricky'
   fill_in 'staff[last_name]', with: 'Martin'
   fill_in 'staff[dob]', with: '10/10/1984'
@@ -29,7 +29,7 @@ Then(/^Broker staff submits his application and see successful message$/) do
 end
 
 And(/^there is a Staff with a “pending” broker staff role in the table$/) do
-  #find('a', :text => "Broker Agency Portal", wait: 5).click
+  # find('a', :text => "Broker Agency Portal", wait: 5).click
   expect(page).to have_content('approve')
   expect(page).to have_content('Broker Agency Staff')
   expect(page).to have_content('Ricky')
