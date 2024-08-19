@@ -145,7 +145,7 @@
 
             <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") %>
             <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')", id='confirm-dependent' class="btn btn-primary">
-              <%= l10n("save_changes") %>
+              <%= is_editing ? l10n("save_changes") : l10n("confirm_new_member") %>
             </span>
           </div>
         </div>
