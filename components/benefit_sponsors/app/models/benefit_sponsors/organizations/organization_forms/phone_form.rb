@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
+    # Form object for phone, used exclusively in the broker agency profile
     class OrganizationForms::PhoneForm
       include Virtus.model
       include ActiveModel::Validations
@@ -11,7 +14,7 @@ module BenefitSponsors
       attribute :extension, String
       attribute :full_number_without_extension, String
       attribute :office_kind_options, Array
-      
+
       validates_presence_of :kind, :area_code, :number
 
       validates :area_code,

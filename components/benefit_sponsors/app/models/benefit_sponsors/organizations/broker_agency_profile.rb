@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
+    # model for broker agency profile
     class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
       include ::SetCurrentUser
       include AASM
@@ -33,10 +36,10 @@ module BenefitSponsors
 
       MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
 
-      WORKING_HOURS_AND_ACCEPTING_NEW_CLIENTS_OPTIONS = {
+      YES_NO_OPTIONS = {
         "Yes" => true,
         "No" => false
-      }
+      }.freeze
 
       field :market_kind, type: Symbol
       field :corporate_npn, type: String
@@ -133,9 +136,8 @@ module BenefitSponsors
       end
 
       def languages
-        if languages_spoken.any?
-          return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
-        end
+        return unless languages_spoken.any?
+        return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
       end
 
       def primary_office_location

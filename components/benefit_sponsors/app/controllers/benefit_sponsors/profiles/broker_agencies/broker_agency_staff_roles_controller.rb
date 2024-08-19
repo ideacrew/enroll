@@ -25,7 +25,7 @@ module BenefitSponsors
             format.js  { render 'new' } if params[:profile_id]
 
             # the html template is for the second scenario metioned above^
-            form_path = @bs4? 'new_staff_applicant' : 'new'
+            form_path = @bs4 ? 'new_staff_applicant' : 'new'
             format.html { render partial: form_path } if params[:profile_type] && @bs4
             format.html { render form_path } if params[:profile_type]
           end
