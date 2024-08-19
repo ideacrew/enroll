@@ -12,6 +12,7 @@ module Insured
         @term_or_cancel = attrs[:term_or_cancel]
         @elected_aptc_pct = attrs[:elected_aptc_pct]
         @selected_aptc = attrs[:aptc_applied_total]
+        @cancellation_reason = attrs[:cancellation_reason]
         @factory_class = ::Insured::Factories::SelfServiceFactory
         @exclude_enrollments_list = attrs[:exclude_enrollments_list]
       end
@@ -26,7 +27,7 @@ module Insured
       end
 
       def term_or_cancel
-        @factory_class.term_or_cancel(@enrollment_id, @term_date, @term_or_cancel)
+        @factory_class.term_or_cancel(@enrollment_id, @term_date, @term_or_cancel, @cancellation_reason)
       end
 
       def update_aptc
@@ -45,7 +46,8 @@ module Insured
           elected_aptc_pct: attrs[:elected_aptc_pct],
           default_tax_credit_value: attrs[:default_tax_credit_value],
           max_tax_credit: attrs[:max_tax_credit],
-          new_enrollment_premium: attrs[:new_enrollment_premium]
+          new_enrollment_premium: attrs[:new_enrollment_premium],
+          cancellation_reason: attrs[:cancellation_reason]
         }
       end
     end
