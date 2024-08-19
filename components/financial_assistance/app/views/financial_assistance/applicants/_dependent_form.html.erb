@@ -227,7 +227,7 @@
               <%= l10n("confirm_member") %>
           <% end %>
 
-          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm-member')" class="btn btn-primary btn-br pull-right mz" onclick="ApplicantValidations.manageRequiredValidations($(this));">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm-member')" class="btn btn-primary btn-br pull-right mz" onclick="confirmMember($(this));">
           <%= l10n("confirm_member") %>
         </span>
         </div>
@@ -249,5 +249,10 @@
               $("#is_applying_coverage_value_dep_1").text(text);
           });
       });
+
+      function confirmMember(element) {
+        element.text("Please Wait...").addClass("disabled");
+        PersonValidations.manageRequiredValidations(element);
+      }
   </script>
 </li>
