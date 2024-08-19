@@ -12,7 +12,7 @@ module Operations
           def call
             renewal_bcp, coverage_years = yield fetch_renewal_data
             products = yield fetch_products_for_year(coverage_years.first)
-            result = map_benefit_data(renewal_bcp, products)
+            result = yield map_benefit_data(renewal_bcp, products)
 
             Success([result, coverage_years])
           end
@@ -44,7 +44,7 @@ module Operations
           end
 
           def map_benefit_data(renewal_bcp, products)
-            {
+            result = {
               l10n('admin_actions.dry_run.benefits.renewal_bcp_present') => renewal_bcp.present?,
               l10n('admin_actions.dry_run.benefits.renewal_bcp_oe_start_date') => renewal_bcp&.open_enrollment_start_on,
               l10n('admin_actions.dry_run.benefits.renewal_bcp_oe_end_date') => renewal_bcp&.open_enrollment_end_on,
@@ -54,6 +54,8 @@ module Operations
               l10n('admin_actions.dry_run.benefits.number_of_benefit_packages') => renewal_bcp&.benefit_packages&.count || 0,
               l10n('admin_actions.dry_run.benefits.number_of_renewal_products') => products.count
             }
+
+            Success(result)
           end
         end
       end
