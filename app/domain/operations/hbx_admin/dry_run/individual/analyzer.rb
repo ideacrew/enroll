@@ -12,11 +12,7 @@ module Operations
         class Analyzer
           include Dry::Monads[:result, :do]
 
-          APPLICATION_STATES = %w[
-            renewal_draft submitted applicants_update_required income_verification_extension_required
-            haven_magi_medicaid_eligibility_request_errored mitc_magi_medicaid_eligibility_request_errored
-            submission_pending determined determination_response_error
-          ].freeze
+          APPLICATION_STATES = FinancialAssistance::Application.all_aasm_states.freeze
 
           NOTICE_TITLE_MAPPING = {
             "Open Enrollment - Medicaid" => "OEM",
