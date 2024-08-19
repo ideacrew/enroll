@@ -41,5 +41,13 @@ ADMIN_ACTIONS_TRANSLATIONS = {
   'en.admin_actions.dry_run.value' => 'Value',
   'en.admin_actions.dry_run.errored' => 'Errored',
   'en.admin_actions.dry_run.notices.note' => 'Note:',
-  'en.admin_actions.dry_run.notices.note_info' => 'Displaying the last 6 months of OE-generated notices. Currently, there is no one-to-one mapping between these notices and applications.'
+  'en.admin_actions.dry_run.notices.note_info' => 'Displaying the last 6 months of OE-generated notices. Currently, there is no one-to-one mapping between these notices and applications.',
+  'en.admin_actions.dry_run.benefits.renewal_bcp_present' => "Is renewal benefit coverage period present?",
+  'en.admin_actions.dry_run.benefits.renewal_bcp_oe_start_date' => "Renewal benefit OE start date",
+  'en.admin_actions.dry_run.benefits.renewal_bcp_oe_end_date' => "Renewal benefit OE end date",
+  'en.admin_actions.dry_run.benefits.renewal_bcp_start_date' => "Renewal benefit start date",
+  'en.admin_actions.dry_run.benefits.renewal_bcp_end_date' => "Renewal benefit end date",
+  'en.admin_actions.dry_run.benefits.renewal_slcsp_id_present' => "Renewal SLCSP id present?",
+  'en.admin_actions.dry_run.benefits.number_of_benefit_packages' => "Number of benefit packages",
+  'en.admin_actions.dry_run.benefits.number_of_renewal_products' => "Number of renewal products"
 }

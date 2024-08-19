@@ -18,7 +18,9 @@ module Operations
         # @return [Dry::Monads::Result] The result of the operation.
         def call(params)
           validated_params = yield validate(params)
-          build_pipeline(validated_params)
+          query = yield build_pipeline(validated_params)
+
+          success(query)
         end
 
         private
@@ -46,7 +48,7 @@ module Operations
           end_date = params[:end_date]
           title_codes = params[:title_codes]
 
-          [
+          result = [
             { "$match" => { "hbx_id" => { '$in' => person_hbx_ids } } },
             { "$unwind" => "$documents" },
             {
@@ -69,6 +71,8 @@ module Operations
               }
             }
           ]
+
+          Success(result)
         end
       end
     end

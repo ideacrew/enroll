@@ -110,6 +110,9 @@ module Operations
               end_date: end_date,
               title_codes: NOTICE_TITLE_MAPPING.keys
             )
+
+            return [] unless pipeline.success?
+
             aggregate_collection(Person.collection, pipeline)
           end
 

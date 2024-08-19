@@ -45,14 +45,14 @@ module Operations
 
           def map_benefit_data(renewal_bcp, products)
             {
-              "is renewal benefit coverage period present?" => renewal_bcp.present?,
-              "renewal benefit OE start date" => renewal_bcp&.open_enrollment_start_on,
-              "renewal benefit OE end date" => renewal_bcp&.open_enrollment_end_on,
-              "renewal benefit start date" => renewal_bcp&.start_on,
-              "renewal benefit end date" => renewal_bcp&.end_on,
-              "renewal SLCSP id present?" => renewal_bcp&.slcsp_id.present?,
-              "number of benefit packages" => renewal_bcp&.benefit_packages&.count || 0,
-              "number of renewal products" => products.count
+              l10n('admin_actions.dry_run.benefits.renewal_bcp_present') => renewal_bcp.present?,
+              l10n('admin_actions.dry_run.benefits.renewal_bcp_oe_start_date') => renewal_bcp&.open_enrollment_start_on,
+              l10n('admin_actions.dry_run.benefits.renewal_bcp_oe_end_date') => renewal_bcp&.open_enrollment_end_on,
+              l10n('admin_actions.dry_run.benefits.renewal_bcp_start_date') => renewal_bcp&.start_on,
+              l10n('admin_actions.dry_run.benefits.renewal_bcp_end_date') => renewal_bcp&.end_on,
+              l10n('admin_actions.dry_run.benefits.renewal_slcsp_id_present') => renewal_bcp&.slcsp_id.present?,
+              l10n('admin_actions.dry_run.benefits.number_of_benefit_packages') => renewal_bcp&.benefit_packages&.count || 0,
+              l10n('admin_actions.dry_run.benefits.number_of_renewal_products') => products.count
             }
           end
         end
