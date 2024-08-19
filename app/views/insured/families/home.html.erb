@@ -4,32 +4,36 @@
   <% else %>
     <% enrollments = @hbx_enrollments %>
   <% end %>
+
   <div class="w-100">
     <%= render partial: 'shared/family_side_nav' %>
-    <div class="pl-2">
-      <% @person.active_employee_roles.each do |employee_role|%>
-        <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
+
+    <% @person.active_employee_roles.each do |employee_role|%>
+      <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
+    <% end %>
+
+    <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? %>
+
+    <h1><%= l10n("insured.my_coverme_header") %></h1>
+
+    <%= render 'right_column' %>
+
+    <% if enrollments.present? %>
+      <h2><%= enrollments.last.coverage_year %> <%= l10n('coverage').titleize %></h2>
+
+      <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
+        <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false } %>
+      <% else %>
+        <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
       <% end %>
 
-      <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? %>
-      <h1><%= l10n("insured.my_coverme_header") %></h1>
+      <div id="plan-summary"></div>
+    <% end %>
 
-      <%= render 'right_column' %>
-      <% if enrollments.present? %>
-        <h2><%= enrollments.last.coverage_year %> <%= l10n('coverage').titleize %></h2>
-        <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
-          <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false } %>
-        <% else %>
-          <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
-        <% end %>
-        <div id="plan-summary"></div>
-      <% end %>
-
-      <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && !EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
-        <strong><%= l10n("insured.display_all_enrollments") %></strong>
-        <input class="ml-half" type="checkbox" id="display_all_enrollments"> <br>
-      <% end %>
-    </div>
+    <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && !EnrollRegistry.feature_enabled?(:enrollment_history_page) %>
+      <strong><%= l10n("insured.display_all_enrollments") %></strong>
+      <input class="ml-half" type="checkbox" id="display_all_enrollments"> <br>
+    <% end %>
   </div>
   <%= render partial: 'ui-components/v1/modals/help_with_plan' %>
 <% else %>
