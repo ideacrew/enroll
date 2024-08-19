@@ -27,7 +27,6 @@ Feature: Create Primary Broker and Broker Agency
 
 
   Scenario: Broker purchase insurance for a family
-    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     Given choose_shopping_method feature is disabled
     And a CCA site exists with a benefit market

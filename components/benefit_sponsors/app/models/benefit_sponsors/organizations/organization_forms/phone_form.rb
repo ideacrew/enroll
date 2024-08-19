@@ -28,7 +28,7 @@ module BenefitSponsors
                 allow_blank: false
 
       def initialize(attributes = {})
-        attributes = sanitize_attributes(attributes) if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
+        attributes = sanitize_attributes(attributes) if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
         super(attributes)
       end

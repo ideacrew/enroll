@@ -24,7 +24,7 @@ module BenefitSponsors
 
             # the html template is for the second scenario metioned above^
             if params[:profile_type] && @bs4
-              format.html { render partial: 'new_staff_applicant', layout: 'bs4_application' }
+              format.html { render partial: 'new_staff_applicant' }
             elsif params[:profile_type]
               format.html { render 'new', layout: false }
             end
