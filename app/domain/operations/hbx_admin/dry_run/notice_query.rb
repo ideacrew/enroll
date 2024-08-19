@@ -20,7 +20,7 @@ module Operations
           validated_params = yield validate(params)
           query = yield build_pipeline(validated_params)
 
-          success(query)
+          Success(query)
         end
 
         private

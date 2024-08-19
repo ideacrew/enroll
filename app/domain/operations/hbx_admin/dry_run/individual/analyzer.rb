@@ -12,7 +12,7 @@ module Operations
         class Analyzer
           include Dry::Monads[:result, :do]
 
-          APPLICATION_STATES = FinancialAssistance::Application.all_aasm_states.freeze
+          APPLICATION_STATES = ::FinancialAssistance::Application.all_aasm_states.map(&:to_s).freeze
 
           # NOTICE_TITLE_MAPPING is only used for redetermination UI purpose. Do not use this CONSTANT outside this class. DB and Notices has different values.
           NOTICE_TITLE_MAPPING = {
@@ -114,7 +114,7 @@ module Operations
 
             return [] unless pipeline.success?
 
-            aggregate_collection(Person.collection, pipeline)
+            aggregate_collection(Person.collection, pipeline.value!)
           end
 
           def map_notices(notices)
