@@ -20,6 +20,7 @@ module Insured
       attribute :default_tax_credit_value,          Float
       attribute :new_enrollment_premium,            Float
       attribute :max_tax_credit,                    Float
+      attribute :cancellation_reason,               String
 
       validates :market_kind,                       presence: true
 
@@ -47,6 +48,7 @@ module Insured
 
       def self.for_post(attrs)
         form = self.new
+        attrs[:term_date] = format_date(attrs[:term_date]) if attrs[:term_date].present?
         unless is_term_or_cancel_date_in_future?(attrs)
           form.errors.add(:base, 'Date cannot be in the past')
           return form
@@ -61,6 +63,7 @@ module Insured
 
         service = self_term_or_cancel_service(attrs)
         service.update_aptc
+
         'Tax credit updated successfully.'
       end
 
@@ -83,8 +86,14 @@ module Insured
       def self.is_term_or_cancel_date_in_future?(attrs)
         return true unless attrs[:term_or_cancel] == 'terminate'
 
-        date = Date.strptime(attrs[:term_date], "%m/%d/%Y")
+        date = Date.strptime(attrs[:term_date].to_s, "%m/%d/%Y")
         return date.today? || date.future?
+      end
+
+      def self.format_date(date_str)
+        date_format = date_str.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+        date = Date.strptime(date_str, date_format)
+        date.strftime("%m/%d/%Y")
       end
     end
   end
