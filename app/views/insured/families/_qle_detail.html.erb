@@ -37,8 +37,13 @@
             </div>
           </div>
           <div class="error-info hidden">
-            <div class="error-text">
-              <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
+            <div class="alert alert-warning d-flex align-items-start">
+              <div class="pl-1">
+                <div class="warning-icon icon" alt="info">&nbsp;</div>
+              </div>
+              <div class="error-text p-0 align-self-center">
+                <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item) %>
+              </div>
             </div>
             <div class="mt-4 <%= pundit_class Family,:updateable? %>">
               <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", disable_link: true} %>
