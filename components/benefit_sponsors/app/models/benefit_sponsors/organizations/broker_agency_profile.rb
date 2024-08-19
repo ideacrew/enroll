@@ -70,7 +70,7 @@ module BenefitSponsors
         length: { minimum: 1, maximum: 10 },
         uniqueness: true,
         allow_blank: true
-      
+
       validates_presence_of :languages_spoken
 
       # validates :market_kind,
