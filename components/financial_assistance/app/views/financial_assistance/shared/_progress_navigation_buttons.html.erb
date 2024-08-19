@@ -3,8 +3,9 @@
 
 <%# previous button params %>
 <% dont_show_prev_button = local_assigns[:dont_show_prev_button] ? dont_show_prev_button : false %>
-<% previous_link = local_assigns[:previous_link] ? previous_link : '#' %>
 <% previous_style = local_assigns[:previous_style] ? previous_style : "outline" %>
+<% previous_class = "#{previous_style} #{'back' unless local_assigns[:previous_link].present?}" %>
+<% previous_link = local_assigns[:previous_link] ? previous_link : '#' %>
 
 <%# continue button params %>
 <% dont_show_next_button = local_assigns[:dont_show_next_button] ? dont_show_next_button : false %>
@@ -18,7 +19,7 @@
   <% end %>
 
   <% unless dont_show_prev_button || @no_previous_button %>
-    <a class="back button <%= previous_style %> mr-2" href=<%= previous_link %>><%= l10n("previous_step") %></a>
+    <a class="button <%= previous_class %> mr-2" href=<%= previous_link %>><%= l10n("previous_step") %></a>
   <% end %>
 
   <% unless dont_show_next_button %>
