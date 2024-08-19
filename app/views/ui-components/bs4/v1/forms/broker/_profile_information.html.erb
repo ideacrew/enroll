@@ -1,0 +1,32 @@
+<div class="row mb-3">
+  <div class="col-md-6">
+    <label for="inputPracticeArea">Practice Area *</label>
+    <%= f.select(:market_kind, options_for_select(BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS_OPTIONS.inject([]) { |options, (k, v)| options << [k, v] }, selected: f.object.try(:market_kind)), { prompt: "Select Practice Area" }, { class: 'form-control', required: true }) %>
+    <div class="invalid-feedback">
+      Please select a practice area.
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :home_page, 'Website' %>
+    <%= f.text_field :home_page, class: "floatlabel form-control interaction-field-control-broker-home-page", placeholder: "#{l10n('website_url')}" %>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-3">
+    <%= f.label :working_hours, 'Available Weekend/Evening Hours?*' %>
+    <%= f.select(:working_hours, options_for_select(BenefitSponsors::Organizations::BrokerAgencyProfile::WORKING_HOURS_AND_ACCEPTING_NEW_CLIENTS_OPTIONS.inject([]) { |options, (k, v)| options << [k, v] }, selected: f.object.try(:working_hours)), { prompt: "Yes / No" }, { class: 'form-control', required: true }) %>
+    <div class="invalid-feedback">
+      Please select an option.
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <%= f.label :accept_new_clients, 'Accepting New Clients?*' %>
+    <%= f.select(:accept_new_clients, options_for_select(BenefitSponsors::Organizations::BrokerAgencyProfile::WORKING_HOURS_AND_ACCEPTING_NEW_CLIENTS_OPTIONS.inject([]) { |options, (k, v)| options << [k, v] }, selected: f.object.try(:accept_new_clients)), { prompt: "Yes / No" }, { class: 'form-control', required: true }) %>
+    <div class="invalid-feedback">
+      Please select an option.
+    </div>
+  </div>
+</div>

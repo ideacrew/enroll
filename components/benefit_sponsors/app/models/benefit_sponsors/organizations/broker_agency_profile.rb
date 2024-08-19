@@ -33,13 +33,18 @@ module BenefitSponsors
 
       MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
 
+      WORKING_HOURS_AND_ACCEPTING_NEW_CLIENTS_OPTIONS = {
+        "Yes" => true,
+        "No" => false
+      }
+
       field :market_kind, type: Symbol
       field :corporate_npn, type: String
       field :primary_broker_role_id, type: BSON::ObjectId
       field :default_general_agency_profile_id, type: BSON::ObjectId
 
       field :languages_spoken, type: Array, default: ["en"] # TODO
-      field :working_hours, type: Boolean, default: false
+      field :working_hours, type: Boolean
       field :accept_new_clients, type: Boolean
 
       field :ach_routing_number, type: String
@@ -62,6 +67,8 @@ module BenefitSponsors
         length: { minimum: 1, maximum: 10 },
         uniqueness: true,
         allow_blank: true
+      
+      validates_presence_of :languages_spoken
 
       # validates :market_kind,
       #   inclusion: { in: BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
@@ -70,6 +77,7 @@ module BenefitSponsors
       before_save :notify_before_save
 
       validate :validate_market_kind
+      validate :validate_at_least_one_language_selected
       add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_broker_agency_profile_events]
 
       after_initialize :build_nested_models
@@ -90,6 +98,12 @@ module BenefitSponsors
 
       def validate_market_kind
         errors.add(:profiles, "#{market_kind} is not a valid practice area") unless BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS.include?(market_kind)
+      end
+
+      def validate_at_least_one_language_selected
+        return if self&.languages_spoken&.any?
+
+        errors.add(:languages_spoken, "At least one language must be selected.")
       end
 
       def primary_broker_role

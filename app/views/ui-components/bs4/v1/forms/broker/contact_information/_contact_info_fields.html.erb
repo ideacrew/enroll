@@ -1,0 +1,25 @@
+<div data-controller="office-locations">
+  <div data-target="office-locations.officeLocations">
+    <%= f.fields_for :office_locations, f.object.office_locations do |office_fields| %>
+      <%= office_fields.hidden_field :id, value: office_fields.object.id if office_fields.object.id.present? %>
+      <%= office_fields.hidden_field(:is_primary, value: true) if office_fields.object.is_primary? %>
+      <div data-target="<%= 'office-locations.officeLocation' if office_fields.object.is_primary? %>" class="js-office-location">
+        <%= office_fields.hidden_field '_destroy', value: false, id: 'delete_location' %>
+        <%= office_fields.fields_for :address, office_fields.object.address do |address_fields| %>
+          <%= render partial: './ui-components/bs4/v1/forms/broker/contact_information/address', locals: { f: address_fields, is_primary: address_is_primary?(office_fields) } %>
+        <% end %>
+        <%= office_fields.fields_for :phone, office_fields.object.phone do |phone_fields| %>
+          <%= render partial: './ui-components/bs4/v1/forms/broker/contact_information/phone', locals: { f: phone_fields } %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <a class="btn btn-default btn-secondary mb-5" type="button" data-action="click->office-locations#addLocation">Add Office Location</a>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $.inputMasks();
+  });
+</script>

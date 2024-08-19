@@ -12,7 +12,7 @@ CENSUS_EMPLOYEE_TRANSLATIONS = {
   :'en.census_employee.dob_text' =>  "DATE OF BIRTH *",
   :'en.census_employee.ssn_text' =>  "SOCIAL SECURITY *",
   :'en.census_employee.address.address_1_text' => 'ADDRESS LINE 1 *',
-  :'en.census_employee.address.city_text' => 'CITY *',
-  :'en.census_employee.address.select_state_text' => 'SELECT STATE *',
+  :'en.census_employee.address.city_text' => 'City *',
+  :'en.census_employee.address.select_state_text' => 'Select State *',
   :'en.census_employee.address.zip_text' => 'ZIP *'
 }.freeze

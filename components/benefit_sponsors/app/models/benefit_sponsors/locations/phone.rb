@@ -94,6 +94,14 @@ module BenefitSponsors
         OFFICE_KINDS
       end
 
+      def has_full_phone_number?
+        self.full_phone_number.valid?
+      end
+      
+      def has_area_code_and_number?
+        self.area_code.valid? && self.number.valid?
+      end 
+
       private
       def filter_non_numeric(str)
         str.present? ? str.to_s.gsub(/\D/,'') : ""

@@ -1,0 +1,17 @@
+<% agency_languages = @agency&.organization&.profile&.languages_spoken ? @agency&.organization&.profile&.languages_spoken : [] %>
+
+<div class='row'>
+  <div class="col-md-12 mb-2">
+    <label for="inputPracticeArea">Languages * <span class="weight-n">(Select all that apply)</span></label>
+    <% display_languages.each do |language_group| %>
+      <div class='row my-3'>
+        <% language_group.each do |language| %>
+          <div class="col-md-2 d-flex align-items-center">
+            <% code = language[1] %>
+            <%= f.check_box :languages_spoken, { multiple: true, checked: agency_languages.include?(code) }, code, nil %> <p class='ml-1 mb-0'><%= language[0] %></p>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

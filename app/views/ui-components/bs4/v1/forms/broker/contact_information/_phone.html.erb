@@ -1,0 +1,29 @@
+<div class="row">
+  <%= f.hidden_field :kind, value: 'work', id: "phoneType" %>
+  <div class="col-md-3 mb-3">
+    <label for="inputNumber">Phone Number *</label>
+    <%= f.text_field :full_number_without_extension, 
+      placeholder: "(000) 000-0000",
+      required: true, id: 'inputNumber', 
+      class: 'form-control phone_number',
+      minlength: '10', maxlength: '10', 
+      onkeypress: 'return isNumberKey(event)',
+      value: determine_phone_number(f.object)
+    %>
+    <div class="invalid-feedback">
+      Please provide a valid number.
+    </div>
+  </div>
+  <% unless EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "dc" %>
+    <div class="col-md-3 mb-3">
+      <label for="inputExtension">Phone Number Extension</label>
+      <%= f.text_field :extension, id: 'inputExtension', class: 'form-control', maxlength: '10' %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  $(document).ready( function() {
+    $.inputMasks();
+  });
+</script>

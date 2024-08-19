@@ -74,8 +74,10 @@ module BenefitSponsors
       end
 
       def update
+        binding.irb
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update(registration_params)
-        authorize @agency
+        binding.irb
+        # authorize @agency
         updated, result_url = @agency.update
         result_url = self.send(result_url)
         if updated
@@ -195,6 +197,11 @@ module BenefitSponsors
 
       def enable_bs4_layout
         @bs4 = EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+      end
+
+      def resolve_layout
+        return 'bs4_application' if @bs4
+        'benefit_sponsors/application'
       end
     end
   end
