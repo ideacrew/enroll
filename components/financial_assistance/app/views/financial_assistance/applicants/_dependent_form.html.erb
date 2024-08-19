@@ -227,7 +227,7 @@
               <%= l10n("confirm_member") %>
           <% end %>
 
-          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm-member')" class="btn btn-primary btn-br pull-right mz" onclick="confirmMember($(this));">
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm-member')" class="btn btn-primary btn-br pull-right mz applicant-confirm-member" onclick="confirmMember($(this));">
           <%= l10n("confirm_member") %>
         </span>
         </div>
@@ -252,7 +252,10 @@
 
       function confirmMember(element) {
         element.text("Please Wait...").addClass("disabled");
-        PersonValidations.manageRequiredValidations(element);
+        ApplicantValidations.manageRequiredValidations(element);
+        if (!element.closest('form')[0].checkValidity()) {
+          element.text("<%= l10n('confirm_member') %>").removeClass("disabled");
+        }
       }
   </script>
 </li>

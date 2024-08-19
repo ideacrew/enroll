@@ -197,7 +197,7 @@
   <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
     <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
     <button type="button" class="btn btn-default close_member_form hide cancel_<%=@applicant.id%>_edit"> Cancel</button>
-    <span tabindex="0" tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm_member')" id="confirm_member" class='btn btn-primary btn-br save_member' onclick='confirmMember($(this));'> Confirm member</span>
+    <span tabindex="0" tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm_member')" id="confirm_member" class='btn btn-primary btn-br save_member applicant-confirm-member' onclick='confirmMember($(this));'> Confirm member</span>
   </div>
 <% end %>
 <br>
@@ -227,6 +227,9 @@
   function confirmMember(element) {
     element.text("Please Wait...").addClass("disabled");
     PersonValidations.manageRequiredValidations(element);
+    if (!element.closest('form')[0].checkValidity()) {
+      element.text("<%= l10n('confirm_member') %>").removeClass("disabled");
+    }
   }
 
   function confirmDestoyApplicant(event, url){
