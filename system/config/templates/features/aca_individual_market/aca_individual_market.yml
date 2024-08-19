@@ -156,3 +156,6 @@ registry:
             item: <%= ENV['BCP_CREATION_DAY'] || 10 %>
       - key: :async_publish_updated_families
         is_enabled: <%= ENV['ASYNC_PUBLISH_UPDATED_FAMILIES_IS_ENABLED'] || false %>
+      - key: :cancellation_reason
+        item: :cancellation_reason
+        is_enabled: <%= ENV['CANCELLATION_REASON_FIELD_IS_ENABLED'] || false %>
