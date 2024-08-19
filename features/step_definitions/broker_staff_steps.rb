@@ -30,8 +30,8 @@ end
 
 And(/^there is a Staff with a “pending” broker staff role in the table$/) do
   # find('a', :text => "Broker Agency Portal", wait: 5).click
-  expect(page).to have_content('approve')
-  expect(page).to have_content('Broker Agency Staff')
+  expect(page).to have_content('Approve')
+  expect(page).to have_content('Staff')
   expect(page).to have_content('Ricky')
 end
 

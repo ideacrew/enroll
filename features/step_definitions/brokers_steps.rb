@@ -192,18 +192,18 @@ Then(/^.+ should see the login page$/) do
 end
 
 Then(/^.+ should see the create account page$/) do
-  find('.create-account-btn')
+  find(CreateAccount.create_account_btn)
 end
 
 When(/^.+ clicks? on Create Account$/) do
-  find('.create-account-btn').click
+  find(CreateAccount.create_account_btn).click
 end
 
 When(/^.+ registers? with valid information$/) do
   fill_in "user[oim_id]", with: "ricky.martin@example.com"
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
-  find('.create-account-btn').click
+  find(CreateAccount.create_account_btn).click
 end
 
 Then(/^.+ should see bank information$/) do
@@ -211,9 +211,11 @@ Then(/^.+ should see bank information$/) do
 end
 
 Then(/^.+ should see successful message with broker agency home page$/) do
-  expect(page).to have_content("Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Your account has been created.")
+  welcome_text = HomePage.agency_home_page_welcome_text
+  expect(page).to have_content(welcome_text)
+
   current_broker_legal_name = Person.all.detect(&:broker_role).broker_role.broker_agency_profile.legal_name
-  expect(page).to have_content("Broker Agency : #{current_broker_legal_name}")
+  expect(page).to have_content(HomePage.agency_home_page_title(current_broker_legal_name))
 end
 
 Then(/^.+ should see no active broker$/) do

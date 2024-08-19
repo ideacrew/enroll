@@ -1,6 +1,7 @@
 Feature: Assign Broker Agency Staff to Broker Agency
 
   Scenario: Broker Staff has not signed up on the HBX
+    Given bs4_consumer_flow feature is enabled
     Given the shop market configuration is enabled
     Given there is a Broker Agency exists for District Brokers Inc
     Given all permissions are present
