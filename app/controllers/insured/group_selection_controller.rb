@@ -174,7 +174,7 @@ class Insured::GroupSelectionController < ApplicationController
       else
         # FIXME: models should update relationships, not the controller
         hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
-        if EnrollRegistry.feature_enabled?(:choose_shopping_method)
+        if EnrollRegistry.feature_enabled?(:choose_shopping_method) && @adapter.coverage_kind == 'health'
           redirect_to choose_shopping_method_insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
         else
           redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
