@@ -212,25 +212,23 @@
                 </div>
               </div>
             </div>
-            <% FinancialAssistanceRegistry.feature_enabled?(:display_medicaid_question) %>
-              <div class="margin-bottom-30">
-                <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
-                  <div class="col-md-12">
-                    <b><%= l10n("faa.medicaid_question")%></b>
-                  </div>
-                </div>
-                <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
-                  <div class="col-md-2">
-                    <%= f.radio_button("full_medicaid_determination", true, class: "radio-yml", id: "medicaid_determination_yes") %>
-                    <label class="radio-yml" for="medicaid_determination_yes">Yes</label>
-                  </div>
-                  <div class='col-md-2'>
-                    <%= f.radio_button("full_medicaid_determination", false, class: "radio-yml", id: "medicaid_determination_no") %>
-                    <label class="radio-yml" for="medicaid_determination_no">No</label>
-                  </div>
+            <div class="margin-bottom-30">
+              <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+                <div class="col-md-12">
+                  <b><%= l10n("faa.medicaid_question")%></b>
                 </div>
               </div>
-            <% end %>
+              <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+                <div class="col-md-2">
+                  <%= f.radio_button("full_medicaid_determination", true, class: "radio-yml", id: "medicaid_determination_yes") %>
+                  <label class="radio-yml" for="medicaid_determination_yes">Yes</label>
+                </div>
+                <div class='col-md-2'>
+                  <%= f.radio_button("full_medicaid_determination", false, class: "radio-yml", id: "medicaid_determination_no") %>
+                  <label class="radio-yml" for="medicaid_determination_no">No</label>
+                </div>
+              </div>
+            </div>
             <div class="margin-bottom-30">
               <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
                 <div class="col-md-12">
