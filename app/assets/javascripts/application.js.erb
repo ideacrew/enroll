@@ -286,7 +286,8 @@ $(document).on('turbolinks:load', function () {
     $('.filter-options').hide();
   });
 
-  $('a.back').click(function(){
+  $('a.back').off('click');
+  $('a.back').on('click', function(){
     parent.history.back();
     return false;
   });
