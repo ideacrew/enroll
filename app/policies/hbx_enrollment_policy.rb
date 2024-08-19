@@ -35,6 +35,10 @@ class HbxEnrollmentPolicy < ApplicationPolicy
     create?
   end
 
+  def choose_shopping_method?
+    create?
+  end
+
   def plan_selection_callback?
     create?
   end

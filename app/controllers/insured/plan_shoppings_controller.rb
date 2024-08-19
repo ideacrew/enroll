@@ -292,7 +292,9 @@ class Insured::PlanShoppingsController < ApplicationController
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
   def choose_shopping_method
-    authorize @hbx_enrollment, :show?
+    authorize @hbx_enrollment, :choose_shopping_method?
+
+    redirect_to insured_plan_shopping_path(:id => @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @hbx_enrollment.coverage_kind, enrollment_kind: @hbx_enrollment.enrollment_kind) unless @hbx_enrollment.coverage_kind == 'health'
 
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url(family_account_path)
