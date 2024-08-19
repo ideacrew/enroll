@@ -219,6 +219,14 @@ var ApplicantValidations = (function(window, undefined) {
     this_obj.closest('div').find('button[type="submit"]').trigger('click');
   }
 
+  function resetConfirmButton() {
+    var btn = document.querySelector('.applicant-confirm-member');
+    if (btn) {
+      btn.textContent = 'Confirm Member';
+      btn.classList.remove('disabled');
+    }
+  }
+
   function restoreRequiredAttributes(e) {
     e.preventDefault && e.preventDefault();
     hidden_requireds.each(function(index) {
@@ -231,6 +239,7 @@ var ApplicantValidations = (function(window, undefined) {
       return true;
     }
     if ($('input[name="applicant[us_citizen]"]').not(":checked").length == 2) {
+      resetConfirmButton();
       alert('Please provide an answer for question: Are you a US Citizen or US National?');
       ApplicantValidations.restoreRequiredAttributes(e);
     }
@@ -306,6 +315,7 @@ var ApplicantValidations = (function(window, undefined) {
       return true;
     }
     if ($('input[name="applicant[is_incarcerated]"]').not(":checked").length == 2) {
+      resetConfirmButton()
       alert('Please provide an answer for question: Are you currently incarcerated?');
       ApplicantValidations.restoreRequiredAttributes(e);
     }
@@ -316,6 +326,7 @@ var ApplicantValidations = (function(window, undefined) {
       return true;
     }
     if ($('#naturalized_citizen_container').is(':visible') && $('input[name="applicant[naturalized_citizen]"]').not(":checked").length == 2) {
+      resetConfirmButton()
       alert('Please provide an answer for question: Are you a naturalized citizen?');
       ApplicantValidations.restoreRequiredAttributes(e);
     }
@@ -323,6 +334,7 @@ var ApplicantValidations = (function(window, undefined) {
 
   function validationForEligibleImmigrationStatuses(e) {
     if ($('#immigration_status_container').is(':visible') && $('input[name="applicant[eligible_immigration_status]"]').not(":checked").length == 2 && !$('#immigration-checkbox').is(':visible')) {
+      resetConfirmButton()
       alert('Please provide an answer for question: Do you have eligible immigration status?');
       ApplicantValidations.restoreRequiredAttributes(e);
     }
