@@ -123,11 +123,12 @@ module Services
       end
 
       def extra_ivl_body
-        current_plan = build_current_plan(@hbx_enrollment)
-        {
-          "coverageStartDate": @hbx_enrollment.effective_on.strftime("%m-%d-%Y"),
-          "currentPlan": current_plan
+        fields = {
+          "coverageStartDate": @hbx_enrollment.effective_on&.strftime("%m-%d-%Y")
         }
+        current_plan = build_current_plan(@hbx_enrollment)
+        fields[:currentPlan] = current_plan if current_plan.present?
+        fields
       end
 
       def construct_body_congress
@@ -232,8 +233,8 @@ module Services
       def build_current_plan(enrollment)
         return "" unless @plans
         available_plans = @plans.map(&:hios_id)
-        enrolled_plan = enrollment.family.current_enrolled_or_termed_products_by_subscriber(enrollment)&.map(&:hios_id)&.first
-        return "" unless available_plans&.include?(enrolled_plan)
+        enrolled_plan = enrollment.family.checkbook_enrollments(enrollment)&.map(&:hios_id)&.first
+        return "" unless enrolled_plan && available_plans&.include?(enrolled_plan)
         enrolled_plan
       end
 

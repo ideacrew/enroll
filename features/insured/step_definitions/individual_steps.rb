@@ -210,6 +210,11 @@ When(/^choose_shopping_method feature is disabled$/) do
   disable_feature :choose_shopping_method
 end
 
+When(/^choose_shopping_method feature is enabled$/) do
+  allow(EnrollRegistry[:choose_shopping_method].feature).to receive(:is_enabled).and_return(true)
+  enable_feature :choose_shopping_method
+end
+
 When(/^send_extra_fields_to_checkbook feature is disabled$/) do
   disable_feature :send_extra_fields_to_checkbook
 end
