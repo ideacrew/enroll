@@ -74,10 +74,8 @@ module BenefitSponsors
       end
 
       def update
-        binding.irb
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update(registration_params)
-        binding.irb
-        # authorize @agency
+        authorize @agency
         updated, result_url = @agency.update
         result_url = self.send(result_url)
         if updated
