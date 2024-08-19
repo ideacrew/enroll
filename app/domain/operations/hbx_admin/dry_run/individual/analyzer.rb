@@ -14,11 +14,7 @@ module Operations
 
           APPLICATION_STATES = FinancialAssistance::Application.all_aasm_states.freeze
 
-          NOTICE_TITLE_MAPPING = {
-            "Open Enrollment - Medicaid" => "OEM",
-            "Open Enrollment - Tax Credit" => "OEA",
-            "Open Enrollment - Marketplace Insurance" => "OEU"
-          }.freeze
+          NOTICE_TITLE_MAPPING = Document::OE_TITLE_CODE_MAPPING.freeze
 
           # @param [Hash] opts The options to fetch application status
           # @option opts [Array] :assistance_years ::Array of assistance years

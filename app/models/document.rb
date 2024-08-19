@@ -25,6 +25,12 @@ class Document
     "ConsumerRole" => ConsumerRole
   }.freeze
 
+  OE_TITLE_CODE_MAPPING = {
+    "Open Enrollment - Medicaid" => "OEM",
+    "Open Enrollment - Tax Credit" => "OEA",
+    "Open Enrollment - Marketplace Insurance" => "OEU"
+  }.freeze
+
   after_save :notify_on_save
 
   # Enable polymorphic associations
