@@ -14,7 +14,6 @@ Feature: Employer Profile
     And ABC Widgets is logged in and on the home page
 
   Scenario: Employer adds another staff role person with invalid details
-    Given bs4_consumer_flow feature is disable
     When employer ABC Widgets decides to Update Business information
     And employer clicks on the Add employer staff role link
     And ABC Widgets fills in all mandatory fields and clicks on save
@@ -22,7 +21,6 @@ Feature: Employer Profile
     Then staff role logs out
 
   Scenario: Employer adds another staff role person with valid details
-    Given bs4_consumer_flow feature is disable
     And employer ABC Widgets decides to Update Business information
     And employer clicks on the Add employer staff role link
     And Employer enters Hannah details and clicks on save
@@ -30,7 +28,6 @@ Feature: Employer Profile
     Then staff role logs out
 
   Scenario: An employer staff adds two roles and deletes one
-    Given bs4_consumer_flow feature is disable
     Given Sarah is a person
     Given Sarah has already provided security question responses
     Given BusyGuy is a person
