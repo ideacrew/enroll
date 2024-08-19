@@ -902,3 +902,31 @@ end
 Given(/the coverall enrollment flag is TRUE/) do
   @family.enrollments.first.update_attributes!(kind: "coverall")
 end
+
+Then(/the user is on the Choose Shopping Page/) do
+  expect(page).to have_css("#chooseShoppingMethod")
+end
+
+And(/the checkbook choice is selected/) do
+  expect(find("#guidance_true")).to be_checked
+end
+
+And(/the user says they know the plan they want/) do
+  find("#guidance_false").click
+end
+
+And(/the user says they don't know the plan they want/) do
+  find("#guidance_true").click
+end
+
+And(/the user clicks continue to next step for plan shopping/) do
+  find("#plan-shopping-link").click
+end
+
+And(/the user clicks continue to next step for plan comparison/) do
+  find("#checkbook-link").click
+end
+
+Then(/the checkbook modal should be visible/) do
+  expect(find("#plan_match_redirection").visible?).to be_truthy
+end
