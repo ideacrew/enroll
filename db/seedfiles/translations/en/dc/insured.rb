@@ -570,6 +570,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.new_monthly_premium' => "Your new monthly premium amount:",
   :'en.plan_canceled' => "Plan successfully canceled",
   :'en.aptc_updated' => "APTC amount successfully updated",
+  :'en.cancellation_reason' => "Cancellation Reason",
   :'en.DCHL' => "DCHL",
   :'en.ID' => "ID",
   :'en.confirmation' => "Confirmation",

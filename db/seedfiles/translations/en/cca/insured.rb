@@ -505,6 +505,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.new_monthly_premium' => "Your new monthly premium amount:",
   :'en.plan_canceled' => "Plan successfully canceled",
   :'en.aptc_updated' => "APTC amount successfully updated",
+  :'en.cancellation_reason' => "Cancellation Reason",
   :'en.DCHL' => "DCHL",
   :'en.DCHL_ID' => "DCHL ID",
   :'en.confirmation' => "Confirmation",
