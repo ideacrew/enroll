@@ -59,7 +59,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
     end
 
     let(:broker_profile_attributes) do
-      { 
+      {
         :ach_account_number => "1234567890",
         :ach_routing_number => "011000015",
         :ach_routing_number_confirmation => "011000015",
