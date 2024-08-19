@@ -67,19 +67,21 @@
       <% end %>
     </div>
 
-    <fieldset class="my-4">
-      <legend class="weight-n"><%= l10n("faa.medicaid_question") %></legend>
-      <div class="focus d-flex align-items-center mt-2 mb-2">
-        <label class="radio-label radio" for="medicaid_determination_yes">
-          <%= f.radio_button("full_medicaid_determination", true, id: "medicaid_determination_yes", checked: false) %>
-          <%= l10n("yes") %>
-        </label>
-        <label class="radio-label radio" for="medicaid_determination_no">
-          <%= f.radio_button("full_medicaid_determination", false, id: "medicaid_determination_no", checked: false) %>
-          <%= l10n("no") %>
-        </label>
-      </div>
-    </fieldset>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step) %>
+      <fieldset class="my-4">
+        <legend class="weight-n"><%= l10n("faa.medicaid_question") %></legend>
+        <div class="focus d-flex align-items-center mt-2 mb-2">
+          <label class="radio-label radio" for="medicaid_determination_yes">
+            <%= f.radio_button("full_medicaid_determination", true, id: "medicaid_determination_yes", checked: false) %>
+            <%= l10n("yes") %>
+          </label>
+          <label class="radio-label radio" for="medicaid_determination_no">
+            <%= f.radio_button("full_medicaid_determination", false, id: "medicaid_determination_no", checked: false) %>
+            <%= l10n("no") %>
+          </label>
+        </div>
+      </fieldset>
+    <% end %>
 
     <fieldset class="my-4">
       <legend class="beta"><%= l10n("electronic_signature") %></legend>
@@ -212,23 +214,25 @@
                 </div>
               </div>
             </div>
-            <div class="margin-bottom-30">
-              <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
-                <div class="col-md-12">
-                  <b><%= l10n("faa.medicaid_question")%></b>
+            <% if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step) %>
+              <div class="margin-bottom-30">
+                <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+                  <div class="col-md-12">
+                    <b><%= l10n("faa.medicaid_question")%></b>
+                  </div>
+                </div>
+                <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
+                  <div class="col-md-2">
+                    <%= f.radio_button("full_medicaid_determination", true, class: "radio-yml", id: "medicaid_determination_yes") %>
+                    <label class="radio-yml" for="medicaid_determination_yes">Yes</label>
+                  </div>
+                  <div class='col-md-2'>
+                    <%= f.radio_button("full_medicaid_determination", false, class: "radio-yml", id: "medicaid_determination_no") %>
+                    <label class="radio-yml" for="medicaid_determination_no">No</label>
+                  </div>
                 </div>
               </div>
-              <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
-                <div class="col-md-2">
-                  <%= f.radio_button("full_medicaid_determination", true, class: "radio-yml", id: "medicaid_determination_yes") %>
-                  <label class="radio-yml" for="medicaid_determination_yes">Yes</label>
-                </div>
-                <div class='col-md-2'>
-                  <%= f.radio_button("full_medicaid_determination", false, class: "radio-yml", id: "medicaid_determination_no") %>
-                  <label class="radio-yml" for="medicaid_determination_no">No</label>
-                </div>
-              </div>
-            </div>
+            <% end %>
             <div class="margin-bottom-30">
               <div class="row row-form-wrapper radio-align no-buffer row-height yml-row small-padding-top-bottom">
                 <div class="col-md-12">
