@@ -137,7 +137,7 @@ module BenefitSponsors
 
       def languages
         return unless languages_spoken.any?
-        return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
+        languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
       end
 
       def primary_office_location
