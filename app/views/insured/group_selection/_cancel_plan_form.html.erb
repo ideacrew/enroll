@@ -1,30 +1,133 @@
-<div class="col-md-4 confirmation hidden" id="cancel-plan-form">
-  <h3><%= l10n("cancel_plan") %></h3>
-  <p id="cancel-msg" class="action-msg hidden"><%= l10n("do_you_want_to_cancel_this_plan") %></p>
-  <%= radio_button_tag :agreement, "action-confirm-yes" %>&nbsp;<%= l10n("yes") %><br>
-  <%= radio_button_tag :agreement, "action-confirm-no" %>&nbsp;<%= l10n("no") %>
-  <br/>
-  <div id="cancel-form" class="hidden">
-    <%= form_for @self_term_or_cancel_form,
-      as: :self_term_or_cancel_form,
-      url: term_or_cancel_insured_group_selections_path do |f| %>
-      <%= hidden_field_tag :hbx_enrollment_id, locals[:hbx_enrollment][:id] %>
-      <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
-      <%= hidden_field_tag :family_id, locals[:family_id] %>
-      <% calendar_enabled = !(locals[:term_or_cancel] == 'cancel') %>
-      <% if calendar_enabled %>
-        <h5 id="enter-text">Choose the last day you want to be covered. The earliest date you can choose is today.</h5>
-        <%# Keep blank space in placeholder. Otherwise, "You forgot to add placeholder attribute!" appears %>
-        <div class="col-md-8 aptc-no-left-padding">
-          <%= text_field_tag 'term_date', '', :'data-date-min'=> "+0d", placeholder: " ",
-              class: "required date-picker term-date-picker floatlabel form-control",
-              required: true, id: "term-date" %>
-        </div>
-        <br><br><br>
-      <% end %>
-      <div class="col-md-8 aptc-no-left-padding">
-        <%= f.submit l10n("cancel_plan"), class: 'button btn btn-lg btn-primary btn-block col-md-6', id: 'btn-cancel', :disabled => true %>
+<% if @bs4 %>
+  <div class="confirmation hidden" id="cancel-plan-form">
+    <h2><%= l10n("plan_cancelation") %></h2>
+    <p id="cancel-msg" class="action-msg hidden"><%= l10n("cancel_plan_confirmation") %></p>
+    <label class="required" for="cancel_plan"> <%= l10n("cancel_your_plan") %></label>
+    <div class="row focus">
+      <div class="col-auto">
+        <label for="cancel_plan_yes"><%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %></label><br>
       </div>
-    <% end %>
+      <div class="col-auto">
+        <label for="cancel_plan_no"><%= radio_button_tag :cancel_plan, "no" %>&nbsp;<%= l10n("no") %></label>
+      </div>
+    </div>
+    <div id="cancellation_section" class="hidden">
+      <%= form_for @self_term_or_cancel_form,
+        as: :self_term_or_cancel_form,
+        url: term_or_cancel_insured_group_selections_path do |f| %>
+        <%= hidden_field_tag :hbx_enrollment_id, locals[:hbx_enrollment][:id] %>
+        <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
+        <%= hidden_field_tag :family_id, locals[:family_id] %>
+        <%= hidden_field_tag :bs4, true %>
+        <p><%= l10n("choose_last_day") %></p>
+        <label class="required" for="term_date"><%= l10n("coverage_end_date") %></label>
+        <%= date_field_tag :term_date, class: "date-field mt-2", :'data-date-max' => "+0", required: true %>
+        <% if show_cancellation_reason %>
+          <p class="mt-4"><%= l10n("why_are_you_canceling") %><p>
+          <label class="required" for="cancellation_reason"><%= l10n("cancelation_reason") %></label>
+          <%= select_tag :cancellation_reason, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: show_cancellation_reason %>
+        <% end %>
+        <div class="mt-4">
+          <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", disabled: false %>
+          <%= submit_tag l10n("cancel_plan"), class: "btn btn-error", id: "btn-cancel-plan", disabled: true %>
+        </div>
+      <% end %>
+    </div>
   </div>
-</div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var radioButtonYes = document.getElementById("cancel_plan_yes");
+      var radioButtonNo = document.getElementById("cancel_plan_no");
+      var section = document.getElementById("cancellation_section");
+      var form = document.getElementById("cancel-plan-form");
+      var field1 = document.getElementById("term_date");
+      var selectField = document.getElementById("cancellation_reason");
+      var button = document.getElementById("btn-cancel-plan");
+
+      form.addEventListener("submit", function(event) {
+        // Prevent form submission if the button is disabled
+        if (button.disabled) {
+          event.preventDefault();
+        }
+      });
+
+      // Toggle the section based on the selected radio button
+      function toggleSection() {
+        if (radioButtonYes.checked) {
+          section.classList.remove("hidden");
+        } else {
+          section.classList.add("hidden");
+        }
+      }
+
+      function checkFields() {
+        if (selectField) {
+          if ((field1.value.trim() !== "" && isValidDate(field1.value)) && selectField.value !== "") {
+            button.disabled = false;
+          } else {
+            button.disabled = true;
+          }
+        } else {
+          if (field1.value.trim() !== "" && isValidDate(field1.value)) {
+            button.disabled = false;
+          } else {
+            button.disabled = true;
+          }
+        }
+      }
+
+      function isValidDate(dateString) {
+        var date = new Date(formatDateToMMDDYYYY(dateString));
+        return !isNaN(date.getTime());
+      }
+
+      // When pulling the date from the date field, it is in the format YYYY-MM-DD. This function converts it to MM-DD-YYYY for more accurate validation.
+      function formatDateToMMDDYYYY(dateString) {
+        const [year, month, day] = dateString.split("-");
+        return `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${year}`;
+      }
+
+      // Add event listeners for change events
+      radioButtonYes.addEventListener("change", toggleSection);
+      radioButtonNo.addEventListener("change", toggleSection);
+      field1.addEventListener("input", checkFields);
+      if (selectField) {
+        selectField.addEventListener("change", checkFields);
+      }
+
+      toggleSection(); // Initial check in case one of the radio buttons is already selected
+      checkFields(); // Initial check for field values
+    });
+  </script>
+<% else %>
+  <div class="col-md-4 confirmation hidden" id="cancel-plan-form">
+    <h3><%= l10n("cancel_plan") %></h3>
+    <p id="cancel-msg" class="action-msg hidden"><%= l10n("do_you_want_to_cancel_this_plan") %></p>
+    <%= radio_button_tag :agreement, "action-confirm-yes" %>&nbsp;<%= l10n("yes") %><br>
+    <%= radio_button_tag :agreement, "action-confirm-no" %>&nbsp;<%= l10n("no") %>
+    <br/>
+    <div id="cancel-form" class="hidden">
+      <%= form_for @self_term_or_cancel_form,
+        as: :self_term_or_cancel_form,
+        url: term_or_cancel_insured_group_selections_path do |f| %>
+        <%= hidden_field_tag :hbx_enrollment_id, locals[:hbx_enrollment][:id] %>
+        <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
+        <%= hidden_field_tag :family_id, locals[:family_id] %>
+        <% calendar_enabled = !(locals[:term_or_cancel] == 'cancel') %>
+        <% if calendar_enabled %>
+          <h5 id="enter-text">Choose the last day you want to be covered. The earliest date you can choose is today.</h5>
+          <%# Keep blank space in placeholder. Otherwise, "You forgot to add placeholder attribute!" appears %>
+          <div class="col-md-8 aptc-no-left-padding">
+            <%= text_field_tag 'term_date', '', :'data-date-min'=> "+0d", placeholder: " ",
+                class: "required date-picker term-date-picker floatlabel form-control",
+                required: true, id: "term-date" %>
+          </div>
+          <br><br><br>
+        <% end %>
+        <div class="col-md-8 aptc-no-left-padding">
+          <%= f.submit l10n("cancel_plan"), class: 'button btn btn-lg btn-primary btn-block col-md-6', id: 'btn-cancel', :disabled => true %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

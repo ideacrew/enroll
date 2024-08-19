@@ -34,9 +34,9 @@ module Insured
         end
       end
 
-      def self.term_or_cancel(enrollment_id, term_date, term_or_cancel)
+      def self.term_or_cancel(enrollment_id, term_date, term_or_cancel, cancellation_reason)
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
-        enrollment.term_or_cancel_enrollment(enrollment, term_date)
+        enrollment.term_or_cancel_enrollment(enrollment, term_date, nil, cancellation_reason)
         return unless term_or_cancel == 'cancel'
 
         transmit_flag = true
@@ -45,6 +45,7 @@ module Insured
           {
             :reply_to => "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler",
             "hbx_enrollment_id" => @enrollment_id,
+            "cancellation_reason" => cancellation_reason,
             "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
             "is_trading_partner_publishable" => transmit_flag
           }
@@ -196,7 +197,8 @@ module Insured
           max_tax_credit: max_tax_credit,
           default_tax_credit_value: default_tax_credit_value,
           elected_aptc_pct: elected_aptc_pct,
-          new_enrollment_premium: new_enrollment_premium(default_tax_credit_value, enrollment)
+          new_enrollment_premium: new_enrollment_premium(default_tax_credit_value, enrollment),
+          cancellation_reason: nil
         }
       end
 

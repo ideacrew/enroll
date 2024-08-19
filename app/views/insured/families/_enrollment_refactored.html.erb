@@ -1,5 +1,6 @@
 <% product = hbx_enrollment.product.present? ? hbx_enrollment.product : @plan %>
 <% details_page = (defined? details_page) ? details_page : false %>
+<% edit_plan = (defined? edit_plan) ? edit_plan : false %>
 <% shopping = (defined? shopping) ? shopping : false %>
 <% if hbx_enrollment.is_coverage_waived? %>
   <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || hbx_enrollment.can_make_changes?, hbx_enrollment: hbx_enrollment } %>
@@ -129,7 +130,7 @@
           <% if shopping %>
             <div><%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: product } %></div>
           <% elsif !details_page %>
-            <%= render partial: "insured/families/enrollment_actions", locals: { read_only: read_only, hbx_enrollment: hbx_enrollment }  %>
+            <%= render partial: "insured/families/enrollment_actions", locals: { read_only: read_only, edit_plan: edit_plan, hbx_enrollment: hbx_enrollment }  %>
           <% end %>
         </div>
       </div>
