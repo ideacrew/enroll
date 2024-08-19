@@ -397,6 +397,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.manage_family' => "Manage Family",
   :'en.my_household' => "My Household",
   :'en.my_household_desc' => "These are currently all the members listed in your household. If you need to get health insurance coverage for other members of your family, select 'Add New Member'",
+  :'en.confirm_new_member' => "Confirm New Member",
   :'en.personal' => "Personal",
   :'en.verifications' => "Verifications",
   :'en.verification_faq' => "View the documents we accept",
