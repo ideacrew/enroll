@@ -497,8 +497,8 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'census_employee[address_attributes][address_2]', :with => 'Apt ABC'
   fill_in 'census_employee[address_attributes][city]', :with => 'Alpharetta'
 
-  find(:xpath, '//span[@class="label"][contains(., "SELECT STATE")]').click
-  find(:xpath, '//div[div/span[contains(., "SELECT STATE")]]//li[contains(., "GA")]').click
+  find(:xpath, '//span[@class="label"][contains(., "Select State")]').click
+  find(:xpath, '//div[div/span[contains(., "Select State")]]//li[contains(., "GA")]').click
   fill_in 'census_employee[address_attributes][zip]', :with => '30228'
   find(:xpath, '//span[@class="label"][contains(., "SELECT KIND")]').click
   find(:xpath, '//div[div/span[contains(., "SELECT KIND")]]//li[contains(., "home")]').click

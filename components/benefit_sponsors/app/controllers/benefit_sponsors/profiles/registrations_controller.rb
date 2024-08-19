@@ -21,7 +21,6 @@ module BenefitSponsors
         authorize @agency
         authorize @agency, :redirect_home?
         set_ie_flash_by_announcement unless is_employer_profile?
-        binding.irb
         respond_to do |format|
           format.html { render layout: 'bs4_application' if @bs4 }
           format.js
@@ -195,7 +194,7 @@ module BenefitSponsors
       end
 
       def enable_bs4_layout
-        @bs4 = EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        @bs4 = true
       end
 
       def resolve_layout

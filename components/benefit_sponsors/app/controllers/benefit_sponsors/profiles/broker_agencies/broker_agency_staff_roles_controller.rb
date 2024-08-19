@@ -23,9 +23,11 @@ module BenefitSponsors
             format.js  { render 'new' } if params[:profile_id]
 
             # the html template is for the second scenario metioned above^
-            form_path = @bs4 ? 'new_staff_applicant' : 'new'
-            format.html { render partial: form_path, layout: resolve_layout } if params[:profile_type] && @bs4
-            format.html { render form_path } if params[:profile_type]
+            if params[:profile_type] && @bs4
+              format.html { render partial: 'new_staff_applicant', layout: 'bs4_application' }
+            elsif params[:profile_type]
+              format.html { render 'new', layout: false }
+            end
           end
         end
 
@@ -108,11 +110,6 @@ module BenefitSponsors
 
         def enable_bs4_layout
           @bs4 = true
-        end
-
-        def resolve_layout
-          return 'bs4_application' if @bs4
-          false
         end
       end
     end
