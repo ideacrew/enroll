@@ -49,7 +49,7 @@ module BenefitSponsors
           if is_broker_profile? && saved
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
             respond_to do |format|
-              format.html { render template_filename, :layout => 'bs4_application' }
+              format.html { render template_filename, :layout => resolve_layout }
             end
             return
           elsif saved
@@ -70,7 +70,7 @@ module BenefitSponsors
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit(profile_id: params[:id])
         authorize @agency
 
-        render layout: 'bs4_application' if @agency.organization.is_broker_profile? || @agency.organization.is_general_agency_profile?
+        render layout: resolve_layout if @agency.organization.is_broker_profile? || @agency.organization.is_general_agency_profile?
       end
 
       def update
@@ -198,8 +198,8 @@ module BenefitSponsors
       end
 
       def resolve_layout
-        return 'bs4_application' if @bs4
-        'benefit_sponsors/application'
+        return "single_column" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        'bs4_application'
       end
     end
   end
