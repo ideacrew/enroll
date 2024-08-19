@@ -13,7 +13,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.previous" => "Previous",
   "en.next" => "Next",
   "en.npn" => "NPN",
-  "en.npn_error" => "Please provide an NPN.",
   "en.legal_name" => "Legal Name",
   "en.fein" => "FEIN",
   "en.primary_broker_name" => "Primary Broker Name",

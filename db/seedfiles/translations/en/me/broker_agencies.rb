@@ -10,6 +10,11 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information_edit_form" => "Agency Information",
 	"en.email" => "Email Address",
 	"en.npn" => "NPN",
+	"en.city" => "City",
+	"en.select_state" => "Select State",
+	"en.date_of_birth" => "Date of Birth",
+	"en.dob_format" => "mm/dd/yyyy",
+  
 	"en.legal_name"=> "Legal Name",
   "en.legal_name_caps"=> "LEGAL NAME",
 	"en.fein" => "FEIN",

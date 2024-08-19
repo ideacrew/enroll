@@ -7,7 +7,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_agencies.broker_roles.new_broker_agency_form.create_broker_agency" => "Create Broker Agency",
   "en.email" => "Email Address",
   "en.npn" => "NPN",
-"en.npn_error" => "Please provide an NPN.",
   "en.legal_name"=> "Legal Name",
   "en.legal_name_caps"=> "LEGAL NAME",
   "en.fein" => "FEIN",
