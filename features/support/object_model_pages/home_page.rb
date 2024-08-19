@@ -45,7 +45,7 @@ class HomePage
 
   def self.agency_home_page_welcome_text
     site_name = EnrollRegistry[:enroll_app].setting(:short_name).item
-    
+
     return "Welcome to #{site_name}, your account has been created." if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     "Welcome to #{site_name}. Your account has been created."
   end
