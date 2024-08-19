@@ -42,6 +42,11 @@
 
           <dt><%= l10n('service_area') %></dt>
           <dd><%= @hbx_enrollment&.product&.service_area&.issuer_provided_code || l10n('not_available') %></dd>
+
+          <% if @hbx_enrollment&.cancellation_reason %>
+            <dt><%= l10n('cancellation_reason') %></dt>
+            <dd><%= @hbx_enrollment&.cancellation_reason %></dd>
+          <% end %>
         </dl>
 
         <h2 data-cuke="enrollment_member_detail"><%= l10n('enrollment.members.header') %></h2>
