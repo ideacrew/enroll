@@ -5,7 +5,9 @@
     <% if !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) %>
       <div>
         <button type="button" id="cancel-button" class="btn btn-error outline"><%= l10n("cancel_plan")%></button>
-        <button type="button" id="aptc-button" class="btn outline"><%= l10n("change_tax_credit")%></button>
+        <% if hbx_enrollment.aggregate_aptc_amount.to_i > 0 %>
+          <button type="button" id="aptc-button" class="btn outline"><%= l10n("change_tax_credit")%></button>
+        <% end %>
       </div>
     <% end %>
   <% else %>
