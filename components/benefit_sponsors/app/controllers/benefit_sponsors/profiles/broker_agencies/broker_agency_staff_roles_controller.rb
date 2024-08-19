@@ -8,8 +8,6 @@ module BenefitSponsors
         before_action :find_broker_agency_profile, only: [:new]
         before_action :enable_bs4_layout, only: [:new, :create] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-        layout :resolve_layout, only: [:new]
-
         def new
           # this endpoint is used for two scenarios
           # 1.) to render the form for brokers/agents creating new broker agency staff roles for their broker agencies
@@ -26,7 +24,7 @@ module BenefitSponsors
 
             # the html template is for the second scenario metioned above^
             form_path = @bs4 ? 'new_staff_applicant' : 'new'
-            format.html { render partial: form_path } if params[:profile_type] && @bs4
+            format.html { render partial: form_path, layout: resolve_layout } if params[:profile_type] && @bs4
             format.html { render form_path } if params[:profile_type]
           end
         end

@@ -14,15 +14,16 @@ module BenefitSponsors
       before_action :set_cache_headers, only: [:edit, :new]
       before_action :enable_bs4_layout, only: [:new, :create, :edit] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-      layout :resolve_layout
+      layout :resolve_edit_layout, :only => :edit
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
         authorize @agency
         authorize @agency, :redirect_home?
         set_ie_flash_by_announcement unless is_employer_profile?
+        binding.irb
         respond_to do |format|
-          format.html
+          format.html { render layout: 'bs4_application' if @bs4 }
           format.js
           format.json { head :ok }
         end
@@ -199,6 +200,11 @@ module BenefitSponsors
 
       def resolve_layout
         return "single_column" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        'bs4_application'
+      end
+
+      def resolve_edit_layout
+        return "two_column" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
         'bs4_application'
       end
     end
