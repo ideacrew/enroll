@@ -3,6 +3,7 @@ Feature: Broker Manages Employer Account
   The Broker should be able to set up application and roster for the employer
 
   Background: Broker registration
+    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for draft initial employer with health benefits
@@ -14,6 +15,7 @@ Feature: Broker Manages Employer Account
     And employer ABC Widgets hired broker Max Planck from District Brokers Inc
 
   Scenario: Broker manages employer account
+    Given bs4_consumer_flow feature is disable
     When Max Planck logs on to the Broker Agency Portal
     And Primary Broker clicks on the Employers tab
     Then Primary Broker should see Employer ABC Widgets and click on legal name
