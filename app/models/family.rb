@@ -462,10 +462,12 @@ class Family
       ]
     ).order_by(effective_on: :desc)
     return nil unless results&.any?
-    results.select do |enr|
+    with_current_subscriber = results.select do |enr|
       next unless enr.subscriber&.applicant_id
       enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
-    end&.map(&:product)
+    end
+    return nil unless with_current_subscriber.any?
+    with_current_subscriber.map(&:product)
   end
 
   def existing_coverage_query_expr(enrollment, include_matching_effective_date)

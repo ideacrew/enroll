@@ -403,6 +403,15 @@ describe ".checkbook_enrollments", dbclean: :after_each do
       expect(current_coverages).to be_nil
     end
   end
+
+  context "when current subscriber is not enrolled in active coverage" do
+    it "should be empty" do
+      active_enrollment.hbx_enrollment_members = []
+      current_coverages = family.checkbook_enrollments(shopping_enrollment)
+
+      expect(current_coverages).to be_nil
+    end
+  end
 end
 
 describe ".current_coverage_expired_coverages", dbclean: :after_each do
