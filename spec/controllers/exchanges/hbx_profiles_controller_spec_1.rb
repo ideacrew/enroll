@@ -16,7 +16,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(admin_user)
     end
 
-    context "with super_admin permission" do
+    context "super_admin with can_extend_open_enrollment permission" do
       let!(:permission) { FactoryBot.create(:permission, :super_admin) }
 
       context "when the request type is invalid" do
@@ -34,11 +34,22 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
     end
 
+    context "super_admin without can_extend_open_enrollment permission" do
+      let!(:permission) { FactoryBot.create(:permission, :super_admin, can_extend_open_enrollment: false) }
+
+      context "when the request type is valid" do
+        it "should render failure" do
+          get :ivl_dry_run_dashboard, format: :html
+          expect(response.status).to eq 302
+        end
+      end
+    end
+
     context "with hbx_staff permission" do
       let!(:permission) { FactoryBot.create(:permission, :hbx_staff) }
 
       context "when the request type is valid" do
-        it "should render success" do
+        it "should render failure" do
           get :ivl_dry_run_dashboard, format: :html
           expect(response.status).to eq 302
         end
