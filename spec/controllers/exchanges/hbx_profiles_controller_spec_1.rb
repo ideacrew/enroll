@@ -16,7 +16,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(admin_user)
     end
 
-    context "with valid user" do
+    context "with super_admin permission" do
       let!(:permission) { FactoryBot.create(:permission, :super_admin) }
 
       context "when the request type is invalid" do
@@ -30,6 +30,17 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         it "should render success" do
           get :ivl_dry_run_dashboard, format: :html
           expect(response.status).to eq 200
+        end
+      end
+    end
+
+    context "with hbx_staff permission" do
+      let!(:permission) { FactoryBot.create(:permission, :hbx_staff) }
+
+      context "when the request type is valid" do
+        it "should render success" do
+          get :ivl_dry_run_dashboard, format: :html
+          expect(response.status).to eq 302
         end
       end
     end

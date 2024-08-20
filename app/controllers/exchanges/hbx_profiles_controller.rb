@@ -853,7 +853,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def ivl_dry_run_dashboard
-    authorize HbxProfile, :dry_run_dashboard?
+    authorize HbxProfile, :can_view_dry_run_dashboard?
 
     result = ::Operations::HbxAdmin::DryRun::Individual::Analyzer.new.call
 

@@ -337,6 +337,11 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_submit_time_travel_request
   end
 
+  def super_admin?
+    role = user_hbx_staff_role
+    role&.permission&.name == "super_admin"
+  end
+
   def send_broker_agency_message?
     role = user_hbx_staff_role
     return false unless role
@@ -506,8 +511,8 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_view_audit_log
   end
 
-  def dry_run_dashboard?
-    individual_market_admin?
+  def can_view_dry_run_dashboard?
+    super_admin?
   end
 
   private
