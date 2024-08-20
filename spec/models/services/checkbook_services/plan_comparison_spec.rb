@@ -341,8 +341,8 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
 
     it "ivl body should have a current start date" do
       body = subject.construct_body_ivl
-      expect(body[:coverageStartDate]).to_not be_nil
-      expect(body[:coverageStartDate]).to eq effective_on.strftime("%m-%d-%Y")
+      expect(body[:enrollmentDate]).to_not be_nil
+      expect(body[:enrollmentDate]).to eq effective_on.strftime("%m-%d-%Y")
     end
 
     it "ivl body should have a current plan" do
