@@ -7,6 +7,7 @@ FactoryBot.define do
     cv_version { '3' }
     aca_version { '1.0.0' }
     aca_entities_sha { 'abc123' }
+    primary_person_hbx_id { '98765' }
     family_hbx_id { '12345' }
     family_updated_at { DateTime.now }
     job_id { 'job_123' }
