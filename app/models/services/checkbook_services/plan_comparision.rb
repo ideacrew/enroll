@@ -124,7 +124,7 @@ module Services
 
       def extra_ivl_body
         fields = {
-          "coverageStartDate": @hbx_enrollment.effective_on&.strftime("%m-%d-%Y")
+          "enrollmentDate": @hbx_enrollment.effective_on&.strftime("%m/%d/%Y")
         }
         current_plan = build_current_plan(@hbx_enrollment)
         fields[:currentPlan] = current_plan if current_plan.present?
