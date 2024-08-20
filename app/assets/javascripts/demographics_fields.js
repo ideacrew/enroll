@@ -256,6 +256,14 @@ function applyListeners() {
 }
 
 var PersonValidations = (function (window, undefined) {
+  function resetConfirmButton() {
+    var btn = document.querySelector('.applicant-confirm-member');
+    if (btn) {
+      btn.textContent = 'Confirm Member';
+      btn.classList.remove('disabled');
+    }
+  }
+
   function manageRequiredValidations(this_obj) {
     $('[required]').not(':visible').removeAttr('required');
     this_obj.closest('div').find('button[type="submit"]').trigger('click');
@@ -278,6 +286,7 @@ var PersonValidations = (function (window, undefined) {
       return true;
     }
     if ($('input[name="person[us_citizen]"]').not(':checked').length == 2) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Is this person a US Citizen or US National?'
       );
@@ -306,6 +315,7 @@ var PersonValidations = (function (window, undefined) {
     var tribe_member_visible = $(".no_coverage_tribe_details").is(':visible')
 
     if (!tribe_member_yes && !tribe_member_no && tribe_member_visible){
+      resetConfirmButton();
       alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
       PersonValidations.restoreRequiredAttributes(e);
     };
@@ -326,13 +336,15 @@ var PersonValidations = (function (window, undefined) {
       if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
         var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
         if (tribe_codes_array.length < 1) {
+         resetConfirmButton();
           alert("At least one tribe must be selected.");
           PersonValidations.restoreRequiredAttributes(e);
         }
 
         if (tribe_codes_array.includes("OT") && $('input#tribal-name').val() == ""){
-            alert("Please provide an answer for 'Other' tribe name.");
-            PersonValidations.restoreRequiredAttributes(e);
+          resetConfirmButton();
+          alert("Please provide an answer for 'Other' tribe name.");
+          PersonValidations.restoreRequiredAttributes(e);
         }
 
         if (!tribe_codes_array.includes("OT")){
@@ -362,6 +374,7 @@ var PersonValidations = (function (window, undefined) {
     if (
       $('input[name="person[is_incarcerated]"]').not(':checked').length == 2
     ) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Is this person currently incarcerated?'
       );
@@ -381,6 +394,7 @@ var PersonValidations = (function (window, undefined) {
       !$('#tobacco_user_container').hasClass('hidden_field') &&
       $('input[name="person[is_tobacco_user]"]').not(':checked').length == 2
     ) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Is this person a tobacco user?'
       );
@@ -400,6 +414,7 @@ var PersonValidations = (function (window, undefined) {
       $('#naturalized_citizen_container').is(':visible') &&
       $('input[name="person[naturalized_citizen]"]').not(':checked').length == 2
     ) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Is this person a naturalized or derived citizen?'
       );
@@ -414,6 +429,7 @@ var PersonValidations = (function (window, undefined) {
         .length == 2 &&
       !$('#immigration-checkbox').is(':visible')
     ) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Do you have eligible immigration status?'
       );
