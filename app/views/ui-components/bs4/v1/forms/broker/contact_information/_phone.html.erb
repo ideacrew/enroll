@@ -11,12 +11,12 @@
       value: determine_phone_number(f.object)
     %>
     <div class="invalid-feedback">
-      Please provide a valid number.
+      <%= l10n('phone_number.error') %>
     </div>
   </div>
   <% unless EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "dc" %>
     <div class="col-md-3 mb-3">
-      <label for="inputExtension">Phone Number Extension</label>
+      <label for="inputExtension"><%= l10n('phone_number.extension') %> </label>
       <%= f.text_field :extension, id: 'inputExtension', class: 'form-control', maxlength: '10' %>
     </div>
   <% end %>

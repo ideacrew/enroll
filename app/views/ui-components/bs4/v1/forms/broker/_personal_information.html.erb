@@ -42,7 +42,7 @@
       required: %w[new create].include?(controller.action_name) ? 'true' : !EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn), 
       id: 'inputNPN', 
       class: 'form-control', 
-      maxlength: '10', 
+      maxlength: '10',
       onkeypress: EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn) ? 'return isAlphaNumeric(event);' : 'return isNumberKey(event);',
       disabled: npn_disabled 
     %>
