@@ -16,6 +16,7 @@ RSpec.describe CvValidationJob, type: :model do
     it { is_expected.to have_field(:cv_version).of_type(String) }
     it { is_expected.to have_field(:aca_version).of_type(String) }
     it { is_expected.to have_field(:aca_entities_sha).of_type(String) }
+    it { is_expected.to have_field(:primary_person_hbx_id).of_type(String) }
     it { is_expected.to have_field(:family_hbx_id).of_type(String) }
     it { is_expected.to have_field(:family_updated_at).of_type(DateTime) }
     it { is_expected.to have_field(:job_id).of_type(String) }
@@ -71,14 +72,14 @@ RSpec.describe CvValidationJob, type: :model do
     it { is_expected.to have_index_for(created_at: 1).with_options(name: 'created_at_index') }
   end
 
-  describe '#cv_payload_creation_time' do
+  describe '#cv_payload_transformation_time' do
     let(:cv_start_time) { DateTime.now - 60.minutes }
     let(:cv_end_time) { DateTime.now - 1.minute }
     let(:cv_validation_job) { FactoryBot.create(:cv_validation_job, cv_start_time: cv_start_time, cv_end_time: cv_end_time) }
 
     context 'when both cv_end_time and cv_start_time are set' do
       it 'returns the difference in seconds between cv_end_time and cv_start_time' do
-        expect(cv_validation_job.cv_payload_creation_time).to eq(3540)
+        expect(cv_validation_job.cv_payload_transformation_time).to eq(3540)
       end
     end
 
@@ -86,7 +87,7 @@ RSpec.describe CvValidationJob, type: :model do
       let(:cv_end_time) { nil }
 
       it 'returns nil' do
-        expect(cv_validation_job.cv_payload_creation_time).to be_nil
+        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
       end
     end
 
@@ -94,7 +95,7 @@ RSpec.describe CvValidationJob, type: :model do
       let(:cv_start_time) { nil }
 
       it 'returns nil' do
-        expect(cv_validation_job.cv_payload_creation_time).to be_nil
+        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
       end
     end
 
@@ -103,7 +104,7 @@ RSpec.describe CvValidationJob, type: :model do
       let(:cv_end_time) { nil }
 
       it 'returns nil' do
-        expect(cv_validation_job.cv_payload_creation_time).to be_nil
+        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
       end
     end
   end
