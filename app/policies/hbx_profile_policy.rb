@@ -506,6 +506,10 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_view_audit_log
   end
 
+  def can_view_dry_run_dashboard?
+    can_extend_open_enrollment?
+  end
+
   private
 
   def user_hbx_staff_role

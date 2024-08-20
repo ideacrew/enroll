@@ -272,6 +272,10 @@ module FinancialAssistance
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
 
+    def self.all_aasm_states
+      aasm.states.map(&:name)
+    end
+
     def ensure_relationship_with_primary(applicant, relation_kind)
       add_or_update_relationships(applicant, primary_applicant, relation_kind)
     end

@@ -191,6 +191,7 @@ Rails.application.routes.draw do
         get :identity_verification
         post :identity_verification_datatable
         get :new_eligibility
+        get :ivl_dry_run_dashboard
       end
 
       member do
