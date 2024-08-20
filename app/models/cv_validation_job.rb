@@ -21,6 +21,10 @@ class CvValidationJob
   #   @return [String] The SHA of the aca_entities gem that was used to validate the CV.
   field :aca_entities_sha, type: String
 
+  # @!attribute [rw] primary_person_hbx_id
+  #   @return [String] This is the identifier that is used to identify the Primary Person in the Enroll System.
+  field :primary_person_hbx_id, type: String
+
   # @!attribute [rw] family_hbx_id
   #   @return [String] This is the identifier that is used to identify the Family in the Enroll System.
   field :family_hbx_id, type: String
@@ -106,10 +110,10 @@ class CvValidationJob
   # @return [Mongoid::Index] Index on the created_at field.
   index({ created_at: 1 }, { name: 'created_at_index' })
 
-  # Calculates the time taken to create the CV payload.
+  # Calculates the time taken to transform a Family object to a valid CV payload.
   #
   # @return [Integer, nil] The difference in seconds between cv_end_time and cv_start_time, or nil if either is not set.
-  def cv_payload_creation_time
+  def cv_payload_transformation_time
     duration_in_seconds(cv_end_time, cv_start_time)
   end
 

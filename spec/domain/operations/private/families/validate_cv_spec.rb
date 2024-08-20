@@ -30,8 +30,9 @@ RSpec.describe Operations::Private::Families::ValidateCv do
       it 'returns an instance of CvValidationJob' do
         validation_job = result.success
         expect(validation_job).to be_a(CvValidationJob)
-        expect(validation_job.cv_payload_creation_time).not_to be_nil
+        expect(validation_job.cv_payload_transformation_time).not_to be_nil
         expect(validation_job.cv_validation_job_time).not_to be_nil
+        expect(validation_job.primary_person_hbx_id).to eq(person.hbx_id)
       end
     end
 

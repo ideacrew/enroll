@@ -54,7 +54,7 @@ module Subscribers
             payload.slice(:family_hbx_id, :family_updated_at, :job_id)
           )
 
-          message = result.success? ? "----- SUCCESS: #{result.value!}" : "----- FAILURE: #{result.failure}"
+          message = result.success? ? "----- SUCCESS - CvValidationJob ID: #{result.success.id}" : "----- FAILURE: #{result.failure}"
           subscriber_logger.info "ValidateCvRequestedSubscriber, result: #{message}"
         rescue StandardError => e
           subscriber_logger.error "ValidateCvRequestedSubscriber, response: #{response}, error message: #{e.message}, backtrace: #{e.backtrace}"
