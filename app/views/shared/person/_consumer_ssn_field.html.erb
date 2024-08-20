@@ -20,6 +20,7 @@
       class: "ssn-eye-off-#{presenter.person_id}",
       alt: "view ssn icon",
       tabindex: 0,
+      onkeydown: handleSEPRadioButton(event),
       data: { type: presenter.object_type, id: presenter.person_id, family_id: presenter.family_id, action: "click->person#showSsn" }
     %>
     <%= image_pack_tag "icons/eye-on.svg",
@@ -29,16 +30,5 @@
       data: { id: presenter.person_id, action: "click->person#hideSsn" }
     %>
   </div>
-
-  <script>
-    // For accessibility
-    $('#ssn-input-container > img').on('keydown', function(e) {
-      e.preventDefault();
-
-      if (e.keyCode == 13 || e.keyCode == 32) {
-        $(this).trigger('click');
-      }
-    })
-  </script>
 <% end %>
 

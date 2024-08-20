@@ -1,5 +1,6 @@
-<div class="container bottom-pd">
+<%= javascript_pack_tag 'effective_table_add_ons' if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
 
+<div class="container bottom-pd">
   <%if !@dont_allow_change && !@dont_update_ssn %>
 
     <h4 class="title">DOB / SSN Update Successful</h4>

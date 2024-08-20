@@ -277,7 +277,7 @@ module ApplicationHelper
     return unless number
     number_to_ssn(number)
     if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
-      number.to_s.gsub!(/\w{3}-\w{2}-\w{4}/, '●●●●●●●●●')
+      '●●●●●●●●●'
     else
       number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
     end

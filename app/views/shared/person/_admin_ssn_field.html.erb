@@ -6,7 +6,7 @@
   <div data-controller='person' id='#admin-ssn-input-field'>
     <%= javascript_pack_tag 'effective_table_add_ons' %>
 
-    New SSN
+    <%= l10n('new_ssn') %>
     <%= f.text_field :ssn,
       disabled: true,
       class: "hidden mask-ssn ssn-input-#{presenter.person_id}",
@@ -37,19 +37,4 @@
       data: { id: presenter.person_id, action: "click->person#hideSsn" }
     %>
   </div>
-
-  <script>
-    $(document).ready(function() {
-      $('.ssn-eye-off, .ssn-eye-on').css('cursor', 'pointer');
-
-      // For accessibility
-      $('#ssn-input-container > img').on('keydown', function(e) {
-        e.preventDefault();
-    
-        if (e.keyCode == 13 || e.keyCode == 32) {
-          $(this).trigger('click');
-        }
-      })
-    })
-  </script>
 <% end %>

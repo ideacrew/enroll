@@ -9,6 +9,8 @@
   });
 </script>
 
+<%= javascript_pack_tag 'effective_table_add_ons' if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+
 <td colspan="90%">
   <% if @hbxs.present? %>
     <% @hbxs.each do |hbx|%>

@@ -5,6 +5,9 @@ module Effective
 
       datatable do
         table_column :name, :label => 'USERNAME', :proc => Proc.new { |row| row.oim_id }, :filter => false, :sortable => true
+        unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+          table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.person.ssn)) if row.person.present? }, :filter => false, :sortable => false
+        end
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.person.dob) if row.person.present?}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.person.hbx_id if row.person.present?}, :filter => false, :sortable => false
         table_column :email, :label => 'USER EMAIL', :proc => Proc.new { |row| row.email }, :filter => false, :sortable => false
