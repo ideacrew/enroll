@@ -203,7 +203,6 @@ When(/^bs4_consumer_flow feature is enabled$/) do
 end
 
 When(/^bs4_consumer_flow feature is disable$/) do
-  allow(EnrollRegistry[:bs4_consumer_flow].feature).to receive(:is_enabled).and_return(false)
   disable_feature :bs4_consumer_flow
 end
 

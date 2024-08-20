@@ -1,7 +1,6 @@
 Feature: Create General Agency and General Agency Staff Role
   
   Scenario: A General Agency Submits Application
-    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     Given the general agency feature is enabled
     Given a CCA site exists with a benefit market
@@ -13,7 +12,6 @@ Feature: Create General Agency and General Agency Staff Role
     And a pending approval status
    
   Scenario: A General Agency is Approved
-    Given bs4_consumer_flow feature is disable
     Given a CCA site exists with a benefit market
     Given the general agency feature is enabled
 
@@ -31,7 +29,6 @@ Feature: Create General Agency and General Agency Staff Role
     And the general agency should receive an email
    
   Scenario: A General Agency Creates an Account
-    Given bs4_consumer_flow feature is disable
     Given a CCA site exists with a benefit market
     Given the general agency feature is enabled
     Given a general agency, approved, awaiting account creation, exists
@@ -43,7 +40,6 @@ Feature: Create General Agency and General Agency Staff Role
    
   
   Scenario: Broker assigns general agency to an employer
-    Given bs4_consumer_flow feature is disable
     Given a CCA site exists with a benefit market
     Given there is a General Agency exists for ABC Inc
     And the broker Max Planck is primary broker for District Brokers Inc
