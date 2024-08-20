@@ -1,5 +1,5 @@
 
-<legend class='beta mb-3'>Personal Information</legend>
+<legend class='beta mb-3'><%= l10n('personal_information') %></legend>
 <%= f.hidden_field :person_id, disabled: f.object.person_id.blank?, value: f.object.person_id if f.object.person_id.present? %>
 
 <div class="row mb-3">
@@ -20,15 +20,15 @@
   </div>
 
   <div class="col-md-3 mb-3">
-    <label for="inputEmail"><%= l10n('email') %> *</label>
-    <%= f.email_field :email, placeholder: 'name@acme.com', required: 'true', id: 'inputEmail', class: 'form-control' %>
+    <label for="inputEmail"><%= l10n('email_address') %> *</label>
+    <%= f.email_field :email, placeholder: l10n('placeholder_email'), required: 'true', id: 'inputEmail', class: 'form-control' %>
     <div class="invalid-feedback">
       <%= l10n("invalid_email") %>
     </div>
   </div>
 
   <div class="col-md-3 mb-3">
-    <label for="inputDOB"><%= l10n('date_of_birth') %> *</label>
+    <label for="inputDOB"><%= l10n('broker_agencies.dob') %> *</label>
     <%= f.date_field :dob, placeholder: l10n('dob_format'), min: 110.years.ago, max:"9999-12-31", required: true, onblur: 'validDob(this)' %>
     <div class="invalid-feedback">
       <%= l10n("invalid_dob") %>
@@ -38,7 +38,7 @@
   <div class="col-md-3 mb-3">
     <label for="inputNPN"><%= l10n('npn') %> *</label>
     <%= f.text_field :npn, 
-      placeholder: '000000000',
+      placeholder: l10n('npn_placeholder'),
       required: %w[new create].include?(controller.action_name) ? 'true' : !EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn), 
       id: 'inputNPN', 
       class: 'form-control', 

@@ -2,7 +2,7 @@
 
 <div class='row'>
   <div class="col-md-12 mb-2">
-    <label for="inputPracticeArea">Languages * <span class="weight-n">(Select all that apply)</span></label>
+    <label for="inputPracticeArea"><%= l10n('languages') %> * <span class="weight-n"><%= "(#{l10n('select_all_that_apply')})" %></span></label>
     <% display_languages.each do |language_group| %>
       <div class='row my-3'>
         <% language_group.each do |language| %>

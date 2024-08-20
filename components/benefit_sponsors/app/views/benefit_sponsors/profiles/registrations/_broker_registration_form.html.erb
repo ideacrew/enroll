@@ -30,8 +30,7 @@
       <% if registration_recaptcha_enabled?(@profile_type) %>
         <%= recaptcha_tags %>
       <% end %>
-      <br>
-      <%= f.submit 'Create Broker Agency', class: 'btn btn-primary', id: 'broker-btn', disabled: EnrollRegistry.feature_enabled?(:broker_attestation_fields) %>
+      <%= f.submit l10n('new_broker_agency_form.create_broker_agency'), class: 'btn btn-primary', id: 'broker-btn', disabled: EnrollRegistry.feature_enabled?(:broker_attestation_fields) %>
     <% end %>
   </div>
 <% else %>

@@ -36,11 +36,6 @@ module BenefitSponsors
 
       MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
 
-      YES_NO_OPTIONS = {
-        "Yes" => true,
-        "No" => false
-      }.freeze
-
       field :market_kind, type: Symbol
       field :corporate_npn, type: String
       field :primary_broker_role_id, type: BSON::ObjectId

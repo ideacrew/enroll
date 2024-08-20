@@ -3,14 +3,14 @@
     <div class="tab-row">
       <div class="tab-content" id="myTabContent">
         <div id="broker_agency_form" class="container bs4-active">
-          <h1 class="heading-text mb-4"><%= @agency.organization.legal_name %></h1>
+          <h1 class="bold mb-4"><%= @agency.organization.legal_name %></h1>
           <%= f.fields_for :staff_roles, @agency.staff_roles, errors: {}, fieldset: false do |f| %>
             <%= render "./ui-components/bs4/v1/forms/broker/personal_information", f: f, npn_disabled: true %>
           <% end %>
 
           <%= f.fields_for :organization, @agency.organization, errors: {}, fieldset: false do |f| %>
             <%= f.hidden_field(:entity_kind, value: f.object.entity_kind) %>
-            <legend class='mb-3'><%= l10n("broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information") %></legend>
+            <legend class='beta mb-3'><%= l10n("broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information") %></legend>
             <%= render partial: './ui-components/bs4/v1/forms/broker/agency_information', locals: {f: f} %>
             <%= f.fields_for :profile, @agency.organization.profile, errors: {}, fieldset: false do |f| %>
               <%= f.hidden_field :id, value: f.object.id %>

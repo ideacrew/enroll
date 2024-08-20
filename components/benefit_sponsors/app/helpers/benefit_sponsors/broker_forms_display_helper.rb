@@ -20,7 +20,6 @@ module BenefitSponsors
       ["Xhosa", "xh"]
     ].freeze
 
-
     def display_languages
       ALL_LANGUAGES.each_slice(6).to_a
     end

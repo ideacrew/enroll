@@ -1,32 +1,32 @@
 
-<legend class='mb-3'><%= l10n("personal_information") %></legend>
+<legend class='beta bold mb-3'><%= l10n("personal_information") %></legend>
 <div class="row mb-4">
   <div class="col-md-3 mb-2">
     <label for="inputFirstname"><%= l10n('first_name') %> *</label>
-    <%= f.text_field :first_name, placeholder: 'First Name', required: 'true', id: 'inputFirstname', class: 'form-control' %>
+    <%= f.text_field :first_name, placeholder: l10n('first_name'), required: 'true', id: 'inputFirstname', class: 'form-control' %>
     <div class="invalid-feedback">
       <%= l10n("invalid_first_name") %>
     </div>
   </div>
   <div class="col-md-3 mb-2">
     <label for="inputLastname"><%= l10n('last_name') %> *</label>
-    <%= f.text_field :last_name, placeholder: 'Last Name', required: 'true', id: 'inputLastname', class: 'form-control' %>
+    <%= f.text_field :last_name, placeholder: l10n('last_name'), required: 'true', id: 'inputLastname', class: 'form-control' %>
     <div class="invalid-feedback">
       <%= l10n("invalid_last_name") %>
     </div>
   </div>
   <div class="col-md-3 mb-2">
-    <label for="inputDOB"><%= l10n('date_of_birth') %> *</label>
-    <%= f.date_field :dob, placeholder: "mm/dd/yyyy", min: 110.years.ago, max:"9999-12-31", required: true, class: 'form-control', onblur: 'validDob(this)' %>
+    <label for="inputEmail"><%= l10n('email_address') %> *</label>
+    <%= f.email_field :email, placeholder: l10n('placeholder_email'), required: 'true', id: 'inputEmail', class: 'form-control' %>
     <div class="invalid-feedback">
-      <%= l10n("invalid_dob") %>
+      <%= l10n("invalid_email") %>
     </div>
   </div>
   <div class="col-md-3 mb-2">
-    <label for="inputEmail"><%= l10n('email') %> *</label>
-    <%= f.email_field :email, placeholder: 'Email', required: 'true', id: 'inputEmail', class: 'form-control' %>
+    <label for="inputDOB"><%= l10n('broker_agencies.dob') %> *</label>
+    <%= f.date_field :dob, placeholder: l10n('dob_format'), min: 110.years.ago, max:"9999-12-31", required: true, class: 'form-control', onblur: 'validDob(this)' %>
     <div class="invalid-feedback">
-      <%= l10n("invalid_email") %>
+      <%= l10n("invalid_dob") %>
     </div>
   </div>
 </div>
