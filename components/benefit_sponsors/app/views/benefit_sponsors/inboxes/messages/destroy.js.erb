@@ -1,5 +1,10 @@
 $("#inbox_form, #message_list_form").hide();
 $('#inbox-messages').show().html("<%= escape_javascript(render "benefit_sponsors/shared/inboxes/message_list", provider: @inbox_provider) %>");
-<% if @inbox_provider != current_user.person%>
-location.reload();
-<% end %>
+var bs4 = document.documentElement.dataset.bs4 == "true";
+if (bs4) {
+  $("#messageDeleted").removeClass("hidden");
+} else {
+  <% if @inbox_provider != current_user.person%>
+    location.reload();
+  <% end %>
+}
