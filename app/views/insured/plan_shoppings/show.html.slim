@@ -466,7 +466,11 @@ javascript:
           var deductibeType = "DEDUCTIBLE"
         }
         if (result.product.sbc_document) {
-          var sbc_url = '/document/download/' + result.product.sbc_document.identifier.split("#")[0].split(":").pop() + '/' + result.product.sbc_document.identifier.split("#")[1] + '?content_type=application/pdf&amp;filename=' + result.product.title.replace(/[^0-9a-z]/gi, '') + '.pdf&amp;disposition=inline';
+          var product_name = result.product.title
+          if (!product_name) {
+            product_name = result.product.name
+          }
+          var sbc_url = "documents/" + result.product.sbc_document['_id'] + "/product_sbc_download?product_id=" + result.product['_id'] + "&content_type=application/pdf&filename=" + product_name.replace(/[^0-9a-z]/gi, '') + ".pdf&disposition=inline"
         }
         else {
           var sbc_url = "";

@@ -28,7 +28,7 @@ module BenefitSponsors
 
       def load_employer_estimates(form)
         return if @employer_profile.present? && @employer_profile.is_fehb?
-        
+
         form.sponsored_benefits.each do |sponsored_benefit_form|
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
@@ -47,7 +47,7 @@ module BenefitSponsors
 
       def load_employees_cost_estimates(form)
         return if @employer_profile.present? && @employer_profile.is_fehb?
-        
+
         form.sponsored_benefits.each do |sponsored_benefit_form|
           if sponsored_benefit_form.id
             benefit_package = form.service.benefit_application.benefit_packages.where(:"sponsored_benefits._id" => BSON::ObjectId.from_string(sponsored_benefit_form.id.to_s)).first
@@ -140,6 +140,7 @@ module BenefitSponsors
 
       def reference_product_details(form, details)
         product = find_product(form)
+        product_name = product.try(:title) || product.try(:name)
         benefit_application = find_benefit_application(form)
         hios_id = [] << product.hios_id
         year = benefit_application.start_on.year
@@ -148,7 +149,7 @@ module BenefitSponsors
         bucket = product.sbc_document.identifier.split("#")[0].split(":")[-1]
         key = product.sbc_document.identifier.split("#")[1]
 
-        sbc_url = "/document/download/#{bucket}/#{key}?content_type=application/pdf&filename=#{product.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline"
+        sbc_url = Rails.application.routes.url_helpers.document_product_sbc_download_path(product.sbc_document.id) + "?product_id=#{product.id}&content_type=application/pdf&filename=#{product_name.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline"
         visit_types = []
 
         qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(hios_id.to_a, year, coverage_kind)

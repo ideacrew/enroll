@@ -247,6 +247,7 @@ module BenefitSponsors
       it "should be a success" do
         sign_in_and_get_ref_prod
         expect(response).to have_http_status(:success)
+        expect(response.body).to have_content(Rails.application.routes.url_helpers.document_product_sbc_download_path(product.sbc_document.id))
       end
 
       it "should initialize form" do
