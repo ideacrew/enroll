@@ -17,7 +17,6 @@
 
 <script>
   function allowBrokerAgencyFormSubmission() {
-    console.log("hitting broker form submission method.");
     var broker_attestation_fields = document.getElementsByClassName("broker-attestation-field");
     var form_button = document.getElementById("broker-btn");
     if (Array.from(broker_attestation_fields).every(form_element => form_element.checked == true) == true) {

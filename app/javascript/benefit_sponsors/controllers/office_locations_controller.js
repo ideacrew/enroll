@@ -31,6 +31,7 @@ export default class extends Controller {
   }
 
   addLocation(event) {
+    event.preventDefault(); // call is made from a tag w/no href
     if (bs4 == "true") event.stopImmediatePropagation();
     const locations = document.querySelectorAll('.js-office-location');
     const lastLocation = locations[locations.length-1];
