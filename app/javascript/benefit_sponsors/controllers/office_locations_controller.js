@@ -31,7 +31,7 @@ export default class extends Controller {
   }
 
   addLocation(event) {
-    event.stopImmediatePropagation();
+    if (bs4 == "true") event.stopImmediatePropagation();
     const locations = document.querySelectorAll('.js-office-location');
     const lastLocation = locations[locations.length-1];
     let emptyLocation = true;
@@ -108,11 +108,12 @@ export default class extends Controller {
       event.target.closest('.js-office-location').querySelectorAll('input[id="delete_location"]').forEach(function(input) {
         input.setAttribute('value', true)
       })
-      if (bs4 == "true") {
-        // if .new-location is present, remove it
-        // else hide the .existing-location and mark it for deletion
-        let location = event.target.closest('.js-office-location');
-        location.classList.contains('new-location') ? location.remove() : location.hide();
+      
+      // if .new-location is present, remove it
+      // else hide the .existing-location and mark it for deletion
+      let location = event.target.closest('.js-office-location');
+      if (bs4 == "true" && location.classList.contains('new-location')) {
+        location.remove();
       } else {
         $(event.target).closest('.js-office-location').hide();
       }

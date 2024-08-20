@@ -44,6 +44,10 @@
   </script>
 
 <% else %>
+  <% content_for :head do %>
+    <%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
+  <% end %>
+
   <div class="profile-content top-pd">
     <div class="tab-row">
       <div class="tab-content" id="myTabContent">
