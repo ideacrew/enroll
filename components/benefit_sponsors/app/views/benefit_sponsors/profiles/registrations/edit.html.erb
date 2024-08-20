@@ -9,11 +9,11 @@
   <% end %>
 
 <% elsif is_sponsor_profile?(profile_type) %>
-  <%= content_for :navigation do %> 
+  <% content_for :navigation do %>
     <%= render "ui-components/v1/navs/employers_navigation", active_tab: params[:tab], organization: @agency.organization, profile: @agency.organization.profile %>
   <% end %>
 
-  <% form_for @agency, as: :agency, url: profiles_registration_path(id: @agency.profile_id), method: :put do |f| %>
+  <%= form_for @agency, as: :agency, url: profiles_registration_path(id: @agency.profile_id), method: :put do |f| %>
     <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_form", f: f %>
   <% end %>
 
