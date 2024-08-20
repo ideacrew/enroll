@@ -3,8 +3,8 @@ Feature: Employer Profile
   Employer Staff should be able to add and delete employer staff roles
 
   Background: Setup site, employer, and benefit application
-    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
+    Given bs4_consumer_flow feature is disable
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
     And there is an employer ABC Widgets

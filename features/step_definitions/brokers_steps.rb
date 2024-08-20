@@ -215,7 +215,7 @@ Then(/^.+ should see successful message with broker agency home page$/) do
   expect(page).to have_content(welcome_text)
 
   current_broker_legal_name = Person.all.detect(&:broker_role).broker_role.broker_agency_profile.legal_name
-  expect(page).to have_content(HomePage.agency_home_page_title(current_broker_legal_name))
+  expect(page).to have_content("Agency : #{current_broker_legal_name}")
 end
 
 Then(/^.+ should see no active broker$/) do

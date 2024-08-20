@@ -49,9 +49,4 @@ class HomePage
     return "Welcome to #{site_name}, your account has been created." if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
     "Welcome to #{site_name}. Your account has been created."
   end
-
-  def self.agency_home_page_title(company_name)
-    return "Agency : #{company_name}" if EnrollRegistry[:bs4_consumer_flow].enabled?
-    "Broker Agency : #{company_name}"
-  end
 end
