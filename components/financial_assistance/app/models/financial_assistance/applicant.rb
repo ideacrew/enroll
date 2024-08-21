@@ -361,6 +361,7 @@ module FinancialAssistance
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
     before_save :generate_hbx_id
+    after_initialize :set_default_tobacco_use
 
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
@@ -379,6 +380,10 @@ module FinancialAssistance
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+    end
+
+    def set_default_tobacco_use
+      self.is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
     end
 
     def accept(visitor)
@@ -784,7 +789,8 @@ module FinancialAssistance
     end
 
     def tobacco_user
-      person.is_tobacco_user || "unknown"
+      default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
+      person.is_tobacco_user || default_tobacco_use
     end
 
     def eligibility_determination=(eg)
