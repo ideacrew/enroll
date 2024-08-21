@@ -4,17 +4,17 @@ module Effective
       include Config::SiteModelConcern
 
       datatable do
-        table_column :name, :label => 'USERNAME', :proc => Proc.new { |row| row.oim_id }, :filter => false, :sortable => true
+        table_column :name, :label => 'USERNAME', :proc => proc { |row| row.oim_id }, :filter => false, :sortable => true
         unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
-          table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.person.ssn)) if row.person.present? }, :filter => false, :sortable => false
+          table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.person.ssn)) if row.person.present? }, :filter => false, :sortable => false
         end
-        table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.person.dob) if row.person.present?}, :filter => false, :sortable => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.person.hbx_id if row.person.present?}, :filter => false, :sortable => false
-        table_column :email, :label => 'USER EMAIL', :proc => Proc.new { |row| row.email }, :filter => false, :sortable => false
-        table_column :status, :label => 'Status', :proc => Proc.new { |row| status(row) }, :filter => false, :sortable => false
+        table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.person.dob) if row.person.present?}, :filter => false, :sortable => false
+        table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.person.hbx_id if row.person.present?}, :filter => false, :sortable => false
+        table_column :email, :label => 'USER EMAIL', :proc => proc { |row| row.email }, :filter => false, :sortable => false
+        table_column :status, :label => 'Status', :proc => proc { |row| status(row) }, :filter => false, :sortable => false
         table_column :role_type, :label => 'Role Type', :proc => proc { |row| all_roles(row) }, :filter => false, :sortable => false
-        table_column :permission, :label => 'Permission level', :proc => Proc.new { |row| permission_type(row) }, :filter => false, :sortable => false
-        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+        table_column :permission, :label => 'Permission level', :proc => proc { |row| permission_type(row) }, :filter => false, :sortable => false
+        table_column :actions, :width => '50px', :proc => proc { |row|
                                dropdown = []
                                # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                                current_user_permission = current_user&.person&.hbx_staff_role&.permission

@@ -6,7 +6,7 @@ module Effective
 
       datatable do
         table_column :name, :label => 'Name', :proc => proc { |row| link_to_with_noopener_noreferrer(h(row.full_name), resume_enrollment_exchanges_agents_path(person_id: row.id)) }, :filter => false, :sortable => false
-        unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+        unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) # rubocop:disable Style/IfUnlessModifier --> not disabling this rule will break the code or result in more rubocop errors, and will be remedied when feature flag is removed
           table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
         end
         table_column :dob, :label => 'DOB', :proc => proc { |row| row.dob }, :filter => false, :sortable => false

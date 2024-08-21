@@ -18,7 +18,7 @@ module Effective
         table_column :name, :label => 'Name', :proc => proc { |row|
           link_to_with_noopener_noreferrer(h(row.primary_applicant.person.full_name), resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id))
         }, :filter => false, :sortable => true
-        unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+        unless EnrollRegistry.feature_disabled?(:mask_ssn_ui_fields) # rubocop:disable Style/IfUnlessModifier --> not disabling this rule will break the code or result in more rubocop errors, and will be remedied when feature flag is removed
           table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         end
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
@@ -39,7 +39,7 @@ module Effective
         table_column :name, :label => 'Name', :proc => proc { |row|
           link_to_with_noopener_noreferrer(eligibility_primary_name(row), resume_enrollment_exchanges_agents_path(person_id: eligibility_primary_family_member(row).person_id))
         }, :filter => false, :sortable => true
-        unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+        unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) # rubocop:disable Style/IfUnlessModifier --> not disabling this rule will break the code or result in more rubocop errors, and will be remedied when feature flag is removed
           table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(eligibility_primary_ssn(row))) }, :filter => false, :sortable => false
         end
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(eligibility_primary_family_member(row).dob)}, :filter => false, :sortable => false
