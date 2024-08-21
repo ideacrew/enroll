@@ -265,7 +265,7 @@ var ApplicantValidations = (function(window, undefined) {
     var tribe_member_no = $("input#indian_tribe_member_no").is(':checked');
 
     if (!tribe_member_yes && !tribe_member_no){
-      resetConfirmButton()
+      resetConfirmButton();
       alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
       ApplicantValidations.restoreRequiredAttributes(e);
     };
@@ -286,13 +286,13 @@ var ApplicantValidations = (function(window, undefined) {
       if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
         var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
         if (tribe_codes_array.length < 1) {
-          resetConfirmButton()
+          resetConfirmButton();
           alert("At least one tribe must be selected.");
           ApplicantValidations.restoreRequiredAttributes(e);
         }
 
         if (tribe_codes_array.includes("OT") && $('input#tribal-name').val() == ""){
-            resetConfirmButton()
+            resetConfirmButton();
             alert("Please provide an answer for 'Other' tribe name.");
             ApplicantValidations.restoreRequiredAttributes(e);
         }
@@ -318,7 +318,7 @@ var ApplicantValidations = (function(window, undefined) {
       return true;
     }
     if ($('input[name="applicant[is_incarcerated]"]').not(":checked").length == 2) {
-      resetConfirmButton()
+      resetConfirmButton();
       alert('Please provide an answer for question: Are you currently incarcerated?');
       ApplicantValidations.restoreRequiredAttributes(e);
     }
@@ -329,7 +329,7 @@ var ApplicantValidations = (function(window, undefined) {
       return true;
     }
     if ($('#naturalized_citizen_container').is(':visible') && $('input[name="applicant[naturalized_citizen]"]').not(":checked").length == 2) {
-      resetConfirmButton()
+      resetConfirmButton();
       alert('Please provide an answer for question: Are you a naturalized citizen?');
       ApplicantValidations.restoreRequiredAttributes(e);
     }
@@ -337,7 +337,7 @@ var ApplicantValidations = (function(window, undefined) {
 
   function validationForEligibleImmigrationStatuses(e) {
     if ($('#immigration_status_container').is(':visible') && $('input[name="applicant[eligible_immigration_status]"]').not(":checked").length == 2 && !$('#immigration-checkbox').is(':visible')) {
-      resetConfirmButton()
+      resetConfirmButton();
       alert('Please provide an answer for question: Do you have eligible immigration status?');
       ApplicantValidations.restoreRequiredAttributes(e);
     }
