@@ -327,5 +327,9 @@ module Insured
 
       return health_offered_relationship_benefits, dental_offered_relationship_benefits
     end
+
+    def show_tobacco_field
+      ::EnrollRegistry.feature_enabled?(:tobacco_cost) && !::EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
+    end
   end
 end
