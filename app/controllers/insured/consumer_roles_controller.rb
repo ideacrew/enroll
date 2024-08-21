@@ -240,7 +240,7 @@ class Insured::ConsumerRolesController < ApplicationController
     mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
     @shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
     @consumer_role.skip_consumer_role_callbacks = true
-    valid_params = {"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true}.merge(params.require(:person).permit(*person_parameters_list))
+    valid_params = {"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true}.merge(params.require(:person).permit(*existing_personal_parameters_list))
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(valid_params)
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
@@ -471,6 +471,15 @@ class Insured::ConsumerRolesController < ApplicationController
     return if contact_method.empty?
 
     params.dig("person", "consumer_role_attributes").merge!("contact_method" => ConsumerRole::CONTACT_METHOD_MAPPING[contact_method])
+  end
+
+  def existing_personal_parameters_list
+    if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+      # NOTE: with this update, the only place ssn/dob/no_ssn can be updated is the edit ssn dob feature, which is restricted to admin
+      person_parameters_list - [:dob, :ssn, :no_ssn]
+    else
+      person_parameters_list
+    end
   end
 
   def person_parameters_list
