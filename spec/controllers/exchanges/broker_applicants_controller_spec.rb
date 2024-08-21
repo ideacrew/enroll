@@ -341,6 +341,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
         put :update, params: {id: broker_role.person.id, sendemail: true}, format: :js
       end
 
