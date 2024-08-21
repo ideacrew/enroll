@@ -11,6 +11,7 @@
     $(".member-<%= @applicant.id %>-buttons").addClass('hidden');
   <% end %>
 
+  $("#dependent_buttons").addClass('hidden');
   $(".close_member_form.cancel_<%=@applicant.id%>_edit").removeClass('hidden');
 
   $("body").on("click", ".close_member_form.cancel_<%=@applicant.id%>_edit", function () {
@@ -19,6 +20,7 @@
 
     $("#member-<%= @applicant.id %>-info-display").removeClass('hidden');
     $(".member-<%= @applicant.id %>-buttons").removeClass('hidden');
+    $("#dependent_buttons").removeClass('hidden');
   });
   indicateRequiredFields()
 <% else %>
