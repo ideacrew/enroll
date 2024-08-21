@@ -9,6 +9,8 @@
   });
 </script>
 
+<%= javascript_pack_tag 'effective_table_add_ons' if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+
 <td colspan="90%">
   <% if @hbxs.present? %>
     <% @hbxs.each do |hbx|%>
@@ -32,7 +34,15 @@
             <% person = member.family_member.person%>
             <tr>
               <td><%= person.full_name %></td>
-              <td><%= number_to_obscured_ssn(person.ssn) %></td>
+              <td>
+                <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+                  <%= render partial: 'shared/person/admin_ssn_block',
+                    locals: { presenter: organize_ssn_params(person, member.family.id), include_label: false }
+                  %>
+                <% else %>
+                  <%= number_to_obscured_ssn(person.ssn) %>
+                <% end %>
+              </td>
               <td><%= person.dob %></td>
               <td><%= member.hbx_id %></td>
               <td><%= hbx.effective_on %></td>

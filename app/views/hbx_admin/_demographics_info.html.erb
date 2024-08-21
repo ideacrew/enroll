@@ -1,3 +1,5 @@
+<%= javascript_pack_tag 'effective_table_add_ons' if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+
 <div>
   <table class="table table-border">
     <thead>
@@ -9,9 +11,17 @@
     <tbody>
       <tr>
         <td><%=@person.hbx_id%></td> 
-        <td><%=@person.full_name%></td> 
-        <td><%=@person.dob%></td> 
-        <td><%=@person.ssn%></td>
+        <td><%=@person.full_name%></td>
+        <td><%=@person.dob%></td>
+        <td>
+          <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+            <%= render partial: 'shared/person/admin_ssn_block',
+              locals: { presenter: organize_ssn_params(@person, @family.id), include_label: false }
+            %>
+          <% else %>
+            <%=@person.ssn%>
+          <% end %>
+        </td>
       </tr>
     </tbody>
   </table>
