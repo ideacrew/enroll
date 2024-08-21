@@ -43,6 +43,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       context 'when account_transfer_notice_trigger is enabled' do
         before do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:account_transfer_notice_trigger).and_return(true)
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
         end
 
         it 'should trigger account transfer notice' do
@@ -77,6 +78,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       context 'when account_transfer_notice_trigger is disabled' do
         before do
           allow(::EnrollRegistry).to receive(:feature_enabled?).with(:account_transfer_notice_trigger).and_return(false)
+          allow(::EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
         end
 
         it 'should not trigger account transfer notice' do
