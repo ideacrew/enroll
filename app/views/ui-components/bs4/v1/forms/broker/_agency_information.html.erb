@@ -4,7 +4,7 @@
   <%= f.hidden_field :entity_kind, value: "s_corporation" %>
   
   <div class="col-md-6">
-    <label for="inputLegalName"><%= l10n('legal_name') %> *</label>
+    <label for="inputLegalName" class='required'><%= l10n('legal_name') %></label>
     <%= f.text_field :legal_name, placeholder: l10n('legal_name_placeholder'), required: true, id: 'validationCustomLegalName', class: 'form-control' %>
     <div class="invalid-feedback">
       <%= l10n('legal_name_error') %>
