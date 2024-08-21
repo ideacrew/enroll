@@ -59,12 +59,15 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
     end
 
     let(:broker_profile_attributes) do
-      { :ach_account_number => "1234567890",
+      {
+        :ach_account_number => "1234567890",
         :ach_routing_number => "011000015",
         :ach_routing_number_confirmation => "011000015",
         :market_kind => :shop,
         :office_locations_attributes => office_locations_attributes,
-        :contact_method => :paper_and_electronic}
+        :contact_method => :paper_and_electronic,
+        :languages_spoken => ['en']
+      }
     end
 
     let(:general_agency_profile_attributes) do

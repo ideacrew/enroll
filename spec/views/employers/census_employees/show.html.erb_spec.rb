@@ -102,8 +102,8 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
       expect(rendered).to match(/Address/)
       expect(rendered).to match(/ADDRESS LINE 2/)
       expect(rendered).to match(/ADDRESS LINE 1/)
-      expect(rendered).to match(/CITY/)
-      expect(rendered).to match(/SELECT STATE/)
+      expect(rendered).to match(/City/)
+      expect(rendered).to match(/Select State/)
       expect(rendered).to match(/ZIP/)
       expect(rendered).to match(/Add Dependent/i)
     end
