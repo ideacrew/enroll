@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
+    # model for broker agency profile
     class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
       include ::SetCurrentUser
       include AASM
@@ -39,7 +42,7 @@ module BenefitSponsors
       field :default_general_agency_profile_id, type: BSON::ObjectId
 
       field :languages_spoken, type: Array, default: ["en"] # TODO
-      field :working_hours, type: Boolean, default: false
+      field :working_hours, type: Boolean
       field :accept_new_clients, type: Boolean
 
       field :ach_routing_number, type: String
@@ -63,6 +66,8 @@ module BenefitSponsors
         uniqueness: true,
         allow_blank: true
 
+      validates_presence_of :languages_spoken
+
       # validates :market_kind,
       #   inclusion: { in: BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
       #   allow_blank: false
@@ -70,6 +75,7 @@ module BenefitSponsors
       before_save :notify_before_save
 
       validate :validate_market_kind
+      validate :validate_at_least_one_language_selected
       add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_broker_agency_profile_events]
 
       after_initialize :build_nested_models
@@ -90,6 +96,12 @@ module BenefitSponsors
 
       def validate_market_kind
         errors.add(:profiles, "#{market_kind} is not a valid practice area") unless BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS.include?(market_kind)
+      end
+
+      def validate_at_least_one_language_selected
+        return if self&.languages_spoken&.any?
+
+        errors.add(:languages_spoken, "At least one language must be selected.")
       end
 
       def primary_broker_role
@@ -119,9 +131,8 @@ module BenefitSponsors
       end
 
       def languages
-        if languages_spoken.any?
-          return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
-        end
+        return unless languages_spoken.any?
+        languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
       end
 
       def primary_office_location
