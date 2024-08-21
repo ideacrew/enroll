@@ -30,9 +30,9 @@
     <script type="text/javascript" charset="utf-8">
       var ssnRemoved = "<%= EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>";
       if (ssnRemoved) {
-        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
-      } else {
         var columnList = [{ data: 'name'}, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
+      } else {
+        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
       }
 
       var market_enabled = document.getElementById("market_enabled_check").value;
@@ -114,9 +114,9 @@
     <script type="text/javascript" charset="utf-8">
       var ssnRemoved = "<%= EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>";
       if (ssnRemoved) {
-        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
-      } else {
         var columnList = [{ data: 'name'}, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
+      } else {
+        var columnList = [{ data: 'name'}, { data: 'ssn' }, { data: 'dob' }, { data: 'hbx_id'}, { data: 'family_count'}, { data: 'registered'}];
       }
       var market_enabled = document.getElementById("market_enabled_check").value;
       if (market_enabled == 'true') {
