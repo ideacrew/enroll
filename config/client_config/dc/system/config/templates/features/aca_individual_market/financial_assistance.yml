@@ -298,12 +298,12 @@ registry:
       is_enabled: true
       settings:
         - key: :name
-          item: 'Medicaid'
+          item: "Medicaid"
     - key: :medicaid_or_chip_program_long_name
       is_enabled: true
       settings:
         - key: :name
-          item: 'Medicaid'
+          item: "Medicaid"
     - key: :medicaid_or_chip_agency_long_name
       is_enabled: true
       settings:
