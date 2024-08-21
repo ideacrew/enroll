@@ -1,16 +1,19 @@
 Feature: HBX Admin should be able to send the broker application to pending state
 
   Background: Setup site, employer, and benefit application
+    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     Given a CCA site exists with a benefit market
     Then user goes to the Broker Registration form
 
   Scenario: Broker can enter ACH information
+    Given bs4_consumer_flow feature is disable
     Given user enters the personal and Broker Agency information
     When user enters the ach routing information
     Then user enters the office locations and phones
 
   Scenario: HBX Admin sends a Broker Applicant to a pending state and approves through Admin portal
+    Given bs4_consumer_flow feature is disable
     Given user enters the personal and Broker Agency information
     And user enters the ach routing information
     And user enters the office locations and phones

@@ -12,6 +12,7 @@
 //
 //= require ui-components/components
 //= require jquery-ui
+//= require jquery.mask
 //= require_tree .
 
 $(document).on('change', "input#jq_datepicker_ignore_benefit_application_open_enrollment_start_on", function() {
@@ -48,3 +49,9 @@ $(document).on('change', "#benefit_application_start_on", function() {
     });
   };
 });
+
+// Input Masks
+jQuery.inputMasks = () => {
+  $(".phone_number").mask("(999) 999-9999");
+};
+$.inputMasks();
