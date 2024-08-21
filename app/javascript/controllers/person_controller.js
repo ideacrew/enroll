@@ -2,6 +2,21 @@ import { Controller } from "stimulus"
 import axios from 'axios'
 
 export default class extends Controller {
+  connect() {
+    document.addEventListener("keydown", this.handleKeyDown);
+  } 
+
+  disconnect() {
+    document.removeEventListener("keydown", this.handleKeyDown);
+  } 
+  
+  handleKeyDown(event) {
+    event.preventDefault();
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.target.click();
+    }
+  }
+
   showSsn(event) {
     event.stopImmediatePropagation();
     let target = event.target;
@@ -38,23 +53,10 @@ export default class extends Controller {
   populateHtmlElement(personId, payload) {
     let ssnInputElement = document.querySelector(`.ssn-input-${personId}`);
 
-    if (ssnInputElement.tagName === 'INPUT') {
+    if (ssnInputElement.tagName === 'Input') {
       ssnInputElement.value = payload;
-      ssnInputElement.setAttribute('value', payload);
     } else {
       ssnInputElement.textContent = payload;
-    }
-  }
-
-  depopulateHtmlElement(personId) {
-    if (personId == 'temp') return;
-    let ssnInputElement = document.querySelector(`.ssn-input-${personId}`);
-
-    if (ssnInputElement.tagName === 'INPUT') {
-      ssnInputElement.value = '';
-      ssnInputElement.setAttribute('value', '');
-    } else {
-      ssnInputElement.textContent = '';
     }
   }
 
@@ -68,7 +70,6 @@ export default class extends Controller {
     document.querySelector(`.ssn-eye-off-${personId}`).classList.remove('hidden');
   
     document.querySelector(`.ssn-eye-off-${personId}`).focus();
-    this.depopulateHtmlElement(personId);
     const ssnInput = document.querySelector(`.ssn-input-${personId}`);
     if (ssnInput.getAttribute('data-admin-can-enable') !== null) {
       ssnInput.disabled = true;
