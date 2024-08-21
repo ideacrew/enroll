@@ -6,6 +6,7 @@ module BenefitSponsors
       # controller that manages adding, approving and removing of staff agency roles to a broker agency profile
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
         before_action :find_broker_agency_profile, only: [:new]
+        before_action :enable_bs4_layout, only: [:new, :create] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
         def new
           # this endpoint is used for two scenarios
@@ -20,8 +21,13 @@ module BenefitSponsors
           respond_to do |format|
             # the js template is for the first scenario metioned above^
             format.js  { render 'new' } if params[:profile_id]
+
             # the html template is for the second scenario metioned above^
-            format.html { render 'new', layout: false} if params[:profile_type]
+            if params[:profile_type] && @bs4
+              format.html { render partial: 'new_staff_applicant' }
+            elsif params[:profile_type]
+              format.html { render 'new', layout: false }
+            end
           end
         end
 
@@ -100,6 +106,10 @@ module BenefitSponsors
           params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: params[:profile_type] || "broker_agency_staff",
                                  filter_criteria: params.permit(:q), is_broker_registration_page: params[:broker_registration_page] || params["staff"]["is_broker_registration_page"]})
           params[:staff].permit!
+        end
+
+        def enable_bs4_layout
+          @bs4 = true
         end
       end
     end
