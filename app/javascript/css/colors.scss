@@ -130,6 +130,8 @@
   --badge-current-border: hsla(206, 33%, 66%, 1);
   --badge-standard-bg: hsla(321, 19%, 80%, 1);
   --badge-standard-border: hsla(317, 33%, 38%, 1);
+
+  --tab-active-border: #A2B289;
 }
 
 [data-theme='dc'] {
@@ -169,6 +171,8 @@
   --button-error-color: #a21e1f;
   --button-error-hover-color: #85191a;
   --button-error-active-color: #671314;
+
+  --tab-active-border: #A2B289;
 }
 
 [data-contrast='true'] {

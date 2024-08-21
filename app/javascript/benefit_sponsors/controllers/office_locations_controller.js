@@ -62,24 +62,18 @@ export default class extends Controller {
       });
 
       newLocation.querySelectorAll('input').forEach(function(input) {
+        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
+        input.setAttribute('name', name);
+
         if (bs4 == "true" && input.id == "phoneType") {
           input.value = "work";
         } else {
           input.value = '';
         }
-
-        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
-        input.setAttribute('name', name);
-        input.setAttribute('id', name);
-        if (input?.previousElementSibling) input.previousElementSibling.setAttribute('for', name);
       })
 
       if (bs4 == "true") {
-        var removeButton = newLocation.querySelector('a.remove_fields');
-        removeButton.classList.remove('hidden');
-        var removeButtonId = "remove-button-" + totalLocationsCount;
-        removeButton.id = removeButtonId;
-        removeButton.setAttribute('onkeydown', `handleButtonKeyDown(event, '${removeButtonId}')`);
+        newLocation.querySelector('a.remove_fields').classList.remove('hidden');
         newLocation.querySelector('input[placeholder="00000"]').setAttribute('data-action', "");
         newLocation.querySelector(".phone_number").addEventListener('input', (event) => {
           event.target.value = this.fullPhoneMask(event.target.value);
@@ -92,6 +86,9 @@ export default class extends Controller {
       }
 
       newLocation.querySelectorAll('select').forEach(function(input) {
+        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
+        input.setAttribute('name', name);
+
         if (input.value != "work" && input.id != "kindSelect") {
           input.value = '';
         }
@@ -99,11 +96,6 @@ export default class extends Controller {
         if (input.id == "kindSelect") {
           input[0].remove();
         }
-
-        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
-        input.setAttribute('name', name);
-        input.setAttribute('id', name);
-        input.previousElementSibling.setAttribute('for', name);
       })
 
       this.officeLocationsTarget.appendChild(newLocation);
