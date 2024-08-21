@@ -265,6 +265,7 @@ var ApplicantValidations = (function(window, undefined) {
     var tribe_member_no = $("input#indian_tribe_member_no").is(':checked');
 
     if (!tribe_member_yes && !tribe_member_no){
+      resetConfirmButton()
       alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
       ApplicantValidations.restoreRequiredAttributes(e);
     };
@@ -285,11 +286,13 @@ var ApplicantValidations = (function(window, undefined) {
       if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
         var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
         if (tribe_codes_array.length < 1) {
+          resetConfirmButton()
           alert("At least one tribe must be selected.");
           ApplicantValidations.restoreRequiredAttributes(e);
         }
 
         if (tribe_codes_array.includes("OT") && $('input#tribal-name').val() == ""){
+            resetConfirmButton()
             alert("Please provide an answer for 'Other' tribe name.");
             ApplicantValidations.restoreRequiredAttributes(e);
         }
@@ -513,6 +516,11 @@ function applicantDemographicValidations() {
     ApplicantValidations.validationForIncarcerated(e);
     ApplicantValidations.validationForVlpDocuments(e);
     if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
+      var btn = document.querySelector('.applicant-confirm-member');
+      if (btn) {
+        btn.textContent = 'Confirm Member';
+        btn.classList.remove('disabled');
+      }
       $('#showWarning').addClass('shown');
       e.preventDefault();
       return false;
