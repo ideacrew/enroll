@@ -29,7 +29,7 @@
 
   <div class="col-md-3 mb-3">
     <label for="inputDOB"  class="required"><%= l10n('broker_agencies.dob') %></label>
-    <%= f.date_field :dob, placeholder: l10n('dob_format'), min: 110.years.ago, max:"9999-12-31", required: true, onblur: 'validDob(this)' %>
+    <%= f.date_field :dob, placeholder: l10n('dob_format'), min: 110.years.ago, max: 16.years.ago, required: true, onblur: 'validDob(this)' %>
     <div class="invalid-feedback">
       <%= l10n("invalid_dob") %>
     </div>
