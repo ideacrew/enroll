@@ -251,11 +251,23 @@
       });
 
       function confirmMember(element) {
+        const form = element.closest('form')[0];
+        const maleRadio = document.getElementById('radio_male');
+        const femaleRadio = document.getElementById('radio_female');
+        const confirmButtonText = "<%= l10n('confirm_member') %>";
+
         element.text("Please Wait...").addClass("disabled");
+
         ApplicantValidations.manageRequiredValidations(element);
-        if (!element.closest('form')[0].checkValidity()) {
-          element.text("<%= l10n('confirm_member') %>").removeClass("disabled");
+
+        if (!form.checkValidity() || !isGenderSelected(maleRadio, femaleRadio)) {
+          element.text(confirmButtonText).removeClass("disabled");
         }
       }
+
+      function isGenderSelected(maleRadio, femaleRadio) {
+        return (maleRadio && maleRadio.checked) || (femaleRadio && femaleRadio.checked);
+      }
+
   </script>
 </li>
