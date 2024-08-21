@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: :after_each do
   let(:params) do
+    default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
     {:family_id => BSON::ObjectId.new,
      :assistance_year => 2020,
      :benchmark_product_id => BSON::ObjectId.new,
@@ -12,7 +13,7 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
        [{:first_name => "John",
          :last_name => "Smith5",
          :gender => "male",
-         :is_tobacco_user => "unknown",
+         :is_tobacco_user => default_tobacco_use,
          :person_hbx_id => "f1baf5a92c0441d8bba93410457a250a",
          :ssn => "725236966",
          :dob => "04/04/1972",
@@ -36,7 +37,7 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
         {:first_name => "John",
          :last_name => "Smith6",
          :gender => "male",
-         :is_tobacco_user => "unknown",
+         :is_tobacco_user => default_tobacco_use,
          :person_hbx_id => "21a52bd40ec44ea6b49ef284a91b14e2",
          :ssn => nil,
          :dob => "04/04/1972",

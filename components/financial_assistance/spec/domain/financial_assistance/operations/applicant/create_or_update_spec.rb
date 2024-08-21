@@ -158,6 +158,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
       end
 
       let!(:applicant_params) do
+        default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
         {:addresses => [{:address_1 => '1112 Awesome Street NE', :address_2 => '#112', :address_3 => '', :city => 'Washington', :country_name => '', :kind => 'home', :quadrant => "", :state => 'DC', :zip => '20001', county: ''},
                         {:address_1 => '1111 Awesome Street NE', :address_2 => '#111', :address_3 => '', :city => 'Washington', :country_name => '', :kind => 'work', :quadrant => "", :state => 'DC', :zip => '20001', county: ''}],
          :alien_number => nil,
@@ -182,7 +183,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          :is_incarcerated => true,
          :is_primary_applicant => true,
          :is_ssn_applied => nil,
-         :is_tobacco_user => "unknown",
+         :is_tobacco_user => default_tobacco_use,
          five_year_bar_applies: true,
          five_year_bar_met: true,
          qualified_non_citizen: true,
