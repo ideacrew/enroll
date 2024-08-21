@@ -2115,6 +2115,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_publish_updated_families).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:bs4_consumer_flow).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       ivl_person.consumer_role.move_identity_documents_to_verified
       sign_in(ivl_user)
     end
