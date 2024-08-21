@@ -62,7 +62,7 @@ module BenefitSponsors
         end
         params[:profile_type] = profile_type
         respond_to do |format|
-          format.html { render 'new', :flash => { :error => @agency.errors.full_messages } }
+          format.html { render 'new', :layout => resolve_layout, :flash => { :error => @agency.errors.full_messages } }
         end
       end
 
