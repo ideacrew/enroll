@@ -10,6 +10,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     allow(EnrollRegistry[:choose_shopping_method].feature).to receive(:is_enabled).and_return(false)
     allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:sensor_tobacco_carrier_usage].feature).to receive(:is_enabled).and_return(false)
     allow(controller).to receive(:ridp_verified?).with(any_args).and_return(true)
   end
 
@@ -1495,6 +1496,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:choose_shopping_method).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
         sign_in user
       end
 
