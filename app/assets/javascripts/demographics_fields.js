@@ -725,6 +725,11 @@ function demographicValidations() {
       PersonValidations.validationForVlpDocuments(e);
       PersonValidations.validationForContactMethod(e);
       if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
+        var btn = document.querySelector('.applicant-confirm-member');
+        if (btn) {
+          btn.textContent = 'Confirm Member';
+          btn.classList.remove('disabled');
+        }
         $('#showWarning').addClass('shown');
         e.preventDefault();
         return false;
