@@ -1,26 +1,66 @@
-<% if @broker_agency_profiles.present?  %>
-  <br />
-  <div class='table-responsive col-12'>
-    <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5' class="broker-staff">
-      <thead style='height: 40px;'>
-      <th style='width: 18%; height: 40px; padding: 10px'> <%= l10n("legal_name") %></th>
-      <th style='width: 18%'> <%= l10n("npn") %></th>
-      <th style='width: 18%'> <%= l10n("primary_broker_name") %></th>
-      <th style='width: 18%'> <%= l10n("select_this_broker_button") %></th>
-      </thead>
-      <% @broker_agency_profiles.each do |agency| %>
-        <tbody class="select-broker">
-        <tr style='border: 1px solid #d5d5d5; height: 50px;'>
-          <td><%= agency.legal_name %></td>
-          <td><%= agency.primary_broker_role&.npn %></td>
-          <td><%= agency.primary_broker_role&.person&.full_name %></td>
-          <td colspan="1"> <a href="javascript:void(0)" class='btn btn-primary select-broker-agency' style="color:#fff" onclick="selectBrokereAgency(this);" data-broker_agency_profile_id="<%= agency._id %>"><%= l10n("select_this_broker_button").upcase %></a>
-          </td>
-        </tr>
-        </tbody>
-      <% end %>
-    </table>
-  </div>
-<% else %>
- <h4> <span class="alert-error"> <%= l10n("no_agencies_found") %> </span> </h4>
+<% if @bs4 %>
+  <% if @broker_agency_profiles.present?  %>
+    <br />
+    <div class='table-responsive col-12 px-0'>
+      <table class="broker-staff border-0">
+        <thead>
+          <tr>
+            <th class="col-5"><%= l10n("legal_name") %></th>
+            <th class="col-1"><%= l10n("npn") %></th>
+            <th class="col-2"><%= l10n("primary_broker_name") %></th>
+            <th class="col-3"></th>
+          </tr>
+        </thead>
+        <% @broker_agency_profiles.each do |agency| %>
+          <tbody class="select-broker">
+            <tr>
+              <td class="col-5 name-col"><%= agency.legal_name %></td>
+              <td class="col-1"><%= agency.primary_broker_role&.npn %></td>
+              <td class="col-2"><%= agency.primary_broker_role&.person&.full_name %></td>
+              <td class="col-3"><a href="javascript:void(0)" class='btn btn-primary select-broker-agency float-right' onclick="selectBrokereAgency(this);" data-broker_agency_profile_id="<%= agency._id %>"><%= l10n("select_this_broker_button") %></a></td>
+            </tr>
+          </tbody>
+        <% end %>
+      </table>
+    </div>
+  <% else %>
+    <h4>
+      <span class="alert-error"> <%= l10n("no_agencies_found") %> </span> 
+    </h4>
+  <% end %>
+<% else %>  
+  <% if @broker_agency_profiles.present?  %>
+    <br />
+    <div class='table-responsive col-12'>
+      <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5' class="broker-staff">
+        <thead style='height: 40px;'>
+        <th style='width: 18%; height: 40px; padding: 10px'> <%= l10n("legal_name") %></th>
+        <th style='width: 18%'> <%= l10n("npn") %></th>
+        <th style='width: 18%'> <%= l10n("primary_broker_name") %></th>
+        <th style='width: 18%'> <%= l10n("select_this_broker_button") %></th>
+        </thead>
+        <% @broker_agency_profiles.each do |agency| %>
+          <tbody class="select-broker">
+          <tr style='border: 1px solid #d5d5d5; height: 50px;'>
+            <td><%= agency.legal_name %></td>
+            <td><%= agency.primary_broker_role&.npn %></td>
+            <td><%= agency.primary_broker_role&.person&.full_name %></td>
+            <td colspan="1"> <a href="javascript:void(0)" class='btn btn-primary select-broker-agency' style="color:#fff" onclick="selectBrokereAgency(this);" data-broker_agency_profile_id="<%= agency._id %>"><%= l10n("select_this_broker_button").upcase %></a>
+            </td>
+          </tr>
+          </tbody>
+        <% end %>
+      </table>
+    </div>
+  <% else %>
+  <h4> <span class="alert-error"> <%= l10n("no_agencies_found") %> </span> </h4>
+  <% end %>
 <% end %>
+
+<script>
+  $(document).ready(function() {
+    if ($('.table-responsive').length) {
+      $('.broker-agency-submit').removeClass('hidden');
+    }
+  });
+</script>

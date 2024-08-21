@@ -1,0 +1,51 @@
+<div class="pull-right d-flex align-items-center justify-content-between mb-2">
+  <h3 class="ol_title"> <%= is_primary ? l10n('address.agency.primary_office_location') : l10n('address.agency.office_location') %></h3>
+  <a class="remove_fields close-2 <%= is_primary ? 'hidden' : ''%>" data-action="click->office-locations#removeLocation"><i class="far fa-trash-alt fa-2x role-trashcan"></i></a>
+</div>
+<div id="address_info">
+  <div class="row mb-2">
+    <div class="col-md-6 col-sm-6 col-xs-12">
+      <label for="inputAddress1"><%= l10n('address_1') %> *</label>
+      <%= f.text_field :address_1, class: "form-control mb-1", placeholder: l10n('address_1_placeholder'), required: true, id: 'inputAddress1' %>
+      <div class="invalid-feedback">
+        <%= l10n('address.address_1_error') %>
+      </div>
+    </div>
+    <div class="col-md-6 col-sm-6 col-xs-12">
+      <label for="inputAddress2"><%= l10n('address_2') %></label>
+      <%= f.text_field :address_2, class: "form-control mb-1", placeholder: l10n('address_2') %>
+    </div>
+  </div>
+
+  <div class="row mb-2" data-controller="zip-check">
+    <div class="col-md-3 col-sm-12 col-xs-12">
+      <label for="inputCity"><%= l10n("city") %> *</label>
+      <%= f.text_field :city, class: "form-control mb-1", required: true, placeholder: l10n("city") %>
+      <div class="invalid-feedback">
+        <%= l10n('address.city_error') %>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-12 col-xs-12">
+      <label for="inputState"><%= l10n('state') %> *</label>
+      <%= f.select :state, options_for_select(State::NAME_IDS.map(&:last).sort_by { |c| c }, selected: f.object.try(:state)), { include_blank: l10n("select_state") }, class: 'form-control mb-1', id: 'inputState', required: true %>
+      <div class="invalid-feedback">
+        <%= l10n('address.state_error') %>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-12 col-xs-12">
+      <label for="inputZip"><%= l10n('zip_code') %> *</label>
+      <%= f.text_field :zip, id: 'inputZip', class: 'form-control mb-1', minlength: '5', maxlength: '5', required: true, placeholder: '00000' %>
+      <div class="invalid-feedback">
+        <%= l10n('address.zip_code_error') %>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-xs-12">
+      <label for="inputKind"><%= l10n('address_kind') %> *</label>
+      <% kinds = f.object.office_kind_options; kinds = kinds.rotate if params[:child_index] %>
+      <%= f.select :kind, options_for_select(kinds.map { |a| [a.to_s.humanize, a.to_s] }, selected: f.object.try(:kind)), { prompt: l10n("address.address_kind_select") }, class: "form-control", required: true, id: 'kindSelect' %>
+      <div class="invalid-feedback">
+        <%= l10n('address.address_kind_error') %>
+      </div>
+    </div>
+  </div>
+</div>

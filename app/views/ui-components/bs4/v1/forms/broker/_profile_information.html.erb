@@ -1,0 +1,32 @@
+<div class="row mb-3">
+  <div class="col-md-6">
+    <label for="inputPracticeArea"><%= l10n("marked_kind") %> *</label>
+    <%= f.select(:market_kind, options_for_select(BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS_OPTIONS.inject([]) { |options, (k, v)| options << [k, v] }, selected: f.object.try(:market_kind)), { prompt: "Select Market Kind" }, { class: 'form-control', required: true }) %>
+    <div class="invalid-feedback">
+      <%= l10n("marked_kind_error") %>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :home_page, l10n("website") %>
+    <%= f.text_field :home_page, class: "floatlabel form-control interaction-field-control-broker-home-page", placeholder: l10n("website_url") %>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-3">
+    <%= f.label :working_hours, "#{l10n("available_working_hours?")}*"%>
+    <%= f.select(:working_hours, options_for_select([[l10n('yes'), true], [l10n('no'), false]], selected: f.object.try(:working_hours)), { prompt: l10n("default_yes_no") }, { class: 'form-control', required: true }) %>
+    <div class="invalid-feedback">
+      <%= l10n("default_select_error") %>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <%= f.label :accept_new_clients, "#{l10n("accepting_new_clients?")}*"%>
+    <%= f.select(:accept_new_clients, options_for_select([[l10n('yes'), true], [l10n('no'), false]], selected: f.object.try(:accept_new_clients)), { prompt: l10n("default_yes_no") }, { class: 'form-control', required: true }) %>
+    <div class="invalid-feedback">
+      <%= l10n("default_select_error") %>
+    </div>
+  </div>
+</div>
