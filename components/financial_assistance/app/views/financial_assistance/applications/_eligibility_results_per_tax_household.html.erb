@@ -75,11 +75,18 @@
       <% if medicaid_or_chip_applicants.present? %>
         <h3 data-cuke='medicaid_or_chip_heading'><%= l10n("faa.results.medicaid_or_chip_heading", medicaid_or_chip_program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item) %></h3>
         <p data-cuke='medicaid_or_chip_text'><%= l10n("faa.results.medicaid_or_chip_text",
-                                                      medicaid_or_chip_agency_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
-                                                      medicaid_or_chip_program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item,
+                                                      medicaid_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_long_name].setting(:name).item,
+                                                      medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item,
+                                                      state_medicaid_agency_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
                                                       medicaid_agency_phone: EnrollRegistry[:enroll_app].setting(:medicaid_agency_phone).item,
-                                                      contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item
-                                                      ) %></p>
+                                                      medicaid_agency_phone_ttd: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item) %>
+        </p>
+        <p><%= l10n("faa.results.medicaid_or_chip_text2",
+                    medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item,
+                    medicaid_agency_phone: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
+                    contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item,
+                    short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+        </p>
         <ul>
           <% medicaid_or_chip_applicants.each do |applicant| %>
             <li><b><%= full_name(applicant) %></b></li>
@@ -122,7 +129,9 @@
       <% if FinancialAssistanceRegistry.feature_enabled?(:non_magi_referral_display) && applicants_with_non_magi_reasons.present? %>
         <h3 data-cuke='non_magi_referral_heading'><%= l10n("faa.results.non_magi_referral_heading") %></h3>
         <p data-cuke='non_magi_referral_text'><%= l10n("faa.results.non_magi_referral_text",
-                                                        medicaid_or_chip_agency_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
+                                                        medicaid_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_long_name].setting(:name).item,
+                                                        medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item,
+                                                        medicaid_or_chip_agency_long_name: EnrollRegistry[:medicaid_or_chip_agency_long_name].settings(:name).item,
                                                         short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
         <ul>
           <% applicants_with_non_magi_reasons.each do |applicant| %>
