@@ -18,7 +18,9 @@ module Effective
         table_column :name, :label => 'Name', :proc => proc { |row|
           link_to_with_noopener_noreferrer(h(row.primary_applicant.person.full_name), resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id))
         }, :filter => false, :sortable => true
-        table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
+        unless EnrollRegistry.feature_disabled?(:mask_ssn_ui_fields) # rubocop:disable Style/IfUnlessModifier --> not disabling this rule will break the code or result in more rubocop errors, and will be remedied when feature flag is removed
+          table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
+        end
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
@@ -37,7 +39,9 @@ module Effective
         table_column :name, :label => 'Name', :proc => proc { |row|
           link_to_with_noopener_noreferrer(eligibility_primary_name(row), resume_enrollment_exchanges_agents_path(person_id: eligibility_primary_family_member(row).person_id))
         }, :filter => false, :sortable => true
-        table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(eligibility_primary_ssn(row))) }, :filter => false, :sortable => false
+        unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) # rubocop:disable Style/IfUnlessModifier --> not disabling this rule will break the code or result in more rubocop errors, and will be remedied when feature flag is removed
+          table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(eligibility_primary_ssn(row))) }, :filter => false, :sortable => false
+        end
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(eligibility_primary_family_member(row).dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false

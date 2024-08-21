@@ -1,5 +1,6 @@
-<div class="container bottom-pd">
+<%= javascript_pack_tag 'effective_table_add_ons' if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
 
+<div class="container bottom-pd">
   <%if !@dont_allow_change && !@dont_update_ssn %>
 
     <h4 class="title">DOB / SSN Update Successful</h4>
@@ -13,7 +14,15 @@
           </tr>
           <tr>
             <td><h5> <b>DOB:</b> <%=@person.dob%> </h5></td>
-            <td><h5> <b>SSN:</b> <%=@person.ssn%></h5></tb>
+            <td>
+            <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+              <%= render partial: 'shared/person/admin_ssn_block',
+                locals: { presenter: organize_ssn_params(@person), include_label: true }
+              %>
+            <% else %>
+              <h5> <b>SSN:</b> <%=@person.ssn%> </h5>
+            <% end %>
+            </td>
           </tr>
         </tbody>
       </table>
