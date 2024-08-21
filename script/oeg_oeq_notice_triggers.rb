@@ -14,8 +14,8 @@ oeg_family_ids = if EnrollRegistry.feature_enabled?(:oeg_notice_income_verificat
                  else
                    faa_application_families - ::FinancialAssistance::Application.determined.by_year(renewal_year).distinct(:family_id)
                  end
-oeq_enrollments = HbxEnrollment.active.enrolled.current_year.where(:family_id.nin=> faa_application_families).distinct(:family_id)
-oeg_enrollments = HbxEnrollment.active.enrolled.current_year.where(:family_id.in=> oeg_family_ids).distinct(:family_id)
+oeq_enrollments = HbxEnrollment.individual_market.active.enrolled.current_year.where(:family_id.nin=> faa_application_families).distinct(:family_id)
+oeg_enrollments = HbxEnrollment.individual_market.active.enrolled.current_year.where(:family_id.in=> oeg_family_ids).distinct(:family_id)
 families = oeq_enrollments + oeg_enrollments
 
 families.each_with_index do |family_id, index|
