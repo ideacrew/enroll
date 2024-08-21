@@ -255,18 +255,24 @@
         const maleRadio = document.getElementById('radio_male');
         const femaleRadio = document.getElementById('radio_female');
         const confirmButtonText = "<%= l10n('confirm_member') %>";
+        const applicantSSN = document.getElementById('applicant_ssn')
+        const applicantNoSSN = document.getElementById('applicant_no_ssn')
 
         element.text("Please Wait...").addClass("disabled");
 
         ApplicantValidations.manageRequiredValidations(element);
 
-        if (!form.checkValidity() || !isGenderSelected(maleRadio, femaleRadio)) {
+        if (!form.checkValidity() || !isGenderSelected(maleRadio, femaleRadio) || !isSsnSelected(applicantSSN, applicantNoSSN)) {
           element.text(confirmButtonText).removeClass("disabled");
         }
       }
 
       function isGenderSelected(maleRadio, femaleRadio) {
         return (maleRadio && maleRadio.checked) || (femaleRadio && femaleRadio.checked);
+      }
+
+      function isSsnSelected(applicantSSN, applicantNoSSN) {
+        return (applicantSSN && applicantSSN.value.replace(/-/g, '').length == 9) || (applicantNoSSN && applicantNoSSN.checked);
       }
 
   </script>
