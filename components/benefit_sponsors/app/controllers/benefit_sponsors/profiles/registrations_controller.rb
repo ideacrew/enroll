@@ -12,8 +12,9 @@ module BenefitSponsors
       # TODO: Let's just doo this for now
       before_action :redirect_if_general_agency_disabled, only: %i[new create edit update destroy]
       before_action :set_cache_headers, only: [:edit, :new]
+      before_action :enable_bs4_layout, only: [:new, :create, :edit] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-      layout 'two_column', :only => :edit
+      layout :resolve_edit_layout, :only => :edit
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
@@ -21,7 +22,7 @@ module BenefitSponsors
         authorize @agency, :redirect_home?
         set_ie_flash_by_announcement unless is_employer_profile?
         respond_to do |format|
-          format.html
+          format.html { render layout: 'bs4_application' if @bs4 }
           format.js
           format.json { head :ok }
         end
@@ -48,7 +49,7 @@ module BenefitSponsors
           if is_broker_profile? && saved
             flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
             respond_to do |format|
-              format.html { render template_filename, :layout => 'single_column' }
+              format.html { render template_filename, :layout => resolve_layout }
             end
             return
           elsif saved
@@ -69,7 +70,7 @@ module BenefitSponsors
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_edit(profile_id: params[:id])
         authorize @agency
 
-        render layout: 'single_column' if @agency.organization.is_broker_profile? || @agency.organization.is_general_agency_profile?
+        render layout: resolve_layout if @agency.organization.is_broker_profile? || @agency.organization.is_general_agency_profile?
       end
 
       def update
@@ -190,6 +191,20 @@ module BenefitSponsors
       def verify_recaptcha_if_needed
         return true unless helpers.registration_recaptcha_enabled?(profile_type)
         verify_recaptcha(model: @agency)
+      end
+
+      def enable_bs4_layout
+        @bs4 = true
+      end
+
+      def resolve_layout
+        return "single_column" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        'bs4_application'
+      end
+
+      def resolve_edit_layout
+        return "two_column" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        'bs4_application'
       end
     end
   end
