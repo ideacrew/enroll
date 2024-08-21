@@ -258,3 +258,120 @@ input[type='date']:invalid::-webkit-datetime-edit {
   color: var(--enrollment-status-red);
   font-weight: 600;
 }
+
+#broker_agency_form.bs4-active {
+  .broker-registration-tabs {
+    border-bottom: 2px solid var(--silver-border);
+    font-size: 0;
+    // font-size needs to be set to 0 here to hide 
+    // the space between the jQuery-ui tabs
+
+    li {
+      padding: 8px 16px;
+      border-radius: 4px 4px 0 0;
+      border: 2px solid var(--tab-active-border);
+      border-bottom: none;
+    }
+
+    li.ui-state-active {
+      background-color: var(--body-color);
+      border-color: var(--silver-border);
+      border-width: 2px 2px 0 2px;
+      position: relative;
+
+      // while class is active, add make font bold + primary color
+      a {
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+    }
+
+    li.ui-state-active::before {
+      content: '';
+      background-color: var(--body-color);
+      border-left: 2px solid transparent;
+      border-right: 2px solid transparent;
+      height: 4px;
+      position: absolute;
+      bottom: -3px;
+      left: 0px;
+      right: 0px;
+    }
+  }
+
+  // legend here needs to explicitly be default color (black)
+  // because otherwise it is grey, which is not in the design
+  legend {
+    color: var(--default-font-color);
+  }
+
+  input[type='text'],
+  input[type='date'] {
+    width: 100%;
+  }
+
+  select {
+    border-color: var(--grey-100);
+  }
+
+  // adding border-0 to these classes does not work
+  // because it is a jquery-ui class 
+  #broker_registration,
+  #broker_agency_staff {
+    border: none;
+  }
+
+  // all of these classes were originally inline
+  #broker_agency_staff {
+    .table-responsive {
+      table.broker-staff {
+        width: 100%; 
+        border-collapse: collapse;
+
+        thead {
+          height: 40px;
+          
+          tr {
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--silver-border);
+            border-radius: 1px 0 0 1px;
+          }
+
+          th:first-of-type {
+            height: 40px;
+            padding: 10px;
+          }
+
+          th { 
+            width: 18%;
+            vertical-align: bottom;
+          }
+        }
+
+        tbody.select-broker {
+          &.agency-selected {
+            border: 2px solid var(--button-tertiary-color);
+
+            tr { 
+              background-color: var(--tertiary-tint);
+            }
+          }
+
+          tr {
+            border-bottom: 1px solid var(--silver-border);
+
+            td.name-col {
+              font-size: 14px;
+            }
+
+            td {
+              .select-broker-agency {
+                color: var(--primary-white);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
