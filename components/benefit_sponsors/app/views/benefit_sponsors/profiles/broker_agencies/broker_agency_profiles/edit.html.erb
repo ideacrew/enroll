@@ -13,7 +13,7 @@
 
               <div class="row">
                 <div class="col-md-9 col-sm-9 col-xs-12">
-                  <h4>Broker Agency Information</h4>
+                  <h4><%= l10n("broker_agency_information") %></h4>
                   <div class="row no-buffer row-form-wrapper">
                     <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields", f: f, entity_kinds: Organization::ENTITY_KINDS[0..3], readonly: 'readonly' %>
                   </div>
@@ -55,7 +55,7 @@
 
               <div class="row">
                 <div class="col-md-9 col-sm-9 col-xs-12">
-                  <h4>Broker Agency Information</h4>
+                  <h4><%= l10n("broker_agency_information") %></h4>
                   <div class="row no-buffer row-form-wrapper">
                     <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields", f: f, entity_kinds: Organization::ENTITY_KINDS[0..3], readonly: 'readonly' %>
                   </div>
