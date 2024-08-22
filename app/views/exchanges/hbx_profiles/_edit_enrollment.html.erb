@@ -20,7 +20,7 @@
           </div>
           <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
             <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
-              <%= render partial: 'shared/person/admin_ssn_field',
+              <%= render partial: 'shared/person/ssn/admin_ssn_field',
                 locals: { f: f, presenter: organize_ssn_params(f.object) }
               %>
             <% else %>
