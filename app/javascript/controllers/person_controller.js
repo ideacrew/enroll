@@ -51,8 +51,6 @@ export default class extends Controller {
   }
 
   populateHtmlElement(personId, payload) {
-    console.log('payload', payload);
-    console.log('personId', personId);
     let ssnInputElement = document.querySelector(`.ssn-input-${personId}`);
 
     if (ssnInputElement.tagName === 'INPUT') {
