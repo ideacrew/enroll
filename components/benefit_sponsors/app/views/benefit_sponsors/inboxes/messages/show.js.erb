@@ -1,6 +1,8 @@
 $("#message_list_form").hide();
 $("#inbox_form").show();
 $('#show_message_form').show().html("<%= escape_javascript(render "benefit_sponsors/shared/inboxes/message", message: @message) %>");
-$('#header').text("<%= l10n('message_detail') %>");
+<% if @bs4 %>
+  $('#header').text("<%= l10n('message_detail') %>");
+<% end %>
 $("#myTab").load(location.href+" #myTab>*", "");
 $("#inbox_form").load(location.href+" #inbox_form>*", "");
