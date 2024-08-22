@@ -338,6 +338,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:send_extra_fields_to_checkbook).and_return(true)
     end
 
@@ -346,7 +347,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     it "ivl body should have a current start date" do
       body = subject.construct_body_ivl
       expect(body[:enrollmentDate]).to_not be_nil
-      expect(body[:enrollmentDate]).to eq effective_on.strftime("%m-%d-%Y")
+      expect(body[:enrollmentDate]).to eq effective_on.strftime("%m/%d/%Y")
     end
 
     it "ivl body should have a current plan" do
@@ -419,6 +420,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:send_extra_fields_to_checkbook).and_return(false)
     end
 
