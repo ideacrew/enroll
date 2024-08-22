@@ -18,6 +18,7 @@ oeq_enrollments = HbxEnrollment.individual_market.active.enrolled.current_year.w
 oeg_enrollments = HbxEnrollment.individual_market.active.enrolled.current_year.where(:family_id.in=> oeg_family_ids).distinct(:family_id)
 families = oeq_enrollments + oeg_enrollments
 
+logger.info "Total number of families to trigger OEQ/OEG notices: #{families.size}"
 families.each_with_index do |family_id, index|
   family = Family.find_by(id: family_id)
   next unless family.present?
