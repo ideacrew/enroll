@@ -1,9 +1,9 @@
 <div class="row mb-3">
   <div class="col-md-6">
-    <label class="required" for="inputPracticeArea"><%= l10n("marked_kind") %></label>
+    <label class="required" for="inputPracticeArea"><%= l10n("market_kind") %></label>
     <%= f.select(:market_kind, options_for_select(BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS_OPTIONS.inject([]) { |options, (k, v)| options << [k, v] }, selected: f.object.try(:market_kind)), { prompt: "Select Market Kind" }, { class: 'form-control', required: true }) %>
     <div class="invalid-feedback">
-      <%= l10n("marked_kind_error") %>
+      <%= l10n("market_kind_error") %>
     </div>
   </div>
 
