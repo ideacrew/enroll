@@ -23,7 +23,7 @@
 <% sorted_inbox_messages = provider.inbox.messages.select{|m| @folder == (m.folder.try(:capitalize) || 'Inbox') }.sort_by(&:created_at).reverse %>
 <div id="inbox-messages" class="mx-0 px-0">
 <div id="inbox-headers" class="tab-holder">
-  <h1 id="header"><%= l10n("messages") %></h1>
+  <h1><%= l10n("messages") %></h1>
 
   <div class="pl-3 inbox-sender row">
     <%= l10n("unread_messages")%>
