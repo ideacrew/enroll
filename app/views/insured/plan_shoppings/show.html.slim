@@ -470,7 +470,7 @@ javascript:
           if (!product_name) {
             product_name = result.product.name
           }
-          var sbc_url = "documents/" + result.product.sbc_document['_id'] + "/product_sbc_download?product_id=" + result.product['_id'] + "&content_type=application/pdf&filename=" + product_name.replace(/[^0-9a-z]/gi, '') + ".pdf&disposition=inline"
+          var sbc_url = "/documents/" + result.product.sbc_document['_id'] + "/product_sbc_download?product_id=" + result.product['_id'] + "&content_type=application/pdf&filename=" + product_name.replace(/[^0-9a-z]/gi, '') + ".pdf&disposition=inline"
         }
         else {
           var sbc_url = "";
