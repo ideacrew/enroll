@@ -15,10 +15,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function toggleDisplayEnrollments(event) {
     for (const panel of initiallyHiddenEnrollmentPanels) {
-      panel.classList.remove('hidden');
+      if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
     }
 
-    enrollmentToggleButton.remove();
+    if (enrollmentToggleButton.classList.contains('showing')) {
+      enrollmentToggleButton.innerText = enrollmentToggleButton.dataset.hidetext;
+      enrollmentToggleButton.classList.remove("showing");
+    } else {
+      enrollmentToggleButton.innerText = enrollmentToggleButton.dataset.showtext;
+      enrollmentToggleButton.classList.add("showing");
+    }
   }
 
   // For when family home page loaded through clicking off of the families index page

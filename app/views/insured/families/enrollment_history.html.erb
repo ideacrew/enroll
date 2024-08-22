@@ -15,6 +15,10 @@
       <% enrollments = @hbx_enrollments %>
     <% end %>
 
+    <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && enrollments&.any? %>
+      <button id="display_all_enrollments_btn" class="button button-primary all-enroll-button showing" data-hidetext="<%= l10n("enrollment_history.hide_all") %>" data-showtext="<%= l10n("enrollment_history.show_all") %>"><%= l10n("enrollment_history.show_all") %></button>
+    <% end %>
+
     <% if enrollments&.any? %>
       <% enrollments.group_by { |enrollment| enrollment&.effective_on&.year }.each do |year, yearly_enrollments| %>
         <% show_year_heading = yearly_enrollments.any?{|enrollment| !initially_hide_enrollment?(enrollment)} %>
@@ -27,10 +31,6 @@
       <% end %>
     <% else %>
       <%= l10n("no_current_or_past_enrollments", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-    <% end %>
-
-    <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) && enrollments&.any? %>
-      <button id="display_all_enrollments_btn" class="button button-primary all-enroll-button"><%= l10n("enrollment_history.show_all") %></button>
     <% end %>
   </div>
 
