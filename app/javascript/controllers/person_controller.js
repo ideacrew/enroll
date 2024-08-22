@@ -2,21 +2,6 @@ import { Controller } from "stimulus"
 import axios from 'axios'
 
 export default class extends Controller {
-  connect() {
-    document.addEventListener("keydown", this.handleKeyDown);
-  } 
-
-  disconnect() {
-    document.removeEventListener("keydown", this.handleKeyDown);
-  } 
-  
-  handleKeyDown(event) {
-    event.preventDefault();
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.target.click();
-    }
-  }
-
   showSsn(event) {
     event.stopImmediatePropagation();
     let target = event.target;

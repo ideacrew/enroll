@@ -15,7 +15,7 @@
         <td><%=@person.dob%></td>
         <td>
           <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
-            <%= render partial: 'shared/person/admin_ssn_block',
+            <%= render partial: 'shared/person/ssn/admin_ssn_block',
               locals: { presenter: organize_ssn_params(@person, @family.id), include_label: false }
             %>
           <% else %>
