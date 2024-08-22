@@ -12,7 +12,7 @@ module BenefitSponsors
       # TODO: Let's just doo this for now
       before_action :redirect_if_general_agency_disabled, only: %i[new create edit update destroy]
       before_action :set_cache_headers, only: [:edit, :new]
-      before_action :enable_bs4_layout, only: [:new, :create, :edit] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+      before_action :enable_bs4_layout, only: [:new, :create, :edit] if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
 
       layout :resolve_edit_layout, :only => :edit
 
@@ -198,12 +198,12 @@ module BenefitSponsors
       end
 
       def resolve_layout
-        return "single_column" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        return "single_column" unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
         'bs4_application'
       end
 
       def resolve_edit_layout
-        return "two_column" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        return "two_column" unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
         'bs4_application'
       end
     end
