@@ -9,7 +9,7 @@ module BenefitSponsors
       before_action :find_inbox_provider
       before_action :find_message
       before_action :set_sent_box, if: :is_broker?
-      before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+      before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
 
       # Shows an inbox message.
       # The id passed in is not the message id but the person id or profile id.
@@ -58,7 +58,7 @@ module BenefitSponsors
           authorize @inbox_provider, :can_read_inbox?
         end
         BenefitSponsors::Services::MessageService.for_destroy(@message)
-        flash[:notice] = "Successfully deleted inbox message." unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        flash[:notice] = "Successfully deleted inbox message." unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
         @inbox_url = params[:url] if params[:url].present?
       end
 
