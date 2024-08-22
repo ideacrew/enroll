@@ -74,9 +74,10 @@ module FinancialAssistance
                 if income_evidence.enrolled_in_any_aptc_csr_enrollments?(enrollments)
                   aasm_state = income_evidence.aasm_state
 
-                  if aasm_state == 'review'
+                  case aasm_state
+                  when 'review'
                     income_evidence.move_to_review
-                  elsif aasm_state == 'rejected'
+                  when 'rejected'
                     applicant.set_evidence_rejected(income_evidence)
                   else
                     applicant.set_evidence_outstanding(income_evidence)
