@@ -279,6 +279,7 @@ var ApplicantValidations = (function(window, undefined) {
 
     if (tribe_member_yes){
       if ($('#tribal-state').length > 0 && $('#tribal-state').val() == ""){
+        resetConfirmButton();
         $('#tribal-state-alert').show();
         ApplicantValidations.restoreRequiredAttributes(e);
       }
@@ -306,9 +307,10 @@ var ApplicantValidations = (function(window, undefined) {
           ApplicantValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('#tribal-id').length > 0 && $('#tribal-id').val() == ""){
-          $('#tribal-id-alert').show();
-          ApplicantValidations.restoreRequiredAttributes(e);
+      if ($('#tribal-id').length > 0 && $('#tribal-id').val().length != 9){
+        resetConfirmButton();
+        $('#tribal-id-alert').show();
+        ApplicantValidations.restoreRequiredAttributes(e);
       }
     }
   }
