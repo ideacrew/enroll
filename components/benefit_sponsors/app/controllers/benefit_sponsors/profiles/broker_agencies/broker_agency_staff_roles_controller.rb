@@ -6,7 +6,7 @@ module BenefitSponsors
       # controller that manages adding, approving and removing of staff agency roles to a broker agency profile
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
         before_action :find_broker_agency_profile, only: [:new]
-        before_action :enable_bs4_layout, only: [:new, :create] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+        before_action :enable_bs4_layout, only: [:new, :create] if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
 
         def new
           # this endpoint is used for two scenarios
