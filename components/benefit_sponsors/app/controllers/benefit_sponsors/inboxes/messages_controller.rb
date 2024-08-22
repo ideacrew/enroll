@@ -73,7 +73,7 @@ module BenefitSponsors
       end
 
       def is_broker?
-        (@inbox_provider.class.to_s == "Person") && /.*BrokerAgencyProfile$/.match(@inbox_provider.broker_role.broker_agency_profile._type)
+        (@inbox_provider.class.to_s == "Person") && /.*BrokerAgencyProfile$/.match(@inbox_provider&.broker_role&.broker_agency_profile&._type)
       end
 
       def find_inbox_provider
