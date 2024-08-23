@@ -1,5 +1,5 @@
 // For when families home page is refreshed when user on it
-document.addEventListener('DOMContentLoaded turbolinks:load', function () {
+document.addEventListener('DOMContentLoaded', function () {
   console.log("Enrollment.js loaded");
   const initiallyHiddenEnrollmentPanels = document.getElementsByClassName(
     'initially_hidden_enrollment'
