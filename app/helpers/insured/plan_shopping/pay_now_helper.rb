@@ -9,7 +9,7 @@ module Insured
         "CareFirst" => "https://member.carefirst.com/members/home.page",
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
         "Dominion National" => "https://www.dominionmembers.com/",
-        "Kaiser" => "https://kp.org/paypremium",
+        "Kaiser" => EnrollRegistry['kaiser_permanente_pay_now'].setting(:generic_url).item,
         "Kaiser Permanente" => EnrollRegistry['kaiser_permanente_pay_now'].setting(:generic_url).item,
         "Community Health Options" => "https://healthoptions.org",
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",

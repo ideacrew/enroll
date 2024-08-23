@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
@@ -386,6 +388,22 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       allow(EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile)).to receive(:item).and_return(false)
       allow(EnrollRegistry[:kaiser_permanente_pay_now].setting(:enrollment_tile)).to receive(:item).and_return(false)
       expect(helper.show_generic_redirect?(hbx_enrollment)).to be_falsey
+    end
+  end
+
+  describe "carrier_url" do
+    context "kaiser Permanente carrier" do
+      before do
+        allow(EnrollRegistry[:kaiser_permanente_pay_now].setting(:generic_url)).to receive(:item).and_return("https://kp.org")
+        stub_const('Insured::PlanShopping::PayNowHelper::LINK_URL', {
+                     "Kaiser Permanente" => EnrollRegistry['kaiser_permanente_pay_now'].setting(:generic_url).item
+                   })
+      end
+
+      it "should return kaiser Permanente pay now generic url" do
+        carrier_name = "Kaiser Permanente"
+        expect(helper.carrier_url(carrier_name)).to eq "https://kp.org"
+      end
     end
   end
 end
