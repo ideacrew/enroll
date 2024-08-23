@@ -61,11 +61,12 @@
         </svg>
         <span class="ml-2"><%= l10n("add_member_to_household") %></span>
       <% end) %>
-
+      <% if @application.present? %>
       <div class="help-to-decide align-content-around ml-3">
         <a href="#help_me_decide" data-toggle="modal" data-target="#help_me_decide" class="d-block"><%= l10n("help_me_decide_title") %></a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "help_me_decide"} %>
       </div>
+      <% end %>
   </div>
 
   <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
