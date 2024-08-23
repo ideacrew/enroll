@@ -1,55 +1,33 @@
 # frozen_string_literal: true
 
+# Operations::Applications::MedicaidGateway::Pdm::MecEvidencesForApplicationHbxIds.new.call({application_hbx_ids: [1, 2, 3]})
 module Operations
   module Applications
     module MedicaidGateway
-      # Publish class will build event and publish the payload for a MEC check
       module Pdm
-        class FetchEligibileApplicationsForMecCheck
+        # This operation fetches the local mec evidences for the given application hbx ids
+        class MecEvidencesFetcher
           include Dry::Monads[:do, :result, :try]
 
           def call(params)
-            yield validate(params)
-            families = yield enrolled_and_renewal_families_stage(params)
-            application_hbx_ids = yield latest_determined_application_stage(families)
-            applicants_evidences_hash = yield fetch_local_mec_evidences(application_hbx_ids)
-            Success(applicants_evidences_hash)
+            application_hbx_ids = yield validate(params)
+            pipeline = yield build_pipeline(application_hbx_ids)
+            applicants_local_mec_evidence_hash = yield execute(pipeline)
+
+            Success(applicants_local_mec_evidence_hash)
           end
 
           private
 
-          def validate(params); end
+          def validate(params)
+            application_hbx_ids = params[:application_hbx_ids]
 
-          def enrolled_and_renewal_families_stage(_params)
-            csr_list = %w[02 03 04 05 06]
-            family_ids  = Family.with_applied_aptc_or_csr_active_enrollments(csr_list).distinct(:_id)
+            return Failure('application_hbx_ids is missing') unless application_hbx_ids.present?
 
-            if family_ids.present?
-              families = Family.where(:_id.in => family_ids)
-              Success(families)
-            else
-              Failure("No families found")
-            end
+            Success(application_hbx_ids)
           end
 
-          def latest_determined_application_stage(_families)
-            application_hbx_ids = FinancialAssistance::Application.collection.aggregate([
-              { '$match' => { 'assistance_year' => 2024, 'family_id' => { '$in' => family_ids }, 'aasm_state' => 'determined' } },
-              { '$sort' => { 'submitted_at' => -1 } },
-              { '$group' => { '_id' => '$family_id', 'application_hbx_id' => { '$first' => '$hbx_id' } } },
-              { '$project' => {'application_hbx_id' => 1, '_id' => 0 } }
-            ], allow_disk_use: true).to_a.collect{|b| b[:application_hbx_id]}
-
-            if application_hbx_ids.present?
-              Success(application_hbx_ids)
-            else
-              Failure("No determined applications found")
-            end
-          rescue StandardError => e
-            Failure("Failed to fetch determined applications due to #{e.inspect}")
-          end
-
-          def fetch_local_mec_evidences(application_hbx_ids)
+          def build_pipeline(application_hbx_ids)
             pipeline = [
               match_stage(application_hbx_ids),
               unwind_stage,
@@ -57,7 +35,25 @@ module Operations
               project_stage
             ]
 
-            FinancialAssistance::Application.collection.aggregate(pipeline, allow_disk_use: true).to_a
+            Success(pipeline)
+          rescue StandardError => e
+            Failure("Failed to build pipeline due to #{e.inspect}")
+          end
+
+          def execute(pipeline)
+            local_mec_evidences = aggregate_collection(FinancialAssistance::Application, pipeline)
+
+            if local_mec_evidences.present?
+              Success(local_mec_evidences)
+            else
+              Failure('No local_mec_evidences found')
+            end
+          rescue StandardError => e
+            Failure("Failed to fetch local_mec_evidences due to #{e.inspect}")
+          end
+
+          def aggregate_collection(collection, pipeline)
+            collection.aggregate(pipeline, allow_disk_use: true).to_a
           end
 
           def match_stage(application_hbx_ids)
