@@ -16,18 +16,7 @@
     <span class="ssn-facade ssn-facade-<%= presenter.person_id %>">
       <%= presenter.obscured_ssn %>
     </span>
-    <%= image_pack_tag "icons/eye-off.svg", 
-      class: "ssn-eye-off-#{presenter.person_id}",
-      alt: "view ssn icon",
-      tabindex: 0,
-      data: { type: presenter.object_type, id: presenter.person_id, family_id: presenter.family_id, action: "click->person#showSsn" }
-    %>
-    <%= image_pack_tag "icons/eye-on.svg",
-      class: "hidden ssn-eye-on-#{presenter.person_id}",
-      alt: "hide ssn icon",
-      tabindex: 0,
-      data: { id: presenter.person_id, action: "click->person#hideSsn" }
-    %>
+    <%= render partial: 'shared/person/ssn/show_hide_ssn_buttons', locals: { presenter: presenter } %>
   </div>
 <% end %>
 
