@@ -10,7 +10,7 @@ module Insured
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
         "Dominion National" => "https://www.dominionmembers.com/",
         "Kaiser" => "https://kp.org/paypremium",
-        "Kaiser Permanente" => "https://kp.org/paypremium",
+        "Kaiser Permanente" => EnrollRegistry['kaiser_permanente_pay_now'].setting(:generic_url).item,
         "Community Health Options" => "https://healthoptions.org",
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",

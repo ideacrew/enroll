@@ -403,6 +403,8 @@ registry:
             item: 'Kaiser Permanente'
           - key: :connect_test
             item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+          - key: :generic_url
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_GENERIC_URL'] || "https://kp.org" %>
       - key: :kaiser_pay_now
         is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
