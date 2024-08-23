@@ -395,6 +395,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.audit_log' => "Audit Log",
   :'en.messages' => "Messages",
   :'en.unread_messages' => "Unread messages",
+  :'en.message_detail' => "Message Detail",
   :'en.my_account' => "My Account",
   :'en.manage_family' => "Manage Family",
   :'en.personal' => "Personal",
