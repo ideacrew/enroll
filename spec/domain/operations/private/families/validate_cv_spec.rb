@@ -59,10 +59,11 @@ RSpec.describe Operations::Private::Families::ValidateCv do
       end
 
       before do
-        allow_any_instance_of(
-          Operations::Families::TransformToEntity
-        ).to receive(:call).and_return(
-          Failure([:failure, 'Failed to transform the input family to CV3 family'])
+        allow(Operations::Families::TransformToEntity).to receive(:new).and_return(
+          instance_double(
+            Operations::Families::TransformToEntity,
+            call: Failure([:failure, 'Failed to transform the input family to CV3 family'])
+          )
         )
       end
 
@@ -96,10 +97,11 @@ RSpec.describe Operations::Private::Families::ValidateCv do
       end
 
       before do
-        allow_any_instance_of(
-          Operations::Families::TransformToEntity
-        ).to receive(:call).and_return(
-          Failure([:error, 'Failed to transform the input family to CV3 family'])
+        allow(Operations::Families::TransformToEntity).to receive(:new).and_return(
+          instance_double(
+            Operations::Families::TransformToEntity,
+            call: Failure([:error, 'Failed to transform the input family to CV3 family'])
+          )
         )
       end
 
