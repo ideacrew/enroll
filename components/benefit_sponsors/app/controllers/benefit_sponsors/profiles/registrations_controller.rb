@@ -47,7 +47,7 @@ module BenefitSponsors
                                 "broker_agencies/broker_roles/extended_confirmation"
                               end
           if is_broker_profile? && saved
-            flash[:success] = l10n("broker_registration.registration_submitted_flash")
+            flash[:success] = l10n("broker_agencies.broker_staff_role_success")
             respond_to do |format|
               format.html { render template_filename, :layout => resolve_layout }
             end
