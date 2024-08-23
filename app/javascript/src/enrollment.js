@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function handleEnrollments() {
-  console.log("Enrollment.js loaded");
   const initiallyHiddenEnrollmentPanels = document.getElementsByClassName(
     'initially_hidden_enrollment'
   );
@@ -46,7 +45,6 @@ function handleEnrollments() {
     enrollmentToggleCheckbox != undefined) && (enrollmentToggleButton != null ||
       enrollmentToggleButton != undefined)
   ) {
-    console.log('Enrollment toggles not found');
     enrollmentToggleCheckbox.addEventListener(
       'click',
       toggleDisplayEnrollments
