@@ -1,4 +1,7 @@
 <% if @bs4 %>
+  <%= javascript_pack_tag "enrollment" %>
+  <%= stylesheet_pack_tag "enrollment" %>
+
   <% if pundit_allow(Family, :can_view_entire_family_enrollment_history?) %>
     <% enrollments = @all_hbx_enrollments_for_admin %>
   <% else %>
