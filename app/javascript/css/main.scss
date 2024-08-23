@@ -149,7 +149,7 @@ a {
 
 dl.parent {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr !important; // !important is needed to override the styles used in enrollment.scss that can be deleted when bs4 flag is removed and bs4 is default
   grid-row-gap: 4px;
   list-style: none;
   padding: 0;
