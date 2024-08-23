@@ -5,11 +5,11 @@ on:
   push:
     branches:
       - 'trunk'
-      - 'clean-bootstrap-4-upgrade'
+      - 'rails-upgrade-5.2-6.0'
   pull_request:
     branches:
       - 'trunk'
-      - 'clean-bootstrap-4-upgrade'
+      - 'rails-upgrade-5.2-6.0'
 
 concurrency:
   group: docker-${{ github.ref }}
