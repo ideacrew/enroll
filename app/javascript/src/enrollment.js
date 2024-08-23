@@ -1,10 +1,14 @@
 // For when families home page is refreshed when user on it
-document.addEventListener('DOMContentLoaded turbolinks:load', function () {
-  console.log("handling enrollments");
-  handleEnrollments();
+document.addEventListener("turbolinks:load", function() {
+  handleEnrollments()
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  handleEnrollments()
 });
 
 function handleEnrollments() {
+  console.log("Enrollment.js loaded");
   const initiallyHiddenEnrollmentPanels = document.getElementsByClassName(
     'initially_hidden_enrollment'
   );
@@ -38,9 +42,11 @@ function handleEnrollments() {
 
   // For when family home page loaded through clicking off of the families index page
   if (
-    enrollmentToggleCheckbox != null ||
-    enrollmentToggleCheckbox != undefined
+    (enrollmentToggleCheckbox != null ||
+    enrollmentToggleCheckbox != undefined) && (enrollmentToggleButton != null ||
+      enrollmentToggleButton != undefined)
   ) {
+    console.log('Enrollment toggles not found');
     enrollmentToggleCheckbox.addEventListener(
       'click',
       toggleDisplayEnrollments
