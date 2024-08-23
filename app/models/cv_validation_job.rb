@@ -5,6 +5,10 @@ class CvValidationJob
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  # @!attribute [r] RESULT_KINDS
+  #   @return [Array<Symbol>] The kinds of results that can be returned.
+  RESULT_KINDS = %i[error failure success].freeze
+
   # @!attribute [rw] cv_payload
   #   @return [String] The JSON payload that is generated for each Family transform.
   field :cv_payload, type: String
@@ -65,6 +69,17 @@ class CvValidationJob
   # @!attribute [rw] end_time
   #   @return [DateTime] The end timestamp of the CV Validation Job.
   field :end_time, type: DateTime
+
+  # Validations
+
+  # @!attribute [rw] result
+  #   @return [Symbol] the result of the validation, which must be one of :success, :failure, or :error.
+  #   @example Valid result values
+  #     :success
+  #     :failure
+  #     :error
+  #   @raise [ArgumentError] if the result is not one of the valid values.
+  validates :result, inclusion: { in: RESULT_KINDS, message: "%{value} is not a valid result" }
 
   # Scopes
 
