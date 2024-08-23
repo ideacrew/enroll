@@ -36,7 +36,7 @@ $(document).on('click', '.name_search_only', function() {
   $('#help_type').html(this.id)
   $('#back_to_help').removeClass('hide')
 })
-$(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide"); $('#back_to_help').addClass("hide") })
+$(document).on('click', '[data-target="#help_with_plan_shopping"]',function(){$('.help_reset').addClass("hide"); $('#help_list').removeClass("hide"); $('#back_to_help').addClass("hide"); $('#bottom_expert_link').removeClass("hide") })
 
 $(document).on('click', '#back_to_help', function(){
   $('.help_reset').addClass("hide");
