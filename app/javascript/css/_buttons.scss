@@ -143,7 +143,30 @@ button.outline,
   );
 }
 
-a.button:hover {
+.button.secondary.outline {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+
+  &:hover {
+    color: var(--secondary-color-dark);
+    border-color: var(--secondary-color);
+    background-color: var(--button-outline-hover-bg);
+  }
+
+  &:active {
+    color: var(--secondary-color-darker);
+    border-color: var(--secondary-color-darker);
+    background-color: var(--button-outline-active-bg);
+  }
+
+  &:focus {
+    color: var(--secondary-color-dark);
+    border-color: var(--secondary-color-dark);
+    background-color: var(--button-outline-hover-bg);
+  }
+}
+
+a.button {
   text-decoration: none;
   cursor: pointer;
 }
