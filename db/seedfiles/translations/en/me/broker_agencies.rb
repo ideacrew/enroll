@@ -30,7 +30,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.dob" => "Date of Birth",
   "en.broker_agencies.message_deleted" => "Successfully deleted message.",
   "en.success" => "Success",
-  "en.broker_registration.registration_submitted_flash" => "Success",
 	"en.broker_agencies.broker_staff_role_success" => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.",
 	"en.broker_agencies.broker_staff_role_error" => "Broker Staff Role was not added because",
 	"en.broker_agencies.profiles.broker_agency_message" => "Broker Agency Message",
