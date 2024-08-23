@@ -1,5 +1,13 @@
 // For when families home page is refreshed when user on it
+document.addEventListener("turbolinks:load", function() {
+  handleEnrollments()
+});
+
 document.addEventListener('DOMContentLoaded', function () {
+  handleEnrollments()
+});
+
+function handleEnrollments() {
   console.log("Enrollment.js loaded");
   const initiallyHiddenEnrollmentPanels = document.getElementsByClassName(
     'initially_hidden_enrollment'
@@ -45,4 +53,4 @@ document.addEventListener('DOMContentLoaded', function () {
     );
     enrollmentToggleButton.addEventListener('click', toggleDisplayEnrollments);
   }
-});
+}
