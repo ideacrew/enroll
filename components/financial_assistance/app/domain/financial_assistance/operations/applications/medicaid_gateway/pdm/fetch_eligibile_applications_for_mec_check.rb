@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Operations
   module Applications
     module MedicaidGateway
@@ -16,10 +18,9 @@ module Operations
 
           private
 
-          def validate(params)
-          end
+          def validate(params); end
 
-          def enrolled_and_renewal_families_stage(params)
+          def enrolled_and_renewal_families_stage(_params)
             csr_list = %w[02 03 04 05 06]
             family_ids  = Family.with_applied_aptc_or_csr_active_enrollments(csr_list).distinct(:_id)
 
@@ -31,7 +32,7 @@ module Operations
             end
           end
 
-          def latest_determined_application_stage(families)
+          def latest_determined_application_stage(_families)
             application_hbx_ids = FinancialAssistance::Application.collection.aggregate([
               { '$match' => { 'assistance_year' => 2024, 'family_id' => { '$in' => family_ids }, 'aasm_state' => 'determined' } },
               { '$sort' => { 'submitted_at' => -1 } },
@@ -44,11 +45,9 @@ module Operations
             else
               Failure("No determined applications found")
             end
-
           rescue StandardError => e
             Failure("Failed to fetch determined applications due to #{e.inspect}")
           end
-
 
           def fetch_local_mec_evidences(application_hbx_ids)
             pipeline = [
@@ -57,18 +56,18 @@ module Operations
               group_stage,
               project_stage
             ]
-          
+
             FinancialAssistance::Application.collection.aggregate(pipeline, allow_disk_use: true).to_a
           end
-          
+
           def match_stage(application_hbx_ids)
             { '$match' => { 'hbx_id' => { '$in' => application_hbx_ids } } }
           end
-          
+
           def unwind_stage
             { '$unwind' => '$applicants' }
           end
-          
+
           def group_stage
             {
               '$group' => {
@@ -86,7 +85,6 @@ module Operations
           def sort_stage
             { '$sort' => { '_id.application_hbx_id' => 1 } }
           end
-
 
           def project_stage
             {
@@ -134,15 +132,15 @@ module Operations
               'application_hbx_id' => '$hbx_id'
             }
           end
-          
+
           def first_field(field)
             { '$first' => field }
           end
-          
+
           def first_array_elem(array_field, index)
             { '$first' => { '$arrayElemAt' => [array_field, index] } }
           end
-          
+
           def first_sorted_array_elem(array_field, index)
             {
               '$first' => {
