@@ -1,8 +1,10 @@
 $("#message_list_form").hide();
 $("#inbox-nav-tabs").hide();
-$("#inbox-headers").hide();
 $("#inbox_form").show();
 $('#show_message_form').show().html("<%= escape_javascript(render "shared/inboxes/message", message: @message) %>");
+<% if @bs4 %>
+  $('#inbox-headers h1').text("<%= l10n('message_detail') %>");
+<% end %>
 $(".btn-danger").click(function(){
   $('#show_message_form').hide();
   $('#profile-content .container').show().html("<%= escape_javascript(render "shared/inboxes/message_list", provider: @inbox_provider) %>");

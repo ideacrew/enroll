@@ -341,6 +341,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.audit_log' => "Audit Log",
   :'en.messages' => "Messages",
   :'en.unread_messages' => "Unread messages",
+  :'en.message_detail' => "Message Detail",
   :'en.my_account' => "My Account",
   :'en.manage_family' => "Manage Family",
   :'en.personal' => "Personal",
