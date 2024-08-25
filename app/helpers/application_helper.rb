@@ -290,6 +290,14 @@ module ApplicationHelper
     presenter.sanitize_ssn_params
   end
 
+  def can_update_ssn?(person, params, allowed_params)
+    return allowed_params unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+    return allowed_params unless params[:ssn].present?
+    # false unless person previously had no_ssn as true, but has changed checkbox to false
+    return allowed_params unless person.no_ssn && params[:no_ssn] == '0'
+    allowed_params + [:ssn, :no_ssn]
+  end
+
   # Formats a number into a nine-digit US Federal Entity Identification Number string (nn-nnnnnnn)
   def number_to_fein(number)
     return unless number

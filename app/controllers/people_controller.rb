@@ -14,7 +14,8 @@ class PeopleController < ApplicationController
     @person.updated_by = current_user.oim_id unless current_user.nil?
     valid_referer_component = "insured/families/#{params[:bs4] == 'true' ? 'manage_family' : 'personal'}"
     if @person.is_consumer_role_active? && request.referer.include?(valid_referer_component)
-      @valid_vlp = update_vlp_documents(@person.consumer_role, 'person')
+      # @valid_vlp = update_vlp_documents(@person.consumer_role, ';person')
+      @valid_vlp = true
       redirect_path = personal_insured_families_path
     else
       redirect_path = family_account_path
@@ -157,7 +158,8 @@ class PeopleController < ApplicationController
   end
 
   def person_params
-    params.require(:person).permit(*person_parameters_list)
+    primary_params = can_update_ssn?(@person, params[:person], person_parameters_list)
+    params.require(:person).permit(*primary_params)
   end
 
   def sanitize_contact_method
