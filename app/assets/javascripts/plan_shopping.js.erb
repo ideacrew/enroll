@@ -264,12 +264,6 @@ $(function() {
     });
   }
 
-  // format float to USD
-  var USDollar = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
-
   // aptc form on thank you page
   const aptcForm = document.getElementById("updateAptcForm");
   if (aptcForm) {
@@ -352,14 +346,14 @@ $(function() {
       element.textContent = electedAptcPercentage.value;
     });
     document.querySelectorAll('.aptc-amount')?.forEach(function(element) {
-      element.textContent = USDollar.format(electedAptcAmount.value);
+      element.textContent = electedAptcAmount.value.toLocaleString("en-US", {style:"currency", currency:"USD"});;
     });
     urlParts = updateUrl.split("?");
     var url = document.location.origin + urlParts[0]
     var params = urlParts[1] + "&elected_aptc=" + elected
     postAjax(url, params, function(data){
       response = JSON.parse(data);
-      var amount = USDollar.format(parseFloat(response['responsible_amount']));
+      var amount = parseFloat(response['responsible_amount']).toLocaleString("en-US", {style:"currency", currency:"USD"});;
       document.getElementById("resp-amount").textContent = amount;
     });
   }
