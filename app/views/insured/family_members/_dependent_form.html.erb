@@ -85,7 +85,7 @@
             </div>
             <div class="col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
               <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
-                <%= f.check_box :no_ssn, disabled: @person.try(:ssn), %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
+                <%= f.check_box :no_ssn, disabled: @person.try(:ssn) %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
                 <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
                 <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
               <% end %>
