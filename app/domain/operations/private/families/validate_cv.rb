@@ -35,7 +35,7 @@ module Operations
         # @option params [String] :job_id the job ID
         # @return [Dry::Monads::Result] the result of the validation
         def validate_params(params)
-          @start_time = Time.now
+          @job_monotonic_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
           if params.is_a?(Hash) && params[:family_hbx_id].present? && params[:family_updated_at].present? && params[:job_id].present?
             @family_updated_at = params[:family_updated_at].to_datetime
@@ -68,9 +68,9 @@ module Operations
         #
         # @note This method always returns a success result, even if the transformation fails for storing the result and error message in the job.
         def transform_to_entity(family)
-          @cv_start_time = Time.now
+          @cv_monotonic_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = Operations::Families::TransformToEntity.new.call(family)
-          @cv_end_time = Time.now
+          @cv_monotonic_end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
           @transform_result = result.success? ? result.success[0] : result.failure[0]
           @json_family_entity = result.success? ? result.success[1].to_json : nil
@@ -96,10 +96,8 @@ module Operations
               job_id: @job_id,
               result: @transform_result,
               cv_errors: @cv_errors,
-              cv_start_time: @cv_start_time,
-              cv_end_time: @cv_end_time,
-              start_time: @start_time,
-              end_time: Time.now
+              cv_payload_transformation_time: @cv_monotonic_end_time - @cv_monotonic_start_time,
+              job_elapsed_time: Process.clock_gettime(Process::CLOCK_MONOTONIC) - @job_monotonic_start_time
             }
           )
         end

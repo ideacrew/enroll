@@ -23,10 +23,8 @@ RSpec.describe CvValidationJob, type: :model do
     it { is_expected.to have_field(:result).of_type(Symbol) }
     it { is_expected.to have_field(:cv_errors).of_type(Array) }
     it { is_expected.to have_field(:logging_messages).of_type(Array) }
-    it { is_expected.to have_field(:cv_start_time).of_type(DateTime) }
-    it { is_expected.to have_field(:cv_end_time).of_type(DateTime) }
-    it { is_expected.to have_field(:start_time).of_type(DateTime) }
-    it { is_expected.to have_field(:end_time).of_type(DateTime) }
+    it { is_expected.to have_field(:cv_payload_transformation_time).of_type(BigDecimal) }
+    it { is_expected.to have_field(:job_elapsed_time).of_type(BigDecimal) }
   end
 
   describe 'validations' do
@@ -42,10 +40,8 @@ RSpec.describe CvValidationJob, type: :model do
         job_id: 'job_123',
         cv_errors: [],
         logging_messages: [],
-        cv_start_time: DateTime.now - 60.minutes,
-        cv_end_time: DateTime.now - 1.minute,
-        start_time: DateTime.now - 61.minutes,
-        end_time: DateTime.now,
+        cv_payload_transformation_time: 10.98,
+        job_elapsed_time: 20.98,
         result: result
       }
     end
@@ -116,80 +112,6 @@ RSpec.describe CvValidationJob, type: :model do
     it { is_expected.to have_index_for(job_id: 1).with_options(name: 'job_id_index') }
     it { is_expected.to have_index_for(family_hbx_id: 1).with_options(name: 'family_hbx_id_index') }
     it { is_expected.to have_index_for(created_at: 1).with_options(name: 'created_at_index') }
-  end
-
-  describe '#cv_payload_transformation_time' do
-    let(:cv_start_time) { DateTime.now - 60.minutes }
-    let(:cv_end_time) { DateTime.now - 1.minute }
-    let(:cv_validation_job) { FactoryBot.create(:cv_validation_job, cv_start_time: cv_start_time, cv_end_time: cv_end_time) }
-
-    context 'when both cv_end_time and cv_start_time are set' do
-      it 'returns the difference in seconds between cv_end_time and cv_start_time' do
-        expect(cv_validation_job.cv_payload_transformation_time).to eq(3540)
-      end
-    end
-
-    context 'when cv_end_time is not set' do
-      let(:cv_end_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
-      end
-    end
-
-    context 'when cv_start_time is not set' do
-      let(:cv_start_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
-      end
-    end
-
-    context 'when both cv_end_time and cv_start_time are not set' do
-      let(:cv_start_time) { nil }
-      let(:cv_end_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
-      end
-    end
-  end
-
-  describe '#cv_validation_job_time' do
-    let(:start_time) { DateTime.now - 60.minutes }
-    let(:end_time) { DateTime.now - 10.minutes }
-    let(:cv_validation_job) { FactoryBot.create(:cv_validation_job, start_time: start_time, end_time: end_time) }
-
-    context 'when both end_time and start_time are set' do
-      it 'returns the difference in seconds between end_time and start_time' do
-        expect(cv_validation_job.cv_validation_job_time).to eq(3000)
-      end
-    end
-
-    context 'when end_time is not set' do
-      let(:end_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_validation_job_time).to be_nil
-      end
-    end
-
-    context 'when start_time is not set' do
-      let(:start_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_validation_job_time).to be_nil
-      end
-    end
-
-    context 'when both end_time and start_time are not set' do
-      let(:start_time) { nil }
-      let(:end_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_validation_job_time).to be_nil
-      end
-    end
   end
 
   describe '.latest_job_id' do

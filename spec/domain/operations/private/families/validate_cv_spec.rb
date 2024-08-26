@@ -35,7 +35,7 @@ RSpec.describe Operations::Private::Families::ValidateCv do
         expect(validation_job).to be_a(CvValidationJob)
         expect(validation_job.result).to eq(:success)
         expect(validation_job.cv_payload_transformation_time).not_to be_nil
-        expect(validation_job.cv_validation_job_time).not_to be_nil
+        expect(validation_job.job_elapsed_time).not_to be_nil
         expect(validation_job.primary_person_hbx_id).to eq(person.hbx_id)
       end
     end
@@ -73,7 +73,7 @@ RSpec.describe Operations::Private::Families::ValidateCv do
         expect(validation_job.result).to eq(:failure)
         expect(validation_job.cv_errors).to eq(['Failed to transform the input family to CV3 family'])
         expect(validation_job.cv_payload_transformation_time).not_to be_nil
-        expect(validation_job.cv_validation_job_time).not_to be_nil
+        expect(validation_job.job_elapsed_time).not_to be_nil
         expect(validation_job.primary_person_hbx_id).to eq(person.hbx_id)
       end
     end
@@ -111,7 +111,7 @@ RSpec.describe Operations::Private::Families::ValidateCv do
         expect(validation_job.result).to eq(:error)
         expect(validation_job.cv_errors).to eq(['Failed to transform the input family to CV3 family'])
         expect(validation_job.cv_payload_transformation_time).not_to be_nil
-        expect(validation_job.cv_validation_job_time).not_to be_nil
+        expect(validation_job.job_elapsed_time).not_to be_nil
         expect(validation_job.primary_person_hbx_id).to eq(person.hbx_id)
       end
     end

@@ -14,10 +14,8 @@ FactoryBot.define do
     job_id { 'job_123' }
     cv_errors { [] }
     logging_messages { [] }
-    cv_start_time { DateTime.now - 60.minutes }
-    cv_end_time { DateTime.now - 1.minute }
-    start_time { DateTime.now - 61.minutes }
-    end_time { DateTime.now }
+    cv_payload_transformation_time { 10.98 }
+    job_elapsed_time { 20.98 }
 
     trait :failure do
       result { :failure }
