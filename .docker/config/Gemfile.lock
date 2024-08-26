@@ -2679,7 +2679,7 @@ DEPENDENCIES
   redis-store (~> 1.10)
   resource_registry!
   resque (~> 2.6.0)
-  rexml (>= 3.3.3)
+  rexml (>= 3.3.6)
   roo (~> 2.10)
   rspec-benchmark
   rspec-instafail (~> 1)

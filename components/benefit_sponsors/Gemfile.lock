@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: d10013bfa0d5c772238eed7791a8d34d47adcbad
+  revision: 9aa24fcfb671e2f0393f11adb0af2160e5b277c7
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -100,7 +100,7 @@ PATH
       mongoid (~> 7.5.4)
       pundit (~> 2.0)
       rails (~> 6.1.7.8)
-      rexml (= 3.3.3)
+      rexml (= 3.3.6)
       slim (~> 3.0)
       symmetric-encryption (= 3.9.1)
       virtus (~> 1.0)
@@ -118,6 +118,7 @@ PATH
       non-stupid-digest-assets
       pundit (~> 2.0)
       rails (~> 6.1.7.8)
+      rexml (= 3.3.6)
       roo (~> 2.10)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
@@ -423,8 +424,8 @@ GEM
       interactor (~> 3.0)
       rails (>= 4.2)
     iso_country_codes (0.7.8)
-    json-schema (4.3.0)
-      addressable (>= 2.8)
+    json-schema (5.0.0)
+      addressable (~> 2.8)
     jsonapi-renderer (0.2.2)
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
@@ -509,7 +510,7 @@ GEM
     nokogiri (1.16.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri-happymapper (0.9.0)
+    nokogiri-happymapper (0.10.0)
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.11)
       sprockets (>= 2.0)
@@ -575,7 +576,7 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rexml (3.3.3)
+    rexml (3.3.6)
       strscan
     roo (2.10.1)
       nokogiri (~> 1)

@@ -40,7 +40,7 @@ PATH
       non-stupid-digest-assets
       pundit (~> 2.0)
       rails (~> 6.1.7.8)
-      rexml (= 3.3.3)
+      rexml (= 3.3.6)
       roo (~> 2.10)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
@@ -320,7 +320,7 @@ GEM
     rake (13.2.1)
     rbtree (0.4.6)
     regexp_parser (2.9.0)
-    rexml (3.3.3)
+    rexml (3.3.6)
       strscan
     roo (2.10.1)
       nokogiri (~> 1)

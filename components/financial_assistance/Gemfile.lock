@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 6fa3494a75c2654d9c059bb715562dda2d82135f
+  revision: 9aa24fcfb671e2f0393f11adb0af2160e5b277c7
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -95,7 +95,7 @@ PATH
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 6.1.7.8)
-      rexml (= 3.3.3)
+      rexml (= 3.3.6)
       slim (~> 3.0)
       symmetric-encryption (= 3.9.1)
 
@@ -303,8 +303,8 @@ GEM
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     iso_country_codes (0.7.8)
-    json-schema (4.3.0)
-      addressable (>= 2.8)
+    json-schema (5.0.0)
+      addressable (~> 2.8)
     little-plugger (1.1.4)
     logging (2.3.1)
       little-plugger (~> 1.1)
@@ -438,7 +438,7 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rexml (3.3.3)
+    rexml (3.3.6)
       strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)

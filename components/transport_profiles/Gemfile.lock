@@ -16,7 +16,7 @@ PATH
       net-sftp (~> 2.1, >= 2.1.2)
       net-ssh (= 4.2.0)
       rails (~> 6.1.7.8)
-      rexml (= 3.3.3)
+      rexml (= 3.3.6)
 
 PATH
   remote: .
@@ -1724,7 +1724,7 @@ GEM
       thor (~> 1.0)
     rake (13.2.1)
     rbtree (0.4.6)
-    rexml (3.3.3)
+    rexml (3.3.6)
       strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
