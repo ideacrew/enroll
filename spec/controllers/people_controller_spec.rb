@@ -270,13 +270,13 @@ RSpec.describe PeopleController, dbclean: :after_each do
       end
 
       context 'a primary with an ssn' do
-        let (:new_ssn) { '373639485' }
+        let(:new_ssn) { '373639485' }
 
         before do
           person.update(ssn: ssn, no_ssn: '0')
           person.reload
         end
-        
+
         it 'cannot update ssn' do
           person_attributes['ssn'] = new_ssn
           person_attributes['no_ssn'] = '0'
