@@ -8,13 +8,13 @@
       <%= l10n("broker_agencies.message_deleted") %>
     </div>
     <div class="d-flex pl-1">
-      <span class="close-icon icon icon-sm pr-1" alt='<%= l10n("close") %>' href="javascript;">&nbsp;<span class="sr-only"><%= l10n("close") %></span></span>
+      <span id="close" class="close-icon icon icon-sm pr-1" alt='<%= l10n("close") %>' href="javascript;" tabindex="0" onkeydown="handleButtonKeyDown(event, 'close')"><span class="sr-only"><%= l10n("close") %></span></span>
     </div>
   </div>
 </div>
 
 <script>
-  $(".close-icon").on('click', function() {
+  $("#close").on('click', function() {
     $("#messageDeleted").addClass("hidden");
   });
 </script>
