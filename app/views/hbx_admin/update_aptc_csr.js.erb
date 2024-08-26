@@ -1,3 +1,8 @@
-//set_tab_content("update successful.");
-$('#aptcData').hide();
-$('#aptcUpdate').html('<%= j render partial: 'update_aptc_csr'%>');
+if (<%= @bs4 %>) {
+  document.querySelector('#aptcData').remove();
+  document.getElementById('aptcUpdate').innerHTML = '<%= j render partial: 'update_aptc_csr' %>';
+} else {
+  //set_tab_content("update successful.");
+  $('#aptcData').hide();
+  $('#aptcUpdate').html('<%= j render partial: 'update_aptc_csr'%>');
+}
