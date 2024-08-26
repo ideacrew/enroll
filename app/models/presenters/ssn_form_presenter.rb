@@ -9,8 +9,7 @@ module Presenters
                 :object_type,
                 :disabled,
                 :person_id,
-                :family_id,
-                :no_ssn
+                :family_id
 
     def initialize(form_object, family_id = nil)
       @form_object = form_object
@@ -20,7 +19,6 @@ module Presenters
       @family_id = family_id ? family_id.to_s : nil
       @person_id = nil
       @disabled = nil
-      @no_ssn = false
     end
 
     def sanitize_ssn_params
