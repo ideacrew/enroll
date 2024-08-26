@@ -4,7 +4,7 @@ module Operations
   module HbxAdmin
     module DryRun
       module Individual
-      # This Operation is responsible for building a query to fetch notice counts based on given parameters.
+      # This Operation is responsible for getting enrollment data for individual market.
         class EnrollmentsPipeline
           include Dry::Monads[:do, :result]
           include L10nHelper
@@ -12,7 +12,6 @@ module Operations
           # Calls the NoticeQuery operation.
           #
           # @param params [Hash] The parameters for the query.
-          # @option params [String] :kind The enrollment kind.
           # @option params [Date] :effective_on The effective_on for the query.
           # @option params [Array<String>] :aasm_states The aasm_states for the query.
           # @return [Dry::Monads::Result] The result of the operation.
