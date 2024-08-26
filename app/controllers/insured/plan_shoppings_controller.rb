@@ -129,6 +129,18 @@ class Insured::PlanShoppingsController < ApplicationController
     dependents_with_existing_coverage(@enrollment) if @market_kind == 'individual' && EnrollRegistry.feature_enabled?(:existing_coverage_warning)
     #flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
+    # Set the aptc form values
+    if @person.has_active_consumer_role? && (@tax_household.present? || @aptc_grants.present?) && @market_kind == "individual" && @plan.metal_level != "catastrophic" && @plan.kind&.to_s != "dental"
+      @has_aptc = true
+      is_ivl_osse_filter_eligible = EnrollRegistry.feature_enabled?(:individual_osse_plan_filter) && @enrollment.ivl_osse_eligible?
+      @min_aptc = is_ivl_osse_filter_eligible ? EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item : 0
+      @max_credit = @plan.total_premium > @max_aptc ? @max_aptc : @plan.total_ehb_premium.round(2)
+      pct = @elected_aptc > 0 ? (@elected_aptc / @max_credit * 100).round : 0
+      @pct = pct > 100 ? 100 : pct
+      @elected_aptc = @elected_aptc > @max_credit ? @max_credit : @elected_aptc
+      @elected_aptc_url = set_elected_aptc_insured_plan_shopping_path({ id: @hbx_enrollment.try(:id), market_kind: @market_kind, coverage_kind: @coverage_kind, elected_aptc: @elected_aptc, plan: @plan&.id, enrollment: @enrollment&.id })
+    end
+
     if EnrollRegistry.feature_enabled?(:enrollment_product_date_match) || (@plan.present? && @plan.application_period.cover?(@enrollment.effective_on)) || @enrollment.is_shop?
       respond_to do |format|
         format.html { render 'thankyou.html.erb' }
