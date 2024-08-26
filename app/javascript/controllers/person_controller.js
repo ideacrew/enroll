@@ -45,6 +45,17 @@ export default class extends Controller {
     }
   }
 
+  depopulateHtmlElement(personId) {
+    if (personId == 'temp') return;
+    let ssnInputElement = document.querySelector(`.ssn-input-${personId}`);
+
+    if (ssnInputElement.tagName === 'INPUT') {
+      ssnInputElement.value = '';
+    } else {
+      ssnInputElement.textContent = '';
+    }
+  }
+
   hideSsn(event) {
     const target = event.target;
     const personId = target.getAttribute('data-id');
@@ -55,6 +66,7 @@ export default class extends Controller {
     document.querySelector(`.ssn-eye-off-${personId}`).classList.remove('hidden');
   
     document.querySelector(`.ssn-eye-off-${personId}`).focus();
+    this.depopulateHtmlElement(personId);
     const ssnInput = document.querySelector(`.ssn-input-${personId}`);
     if (ssnInput.getAttribute('data-admin-can-enable') !== null) {
       ssnInput.disabled = true;
