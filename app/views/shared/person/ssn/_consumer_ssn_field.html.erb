@@ -1,7 +1,12 @@
 <% if f.object.ssn.blank? %>
-  <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
-    pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-    oninput: "this.setCustomValidity('')" %>
+  <%= f.text_field :ssn,
+    placeholder: "000-00-0000",
+    class: "required keep-label mask-ssn",
+    pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
+    oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+    oninput: "this.setCustomValidity('')",
+    disabled: defined?(default_disabled) && default_disabled
+  %>
 <% else %>
   <div id='ssn-input-container' class="<%= 'div-disabled' if presenter.disabled %>" data-controller='person'> 
     <%= f.text_field :ssn,
