@@ -100,7 +100,7 @@ PATH
       mongoid (~> 7.5.4)
       pundit (~> 2.0)
       rails (~> 6.1.7.8)
-      rexml (= 3.3.3)
+      rexml (= 3.3.6)
       slim (~> 3.0)
       symmetric-encryption (= 3.9.1)
       virtus (~> 1.0)
@@ -575,7 +575,7 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rexml (3.3.3)
+    rexml (3.3.6)
       strscan
     roo (2.10.1)
       nokogiri (~> 1)
