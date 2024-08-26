@@ -8,7 +8,6 @@ class PeopleController < ApplicationController
 
   def update
     authorize record, :can_update?
-
     @person_old_home_address = @person.addresses.select{|address| address.kind == 'home'}.first.dup
     @family = @person.primary_family
 
