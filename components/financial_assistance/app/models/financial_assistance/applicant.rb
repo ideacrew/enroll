@@ -1365,11 +1365,12 @@ module FinancialAssistance
       save!
     end
 
-    def set_evidence_rejected(evidence)
+    def set_evidence_rejected(evidence, desired_due_date = nil)
       return unless evidence.may_move_to_rejected?
 
       evidence.verification_outstanding = true
       evidence.is_satisfied = false
+      evidence.due_on = (desired_due_date || schedule_verification_due_on) if evidence.due_on.blank?
       evidence.move_to_rejected
       save!
     end
