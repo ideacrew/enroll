@@ -252,74 +252,117 @@ $(function() {
     }
   });
 
-  $(document).on('change', 'input[name="elected_aptc_pct"]', function(){
-    var max = parseFloat($('input#elected_aptc_value').attr('max'));
-    var elected_pct = $("input[name='elected_aptc_pct']").val() / 100;
-    var elected_amount = parseFloat($('#max_aptc').attr('value')).toFixed(2) * parseFloat(elected_pct).toFixed(2);
-    if (elected_amount <= 0) {
-      elected_amount = 0;
-    }
-    if (elected_amount > max) {
-      elected_amount = max;
-      $("input[name='elected_aptc_pct']").val(100);
-    }
-    $('#elected_aptc_value').val(elected_amount.toFixed(2));
-    $('#elected_aptc_value').attr('value', elected_amount.toFixed(2));
-  });
+  // opens the update aptc form on the thank you page
+  const updateAptc = document.getElementById("updateAptc");
+  if (updateAptc) {
+    document.getElementById("updateAptc").addEventListener('click', function(){
+      this.classList.add('hidden');
+      document.getElementById("aptcDesc")?.classList?.add('hidden');
+      document.querySelectorAll('.aptc')?.forEach(function(element) {
+        element.classList.remove('hidden');
+      });
+    });
+  }
 
-  $(document).on('change', 'input#elected_aptc_value', function(){
-    var elected_aptc = $(this).val();
-    var max = $('input#elected_aptc_value').attr('max');
-    var max_aptc = $('input#max_aptc').val();
-    elected_pct = (elected_aptc/max_aptc).toFixed(1) * 100;
-    if (elected_pct <= 0) {
-      elected_amount = 0;
-    }
-    if (elected_pct > 100) {
-      elected_pct = 100;
-      $('#elected_aptc_value').val(max_aptc);
-    }
-    $("input[name='elected_aptc_pct']").val(elected_pct);
-  });
-
-  $("#updateAptc").on('click', function(){
-    $(this).addClass('hidden');
-    $("#aptcDesc").addClass('hidden');
-    $('.aptc').removeClass('hidden');
-  });
-
+  // format float to USD
   var USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
   });
 
-  $("#aptc_submit").on('click', function(){
-    var elected_aptc = $("input#elected_aptc_value").val();
-    var elected_pct = $("input[name='elected_aptc_pct']").val();
-    var coverage_kind = $("input#coverage_kind").val();
-    var market_kind = $("input#market_kind").val();
-    var plan = $("input#plan").val();
-    var enrollment = $("input#enrollment").val();
-    $('.aptc-percentage').text(elected_pct);
-    $('.aptc-amount').text(USDollar.format(elected_aptc));
-    $.ajax({
-        type: "POST",
-        url: $('#set_elected_aptc_url').val(),
-        data: {
-          'elected_aptc': elected_aptc,
-          'market_kind': market_kind,
-          'coverage_kind': coverage_kind,
-          'plan': plan,
-          'enrollment': enrollment
-        },
-        success: function(data){
-          response = JSON.parse(JSON.stringify(data));
-          var amount = USDollar.format(data['responsible_amount']);
-          $('#resp-amount').text(amount);
-        },
-      });
-  });
+  // aptc form on thank you page
+  const aptcForm = document.getElementById("updateAptcForm");
+  if (aptcForm) {
+    const maxAptc = parseFloat(aptcForm.dataset.max)?.toFixed(2);
+    const minAptc = parseFloat(aptcForm.dataset.min)?.toFixed(2);
+    const updateUrl = aptcForm.dataset.url;
 
+    // updates the aptc percentage on the thank you page
+    const electedAptcPercentage = document.getElementById("electedAptcPercentage");
+    const electedAptcAmount = document.getElementById("electedAptcAmount");
+
+    electedAptcPercentage.addEventListener('blur', function(){
+      var electedPct = parseFloat(this.value)?.toFixed(2);
+      if (electedPct > 100) {
+        this.value = 100;
+        electedAptcAmount.value = maxAptc;
+      } else {
+        let electedAptc = ((electedPct/100) * maxAptc)?.toFixed(2);
+        electedAptc = electedAptc < 0 ? 0 : electedAptc;
+        if (electedAptc > maxAptc) {
+          electedAptc = maxAptc;
+          electedAptcPercentage.value = 100;
+        }
+        electedAptcAmount.value = electedAptc;
+      }
+      setUpdatedAptc(electedAptcAmount.value, updateUrl)
+    });
+
+    electedAptcAmount.addEventListener('blur', function(){
+      var electedAptc = parseFloat(this.value)?.toFixed(2);
+      if (electedAptc > maxAptc) {
+        this.value = maxAptc;
+        electedAptcPercentage.value = 100;
+      } else {
+        let electedPct = (electedAptc/maxAptc)?.toFixed(2) * 100;
+        if (electedPct < minAptc) {
+          electedPct = 100;
+          this.value = minAptc;
+        }
+        if (electedPct > 100) {
+          electedPct = 100;
+          this.value = maxAptc;
+        }
+        electedAptcPercentage.value = electedPct;
+      }
+      setUpdatedAptc(electedAptcAmount.value, updateUrl)
+    });
+
+    // submits the update aptc form on the thank you page
+    const submitAptcChange = document.getElementById("submitAptcChange");
+
+    document.getElementById("submitAptcChange").addEventListener('click', function(){
+      setUpdatedAptc(electedAptcAmount.value, updateUrl)
+    });
+  }
+
+  // non jquery ajax post request
+  function postAjax(url, data, success) {
+    var params = typeof data == 'string' ? data : Object.keys(data).map(
+            function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
+        ).join('&');
+
+    var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+    xhr.open('POST', url);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
+    };
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    var token = document.querySelector('meta[name="csrf-token"]').content;
+    xhr.setRequestHeader('X-CSRF-Token', token);
+    xhr.send(params);
+    return xhr;
+}
+
+  function setUpdatedAptc(elected, updateUrl) {
+    const electedAptcPercentage = document.getElementById("electedAptcPercentage");
+    const electedAptcAmount = document.getElementById("electedAptcAmount");
+    document.querySelectorAll('.aptc-percentage')?.forEach(function(element) {
+      element.textContent = electedAptcPercentage.value;
+    });
+    document.querySelectorAll('.aptc-amount')?.forEach(function(element) {
+      element.textContent = USDollar.format(electedAptcAmount.value);
+    });
+    urlParts = updateUrl.split("?");
+    var url = document.location.origin + urlParts[0]
+    var params = urlParts[1] + "&elected_aptc=" + elected
+    postAjax(url, params, function(data){
+      response = JSON.parse(data);
+      var amount = USDollar.format(parseFloat(response['responsible_amount']));
+      document.getElementById("resp-amount").textContent = amount;
+    });
+  }
 
   $(document).on('click', '.all-filters-row .apply-btn', function(){
 		applyPlanFilters();
