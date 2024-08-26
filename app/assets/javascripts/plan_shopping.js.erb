@@ -257,8 +257,8 @@ $(function() {
   if (updateAptc) {
     document.getElementById("updateAptc").addEventListener('click', function(){
       this.classList.add('hidden');
-      document.getElementById("aptcDesc")?.classList?.add('hidden');
-      document.querySelectorAll('.aptc')?.forEach(function(element) {
+      document.getElementById("aptcDesc").classList.add('hidden');
+      document.querySelectorAll('.aptc').forEach(function(element) {
         element.classList.remove('hidden');
       });
     });
@@ -276,12 +276,12 @@ $(function() {
     const electedAptcAmount = document.getElementById("electedAptcAmount");
 
     electedAptcPercentage.addEventListener('blur', function(){
-      var electedPct = parseFloat(this.value)?.toFixed(2);
+      var electedPct = parseFloat(this.value).toFixed(2);
       if (electedPct > 100) {
         this.value = 100;
         electedAptcAmount.value = maxAptc;
       } else {
-        let electedAptc = ((electedPct/100) * maxAptc)?.toFixed(2);
+        let electedAptc = ((electedPct/100) * maxAptc).toFixed(2);
         electedAptc = electedAptc < 0 ? 0 : electedAptc;
         if (electedAptc > maxAptc) {
           electedAptc = maxAptc;
@@ -293,12 +293,12 @@ $(function() {
     });
 
     electedAptcAmount.addEventListener('blur', function(){
-      var electedAptc = parseFloat(this.value)?.toFixed(2);
+      var electedAptc = parseFloat(this.value).toFixed(2);
       if (electedAptc > maxAptc) {
         this.value = maxAptc;
         electedAptcPercentage.value = 100;
       } else {
-        let electedPct = (electedAptc/maxAptc)?.toFixed(2) * 100;
+        let electedPct = (electedAptc/maxAptc).toFixed(2) * 100;
         if (electedPct < minAptc) {
           electedPct = 100;
           this.value = minAptc;
@@ -342,11 +342,11 @@ $(function() {
   function setUpdatedAptc(elected, updateUrl) {
     const electedAptcPercentage = document.getElementById("electedAptcPercentage");
     const electedAptcAmount = document.getElementById("electedAptcAmount");
-    document.querySelectorAll('.aptc-percentage')?.forEach(function(element) {
+    document.querySelectorAll('.aptc-percentage').forEach(function(element) {
       element.textContent = electedAptcPercentage.value;
     });
-    document.querySelectorAll('.aptc-amount')?.forEach(function(element) {
-      element.textContent = electedAptcAmount.value.toLocaleString("en-US", {style:"currency", currency:"USD"});;
+    document.querySelectorAll('.aptc-amount').forEach(function(element) {
+      element.textContent = electedAptcAmount.value.toLocaleString("en-US", {style:"currency", currency:"USD"});
     });
     urlParts = updateUrl.split("?");
     var url = document.location.origin + urlParts[0]
