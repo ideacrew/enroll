@@ -860,7 +860,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     if result.failure?
       flash[:error], skeleton  = result.failure
       eligible_families = {}
-      application_states = skeleton["mapped_states"]
+      application_states = skeleton["mapped_application_states"]
       benefit_coverage_values = {}
       oe_determined_notices = skeleton["oe_determined_notices"]
       enrollment_states = skeleton["enrollment_states"]

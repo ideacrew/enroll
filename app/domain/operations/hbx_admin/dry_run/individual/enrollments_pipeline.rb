@@ -17,9 +17,9 @@ module Operations
           # @return [Dry::Monads::Result] The result of the operation.
           def call(params)
             validated_params = yield validate(params)
-            result = yield build_pipeline(validated_params)
+            pipeline = yield pipeline(validated_params)
 
-            Success(result)
+            Success(pipeline)
           end
 
           private
@@ -39,47 +39,106 @@ module Operations
           #
           # @param params [Hash] The validated parameters.
           # @return [Array<Hash>] The aggregation pipeline.
-          def build_pipeline(params)
+          def pipeline(params)
             effective_on = params[:effective_on]
             aasm_states = params[:aasm_states]
 
-            query = [
-              {
-                '$match' => {
-                  'kind' => 'individual',
-                  'effective_on' => {
-                    '$gte' => effective_on.beginning_of_year,
-                    '$lte' => effective_on.end_of_year
-                  },
-                  'aasm_state' => {
-                    '$in' => aasm_states
+            Success([
+              match_stage(effective_on, aasm_states),
+              group_stage_1,
+              group_stage_2,
+              project_stage
+            ])
+          rescue StandardError => e
+            Failure(["pipeline: error: #{e.message}", {}])
+          end
+
+          def match_stage(effective_on, aasm_states)
+            {
+              '$match' => {
+                'kind' => 'individual',
+                'effective_on' => {
+                  '$gte' => effective_on.beginning_of_year,
+                  '$lte' => effective_on.end_of_year
+                },
+                'aasm_state' => { '$in' => aasm_states }
+              }
+            }
+          end
+
+          def group_stage_1
+            {
+              '$group' => {
+                '_id' => {
+                  'aasm_state' => '$aasm_state',
+                  'coverage_kind' => '$coverage_kind',
+                  'applied_aptc_greater_than_zero' => {
+                    '$cond' => [{ '$gt' => ['$applied_aptc_amount.cents', 0] }, true, false]
+                  }
+                },
+                'count' => { '$sum' => 1 }
+              }
+            }
+          end
+
+          def group_stage_2
+            {
+              '$group' => {
+                '_id' => '$_id.coverage_kind',
+                'states' => {
+                  '$push' => {
+                    'state' => '$_id.aasm_state',
+                    'applied_aptc' => '$_id.applied_aptc_greater_than_zero',
+                    'count' => '$count'
                   }
                 }
-              },
-              {
-                '$group' => {
-                  '_id' => {
-                    'aasm_state' => '$aasm_state',
-                    'coverage_kind' => '$coverage_kind',
-                    'applied_aptc_greater_than_zero' => {
-                      '$cond' => [{ '$gt' => ['$applied_aptc_amount.cents', 0] }, true, false]
+              }
+            }
+          end
+
+          def project_stage
+            {
+              '$project' => {
+                '_id' => 0,
+                'coverage_kind' => '$_id',
+                'without_aptc' => {
+                  '$arrayToObject' => {
+                    '$map' => {
+                      'input' => {
+                        '$filter' => {
+                          'input' => '$states',
+                          'as' => 'state',
+                          'cond' => { '$eq' => ['$$state.applied_aptc', false] }
+                        }
+                      },
+                      'as' => 'state',
+                      'in' => {
+                        'k' => '$$state.state',
+                        'v' => '$$state.count'
+                      }
                     }
-                  },
-                  'count' => { '$sum' => 1 }
-                }
-              },
-              {
-                '$project' => {
-                  'aasm_state' => '$_id.aasm_state',
-                  'coverage_kind' => '$_id.coverage_kind',
-                  'applied_aptc_greater_than_zero' => '$_id.applied_aptc_greater_than_zero',
-                  'count' => 1,
-                  '_id' => 0
+                  }
+                },
+                'with_aptc' => {
+                  '$arrayToObject' => {
+                    '$map' => {
+                      'input' => {
+                        '$filter' => {
+                          'input' => '$states',
+                          'as' => 'state',
+                          'cond' => { '$eq' => ['$$state.applied_aptc', true] }
+                        }
+                      },
+                      'as' => 'state',
+                      'in' => {
+                        'k' => '$$state.state',
+                        'v' => '$$state.count'
+                      }
+                    }
+                  }
                 }
               }
-            ]
-
-            Success(query)
+            }
           end
         end
       end
