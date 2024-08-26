@@ -267,8 +267,8 @@ $(function() {
   // aptc form on thank you page
   const aptcForm = document.getElementById("updateAptcForm");
   if (aptcForm) {
-    const maxAptc = parseFloat(aptcForm.dataset.max)?.toFixed(2);
-    const minAptc = parseFloat(aptcForm.dataset.min)?.toFixed(2);
+    const maxAptc = parseFloat(aptcForm.dataset.max).toFixed(2);
+    const minAptc = parseFloat(aptcForm.dataset.min).toFixed(2);
     const updateUrl = aptcForm.dataset.url;
 
     // updates the aptc percentage on the thank you page
