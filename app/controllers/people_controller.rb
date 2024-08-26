@@ -165,7 +165,7 @@ class PeopleController < ApplicationController
   end
 
   def build_update_primary_params
-    return person_parameters_list unless params[:person][:ssn].present?
+    return person_parameters_list unless params[:person][:ssn].present? && @person.ssn.nil?
     # false unless person previously had no_ssn as true, but has changed checkbox to false
     return person_parameters_list unless @person.no_ssn == '1' && params[:person][:no_ssn] == '0'
     person_parameters_list + [:ssn, :no_ssn]
