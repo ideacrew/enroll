@@ -34,6 +34,7 @@ class HbxAdminController < ApplicationController
 
   def update_aptc_csr
     authorize HbxProfile, :edit_aptc_csr?
+
     if @aptc_errors.blank?
       if @family.present? #&& TimeKeeper.date_of_record.year == year
         @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, @current_year)
