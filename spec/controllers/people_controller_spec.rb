@@ -64,50 +64,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
       post :update, params: {id: person.id, person: person_attributes}
     end
 
-    describe 'change ssn' do
-      before do
-        allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
-        allow(person).to receive(:is_consumer_role_active?).and_return(true)
-        allow(consumer_role).to receive(:find_document).and_return(vlp_document)
-        allow(consumer_role).to receive(:check_for_critical_changes).and_return(true)
-        allow(consumer_role).to receive(:check_native_status).and_return(true)
-        allow(vlp_document).to receive(:save).and_return(true)
-      end
-
-      context 'a primary with no ssn' do
-        before do
-          person.update(no_ssn: '1')
-          person.reload
-        end
-
-        xit 'can update (add) ssn' do
-          person_attributes[:ssn] = '123456789'
-          person_attributes[:no_ssn] = '0'
-          expect(response).to redirect_to(family_account_path)
-          expect(flash[:notice]).to eq 'Person was successfully updated.'
-        end
-      end
-
-      context 'a primary with an ssn' do
-        xit 'cannot update ssn' do
-          binding.irb
-          person_attributes[:ssn] = '123456789'
-          expect(response).to redirect_to(family_account_path)
-          expect(flash[:notice]).to eq 'Person was successfully updated.'
-        end
-      end
-
-      context 'a primary with an ssn' do
-        xit 'cannot update no_ssn' do
-
-          person_attributes[:ssn] = '123456789'
-          person_attributes[:no_ssn] = '0'
-          expect(response).to redirect_to(family_account_path)
-          expect(flash[:notice]).to eq 'Person was successfully updated.'
-        end
-      end
-    end
-
     describe "native status" do
       let!(:ai_an_person) {FactoryBot.create(:person, :with_consumer_role, tribal_id: '123')}
       let!(:ai_an_person_params) {ai_an_person.attributes.to_hash.merge(:is_applying_coverage => "true") }
@@ -160,9 +116,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
     end
 
     context "to verify if addresses are updated?" do
-      before do
-        post :update, params: {id: person.id, person: person_attributes}
-      end
 
       it "should not create new address instances on update" do
         expect(assigns(:valid_vlp)).to be_nil
@@ -180,10 +133,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
     end
 
     context "employee roles are updated" do
-      before do
-        post :update, params: {id: person.id, person: person_attributes}
-      end
-
       it "should update active employee role's contact method to match consumer role contact method" do
         expect(person.consumer_role.contact_method).to eq(person.employee_roles.first.contact_method)
       end
@@ -193,7 +142,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
       before do
         request.env['HTTP_REFERER'] = "insured/families/personal"
         allow(person).to receive(:is_consumer_role_active?).and_return(true)
-        post :update, params: {id: person.id, person: person_attributes}
       end
       it "update person" do
         allow(consumer_role).to receive(:find_document).and_return(vlp_document)
@@ -227,7 +175,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
         let!(:invalid_vlp_documents_attributes) { {"1" => invalid_vlp_doc.attributes.to_hash}}
 
         before do
-          post :update, params: {id: person.id, person: person_attributes}
           allow(person).to receive(:is_consumer_role_active?).and_return(true)
           allow(consumer_role).to receive(:check_for_critical_changes).and_return(true)
           consumer_role_attributes[:vlp_documents_attributes] = invalid_vlp_documents_attributes
@@ -243,10 +190,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
     end
 
     context "when employee" do
-      before do
-        post :update, params: {id: person.id, person: person_attributes}
-      end
-
       it "when employee" do
         person_attributes[:emails_attributes] = email_attributes
         allow(person).to receive(:update_attributes).and_return(true)
@@ -294,6 +237,62 @@ RSpec.describe PeopleController, dbclean: :after_each do
         primary_address = person.addresses.select{|address| address.kind == 'home'}.first
         dependent_address = person.primary_family.family_members.reject(&:is_primary_applicant?).first.person.addresses.first
         expect(primary_address.same_address?(dependent_address)).to eq true
+      end
+    end
+
+    describe 'change ssn' do
+      let(:ssn) { '523456989' }
+
+      before do
+        allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
+      end
+
+      context 'a primary with no ssn' do
+        before do
+          person.update(no_ssn: '1')
+          person.reload
+
+          person_attributes['ssn'] = ssn
+          person_attributes['no_ssn'] = '0'
+
+          post :update, params: { id: person.id, person: person_attributes }
+        end
+
+        it 'can update (add) ssn' do
+          expect(response).to redirect_to(family_account_path)
+          expect(flash[:notice]).to eq 'Person was successfully updated.'
+        end
+
+        it 'will be updated with the new ssn' do
+          person.reload
+          expect(person.ssn).to eq ssn
+        end
+      end
+
+      context 'a primary with an ssn' do
+        let (:new_ssn) { '373639485' }
+
+        before do
+          person.update(ssn: ssn, no_ssn: '0')
+          person.reload
+        end
+        
+        it 'cannot update ssn' do
+          person_attributes['ssn'] = new_ssn
+          person_attributes['no_ssn'] = '0'
+
+          post :update, params: { id: person.id, person: person_attributes }
+
+          person.reload
+          expect(person.ssn).to_not eq new_ssn
+        end
+
+        it 'cannot update no_ssn' do
+          person_attributes['no_ssn'] = '0'
+
+          expect(response).to redirect_to(family_account_path)
+          expect(flash[:notice]).to eq 'Person was successfully updated.'
+        end
       end
     end
   end

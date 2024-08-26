@@ -8,14 +8,14 @@ class PeopleController < ApplicationController
 
   def update
     authorize record, :can_update?
+
     @person_old_home_address = @person.addresses.select{|address| address.kind == 'home'}.first.dup
     @family = @person.primary_family
 
     @person.updated_by = current_user.oim_id unless current_user.nil?
     valid_referer_component = "insured/families/#{params[:bs4] == 'true' ? 'manage_family' : 'personal'}"
     if @person.is_consumer_role_active? && request.referer.include?(valid_referer_component)
-      # @valid_vlp = update_vlp_documents(@person.consumer_role, ';person')
-      @valid_vlp = true
+      @valid_vlp = update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
       redirect_path = family_account_path
@@ -158,8 +158,18 @@ class PeopleController < ApplicationController
   end
 
   def person_params
-    primary_params = can_update_ssn?(@person, params[:person], person_parameters_list)
-    params.require(:person).permit(*primary_params)
+    # NOTE: after feature flag is removed, this method should be memoized
+    # @person_params || params.require(:person).permit(*build_update_primary_params)
+
+    base_params = EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) ? build_update_primary_params : person_parameters_list
+    params.require(:person).permit(*base_params)
+  end
+
+  def build_update_primary_params
+    return person_parameters_list unless params[:person][:ssn].present?
+    # false unless person previously had no_ssn as true, but has changed checkbox to false
+    return person_parameters_list unless @person.no_ssn == '1' && params[:person][:no_ssn] == '0'
+    person_parameters_list + [:ssn, :no_ssn]
   end
 
   def sanitize_contact_method
