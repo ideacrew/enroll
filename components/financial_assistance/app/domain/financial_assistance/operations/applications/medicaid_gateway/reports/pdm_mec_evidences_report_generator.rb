@@ -27,7 +27,7 @@ module Operations
           end
 
           def enrolled_and_renewing_families
-            Operations::Families::FetchEnrolledAndRenewingAssistedFamilies.new.call({})
+            Operations::Families::FetchEnrolledAndRenewingAssisted.new.call({})
           end
 
           def latest_determined_applications_stage(families, year = Date.new.year)

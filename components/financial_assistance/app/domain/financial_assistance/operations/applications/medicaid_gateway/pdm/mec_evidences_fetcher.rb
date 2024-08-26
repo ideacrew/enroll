@@ -41,7 +41,7 @@ module Operations
           end
 
           def execute(pipeline)
-            local_mec_evidences = aggregate_collection(FinancialAssistance::Application, pipeline)
+            local_mec_evidences = aggregate_collection(::FinancialAssistance::Application.collection, pipeline)
 
             if local_mec_evidences.present?
               Success(local_mec_evidences)

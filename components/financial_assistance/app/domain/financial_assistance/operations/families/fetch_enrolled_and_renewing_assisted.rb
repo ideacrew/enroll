@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-# Operations::Families::FetchEnrolledAndRenewingAssistedFamilies.new.call({csr_list: ['02', '03', '04', '05', '06']})
-# Operations::Families::FetchEnrolledAndRenewingAssistedFamilies.new.call({})
+# Operations::Families::FetchEnrolledAndRenewingAssisted.new.call({csr_list: ['02', '03', '04', '05', '06']})
+# Operations::Families::FetchEnrolledAndRenewingAssisted.new.call({})
+module FinancialAssistance
 module Operations
   module Families
     # This operation fetches families with active health enrollment with APTC or CSR
-    class FetchEnrolledAndRenewingAssistedFamilies
+    class FetchEnrolledAndRenewingAssisted
       include Dry::Monads[:result, :do]
 
       def call(params)
@@ -35,4 +36,5 @@ module Operations
       end
     end
   end
+end
 end
