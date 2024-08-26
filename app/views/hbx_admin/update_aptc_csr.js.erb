@@ -1,5 +1,5 @@
 if (<%= @bs4 %>) {
-  document.querySelector('#aptcData').remove();
+  document.getElementById('aptcData').innerHTML = ''
   document.getElementById('aptcUpdate').innerHTML = '<%= j render partial: 'update_aptc_csr' %>';
 } else {
   //set_tab_content("update successful.");
