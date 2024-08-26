@@ -257,24 +257,18 @@ $(function() {
   if (updateAptc) {
     document.getElementById("updateAptc").addEventListener('click', function(){
       this.classList.add('hidden');
-      document.getElementById("aptcDesc")?.classList?.add('hidden');
-      document.querySelectorAll('.aptc')?.forEach(function(element) {
+      document.getElementById("aptcDesc").classList.add('hidden');
+      document.querySelectorAll('.aptc').forEach(function(element) {
         element.classList.remove('hidden');
       });
     });
   }
 
-  // format float to USD
-  var USDollar = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
-
   // aptc form on thank you page
   const aptcForm = document.getElementById("updateAptcForm");
   if (aptcForm) {
-    const maxAptc = parseFloat(aptcForm.dataset.max)?.toFixed(2);
-    const minAptc = parseFloat(aptcForm.dataset.min)?.toFixed(2);
+    const maxAptc = parseFloat(aptcForm.dataset.max).toFixed(2);
+    const minAptc = parseFloat(aptcForm.dataset.min).toFixed(2);
     const updateUrl = aptcForm.dataset.url;
 
     // updates the aptc percentage on the thank you page
@@ -282,12 +276,12 @@ $(function() {
     const electedAptcAmount = document.getElementById("electedAptcAmount");
 
     electedAptcPercentage.addEventListener('blur', function(){
-      var electedPct = parseFloat(this.value)?.toFixed(2);
+      var electedPct = parseFloat(this.value).toFixed(2);
       if (electedPct > 100) {
         this.value = 100;
         electedAptcAmount.value = maxAptc;
       } else {
-        let electedAptc = ((electedPct/100) * maxAptc)?.toFixed(2);
+        let electedAptc = ((electedPct/100) * maxAptc).toFixed(2);
         electedAptc = electedAptc < 0 ? 0 : electedAptc;
         if (electedAptc > maxAptc) {
           electedAptc = maxAptc;
@@ -299,12 +293,12 @@ $(function() {
     });
 
     electedAptcAmount.addEventListener('blur', function(){
-      var electedAptc = parseFloat(this.value)?.toFixed(2);
+      var electedAptc = parseFloat(this.value).toFixed(2);
       if (electedAptc > maxAptc) {
         this.value = maxAptc;
         electedAptcPercentage.value = 100;
       } else {
-        let electedPct = (electedAptc/maxAptc)?.toFixed(2) * 100;
+        let electedPct = (electedAptc/maxAptc).toFixed(2) * 100;
         if (electedPct < minAptc) {
           electedPct = 100;
           this.value = minAptc;
@@ -348,18 +342,18 @@ $(function() {
   function setUpdatedAptc(elected, updateUrl) {
     const electedAptcPercentage = document.getElementById("electedAptcPercentage");
     const electedAptcAmount = document.getElementById("electedAptcAmount");
-    document.querySelectorAll('.aptc-percentage')?.forEach(function(element) {
+    document.querySelectorAll('.aptc-percentage').forEach(function(element) {
       element.textContent = electedAptcPercentage.value;
     });
-    document.querySelectorAll('.aptc-amount')?.forEach(function(element) {
-      element.textContent = USDollar.format(electedAptcAmount.value);
+    document.querySelectorAll('.aptc-amount').forEach(function(element) {
+      element.textContent = electedAptcAmount.value.toLocaleString("en-US", {style:"currency", currency:"USD"});
     });
     urlParts = updateUrl.split("?");
     var url = document.location.origin + urlParts[0]
     var params = urlParts[1] + "&elected_aptc=" + elected
     postAjax(url, params, function(data){
       response = JSON.parse(data);
-      var amount = USDollar.format(parseFloat(response['responsible_amount']));
+      var amount = parseFloat(response['responsible_amount']).toLocaleString("en-US", {style:"currency", currency:"USD"});;
       document.getElementById("resp-amount").textContent = amount;
     });
   }
