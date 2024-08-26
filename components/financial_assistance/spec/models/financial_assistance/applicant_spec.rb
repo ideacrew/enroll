@@ -1640,6 +1640,9 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
       context 'for esi mec evidence' do
 
+        let(:due_on) { TimeKeeper.date_of_record + 96.days }
+        let(:desired_due_date) { TimeKeeper.date_of_record + 1.month }
+
         before do
           applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', verification_outstanding: false, is_satisfied: true)
         end
