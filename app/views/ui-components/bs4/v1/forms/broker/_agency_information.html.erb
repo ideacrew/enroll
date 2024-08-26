@@ -10,7 +10,7 @@
   </div>
 
   <div class="col-md-6">
-    <label for="inputDBA"><%= l10n('dba_caps') %></label>
-    <%= f.text_field :dba, placeholder: l10n('doing_business_as'), id: 'validationCustomdba', class: 'form-control' %>
+    <%= f.label :dba, l10n('dba_caps') %>
+    <%= f.text_field :dba, placeholder: l10n('doing_business_as'), class: 'form-control' %>
   </div>
 </div>
