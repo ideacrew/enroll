@@ -157,7 +157,18 @@ class PeopleController < ApplicationController
   end
 
   def person_params
-    params.require(:person).permit(*person_parameters_list)
+    # NOTE: after feature flag is removed, this method should be memoized
+    # @person_params || params.require(:person).permit(*build_update_primary_params)
+
+    base_params = EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) ? build_update_primary_params : person_parameters_list
+    params.require(:person).permit(*base_params)
+  end
+
+  def build_update_primary_params
+    return person_parameters_list unless params[:person][:ssn].present? && @person.ssn.nil?
+    # false unless person previously had no_ssn as true, but has changed checkbox to false
+    return person_parameters_list unless @person.no_ssn == '1' && params[:person][:no_ssn] == '0'
+    person_parameters_list + [:ssn, :no_ssn]
   end
 
   def sanitize_contact_method
