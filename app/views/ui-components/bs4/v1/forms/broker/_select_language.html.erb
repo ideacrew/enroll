@@ -11,7 +11,11 @@
         <% language_group.each do |language| %>
           <div class="col-md-2 d-flex align-items-center">
             <% code = language[1] %>
-            <%= f.check_box :languages_spoken, { multiple: true, checked: agency_languages.include?(code) }, code, nil %> <p class='ml-1 mb-0'><%= language[0] %></p>
+            <%= f.check_box :languages_spoken,
+              { multiple: true, checked: agency_languages.include?(code), id: "language_#{code}" },
+              code, nil
+            %>
+            <label class='ml-1 mb-0 mt-0 font-weight-normal' for="language_<%= code %>"><%= language[0] %></label>
           </div>
         <% end %>
       </div>
