@@ -25,8 +25,7 @@ module FinancialAssistance
         applicant.set_evidence_verified(evidence)
         "#{evidence.title} successfully verified."
       when "return_for_deficiency"
-        desired_due_date = evidence.aasm_state == "review" ? evidence.due_on : nil
-        applicant.set_evidence_rejected(evidence, desired_due_date)
+        applicant.set_evidence_rejected(evidence)
         "#{evidence.title} rejected."
       end
     end

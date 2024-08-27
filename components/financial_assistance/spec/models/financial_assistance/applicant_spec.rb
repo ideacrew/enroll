@@ -1628,9 +1628,13 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(current_evidence.aasm_state).to eql('rejected')
         end
 
-        context "with desired due date" do
+        context "with evidence in review" do
+
+          before do
+            current_evidence.update_attributes!(aasm_state: 'review', due_on: desired_due_date)
+          end
           it 'should move evidence to rejected and set due date' do
-            applicant.set_evidence_rejected(current_evidence, desired_due_date)
+            applicant.set_evidence_rejected(current_evidence)
             current_evidence.reload
             expect(current_evidence.due_on).to eq desired_due_date
             expect(current_evidence.aasm_state).to eql('rejected')
@@ -1656,9 +1660,14 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(current_evidence.aasm_state).to eql('rejected')
         end
 
-        context "with desired due date" do
+        context "with evidence in review" do
+
+          before do
+            applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'review', verification_outstanding: false, is_satisfied: true, due_on: desired_due_date)
+          end
+
           it 'should move evidence to rejected and set due date' do
-            applicant.set_evidence_rejected(current_evidence, desired_due_date)
+            applicant.set_evidence_rejected(current_evidence)
             current_evidence.reload
             expect(current_evidence.due_on).to eq desired_due_date
             expect(current_evidence.aasm_state).to eql('rejected')

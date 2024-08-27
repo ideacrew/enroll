@@ -1337,7 +1337,7 @@ module FinancialAssistance
       save!
     end
 
-    def set_evidence_outstanding(evidence, desired_due_date = nil)
+    def set_evidence_outstanding(evidence)
       return unless evidence.may_move_to_outstanding?
 
       evidence.verification_outstanding = true
@@ -1365,12 +1365,12 @@ module FinancialAssistance
       save!
     end
 
-    def set_evidence_rejected(evidence, desired_due_date = nil)
+    def set_evidence_rejected(evidence)
       return unless evidence.may_move_to_rejected?
 
       evidence.verification_outstanding = true
       evidence.is_satisfied = false
-      evidence.due_on = (desired_due_date || schedule_verification_due_on) if evidence.due_on.blank?
+      evidence.due_on = schedule_verification_due_on unless evidence.aasm_state == 'review'
       evidence.move_to_rejected
       save!
     end
