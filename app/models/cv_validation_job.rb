@@ -5,6 +5,10 @@ class CvValidationJob
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  # @!attribute [r] RESULT_KINDS
+  #   @return [Array<Symbol>] The kinds of results that can be returned.
+  RESULT_KINDS = %i[error failure success].freeze
+
   # @!attribute [rw] cv_payload
   #   @return [String] The JSON payload that is generated for each Family transform.
   field :cv_payload, type: String
@@ -39,7 +43,10 @@ class CvValidationJob
   field :job_id, type: String
 
   # @!attribute [rw] result
-  #   @return [Symbol] The result of the CV Validation Job. This can be one of the following: :success - The CV Validation Job was successful. :failure - The CV Validation Job failed.
+  #   @return [Symbol] The result of the CV Validation Job. This can be one of the following:
+  #     :success - The CV Validation Job was successful.
+  #     :failure - The CV Validation Job failed.
+  #     :error - The CV Validation Job encountered an error.
   field :result, type: Symbol
 
   # @!attribute [rw] cv_errors
@@ -50,21 +57,24 @@ class CvValidationJob
   #   @return [Array<String>] The messages that were logged during the CV Validation Job. This is a placeholder for future enhancements/use.
   field :logging_messages, type: Array
 
-  # @!attribute [rw] cv_start_time
-  #   @return [DateTime] The start timestamp to track how long the CV payload took to generate.
-  field :cv_start_time, type: DateTime
+  # @!attribute [rw] cv_payload_transformation_time
+  #   @return [BigDecimal] The time taken to transform the Family into a valid Aca Entity.
+  field :cv_payload_transformation_time, type: BigDecimal
 
-  # @!attribute [rw] cv_end_time
-  #   @return [DateTime] The end timestamp to track how long the CV payload took to generate.
-  field :cv_end_time, type: DateTime
+  # @!attribute [rw] job_elapsed_time
+  #   @return [BigDecimal] The time taken to complete the CV Validation Job.
+  field :job_elapsed_time, type: BigDecimal
 
-  # @!attribute [rw] start_time
-  #   @return [DateTime] The start timestamp of the CV Validation Job.
-  field :start_time, type: DateTime
+  # Validations
 
-  # @!attribute [rw] end_time
-  #   @return [DateTime] The end timestamp of the CV Validation Job.
-  field :end_time, type: DateTime
+  # @!attribute [rw] result
+  #   @return [Symbol] the result of the validation, which must be one of :success, :failure, or :error.
+  #   @example Valid result values
+  #     :success
+  #     :failure
+  #     :error
+  #   @raise [ArgumentError] if the result is not one of the valid values.
+  validates :result, inclusion: { in: RESULT_KINDS, message: "%{value} is not a valid result" }
 
   # Scopes
 
@@ -109,33 +119,6 @@ class CvValidationJob
   # Index on the created_at field to optimize queries filtering by creation date.
   # @return [Mongoid::Index] Index on the created_at field.
   index({ created_at: 1 }, { name: 'created_at_index' })
-
-  # Calculates the time taken to transform a Family object to a valid CV payload.
-  #
-  # @return [Integer, nil] The difference in seconds between cv_end_time and cv_start_time, or nil if either is not set.
-  def cv_payload_transformation_time
-    duration_in_seconds(cv_end_time, cv_start_time)
-  end
-
-  # Calculates the time taken for the CV validation job.
-  #
-  # @return [Integer, nil] The difference in seconds between end_time and start_time, or nil if either is not set.
-  def cv_validation_job_time
-    duration_in_seconds(end_time, start_time)
-  end
-
-  private
-
-  # Calculates the difference in seconds between two DateTime objects.
-  #
-  # @param end_datetime [DateTime] The end time.
-  # @param start_datetime [DateTime] The start time.
-  # @return [Integer, nil] The difference in seconds between end_datetime and start_datetime, or nil if either is not set.
-  def duration_in_seconds(end_datetime, start_datetime)
-    return nil unless start_datetime && end_datetime
-
-    ((end_datetime - start_datetime) * 24 * 60 * 60).to_i
-  end
 
   class << self
     # Returns the job ID of the latest job.

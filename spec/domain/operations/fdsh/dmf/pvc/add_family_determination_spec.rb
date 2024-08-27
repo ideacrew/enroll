@@ -97,4 +97,22 @@ RSpec.describe Operations::Fdsh::Dmf::Pvc::AddFamilyDetermination, dbclean: :aft
       expect(family.eligibility_determination.subjects[0].eligibility_states[1].evidence_states.last.status).to eq(:outstanding)
     end
   end
+
+  context "when alive status type is not present in entity" do
+    before do
+      @result = described_class.new.call({encrypted_family_payload: encrypted_family_payload, job_id: job.job_id, family_hbx_id: family.hbx_assigned_id})
+      person.reload
+      family.reload
+      job.reload
+    end
+
+    it "should not record error in transmission" do
+      transmission = job.transmissions.first
+      transmittable_errors = transmission.transmittable_errors
+      latest_state = transmission.process_status.latest_state
+
+      expect(transmittable_errors).to be_empty
+      expect(latest_state).to eq(:succeeded)
+    end
+  end
 end

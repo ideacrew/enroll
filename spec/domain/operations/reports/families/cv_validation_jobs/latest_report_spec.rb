@@ -4,6 +4,16 @@ RSpec.describe Operations::Reports::Families::CvValidationJobs::LatestReport do
   describe '#call' do
     let(:result) { subject.call }
 
+    after :all do
+      Dir.glob("#{Rails.root}/latest_cv_validation_job_report_*.csv").each do |file|
+        File.delete(file)
+      end
+
+      Dir.glob("#{Rails.root}/latest_cv_validation_job_logger_*.log").each do |file|
+        File.delete(file)
+      end
+    end
+
     context 'when the jobs do not exist' do
       it 'returns a failure result' do
         expect(result).to be_failure
@@ -14,7 +24,7 @@ RSpec.describe Operations::Reports::Families::CvValidationJobs::LatestReport do
     context 'when the jobs exist' do
       let(:job_id) { 'aksjh7d7gds7sg00000' }
       let(:create_jobs) do
-        FactoryBot.create_list(:cv_validation_job, 3, :success, job_id: job_id)
+        FactoryBot.create_list(:cv_validation_job, 3, job_id: job_id)
       end
 
       let(:csv_file_name) { Dir.glob("#{Rails.root}/latest_cv_validation_job_report_#{job_id}_*.csv").first }
