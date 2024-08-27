@@ -858,7 +858,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     result = ::Operations::HbxAdmin::DryRun::Individual::Analyzer.new.call
 
     if result.failure?
-      flash[:error], skeleton  = result.failure
+      flash[:error], skeleton = result.failure
       eligible_families = {}
       application_states = skeleton["mapped_application_states"]
       benefit_coverage_values = {}
