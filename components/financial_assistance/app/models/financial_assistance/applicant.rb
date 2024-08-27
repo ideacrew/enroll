@@ -1337,7 +1337,7 @@ module FinancialAssistance
       save!
     end
 
-    def set_evidence_outstanding(evidence)
+    def set_evidence_outstanding(evidence, desired_due_date = nil)
       return unless evidence.may_move_to_outstanding?
 
       evidence.verification_outstanding = true
