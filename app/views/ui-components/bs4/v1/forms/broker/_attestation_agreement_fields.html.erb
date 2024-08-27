@@ -1,18 +1,24 @@
 <h2 class='mb-3'><%= l10n("agreements") %></h2>
 
-<div class="form-group mb-3">
+<div class="form-group mt-0 d-flex align-items-center">
   <%= check_box_tag :all_marketplace_required_trainings, nil, false, class: "broker-attestation-field", onChange: "allowBrokerAgencyFormSubmission()" %>
-  <%= sanitize_html(l10n("broker_attestation.required_trainings", trainings_link: 'https://coverme.inquisiqlms.com/', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)) %>
+  <label for="<%= :all_marketplace_required_trainings %>" class="mt-0 ml-1 font-weight-normal text-body">
+    <%= h(l10n("broker_attestation.required_trainings", trainings_link: 'https://coverme.inquisiqlms.com/', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)) %>
+  </label>
 </div>
 
-<div class="form-group mb-3">
+<div class="form-group mt-0 d-flex align-items-center">
   <%= check_box_tag :active_license_attestation, nil, false, class: "broker-attestation-field", onChange: "allowBrokerAgencyFormSubmission()" %>
-  <%= "  #{l10n('broker_attestation.active_license', state_name: EnrollRegistry[:enroll_app].setting(:state_name).item)}" %>
+  <label for="<%= :active_license_attestation %>" class="mt-0 ml-1 font-weight-normal text-body">
+    <%= "#{l10n('broker_attestation.active_license', state_name: EnrollRegistry[:enroll_app].setting(:state_name).item)}" %>
+  </label>
 </div>
 
-<div class="form-group mb-3">
+<div class="form-group mt-0 d-flex align-items-center">
   <%= check_box_tag :marketplace_broker_agreement, nil, false, class: "broker-attestation-field", onChange: "allowBrokerAgencyFormSubmission()" %>
-  <%= sanitize_html(l10n("broker_attestation.broker_agreement", agreement_pdf_url: '/ohim_broker_agreement.pdf', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)) %>
+  <label for="<%= :marketplace_broker_agreement %>" class="mt-0 ml-1 font-weight-normal text-body">
+    <%= h(l10n("broker_attestation.broker_agreement", agreement_pdf_url: '/ohim_broker_agreement.pdf', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)) %>
+  </label>
 </div>
 
 <script>
