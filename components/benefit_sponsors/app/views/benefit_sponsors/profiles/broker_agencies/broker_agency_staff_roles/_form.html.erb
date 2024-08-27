@@ -13,7 +13,7 @@
         </div>
         <div class="col-md-4 col-sm-4 col-xs-12 pr-0">
           <%= f.label :dob, l10n("broker_agencies.dob"), class: "required" %>
-          <%= f.date_field :dob, placeholder: ("MM/DD/YYYY").upcase, min: 110.years.ago, max:"9999-12-31", required: true, readonly: defined?(readonly), class: "w-100" %>
+          <%= f.date_field :dob, placeholder: ("MM/DD/YYYY").upcase, min: 110.years.ago, max: 16.years.ago.beginning_of_month, required: true, readonly: defined?(readonly), class: "w-100" %>
         </div>
       </div>
       <%= hidden_field_tag :profile_id, params[:profile_id] %>
