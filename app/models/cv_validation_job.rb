@@ -43,7 +43,10 @@ class CvValidationJob
   field :job_id, type: String
 
   # @!attribute [rw] result
-  #   @return [Symbol] The result of the CV Validation Job. This can be one of the following: :success - The CV Validation Job was successful. :failure - The CV Validation Job failed.
+  #   @return [Symbol] The result of the CV Validation Job. This can be one of the following:
+  #     :success - The CV Validation Job was successful.
+  #     :failure - The CV Validation Job failed.
+  #     :error - The CV Validation Job encountered an error.
   field :result, type: Symbol
 
   # @!attribute [rw] cv_errors

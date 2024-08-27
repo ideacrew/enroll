@@ -62,25 +62,34 @@ module Operations
           end
         end
 
-        # Transforms the family to an entity
-        # @param family [Family] the family object
-        # @return [Dry::Monads::Result] the result of the transformation
+        # Transforms a family object to an entity and records the process time.
         #
-        # @note This method always returns a success result, even if the transformation fails for storing the result and error message in the job.
+        # @param family [Object] The family object to be transformed.
+        # @return [Dry::Monads::Result] The result of the transformation. Returns a success result with the transformed entity or a failure result with errors.
+        # @!attribute [r] @cv_monotonic_start_time
+        #   @return [Float] The start time of the transformation process.
+        # @!attribute [r] @cv_monotonic_end_time
+        #   @return [Float] The end time of the transformation process.
+        # @!attribute [r] @transform_result
+        #   @return [Object] The result of the transformation process.
+        # @!attribute [r] @json_family_entity
+        #   @return [String, nil] The JSON representation of the transformed entity if successful, otherwise nil.
+        # @!attribute [r] @cv_errors
+        #   @return [Array, nil] The errors encountered during the transformation if any, otherwise nil.
         def transform_to_entity(family)
           @cv_monotonic_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-          result = Operations::Families::TransformToEntity.new.call(family)
+          transform_instance = ::Operations::Families::TransformToEntity.new
+          result = transform_instance.call(family)
           @cv_monotonic_end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
-          @transform_result = result.success? ? result.success[0] : result.failure[0]
-          @json_family_entity = result.success? ? result.success[1].to_json : nil
-          @cv_errors = result.failure? ? [result.failure[1]] : nil
+          @transform_result = transform_instance.transform_result
+          @json_family_entity = result.success.to_json if result.success?
+          @cv_errors = [result.failure] if result.failure?
 
           result.success? ? result : Success(nil)
         end
 
         # Constructs the CV validation job parameters
-        # @param family [Family] the family object
+        # @param family [Object] the family object
         # @param family_hbx_id [String] the family HBX ID
         # @return [Dry::Monads::Result] the result of the construction
         def construct_cv_validation_job_params(family, family_hbx_id)
