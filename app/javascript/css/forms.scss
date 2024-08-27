@@ -54,7 +54,9 @@
 }
 
 label,
-legend {
+legend,
+.label,
+.legend {
   display: block;
   font-size: 16px;
   line-height: 24px;
@@ -74,7 +76,9 @@ button,
 }
 
 label.required:after,
+.label.required:after,
 legend.required:after,
+.legend.required:after,
 dt.required:after,
 .applications .required:not(input):not(select):after {
   content: '*';
@@ -96,7 +100,8 @@ select,
   &:hover {
     border-color: var(--grey-120);
   }
-  &:disabled, &[readonly] {
+  &:disabled,
+  &[readonly] {
     background: var(--grey-030);
     color: var(--input-text-color);
   }
@@ -308,7 +313,7 @@ input[type='date']:invalid::-webkit-datetime-edit {
   .broker-registration-tabs {
     border-bottom: 2px solid var(--silver-border);
     font-size: 0;
-    // font-size needs to be set to 0 here to hide 
+    // font-size needs to be set to 0 here to hide
     // the space between the jQuery-ui tabs
 
     li {
@@ -360,7 +365,7 @@ input[type='date']:invalid::-webkit-datetime-edit {
   }
 
   // adding border-0 to these classes does not work
-  // because it is a jquery-ui class 
+  // because it is a jquery-ui class
   #broker_registration,
   #broker_agency_staff {
     border: none;
@@ -370,12 +375,12 @@ input[type='date']:invalid::-webkit-datetime-edit {
   #broker_agency_staff {
     .table-responsive {
       table.broker-staff {
-        width: 100%; 
+        width: 100%;
         border-collapse: collapse;
 
         thead {
           height: 40px;
-          
+
           tr {
             color: var(--text-secondary);
             border-bottom: 1px solid var(--silver-border);
@@ -387,7 +392,7 @@ input[type='date']:invalid::-webkit-datetime-edit {
             padding: 10px;
           }
 
-          th { 
+          th {
             width: 18%;
             vertical-align: bottom;
           }
@@ -397,7 +402,7 @@ input[type='date']:invalid::-webkit-datetime-edit {
           &.agency-selected {
             border: 2px solid var(--button-tertiary-color);
 
-            tr { 
+            tr {
               background-color: var(--tertiary-tint);
             }
           }
