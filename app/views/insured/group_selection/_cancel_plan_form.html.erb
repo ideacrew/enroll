@@ -6,12 +6,12 @@
     <div class="row focus">
       <div class="col-auto">
         <%= label_tag :cancel_plan_yes do %>
-          <%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %>
+          <%= radio_button_tag :cancel_plan, "yes", class: 'mr-2' %><%= l10n("yes") %>
         <% end %>
       </div>
       <div class="col-auto">
         <%= label_tag :cancel_plan_no do %>
-          <%= radio_button_tag :cancel_plan, "no" %>&nbsp;<%= l10n("no") %>
+          <%= radio_button_tag :cancel_plan, "no", class: 'mr-2' %><%= l10n("no") %>
         <% end %>
       </div>
     </div>
