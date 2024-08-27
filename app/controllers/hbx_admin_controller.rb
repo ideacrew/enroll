@@ -13,38 +13,39 @@ class HbxAdminController < ApplicationController
   end
 
   def edit_aptc_csr
-    # authorize HbxProfile
+    authorize HbxProfile
 
-    # @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)
+    @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)
     @household_members = Admin::Aptc.build_household_members(@current_year, @family)
-    # @household_info = Admin::Aptc.build_household_level_aptc_csr_data(@current_year, @family, @hbxs)
-    # @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs) if @hbxs.present?
-    # check_osse_eligibility
-    # @current_aptc_applied_hash =  Admin::Aptc.build_current_aptc_applied_hash(@hbxs)
-    # @plan_premium_for_enrollments = Admin::Aptc.build_plan_premium_hash_for_enrollments(@hbxs)
-    # @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
-    # @max_aptc = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:max_aptc) || 0
-    # @csr_percent_as_integer = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
-    # @household_csrs = build_thhm_csr_hash(@active_tax_household_for_current_year)
-    # @year_options = Admin::Aptc::years_with_tax_household(@family)
+    @household_info = Admin::Aptc.build_household_level_aptc_csr_data(@current_year, @family, @hbxs)
+    @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs) if @hbxs.present?
+    check_osse_eligibility
+    @current_aptc_applied_hash =  Admin::Aptc.build_current_aptc_applied_hash(@hbxs)
+    @plan_premium_for_enrollments = Admin::Aptc.build_plan_premium_hash_for_enrollments(@hbxs)
+    @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
+    @max_aptc = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:max_aptc) || 0
+    @csr_percent_as_integer = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
+    @household_csrs = build_thhm_csr_hash(@active_tax_household_for_current_year)
+    @year_options = Admin::Aptc::years_with_tax_household(@family)
     respond_to do |format|
       format.js { render (@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")}
     end
   end
 
   def update_aptc_csr
-    # authorize HbxProfile, :edit_aptc_csr?
+    authorize HbxProfile, :edit_aptc_csr?
+
     if @aptc_errors.blank?
-      # if @family.present? #&& TimeKeeper.date_of_record.year == year
-      #   @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, @current_year)
-      #   @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(@family, params, @current_year)
-      #   @thm_csr_pct_result = false
-      #   active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
-      #   active_tax_household_for_current_year.tax_household_members.each do |thm|
-      #     @thm_csr_pct_result = true if thm.csr_percent_as_integer != params["csr_percentage_#{thm.person.id}"] && thm.is_ia_eligible?
-      #     thm.update_attributes!(csr_percent_as_integer: params["csr_percentage_#{thm.person.id}"]) if thm.is_ia_eligible?
-      #   end
-      # end
+      if @family.present? #&& TimeKeeper.date_of_record.year == year
+        @eligibility_redetermination_result = Admin::Aptc.redetermine_eligibility_with_updated_values(@family, params, @hbxs, @current_year)
+        @enrollment_update_result = Admin::Aptc.update_aptc_applied_for_enrollments(@family, params, @current_year)
+        @thm_csr_pct_result = false
+        active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
+        active_tax_household_for_current_year.tax_household_members.each do |thm|
+          @thm_csr_pct_result = true if thm.csr_percent_as_integer != params["csr_percentage_#{thm.person.id}"] && thm.is_ia_eligible?
+          thm.update_attributes!(csr_percent_as_integer: params["csr_percentage_#{thm.person.id}"]) if thm.is_ia_eligible?
+        end
+      end
       respond_to do |format|
         format.js {render "update_aptc_csr", person: @person}
       end
