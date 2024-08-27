@@ -267,8 +267,8 @@ $(function() {
   // aptc form on thank you page
   const aptcForm = document.getElementById("updateAptcForm");
   if (aptcForm) {
-    const maxAptc = parseFloat(aptcForm.dataset.max).toFixed(2);
-    const minAptc = parseFloat(aptcForm.dataset.min).toFixed(2);
+    const maxAptc = parseFloat(aptcForm.dataset.max);
+    const minAptc = parseFloat(aptcForm.dataset.min);
     const updateUrl = aptcForm.dataset.url;
 
     // updates the aptc percentage on the thank you page
@@ -276,38 +276,38 @@ $(function() {
     const electedAptcAmount = document.getElementById("electedAptcAmount");
 
     electedAptcPercentage.addEventListener('blur', function(){
-      var electedPct = parseFloat(this.value).toFixed(2);
+      var electedPct = parseFloat(this.value);
       if (electedPct > 100) {
         this.value = 100;
         electedAptcAmount.value = maxAptc;
       } else {
-        let electedAptc = ((electedPct/100) * maxAptc).toFixed(2);
+        let electedAptc = ((electedPct/100) * maxAptc);
         electedAptc = electedAptc < 0 ? 0 : electedAptc;
-        if (electedAptc > maxAptc) {
-          electedAptc = maxAptc;
+        if (electedAptc > parseFloat(maxAptc)) {
+          electedAptc = maxAptc.toFixed(2);
           electedAptcPercentage.value = 100;
         }
-        electedAptcAmount.value = electedAptc;
+        electedAptcAmount.value = electedAptc.toFixed(2);
       }
       setUpdatedAptc(electedAptcAmount.value, updateUrl)
     });
 
     electedAptcAmount.addEventListener('blur', function(){
-      var electedAptc = parseFloat(this.value).toFixed(2);
+      var electedAptc = parseFloat(this.value);
       if (electedAptc > maxAptc) {
         this.value = maxAptc;
         electedAptcPercentage.value = 100;
       } else {
-        let electedPct = (electedAptc/maxAptc).toFixed(2) * 100;
+        let electedPct = (electedAptc/maxAptc) * 100;
         if (electedPct < minAptc) {
           electedPct = 100;
-          this.value = minAptc;
+          this.value = minAptc.toFixed(2);
         }
         if (electedPct > 100) {
           electedPct = 100;
-          this.value = maxAptc;
+          this.value = maxAptc.toFixed(2);
         }
-        electedAptcPercentage.value = electedPct;
+        electedAptcPercentage.value = electedPct.toFixed(0);
       }
       setUpdatedAptc(electedAptcAmount.value, updateUrl)
     });
