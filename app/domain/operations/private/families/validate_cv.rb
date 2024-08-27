@@ -65,7 +65,7 @@ module Operations
         # Transforms a family object to an entity and records the process time.
         #
         # @param family [Object] The family object to be transformed.
-        # @return [Dry::Monads::Result] The result of the transformation. Returns a success result with the transformed entity or a failure result with errors.
+        # @return [Dry::Monads::Success] The result of the transformation. Returns a success result with the transformed entity or nil.
         # @!attribute [r] @cv_monotonic_start_time
         #   @return [Float] The start time of the transformation process.
         # @!attribute [r] @cv_monotonic_end_time
