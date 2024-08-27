@@ -161,18 +161,27 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:multiple_determination_submission_reasons).and_return(true)
       end
 
-      context "when applicant is gap filling eligible" do
+      context "when the application is renewal" do
         it 'should add additional_reason_codes' do
           applicant.update_attributes(is_gap_filling: true)
-          expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq %w[FullDetermination GapFilling]
+          allow(application).to receive(:previously_renewal_draft?).and_return(true)
+          expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq %w[Renewal]
+        end
+      end
+
+      context "when applicant is gap filling eligible" do
+        it 'should have the correct reason code' do
+          applicant.update_attributes(is_gap_filling: true)
+          expect(result.value!.dig(:applicants, 0, :reason_code)).to eq "GapFilling"
+          expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq []
         end
       end
 
       context "when applicant is not gap filling eligible" do
-        it 'should add reason_codes' do
+        it 'should not add reason_codes' do
           applicant.update_attributes(is_gap_filling: false)
-          expect(result.value!.dig(:applicants, 0, :reason_code)).to eq "FullDetermination"
-          expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq nil
+          expect(result.value!.dig(:applicants, 0, :reason_code)).to eq nil
+          expect(result.value!.dig(:applicants, 0, :additional_reason_codes)).to eq []
         end
       end
     end
