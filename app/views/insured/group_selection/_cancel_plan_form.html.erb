@@ -2,13 +2,17 @@
   <div class="confirmation hidden" id="cancel-plan-form">
     <h2><%= l10n("plan_cancelation") %></h2>
     <p id="cancel-msg" class="action-msg hidden"><%= l10n("cancel_plan_confirmation") %></p>
-    <label class="required" for="cancel_plan"> <%= l10n("cancel_your_plan") %></label>
+    <%= label_tag :cancel_plan, l10n("cancel_your_plan"), class: "required" %>
     <div class="row focus">
       <div class="col-auto">
-        <label for="cancel_plan_yes"><%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %></label>
+        <%= label_tag :cancel_plan_yes do %>
+          <%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %>
+        <% end %>
       </div>
       <div class="col-auto">
-        <label for="cancel_plan_no"><%= radio_button_tag :cancel_plan, "no" %>&nbsp;<%= l10n("no") %></label>
+        <%= label_tag :cancel_plan_no do %>
+          <%= radio_button_tag :cancel_plan, "no" %>&nbsp;<%= l10n("no") %>
+        <% end %>
       </div>
     </div>
     <div id="cancellation_section" class="hidden">
