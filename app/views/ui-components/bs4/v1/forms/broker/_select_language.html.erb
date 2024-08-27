@@ -2,19 +2,26 @@
 
 <div class='row'>
   <div class="col-md-12 mb-2">
-    <div class='d-flex align-items-center justify-content-start'>
-      <label for="inputPracticeArea" class='mb-0 mr-1 required'><%= l10n('languages') %></label>
-      <span class="weight-n secondary-text"><%= "(#{l10n('select_all_that_apply')})" %></span>
-    </div>
-    <% display_languages.each do |language_group| %>
-      <div class='row my-3'>
-        <% language_group.each do |language| %>
-          <div class="col-md-2 d-flex align-items-center">
-            <% code = language[1] %>
-            <%= f.check_box :languages_spoken, { multiple: true, checked: agency_languages.include?(code) }, code, nil %> <p class='ml-1 mb-0'><%= language[0] %></p>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+    <fieldset class="d-block">
+      <legend class='d-flex align-items-center justify-content-start'>
+        <p class='mb-0 mr-1 required label'><%= l10n('languages') %></p>
+        <span class="weight-n secondary-text"><%= "(#{l10n('select_all_that_apply')})" %></span>
+      </legend>
+
+      <% display_languages.each do |language_group| %>
+        <div class='row my-3'>
+          <% language_group.each do |language| %>
+            <div class="col-md-2 d-flex align-items-center">
+              <% code = language[1] %>
+              <%= f.check_box :languages_spoken,
+                { multiple: true, checked: agency_languages.include?(code), id: "language_#{code}" },
+                code, nil
+              %>
+              <label class='ml-1 mb-0 mt-0 font-weight-normal' for="language_<%= code %>"><%= language[0] %></label>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </fieldset>
   </div>
 </div>
