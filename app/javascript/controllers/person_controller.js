@@ -40,6 +40,7 @@ export default class extends Controller {
 
     if (ssnInputElement.tagName === 'INPUT') {
       ssnInputElement.value = payload;
+      ssnInputElement.setAttribute('value', payload);
     } else {
       ssnInputElement.textContent = payload;
     }
@@ -51,6 +52,7 @@ export default class extends Controller {
 
     if (ssnInputElement.tagName === 'INPUT') {
       ssnInputElement.value = '';
+      ssnInputElement.setAttribute('value', '');
     } else {
       ssnInputElement.textContent = '';
     }
