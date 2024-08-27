@@ -49,6 +49,7 @@
     background-color: var(--error-tint);
     border-color: var(--error-color);
     color: var(--default-font-color);
+    a {color: var(--secondary-color-darker)}
   }
 
   &.alert-warning {
@@ -85,6 +86,7 @@
     background-color: var(--error-tint);
     border-color: var(--error-color);
     color: var(--error-shade);
+    a {color: var(--secondary-color-darker)}
   }
 
   &.notice-warning {
