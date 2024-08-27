@@ -23,6 +23,7 @@ class Users::SessionsController < Devise::SessionsController
 
   def destroy
     current_user.revoke_all_jwts!
+    Operations::Authentication::LogoutSamlUser.new.call(session)
     super
   end
 

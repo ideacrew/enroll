@@ -12,36 +12,27 @@ class SamlController < ApplicationController
   end
 
   def login
-    response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
-    response.settings = saml_settings
+    result = Operations::Authentication::LoginSamlUser.new.call(params)
 
-    relay_state = params['RelayState'] || response.attributes['relay_state']
+    if result.success?
+      success = result.value!
+      relay_state = success.relay_state
 
-    if response.is_valid? && response.name_id.present?
-      username = response.name_id.downcase
-      oim_user = User.where(oim_id: /^#{Regexp.escape(username)}$/i).first
+      oim_user = success.user
+      sign_in(:user, oim_user)
 
-      if oim_user.present?
-        if oim_user.expired?
-          redirect_to account_expired_saml_index_path
-          return
+      session[:__saml_name_id] = success.saml_name_id
+      session[:__saml_session_index] = success.saml_session_index if success.saml_session_index
+
+      if success.new_user
+        if relay_state.blank?
+          oim_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
+          redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
+        else
+          oim_user.update_attributes!(last_portal_visited: relay_state)
+          redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
         end
-
-        oim_user.idp_verified = true
-        oim_user.oim_id = response.name_id
-
-        unless oim_user.valid?
-          log("ERROR: #{oim_user.errors.messages}", {:severity => "error"})
-          return redirect_to URI.parse(SamlInformation.iam_login_url).to_s, flash: {error: "Invalid User Details."}
-        end
-
-        oim_user.save!
-        ::IdpAccountManager.update_navigation_flag(
-          oim_user.oim_id,
-          response.attributes['mail'],
-          ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
-        )
-        sign_in(:user, oim_user)
+      else
         if !relay_state.blank?
           oim_user.update_attributes!(last_portal_visited: relay_state)
           redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
@@ -51,40 +42,19 @@ class SamlController < ApplicationController
           oim_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
         end
-      else
-        new_password = User.generate_valid_password
-        new_email = response.attributes['mail'].present? ? response.attributes['mail'] : ""
-
-        headless = User.where(email: /^#{Regexp.escape(new_email)}$/i).first
-        headless.destroy if headless.present? && !headless.person.present?
-        new_user = User.new(email: new_email, password: new_password, idp_verified: true, oim_id: response.name_id)
-
-        unless new_user.valid?
-          log("ERROR: #{new_user.errors.messages}", {:severity => "error"})
-          return redirect_to URI.parse(SamlInformation.iam_login_url).to_s, flash: {error: "Invalid User Details."}
-        end
-
-        new_user.save!
-        ::IdpAccountManager.update_navigation_flag(
-          response.name_id,
-          response.attributes['mail'],
-          ::IdpAccountManager::ENROLL_NAVIGATION_FLAG
-        )
-        sign_in(:user, new_user)
-        if relay_state.blank?
-          new_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
-          redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
-        else
-          new_user.update_attributes!(last_portal_visited: relay_state)
-          redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
-        end
       end
-    elsif !response.name_id.present?
-      log("ERROR: SAMLResponse has missing required mail attribute", {:severity => "critical"})
-      render file: 'public/403.html', status: 403
     else
-      log("ERROR: SAMLResponse assertion errors #{response.errors}", {:severity => "error"})
-      render file: 'public/403.html', status: 403
+      failure = result.failure
+      case failure.kind
+      when :user_expired
+        redirect_to account_expired_saml_index_path
+      when :invalid_user_data
+        log(failure.message, {:severity => failure.severity})
+        redirect_to URI.parse(SamlInformation.iam_login_url).to_s, flash: {error: "Invalid User Details."}
+      else
+        log(failure.message, {:severity => failure.severity})
+        render file: 'public/403.html', status: 403
+      end
     end
   end
 
@@ -121,29 +91,5 @@ class SamlController < ApplicationController
 
   def redirect_if_medicaid_tax_credits_link_is_disabled
     redirect_to(main_app.root_path, notice: l10n("medicaid_and_tax_credits_link_is_disabled")) unless EnrollRegistry.feature_enabled?(:medicaid_tax_credits_link)
-  end
-
-  def saml_settings
-    settings = OneLogin::RubySaml::Settings.new
-
-    settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
-    settings.issuer                         = SamlInformation.issuer
-    settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
-    settings.idp_cert_fingerprint           = SamlInformation.idp_cert_fingerprint
-    settings.idp_cert_fingerprint_algorithm = SamlInformation.idp_cert_fingerprint_algorithm
-    settings.name_identifier_format         = SamlInformation.name_identifier_format
-    ## Optional for most SAML IdPs
-    # settings.authn_context = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
-
-    ## Optional. Describe according to IdP specification (if supported) which attributes the SP desires to receive in SAMLResponse.
-    # settings.attributes_index = 5
-    ## Optional. Describe an attribute consuming service for support of additional attributes.
-    # settings.attribute_consuming_service.configure do
-    #   service_name "Service"
-    #   service_index 5
-    #   add_attribute :name => "Name", :name_format => "Name Format", :friendly_name => "Friendly Name"
-    # end
-
-    settings
   end
 end
