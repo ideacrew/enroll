@@ -121,7 +121,7 @@
   <div class="col-md-4 confirmation hidden" id="cancel-plan-form">
     <h3><%= l10n("cancel_plan") %></h3>
     <p id="cancel-msg" class="action-msg hidden"><%= l10n("do_you_want_to_cancel_this_plan") %></p>
-    <%= radio_button_tag :agreement, "action-confirm-yes" %>&nbsp;<%= l10n("yes") %>
+    <%= radio_button_tag :agreement, "action-confirm-yes" %>&nbsp;<%= l10n("yes") %><br>
     <%= radio_button_tag :agreement, "action-confirm-no" %>&nbsp;<%= l10n("no") %>
     <div id="cancel-form" class="hidden">
       <%= form_for @self_term_or_cancel_form,
