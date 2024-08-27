@@ -4,6 +4,16 @@ RSpec.describe Operations::Reports::Families::CvValidationJobs::LatestReport do
   describe '#call' do
     let(:result) { subject.call }
 
+    after :all do
+      Dir.glob("#{Rails.root}/latest_cv_validation_job_report_*.csv").each do |file|
+        File.delete(file)
+      end
+
+      Dir.glob("#{Rails.root}/latest_cv_validation_job_logger_*.log").each do |file|
+        File.delete(file)
+      end
+    end
+
     context 'when the jobs do not exist' do
       it 'returns a failure result' do
         expect(result).to be_failure
