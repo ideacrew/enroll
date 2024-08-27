@@ -18,7 +18,8 @@
       <div class="col-md-9 col-sm-9 col-xs-12 broker-agency-search">
         <div class="row search-dropdown-wrapper">
           <div class="col-md-12 col-sm-12 col-xs-12 px-0">
-            <label class='pl-3'><%= l10n("broker_agencies.broker_roles.search_broker_agencies") %></label>
+
+<%= f.label :agency_search, l10n("broker_agencies.broker_roles.search_broker_agencies"), class: 'pl-3' %>
             <div class="col-md-12 col-sm-10 col-xs-12 input-group d-flex align-items-center justify-content-start">
               <%= f.hidden_field :profile_id %>
               <%= f.hidden_field :profile_type, value: "broker_agency_staff" %>
