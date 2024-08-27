@@ -632,10 +632,6 @@ a.disabled {
 .msg-inbox {
   cursor: pointer;
 
-  .sender {
-    font-size: 14px;
-  }
-
   &.msg-inbox-read {
     td {
       font-weight: 400;

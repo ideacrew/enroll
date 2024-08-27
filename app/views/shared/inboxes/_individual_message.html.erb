@@ -3,7 +3,7 @@
     class='msg-inbox <%= message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread" %>'
     data-url="<%= retrieve_show_path(provider, message) %>">
 
-    <td tabindex="0" class="sender">
+    <td tabindex="0">
       <div><%= message.try(:from) if @folder == "Inbox" || @folder == "Deleted" %></div>
       <div><%= message.try(:to) if @folder == "Send" %></div>
     </td>
