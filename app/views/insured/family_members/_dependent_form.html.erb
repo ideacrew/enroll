@@ -1,4 +1,5 @@
 <% if @bs4 %>
+<% readonly_status = @person.is_a?(Person) %>
   <div id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
     <% is_editing = dependent.id.present? %>
     <h2><%= is_editing ? l10n("edit_member") : l10n("add_member") %></h2>
@@ -77,15 +78,16 @@
                 <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
                   <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required keep-label mask-ssn",
                     pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-                    oninput: "this.setCustomValidity('')", disabled: readonly %>
+                    oninput: "this.setCustomValidity('')",
+                    disabled: readonly_status %>
                 <% else %>
-                  <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: readonly %>
+                  <%= f.text_field :ssn, placeholder: "000-00-0000", class: "required", disabled: readonly_status %>
                 <% end %>
               <% end %>
             </div>
             <div class="col-md-6 col-lg-3 p-0 pt-md-4 no-ssn-container mr-auto">
               <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
-                <%= f.check_box :no_ssn, disabled: @person.try(:ssn), %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
+                <%= f.check_box :no_ssn, disabled: @person.try(:ssn) %><span class='no_ssn'><%= l10n("do_not_have_ssn") %></span>
                 <a href="#no_ssn_info" data-toggle="modal" data-target="#no_ssn_info" class="d-block"><%= l10n("not_sure") %></a>
                 <%= render partial: 'shared/modal_support_text_household', locals: {key: "no_ssn_info"} %>
               <% end %>
