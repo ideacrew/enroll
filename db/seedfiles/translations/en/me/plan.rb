@@ -110,5 +110,7 @@ PLAN_TRANSLATIONS = {
   'en.plans.plan_shopping_options.modal.go_back' => "Go Back",
   'en.plans.plan_shopping_options.modal.proceed' => "Yes, Compare Plans",
   'en.plans.view_summary_of_benefits' => 'View Summary of Benefits and Coverage',
-  'en.plans.summary_of_benefits' => 'Summary of Benefits and Coverage'
+  'en.plans.summary_of_benefits' => 'Summary of Benefits and Coverage',
+  'en.plans.plan_shopping_options.modal.title' => "Plan Comparison",
+  'en.plans.comparison_modal.number_exceeded' => "You cannot select more than three (3) plans to compare."
 }
