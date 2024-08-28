@@ -16,7 +16,7 @@
           <%= hidden_field_tag 'effective_on_option', @active_sep.next_poss_effective_date %>
         <% end %>
         <div class="mt-4">
-          <%= submit_tag l10n('continue_next'), class: 'btn btn-primary' %>
+          <%= submit_tag l10n('continue_next'), id: 'existing-submit', class: 'btn btn-primary', onkeydown: "handleButtonKeyDown(event, 'existing-submit');" %>
         </div>
       </div>
     <% end %>
