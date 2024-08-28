@@ -5,7 +5,7 @@
       <li><%= l10n('edit_plan') %></li>
     </ul>
     <% if @self_term_or_cancel_form.hbx_enrollment.present? %>
-      <h1><%= @self_term_or_cancel_form.hbx_enrollment.coverage_year %> <%= l10n('health_coverage').titleize %></h1>
+      <h1><%= @self_term_or_cancel_form.hbx_enrollment.coverage_year %> <%= @self_term_or_cancel_form.hbx_enrollment.coverage_kind&.titleize %> <%= l10n('coverage').titleize %></h1>
       <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
         <%= render partial: "insured/families/enrollment_refactored", :collection => [@self_term_or_cancel_form.hbx_enrollment], :as => :hbx_enrollment, :layout => ("insured/families/partial_layouts/wrap_enrollments_by_year" if is_under_open_enrollment?) , locals: { read_only: false, edit_plan: true } %>
       <% end %>
