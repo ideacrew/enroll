@@ -33,6 +33,40 @@
       <%= f.submit l10n('broker_agencies.broker_roles.new_broker_agency_form.create_broker_agency'), class: 'btn btn-primary', id: 'broker-btn', disabled: EnrollRegistry.feature_enabled?(:broker_attestation_fields) %>
     <% end %>
   </div>
+
+  <script>
+    function validDob(element) {
+      let dob = element.value;
+      let warningTitle;
+      let warningText;
+
+      if (!dob || dob.length < 10 || isNaN(Date.parse(dob))) {
+        warningTitle = "Invalid DOB Format";
+        warningText = "DOB must be entered as MM/DD/YYYY";
+      } else if (Date.parse(dob) > Date.parse(element.max)) {
+        let max = element.max;
+        warningTitle = "Invalid DOB";
+        warningText = `DOB cannot be after ${max.substr(5, 2)}/${max.substr(8, 2)}/${max.substr(0, 4)}`;
+      } else if (Date.parse(dob) < Date.parse(element.min)) {
+        let min = element.min;
+        warningTitle = "Invalid DOB";
+        warningText = `DOB cannot be before ${min.substr(5, 2)}/${min.substr(8, 2)}/${min.substr(0, 4)}`;
+      }
+
+      showDobErrorMessage(element, warningTitle, warningText);
+    }
+
+    function showDobErrorMessage(element, warningTitle, warningText) {
+      if (!warningTitle || !warningText) return;
+
+      swal({
+        title: warningTitle,
+        text: warningText,
+        icon: 'warning'
+      });
+      element.value = '';
+    }
+  </script>
 <% else %>
 <head>
   <style>
