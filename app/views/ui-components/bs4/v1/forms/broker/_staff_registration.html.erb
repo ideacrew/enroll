@@ -24,28 +24,9 @@
   </div>
   <div class="col-md-3 mb-2">
     <%= f.label :dob, l10n("broker_agencies.dob"), class: "required" %>
-    <%= f.date_field :dob, placeholder: l10n('dob_format'), min: 110.years.ago, max: 16.years.ago, required: true, class: 'form-control', onblur: 'validDob(this)' %>
+    <%= f.date_field :dob, placeholder: l10n('dob_format'), min: 110.years.ago, max: 18.years.ago.end_of_month, required: true, class: 'form-control', onblur: 'validDob(this)' %>
     <div class="invalid-feedback">
       <%= l10n("invalid_dob") %>
     </div>
   </div>
 </div>
-
-
-<script>
-  var cleave = new Cleave('#inputDOB', {
-    date: true,
-    datePattern: ['m', 'd', 'Y']
-  });
-
-  function validDob(element) {
-    if (element.value && element.value.length < 10) {
-      swal({
-        title: "Invalid DOB Format",
-        text: "DOB must be entered as MM/DD/YYYY",
-        icon: "warning"
-      });
-      element.value = '';
-    }
-  }
-</script>
