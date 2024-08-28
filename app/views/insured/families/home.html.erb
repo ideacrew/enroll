@@ -18,6 +18,8 @@
     <%= render 'sep_message', locals: {family_id: @family.id.to_s} if @active_sep.present? %>
 
     <h1><%= l10n("insured.my_coverme_header") %></h1>
+    
+    <%= render partial: 'qle_detail_for_existing_sep' if @active_sep.present? %>
 
     <%= render 'right_column' %>
 
