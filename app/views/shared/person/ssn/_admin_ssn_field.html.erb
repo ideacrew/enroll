@@ -1,7 +1,14 @@
 <% if f.object.ssn.blank? %>
-  <%= f.text_field :ssn, placeholder: "#{l10n("social_security").to_s.upcase}", class: "required mask-ssn input_txt",
-                  pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')", oninput: "this.setCustomValidity('')",
-                  :value => params[:new_ssn].present? ? params[:new_ssn] : @person.ssn, required: params[:new_ssn].present? ? true : false, :input_html => {:maxlength => 15, :size => 40, :width => '100%'} %>
+  <%= f.text_field :ssn,
+    placeholder: "#{l10n("social_security").to_s.upcase}",
+    class: "required mask-ssn input_txt",
+    pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
+    oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+    oninput: "this.setCustomValidity('')",
+    value: params[:new_ssn].present? ? params[:new_ssn] : @person.ssn,
+    required: params[:new_ssn].present? ? true : false,
+    :input_html => {:maxlength => 15, :size => 40, :width => '100%'}
+  %>
 <% else %>
   <div data-controller='person' id='#admin-ssn-input-field'>
     <%= javascript_pack_tag 'effective_table_add_ons' %>
@@ -14,6 +21,7 @@
       pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
       oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
       oninput: "this.setCustomValidity('')",
+      value: nil,
       data: { :"admin-can-enable" => true }
     %>
     <input

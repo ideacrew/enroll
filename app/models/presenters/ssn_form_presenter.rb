@@ -45,7 +45,9 @@ module Presenters
       obscure_ssn
 
       @person_id = 'temp'
-      @disabled = true
+
+      # enable users to change ssn on sign up if errors present
+      @disabled = candidate_ssn_field_disabled?
     end
 
     def sanitize_person
@@ -79,6 +81,10 @@ module Presenters
     def obscure_ssn(subject = @form_object)
       clone_ssn = subject.ssn.dup
       @obscured_ssn = number_to_obscured_ssn(clone_ssn)
+    end
+
+    def candidate_ssn_field_disabled?
+      !(@form_object.errors[:base].any? || @form_object.errors[:ssn_taken].any?)
     end
   end
 end
