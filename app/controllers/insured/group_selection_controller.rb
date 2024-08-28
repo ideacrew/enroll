@@ -28,6 +28,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   helper_method :cancelation_reasons
   helper_method :show_cancellation_reason
+  helper_method :show_termination_calendar?
 
   def new
     set_bookmark_url
@@ -558,6 +559,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   def show_cancellation_reason
     ::EnrollRegistry.feature_enabled?(:cancellation_reason)
+  end
+
+  def show_termination_calendar?
+    @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl == 'terminate'
   end
 
   def enable_bs4_layout
