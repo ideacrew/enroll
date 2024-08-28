@@ -161,6 +161,7 @@ $(function () {
 
   $(document).on('click', 'a.existing-sep-item', function() {
     $('#choose_flow').modal('hide');
+    $('.modal-backdrop').remove();
     //window.scrollTo(0, 0);
     $('html,body').animate({scrollTop: 0});
     init_qle_message();
