@@ -6,12 +6,12 @@
     <div class="row focus">
       <div class="col-auto">
         <%= label_tag :cancel_plan_yes do %>
-          <%= radio_button_tag :cancel_plan, "yes", class: 'mr-2' %><%= l10n("yes") %>
+          <%= radio_button_tag :cancel_plan, "yes", false, class: 'mr-2' %><%= l10n("yes") %>
         <% end %>
       </div>
       <div class="col-auto">
         <%= label_tag :cancel_plan_no do %>
-          <%= radio_button_tag :cancel_plan, "no", class: 'mr-2' %><%= l10n("no") %>
+          <%= radio_button_tag :cancel_plan, "no", false, class: 'mr-2' %><%= l10n("no") %>
         <% end %>
       </div>
     </div>
@@ -42,7 +42,7 @@
         <% end %>
 
         <div class="mt-3">
-          <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", disabled: false %>
+          <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", onkeydown: "handleButtonKeyDown(event, 'btn-keep-plan')", disabled: false %>
           <%= submit_tag l10n("cancel_plan"), class: "btn btn-error", id: "btn-cancel-plan", disabled: true %>
         </div>
       <% end %>
@@ -57,6 +57,7 @@
       var termDateField = document.getElementById("term_date");
       var selectField = document.getElementById("cancellation_reason");
       var button = document.getElementById("btn-cancel-plan");
+      var keepButton = document.getElementById("btn-keep-plan");
 
       form.addEventListener("submit", function(event) {
         // Prevent form submission if the button is disabled
@@ -107,9 +108,20 @@
         return `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${year}`;
       }
 
+      function hideAndResetCancelForm(e) {
+        e.preventDefault();
+        radioButtonYes.checked = false;
+        radioButtonNo.checked = false;
+        document.getElementById('cancel-plan-form').classList.add("hidden");
+        document.getElementById('cancellation_section').classList.add("hidden");
+        if (termDateField) termDateField.value = "";
+        if (selectField) selectField.selectedIndex = 0;
+      }
+
       // Add event listeners for change events
       radioButtonYes.addEventListener("change", toggleSection);
       radioButtonNo.addEventListener("change", toggleSection);
+      keepButton.addEventListener('click', function(e) { hideAndResetCancelForm(e) });
       if (termDateField) termDateField.addEventListener("input", checkFields);
       if (selectField) selectField.addEventListener("change", checkFields);
 
