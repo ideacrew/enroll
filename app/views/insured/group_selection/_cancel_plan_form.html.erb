@@ -2,13 +2,17 @@
   <div class="confirmation hidden" id="cancel-plan-form">
     <h2><%= l10n("plan_cancelation") %></h2>
     <p id="cancel-msg" class="action-msg hidden"><%= l10n("cancel_plan_confirmation", coverage_kind: locals[:hbx_enrollment][:coverage_kind]) %></p>
-    <label class="required" for="cancel_plan"> <%= l10n("cancel_your_plan") %></label>
+    <%= label_tag :cancel_plan, l10n("cancel_your_plan"), class: "required" %>
     <div class="row focus">
       <div class="col-auto">
-        <label for="cancel_plan_yes"><%= radio_button_tag :cancel_plan, "yes" %>&nbsp;<%= l10n("yes") %></label><br>
+        <%= label_tag :cancel_plan_yes do %>
+          <%= radio_button_tag :cancel_plan, "yes", class: 'mr-2' %><%= l10n("yes") %>
+        <% end %>
       </div>
       <div class="col-auto">
-        <label for="cancel_plan_no"><%= radio_button_tag :cancel_plan, "no" %>&nbsp;<%= l10n("no") %></label>
+        <%= label_tag :cancel_plan_no do %>
+          <%= radio_button_tag :cancel_plan, "no", class: 'mr-2' %><%= l10n("no") %>
+        <% end %>
       </div>
     </div>
     <div id="cancellation_section" class="hidden">
@@ -19,15 +23,25 @@
         <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
         <%= hidden_field_tag :family_id, locals[:family_id] %>
         <%= hidden_field_tag :bs4, true %>
-        <p><%= l10n("choose_last_day") %></p>
-        <label class="required" for="term_date"><%= l10n("coverage_end_date") %></label>
-        <%= date_field_tag :term_date, class: "date-field mt-2", :'data-date-max' => "+0", required: true %>
+
+        <% if show_termination_calendar? %>
+          <p><%= l10n("choose_last_day") %></p>
+          <%= label :term_date, l10n("coverage_end_date"), class: "required"%>
+          <%= date_field_tag :term_date, nil, { 
+            class: "date-field mt-2",
+            min: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+            max: TimeKeeper.date_of_record.end_of_year.strftime("%Y-%m-%d"), 
+            required: true
+          } %>
+        <% end %>
+
         <% if show_cancellation_reason %>
-          <p class="mt-4"><%= l10n("why_are_you_canceling") %><p>
-          <label class="required" for="cancellation_reason"><%= l10n("cancelation_reason") %></label>
+          <p class="mt-3"><%= l10n("why_are_you_canceling") %><p>
+          <%= label :cancellation_reason, l10n("cancelation_reason"), class:"required" %>
           <%= select_tag :cancellation_reason, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: show_cancellation_reason %>
         <% end %>
-        <div class="mt-4">
+
+        <div class="mt-3">
           <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", disabled: false %>
           <%= submit_tag l10n("cancel_plan"), class: "btn btn-error", id: "btn-cancel-plan", disabled: true %>
         </div>
@@ -40,7 +54,7 @@
       var radioButtonNo = document.getElementById("cancel_plan_no");
       var section = document.getElementById("cancellation_section");
       var form = document.getElementById("cancel-plan-form");
-      var field1 = document.getElementById("term_date");
+      var termDateField = document.getElementById("term_date");
       var selectField = document.getElementById("cancellation_reason");
       var button = document.getElementById("btn-cancel-plan");
 
@@ -61,19 +75,25 @@
       }
 
       function checkFields() {
-        if (selectField) {
-          if ((field1.value.trim() !== "" && isValidDate(field1.value)) && selectField.value !== "") {
-            button.disabled = false;
-          } else {
-            button.disabled = true;
-          }
+        // button defaults as disabled being 'true'
+        let buttonDisabled = true;
+
+        if (termDateField && selectField) {
+          buttonDisabled = !validTermDate() || selectField.value === "";
+         } else if (termDateField) {
+          buttonDisabled = !validTermDate();
+        } else if (selectField) {
+          buttonDisabled = selectField.value === "";
         } else {
-          if (field1.value.trim() !== "" && isValidDate(field1.value)) {
-            button.disabled = false;
-          } else {
-            button.disabled = true;
-          }
+          buttonDisabled = false;
         }
+
+        button.disabled = buttonDisabled;
+      }
+
+      function validTermDate() {
+        if (!termDateField.value.trim().length) return false
+        return isValidDate(termDateField.value);
       }
 
       function isValidDate(dateString) {
@@ -90,10 +110,8 @@
       // Add event listeners for change events
       radioButtonYes.addEventListener("change", toggleSection);
       radioButtonNo.addEventListener("change", toggleSection);
-      field1.addEventListener("input", checkFields);
-      if (selectField) {
-        selectField.addEventListener("change", checkFields);
-      }
+      if (termDateField) termDateField.addEventListener("input", checkFields);
+      if (selectField) selectField.addEventListener("change", checkFields);
 
       toggleSection(); // Initial check in case one of the radio buttons is already selected
       checkFields(); // Initial check for field values
