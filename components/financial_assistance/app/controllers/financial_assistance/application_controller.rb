@@ -41,5 +41,15 @@ module FinancialAssistance
         value.gsub! '<application-applicable-year>', @application.assistance_year.to_s if value.include? '<application-applicable-year>'
       end
     end
+
+    # Checks if the application is a renewal draft and if so, sets a flash message and redirects to the applications path.
+    #
+    # @return [void]
+    def check_for_uneditable_application
+      return unless @application&.renewal_draft?
+
+      flash[:alert] = "This application cannot be edited as it is a renewal draft."
+      redirect_to(applications_path) and return
+    end
   end
 end

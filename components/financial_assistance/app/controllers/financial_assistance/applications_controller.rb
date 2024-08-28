@@ -6,7 +6,14 @@ module FinancialAssistance
 
     before_action :set_current_person
     before_action :set_family
-    before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
+    before_action :find_application, :except => [:index, :index_with_filter, :new]
+
+    # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
+    # This before_action needs to be called after finding the application
+    #
+    # @before_action
+    # @private
+    before_action :check_for_uneditable_application
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -20,6 +27,31 @@ module FinancialAssistance
     before_action :check_eligibility, only: [:copy]
     before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
+
+    # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
+    # This before_action needs to be called after finding the application
+    #
+    # @before_action
+    # @private
+    before_action :check_for_uneditable_application, only: [
+      :edit,
+      :step,
+      :copy,
+      :application_year_selection,
+      :application_checklist,
+      :review_and_submit,
+      :review,
+      :raw_application,
+      :transfer_history,
+      :wait_for_eligibility_response,
+      :eligibility_results,
+      :application_publish_error,
+      :eligibility_response_error,
+      :check_eligibility_results_received,
+      :checklist_pdf,
+      :update_transfer_requested,
+      :update_application_year
+    ]
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
