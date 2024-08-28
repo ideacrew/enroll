@@ -29,7 +29,13 @@
 
   <div class="col-md-3 mb-3">
     <%= f.label :dob, l10n("broker_agencies.dob"), class: "required" %>
-    <%= f.date_field :dob, placeholder: l10n('dob_format'), min: 110.years.ago, max: 16.years.ago, required: true, onblur: 'validDob(this)' %>
+    <%= f.date_field :dob,
+      placeholder: l10n('dob_format'),
+      min: 110.years.ago,
+      max: 16.years.ago.beginning_of_month,
+      required: true,
+      onblur: 'validDob(this)'
+    %>
     <div class="invalid-feedback">
       <%= l10n("invalid_dob") %>
     </div>
@@ -51,27 +57,3 @@
     </div>
   </div>
 </div>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var cleave = new Cleave('#inputDOB', {
-      date: true,
-      datePattern: ['m', 'd', 'Y']
-    });
-
-    document.getElementById('inputDOB').addEventListener('blur', function() {
-      validDob(this);
-    });
-  });
-
-  function validDob(element) {
-    if (element.value && element.value.length < 10) {
-      swal({
-        title: 'Invalid Date of Birth',
-        text: 'Please provide a valid date of birth.',
-        icon: 'warning'
-      });
-    }
-  }
-</script>
