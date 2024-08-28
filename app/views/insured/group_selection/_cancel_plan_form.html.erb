@@ -26,7 +26,7 @@
         <%= hidden_field_tag :family_id, locals[:family_id] %>
         <%= hidden_field_tag :bs4, true %>
 
-        <% if true %>
+        <% if show_termination_calendar? %>
           <p class='mt-4 mb-2'><%= l10n("choose_last_day") %></p>
           <%= label_tag :term_date, l10n("coverage_end_date"), class: "required"%>
           <%= date_field_tag :term_date, nil, { 
