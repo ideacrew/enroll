@@ -69,7 +69,11 @@
             <dd><%= product.try(:product_type).try(:upcase) %></dd>
             <dt class="plan-metal-level"><%= l10n("metal_level") %>:</dt>
             <% plan_level = display_dental_metal_level(product) %>
-            <dd><span class="badge badge-pill badge-lg badge-<%= plan_level.downcase %>"><%= plan_level %></span></dd>
+            <% if product.kind.to_s == "dental" %>
+              <dd><%= plan_level %></dd>
+            <% else %>
+              <dd><span class="badge badge-pill badge-lg badge-<%= plan_level.downcase %>"><%= plan_level %></span></dd>
+            <% end %>
           </dl>
           <dl class="parent col-6 pl-0">
             <dt class="plan-id"><%= HbxProfile::ShortName %> <%= l10n("enrollment_id") %>:</dt>
