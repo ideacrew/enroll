@@ -602,7 +602,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.ID' => "ID",
   :'en.confirmation' => "Confirmation",
   :'en.do_you_want_to_cancel_this_plan' => "Do you want to cancel this plan? Cancelling means you will no longer have insurance. You will not be able to enroll in a new plan unless it’s open enrollment or you qualify for a special enrollment period.",
-  :'en.cancel_plan_confirmation' => "Canceling means you will no longer have health insurance thorugh CoverME.gov. You will not be able to enroll in a new plan unless it's Open Enrollment or if you have a special enrollment period due to a qualifying life event.",
+  :'en.cancel_plan_confirmation' => "Canceling means you will no longer have %{coverage_kind} insurance thorugh CoverME.gov. You will not be able to enroll in a new plan unless it's Open Enrollment or if you have a special enrollment period due to a qualifying life event.",
   :'en.are_you_sure_you_want_to_update_aptc' => "Are you sure you want to update your tax credit? If you make a change today, we’ll apply it to your premium starting on the date listed below.",
   :'en.total_tax_credit_amount' => "The total tax credit amount the people on this plan qualify for is",
   :'en.total_available_aptc_amount' => "The maximum amount you can use for this plan is",
