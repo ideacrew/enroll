@@ -651,6 +651,7 @@ module FinancialAssistance
       return if domestic_partner_relationship.blank?
 
       domestic_partner_relationship_relative = relationships.where(relative_id: domestic_partner_relationship.relative.id).first
+      return if domestic_partner_relationship_relative.blank?
       return domestic_partner_relationship_relative unless ['domestic_partners_child', 'child'].include?(domestic_partner_relationship_relative.kind)
     end
 
