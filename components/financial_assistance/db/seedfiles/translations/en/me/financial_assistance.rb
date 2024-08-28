@@ -294,7 +294,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.filing_as_head_of_household" => "Will this person be filing as head of household?",
   # Year Selection page
   "en.faa.year_selection_header" => "Which Year Would You Like To Apply For?",
-  "en.faa.year_selection_subheader" => "Select which plan year you would like to apply for and then select CONTINUE.",
+  "en.faa.year_selection_subheader" => "Select which plan year you would like to apply for and then select Continue to Next Step.",
   "en.faa.assitance_year_option1" => "%{year} Open Enrollment",
   "en.faa.assitance_year_option2" => "%{year} Report a Life Change",
   "en.faa.year_selection_oe_year" => " Open Enrollment",
