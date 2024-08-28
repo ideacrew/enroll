@@ -153,8 +153,8 @@ module Insured::FamiliesHelper
     link_to qle_title_html || qle.title, @bs4 ? "#" : "javascript:void(0)", options
   end
 
-  def qle_link_generator_for_an_existing_qle(qle, link_title = nil)
-    options = {class: 'existing-sep-item'}
+  def qle_link_generator_for_an_existing_qle(qle, link_title = nil, link_class = nil)
+    options = {class: "existing-sep-item #{link_class}"}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
@@ -336,7 +336,7 @@ module Insured::FamiliesHelper
     return if qle.blank?
     if qle.date_options_available && sep.optional_effective_on.present?
       # Take to the QLE like flow of choosing Option dates if available
-      qle_link_generator_for_an_existing_qle(qle, link_title)
+      qle_link_generator_for_an_existing_qle(qle, link_title, link_class)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
       # Use turbolinks: false, to avoid calling controller action twice.
