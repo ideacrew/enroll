@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div class="confirmation hidden" id="cancel-plan-form">
     <h2><%= l10n("plan_cancelation") %></h2>
-    <p id="cancel-msg" class="action-msg hidden"><%= l10n("cancel_plan_confirmation") %></p>
+    <p id="cancel-msg" class="action-msg hidden"><%= l10n("cancel_plan_confirmation", coverage_kind: locals[:hbx_enrollment][:coverage_kind]) %></p>
     <label class="required" for="cancel_plan"> <%= l10n("cancel_your_plan") %></label>
     <div class="row focus">
       <div class="col-auto">
