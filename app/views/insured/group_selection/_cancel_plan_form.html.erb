@@ -2,19 +2,21 @@
   <div class="confirmation hidden" id="cancel-plan-form">
     <h2><%= l10n("plan_cancelation") %></h2>
     <p id="cancel-msg" class="action-msg hidden"><%= l10n("cancel_plan_confirmation", coverage_kind: locals[:hbx_enrollment][:coverage_kind]) %></p>
-    <%= label_tag :cancel_plan, l10n("cancel_your_plan"), class: "required" %>
-    <div class="row focus">
-      <div class="col-auto">
-        <%= label_tag :cancel_plan_yes do %>
-          <%= radio_button_tag :cancel_plan, "yes", false, class: 'mr-2' %><%= l10n("yes") %>
-        <% end %>
+    <fieldset>
+      <legend class="required"><%= l10n("cancel_your_plan") %></legend>
+      <div class="row focus">
+        <div class="col-auto">
+          <%= label_tag :cancel_plan_yes do %>
+            <%= radio_button_tag :cancel_plan, "yes", false, class: 'mr-2' %><%= l10n("yes") %>
+          <% end %>
+        </div>
+        <div class="col-auto">
+          <%= label_tag :cancel_plan_no do %>
+            <%= radio_button_tag :cancel_plan, "no", false, class: 'mr-2' %><%= l10n("no") %>
+          <% end %>
+        </div>
       </div>
-      <div class="col-auto">
-        <%= label_tag :cancel_plan_no do %>
-          <%= radio_button_tag :cancel_plan, "no", false, class: 'mr-2' %><%= l10n("no") %>
-        <% end %>
-      </div>
-    </div>
+    </fieldset>
     <div id="cancellation_section" class="hidden">
       <%= form_for @self_term_or_cancel_form,
         as: :self_term_or_cancel_form,
@@ -25,8 +27,8 @@
         <%= hidden_field_tag :bs4, true %>
 
         <% if show_termination_calendar? %>
-          <p><%= l10n("choose_last_day") %></p>
-          <%= label :term_date, l10n("coverage_end_date"), class: "required"%>
+          <p class='mt-4 mb-2'><%= l10n("choose_last_day") %></p>
+          <%= label_tag :term_date, l10n("coverage_end_date"), class: "required"%>
           <%= date_field_tag :term_date, nil, { 
             class: "date-field mt-2",
             min: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
@@ -36,12 +38,12 @@
         <% end %>
 
         <% if show_cancellation_reason %>
-          <p class="mt-3"><%= l10n("why_are_you_canceling") %><p>
-          <%= label :cancellation_reason, l10n("cancelation_reason"), class:"required" %>
+          <p class="mt-4 mb-2"><%= l10n("why_are_you_canceling") %><p>
+          <%= label_tag :cancellation_reason, l10n("cancelation_reason"), class:"required" %>
           <%= select_tag :cancellation_reason, options_for_select(cancelation_reasons), prompt: l10n("select_reason"), class: "form-control mt-2", required: show_cancellation_reason %>
         <% end %>
 
-        <div class="mt-3">
+        <div class="mt-4">
           <%= button_tag l10n("keep_plan"), class: "btn outline", id: "btn-keep-plan", onkeydown: "handleButtonKeyDown(event, 'btn-keep-plan')", disabled: false %>
           <%= submit_tag l10n("cancel_plan"), class: "btn btn-error", id: "btn-cancel-plan", disabled: true %>
         </div>
