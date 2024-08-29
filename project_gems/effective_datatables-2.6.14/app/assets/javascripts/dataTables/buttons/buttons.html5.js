@@ -885,15 +885,14 @@ DataTable.ext.buttons.copyHtml5 = {
 			try {
 				var successful = document.execCommand( 'copy' );
 				hiddenDiv.remove();
-
 				if (successful) {
 					dt.buttons.info(
 						dt.i18n( 'buttons.copyTitle', 'Copy to clipboard' ),
 						dt.i18n( 'buttons.copySuccess', {
-							1: 'Copied one row to clipboard',
-							_: 'Copied %d rows to clipboard'
+							1: 'Row(s) copied to clipboard',
+							_: 'Row(s) copied to clipboard'
 						}, exportData.rows ),
-						2000
+						2000, "success"
 					);
 					return;
 				}

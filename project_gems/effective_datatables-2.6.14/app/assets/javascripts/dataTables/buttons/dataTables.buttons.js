@@ -194,7 +194,7 @@ $.extend( Buttons.prototype, {
 		// needed). Take a copy as the array is modified by `remove`
 		var buttons = this.s.buttons.slice();
 		var i, ien;
-		
+
 		for ( i=0, ien=buttons.length ; i<ien ; i++ ) {
 			this.remove( buttons[i].node );
 		}
@@ -515,7 +515,7 @@ $.extend( Buttons.prototype, {
 			config.action.call( dt.button( button ), e, dt, button, config );
 
 			$(dt.table().node()).triggerHandler( 'buttons-action.dt', [
-				dt.button( button ), dt, button, config 
+				dt.button( button ), dt, button, config
 			] );
 		};
 
@@ -860,7 +860,7 @@ $.extend( Buttons.prototype, {
 /**
  * Show / hide a background layer behind a collection
  * @param  {boolean} Flag to indicate if the background should be shown or
- *   hidden 
+ *   hidden
  * @param  {string} Class to assign to the background
  * @static
  */
@@ -938,7 +938,7 @@ Buttons.instanceSelector = function ( group, buttons )
 			ret.push( buttons[ input ].inst );
 		}
 	};
-	
+
 	process( group );
 
 	return ret;
@@ -1474,7 +1474,7 @@ DataTable.Api.registerPlural( 'buttons().remove()', 'buttons().remove()', functi
 
 // Information box that can be used by buttons
 var _infoTimer;
-DataTable.Api.register( 'buttons.info()', function ( title, message, time ) {
+DataTable.Api.register( 'buttons.info()', function ( title, message, time, type = "info") {
 	var that = this;
 
 	if ( title === false ) {
@@ -1497,12 +1497,23 @@ DataTable.Api.register( 'buttons.info()', function ( title, message, time ) {
 
 	title = title ? '<h2>'+title+'</h2>' : '';
 
+  var bs4 = document.documentElement.dataset.bs4;
+  if (bs4) {
+    $('<div id="datatables_buttons_info" class="alert d-flex align-items-start"/>')
+      .addClass( "alert-" + type )
+      .append($('<div class="d-flex pl-1" />')).html('<div class="'+type+'-icon icon" alt="alert-icon">&nbsp;</div>')
+      .append( $('<div class="col mr-auto p-0 align-self-center"/>').html( message ) )
+      .css( 'display', 'none' )
+      .insertBefore( '.dataTables_wrapper' )
+      .fadeIn();
+  } else {
 	$('<div id="datatables_buttons_info" class="dt-button-info"/>')
 		.html( title )
 		.append( $('<div/>')[ typeof message === 'string' ? 'html' : 'append' ]( message ) )
 		.css( 'display', 'none' )
 		.appendTo( 'body' )
 		.fadeIn();
+  }
 
 	if ( time !== undefined && time !== 0 ) {
 		_infoTimer = setTimeout( function () {
