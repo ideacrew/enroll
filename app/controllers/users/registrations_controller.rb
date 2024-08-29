@@ -127,7 +127,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def set_sign_up_warning
     return unless is_flashing_format?
-    set_flash_message :notice, @bs4 ? :signed_up_bs4 : :signed_up, site_name: EnrollRegistry[:enroll_app].setting(:short_name).item
+    flash_type = @bs4 ? :success : :notice
+    flash_message = @bs4 ? :signed_up_bs4 : :signed_up
+    set_flash_message flash_type, flash_message, site_name: EnrollRegistry[:enroll_app].setting(:short_name).item
   end
 
   def enable_bs4_layout
