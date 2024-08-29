@@ -33,8 +33,25 @@
       <%= f.submit l10n('broker_agencies.broker_roles.new_broker_agency_form.create_broker_agency'), class: 'btn btn-primary', id: 'broker-btn', disabled: EnrollRegistry.feature_enabled?(:broker_attestation_fields) %>
     <% end %>
   </div>
-
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var checkboxes = document.getElementById("brokerLanguageOptions").getElementsByTagName("input")
+
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener("change", function() {
+          var checked = Array.from(checkboxes).some(function(checkbox) {
+            return checkbox.checked
+          })
+          var warning = document.getElementById("languageWarning")
+          if (checked) {
+            warning.classList.add("hidden")
+          } else {
+            warning.classList.remove("hidden")
+          }
+        })
+      }
+    });
+
     function validDob(element) {
       let dob = element.value;
       let warningTitle;
