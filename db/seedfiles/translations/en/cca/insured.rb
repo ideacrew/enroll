@@ -325,6 +325,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.from' => "From",
   :'en.date' => "Date",
   :'en.zero_deleted_messages' => "You have zero deleted messages",
+  :'en.no_messages' => "No Messages",
   :'en.back_to_messages' => "Back to Messages",
   :'en.name_hbx_id_ssn' => "Name, HBX ID, SSN",
   :'en.insured.switch_to_aptc_or_csr_families' => "Switch to APTC / CSR Families",
