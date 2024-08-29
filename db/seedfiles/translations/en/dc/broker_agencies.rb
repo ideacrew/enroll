@@ -86,6 +86,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.view" => "View",
 	"en.website_url" => "www.example.com",
   "en.available_working_hours?" => "Weekend/Evening Availability?",
+  "en.broker_form.languages_warning" => "Please select at least one language",
   "en.accepting_new_clients?" => "Accepting New Clients?",
   "en.default_yes_no" => "Yes / No",
   "en.default_select_error" => "Please select an option.",
