@@ -115,7 +115,7 @@ DataTable.ext.buttons.print = {
 			title= title.replace( '*', $('title').first().text() );
 		}
 
-		win.document.close($('title').text());
+		win.document.close();
 
 		// Inject the title and also a copy of the style and link tags from this
 		// document so the table can retain its base styling. Note that we have
