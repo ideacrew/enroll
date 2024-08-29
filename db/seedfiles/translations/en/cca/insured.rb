@@ -497,7 +497,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.cost_cancel' => "I cannot afford the monthly premium",
   :'en.unwanted_cancel' => "I don't want health insurance anymore",
   :'en.other_cancel' => "Other",
-  :'en.cancel_plan_confirmation' => "Canceling means you will no longer have health insurance thorugh CoverME.gov. You will not be able to enroll in a new plan unless it's Open Enrollment or if you have a special enrollment period due to a qualifying life event.",
+  :'en.cancel_plan_confirmation' => "Canceling means you will no longer have %{coverage_kind} insurance thorugh CoverME.gov. You will not be able to enroll in a new plan unless it's Open Enrollment or if you have a special enrollment period due to a qualifying life event.",
   :'en.your_tax_credit' => "Your Tax Credit",
   :'en.make_change_tax_credit' => "If you make a change to your tax credit today, we’ll apply it to your premium starting on the date listed below.",
   :'en.are_you_sure_tax_credit' => "Are you sure you want to update your tax credit?",
