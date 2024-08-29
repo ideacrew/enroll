@@ -16,12 +16,12 @@
               <%= f.hidden_field :id, value: f.object.id %>
               <%= render partial: './ui-components/bs4/v1/forms/broker/profile_information', locals: { f: f } %>
               <%= render partial: './ui-components/bs4/v1/forms/broker/select_language', locals: { f: f } %>
-              <div class="action-group">
+              <div class="action-group mb-4">
                 <% if (aca_broker_routing_information && @agency.profile_type == "broker_agency") %>
                   <%= render "benefit_sponsors/shared/profiles/broker_agency/bank_information", f: f %>
                   <p class="bank-name-container"></p>
                 <% end %>
-              </div><br>
+              </div>
               <div class="action-group">
                 <%= render partial: './ui-components/bs4/v1/forms/broker/contact_information/contact_info_fields', locals: { f: f, registration: false } %>
               <div class="row pl-3">
@@ -30,7 +30,7 @@
                     <%= l10n("cancel") %>
                   <% end %>
                 </span>
-                <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n(".update_broker_agency")%></button>
+                <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency" id="brokerFormSubmit"><%= l10n("update_broker_agency")%></button>
               </div>
             <% end %>
           <% end %>
@@ -38,11 +38,30 @@
       </div>
     </div>
   </div>
-
   <script>
-  var disableSelectric = true;
-  </script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var checkboxes = document.getElementById("brokerLanguageOptions").getElementsByTagName("input")
+      var button = document.getElementById("brokerFormSubmit")
 
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener("change", function() {
+          var checked = Array.from(checkboxes).some(function(checkbox) {
+            return checkbox.checked
+          })
+          var warning = document.getElementById("languageWarning")
+          if (checked) {
+            warning.classList.add("hidden")
+            button.removeAttribute("disabled")
+            button.classList.remove("disabled")
+          } else {
+            warning.classList.remove("hidden")
+            button.setAttribute("disabled", "disabled")
+            button.classList.add("disabled")
+          }
+        })
+      }
+    });
+  </script>
 <% else %>
   <% content_for :head do %>
     <%= javascript_pack_tag 'benefit_sponsors', 'data-turbolinks-track': 'reload' %>
