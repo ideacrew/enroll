@@ -23,7 +23,10 @@ class Users::SessionsController < Devise::SessionsController
 
   def destroy
     current_user.revoke_all_jwts!
-    Operations::Authentication::LogoutSamlUser.new.call(session)
+    saml_logout_attempt = Operations::Authentication::LogoutSamlUser.new.call(session)
+    logger.tagged("SAMLLogoutAttempt") do
+      logger.error saml_logout_attempt.failure.inspect unless saml_logout_attempt.success?
+    end
     super
   end
 
