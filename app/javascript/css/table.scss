@@ -156,3 +156,43 @@ table {
     width: 100% !important;
   }
 }
+
+ // all of these classes were originally inline
+ #broker_agency_staff {
+  .table-responsive {
+    table.broker-staff {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        height: 40px;
+
+        tr {
+          color: var(--text-secondary);
+          border-bottom: 1px solid var(--silver-border);
+          border-radius: 1px 0 0 1px;
+        }
+      }
+
+      tbody.select-broker {
+        &.agency-selected {
+          border: 2px solid var(--button-tertiary-color);
+
+          tr {
+            background-color: var(--tertiary-tint);
+          }
+        }
+
+        tr {
+          border-bottom: 1px solid var(--silver-border);
+
+          td {
+            .select-broker-agency {
+              color: var(--primary-white);
+            }
+          }
+        }
+      }
+    }
+  }
+}
