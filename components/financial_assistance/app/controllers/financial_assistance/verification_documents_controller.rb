@@ -7,8 +7,6 @@ module FinancialAssistance
     include VerificationHelper
 
     before_action :fetch_applicant
-    before_action :find_type, only: [:upload, :update_evidence, :download]
-    before_action :set_document, only: [:destroy]
 
     # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
     # This before_action needs to be called after finding the application
@@ -16,6 +14,9 @@ module FinancialAssistance
     # @before_action
     # @private
     before_action :check_for_uneditable_application
+
+    before_action :find_type, only: [:upload, :update_evidence, :download]
+    before_action :set_document, only: [:destroy]
 
     def upload
       authorize @applicant
