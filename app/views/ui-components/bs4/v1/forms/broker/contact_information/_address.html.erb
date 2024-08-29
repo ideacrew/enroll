@@ -1,6 +1,7 @@
 <div class="pull-right d-flex align-items-center justify-content-between mb-2">
   <h2 class="ol_title"> <%= is_primary ? l10n('address.agency.primary_office_location') : l10n('address.agency.office_location') %></h2>
-  <a class="remove_fields close-2 <%= is_primary ? 'hidden' : ''%>" id="remove-location" tabindex="0" onkeydown="handleButtonKeyDown(event, 'remove-location')" data-action="click->office-locations#removeLocation"><i class="far fa-trash-alt fa-2x role-trashcan"></i></a>
+  <% remove_id ="remove-location-#{f.object.id}" %>
+  <a class="remove_fields close-2 <%= is_primary ? 'hidden' : ''%>" tabindex="0" data-action="click->office-locations#removeLocation"><i class="far fa-trash-alt fa-2x role-trashcan"></i></a>
 </div>
 <div id="address_info">
   <div class="row mb-2">
