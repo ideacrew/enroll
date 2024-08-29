@@ -112,7 +112,7 @@ DataTable.ext.buttons.print = {
 		}
 
 		if ( title.indexOf( '*' ) !== -1 ) {
-			title= title.replace( /\*/g, $('title').first().text() );
+			title= title.replace( '*', $('title').first().text() );
 		}
 
 		win.document.close();
