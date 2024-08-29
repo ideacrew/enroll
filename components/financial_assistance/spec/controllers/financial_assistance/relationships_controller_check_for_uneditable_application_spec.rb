@@ -48,7 +48,7 @@ RSpec.describe FinancialAssistance::RelationshipsController, type: :controller d
       it 'redirects to applications index page' do
         get :index, params: { application_id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -64,7 +64,7 @@ RSpec.describe FinancialAssistance::RelationshipsController, type: :controller d
           kind: 'child'
         }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end

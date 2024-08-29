@@ -37,7 +37,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       it 'redirects to applications index page' do
         get :index, params: { application_id: application.id, applicant_id: applicant.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -48,7 +48,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       it 'redirects to applications index page' do
         get :other, params: { application_id: application.id, applicant_id: applicant.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -59,7 +59,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       it 'redirects to applications index page' do
         get :new, params: { application_id: application.id, applicant_id: applicant.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -70,7 +70,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       it 'redirects to applications index page' do
         get :edit, params: { application_id: application.id, applicant_id: applicant.id, id: income.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -81,7 +81,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       it 'redirects to applications index page' do
         get :step, params: { application_id: application.id, applicant_id: applicant.id, id: income.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -92,7 +92,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       it 'redirects to applications index page' do
         post :create, params: { application_id: application.id, applicant_id: applicant.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -103,7 +103,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       it 'redirects to applications index page' do
         put :update, params: { application_id: application.id, applicant_id: applicant.id, id: income.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -114,7 +114,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       it 'redirects to applications index page' do
         delete :destroy, params: { application_id: application.id, applicant_id: applicant.id, id: income.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end

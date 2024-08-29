@@ -45,7 +45,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
           evidence_kind: 'income_evidence'
         }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -56,7 +56,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
       it 'redirects to insured families verification page' do
         get :download, params: { application_id: application.id, applicant_id: applicant.id, id: evidence.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -67,7 +67,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
       it 'redirects to insured families verification page' do
         delete :destroy, params: { application_id: application.id, applicant_id: applicant.id, id: evidence.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end

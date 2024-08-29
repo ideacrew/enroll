@@ -4,6 +4,7 @@ module FinancialAssistance
   class ApplicationController < ::ApplicationController
     protect_from_forgery with: :exception
     include ::FileUploadHelper
+    include ::L10nHelper
 
     before_action :verify_financial_assistance_enabled
 
@@ -48,7 +49,7 @@ module FinancialAssistance
     def check_for_uneditable_application
       return unless @application&.renewal_draft?
 
-      flash[:alert] = "This application cannot be edited as it is a renewal draft."
+      flash[:alert] = l10n('faa.flash_alerts.uneditable_application')
       redirect_to(applications_path) and return
     end
   end

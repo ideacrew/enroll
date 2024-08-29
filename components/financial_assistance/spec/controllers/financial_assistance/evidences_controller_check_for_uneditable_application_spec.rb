@@ -49,7 +49,7 @@ RSpec.describe FinancialAssistance::EvidencesController, type: :controller do
         }
 
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -66,7 +66,7 @@ RSpec.describe FinancialAssistance::EvidencesController, type: :controller do
         }
 
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -82,7 +82,7 @@ RSpec.describe FinancialAssistance::EvidencesController, type: :controller do
         }
 
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end

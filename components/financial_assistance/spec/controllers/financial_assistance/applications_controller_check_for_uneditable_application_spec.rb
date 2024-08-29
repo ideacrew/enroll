@@ -22,7 +22,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :edit, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -33,7 +33,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :step, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -44,7 +44,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :copy, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -55,7 +55,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :application_year_selection, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -66,7 +66,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :application_checklist, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -77,7 +77,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :review_and_submit, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -88,7 +88,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :review, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -99,7 +99,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :raw_application, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -110,7 +110,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :transfer_history, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -121,7 +121,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :wait_for_eligibility_response, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -132,7 +132,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :eligibility_results, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -143,7 +143,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :application_publish_error, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -154,7 +154,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :eligibility_response_error, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -165,7 +165,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :check_eligibility_results_received, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -176,7 +176,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         get :checklist_pdf, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -187,7 +187,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         post :update_transfer_requested, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
@@ -198,7 +198,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
       it 'redirects to applications index page' do
         post :update_application_year, params: { id: application.id }
         expect(response).to redirect_to(applications_path)
-        expect(flash[:alert]).to eq('This application cannot be edited as it is a renewal draft.')
+        expect(flash[:alert]).to eq(l10n('faa.flash_alerts.uneditable_application'))
       end
     end
   end
