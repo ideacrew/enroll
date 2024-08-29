@@ -2,7 +2,7 @@
   <% if @year_display != hbx_enrollment.effective_on.year %>
       <% @year_display = hbx_enrollment.effective_on.year %>
       <div id="title-<%=@year_display %>" class="module year-group-title <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %> ">
-        <h3 class="text-left"><%= l10n("insured.year_title", year: @year_display) %></h3>
+        <h2 class="text-left"><%= l10n("insured.year_title", year: @year_display) %></h2>
       </div>
     <% else %>
       <script>
