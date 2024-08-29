@@ -1,12 +1,26 @@
 <% agency_languages = @agency&.organization&.profile&.languages_spoken ? @agency&.organization&.profile&.languages_spoken : [] %>
 
-<div class='row'>
+<div class='row' id="brokerLanguageOptions">
   <div class="col-md-12 mb-2">
     <fieldset class="d-block">
       <legend class='d-flex align-items-center justify-content-start'>
         <p class='mb-0 mr-1 required label'><%= l10n('languages') %></p>
         <span class="weight-n secondary-text"><%= "(#{l10n('select_all_that_apply')})" %></span>
       </legend>
+
+      <div id="languageWarning" class="hidden">
+        <div class="alert alert-warning d-flex align-items-start">
+          <div class="d-flex pl-1">
+            <div class="warning-icon icon" alt="info">&nbsp;</div>
+          </div>
+          <div class="col mr-auto p-0 align-self-center">
+            <%= l10n("broker_form.languages_warning") %>
+          </div>
+          <div class="d-flex pl-1">
+            <a class="close-icon icon icon-sm pr-1" alt="Close" href="#">&nbsp;<span class="sr-only">Close</span></a>
+          </div>
+        </div>
+      </div>
 
       <% display_languages.each do |language_group| %>
         <div class='row my-3'>
