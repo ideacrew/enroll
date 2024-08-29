@@ -76,7 +76,11 @@ export default class extends Controller {
       })
 
       if (bs4 == "true") {
-        newLocation.querySelector('a.remove_fields').classList.remove('hidden');
+        var removeButton = newLocation.querySelector('a.remove_fields');
+        removeButton.classList.remove('hidden');
+        var removeButtonId = "remove-button-" + totalLocationsCount;
+        removeButton.id = removeButtonId;
+        removeButton.setAttribute('onkeydown', `handleButtonKeyDown(event, '${removeButtonId}')`);
         newLocation.querySelector('input[placeholder="00000"]').setAttribute('data-action', "");
         newLocation.querySelector(".phone_number").addEventListener('input', (event) => {
           event.target.value = this.fullPhoneMask(event.target.value);
