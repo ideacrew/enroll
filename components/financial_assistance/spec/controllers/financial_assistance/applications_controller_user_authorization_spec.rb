@@ -67,7 +67,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           let!(:params) {{ id: "test" }}
 
           it 'returns application not found error' do
-            expect { get :copy, params: params }.to raise_error
+            expect do
+              get :copy, params: params
+            end.to raise_error(
+              Mongoid::Errors::DocumentNotFound,
+              /#{params[:id]}/
+            )
           end
         end
       end
@@ -206,7 +211,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           let!(:params) {{ id: "test" }}
 
           it 'returns application not found error' do
-            expect { get :copy, params: params }.to raise_error
+            expect do
+              get :copy, params: params
+            end.to raise_error(
+              Mongoid::Errors::DocumentNotFound,
+              /#{params[:id]}/
+            )
           end
         end
       end
@@ -248,7 +258,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
 
           it 'returns application not found error for unauthorized user' do
-            expect { get :copy, params: params }.to raise_error
+            expect do
+              get :copy, params: params
+            end.to raise_error(
+              Mongoid::Errors::DocumentNotFound,
+              /#{params[:id]}/
+            )
           end
         end
       end
@@ -259,7 +274,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
           it 'returns application not found error for unauthorized user' do
             application.update_attributes(:aasm_state => "draft")
-            expect { get :review_and_submit, params: params }.to raise_error
+            expect do
+              get :review_and_submit, params: params
+            end.to raise_error(
+              Mongoid::Errors::DocumentNotFound,
+              /#{params[:id]}/
+            )
           end
         end
       end
@@ -267,16 +287,27 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       context 'GET #review' do
         let!(:params) {{ id: application.id }}
 
-        it 'returns authorization failure' do
-          get :review, params: params
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.review?, (Pundit policy)")
+        it 'raises an error as the application is not related to the family' do
+          expect do
+            get :review, params: params
+          end.to raise_error(
+            Mongoid::Errors::DocumentNotFound,
+            /#{application.id}/
+          )
         end
       end
 
       context "GET application_publish_error" do
         context "With missing family id" do
+          let(:params) { { id: application.id } }
+
           it 'should find application and it is not authorized to view' do
-            expect { get :application_publish_error, params: params }.to raise_error
+            expect do
+              get :application_publish_error, params: params
+            end.to raise_error(
+              Mongoid::Errors::DocumentNotFound,
+              /#{application.id}/
+            )
           end
         end
       end

@@ -710,9 +710,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(assigns(:application)).to eq application
     end
 
-    it "should redirect to applications page" do
-      get :review, params: { id: FinancialAssistance::Application.new.id }
-      expect(response).to redirect_to(applications_path)
+    it 'raises an error if application cannot be found' do
+      input_params = { id: FinancialAssistance::Application.new.id }
+      expect do
+        get :review, params: input_params
+      end.to raise_error(
+        Mongoid::Errors::DocumentNotFound,
+        /#{input_params[:id]}/
+      )
     end
 
     context "when the request type is invalid" do
@@ -769,15 +774,26 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(response).to redirect_to(applications_path)
     end
 
-    it "should redirect to applications page for invalid id" do
-      get :raw_application, params: { id: FinancialAssistance::Application.new.id }
-      expect(response).to redirect_to(applications_path)
+    it 'raises an error if application cannot be found' do
+      input_params = { id: FinancialAssistance::Application.new.id }
+      expect do
+        get :raw_application, params: input_params
+      end.to raise_error(
+        Mongoid::Errors::DocumentNotFound,
+        /#{input_params[:id]}/
+      )
     end
 
-    it "should redirect to applications page for non hbx_staff roles" do
+    it 'raises an error if application cannot be found' do
       user.update_attributes(roles: ["comsumer_role"])
-      get :raw_application, params: { id: FinancialAssistance::Application.new.id }
-      expect(response).to redirect_to(applications_path)
+
+      input_params = { id: FinancialAssistance::Application.new.id }
+      expect do
+        get :raw_application, params: input_params
+      end.to raise_error(
+        Mongoid::Errors::DocumentNotFound,
+        /#{input_params[:id]}/
+      )
     end
 
     context "generate income hash" do
