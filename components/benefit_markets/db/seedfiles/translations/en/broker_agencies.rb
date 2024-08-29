@@ -4,6 +4,8 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_agencies.broker_roles.select_your_broker_agency" => "Select Your Broker Agency",
   "en.search" => "Search",
   "en.submit_application" => "Submit Application",
+  "en.update_broker_agency" => "Update Broker Agency",
+  "en.broker_form.languages_warning" => "Please select at least one language",
   "en.broker_agencies.broker_roles.new_broker_agency_form.broker_agency_information" => "Broker Agency Information",
   "en.broker_agencies.broker_roles.new_broker_agency_form.new_broker_agency_note" => "NOTE: If you are not associated with a broker agency,
                                                                                     please enter your personal information. Do not enter a General Agency or Third Party Administrator‘s Information.",
