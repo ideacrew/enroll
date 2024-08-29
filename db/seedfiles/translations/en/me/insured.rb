@@ -579,7 +579,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.return_to_my_account' => "Return to My Account",
   :'en.plan_cancelation' => "Plan Cancelation",
   :'en.medicare_cancel' => "I'm on Medicare",
-  :'en.medicaid_cancel' => "I'm on Medicaid",
+  :'en.medicaid_cancel' => "I'm on MaineCare (Medicaid)",
   :'en.employer_cancel' => "I have coverage through my employer",
   :'en.spouse_cancel' => "I have coverage through my spouse",
   :'en.parents_cancel' => "I have coverage through my parents",
