@@ -65,8 +65,8 @@ export default class extends Controller {
 
         var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
         input.setAttribute('name', name);
-        // input.setAttribute('id', name);
-        // if (input?.previousElementSibling) input.previousElementSibling.setAttribute('for', name);
+        input.setAttribute('id', name);
+        if (input?.previousElementSibling) input.previousElementSibling.setAttribute('for', name);
 
         if (bs4 == "true" && input.id == "phoneType") {
           input.value = "work";
