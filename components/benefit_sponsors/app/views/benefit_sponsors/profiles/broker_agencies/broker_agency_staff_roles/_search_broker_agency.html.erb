@@ -7,17 +7,20 @@
           <tr>
             <th class="col-5"><%= l10n("legal_name") %></th>
             <th class="col-1"><%= l10n("npn") %></th>
-            <th class="col-2"><%= l10n("primary_broker_name") %></th>
-            <th class="col-3"></th>
+            <th class="col-6"><%= l10n("primary_broker_name") %></th>
           </tr>
         </thead>
         <% @broker_agency_profiles.each do |agency| %>
           <tbody class="select-broker">
             <tr>
-              <td class="col-5 name-col"><%= agency.legal_name %></td>
+              <td class="col-5"><%= agency.legal_name %></td>
               <td class="col-1"><%= agency.primary_broker_role&.npn %></td>
-              <td class="col-2"><%= agency.primary_broker_role&.person&.full_name %></td>
-              <td class="col-3"><a href="javascript:void(0)" class='btn btn-primary select-broker-agency float-right' onclick="selectBrokereAgency(this);" data-broker_agency_profile_id="<%= agency._id %>"><%= l10n("select_this_broker_button") %></a></td>
+              <td class="col-6">
+                <span class="d-flex align-items-center justify-content-between">
+                  <span><%= agency.primary_broker_role&.person&.full_name %></span>
+                  <a href="javascript:void(0)" class='btn btn-primary select-broker-agency float-right' onclick="selectBrokereAgency(this);" data-broker_agency_profile_id="<%= agency._id %>"><%= l10n("select_this_broker_button") %></a>
+                </span>
+              </td>
             </tr>
           </tbody>
         <% end %>
