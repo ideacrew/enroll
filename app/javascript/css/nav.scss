@@ -85,6 +85,14 @@ header.navbar-primary {
     width: 100vw;
     height: 100vh;
   }
+
+  .multi-role-dropdown {
+    top: 35px;
+    width: 250px;
+    font-size: inherit;
+    left: -130px;
+    box-shadow: 0px 3.2px 7.2px 0px var(--nav-dropdown-drop-shadow);
+  }
 }
 
 // progress layout nav pane
