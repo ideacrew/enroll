@@ -59,11 +59,11 @@ module Bs4
         nil
       elsif current_user.try(:has_hbx_staff_role?)
         link_to(ltext, main_app.exchanges_hbx_profiles_root_path)
-      elsif display_i_am_broker_for_consumer?(current_user.person) && controller_path.exclude?('general_agencies')
-        link_to(ltext, get_broker_profile_path)
       elsif user_has_multiple_roles?
         roles = all_non_admin_roles
         render partial: 'ui-components/bs4/v1/navs/multi_role_my_portal_links', locals: roles
+      elsif display_i_am_broker_for_consumer?(current_user.person) && controller_path.exclude?('general_agencies')
+        link_to(ltext, get_broker_profile_path)
       elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
         link_to(ltext, main_app.home_exchanges_agents_path)
       elsif current_user.person&.active_employee_roles&.any?
