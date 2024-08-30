@@ -257,6 +257,7 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_carrier_appointments_enabled_note" => "Note: All Carrier appointments for brokers may not be necessary for participation in %{site_long_name}.",
 	"en.write_here" => "Write here",
 	"en.broker_agencies.profiles.npn_taken_error" => "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.",
+  "en.broker_agencies.registrations.errors.language_options"=> "Languages cannot be blank",
 	"en.broker_agencies.broker_invitation.thank_you_registering" => "Thank you for registering as a broker through %{site_short_name}.",
 	"en.broker_agencies.broker_invitation.create_broker_acc" => "Please visit <a href= %{url} target='_blank' rel='noopener noreferrer'> %{site_short_name} </a> to create your broker account and manage your clients.",
 	"en.broker_agencies.broker_application_confirm.thank_you" => "Thank you for submitting your broker application to %{site_short_name}. Please allow 7-10 business days for %{site_short_name} to review your application.",

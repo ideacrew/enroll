@@ -41,6 +41,8 @@ module BenefitSponsors
       validate :validate_routing_information, if: :is_broker_profile?
       validates_presence_of :referred_reason, if: :is_referred_by_other?
 
+      validate :validate_at_least_one_language_selected, if: :is_broker_profile?
+
       def initialize(params = {})
         super(params)
       end
@@ -99,6 +101,12 @@ module BenefitSponsors
         end
       end
 
+      def validate_at_least_one_language_selected
+        return true unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
+        return if self&.language_options&.any?
+
+        errors.add(:base, l10n("broker_agencies.registrations.errors.language_options"))
+      end
     end
   end
 end
