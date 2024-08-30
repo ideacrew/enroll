@@ -3,7 +3,7 @@
 # Here is a comment
 module Bs4
   # this is used with the new bs4 header
-  module Bs4HeaderHelper
+  module Bs4HeaderHelper # rubocop:disable Metrics/ModuleLength
     include L10nHelper
     include ApplicationHelper
 
@@ -61,6 +61,9 @@ module Bs4
         link_to(ltext, main_app.exchanges_hbx_profiles_root_path)
       elsif display_i_am_broker_for_consumer?(current_user.person) && controller_path.exclude?('general_agencies')
         link_to(ltext, get_broker_profile_path)
+      elsif user_has_multiple_roles?
+        roles = all_non_admin_roles
+        render partial: 'ui-components/bs4/v1/navs/multi_role_my_portal_links', locals: roles
       elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
         link_to(ltext, main_app.home_exchanges_agents_path)
       elsif current_user.person&.active_employee_roles&.any?
@@ -113,6 +116,35 @@ module Bs4
       else
         person.broker_role.present?
       end
+    end
+
+    def user_has_multiple_roles?
+      # if user has at least two different types of roles, return true
+      return true if all_non_admin_roles.values.select(&:present?).size > 1
+
+      # if user has more than one of the same type of role, return true
+      [
+        all_non_admin_roles[:employer_staff_roles],
+        all_non_admin_roles[:broker_roles],
+        all_non_admin_roles[:general_agency_roles]
+      ].any? { |roles| roles.size > 1 }
+    end
+
+    def all_non_admin_roles
+      @all_non_admin_roles ||= determine_user_roles
+    end
+
+    def determine_user_roles
+      roles = {}
+      person = current_user&.person
+      return roles unless person.present?
+
+      roles[:consumer_role] = insured_role_exists?(current_user)
+      roles[:csr_or_assistant] = person.csr_role || person.assister_role
+      roles[:broker_roles] = person.active_broker_staff_roles
+      roles[:general_agency_roles] = person.active_general_agency_staff_roles
+      roles[:employer_staff_roles] = person.active_employer_staff_roles
+      roles
     end
   end
 end
