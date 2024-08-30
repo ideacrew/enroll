@@ -2,7 +2,68 @@
 // These will only be applied if the contrast level is set to true in the layout.
 [data-contrast='true'] {
   --font: Barlow, sans-serif;
+
+  // these colors should be remove from this file and added to the colors.scss file
+  // once bootstrap is turned on in production
   --placeholder-font-weight: 400;
+  --secondary-font-color: #676c72; //secondary text gray
+  --bold-font-color: #323130; //bold text
+  --theme-primary-blue: #3b6b90; //primary blue
+  --theme-secondary: #425c6e; //secondary dark blue
+  --primary-red: #d42537; //primary red
+  --background-light-red: #f9f1f1; //error notice background color
+  --primary-green: #5a7334; //green continue buttons
+  --secondary-green: #738c4a; //green for continue button hover
+  --success-green-background: #e3f9e6; //green for success pill
+
+  --primary-yellow: #ffd600;
+  --soft-yellow: #fffadf;
+  --primary-white: #ffffff;
+  --primary-black: #000000;
+  --alert-notice-green: #62703e; //success notice green
+  --soft-blue: #d6ebff; //home page right nav text color
+
+  --status-red: #a21e1f; //status danger
+  --status-red-hover: #85191a; //status danger
+  --status-red-active: #671314; //status danger
+  --status-blue: #003260; //status pending
+  --status-yellow: #e5a900; //status needs info
+  --status-green: #027314; //status complete
+  --light-gray: #a19f9d;
+
+  --default-font-color: #323130;
+
+  --placeholder-color: #676767;
+  --floatlabel-color: #767676;
+  --floatlabel-onclick-color: #676767;
+  --input-text-color: #454545;
+  --form-element-text-color: #454545;
+
+  --button-default-color: #3d5d6f;
+  --button-default-hover-color: #314a59;
+  --button-default-active-color: #253843;
+
+  --button-primary-color: #3d5d6f;
+  --button-primary-hover-color: #314a59;
+  --button-primary-active-color: #253843;
+
+  --button-secondary-color: #3b6b90;
+  --button-secondary-hover-color: #345f80;
+  --button-secondary-active-color: #274760;
+
+  --button-tertiary-color: #647f3a;
+  --button-tertiary-hover-color: #50662e;
+  --button-tertiary-active-color: #3c4c23;
+
+  --button-error-color: var(--status-red);
+  --button-error-hover-color: var(--status-red-hover);
+  --button-error-active-color: var(--status-red-active);
+
+  --enrollment-status-red: #a21e1f;
+  --enrollment-status-green: #027314;
+  --enrollment-status-yellow: #e5a900;
+  --enrollment-status-blue: #003260;
+  --enrollment-status-grey: #3b3a39;
 
   .warning-notice {
     padding: 8px 14px 8px 14px;
