@@ -221,7 +221,6 @@ module FinancialAssistance
 
     def review
       save_faa_bookmark(request.original_url)
-      @application = FinancialAssistance::Application.where(id: params["id"]).first
       return redirect_to applications_path if @application.blank?
 
       authorize @application, :review?
@@ -237,8 +236,6 @@ module FinancialAssistance
         redirect_to applications_path
         return
       end
-
-      @application = FinancialAssistance::Application.where(id: params['id'], family_id: get_current_person.financial_assistance_identifier).first
 
       if @application.nil? || @application.is_draft?
         redirect_to applications_path
