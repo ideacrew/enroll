@@ -127,7 +127,7 @@ module Bs4
         all_non_admin_roles[:employer_staff_roles],
         all_non_admin_roles[:broker_roles],
         all_non_admin_roles[:general_agency_roles]
-      ].any? { |roles| roles.size > 1 }
+      ].any? { |roles| roles.present? && roles.size > 1 }
     end
 
     def all_non_admin_roles
