@@ -2,7 +2,6 @@
 
 module FinancialAssistance
   module ApplicationHelper
-
     def to_est(datetime)
       datetime.in_time_zone("Eastern Time (US & Canada)") if datetime.present?
     end
@@ -11,12 +10,14 @@ module FinancialAssistance
       eds = FinancialAssistance::Application.find(application_id).eligibility_determinations
       eds.map(&:max_aptc).flat_map(&:to_f).inject(:+)
     end
+
     def eligible_applicants(application_id, eligibility_flag)
       application = FinancialAssistance::Application.find(application_id)
       full_names = application.active_applicants.where(eligibility_flag => true).map(&:full_name)
       # capitalize each name of full name individually, as titleize will cause spacing issues if multiple capital letters already in applicant name
       full_names.map{ |full_name| capitalize_full_name(full_name) }
     end
+
     def any_csr_ineligible_applicants?(application_id)
       application = FinancialAssistance::Application.find(application_id)
       application.eligibility_determinations.inject([]) do |csr_eligible, ed_obj|
@@ -370,6 +371,38 @@ module FinancialAssistance
 
       year_selection_enabled = FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form))
       @assistance_year = year_selection_enabled ? @application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
+    end
+
+    def benefit_coverage_period_info
+      return @benefit_coverage_period_info if defined? @benefit_coverage_period_info
+
+      current_hbx = HbxProfile.current_hbx
+      is_under_open_enrollment = current_hbx.under_open_enrollment?
+      latest_benefit_coverage_period = current_hbx.benefit_sponsorship.benefit_coverage_periods.last
+      open_enrollment_start_on = latest_benefit_coverage_period.open_enrollment_start_on
+      open_enrollment_end_on = latest_benefit_coverage_period.open_enrollment_end_on
+
+      @benefit_coverage_period_info = {
+        is_under_open_enrollment: is_under_open_enrollment,
+        not_under_open_enrollment: !is_under_open_enrollment,
+        open_enrollment_start_on: open_enrollment_start_on,
+        open_enrollment_end_on: open_enrollment_end_on
+      }
+    end
+
+    def can_display_coverage_update_reminder?
+      FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && benefit_coverage_period_info[:is_under_open_enrollment]
+    end
+
+    def can_display_oe_application_warning?
+      FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && benefit_coverage_period_info[:not_under_open_enrollment] && (TimeKeeper.date_of_record >= bulk_application_renewal_trigger_date)
+    end
+
+    def bulk_application_renewal_trigger_date
+      day = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_day).item
+      month = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_month).item
+      year = TimeKeeper.date_of_record.year
+      Date.new(year, month, day)
     end
   end
 end
