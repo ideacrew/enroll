@@ -489,7 +489,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.plan_cancelation' => "Plan Cancelation",
   :'en.cancel_your_plan' => "Cancel Your Plan?",
   :'en.medicare_cancel' => "I'm on Medicare",
-  :'en.medicaid_cancel' => "I'm on Medicaid",
+  :'en.medicaid_cancel' => "I'm on MaineCare (Medicaid)",
   :'en.employer_cancel' => "I have coverage through my employer",
   :'en.spouse_cancel' => "I have coverage through my spouse",
   :'en.parents_cancel' => "I have coverage through my parents",
