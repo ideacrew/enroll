@@ -1,5 +1,4 @@
 <% if EnrollRegistry.feature_enabled?(:home_tiles_group_by_year) %>
-  <% puts "\n\n\n\n\n" %>
   <% if @year_display != hbx_enrollment.effective_on.year %>
       <% @year_display = hbx_enrollment.effective_on.year %>
       <div id="title-<%=@year_display %>" class="module year-group-title <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) || (defined?(edit_plan) && edit_plan == true) %> ">
