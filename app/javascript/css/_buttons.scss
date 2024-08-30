@@ -232,3 +232,20 @@ button.accordion-action {
   margin-top: 1rem;
   translate: 0.25rem 0;
 }
+
+button.text-button {
+  background-color: transparent;
+  border: none;
+  color: var(--button-primary-color);
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: normal;
+  padding: 0;
+  &:hover {
+    background-color: transparent;
+    color: var(--button-primary-active-color);
+  }
+  &:active {
+    color: var(--button-primary-active-color);
+  }
+}
