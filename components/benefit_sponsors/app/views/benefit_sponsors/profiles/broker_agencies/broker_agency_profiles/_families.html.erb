@@ -76,6 +76,17 @@
           "p" +
           ">"
         } );
+
+        var logoLink = document.getElementById("link-home-logo");
+    
+        logoLink.addEventListener("click", function(e) {
+          e.preventDefault();
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get('id');
+          const homeUrl = `/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/${id}`;
+
+          window.location.replace(homeUrl);
+        });
       });
   </script>
   </div>
