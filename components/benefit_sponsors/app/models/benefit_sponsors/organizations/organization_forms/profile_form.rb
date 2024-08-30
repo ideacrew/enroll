@@ -4,6 +4,7 @@ module BenefitSponsors
       include Virtus.model
       include ActiveModel::Validations
       include Config::AcaHelper
+      include ::L10nHelper
 
       attribute :id, String
       attribute :market_kind, Symbol
@@ -105,7 +106,7 @@ module BenefitSponsors
         return true unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
         return if self&.language_options&.any?
 
-        errors.add(:base, l10n("broker_agencies.registrations.errors.language_options"))
+        errors.add(:base, l10n("broker_agencies.profiles.errors.language_options"))
       end
     end
   end
