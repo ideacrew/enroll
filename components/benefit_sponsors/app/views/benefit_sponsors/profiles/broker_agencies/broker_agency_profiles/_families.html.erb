@@ -80,7 +80,6 @@
         var logoLink = document.getElementById("link-home-logo");
     
         logoLink.addEventListener("click", function(e) {
-          console.log('click event listener');
           e.preventDefault();
           const urlParams = new URLSearchParams(window.location.search);
           const id = urlParams.get('id');
