@@ -105,7 +105,7 @@ module BenefitSponsors
         return true unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
         return if self&.language_options&.any?
 
-        errors.add(:base, "Languages cannot be blank")
+        errors.add(:base, l10n("broker_agencies.registrations.errors.language_options"))
       end
     end
   end
