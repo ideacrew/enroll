@@ -1,8 +1,8 @@
 <% if EnrollRegistry.feature_enabled?(:home_tiles_group_by_year) %>
   <% if @year_display != hbx_enrollment.effective_on.year %>
       <% @year_display = hbx_enrollment.effective_on.year %>
-      <div id="title-<%=@year_display %>" class="module year-group-title <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %> ">
-        <h2 class="text-left"><%= l10n("insured.year_title", year: @year_display) %></h2>
+      <div id="title-<%=@year_display %>" class="module year-group-title <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) || (defined?(edit_plan) && edit_plan == true) %> ">
+        <h2 class="text-left"><%= l10n("insured.year_title", year: @year_display) %> <%= @bs4 && site_key == :me ? l10n('coverage') : '' %></h2>
       </div>
     <% else %>
       <script>
