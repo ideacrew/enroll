@@ -89,11 +89,7 @@
           </span>
         </li>
       <% end %>
-      <li>
-        <% if signed_in? %>
-          <%= render partial: "shared/my_portal_links" %>
-        <% end %>
-      </li>
+      <li><% if signed_in? %><%= render partial: "shared/my_portal_links" %><% end %></li>
       <li class="nav-item my-2"><%= h(link_to l10n('layout.header.help'), EnrollRegistry[:enroll_app].setting(:help_url).item, target: '_blank', rel: "noopener noreferrer") %></li>
     </ul>
 
