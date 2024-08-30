@@ -14,6 +14,7 @@ LAYOUT_TRANSLATIONS = {
   "en.layout.header.role.employee" => "Employee",
   "en.layout.header.role.individual_and_family" => "Individual and Family",
   "en.layout.header.portal" => "My Portal",
+  "en.layout.header.multi_role_dropdown_text" => "You can move between your insured and broker accounts using this My Portal link.",
   "en.layout.footer.all_rights" => "All Rights Reserved.",
   "en.layout.footer.get_help" => "Get Help",
 }
