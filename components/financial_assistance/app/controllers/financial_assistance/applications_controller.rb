@@ -7,14 +7,6 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new]
-
-    # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
-    # This before_action needs to be called after finding the application
-    #
-    # @before_action
-    # @private
-    before_action :check_for_uneditable_application
-
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
     include ActionView::Helpers::SanitizeHelper
