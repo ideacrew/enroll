@@ -4,6 +4,7 @@ module FinancialAssistance
   class ApplicationController < ::ApplicationController
     protect_from_forgery with: :exception
     include ::FileUploadHelper
+    include ::L10nHelper
 
     before_action :verify_financial_assistance_enabled
 
@@ -40,6 +41,16 @@ module FinancialAssistance
       raw_support_text.update(raw_support_text).each do |_key, value|
         value.gsub! '<application-applicable-year>', @application.assistance_year.to_s if value.include? '<application-applicable-year>'
       end
+    end
+
+    # Checks if the application is a renewal draft and if so, sets a flash message and redirects to the applications path.
+    #
+    # @return [void]
+    def check_for_uneditable_application
+      return unless @application&.renewal_draft?
+
+      flash[:alert] = l10n('faa.flash_alerts.uneditable_application')
+      redirect_to(applications_path) and return
     end
   end
 end
