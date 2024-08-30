@@ -9,6 +9,13 @@ module FinancialAssistance
     before_action :load_support_texts, only: [:index]
     before_action :set_cache_headers, only: [:index]
 
+    # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
+    # This before_action needs to be called after finding the application
+    #
+    # @before_action
+    # @private
+    before_action :check_for_uneditable_application
+
     def index
       authorize @applicant, :index?
 

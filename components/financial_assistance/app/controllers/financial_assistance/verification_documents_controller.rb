@@ -7,6 +7,14 @@ module FinancialAssistance
     include VerificationHelper
 
     before_action :fetch_applicant
+
+    # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
+    # This before_action needs to be called after finding the application
+    #
+    # @before_action
+    # @private
+    before_action :check_for_uneditable_application
+
     before_action :find_type, only: [:upload, :update_evidence, :download]
     before_action :set_document, only: [:destroy]
 
@@ -99,6 +107,8 @@ module FinancialAssistance
                    elsif current_user.try(:person).try(:agent?) && session[:person_id].present?
                      FinancialAssistance::Applicant.find(session[:person_id])
                    end
+
+      @application = @applicant&.application if @application.blank?
 
       redirect_to maain_app.logout_saml_index_path unless fetch_applicant_succeeded?
     end
