@@ -51,6 +51,7 @@
               data: { profile_type: "broker_agency_staff" },
               success: function (data) {
                 $("#broker_agency_staff").html(data);
+                indicateRequiredFields();
                 setTimeout(function () {
                   initDatepicker('inputStaffDOB', new Date("<%= Date.today.beginning_of_month - 90.years %>"), new Date("<%= Date.today.end_of_month - 18.years %>"));
 
