@@ -176,7 +176,7 @@ group :test do
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.18.0'
   gem 'webdrivers', '~> 5.3.1'
-  gem 'webmock',                      '~> 3.0.1'
+  gem 'webmock',                      '~> 3.9.0'
 end
 
 group :production do
