@@ -139,7 +139,7 @@ module Bs4
       person = current_user&.person
       return roles unless person.present?
 
-      roles[:consumer_role] = insured_role_exists?(current_user)
+      roles[:consumer_role] = person.has_consumer_role?
       roles[:csr_or_assistant] = person.csr_role || person.assister_role
       roles[:broker_roles] = person.active_broker_staff_roles
       roles[:general_agency_roles] = person.active_general_agency_staff_roles

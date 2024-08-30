@@ -65,26 +65,26 @@ class Products::QhpCostShareVariance
 
   def plan
     # return @qhp_plan if defined? @qhp_plan
-    Rails.cache.fetch("qcsv-plan-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hour) do
+    # Rails.cache.fetch("qcsv-plan-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hour) do
       plan = Plan.where(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id).first
       if plan.blank?
         plan = Plan.where(active_year: qhp.active_year, hios_id: hios_plan_and_variant_id.split('-')[0]).first if dental?
       end
       plan
-    end
+    # end
   end
 
   def product
     if product_id.present?
       ::BenefitMarkets::Products::Product.find(product_id)
     else
-      Rails.cache.fetch("qcsv-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
+      # Rails.cache.fetch("qcsv-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
         product = BenefitMarkets::Products::Product.where(hios_id: /#{hios_plan_and_variant_id}/).select{|a| a.active_year == qhp.active_year}.first
         if product.blank?
           product = BenefitMarkets::Products::Product.where(hios_id: /#{hios_plan_and_variant_id.split('-')[0]}/).select{|a| a.active_year == qhp.active_year}.first if dental?
         end
         product
-      end
+      # end
     end
   end
 
@@ -95,14 +95,14 @@ class Products::QhpCostShareVariance
 
     return qhp_product if market_kinds.include?(qhp_product.benefit_market_kind) || dental?
 
-    Rails.cache.fetch("qcsv--#{market_kind}-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
+    # Rails.cache.fetch("qcsv--#{market_kind}-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
       BenefitMarkets::Products::Product.where(
         :hios_base_id => /#{qhp_product.hios_base_id}/,
         :"application_period.min".gte => Date.new(qhp.active_year, 1, 1), :"application_period.max".lte => Date.new(qhp.active_year, 1, 1).end_of_year,
         :kind => qhp_product.kind,
         :benefit_market_kind.in => market_kinds
       ).first
-    end
+    # end
   end
 
   private
