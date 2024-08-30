@@ -492,4 +492,55 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
     end
   end
+
+  context "can_display_oe_application_warning?" do
+    let(:current_hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: current_hbx_profile) }
+    let(:benefit_coverage_period) { current_hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:oe_application_warning_display).and_return(true)
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
+    end
+
+    after(:each) do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    it 'should return false if system date is not within open enrollment' do
+      TimeKeeper.set_date_of_record_unprotected!(benefit_coverage_period.open_enrollment_start_on - 1.day)
+      expect(helper.can_display_oe_application_warning?).to eq(true)
+    end
+
+    it 'should return true if system date is within open enrollment' do
+      TimeKeeper.set_date_of_record_unprotected!(benefit_coverage_period.open_enrollment_start_on + 1.day)
+      expect(helper.can_display_oe_application_warning?).to eq(false)
+    end
+  end
+
+  context 'can_display_coverage_update_reminder?' do
+    let(:current_hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: current_hbx_profile) }
+    let(:benefit_coverage_period) { current_hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:oe_application_warning_display).and_return(true)
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
+    end
+
+    after(:each) do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    it 'should return false if system date is not within open enrollment' do
+      TimeKeeper.set_date_of_record_unprotected!(benefit_coverage_period.open_enrollment_start_on - 1.day)
+      expect(helper.can_display_coverage_update_reminder?).to eq(false)
+    end
+
+    it 'should return true if system date is within open enrollment' do
+      TimeKeeper.set_date_of_record_unprotected!(benefit_coverage_period.open_enrollment_start_on + 1.day)
+      expect(helper.can_display_coverage_update_reminder?).to eq(true)
+    end
+
+  end
 end
