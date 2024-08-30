@@ -102,6 +102,7 @@ module BenefitSponsors
       end
 
       def validate_at_least_one_language_selected
+        return true unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
         return if self&.language_options&.any?
 
         errors.add(:base, "Languages cannot be blank")
