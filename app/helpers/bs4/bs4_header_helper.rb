@@ -3,7 +3,7 @@
 # Here is a comment
 module Bs4
   # this is used with the new bs4 header
-  module Bs4HeaderHelper
+  module Bs4HeaderHelper # rubocop:disable Metrics/ModuleLength
     include L10nHelper
     include ApplicationHelper
 
