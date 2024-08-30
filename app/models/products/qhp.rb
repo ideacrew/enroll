@@ -159,9 +159,9 @@ class Products::Qhp
   end
 
   def self.get_cost_share_variances
-    Rails.cache.fetch("csvs-hios-ids-#{@hios_ids}-year-#{@year}", expires_in: 5.hour) do
+    # Rails.cache.fetch("csvs-hios-ids-#{@hios_ids}-year-#{@year}", expires_in: 5.hour) do
       Products::QhpCostShareVariance.find_qhp_cost_share_variances(@hios_ids, @year, "")
-    end
+    # end
   end
 
   def self.csv_for(qhps, visit_types)
