@@ -1,0 +1,43 @@
+<a href="#" class="header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><%= l10n("layout.header.portal") %></a>
+<ul class="dropdown-menu p-2 multi-role-dropdown">
+  <% if current_user.hints == true %>
+    <li class='mb-3'>
+      <div class="panel panel-default">
+        <div class="panel-body"><%= l10n("layout.header.multi_role_dropdown_text") %></div>
+      </div>
+    </li>
+  <% end %>
+  <% if consumer_role %>
+    <% if eligible_to_redirect_to_home_page?(current_user) %>
+      <li><%= link_to l10n('layout.header.role.individual_and_family'), main_app.family_account_path(tab: 'home'), class: 'header-text' %></li>
+    <% else %>
+      <li><%= sanitize link_to l10n('layout.header.role.individual_and_family'), current_user.person&.consumer_role&.bookmark_url, class: 'header-text' %></li>
+    <% end %>
+  <% end %>
+  <% if csr_or_assistant %>
+    <li><%= link_to(l10n("layout.header.role.trained_expert"), main_app.home_exchanges_agents_path) %></li>
+  <% end %>
+  <% employer_staff_roles.each do |employer_staff_role| %>
+    <% id = employer_staff_role.benefit_sponsor_employer_profile_id %>
+    <% employer = BenefitSponsors::Organizations::Profile.find(id) %>
+    <li><%= link_to employer.organization.legal_name, benefit_sponsors.profiles_employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
+  <% end %>
+  <% broker_roles.each do |broker_staff_role| %>
+    <% profile = broker_staff_role.broker_agency_profile %>
+    <% if profile.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile %>
+      <% broker_link = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(profile, tab: 'home') %>
+    <% end %>
+    <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
+  <% end %>
+  <% general_agency_roles.each do |ga_staff_role| %>
+    <% profile = ga_staff_role.general_agency_profile %>
+
+    <% if profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile %>
+      <% ga_link = benefit_sponsors.profiles_general_agencies_general_agency_profile_path(profile, tab: 'home') %>
+    <% else %>
+      <% ga_link = main_app.general_agencies_profile_path(profile) %>
+    <% end %>
+
+    <li style="text-align:left"><%= link_to profile.legal_name, ga_link, class: 'header-text' %></li>
+  <% end %>
+</ul>
