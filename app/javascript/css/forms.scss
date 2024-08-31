@@ -371,3 +371,7 @@ input[type='date']:invalid::-webkit-datetime-edit {
     border: none;
   }
 }
+
+#update_tax_credit_section input[type="number"] {
+  width: 100px;
+}
