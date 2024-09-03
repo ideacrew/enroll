@@ -677,18 +677,6 @@ a.disabled {
   border-bottom: 1px solid var(--body-divider);
 }
 
-.plan-card {
-  background: var(--grey-010);
-
-  .plan-footer {
-    a:not(.btn) {
-      text-decoration: none;
-      font-weight: 600;
-      color: var(--info-color);
-    }
-  }
-}
-
 .actions-dropdown {
   border: 1px solid var(--grey-100);
 

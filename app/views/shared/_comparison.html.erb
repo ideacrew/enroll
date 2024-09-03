@@ -96,7 +96,7 @@
             <% qhps.each do |qhp|%>
               <td colspan="2" class="rb2">
                 <div class="plan_comparison">
-                  <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.product_for(@market_kind) } %>
+                  <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.product_for(@market_kind), hide_pdf_icon: true } %>
                 </div>
               </td>
             <% end %>
