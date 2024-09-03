@@ -27,12 +27,12 @@ module Operations
           def call
             benefit_coverage_values, coverage_years = yield fetch_benefits
             eligible_families = yield fetch_eligible_families(coverage_years[0])
-            application_states = yield application_states_by_year(coverage_years)
-            mapped_states = yield map_states_to_years(application_states, coverage_years)
+            mapped_application_states = yield application_states_by_year(coverage_years)
+            enrollment_states = yield fetch_enrollment_states(coverage_years)
             person_hbx_ids = yield primary_person_hbx_ids(coverage_years[0])
             oe_determined_notices = yield oe_determined_notices_count(coverage_years[0], person_hbx_ids)
 
-            Success([eligible_families, mapped_states, benefit_coverage_values, oe_determined_notices])
+            Success([eligible_families, mapped_application_states, benefit_coverage_values, oe_determined_notices, enrollment_states])
           end
 
           private
@@ -61,16 +61,16 @@ module Operations
             application_states = aggregate_collection(::FinancialAssistance::Application.collection, application_pipeline(coverage_years)).sort_by { |state| -state['assistance_year'] }
 
             if application_states.collect { |as| as["assistance_year"] }.compact.flatten.count > 0
-              Success(application_states)
+              Success(map_states_to_years(application_states, coverage_years))
             else
-              Failure(["application_states_by_year: Unable to query Applications count", skeleton(coverage_years)])
+              Success(skeleton_for_applications(coverage_years))
             end
           rescue StandardError => e
             Failure(["application_states_by_year: error: #{e.message}", skeleton(coverage_years)])
           end
 
-          def map_states_to_years(application_states, coverage_years)
-            output = application_states.each_with_object({}) do |hash, result|
+          def map_states_to_years(application_states, _coverage_years)
+            application_states.each_with_object({}) do |hash, result|
               year = hash["assistance_year"]
               states = hash["application_states"]
 
@@ -81,10 +81,36 @@ module Operations
 
               result[year] = mapped_states
             end
+          end
 
-            Success(output)
+          def fetch_enrollment_states(coverage_years)
+            year = coverage_years[0]
+            pipeline = ::Operations::HbxAdmin::DryRun::Individual::EnrollmentsPipeline.new.call(effective_on: Date.new(year, 1, 1), aasm_states: HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES)
+            return Success(skeleton_for_enrollments(year)) if pipeline.failure?
+
+            enrollment_states = aggregate_collection(HbxEnrollment.collection, pipeline.value!).to_a
+
+            if enrollment_states.present?
+              Success(map_enrollment_kinds(enrollment_states))
+            else
+              Success(skeleton_for_enrollments(year))
+            end
           rescue StandardError => e
-            Failure(["map_states_to_years: error: #{e.message}", skeleton(coverage_years)])
+            Failure(["fetch_enrollment_states: error: #{e.message}", skeleton(coverage_years)])
+          end
+
+          def map_enrollment_kinds(enrollment_states)
+            enrollment_states.each_with_object({}) do |hash, result|
+              coverage_kind = hash["coverage_kind"]
+              without_aptc = hash['without_aptc']
+              with_aptc = hash['with_aptc']
+
+              result[coverage_kind] = if coverage_kind == "dental"
+                                        without_aptc
+                                      else
+                                        { "without_aptc" => without_aptc, "with_aptc" => with_aptc }
+                                      end
+            end
           end
 
           def primary_person_hbx_ids(year)
@@ -137,17 +163,31 @@ module Operations
             end
           end
 
+          def skeleton_for_enrollments(_year)
+            {'health' =>
+            {'without_aptc' => {'auto_renewing' => 0, 'coverage_selected' => 0, 'renewing_coverage_selected' => 0 },
+             'with_aptc' => {'auto_renewing' => 0, 'coverage_selected' => 0, 'renewing_coverage_selected' => 0 }},
+             'dental' => {'auto_renewing' => 0, 'coverage_selected' => 0, 'renewing_coverage_selected' => 0 }}
+          end
+
+          def skeleton_for_applications(coverage_years)
+            coverage_years.each_with_object({}) do |year, hash|
+              hash[year] = APPLICATION_STATES.each_with_object({}) do |aasm_state, h|
+                h[aasm_state] = 0
+              end
+            end
+          end
+
           # Default Hash
           # Generates a skeleton hash for application states by coverage years.
           #
           # @param coverage_years [Array<Integer>] The coverage years.
           # @return [Hash] The skeleton hash for application states.
           def skeleton(coverage_years)
-            coverage_years.each_with_object({}) do |year, hash|
-              hash[year] = APPLICATION_STATES.each_with_object({}) do |aasm_state, h|
-                h[aasm_state] = 0
-              end
-            end
+            hash = {}
+            hash.merge!("mapped_states" =>  skeleton_for_applications(coverage_years))
+            hash.merge!("oe_determined_notices" => skeleton_for_notices)
+            hash.merge!("enrollment_states" => skeleton_for_enrollments(coverage_years[0]))
           end
 
           # Generates an aggregation pipeline for applications.
