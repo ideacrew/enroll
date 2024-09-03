@@ -32,14 +32,14 @@ And(/^current hbx is under open enrollment$/) do
   HbxProfile.any_instance.stub(:under_open_enrollment?).and_return(true)
 end
 
-And(/^system date is on_after application renewals generation date and before open enrollment start date$/) do
-  oe_start_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.start_on.year == Date.today.year}.open_enrollment_start_on
-  allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(oe_start_on.year,10,27)
+And(/^current date is between renewals generation date and open enrollment start on$/) do
+  oe_start_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp.start_on.year == Date.today.year }.open_enrollment_start_on
+  allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(oe_start_on.year, 10, 27)
 end
 
-And(/^system date is before application renewals generation date or on_after open enrollment start date$/) do
+And(/^current date is outside renewals generation date and open enrollment start on$/) do
   oe_end_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on
-  allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(oe_end_on.year,2,15)
+  allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(oe_end_on.year, 2, 15)
 end
 
 And(/^current hbx is not under open enrollment$/) do
