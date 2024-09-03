@@ -65,5 +65,7 @@ PLAN_TRANSLATIONS = {
   'en.plans.plan_shopping_options.question.compare' => "I want to compare plans while plan shopping",
   'en.plans.plan_shopping_options.question.know' => "I know the plan I want",
   'en.plans.plan_shopping_options.modal.go_back' => "Go Back",
-  'en.plans.plan_shopping_options.modal.proceed' => "Yes, Compare Plans"
+  'en.plans.plan_shopping_options.modal.proceed' => "Yes, Compare Plans",
+  'en.plans.view_summary_of_benefits' => 'View Summary of Benefits and Coverage',
+  'en.plans.summary_of_benefits' => 'Summary of Benefits and Coverage'
 }
