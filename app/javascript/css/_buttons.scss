@@ -143,7 +143,7 @@ button.outline,
   );
 }
 
-.button.secondary.outline {
+.button.secondary.outline, button.secondary.outline, .btn.secondary.outline, .btn-secondary.outline {
   color: var(--secondary-color);
   border-color: var(--secondary-color);
 

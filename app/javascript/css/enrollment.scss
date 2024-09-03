@@ -87,6 +87,7 @@
                 font-weight: 700;
                 line-height: 1.5;
                 display: block;
+                text-decoration: none;
               }
 
             }
@@ -199,4 +200,36 @@
         }
       }
     }
+}
+
+.plan-card {
+  background: var(--grey-010);
+
+  .plan-footer {
+    a:not(.btn) {
+      text-decoration: none;
+      font-weight: 600;
+      color: var(--info-color);
+    }
+  }
+}
+
+.hbx-enrollment-refactored-panel, .plan-shopping-refactored-panel {
+  border-radius: 12px;
+  .panel-body, .plan-footer {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+  .plan-footer div a:not(.btn) {
+    color: var(--secondary-color);
+  }
+
+  h3 a {
+    color: var(--default-font-color);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+    display: block;
+    text-decoration: none;
+  }
 }
