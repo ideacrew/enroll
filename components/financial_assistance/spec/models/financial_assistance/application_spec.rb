@@ -498,7 +498,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           medicaid_insurance_collection_terms: true,
           report_change_terms: true,
           parent_living_out_of_home_terms: true,
-          applicants: [applicant_primary, applicant_spouse]
+          applicants: [applicant_primary, applicant_spouse],
         )
       end
       let!(:applicant_primary) do
@@ -508,13 +508,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination2.id, application: application, family_member_id: BSON::ObjectId.new)
       end
       let(:family_member_id) { BSON::ObjectId.new }
-    
-      before do
-        application.send(:set_filing_jointly)
+      before do 
+        allow(application).to receive(:is_application_valid?).and_return(true)
       end
 
       it 'should update their filing jointly status' do
+        application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
+        application.ensure_relationship_with_primary(applicant_spouse, 'spouse')
+        application.update_attributes!({ aasm_state: 'draft' })
         binding.irb
+        application.submit!
         expect(application.effective_date).to eq('')
       end
     end
