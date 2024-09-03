@@ -67,7 +67,9 @@ var addFamilyMemberRow= function(button){
 
                 $(".uidatepicker").focus(date_handler);
                 $('button#remove_member_button').click(remove_member_handler);
-                $('select').selectric('refresh')
+                if (!disableSelectric) {
+                  $('select').selectric('refresh')
+                }
 
   };// add emp click end
 </script>
