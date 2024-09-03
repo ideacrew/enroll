@@ -30,7 +30,7 @@ module FinancialAssistance
           # @param params [Hash] the parameters containing the application
           # @return [Dry::Monads::Result] the result monad containing the application or failure message
           def validate(params)
-            return Success(application) if params[:application].is_a?(::FinancialAssistance::Application)
+            return Success(params[:application]) if params[:application].is_a?(::FinancialAssistance::Application)
 
             Failure("Invalid application object. Expected FinancialAssistance::Application, got #{params[:application].class}")
           end
