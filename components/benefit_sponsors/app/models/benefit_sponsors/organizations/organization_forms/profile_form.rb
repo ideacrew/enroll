@@ -86,7 +86,7 @@ module BenefitSponsors
       end
 
       def validate_routing_information
-        self.errors.add(:base, "can't have two different routing numbers, please make sure you have same routing numbers on both fields") if ach_routing_number.present? && !(ach_routing_number == ach_routing_number_confirmation)
+        self.errors.add(:base, "can't have two different routing numbers, please make sure you have same routing numbers on both fields") if ach_routing_number.present? && (ach_routing_number != ach_routing_number_confirmation)
       end
 
       def validate_profile_office_locations
