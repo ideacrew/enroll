@@ -53,7 +53,7 @@ module BenefitSponsors
       end
 
       def office_locations_attributes=(locations_params)
-        self.office_locations=(locations_params.values)
+        self.office_locations = (locations_params.values)
       end
 
       def is_broker_profile?
@@ -86,9 +86,7 @@ module BenefitSponsors
       end
 
       def validate_routing_information
-        if ach_routing_number.present? && !(ach_routing_number == ach_routing_number_confirmation)
-          self.errors.add(:base, "can't have two different routing numbers, please make sure you have same routing numbers on both fields")
-        end
+        self.errors.add(:base, "can't have two different routing numbers, please make sure you have same routing numbers on both fields") if ach_routing_number.present? && !(ach_routing_number == ach_routing_number_confirmation)
       end
 
       def validate_profile_office_locations
@@ -104,7 +102,7 @@ module BenefitSponsors
 
       def validate_at_least_one_language_selected
         return true unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
-        return if self&.language_options&.any?
+        return true if self&.languages_spoken&.any?
 
         errors.add(:base, l10n("broker_agencies.profiles.errors.language_options"))
       end
