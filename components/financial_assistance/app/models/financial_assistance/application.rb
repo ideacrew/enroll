@@ -1561,6 +1561,15 @@ module FinancialAssistance
       update_attribute(:effective_date, effective_date)
     end
 
+    # the primary applicant and their spouse should not be able to submit false for filing jointly while living together, as it would incorrectly split the tax household.
+    def set_filing_jointly
+      binding.irb
+      if primary_applicant&.spouse_relationship&.relative&.same_with_primary
+        primary_applicant.update_attribute(:is_joint_tax_filing, true) if primary_applicant&.is_married
+        primary_applicant.spouse_relationship.relative.update_attribute(:is_joint_tax_filing, true) if primary_applicant&.spouse_relationship&.relative&.present?
+      end
+    end
+
     # def set_benchmark_product_id
     #   benchmark_product_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
     #   write_attribute(:benchmark_product_id, benchmark_product_id)
@@ -1646,6 +1655,7 @@ module FinancialAssistance
       set_submission_date
       set_assistance_year
       set_effective_date
+      set_filing_jointly if primary_applicant&.spouse_relationship&.present?
       create_eligibility_determinations
       set_renewal_base_year
     end

@@ -478,6 +478,74 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
+  describe '.set_filing_jointly' do
+    context 'for tax households with married members living together who selected not filing jointly' do
+      let!(:valid_application) do
+        FactoryBot.create(
+          :financial_assistance_application,
+          family_id: BSON::ObjectId.new,
+          hbx_id: '345332',
+          applicant_kind: 'user and/or family',
+          request_kind: 'request-kind',
+          motivation_kind: 'motivation-kind',
+          us_state: 'DC',
+          is_ridp_verified: true,
+          assistance_year: TimeKeeper.date_of_record.year,
+          aasm_state: 'draft',
+          medicaid_terms: true,
+          attestation_terms: true,
+          submission_terms: true,
+          medicaid_insurance_collection_terms: true,
+          report_change_terms: true,
+          parent_living_out_of_home_terms: true,
+          applicants: [applicant_primary, applicant_spouse]
+        )
+      end
+      let!(:applicant_primary) do
+        FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member_id)
+      end
+      let!(:applicant_spouse) do
+        FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination2.id, application: application, family_member_id: BSON::ObjectId.new)
+      end
+      let(:family_member_id) { BSON::ObjectId.new }
+    
+      before do
+        application.send(:set_filing_jointly)
+      end
+
+      it 'should update their filing jointly status' do
+        binding.irb
+        expect(application.effective_date).to eq('')
+      end
+    end
+
+    context 'for tax households with married members not living together who selected not filing jointly' do
+      let(:family_id) { BSON::ObjectId.new }
+      let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+
+      before do
+        application.send(:set_filing_jointly)
+      end
+
+      it 'should not update their filing jointly status' do
+        expect(application.effective_date).to eq('')
+      end
+    end
+
+    context 'for tax households with married members living together who selected filing jointly' do
+      let(:family_id) { BSON::ObjectId.new }
+      let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+
+      before do
+        application.send(:set_filing_jointly)
+      end
+
+      it 'should update their filing jointly status' do
+        expect(application.effective_date).to eq('')
+      end
+    end
+  end
+
   describe '.eligibility_determinations' do
     it 'verifies eligibility_determinations count of a given applicant' do
       expect(application.eligibility_determinations.count).to eq 3
