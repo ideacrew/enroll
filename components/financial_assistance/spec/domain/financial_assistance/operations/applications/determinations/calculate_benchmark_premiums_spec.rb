@@ -2,8 +2,7 @@
 
 require 'rails_helper'
 
-# rubocop:disable Style/ExponentialNotation
-RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::Determinations::CalculateBenchmarkPremiums do
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
@@ -89,7 +88,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
   describe "#applicant_benchmark_premium slcsp/lscp values" do
     context "when there is valid address" do
-      let(:result) { subject.call(application) }
+      let(:result) { subject.call(application: application) }
       let!(:in_state_address_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'DC', zip: '20001' } }
       let(:non_zero_output) do
         {:health_only_lcsp_premiums => [{:member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.1e3}],
@@ -102,17 +101,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it "should build with non zero benchmark_premium values" do
-        params = result.success
-        app_contract = ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract.new.call(params)
-        expect(result.success?).to be_truthy
-        app_entity = ::AcaEntities::MagiMedicaid::Application.new(app_contract.to_h).to_h
-        applicant = app_entity[:applicants][0]
-        expect(applicant[:benchmark_premium]).to eq non_zero_output
+        expect(result.success).to eq non_zero_output
       end
     end
 
     context "when there is invalid address" do
-      let(:result) { subject.call(application) }
+      let(:result) { subject.call(application: application) }
       let!(:out_of_state_address_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'FL', zip: '12345' } }
       let(:zero_permium_output) do
         {:health_only_lcsp_premiums => [{:member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.0}],
@@ -128,14 +122,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it "should build with zero benchmark_premium values" do
-        params = result.success
-        app_contract = ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract.new.call(params)
-        expect(result.success?).to be_truthy
-        app_entity = ::AcaEntities::MagiMedicaid::Application.new(app_contract.to_h).to_h
-        applicant = app_entity[:applicants][0]
-        expect(applicant[:benchmark_premium]).to eq zero_permium_output
+        expect(result.success).to eq zero_permium_output
       end
     end
   end
 end
-# rubocop:enable Style/ExponentialNotation

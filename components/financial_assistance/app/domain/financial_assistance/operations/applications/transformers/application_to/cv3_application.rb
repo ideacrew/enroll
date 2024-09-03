@@ -66,8 +66,8 @@ module FinancialAssistance
               application     = yield validate(application)
               notice_options  = yield notice_options_for_app(application)
               oe_start_on     = yield fetch_oe_start_on(application)
-              benchmark_premiums = yield applicant_benchmark_premium(application)
-              request_payload = yield construct_payload(application, notice_options, oe_start_on, benchmark_premiums)
+              request_payload = yield construct_payload(application, notice_options, oe_start_on)
+
               Success(request_payload)
             end
 
@@ -98,25 +98,28 @@ module FinancialAssistance
               ::Operations::Individual::OpenEnrollmentStartOn.new.call({date: application.effective_date.to_date})
             end
 
-            def construct_payload(application, notice_options, oe_start_on, benchmark_premiums)
-              payload = {family_reference: {hbx_id: family(application.family_id)&.hbx_assigned_id.to_s},
-                         assistance_year: application.assistance_year,
-                         aptc_effective_date: application.effective_date,
-                         years_to_renew: application.renewal_base_year,
-                         renewal_consent_through_year: application.years_to_renew,
-                         is_ridp_verified: application.is_ridp_verified.present?,
-                         is_renewal_authorized: application.is_renewal_authorized.present?,
-                         applicants: applicants(application, benchmark_premiums),
-                         relationships: application_relationships(application),
-                         tax_households: tax_households(application),
-                         us_state: application.us_state,
-                         hbx_id: application.hbx_id,
-                         oe_start_on: oe_start_on,
-                         submitted_at: application.submitted_at,
-                         notice_options: notice_options,
-                         mitc_households: mitc_households(application),
-                         mitc_tax_returns: mitc_tax_returns(application)}
-              payload.merge!({full_medicaid_determination: application.full_medicaid_determination}) if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
+            def construct_payload(application, notice_options, oe_start_on)
+              payload = {
+                family_reference: {hbx_id: family(application.family_id)&.hbx_assigned_id.to_s},
+                assistance_year: application.assistance_year,
+                aptc_effective_date: application.effective_date,
+                years_to_renew: application.renewal_base_year,
+                renewal_consent_through_year: application.years_to_renew,
+                is_ridp_verified: application.is_ridp_verified.present?,
+                is_renewal_authorized: application.is_renewal_authorized.present?,
+                applicants: applicants(application),
+                relationships: application_relationships(application),
+                tax_households: tax_households(application),
+                us_state: application.us_state,
+                hbx_id: application.hbx_id,
+                oe_start_on: oe_start_on,
+                submitted_at: application.submitted_at,
+                notice_options: notice_options,
+                mitc_households: mitc_households(application),
+                mitc_tax_returns: mitc_tax_returns(application)
+              }
+
+              payload.merge!({ full_medicaid_determination: application.full_medicaid_determination }) if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
               Success(payload)
             end
 
@@ -154,7 +157,7 @@ module FinancialAssistance
 
             # rubocop:disable Metrics/AbcSize
             # rubocop:disable Metrics/MethodLength
-            def applicants(application, benchmark_premiums)
+            def applicants(application)
               assistance_year = application.assistance_year
               applicants = application.applicants
 
@@ -239,7 +242,7 @@ module FinancialAssistance
                   hours_worked_per_week: applicant.total_hours_worked_per_week,
                   is_temporarily_out_of_state: applicant.is_temporarily_out_of_state.present?,
                   is_claimed_as_dependent_by_non_applicant: false, # as per sb notes
-                  benchmark_premium: benchmark_premiums,
+                  benchmark_premium: applicant.benchmark_premiums,
                   is_homeless: applicant.is_homeless.present?,
                   mitc_income: mitc_income(applicant, mitc_eligible_incomes),
                   income_evidence: evidence_info(applicant.income_evidence),
@@ -634,10 +637,6 @@ module FinancialAssistance
             end
             # rubocop:enable Metrics/CyclomaticComplexity
 
-            def monthly_amount(frequency, amount)
-              annual_amount(frequency, amount) / 12
-            end
-
             # Was the applicant receiving coverage that has expired?
             # Benefit of type is_enrolled and end dated.
             def prior_insurance(applicant)
@@ -807,45 +806,6 @@ module FinancialAssistance
             # Match with AcaEntities Deduction Kind
             def get_deduction_kind(deduction_kind)
               deduction_kind == 'deductable_part_of_self_employment_taxes' ? 'deductible_part_of_self_employment_taxes' : deduction_kind
-            end
-
-            def applicant_benchmark_premium(application)
-              family = family(application.family_id) if application.family_id.present?
-              return unless family.present?
-              # family_member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
-              applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)
-              # return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
-              premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
-              return build_zero_member_premiums(applicant_hbx_ids) if premiums.failure?
-
-              slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
-              return build_zero_member_premiums(applicant_hbx_ids) if slcsp_info.failure?
-
-              lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
-              return build_zero_member_premiums(applicant_hbx_ids) if lcsp_info.failure?
-
-              slcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
-                next applicant_hbx_id unless slcsp_info.success[applicant_hbx_id].present?
-
-                result << slcsp_info.success[applicant_hbx_id][:health_only_slcsp_premiums]
-              end.compact
-
-              lcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
-                next applicant_hbx_id unless lcsp_info.success[applicant_hbx_id].present?
-
-                result << lcsp_info.success[applicant_hbx_id][:health_only_lcsp_premiums]
-              end.compact
-
-              Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
-            end
-
-            # return zero premiums only when there is a failure monad
-            def build_zero_member_premiums(applicant_hbx_ids)
-              member_premiums = applicant_hbx_ids.collect do |applicant_hbx_id|
-                {cost: 0.0, member_identifier: applicant_hbx_id, monthly_premium: 0.0}
-              end.compact
-
-              Success({ health_only_lcsp_premiums: member_premiums, health_only_slcsp_premiums: member_premiums })
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.

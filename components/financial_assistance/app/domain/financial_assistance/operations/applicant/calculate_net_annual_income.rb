@@ -8,27 +8,28 @@ module FinancialAssistance
     module Applicant
       #This class calculated net annual income for a applicant
       # Net Annual Income = Total Incomes - Total Deductions
-      class CalculateAndPersistNetAnnualIncome
+      class CalculateNetAnnualIncome
         include Dry::Monads[:do, :result]
 
         # @param [application assistance year, applicant object] input
         #
         # @return [applicant]
         def call(params)
-          params = yield validate(params)
-          total_net_income = yield calculate_net_income(params)
-          result = yield persist(params[:applicant], total_net_income)
+          params            = yield validate(params)
+          total_net_income  = yield calculate_net_income(params)
 
-          Success(result)
+          Success(total_net_income)
         end
 
         private
 
         def validate(params)
-          if params[:application_assistance_year].present? && params[:applicant].present? && params[:applicant].is_a?(FinancialAssistance::Applicant)
+          if params[:application_assistance_year].is_a?(Integer) && params[:applicant].is_a?(FinancialAssistance::Applicant)
             Success(params)
           else
-            Failure("Invalid Params")
+            Failure(
+              'Invalid input params. Expected application_assistance_year as Integer and applicant as FinancialAssistance::Applicant.'
+            )
           end
         end
 
@@ -94,11 +95,6 @@ module FinancialAssistance
 
         def income_for_current_year?(income_start_date)
           (@assistance_year_start..@assistance_year_end).cover?(income_start_date)
-        end
-
-        def persist(applicant, total_net_income)
-          applicant.update_attributes(net_annual_income: total_net_income) unless applicant.net_annual_income&.to_d == total_net_income&.to_d
-          Success(applicant)
         end
 
         def daily_employee_income(employee_cost_frequency, employee_cost)

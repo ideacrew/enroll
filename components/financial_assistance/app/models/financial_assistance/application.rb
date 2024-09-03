@@ -1178,10 +1178,28 @@ module FinancialAssistance
       applicants.where(:is_active => true)
     end
 
-    def calculate_total_net_income_for_applicants
-      active_applicants.each do |applicant|
-        FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome.new.call({application_assistance_year: assistance_year, applicant: applicant})
+    # Calculates the total net income and benchmark premiums for all applicants.
+    # Iterates over each applicant and performs the necessary calculations.
+    #
+    # @return [void]
+    def calculate_total_net_income_and_benchmark_premiums_for_applicants
+      applicants.each do |applicant|
+        applicant.calculate_and_assign_total_net_income
+        applicant.assign_benchmark_premiums(benchmark_premiums)
       end
+    end
+
+    # Retrieves the benchmark premiums for the application.
+    # If the benchmark premiums have already been calculated, it returns the cached value.
+    # Otherwise, it calculates the benchmark premiums and caches the result.
+    #
+    # @return [Array<BenchmarkPremium>] the calculated benchmark premiums
+    def benchmark_premiums
+      return @benchmark_premiums if defined?(@benchmark_premiums)
+
+      @benchmark_premiums = ::FinancialAssistance::Operations::Applications::Determinations::CalculateBenchmarkPremiums.new.call(
+        application: self
+      ).success
     end
 
     def non_primary_applicants
@@ -1270,12 +1288,21 @@ module FinancialAssistance
       workflow_state_transitions.any? { |wst| wst.from_state == 'renewal_draft' }
     end
 
-    def set_renewal_base_year
+    # Assigns the renewal base year if it is not already present.
+    #
+    # @return [void]
+    def assign_renewal_base_year
       return if renewal_base_year.present?
+
       renewal_year = calculate_renewal_base_year
-      update_attribute(:renewal_base_year, renewal_year) if renewal_year.present?
+      return if renewal_base_year.blank?
+
+      self.renewal_base_year = renewal_year
     end
 
+    # Calculates the renewal base year based on the assistance year and renewal authorization.
+    #
+    # @return [Integer, nil] the calculated renewal base year or nil if not authorized
     def calculate_renewal_base_year
       ass_year = assistance_year.present? ? assistance_year : TimeKeeper.date_of_record.year
       if is_renewal_authorized.present?
@@ -1316,10 +1343,15 @@ module FinancialAssistance
     end
     # rubocop:enable Lint/EmptyRescueClause
 
-    def set_assistance_year
-      return unless assistance_year.blank?
-      update_attribute(:assistance_year,
-                       FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
+    # Assigns the assistance year if it is not already present.
+    #
+    # @return [void]
+    def assign_assistance_year
+      return if assistance_year.present?
+
+      self.assistance_year = SAFE_REGISTRY_METHODS.fetch(
+        FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item
+      ).new.call(assistance_year: assistance_year).value!
     end
 
     def create_rrv_evidences
@@ -1551,20 +1583,22 @@ module FinancialAssistance
       )
     end
 
-    def set_submission_date
-      update_attribute(:submitted_at, Time.current)
+    # Assigns the current time to the submitted_at attribute.
+    # @return [Time] the current time
+    def assign_submission_date
+      self.submitted_at = Time.current
     end
 
-    def set_effective_date
+    # Assigns the effective date if it is not already present.
+    # Fetches the earliest effective date from the registry and assigns it.
+    # @return [Date, nil] the effective date or nil if already present
+    def assign_effective_date
       return if effective_date.present?
-      effective_date = SAFE_REGISTRY_METHODS.fetch(FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item).new.call(assistance_year: assistance_year).value!
-      update_attribute(:effective_date, effective_date)
-    end
 
-    # def set_benchmark_product_id
-    #   benchmark_product_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
-    #   write_attribute(:benchmark_product_id, benchmark_product_id)
-    # end
+      self.effective_date = SAFE_REGISTRY_METHODS.fetch(
+        FinancialAssistanceRegistry[:enrollment_dates].settings(:earliest_effective_date).item
+      ).new.call(assistance_year: assistance_year).value!
+    end
 
     def active_approved_application
       return unless family_id.present?
@@ -1640,14 +1674,27 @@ module FinancialAssistance
       end
     end
 
+    # Sets the submission details and calculates necessary values for the application.
+    #
+    # @note This method sets data and builds objects, hitting the database only once instead of multiple times for each method.
+    #
+    # @return [void]
     def set_submit
       return unless submitted?
-      calculate_total_net_income_for_applicants
-      set_submission_date
-      set_assistance_year
-      set_effective_date
-      create_eligibility_determinations
-      set_renewal_base_year
+
+      # Assigns the submission date, assistance year, effective date, and renewal base year.
+      assign_submission_date
+      assign_assistance_year
+      assign_effective_date
+      assign_renewal_base_year
+
+      # Calculates the total net income and benchmark premiums for the applicants and assigns these values to the applicants.
+      calculate_total_net_income_and_benchmark_premiums_for_applicants
+
+      # Builds the eligibility determinations for the applicants, assigns the eligibility determinations identifier and tax_filer_kind to the applicants.
+      build_eligibility_determinations
+
+      self.save!
     end
 
     def trigger_fdsh_hub_calls
@@ -1662,35 +1709,41 @@ module FinancialAssistance
       delete_eligibility_determinations
     end
 
-    def create_eligibility_determinations
-      ## Remove  when copy method is fixed to exclude copying Tax Household
-      active_applicants.update_all(eligibility_determination_id: nil)
+    # Builds eligibility determinations for applicants.
+    #
+    # This method processes two groups of applicants: non-tax dependents and tax dependents.
+    # For non-tax dependents, it creates a new Eligibility Determination and assigns it to the applicant.
+    # If the applicant is joint tax filing and not in a tax household, it assigns the Eligibility Determination of the spouse.
+    # For tax dependents, it assigns the Eligibility Determination of the claimer.
+    # If the claimer is not found, it assigns the Eligibility Determination of the non-tax dependent.
+    #
+    # @return [void]
+    def build_eligibility_determinations
+      # Finds all the non-tax dependents
+      non_tax_dependents = applicants.where(is_claimed_as_tax_dependent: false)
 
-      non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false)
-      tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: true)
+      # Finds all the tax dependents
+      tax_dependents = applicants.where(is_claimed_as_tax_dependent: true)
 
+      # Builds a new Eligibility Determination for each non-tax dependent and assigns it to the applicant.
+      # If the applicant is joint tax filing and not in a tax household, then assigns the Eligibility Determination of the spouse.
       non_tax_dependents.each do |applicant|
         if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.eligibility_determination_of_spouse.present?
-          applicant.eligibility_determination = applicant.eligibility_determination_of_spouse
-          applicant.update_attributes(tax_filer_kind: 'tax_filer')
+          applicant.eligibility_determination_id = applicant.eligibility_determination_of_spouse.id
+          applicant.tax_filer_kind = 'tax_filer'
         else
-          # Create a new THH and assign it to the applicant
-          # Need THH for Medicaid cases too
-          applicant.eligibility_determination = eligibility_determinations.create!
-          applicant.update_attributes(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
+          applicant.eligibility_determination_id = eligibility_determinations.build.id
+          applicant.tax_filer_kind = applicant.tax_filing? ? 'tax_filer' : 'non_filer'
         end
       end
 
+      # Assigns the Eligibility Determination of the claimer to the tax dependents.
+      # If the claimer is not found, then assigns the Eligibility Determination of the non-tax dependent.
       tax_dependents.each do |applicant|
-        thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
-        applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
-        applicant.update_attributes(tax_filer_kind: 'dependent')
+        ed_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
+        applicant.eligibility_determination_id = ed_of_claimer.id if ed_of_claimer.present?
+        applicant.tax_filer_kind = 'dependent'
       end
-
-      empty_ed = eligibility_determinations.select do |ed|
-        active_applicants.map(&:eligibility_determination).exclude?(ed)
-      end
-      empty_ed.each(&:destroy)
     end
 
     def delete_eligibility_determinations
