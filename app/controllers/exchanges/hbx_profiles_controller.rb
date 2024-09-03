@@ -798,7 +798,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
       flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-    rescue Exception => e # rubocop:disable Lint/RescueException
+    rescue Exception => e
       flash[:error] = "Failed to set date of record, " + e.message
     end
     redirect_to exchanges_hbx_profiles_root_path
