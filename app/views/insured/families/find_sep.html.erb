@@ -38,8 +38,8 @@
         <p class="mb-4"><%= l10n("insured.families.final_sep_experienced_any_events") %></p>
         <h2><%= l10n("insured.top_life_changes") %></h2>
         <ul>
-          <% @qualifying_life_events&.each_with_index do |qle, index| %>
-            <li class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generator(qle, index) %></li>
+          <% @qualifying_life_events.each_with_index do |qle, index| %>
+            <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
           <% end %>
         </ul>
         <div class="align-content-center">

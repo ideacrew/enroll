@@ -8,7 +8,7 @@ module FinancialAssistance
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new]
     if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-      before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :edit, :eligibility_results, :review_and_submit, :review,
+      before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :edit, :eligibility_results, :review_and_submit, :review, :transfer_history,
                                                :submit_your_application, :wait_for_eligibility_response, :preferences, :application_publish_error, :eligibility_response_error, :index, :index_with_filter]
     end
     around_action :cache_current_hbx, :only => [:index_with_filter]
@@ -604,6 +604,10 @@ module FinancialAssistance
                         { error: "Submission Error: #{publish_result.failure}" }
                       end
       { path: application_publish_error_application_path(@application), flash: flash_message }
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
     end
   end
 end

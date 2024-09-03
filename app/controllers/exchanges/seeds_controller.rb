@@ -8,7 +8,7 @@ module Exchanges
     include ::Pundit
 
   # layout 'single_column'
-    layout 'bootstrap_4'
+    layout 'progress'
     before_action :set_seed, only: %i[edit]
     before_action :csv_format_valid?, only: %i[create]
     before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
