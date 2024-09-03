@@ -1439,9 +1439,7 @@ module FinancialAssistance
     #
     # @return [Boolean] true if the record was successfully saved, false otherwise
     def calculate_total_net_income_for_applicants
-      applicants.each do |applicant|
-        applicant.calculate_and_assign_total_net_income
-      end
+      applicants.each(&:calculate_and_assign_total_net_income)
 
       self.save!
     end
