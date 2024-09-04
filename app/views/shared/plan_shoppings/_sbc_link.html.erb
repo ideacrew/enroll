@@ -4,9 +4,9 @@
   <% plan_kind = (plan.try(:kind) || plan.try(:coverage_kind)).to_s %>
   <% link_text = hide_pdf_icon ? l10n("plans.view_summary_of_benefits") : l10n("plans.summary_of_benefits") %>
   <% link_text_class = "Summary-of-Benefits-and-Coverage" %>
-  <% link_text = "Plan Summary" unless plan_kind == "health" %>
-  <% link_text_class = "plan-summary" unless plan_kind == "health" %>
-  <% icon_class = "pull-left" unless plan_kind == "health" %>
+  <% link_text = "Plan Summary" unless plan_kind == "health" || @bs4 %>
+  <% link_text_class = "plan-summary" unless plan_kind == "health" || @bs4 %>
+  <% icon_class = "pull-left" unless plan_kind == "health" || @bs4 %>
   <% text_class = "health" %>
   <% text_class = "dental" unless plan_kind == "health" %>
 

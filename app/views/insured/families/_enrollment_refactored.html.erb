@@ -27,8 +27,8 @@
 
       <div class="panel-body bg-white py-2 px-3">
         <div class="d-flex">
-          <div class="col-md-2 col-sm-2 align-self-center pl-0"><%= display_carrier_logo(Maybe.new(product), {width: 100}) %></div>
-          <div class="col-md-8">
+          <div class="logo-column"><%= display_carrier_logo(Maybe.new(product), {width: 100}) %></div>
+          <div class="flex-grow-1 px-3">
             <h3 class="no-buffer">
               <%= h(link_to product.title, summary_products_plans_path({plan_id: product.id, :standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, market_kind: hbx_enrollment.market_name&.downcase, coverage_kind: hbx_enrollment.coverage_kind, active_year: product.active_year, bs4: @bs4}), remote: action_name != "home", class:"default-text") %>
             </h3>
@@ -69,7 +69,11 @@
             <dd><%= product.try(:product_type).try(:upcase) %></dd>
             <dt class="plan-metal-level"><%= l10n("metal_level") %>:</dt>
             <% plan_level = display_dental_metal_level(product) %>
-            <dd><span class="badge badge-pill badge-lg badge-<%= plan_level.downcase %>"><%= plan_level %></span></dd>
+            <% if product.kind.to_s == "dental" %>
+              <dd><%= plan_level %></dd>
+            <% else %>
+              <dd><span class="badge badge-pill badge-lg badge-<%= plan_level.downcase %>"><%= plan_level %></span></dd>
+            <% end %>
           </dl>
           <dl class="parent col-6 pl-0">
             <dt class="plan-id"><%= l10n("enrollment_id") %>:</dt>

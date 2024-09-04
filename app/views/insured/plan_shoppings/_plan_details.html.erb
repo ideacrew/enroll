@@ -79,8 +79,8 @@
     </div>
     <div class="panel-body bg-white py-2 px-3">
       <div class="d-flex align-items-start">
-        <div class="col-md-2 col-sm-2 pl-0"><%= display_carrier_logo(Maybe.new(plan), {width: 100}) %></div>
-        <div class="col-md-8">
+        <div class="logo-column"><%= display_carrier_logo(Maybe.new(plan), {width: 100}) %></div>
+        <div class="flex-grow-1 px-3">
           <h3 class="no-buffer">
             <%= link_to summary_products_plans_path({plan_id: plan.id, :standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year), bs4: @bs4}), {:remote => true, class: "default-text"} do %>
               <% if plan.is_csr?%>
@@ -90,7 +90,7 @@
             <% end %>
           </h3>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 px-0">
           <div class="price-wrapper text-right">
             <strong class="text-secondary"><%= l10n("premium") %></strong>
             <p class="bold beta m-0"><%= number_to_currency(premium) %></p>
@@ -99,7 +99,7 @@
         </div>
       </div>
       <div class="d-flex">
-        <dl class="parent col-5 pl-0">
+        <dl class="parent col-6 pl-0">
           <dt>Carrier</dt>
           <dd><%= plan_carrier.legal_name %></dd>
           <dt><%= l10n("network") %></dt>
@@ -116,13 +116,17 @@
           <dt><%= l10n("deductible") %></dt>
           <dd><%= deductible_display(@hbx_enrollment, plan) %></dd>
         </dl>
-        <dl class="parent col-5 pl-0">
+        <dl class="parent col-6 pr-0">
           <dt><%= l10n("level") %></dt>
           <dd>
             <% plan_level = plan.metal_level.titleize %>
-            <span class="badge badge-pill badge-lg badge-<%= plan_level.downcase %>">
-              <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).titleize %>
-            </span>
+            <% if plan.kind.to_s == "dental" %>
+              <%= display_dental_metal_level(plan).titleize %>
+            <% else %>
+              <span class="badge badge-pill badge-lg badge-<%= plan_level.downcase %>">
+                <%= plan_level %>
+              </span>
+            <% end %>
           </dd>
           <dt><%= l10n("type") %></dt>
           <dd><%= plan.product_type ? plan.product_type.upcase : "" %></dd>

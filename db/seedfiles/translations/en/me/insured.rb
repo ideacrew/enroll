@@ -320,7 +320,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.hired_on' => "Hired On",
   :'en.plan_end' => "Plan End",
   :'en.enrollment_status' => "Enrollment Status",
-  :'en.enrollment_id' => "ID",
+  :'en.enrollment_id' => "Plan ID",
   :'en.coverage_waived' => "Coverage Waived",
   :'en.waiver_reason' => "Waiver Reason",
   :'en.insured.families.future_enrollment_termination_date' => "Future Enrollment Termination Date",
