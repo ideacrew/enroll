@@ -138,7 +138,7 @@
         radioButtonNo.removeAttribute("checked");
         aptcAppliedTotal.value = aptcAppliedTotal.dataset.initialAmount;
         updateTaxCreditPercentage.value = updateTaxCreditPercentage.dataset.initialPercent;
-        calculatedAmountApplied.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(aptcAppliedTotal.dataset.initialAmount);
+        calculatedAmountApplied.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(premiumTotal - aptcAppliedTotal.value);
         saveButton.disabled = true;
       }
 
