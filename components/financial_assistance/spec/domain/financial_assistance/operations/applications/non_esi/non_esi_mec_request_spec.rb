@@ -5,10 +5,10 @@ require 'rails_helper'
 RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::NonEsiMecRequest, dbclean: :after_each do
   include Dry::Monads[:do, :result]
 
-  let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
-  let!(:applicant) do
+  let(:person) { FactoryBot.create(:person, :with_ssn, :with_consumer_role, :with_active_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+  let(:applicant) do
     FactoryBot.create(:applicant,
                       first_name: person.first_name,
                       last_name: person.last_name,
@@ -39,7 +39,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Non
                       is_former_foster_care: false,
                       is_post_partum_period: false)
   end
-  let!(:create_home_address) do
+  let(:create_home_address) do
     add = ::FinancialAssistance::Locations::Address.new({
                                                           kind: 'home',
                                                           address_1: '3 Awesome Street',
@@ -52,7 +52,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Non
     applicant.save!
   end
 
-  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let(:event) { Success(double) }
   let(:obj)  { ::FinancialAssistance::Operations::Applications::NonEsi::H31::PublishNonEsiMecRequest.new }
 
@@ -70,6 +70,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::NonEsi::H31::Non
   end
 
   before do
+    create_home_address
+    eligibility_determination
     allow(::FinancialAssistance::Operations::Applications::NonEsi::H31::PublishNonEsiMecRequest).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)

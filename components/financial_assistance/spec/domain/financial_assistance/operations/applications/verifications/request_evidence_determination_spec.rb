@@ -5,14 +5,14 @@ require 'rails_helper'
 RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::RequestEvidenceDetermination, dbclean: :after_each do
   include Dry::Monads[:do, :result]
 
-  let!(:person_1) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020") }
-  let!(:person_2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021") }
-  let!(:person_3) { FactoryBot.create(:person, :with_ssn, hbx_id: "732022") }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person_1)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
-  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let(:person_1) { FactoryBot.create(:person, :with_ssn, :with_consumer_role, :with_active_consumer_role) }
+  let(:person_2) { FactoryBot.create(:person, :with_ssn, :with_consumer_role, :with_active_consumer_role) }
+  let(:person_3) { FactoryBot.create(:person, :with_ssn, :with_consumer_role, :with_active_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person_1)}
+  let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+  let(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
 
-  let!(:applicant_1) do
+  let(:applicant_1) do
     FactoryBot.build(:financial_assistance_applicant,
                      :with_student_information,
                      :with_home_address,
@@ -30,7 +30,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
                      eligibility_determination_id: eligibility_determination.id)
   end
 
-  let!(:applicant_2) do
+  let(:applicant_2) do
     FactoryBot.build(:financial_assistance_applicant,
                      :with_student_information,
                      :with_home_address,
@@ -49,7 +49,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
                      eligibility_determination_id: eligibility_determination.id)
   end
 
-  let!(:applicant_3) do
+  let(:applicant_3) do
     FactoryBot.build(:financial_assistance_applicant,
                      :with_student_information,
                      :with_home_address,
@@ -68,7 +68,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
                      eligibility_determination_id: eligibility_determination.id)
   end
 
-  let!(:create_home_address) do
+  let(:create_home_address) do
     add = ::FinancialAssistance::Locations::Address.new({
                                                           kind: 'home',
                                                           address_1: '3 Awesome Street',
@@ -81,32 +81,31 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     applicant_1.save!
   end
 
-  let(:premiums_hash) do
-    {
-      [person_1.hbx_id] => {:health_only => {person_1.hbx_id => [{:cost => 200.0, :member_identifier => person_1.hbx_id, :monthly_premium => 200.0}]}}
-    }
-  end
-
-  let(:slcsp_info) do
-    {
-      person_1.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person_1.hbx_id, :monthly_premium => 200.0}}
-    }
-  end
-
-  let(:lcsp_info) do
-    {
-      person_1.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person_1.hbx_id, :monthly_premium => 100.0}}
-    }
-  end
-
-  let(:fetch_double) { double(:new => double(call: double(:value! => premiums_hash, :failure? => false, :success => premiums_hash)))}
-  let(:fetch_slcsp_double) { double(:new => double(call: double(:value! => slcsp_info, :failure? => false, :success => slcsp_info)))}
-  let(:fetch_lcsp_double) { double(:new => double(call: double(:value! => lcsp_info, :failure? => false, :success => lcsp_info)))}
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   let(:event) { Success(double) }
+
+  let(:benchmark_premiums) do
+    {
+      health_only_lcsp_premiums: [
+        { member_identifier: applicant_1.person_hbx_id, monthly_premium: 90.0 },
+        { member_identifier: applicant_2.person_hbx_id, monthly_premium: 91.0 },
+        { member_identifier: applicant_3.person_hbx_id, monthly_premium: 92.0 }
+      ],
+      health_only_slcsp_premiums: [
+        { member_identifier: applicant_1.person_hbx_id, monthly_premium: 100.00 },
+        { member_identifier: applicant_2.person_hbx_id, monthly_premium: 101.00 },
+        { member_identifier: applicant_3.person_hbx_id, monthly_premium: 102.00 }
+      ]
+    }
+  end
+
+  let(:update_benchmark_premiums) do
+    application.applicants.each { |applicant| applicant.benchmark_premiums = benchmark_premiums }
+    application.save!
+  end
 
   before do
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
@@ -115,9 +114,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     allow(subject).to receive(:build_event).and_return(event)
     allow(subject).to receive(:publish_event_result).and_return(Success("Event published successfully"))
 
-    stub_const('::Operations::Products::Fetch', fetch_double)
-    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
-    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
@@ -131,6 +127,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     applicant_1.local_mec_evidence.update(aasm_state: 'pending')
     applicant_2.local_mec_evidence.update(aasm_state: 'pending')
     applicant_3.local_mec_evidence.update(aasm_state: 'pending')
+
+    update_benchmark_premiums
   end
 
   context 'with valid application' do

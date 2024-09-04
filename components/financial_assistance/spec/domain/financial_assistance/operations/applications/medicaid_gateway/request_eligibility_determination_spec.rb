@@ -5,41 +5,44 @@ require 'rails_helper'
 RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination, dbclean: :after_each do
   include Dry::Monads[:do, :result]
 
-  let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'draft', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
-  let!(:applicant) do
-    FactoryBot.create(:applicant,
-                      first_name: person.first_name,
-                      last_name: person.last_name,
-                      dob: person.dob,
-                      gender: person.gender,
-                      ssn: person.ssn,
-                      application: application,
-                      eligibility_determination_id: eligibility_determination.id,
-                      citizen_status: 'us_citizen',
-                      person_hbx_id: person.hbx_id,
-                      ethnicity: [],
-                      is_primary_applicant: true,
-                      is_self_attested_blind: false,
-                      is_applying_coverage: true,
-                      is_required_to_file_taxes: true,
-                      is_pregnant: false,
-                      has_job_income: false,
-                      has_self_employment_income: false,
-                      has_unemployment_income: false,
-                      has_other_income: false,
-                      has_deductions: false,
-                      has_enrolled_health_coverage: false,
-                      has_eligible_health_coverage: false,
-                      has_eligible_medicaid_cubcare: false,
-                      is_claimed_as_tax_dependent: false,
-                      is_incarcerated: false,
-                      is_student: false,
-                      is_former_foster_care: false,
-                      is_post_partum_period: false)
+  let(:person) { FactoryBot.create(:person, :with_ssn, :with_consumer_role, :with_active_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'draft', effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+  let(:applicant) do
+    FactoryBot.create(
+      :applicant,
+      first_name: person.first_name,
+      last_name: person.last_name,
+      dob: person.dob,
+      gender: person.gender,
+      ssn: person.ssn,
+      application: application,
+      eligibility_determination_id: eligibility_determination.id,
+      citizen_status: 'us_citizen',
+      person_hbx_id: person.hbx_id,
+      ethnicity: [],
+      is_primary_applicant: true,
+      is_self_attested_blind: false,
+      is_applying_coverage: true,
+      is_required_to_file_taxes: true,
+      is_pregnant: false,
+      has_job_income: false,
+      has_self_employment_income: false,
+      has_unemployment_income: false,
+      has_other_income: false,
+      has_deductions: false,
+      has_enrolled_health_coverage: false,
+      has_eligible_health_coverage: false,
+      has_eligible_medicaid_cubcare: false,
+      is_claimed_as_tax_dependent: false,
+      is_incarcerated: false,
+      is_student: false,
+      is_former_foster_care: false,
+      is_post_partum_period: false
+      )
   end
-  let!(:create_home_address) do
+
+  let(:create_home_address) do
     add = ::FinancialAssistance::Locations::Address.new({
                                                           kind: 'home',
                                                           address_1: '3 Awesome Street',
@@ -52,38 +55,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     applicant.save!
   end
 
-  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let(:event) { Success(double) }
   let(:obj)  { FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
-  let(:premiums_hash) do
-    {
-      [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
-    }
-  end
-
-  let(:slcsp_info) do
-    {
-      person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}}
-    }
-  end
-
-  let(:lcsp_info) do
-    {
-      person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}}
-    }
-  end
-
-  let(:premiums_double) { double(:success => premiums_hash) }
-  let(:slcsp_double) { double(:success => slcsp_info) }
-  let(:lcsp_double) { double(:success => lcsp_info) }
-
-  let(:fetch_double) { double(:new => double(call: premiums_double))}
-  let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
-  let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
 
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+
+  let(:update_benchmark_premiums) do
+    applicant.benchmark_premiums = {
+      health_only_lcsp_premiums: [{ member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }],
+      health_only_slcsp_premiums: [{ member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }]
+    }
+
+    applicant.save!
+  end
 
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step)
@@ -95,12 +82,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     allow(FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
-    stub_const('::Operations::Products::Fetch', fetch_double)
-    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
-    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
-    allow(premiums_double).to receive(:failure?).and_return(false)
-    allow(slcsp_double).to receive(:failure?).and_return(false)
-    allow(lcsp_double).to receive(:failure?).and_return(false)
+    create_home_address
+    eligibility_determination
+    update_benchmark_premiums
   end
 
   context 'success' do
