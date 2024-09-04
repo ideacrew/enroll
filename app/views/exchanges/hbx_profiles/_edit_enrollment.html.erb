@@ -14,13 +14,14 @@
         <div class="mb-3">
           <div class="d-flex flex-column">
             <%= f.label :dob, l10n('new_dob'), class: "align-self-start" %>
-            <%= f.date_field :dob, required: true, :value => params[:new_dob].present? ? Date.strptime(params[:new_dob], '%m/%d/%Y') : @person.dob, placeholder: "MM/DD/YYYY", :'data-date-min' => "-110y", :'data-date-max' => "+0", :onchange => "check_dob_change_implication('#{@person.id}', this.value, '#{@element_to_replace_id}')", class: "col-2" %>
+            <% dob = params[:new_dob].present? ? params[:new_dob] : @person.dob.strftime('%Y-%m-%d') %>
+            <%= f.date_field :dob, required: true, :value => dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", :onchange => "check_dob_change_implication('#{@person.id}', this.value, '#{@element_to_replace_id}')", class: "col-2" %>
           </div>
           <div class="d-flex flex-column">
             <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
-                <%= render partial: 'shared/person/ssn/admin_ssn_field', locals: { f: f, presenter: organize_ssn_params(f.object) } %>
+              <%= render partial: 'shared/person/ssn/admin_ssn_field', locals: { f: f, presenter: organize_ssn_params(f.object) } %>
             <% else %>
-               <%= f.label :ssn, l10n('new_ssn'), class: "align-self-start" %>
+              <%= f.label :ssn, l10n('new_ssn'), class: "align-self-start" %>
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
                 <%= f.text_field :ssn, placeholder: "000-00-0000", class: "col-2 mask-ssn",
                   pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')", oninput: "this.setCustomValidity('')",

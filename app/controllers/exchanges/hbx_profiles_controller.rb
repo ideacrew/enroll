@@ -677,9 +677,10 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
-    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, params[:new_dob])
+    new_dob = parse_date(params[:new_dob])
+    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, new_dob)
     respond_to do |format|
-      format.js { render "edit_enrollment", person: @person, :new_ssn => params[:new_ssn], :new_dob => params[:new_dob],  :family_actions_id => params[:family_actions_id]}
+      format.js { render "edit_enrollment", person: @person, :new_ssn => params[:new_ssn], :new_dob => new_dob, :family_actions_id => params[:family_actions_id]}
     end
   end
 
