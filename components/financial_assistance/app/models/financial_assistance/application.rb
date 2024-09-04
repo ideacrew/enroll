@@ -1444,6 +1444,16 @@ module FinancialAssistance
       self.save!
     end
 
+    # Configures the assistance year by assigning it and saving the record.
+    #
+    # @return [void]
+    # @raise [ActiveRecord::RecordInvalid] if the record is invalid
+    def configure_assistance_year
+      assign_assistance_year
+
+      self.save!
+    end
+
     private
 
     # If MemberA is parent to MemberB,
