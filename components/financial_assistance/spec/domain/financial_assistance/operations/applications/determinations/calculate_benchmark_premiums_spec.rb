@@ -85,8 +85,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Determinations::
       let(:result) { subject.call(application: application) }
       let(:in_state_address_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'DC', zip: '20001' } }
       let(:non_zero_output) do
-        {:health_only_lcsp_premiums => [{:member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.1e3}],
-         :health_only_slcsp_premiums => [{:member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.2e3}]}
+        {
+          health_only_lcsp_premiums: [{ member_identifier: applicant.person_hbx_id.to_s, monthly_premium: 100.00 }],
+          health_only_slcsp_premiums: [{ member_identifier: applicant.person_hbx_id.to_s, monthly_premium: 200.00 }]
+        }
       end
 
       before do

@@ -31,6 +31,27 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
     applicant.incomes << income
   end
 
+  let(:update_benchmark_premiums) do
+    ::FinancialAssistance::Application.all.each do |application|
+      application.applicants.each do |applicant|
+        applicant.benchmark_premiums = {
+          health_only_lcsp_premiums: [
+            { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 },
+          ],
+          health_only_slcsp_premiums: [
+            { member_identifier: applicant.person_hbx_id, monthly_premium: 100.00 },
+          ]
+        }
+      end
+
+      application.save!
+    end
+  end
+
+  before do
+    update_benchmark_premiums
+  end
+
   describe 'Evidences present the applicant' do
     let(:esi_evidence) do
       applicant.create_esi_evidence(

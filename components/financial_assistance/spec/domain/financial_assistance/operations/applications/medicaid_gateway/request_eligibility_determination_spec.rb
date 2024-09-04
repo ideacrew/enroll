@@ -39,7 +39,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       is_student: false,
       is_former_foster_care: false,
       is_post_partum_period: false
-      )
+    )
   end
 
   let(:create_home_address) do
