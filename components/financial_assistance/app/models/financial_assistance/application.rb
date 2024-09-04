@@ -1295,7 +1295,7 @@ module FinancialAssistance
       return if renewal_base_year.present?
 
       renewal_year = calculate_renewal_base_year
-      return if renewal_base_year.blank?
+      return if renewal_year.blank?
 
       self.renewal_base_year = renewal_year
     end
