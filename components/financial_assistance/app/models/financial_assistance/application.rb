@@ -1351,7 +1351,7 @@ module FinancialAssistance
 
       self.assistance_year = SAFE_REGISTRY_METHODS.fetch(
         FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item
-      ).new.call(assistance_year: assistance_year).value!
+      ).new.call.value!
     end
 
     def create_rrv_evidences
