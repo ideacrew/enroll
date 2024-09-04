@@ -73,7 +73,7 @@ module Effective
 
           dropdown += if individual_market_is_enabled?
                         [
-                          [l10n('admin_actions.edit_aptc_csr'), edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
+                          [l10n('admin_actions.edit_aptc_csr'), edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id), #TODO: Add new AJAX case for this link
                            aptc_csr_link_type(row, pundit_allow(Family, :can_edit_aptc?))],
                           ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), no_transition_families_is_enabled? ? 'static' : ''],
                           ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), no_transition_families_is_enabled? ? 'static' : '']
@@ -92,6 +92,7 @@ module Effective
           dropdown = construct_options(dropdown) if @bs4
           locals = {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}
           locals.merge!({pull_left: true, dropdown_class: "dropdown-menu-right"}) if @bs4
+          # TODO (maybe): add localized strings to keep that functionality in dropdown helper (which will require moving pundit in partial), 
           render partial: 'datatables/shared/dropdown', locals: locals, formats: :html
         }, :filter => false, :sortable => false
       end
