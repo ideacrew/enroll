@@ -5,6 +5,7 @@ module Operations
     # Do any work needed outside of just killing the devise session to log out
     # a SAML-based user.
     class LogoutSamlUser
+
       include Dry::Monads[:do, :result, :try]
 
       def call(session)
@@ -43,12 +44,23 @@ module Operations
       end
 
       def post_saml_logout_xml(logout_url, saml_logout_xml)
+        logger = Rails.logger
         request = Net::HTTP::Post.new logout_url.path
         request.body = saml_logout_xml.to_s
         request.content_type = 'text/xml'
-        Try do
+        result = Try do
           Net::HTTP.start(logout_url.hostname, logout_url.port, :use_ssl => logout_url.scheme == 'https') { |http| http.request request }
         end.to_result
+        logger.tagged("SAMLLogoutAttempt") do
+          if result.success?
+            response = result.value!
+            unless (200..299).include?(response.code.to_i)
+              logger.error "Status: #{response.code}"
+              logger.error "Body:\n#{response.body}"
+            end
+          end
+        end
+        result
       end
     end
   end
