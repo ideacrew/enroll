@@ -85,7 +85,14 @@ module Effective
                          transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?)) ? 'ajax' : 'disabled']
           end
 
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
+          dropdown.each { |option| 
+            option[2] = dropdown_type(option[2], @bs4)
+          }
+          dropdown.select! { |option| option[2].present? }
+          dropdown = construct_options(dropdown) if @bs4
+          locals = {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}
+          locals.merge!({pull_left: true, dropdown_class: "dropdown-menu-right"}) if @bs4
+          render partial: 'datatables/shared/dropdown', locals: locals, formats: :html
         }, :filter => false, :sortable => false
       end
 
@@ -102,6 +109,18 @@ module Effective
         true
       end
 
+      def dropdown_type(option_type, use_bs4)
+        return option_type unless use_bs4
+        case option_type
+        when "ajax"
+          :remote
+        when "edit_aptc_csr"
+          :remote_edit_aptc_csr
+        when "disabled"
+          nil # disabled dropdowns are not rendered on BS4
+        end
+      end
+
       def secure_message_link_type(family, current_user)
         person = family.primary_applicant.person
         ((person.user.present? || person.emails.present?) && current_user.person.hbx_staff_role) ? 'ajax' : 'disabled'
@@ -109,7 +128,7 @@ module Effective
 
       def aptc_csr_link_type(family, allow)
         # return "disabled" # DISABLING APTC FEATURE.
-        family.active_household.latest_active_tax_household.present? && allow ? 'ajax' : 'disabled'
+        family.active_household.latest_active_tax_household.present? && allow ? 'edit_aptc_csr' : 'disabled'
       end
 
       def add_sep_link_type(allow)
