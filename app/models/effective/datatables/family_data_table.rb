@@ -88,7 +88,7 @@ module Effective
           dropdown.each { |option| 
             option[2] = dropdown_type(option[2], @bs4)
           }
-          dropdown.select! { |option| option[2].present? }
+          dropdown.select! { |option| option[2].present? } if @bs4
           dropdown = construct_options(dropdown) if @bs4
           locals = {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}
           locals.merge!({pull_left: true, dropdown_class: "dropdown-menu-right"}) if @bs4
