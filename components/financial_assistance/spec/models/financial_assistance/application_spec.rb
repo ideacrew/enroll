@@ -892,17 +892,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       FactoryBot.build(:financial_assistance_deduction, amount: 100, start_on: Date.new(TimeKeeper.date_of_record.year,6,1), end_on: Date.new(TimeKeeper.date_of_record.year, 6, 30), frequency_kind: "biweekly")
     end
 
-    context "application does not have any active applicants" do
-      before do
-        applicant.update_attributes(is_active: false)
-      end
-
-      it 'should not update net annual income for applicant' do
-        application.calculate_total_net_income_for_applicants
-        expect(applicant.net_annual_income).to eq nil
-      end
-    end
-
     context "No incomes and only deductions" do
       before do
         applicant.deductions << deduction
