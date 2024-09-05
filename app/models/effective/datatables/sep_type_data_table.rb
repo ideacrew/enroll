@@ -25,8 +25,27 @@ module Effective
               [l10n("datatables.sep_type_data_table.clone"), clone_exchanges_manage_sep_types_path(id: row.id), 'static']
             ]
           end
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "sep_type_actions_#{row.id}"}, formats: :html
+          dropdown.each { |option| 
+            option[2] = dropdown_type(option[2], @bs4)
+          }
+          dropdown.select! { |option| option[2].present? } if @bs4
+          dropdown = construct_options(dropdown) if @bs4
+          locals = {dropdowns: dropdown, row_actions_id: "sep_type_actions_#{row.id}"}
+          locals.merge!({pull_left: true, dropdown_class: "dropdown-menu-right"}) if @bs4
+          render partial: 'datatables/shared/dropdown', locals: locals, formats: :html
         }, :filter => false, :sortable => false
+      end
+
+      def dropdown_type(option_type, use_bs4)
+        return option_type unless use_bs4
+        case option_type
+        when "static"
+          :default
+        when "ajax"
+          :remote
+        when "disabled"
+          nil # disabled dropdowns are not rendered on BS4
+        end
       end
 
       def collection
