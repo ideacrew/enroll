@@ -3,6 +3,9 @@
 require "rails_helper"
 
 describe Forms::HealthcareForChildcareProgramForm do
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
+  end
 
   context '.load_eligibility' do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary)}
