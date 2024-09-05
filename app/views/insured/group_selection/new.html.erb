@@ -51,18 +51,11 @@
         <% end %>
       <% end %>
 
-      <h2><%= l10n("insured.group_selection.new.who_needs_coverage") %></h2>
-      <% if @adapter.can_shop_shop?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) && @coverage_household.coverage_household_members %>
-        <div id="coverage-household">
-          <%= render 'coverage_household' %>
-        </div>
-      <% end %>
-
       <% if @adapter.can_shop_both_markets?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) %>
         <div id="market_kinds" class="mb-3">
         <fieldset>
-          <legend class="text-reset"><h3><%= l10n("insured.group_selection.new.marketplace") %></h3></legend>
-          <div class="n-radio-group d-flex align-items-center my-2">
+          <legend class="text-reset mb-0"><h3><%= l10n("insured.group_selection.new.marketplace") %></h3></legend>
+          <div class="n-radio-group d-flex align-items-center mb-2">
             <% view_market_places(@person).each_with_index do |kind, index| %>
               <label class="n-radio weight-n" for="market_kind_<%= kind %>">
                 <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'market_kind_<%= kind %>')">
@@ -90,15 +83,11 @@
         <% end %>
       <% end %>
 
-      <% if @adapter.can_shop_shop?(@person) %>
-        <%= render partial: 'select_employer', locals: {effective_date: effective_date_for_display} %>
-      <% end %>
-
       <div id="coverage_kinds" class="mb-3">
       <fieldset>
-        <legend class="text-reset"><h3><%= l10n("benefit_type") %></h3></legend>
+        <legend class="text-reset mb-0"><h3><%= l10n("benefit_type") %></h3></legend>
 
-        <div class="n-radio-group d-flex align-items-center my-2">
+        <div class="n-radio-group d-flex align-items-center mb-2">
           <div tabindex="0" onkeydown="handleButtonKeyDown(event, 'coverage_kind_health')" class="n-radio-row mr-3">
             <label class="n-radio weight-n" for="coverage_kind_health">
               <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"), id: 'coverage_kind_health', required: true, class: "n-radio" %>
@@ -115,6 +104,19 @@
         </div>
       </fieldset>
       </div>
+
+      <h2><%= l10n("insured.group_selection.new.who_needs_coverage") %></h2>
+      <% if @adapter.can_shop_shop?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) && @coverage_household.coverage_household_members %>
+        <div id="coverage-household">
+          <%= render 'coverage_household' %>
+        </div>
+      <% end %>
+
+      <% if @adapter.can_shop_shop?(@person) %>
+        <%= render partial: 'select_employer', locals: {effective_date: effective_date_for_display} %>
+      <% end %>
+
+
       <% if @change_plan.present? %>
         <%= hidden_field_tag 'change_plan', @change_plan %>
         <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present? %>
