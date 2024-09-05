@@ -116,6 +116,8 @@ class UsersController < ApplicationController
     authorize HbxProfile, :login_history?
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
 
+    @bs4 = true
+
     respond_to do |format|
       format.js { render 'login_history' }
     end
@@ -127,6 +129,8 @@ class UsersController < ApplicationController
   # @response_to HTML
   # @note Authentication and Authorization are not required
   def unsupported_browser
+    @bs4 = true
+    
     respond_to do |format|
       format.html { render 'unsupported_browser' }
     end
