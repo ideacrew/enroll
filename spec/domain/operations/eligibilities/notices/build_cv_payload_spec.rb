@@ -84,6 +84,8 @@ RSpec.describe ::Operations::Eligibilities::Notices::BuildCvPayload,
 
     context 'with valid params' do
       before :each do
+        allow(::EnrollRegistry).to receive(:feature?).and_return(true)
+        allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
         person1.consumer_role.verification_types.each do |vt|
           vt.update_attributes(

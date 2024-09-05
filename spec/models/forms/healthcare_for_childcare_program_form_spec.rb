@@ -3,9 +3,6 @@
 require "rails_helper"
 
 describe Forms::HealthcareForChildcareProgramForm do
-  before do
-    allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
-  end
 
   context '.load_eligibility' do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary)}
@@ -34,6 +31,7 @@ describe Forms::HealthcareForChildcareProgramForm do
     before do
       allow(::EnrollRegistry).to receive(:feature?).and_return(true)
       allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
       TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 5, 1))
       catalog_eligibility
     end
@@ -136,6 +134,7 @@ describe Forms::HealthcareForChildcareProgramForm do
     before do
       allow(::EnrollRegistry).to receive(:feature?).and_return(true)
       allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
     end
 
     context 'when osse_eligibility selected YES' do
