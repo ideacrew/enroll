@@ -1,6 +1,6 @@
 <br/><br/>
 <% url, http_method = add_new_sep_exchanges_hbx_profiles_path, :post %>
-<%= form_tag url, method: http_method, remote: true, class: 'input', id: 'admin_sep_form' do %>
+<%= form_tag url, method: http_method, remote: true, class: ('input' unless @bs4), id: 'admin_sep_form' do %>
 <div class='radio_option'>
 	<div class="col-md-2 col-md-offset-1 col-sm-4 content-bottom">
 		<div class="col-md-8 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
