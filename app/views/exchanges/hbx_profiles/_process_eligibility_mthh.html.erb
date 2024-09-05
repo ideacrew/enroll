@@ -7,7 +7,11 @@
 
   <div class="mb-2">
     <p>Please enter the effective date</p>
-    <%= text_field_tag 'tax_household_group[effective_date]', nil, {:class => "interaction-field-control-census-employee-dob input_txt date-picker form-control", :placeholder => "EFFECTIVE DATE", required: true} %>
+    <% if @bs4 %>
+      <%= date_field_tag 'tax_household_group[effective_date]', nil, {:class => "interaction-field-control-census-employee-dob input_txt form-control", required: true} %>
+    <% else %>
+      <%= text_field_tag 'tax_household_group[effective_date]', nil, {:class => "interaction-field-control-census-employee-dob input_txt date-picker form-control", :placeholder => "EFFECTIVE DATE", required: true} %>
+    <% end %>
   </div>
 
   <div>
