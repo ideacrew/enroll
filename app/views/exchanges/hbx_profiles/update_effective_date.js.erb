@@ -8,13 +8,21 @@ if (!disableSelectric) {
   $('.admin_effective_on_kind_options select').html("<%= escape_javascript options_for_select([['EFFECTIVE DATE RULE', '']]) + options_for_select(@effective_kinds)%>");
 }
 
+var bs4 = document.documentElement.dataset.bs4 == "true";
+var date_inputs =  $('#start_on, #end_on, #next_poss_effective_date');
 if("<%= @qle.is_self_attested %>" == 'true'){
-  $('#start_on, #end_on').addClass("disabled-input");
-  $('#next_poss_effective_date').addClass("disabled-input");
+  if (!bs4) {
+    date_inputs.addClass("disabled-input");
+  } else {
+    date_inputs.attr("disabled", true);
+  }
 }
 else{
-  $('#start_on, #end_on').removeClass("disabled-input");
-  $('#next_poss_effective_date').removeClass("disabled-input");
+  if (!bs4) {
+    date_inputs.removeClass("disabled-input");
+  } else {
+    date_inputs.removeAttr("disabled");
+  }
 }
 
 function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, eligibilty_start_date, eligibilty_end_date, cdate) {

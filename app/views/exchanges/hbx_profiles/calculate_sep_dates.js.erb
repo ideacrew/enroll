@@ -1,7 +1,15 @@
 $('.sep_dates_filter').show();
-$('.start_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @start_on %>");
-$('.end_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @end_on %>");
-$('.init_effective_date input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @effective_on %>");
+var bs4 = document.documentElement.dataset.bs4 == "true";
+if (!bs4) {
+  $('.start_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @start_on %>");
+  $('.end_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @end_on %>");
+  $('.init_effective_date input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @effective_on %>");
+} else {
+  $('.start_btn input').val("<%= @start_on %>");
+  $('.end_btn input').val("<%= @end_on %>");
+  $('.init_effective_date input').val("<%= @effective_on %>");
+}
+
 $('.kind input').val("<%= @eff_kind %>")
 "<%= @date_options %>" == "true" ? $('.optional_date').show() : $('.optional_date').hide();
 if ("<%= prior_py_sep?(@family, @effective_on, @market_kind) %>" == "true") {
