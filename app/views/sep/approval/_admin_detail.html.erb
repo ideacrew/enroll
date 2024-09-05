@@ -40,13 +40,19 @@
 		         	</div>
 	         	</div>
 	         	<div class='init_event_date'>
-	         	  <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-			     			<%= text_field_tag :event_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y", class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE"%>
-			 				</div>
+              <% if @bs4 %>
+                <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: 110.years.ago, max: 110.years, required: true %>
+              <% else %>
+                <%= text_field_tag :event_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y", class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE"%>
+              <% end %>
 			 			</div>
 	         	<div class='admin_effective_on_kind_options'>
 							<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-		            <%= select_tag :effective_on_date, class: "selectric form-control qle-date-kind", required: true,  prompt: "EFFECTIVE DATE RULE" %>
+                <% if @bs4 %>
+		              <%= select_tag :effective_on_date, class: "form-control qle-date-kind", required: true,  prompt: "EFFECTIVE DATE RULE" %>
+                <% else %>
+		              <%= select_tag :effective_on_date, class: "selectric form-control qle-date-kind", required: true, prompt: "EFFECTIVE DATE RULE" %>
+                <% end %>
 		          </div>
 		        </div>
 			    	<div class='csl_num_options'>
