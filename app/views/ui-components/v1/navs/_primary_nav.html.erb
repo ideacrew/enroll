@@ -1,11 +1,11 @@
 <% content_for :horizontal_menu do %>
-  <% if @bs4 %>
+  <% if true # @bs4 %>
     <nav id="admin-nav" class="<%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' %>">
-      <div class="container px-0">
+      <div class="container">
         <ul id="myTab" class="list-unstyled list-inline m-0 p-0" role="tablist">
           <% if individual_market_is_enabled? %>
             <li class="nav-item" role="presentation">
-              <button class="dropdown-toggle unstyled" data-toggle="dropdown" id="families_dropdown">Families</button>
+              <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="families_dropdown">Families <i class="fas fa-caret-down"></i></a>
               <ul class="dropdown-menu" aria-labelledby="families_dropdown">
                 <li>
                   <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'families', link_path: main_app.family_index_dt_exchanges_hbx_profiles_path, display_name: 'Families', active_tab: "families", remote: false, pundit_object: nil, pundit_method: nil} %>
@@ -62,7 +62,7 @@
             </li>
           <% end %>
           <li class="dropdown pl-1" role="presentation">
-            <button class="dropdown-toggle unstyled" data-toggle="dropdown" id="brokersMenu">Brokers</button>
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="brokersMenu">Brokers <i class="fas fa-caret-down"></i></a>
             <ul class="dropdown-menu" aria-labelledby="brokersMenu">
               <li>
                 <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'brokers', link_path: main_app.exchanges_broker_applicants_path, display_name: 'Broker Applications', active_tab: "brokers", remote: false, pundit_object: nil, pundit_method: nil} %>
@@ -87,7 +87,7 @@
             </ul>
           </li>
           <li class="dropdown pl-1" role="presentation">
-            <button class="dropdown-toggle unstyled" data-toggle="dropdown" id="adminMenu">Admin</button>
+            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="adminMenu">Admin <i class="fas fa-caret-down"></i></a>
             <ul class="dropdown-menu" aria-labelledby="adminMenu">
               <% if policy_helper(HbxProfile).view_the_configuration_tab? %>
                 <li>
@@ -119,6 +119,14 @@
               <% end %>
             </ul>
           </li>
+          <% if EnrollRegistry.feature_enabled?(:inbox_tab) %>
+            <li class="pl-1" role="presentation <%= pundit_class HbxProfile, :view_admin_tabs? %>">
+              <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), remote: false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", id: "inbox-tab") do %>
+                Inbox
+                <span class="badge message-unread ml-half"><%= @unread_messages %></span>
+              <% end %>
+            </li>
+          <% end %>
           <% if EnrollRegistry.feature_enabled?(:notices_tab) %>
             <li class="pl-1" role="presentation <%= pundit_class HbxProfile, :view_admin_tabs? %>">
               <%= link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab") do %>
@@ -268,6 +276,14 @@
               <% end %>
             </ul>
           </li>
+          <% if EnrollRegistry.feature_enabled?(:inbox_tab) %>
+            <li class="pl-1" role="presentation <%= pundit_class HbxProfile, :view_admin_tabs? %>">
+              <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), remote: false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do %>
+                Inbox
+                <span class="badge ml-half"><%= @unread_messages %></span>
+              <% end %>
+            </li>
+          <% end %>
           <% if EnrollRegistry.feature_enabled?(:notices_tab) %>
             <li class="pl-1" role="presentation <%= pundit_class HbxProfile, :view_admin_tabs? %>">
               <%= link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab") do %>
