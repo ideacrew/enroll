@@ -2,6 +2,7 @@
 
 # Helper for constructing dropdown options for use in the `datatables/shared/_dropdown` partial
 module DropdownHelper
+  # the dropdowns used for the Applications index - these live outside of datatable
   def application_dropdowns(application)
     option_args = [
       ([l10n('faa.applications.actions.update'), edit_application_path(application), :default] if application.is_draft? || (application.imported? && current_user.has_hbx_staff_role?)),
@@ -11,6 +12,16 @@ module DropdownHelper
     ]
     option_args = add_hbx_only_dropdowns(application, option_args)
     construct_options(option_args)
+  end
+
+  # map legacy dropdowns to BS4 dropdowns
+  # NOTE: should remove & refactor dropdowns from callers once BS4 is turned on
+  # TODO: maybe move into a new dedicated module Datatables file to be defined solely there and called from the datables
+  def datatable_dropdowns(dropdowns)
+    return dropdowns unless @bs4
+    dropdowns.each { |dropdown| dropdown[2] = dropdown_type(dropdown[2]) }
+    dropdowns.select! { |option| option[2].present? } if @bs4 # legacy disabled dropdowns are not rendered on BS4
+    construct_options(dropdowns)
   end
 
   private
@@ -28,6 +39,7 @@ module DropdownHelper
     {title: title, link: link, attributes: attribute_hash(option_type)}
   end
 
+  # map dropdown type keys to link attributes
   def attribute_hash(option_type)
     case option_type
     when :default
@@ -36,6 +48,21 @@ module DropdownHelper
       ::DropdownHelper::REMOTE.dup
     when :remote_edit_aptc_csr
       ::DropdownHelper::REMOTE_EDIT_APTC_CSR.dup
+    end
+  end
+
+  # map legacy dropdown types to BS4 dropdown types
+  # NOTE: should remove & update dropdown types from callers once BS4 is turned on
+  def dropdown_type(legacy_type)
+    case legacy_type
+    when "static"
+      :default
+    when "ajax"
+      :remote
+    when "edit_aptc_csr"
+      :remote_edit_aptc_csr
+    when "disabled"
+      nil # disabled dropdowns are not rendered on BS4
     end
   end
 
