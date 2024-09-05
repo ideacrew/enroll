@@ -32,8 +32,10 @@ class HbxAdminController < ApplicationController
     end
   end
 
-  def update_aptc_csr
+  def update_aptc_csr # GUESSING this is needed to render validation_error modal in household_header - conditional?
     authorize HbxProfile, :edit_aptc_csr?
+
+    @bs4 = true
 
     if @aptc_errors.blank?
       if @family.present? #&& TimeKeeper.date_of_record.year == year
@@ -57,8 +59,10 @@ class HbxAdminController < ApplicationController
   end
 
   # For AJAX Calculations.
-  def calculate_aptc_csr
+  def calculate_aptc_csr # needed to render validation_error modal in household_header - conditional?
     authorize HbxProfile
+
+    @bs4 = true
 
     @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)

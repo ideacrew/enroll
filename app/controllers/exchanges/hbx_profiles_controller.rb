@@ -8,6 +8,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include HtmlScrubberUtil
   include StringScrubberUtil
 
+  before_action :enable_bs4_layout
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :configuration, :broker_agency_index, :inbox, :show, :binder_index]
