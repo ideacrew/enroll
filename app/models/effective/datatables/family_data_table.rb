@@ -85,15 +85,8 @@ module Effective
                          transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?)) ? 'ajax' : 'disabled']
           end
 
-          dropdown.each { |option| 
-            option[2] = dropdown_type(option[2], @bs4)
-          }
-          dropdown.select! { |option| option[2].present? } if @bs4
-          dropdown = construct_options(dropdown) if @bs4
-          locals = {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}
-          locals.merge!({pull_left: true, dropdown_class: "dropdown-menu-right"}) if @bs4
-          # TODO (maybe): add localized strings to keep that functionality in dropdown helper (which will require moving pundit in partial), 
-          render partial: 'datatables/shared/dropdown', locals: locals, formats: :html
+          # TODO (maybe): add localized strings to keep that functionality in dropdown helper (which will require moving pundit in partial)
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: datatable_dropdowns(dropdown), row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
@@ -108,20 +101,6 @@ module Effective
 
       def global_search?
         true
-      end
-
-      def dropdown_type(option_type, use_bs4)
-        return option_type unless use_bs4
-        case option_type
-        when "static"
-          :default
-        when "ajax"
-          :remote
-        when "edit_aptc_csr"
-          :remote_edit_aptc_csr
-        when "disabled"
-          nil # disabled dropdowns are not rendered on BS4
-        end
       end
 
       def secure_message_link_type(family, current_user)
