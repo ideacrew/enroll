@@ -1,16 +1,18 @@
 <script type="text/javascript">
+    var id = $('[id^="terminate_hbx_"]:checked').first().attr('id').split('_').reverse()[0];
     jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=checkbox]").prop('disabled', false);
-    jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=text]").prop('disabled', false);
+    $('#termination-date-picker_' + id).prop('disabled', false);
+    console.log(id);
     jQuery('[id^="terminate_hbx_"]').click(function($) {
         jQuery('[id^="terminate_hbx_"]').each(function($) {
+            id = jQuery(this).attr('id').split('_').reverse()[0];
             if (this.checked) {
                 jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', false);
-                jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', false);
+                jQuery('#termination-date-picker_' + id).prop('disabled', false);
             }else{
                 jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', true);
                 jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('checked', false);
-                jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', true);
-            }
+                jQuery('#termination-date-picker_' + id).prop('disabled', true);            }
         });
     });
 
@@ -90,12 +92,12 @@
                   <td id="enrollment_effective_on"><%= hbx.effective_on %></td>
                   <% term_or_expire_date = hbx.fetch_term_or_expiration_date %>
                   <td><%= term_or_expire_date %></td>
-                  <% if hbx.prior_plan_year_coverage? || hbx.active_plan_year_coverage? %>
-                    <% max_date = hbx.is_shop? ? hbx.sponsored_benefit_package.end_on : hbx.effective_on.end_of_year %>
-                    <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value:  term_or_expire_date, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" => max_date  %></td>
-                  <% else %>
-                    <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value:  term_or_expire_date, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" =>  hbx.terminated_on %></td>
-                  <% end %>
+                  <% max_date = hbx.prior_plan_year_coverage? || hbx.active_plan_year_coverage? ? (hbx.is_shop? ? hbx.sponsored_benefit_package.end_on : hbx.effective_on.end_of_year) : hbx.terminated_on %> 
+                    <% if @bs4 %>
+                      <td><%= date_field_tag :new_termination_date, nil, disabled: true, value: term_or_expire_date, id: "termination-date-picker_#{hbx.id}", min_date: hbx.effective_on, max_date: max_date  %></td>
+                    <% else %>
+                      <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value: term_or_expire_date, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" => hbx.effective_on, "data-date-max" => max_date  %></td>
+                    <% end %>
                   <td><%= check_box_tag "edi_required", hbx.id, false,  disabled: true%></td>
                 </tr>
             <% end %>
@@ -113,7 +115,7 @@
       <h4 class='title'>No Enrollments to terminate</h4>
   <%end%>
 
-  <div class="modal fade" id="termiante_with_earlier_date" tabindex="-1" role="dialog" aria-labelledby="RetermConfirm" role="document">
+  <div class="modal <%= 'fade' unless @bs4 %>" id="termiante_with_earlier_date" tabindex="-1" role="dialog" aria-labelledby="RetermConfirm" role="document">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header" style="border-bottom:none">
