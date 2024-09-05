@@ -337,6 +337,7 @@ module FinancialAssistance
 
     validate :presence_of_attr_other_qns, on: :other_qns
     validate :driver_question_responses, on: :submission
+    validate :filing_jointly, on: :tax_info_complete
     validates :validate_applicant_information, presence: true, on: :submission
     validate :is_temporarily_out_of_state, on: :submission, if: :living_outside_state?
 
@@ -1549,6 +1550,9 @@ module FinancialAssistance
 
     def presence_of_attr_step_1
       errors.add(:is_joint_tax_filing, "#{full_name} must answer 'Will this person be filing jointly?'") if is_required_to_file_taxes && is_joint_tax_filing.nil? && (is_spouse_of_primary || (is_primary_applicant && has_spouse))
+      if is_required_to_file_taxes && is_joint_tax_filing == false && (is_spouse_of_primary || (is_primary_applicant && has_spouse))
+        errors.add(:is_joint_tax_filing, "#{full_name} should be filing jointly if they are married to another applicant and living together")
+      end
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
       errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank") if is_required_to_file_taxes.nil?
       errors.add(:is_claimed_as_tax_dependent, "' is_claimed_as_tax_dependent can't be blank") if is_claimed_as_tax_dependent.nil?
