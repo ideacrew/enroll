@@ -30,7 +30,7 @@
           </div>
           <div class="mr-4">
             <label class="required" for="update_tax_credit_percentage"> <%= l10n("percentage") %></label>
-            <input type="number" min="0" max="100" name="update_tax_credit_percentage" id="update_tax_credit_percentage" class="form-control tax_credit_field_container" data-initial-percent="<%= number_with_precision(@self_term_or_cancel_form[:elected_aptc_pct].to_f * 100) %>" value="<%= number_with_precision(@self_term_or_cancel_form[:elected_aptc_pct].to_f * 100, precision: 0) %>" placeholder="0">
+            <input type="number" min="0" max="100" name="update_tax_credit_percentage" id="update_tax_credit_percentage" class="form-control tax_credit_field_container" data-initial-percent="<%= number_with_precision(@self_term_or_cancel_form[:elected_aptc_pct].to_f * 100, precision: 0) %>" value="<%= number_with_precision(@self_term_or_cancel_form[:elected_aptc_pct].to_f * 100, precision: 0) %>" placeholder="0">
           </div>
           <div class="mt-4">
             <div class="d-flex">
