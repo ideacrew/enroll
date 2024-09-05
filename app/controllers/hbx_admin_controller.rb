@@ -12,8 +12,10 @@ class HbxAdminController < ApplicationController
     authorize EnrollRegistry, :show?
   end
 
-  def edit_aptc_csr
+  def edit_aptc_csr #conditional?
     authorize HbxProfile
+
+    @bs4 = true
 
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)
     @household_members = Admin::Aptc.build_household_members(@current_year, @family)

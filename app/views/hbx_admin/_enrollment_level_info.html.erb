@@ -12,7 +12,7 @@
       </div>
     </h2>
   </div>
-  <div id="<%='enrollment_' + hbx_id.to_s%>" class="collapse in">
+  <div id="<%='enrollment_' + hbx_id.to_s%>" class="<%= "collapse" unless @bs4 %> in">
 
     <div class="panel-body">
       <%= render 'enrollment_header.html.erb', :hbx_id => hbx_id, :hbx_values => hbx_values, :enrollment_count => enrollment_count%>
