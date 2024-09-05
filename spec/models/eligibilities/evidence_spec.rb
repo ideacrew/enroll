@@ -31,25 +31,14 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
     applicant.incomes << income
   end
 
-  let(:update_benchmark_premiums) do
+  let(:configure_benchmark_premiums) do
     ::FinancialAssistance::Application.all.each do |application|
-      application.applicants.each do |applicant|
-        applicant.benchmark_premiums = {
-          health_only_lcsp_premiums: [
-            { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 },
-          ],
-          health_only_slcsp_premiums: [
-            { member_identifier: applicant.person_hbx_id, monthly_premium: 100.00 },
-          ]
-        }
-      end
-
-      application.save!
+      update_benchmark_premiums(application)
     end
   end
 
   before do
-    update_benchmark_premiums
+    configure_benchmark_premiums
   end
 
   describe 'Evidences present the applicant' do
@@ -541,6 +530,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
             family_member_id = family.family_members[0].id
             applicant.update(family_member_id: family_member_id)
             application.update(family_id: family.id)
+            update_benchmark_premiums(application)
           end
 
           context 'when hub call made for applicant 2' do
@@ -642,6 +632,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
             family_member_id = family.family_members[0].id
             applicant.update(family_member_id: family_member_id)
             application.update(family_id: family.id)
+            update_benchmark_premiums(application)
           end
 
           context 'when hub call made for applicant 2' do
@@ -889,6 +880,21 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       end
     end
   end
+end
+
+def update_benchmark_premiums(application)
+  premiums = application.applicants.collect do |applicant|
+    { member_identifier: applicant.person_hbx_id, monthly_premium: 100.0 }
+  end
+
+  application.applicants.each do |applicant|
+    applicant.benchmark_premiums = {
+      health_only_lcsp_premiums: premiums,
+      health_only_slcsp_premiums: premiums
+    }
+  end
+
+  application.save!
 end
 
 def create_embedded_docs_for_evidence(evidence)

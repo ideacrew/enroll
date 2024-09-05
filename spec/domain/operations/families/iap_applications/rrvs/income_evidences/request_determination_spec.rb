@@ -55,7 +55,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::IncomeEvidences::Req
       is_post_partum_period: false,
       is_ia_eligible: true,
       incomes: incomes
-      )
+    )
   end
 
   let(:applicant2) do
