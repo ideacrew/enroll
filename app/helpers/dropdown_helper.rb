@@ -21,6 +21,7 @@ module DropdownHelper
     return dropdowns unless @bs4
     dropdowns.each { |dropdown| dropdown[2] = dropdown_type(dropdown[2]) }
     dropdowns.select! { |option| option[2].present? } if @bs4 # legacy disabled dropdowns are not rendered on BS4
+    # NOTE: We should remove this select call and update the callers to not pass in disabled dropdowns
     construct_options(dropdowns)
   end
 
