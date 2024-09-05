@@ -2,11 +2,11 @@
 <script> $(function() { $("#validationModal").modal(); });</script>
 
 <!-- Validation Modal -->
-<div class="modal fade" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal <%= "fade" unless @bs4 %>" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-header <%= 'flex-row-reverse' if @bs4 %>">
+        <button type="button" class="close <%= 'pl-0 ml-0' if @bs4 %>" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">Please fix the following validation error(s)</h4>
       </div>
       <div class="modal-body">
@@ -17,10 +17,8 @@
         <hr />
         
           <div class="warning">
-            <i class="fa fa-info-circle"> &nbsp; You may reset your changes by clicking on the 'Reset' button. It will revert to the values strored in the database.</i>
+            <i class="<%= 'fa fa-info-circle' unless @bs4 %>%"> &nbsp; You may reset your changes by clicking on the 'Reset' button. It will revert to the values strored in the database.</i>
           </div>
-
-
       </div>
     </div>
   </div>

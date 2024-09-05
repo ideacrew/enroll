@@ -8,6 +8,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include HtmlScrubberUtil
   include StringScrubberUtil
 
+  before_action :enable_bs4_layout
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :configuration, :broker_agency_index, :inbox, :show, :binder_index]
@@ -18,7 +19,15 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :redirect_if_employer_datatable_is_disabled, only: [:employer_datatable]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
-  layout 'single_column'
+  layout :resolve_layout
+
+  def resolve_layout
+    true ? 'progress' : 'single_column'
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
+  end
 
   # SHOP Feature
   def oe_extendable_applications
