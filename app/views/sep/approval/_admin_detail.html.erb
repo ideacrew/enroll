@@ -40,11 +40,14 @@
 		         	</div>
 	         	</div>
 	         	<div class='init_event_date'>
-              <% if @bs4 %>
-                <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: 110.years.ago, max: 110.years, required: true %>
-              <% else %>
-                <%= text_field_tag :event_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y", class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE"%>
-              <% end %>
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                <% if @bs4 %>
+                  <label for="event_date">EVENT DATE</label>
+                  <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: 110.years.ago, max: 110.years.from_now, required: true %>
+                <% else %>
+                  <%= text_field_tag :event_date, "", :'data-date-max'=> "+110y", :'data-date-min'=> "-110y", class: "floatlabel required date-picker qle-date-picker form-control", required: true, placeholder: "EVENT DATE"%>
+                <% end %>
+              </div>
 			 			</div>
 	         	<div class='admin_effective_on_kind_options'>
 							<div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
@@ -65,31 +68,61 @@
 			 			<div class = "start_end_date">
 			 				<div class = "start_btn">
 						 		<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd start_input">
-						      		<%= text_field_tag :start_on, "", :'data-date-max'=> "+0d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-startDate form-control", required: true, placeholder: "SEP START DATE", value: Date.current %>
+                  <% if @bs4 %>
+                    <label for="start_on">SEP Start Date</label>
+                    <%= date_field_tag :start_on, nil, value: Date.current, placeholder: "MM/DD/YYYY", min: 0, max: 0, required: true %>
+                  <% else %>
+                    <%= text_field_tag :start_on, "", :'data-date-max'=> "+0d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-startDate form-control", required: true, placeholder: "SEP START DATE", value: Date.current %>
+                  <% end %>						 		
 						 		</div>
 						 	</div>
 						 	<div class = "end_btn">
 						 		<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd end_input">
-						      		<%= text_field_tag :end_on, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-endDate form-control disabled-input", required: true, placeholder: "SEP END DATE", value: Date.current + 60%>
+                  <% if @bs4 %>
+                    <label for="end_on">SEP End Date</label>
+                    <%= date_field_tag :end_on, nil, value: Date.current + 60, placeholder: "MM/DD/YYYY", min: 0, max: 60.days.from_now, required: true %>
+                  <% else %>
+                    <%= text_field_tag :end_on, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker qle-endDate form-control disabled-input", required: true, placeholder: "SEP END DATE", value: Date.current + 60%>
+                  <% end %>		
 								</div>
 							</div>
 						</div>
 						<div class='init_effective_date'>
 							<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-						    	<%= text_field_tag :next_poss_effective_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control disabled-input", required: true, placeholder: "NEXT POSSIBLE START DATE", value: Date.current %>
+                <% if @bs4 %>
+                <label for="next_poss_effective_date">Next Possible Start Date</label>
+                  <%= date_field_tag :next_poss_effective_date, nil, value: Date.current, placeholder: "MM/DD/YYYY", min: 0, max: 60.days.from_now, required: true %>
+                <% else %>
+                  <%= text_field_tag :next_poss_effective_date, "", :'data-date-max'=> "+60d", :'data-date-min'=> "0d",class: "floatlabel required date-picker form-control disabled-input", required: true, placeholder: "NEXT POSSIBLE START DATE", value: Date.current %>
+                <% end %>		
 							</div>
 						</div>
 					</div>
 					<div class='row row-form-wrapper no-buffer optional_date'>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <% if @bs4 %>
+                <label for="option1_date">Date 1 Option</label>
+                <%= date_field_tag :option1_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max'), placeholder: "DATE 1 OPTION" %>
+              <% else %>
 						    <%= text_field_tag :option1_date, "", :'data-date-max'=> sep_optional_date(@family, 'max'), :'data-date-min'=> sep_optional_date(@family, 'min'),class: "floatlabel required date-picker form-control", placeholder: "DATE 1 OPTION" %>
+              <% end %>
 						</div>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <% if @bs4 %>
+                <label for="option2_date">Date 2 Option</label>
+                <%= date_field_tag :option2_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max'), placeholder: "DATE 2 OPTION" %>
+              <% else %>
 						    <%= text_field_tag :option2_date, "", :'data-date-max'=> sep_optional_date(@family, 'max'), :'data-date-min'=> sep_optional_date(@family, 'min'),class: "floatlabel required date-picker form-control", placeholder: "DATE 2 OPTION" %>
-						</div>
+              <% end %>						
+            </div>
 						<div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <% if @bs4 %>
+                <label for="option3_date">Date 3 Option</label>
+                <%= date_field_tag :option3_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max'), placeholder: "DATE 3 OPTION" %>
+              <% else %>
 						    <%= text_field_tag :option3_date, "", :'data-date-max'=> sep_optional_date(@family, 'max'), :'data-date-min'=> sep_optional_date(@family, 'min'),class: "floatlabel required date-picker form-control", placeholder: "DATE 3 OPTION" %>
-						</div>
+              <% end %>						
+            </div>
 					</div>
           <% is_individual = @family.primary_person.has_consumer_role? || @family.primary_person.has_resident_role? %>
           <% is_employee = @family.primary_person.has_employee_roles? %>
