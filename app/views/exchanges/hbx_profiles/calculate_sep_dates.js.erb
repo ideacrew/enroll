@@ -5,9 +5,9 @@ if (!bs4) {
   $('.end_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @end_on %>");
   $('.init_effective_date input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @effective_on %>");
 } else {
-  $('.start_btn input').val("<%= @start_on %>");
-  $('.end_btn input').val("<%= @end_on %>");
-  $('.init_effective_date input').val("<%= @effective_on %>");
+  $('.start_btn input').val("<%= @start_on.strftime('%Y-%m-%d') %>");
+  $('.end_btn input').val("<%= @end_on.strftime('%Y-%m-%d') %>");
+  $('.init_effective_date input').val("<%= @effective_on.strftime('%Y-%m-%d') %>");
 }
 
 $('.kind input').val("<%= @eff_kind %>")
