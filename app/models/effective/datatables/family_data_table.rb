@@ -113,6 +113,8 @@ module Effective
       def dropdown_type(option_type, use_bs4)
         return option_type unless use_bs4
         case option_type
+        when "static"
+          :default
         when "ajax"
           :remote
         when "edit_aptc_csr"

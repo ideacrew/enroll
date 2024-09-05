@@ -752,18 +752,20 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def create_eligibility
+  def create_eligibility #conditional?
     authorize HbxProfile, :create_eligibility?
 
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       @element_to_replace_id = params[:tax_household_group][:family_actions_id]
       family = Person.find(params[:tax_household_group][:person_id]).primary_family
+      th_group_info = params.require(:tax_household_group).permit(
+        :person_id, :family_actions_id, :effective_date, tax_households: {}
+      ).to_h
+      th_group_info[:effective_date] = parse_date(th_group_info[:effective_date]).strftime("%m/%d/%Y")
       result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call(
         {
           family: family,
-          th_group_info: params.require(:tax_household_group).permit(
-            :person_id, :family_actions_id, :effective_date, tax_households: {}
-          ).to_h
+          th_group_info: th_group_info,
         }
       )
 
