@@ -521,7 +521,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def update_terminate_enrollment
+  def update_terminate_enrollment #TODO: check if date can actually be updated, value sent through params seems stale even on legacy
     authorize HbxProfile, :update_terminate_enrollment?
 
     params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_terminate_params).to_h)
@@ -572,10 +572,11 @@ class Exchanges::HbxProfilesController < ApplicationController
     respond_to :js
   end
 
-  def update_enrollment_terminated_on_date
+  def update_enrollment_terminated_on_date #TODO: confirm if this works (ran out of enrollment to test)s
     authorize HbxProfile, :update_enrollment_terminated_on_date?
 
     begin
+      params[:new_termination_date] = parse_date(params[:new_termination_date]).strftime("%m/%d/%Y")
       @row = params[:family_actions_id]
       @element_to_replace_id = params[:family_actions_id]
       result = Operations::HbxEnrollments::EndDateChange.new.call(params: params)
