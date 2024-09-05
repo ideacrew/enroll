@@ -129,8 +129,6 @@ class UsersController < ApplicationController
   # @response_to HTML
   # @note Authentication and Authorization are not required
   def unsupported_browser
-    @bs4 = true
-    
     respond_to do |format|
       format.html { render 'unsupported_browser' }
     end
