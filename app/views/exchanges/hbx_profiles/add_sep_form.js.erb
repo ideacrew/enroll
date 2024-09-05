@@ -44,11 +44,19 @@ $(document).on('change','.admin_selected_sep_reason select',function(){
     $('.csl_num_options input:text').val("");
   }
   else{
-    var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
-    var getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
-    self_attested = getObj.data('is-self-attested');
-    arrEffectiveDate = getObj.data('effective-on-kinds');
-    idVal = getObj.data('id');
+    if (document.documentElement.dataset.bs4 != "true") {
+      var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
+      var getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
+      self_attested = getObj.data('is-self-attested');
+      arrEffectiveDate = getObj.data('effective-on-kinds');
+      console.log(arrEffectiveDate);
+      idVal = getObj.data('id');  
+    } else {
+      idVal = $(this).val();
+      const selected = $(this).find('option:selected');
+      self_attested = $(selected).data('is-self-attested');
+      arrEffectiveDate = $(selected).data('effective-on-kinds');
+    }
 
     $.ajax({
       type: "GET",
@@ -127,7 +135,9 @@ $(document).on('change','.init_event_date input', function(){
     $('.init_event_date .label-floatlabel').removeClass("dn-1");
     $('.init_event_date .label-floatlabel').addClass("dn-1");
     $('.sep_dates_filter').hide();
-    $('.admin_effective_on_kind_options #effective_on_date').selectric("refresh");
+    if (!disableSelectric) {
+      $('.admin_effective_on_kind_options #effective_on_date').selectric("refresh");
+    }
     $('.optional_date').hide();
     $('.coverage-renewal-flag').hide();
 });
