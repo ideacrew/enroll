@@ -31,11 +31,15 @@ RSpec.describe ::Operations::HbxAdmin::DryRun::Individual::Benefits do
     benefit_sponsorship.benefit_coverage_periods << [benefit_coverage_period_previous_year, benefit_coverage_period_this_year, benefit_coverage_period_next_year]
   end
 
-
   context 'with valid data' do
     it 'should return renewal benefit coverage params' do
       result = described_class.new.call
       expect(result).to be_success
+      hash = result.success.first
+      expect(hash["Create renewals on date change feature is enabled"]).to eq false
+      expect(hash["Renewals creation month"]).to eq 10
+      expect(hash["Renewals creation day"]).to eq 16
+      expect(hash["Atleast one silver plan do not cover pediatric dental cost feature is enabled"]).to eq false
     end
   end
 end
