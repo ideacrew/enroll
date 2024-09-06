@@ -51,6 +51,13 @@
         <% end %>
       <% end %>
 
+      <h2><%= l10n("insured.group_selection.new.who_needs_coverage") %></h2>
+      <% if @adapter.can_shop_shop?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) && @coverage_household.coverage_household_members %>
+        <div id="coverage-household">
+          <%= render 'coverage_household' %>
+        </div>
+      <% end %>
+
       <% if @adapter.can_shop_both_markets?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) %>
         <div id="market_kinds" class="mb-3">
         <fieldset>
@@ -83,6 +90,10 @@
         <% end %>
       <% end %>
 
+      <% if @adapter.can_shop_shop?(@person) %>
+        <%= render partial: 'select_employer', locals: {effective_date: effective_date_for_display} %>
+      <% end %>
+
       <div id="coverage_kinds" class="mb-3">
       <fieldset>
         <legend class="text-reset mb-0"><h3><%= l10n("benefit_type") %></h3></legend>
@@ -104,18 +115,6 @@
         </div>
       </fieldset>
       </div>
-
-      <h2><%= l10n("insured.group_selection.new.who_needs_coverage") %></h2>
-      <% if @adapter.can_shop_shop?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) && @coverage_household.coverage_household_members %>
-        <div id="coverage-household">
-          <%= render 'coverage_household' %>
-        </div>
-      <% end %>
-
-      <% if @adapter.can_shop_shop?(@person) %>
-        <%= render partial: 'select_employer', locals: {effective_date: effective_date_for_display} %>
-      <% end %>
-
 
       <% if @change_plan.present? %>
         <%= hidden_field_tag 'change_plan', @change_plan %>
