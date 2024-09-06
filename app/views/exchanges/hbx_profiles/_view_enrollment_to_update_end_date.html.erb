@@ -2,7 +2,6 @@
     var id = $('[id^="terminate_hbx_"]:checked').first().attr('id').split('_').reverse()[0];
     jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=checkbox]").prop('disabled', false);
     $('#termination-date-picker_' + id).prop('disabled', false);
-    console.log(id);
     jQuery('[id^="terminate_hbx_"]').click(function($) {
         jQuery('[id^="terminate_hbx_"]').each(function($) {
             id = jQuery(this).attr('id').split('_').reverse()[0];
