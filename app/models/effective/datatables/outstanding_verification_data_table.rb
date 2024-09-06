@@ -52,7 +52,7 @@ module Effective
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => eligibility_primary_family_member(row).person_id),"static"]
           ]
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: datatable_dropdowns(dropdown), row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
