@@ -67,6 +67,7 @@ module BenefitSponsors
       false
     end
 
+    # rubocop:disable Lint/EmptyRescueClause
     def set_flash_by_announcement
       return if current_user.blank?
       if flash.blank? || flash[:warning].blank?
@@ -86,6 +87,7 @@ module BenefitSponsors
         end
       end
     end
+    # rubocop:enable Lint/EmptyRescueClause
 
     def set_ie_flash_by_announcement
       return unless check_browser_compatibility
