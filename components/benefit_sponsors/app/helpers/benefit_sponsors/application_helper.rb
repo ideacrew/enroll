@@ -221,5 +221,12 @@ module BenefitSponsors
       next_page_index = active_page_index.to_i + 1
       pages[next_page_index]
     end
+
+    def current_page(page_param, pages)
+      return pages.first unless page_param.present?
+      JSON.parse(page_param)
+    rescue JSON::ParserError, TypeError
+      page_param
+    end
   end
 end
