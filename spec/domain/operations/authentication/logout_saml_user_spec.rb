@@ -54,7 +54,11 @@ RSpec.describe Operations::Authentication::LogoutSamlUser do
 
     before :each do
       allow(SamlInformation).to receive(:idp_slo_target_url).and_return("https://my.logout.example/saml/logout_endpoint")
-      stub_request(:post, "https://my.logout.example/saml/logout_endpoint").to_return(body: "OK")
+      stub_request(:get, %r{https://my.logout.example/saml/logout_endpoint}).with do |req|
+        path_matches = req.uri.path == "/saml/logout_endpoint"
+        query = Rack::Utils.parse_nested_query req.uri.query
+        path_matches && !query["SAMLRequest"].nil?
+      end.to_return(body: "OK")
     end
 
     it "constructs and submits the logout payload" do
