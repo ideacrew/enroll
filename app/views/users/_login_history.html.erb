@@ -12,7 +12,7 @@
           <% end %>
         </ul>
         <div class="row text-center">
-          <%= paginate login_history, remote: true %>
+          <%= paginate login_history, window: @bs4 ? 2 : nil, remote: true %>
         </div>
         <div class="row text-center">
           <%= page_entries_info login_history, entry_name: 'login records' %>

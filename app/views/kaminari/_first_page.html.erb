@@ -1,3 +1,11 @@
-<li>
-  <%= link_to_unless current_page.first?, raw(t 'views.pagination.first'), url, :remote => remote %>
-</li>
+<% if @bs4 %>
+  <% if current_page.to_i - 2 > 1 %>
+    <li class='paginate_button'>
+      <%= link_to_unless current_page.first?, '1', url, :remote => remote %>
+    </li>
+  <% end %>
+<% else %>
+  <li>
+    <%= link_to_unless current_page.first?, raw(t 'views.pagination.first'), url, :remote => remote %>
+  </li>
+<% end %>

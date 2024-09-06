@@ -1,3 +1,12 @@
-<li>
-  <%= link_to_unless current_page.last?, raw(t 'views.pagination.last'), url, {:remote => remote} %>
-</li>
+<% last_index = url.split('=').last.to_i %>
+<% if @bs4 %>
+  <% if current_page.to_i + 2 < last_index %>
+    <li class="paginate_button">
+      <%= link_to_unless current_page.last?, last_index, url, {:remote => remote} %>
+    </li>
+  <% end %>
+<% else %>
+  <li>
+    <%= link_to_unless current_page.last?, raw(t 'views.pagination.last'), url, {:remote => remote} %>
+  </li>
+<% end %>

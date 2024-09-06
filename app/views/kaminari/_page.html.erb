@@ -1,9 +1,9 @@
 <% if page.current? %>
-  <li class='active'>
+  <li class='<%= 'paginate_button' if @bs4 %> active'>
     <%= content_tag :a, page, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil)) %>
   </li>
 <% else %>
-  <li>
+  <li class='<%= 'paginate_button' if @bs4 %>'>
     <%= link_to page, url, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil)) %>
   </li>
 <% end %>
