@@ -123,6 +123,7 @@ describe HbxEnrollmentMember, dbclean: :around_each do
     before do
       allow(::EnrollRegistry).to receive(:feature?).and_return(true)
       allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       catalog_eligibility
       allow(enrollment_member).to receive(:ivl_osse_eligibility_is_enabled?).and_return(osse_eligible)
     end
@@ -177,6 +178,7 @@ describe HbxEnrollmentMember, dbclean: :around_each do
     before do
       allow(::EnrollRegistry).to receive(:feature?).and_return(true)
       allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
       catalog_eligibility
       allow(enrollment_member).to receive(:ivl_osse_eligibility_is_enabled?).and_return(osse_eligible)
     end
