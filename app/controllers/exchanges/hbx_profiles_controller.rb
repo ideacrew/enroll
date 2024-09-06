@@ -418,7 +418,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def outstanding_verification_dt
+  def outstanding_verification_dt #implement this
     authorize HbxProfile, :outstanding_verification_dt?
 
     @selector = params[:scopes][:selector] if params[:scopes].present?
