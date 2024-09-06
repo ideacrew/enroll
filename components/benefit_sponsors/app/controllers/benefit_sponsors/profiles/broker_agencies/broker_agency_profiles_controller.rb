@@ -50,7 +50,12 @@ module BenefitSponsors
           @q = params.permit(:q)[:q]
 
           @staff = eligible_brokers
-          @page_alphabets = page_alphabets(@staff, "last_name")
+          @page_alphabets = if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+                              grouped_alphabet(@staff, "last_name")
+                            else
+                              page_alphabets(@staff, "last_name")
+                            end
+          @alph_labels = @page_alphabets.map{|alph| [alph.first, alph.last].join("–")} if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
           page_no = cur_page_no(@page_alphabets.first)
           @staff = if @q.nil?
                      @staff.where(last_name: /^#{page_no}/i)
