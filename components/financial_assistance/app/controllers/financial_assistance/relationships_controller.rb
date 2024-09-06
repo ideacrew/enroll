@@ -3,6 +3,7 @@
 module FinancialAssistance
   class RelationshipsController < FinancialAssistance::ApplicationController
     before_action :find_application
+    before_action :set_current_person
     before_action :set_cache_headers, only: [:index]
     before_action :enable_bs4_layout, only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
@@ -17,7 +18,6 @@ module FinancialAssistance
 
     def index
       authorize @application, :index?
-
       @matrix = @application.build_relationship_matrix
       @missing_relationships = @application.find_missing_relationships(@matrix)
       @all_relationships = @application.find_all_relationships(@matrix)
