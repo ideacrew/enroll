@@ -86,8 +86,12 @@ module Effective
           end
 
           # TODO (maybe): add localized strings to keep that functionality in dropdown helper (which will require moving pundit in partial)
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: datatable_dropdowns(dropdown), row_actions_id: "family_actions_#{row.id}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_dropdown(dropdown) : dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
+      end
+
+      def map_dropdown(dropdown)
+        super
       end
 
       scopes do
