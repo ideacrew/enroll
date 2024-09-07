@@ -25,8 +25,12 @@ module Effective
               [l10n("datatables.sep_type_data_table.clone"), clone_exchanges_manage_sep_types_path(id: row.id), 'static']
             ]
           end
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: datatable_dropdowns(dropdown), row_actions_id: "sep_type_actions_#{row.id}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: map_dropdown(dropdown), row_actions_id: "sep_type_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
+      end
+
+      def map_dropdown(dropdown)
+        super
       end
 
       def collection

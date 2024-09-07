@@ -26,8 +26,12 @@ module Effective
             dropdown << ['Reset Password', edit_user_path(row.id), 'ajax']
           end
           dropdown << ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id}"), 'ajax'] if current_user_permission&.can_lock_unlock
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: datatable_dropdowns(dropdown), row_actions_id: "user_action_#{row.id}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: map_dropdown(dropdown), row_actions_id: "user_action_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
+      end
+
+      def map_dropdown(dropdown)
+        super
       end
 
       def collection
