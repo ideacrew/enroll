@@ -60,7 +60,7 @@ module Operations
             CSV.open(file_name, 'w', force_quotes: true) do |csv|
               csv << ['Family HBX ID', 'Family Updated At', 'Job ID', 'Publish Result']
 
-              families.each do |family|
+              families.no_timeout.each do |family|
                 logger.info "***** Processing family hbx_assigned_id: #{family.hbx_assigned_id}"
                 csv << build_and_publish_event(family, job_id, logger)
                 logger.info "***** Processed family hbx_assigned_id: #{family.hbx_assigned_id}"
