@@ -1501,6 +1501,10 @@ module FinancialAssistance
       self.benchmark_premiums = calculated_benchmark_premiums
     end
 
+    def rating_address
+      home_address || mailing_address
+    end
+
     private
 
     def fetch_evidence_params(evidence)
