@@ -58,7 +58,7 @@ module FinancialAssistance
 
               if applicant_non_esi_evidence.present?
                 if response_non_esi_evidence.aasm_state == 'outstanding'
-                  if enrolled?(applicant, enrollments)
+                  if applicant_non_esi_evidence.enrolled_in_any_aptc_csr_enrollments?(enrollments)
                     applicant.set_evidence_outstanding(applicant_non_esi_evidence)
                   else
                     applicant.set_evidence_to_negative_response(applicant_non_esi_evidence)
@@ -74,13 +74,6 @@ module FinancialAssistance
               end
 
               Success(applicant)
-            end
-
-            def enrolled?(applicant, enrollments)
-              return false if enrollments.blank?
-
-              family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
-              family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
             end
           end
         end
