@@ -7,11 +7,16 @@ module Operations
         # Class for populating benchmark premiums for the input application
         class Populate
 
-          # { application_id: application_id }
+          # Populates benchmark premiums for the given application.
+          #
+          # @param params [Hash] the parameters for the operation
+          # @option params [String] :application_id the ID of the application
+          # @return [Dry::Monads::Result] the result of the operation
           def call(params)
             @logger             = yield initialize_logger
             application_id      = yield validate_params(params)
             application         = yield find_application(application_id)
+            _eligibility_result = yield check_for_eligibility(application)
             benchmark_premiums  = yield fetch_benchmark_premiums(application)
             result              = yield populate_benchmark_premiums(application, benchmark_premiums)
 
@@ -20,6 +25,9 @@ module Operations
 
           private
 
+          # Initializes the logger.
+          #
+          # @return [Dry::Monads::Success] the logger instance
           def initialize_logger
             Success(
               Logger.new(
@@ -28,6 +36,10 @@ module Operations
             )
           end
 
+          # Validates the input parameters.
+          #
+          # @param params [Hash] the parameters to validate
+          # @return [Dry::Monads::Result] the result of the validation
           def validate_params(params)
             @logger.info "Validating input params: #{params}." unless Rails.env.test?
 
@@ -40,6 +52,10 @@ module Operations
             end
           end
 
+          # Finds the application by ID.
+          #
+          # @param application_id [String] the ID of the application
+          # @return [Dry::Monads::Result] the result of the find operation
           def find_application(application_id)
             application = ::FinancialAssistance::Application.only(
               :_id,
@@ -47,6 +63,7 @@ module Operations
               :effective_date,
               :'applicants.person_hbx_id',
               :'applicants.is_primary_applicant',
+              :'applicants.benchmark_premiums',
               :'applicants.addresses'
             ).where(_id: application_id).first
 
@@ -59,6 +76,24 @@ module Operations
             end
           end
 
+          # Checks if the application is eligible for processing.
+          #
+          # @param application [Application] The application to check.
+          # @return [Success, Failure] Returns a Success object if the application is eligible, otherwise returns a Failure object with a message.
+          def check_for_eligibility(application)
+            if ['submitted', 'determined'].include?(application.aasm_state) && application.applicants.any? { |applicant| applicant.benchmark_premiums.blank? }
+              Success(application)
+            else
+              failure_message = "Application is not in a valid state for processing: #{application.aasm_state} or benchmark premiums already exist."
+              @logger.error "-- FAILED -- app_id: #{application._id}. Message: #{failure_message}" unless Rails.env.test?
+              Failure(failure_message)
+            end
+          end
+
+          # Fetches the benchmark premiums for the application.
+          #
+          # @param application [FinancialAssistance::Application] the application instance
+          # @return [Dry::Monads::Result] the result of the fetch operation
           def fetch_benchmark_premiums(application)
             benchmark_member_premiums = ::Operations::Migrations::Applications::BenchmarkPremiums::FetchProducts.new.call(
               application: application,
@@ -74,8 +109,11 @@ module Operations
             end
           end
 
-          # 1. Need to verify if set updates the updated_at field
-          # 2. Need to verify if set persists the changes to the database or just in memory
+          # Populates the benchmark premiums for the application.
+          #
+          # @param application [FinancialAssistance::Application] the application instance
+          # @param benchmark_premiums [Hash] the benchmark premiums to populate
+          # @return [Dry::Monads::Success] the result of the populate operation
           def populate_benchmark_premiums(application, benchmark_premiums)
             application.applicants.each do |applicant|
               applicant.set(

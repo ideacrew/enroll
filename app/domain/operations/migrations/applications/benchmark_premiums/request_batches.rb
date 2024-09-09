@@ -4,11 +4,16 @@ module Operations
   module Migrations
     module Applications
       module BenchmarkPremiums
-        # Class for request
+        # Class for requesting batches of records to process the benchmark premiums migration.
         class RequestBatches
           include Dry::Monads[:do, :result]
           include EventSource::Command
 
+          # Main method to call the request batches process
+          #
+          # @param params [Hash] the parameters for the request
+          # @option params [Integer] :batch_size the size of each batch
+          # @return [Dry::Monads::Result] the result of the operation
           def call(params)
             @logger     = yield initialize_logger
             batch_size  = yield validate_params(params)
@@ -19,6 +24,9 @@ module Operations
 
           private
 
+          # Initializes the logger
+          #
+          # @return [Dry::Monads::Success] the logger instance
           def initialize_logger
             Success(
               Logger.new(
@@ -27,6 +35,10 @@ module Operations
             )
           end
 
+          # Validates the input parameters
+          #
+          # @param params [Hash] the parameters to validate
+          # @return [Dry::Monads::Result] the result of the validation
           def validate_params(params)
             @logger.info "Validating input params: #{params}." unless Rails.env.test?
 
@@ -38,6 +50,10 @@ module Operations
             Success(batch_size)
           end
 
+          # Requests batches of records to process
+          #
+          # @param batch_size [Integer] the size of each batch
+          # @return [Dry::Monads::Success] the result of the batch request
           def request_batches(batch_size)
             total_records = ::FinancialAssistance::Application.count
             records_processed = 0
@@ -50,6 +66,12 @@ module Operations
             end
           end
 
+          # Requests a single batch of records to process
+          #
+          # @param batch_size [Integer] the size of the batch
+          # @param event_name [String] the name of the event
+          # @param records_processed [Integer] the number of records already processed
+          # @return [void]
           def request_batch(batch_size, event_name, records_processed)
             @logger.info "Requesting migration event batches of size: #{batch_size}, processed records count: #{records_processed} of #{total_records}" unless Rails.env.test?
             ev_event = build_event(batch_size, event_name, records_processed)
@@ -62,6 +84,12 @@ module Operations
             end
           end
 
+          # Builds an event for the batch request
+          #
+          # @param batch_size [Integer] the size of the batch
+          # @param event_name [String] the name of the event
+          # @param records_processed [Integer] the number of records already processed
+          # @return [EventSource::Event] the event instance
           def build_event(batch_size, event_name, records_processed)
             event(
               event_name,
