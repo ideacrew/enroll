@@ -42,33 +42,45 @@ module FinancialAssistance
             # @param params [Hash] The parameters to filter applications.
             # @option params [Integer] :renewal_year The renewal year to filter applications.
             # @return [Success, Failure] Returns a Success object with eligible applications if found, otherwise returns a Failure object with an error message.
-            def applications_for_families(params)
+            def applications_for_families(params, family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id))
               @renewal_year = params[:renewal_year]
               @current_plan_year = @renewal_year.pred
-              family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
-              latest_applications = ::FinancialAssistance::Application.collection.aggregate([
-                {
-                  '$match': {
-                    'assistance_year': @current_plan_year,
-                    'aasm_state': 'determined',
-                    'family_id': { '$in': family_ids }
-                  }
-                },
-                {
-                  '$sort': {
-                    'family_id': 1,
-                    'created_at': -1
-                  }
-                },
-                {
-                  '$group': {
-                    '_id': '$family_id',
-                    'latest_application_id': { '$first': '$_id' }
-                  }
-                }
-              ])
+              batch_size = 500
+              results = []
 
-              latest_application_ids = latest_applications.map { |doc| doc['latest_application_id'] }
+              family_ids.each_slice(batch_size) do |batch|
+                batch_results = ::FinancialAssistance::Application.collection.aggregate([
+                  {
+                    '$match' => {
+                      'assistance_year' => @renewal_year.pred,
+                      'aasm_state' => 'determined',
+                      'family_id' => { '$in' => batch }
+                    }
+                  },
+                  {
+                    '$sort' => {
+                      'submitted_at' => -1
+                    }
+                  },
+                  {
+                    '$group' => {
+                      '_id' => '$family_id',
+                      'latest_application' => { '$first' => '$$ROOT' }
+                    }
+                  },
+                  {
+                    '$project' => {
+                      '_id' => 0,
+                      'family_id' => '$_id',
+                      'latest_application_id' => '$latest_application._id'
+                    }
+                  }
+                ], allow_disk_use: true).to_a
+
+                results.concat(batch_results)
+              end
+
+              latest_application_ids = results.map { |doc| doc['latest_application_id'] }
               eligible_applications = if FinancialAssistanceRegistry.feature_enabled?(:skip_eligibility_redetermination)
                                         # when the skip_eligibility_redetermination feature is enabled, the eligible_for_renewal? method must be checked on each application as it may return true or false
                                         ::FinancialAssistance::Application.no_timeout.where(:_id.in => latest_application_ids).select(&:eligible_for_renewal?)
