@@ -1,4 +1,5 @@
 <% if @bs4 %>
+  <h1>edit HTML</h1>
   <%= form_for @applicant, url: application_applicant_path(@application, @applicant), method: :patch do |f|%>
     <%= hidden_field_tag :is_dependent, @applicant.is_dependent? %>
     <% readonly_status = @applicant.is_primary_applicant? %>
@@ -216,8 +217,7 @@
       $(this).addClass("disabled").attr('tabindex', -1).blur();
       PersonValidations.manageRequiredValidations($('#confirm_member'));
       if (!$(this).closest('form')[0].checkValidity()) {
-        $(this).removeClass("disabled");
-        $(this).addClass("disabled").attr('tabindex', 0);
+        $(this).removeClass("disabled").attr('tabindex', 0);
       }
     });
   </script>
