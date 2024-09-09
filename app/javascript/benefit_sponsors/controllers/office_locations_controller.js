@@ -62,17 +62,16 @@ export default class extends Controller {
       });
 
       newLocation.querySelectorAll('input').forEach(function(input) {
-
-        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
-        input.setAttribute('name', name);
-        input.setAttribute('id', name);
-        if (input?.previousElementSibling) input.previousElementSibling.setAttribute('for', name);
-
         if (bs4 == "true" && input.id == "phoneType") {
           input.value = "work";
         } else {
           input.value = '';
         }
+
+        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
+        input.setAttribute('name', name);
+        input.setAttribute('id', name);
+        if (input?.previousElementSibling) input.previousElementSibling.setAttribute('for', name);
       })
 
       if (bs4 == "true") {
@@ -93,11 +92,6 @@ export default class extends Controller {
       }
 
       newLocation.querySelectorAll('select').forEach(function(input) {
-        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
-        input.setAttribute('name', name);
-        input.setAttribute('id', name);
-        input.previousElementSibling.setAttribute('for', name);
-
         if (input.value != "work" && input.id != "kindSelect") {
           input.value = '';
         }
@@ -105,6 +99,11 @@ export default class extends Controller {
         if (input.id == "kindSelect") {
           input[0].remove();
         }
+
+        var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
+        input.setAttribute('name', name);
+        input.setAttribute('id', name);
+        input.previousElementSibling.setAttribute('for', name);
       })
 
       this.officeLocationsTarget.appendChild(newLocation);
