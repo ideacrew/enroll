@@ -130,18 +130,19 @@ class Insured::FamiliesController < FamiliesController
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
 
-    if (params[:resident_role_id].present? && params[:resident_role_id])
-      @resident_role_id = params[:resident_role_id]
-    else
-      @resident_role_id = @person.try(:resident_role).try(:id)
-    end
+    @common_seps = @qualifying_life_events.select(&:is_common)
+    @rare_seps = @qualifying_life_events.reject(&:is_common)
+
+    @resident_role_id = if params[:resident_role_id].present? && params[:resident_role_id]
+                          params[:resident_role_id]
+                        else
+                          @person.try(:resident_role).try(:id)
+                        end
 
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
     @market_kind = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? 'shop' : 'individual'
-    if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
-      @market_kind = "coverall"
-    end
+    @market_kind = "coverall" if (params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id
 
     respond_to do |format|
       format.html { render :layout => EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application" }
@@ -162,9 +163,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: qle.id}
-    if @family.enrolled_hbx_enrollments.any?
-      action_params.merge!({change_plan: "change_plan"})
-    end
+    action_params.merge!({change_plan: "change_plan"}) if @family.enrolled_hbx_enrollments.any?
 
     redirect_to new_insured_group_selection_path(action_params)
   end
@@ -277,9 +276,7 @@ class Insured::FamiliesController < FamiliesController
       @future_qualified_date = (@qle_date > today) ? true : false
     end
 
-    if @person.resident_role?
-      @resident_role_id = @person.resident_role.id
-    end
+    @resident_role_id = @person.resident_role.id if @person.resident_role?
 
     employee_role = @person.active_employee_roles.first
 
@@ -348,8 +345,8 @@ class Insured::FamiliesController < FamiliesController
   def purchase
     if params[:hbx_enrollment_id].present?
       @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
-    else
-      @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
+    elsif @family.present?
+      @enrollment = @family.active_household.hbx_enrollments.active.last
     end
     @family ||= @enrollment&.family
     authorize @family, :purchase?
@@ -365,7 +362,7 @@ class Insured::FamiliesController < FamiliesController
 
       begin
         @plan.name
-      rescue => e
+      rescue StandardError => e
         log("#{e.message};  #3742 plan: #{@plan}, family_id: #{@family.id}, hbx_enrollment_id: #{@enrollment.id}", {:severity => "error"})
       end
 
@@ -408,15 +405,15 @@ class Insured::FamiliesController < FamiliesController
         @person.save!
         send_notice_upload_notifications(notice_document, params[:subject])
         flash[:notice] = "File Saved"
-      rescue => e
+      rescue StandardError => e
         flash[:error] = "Could not save file."
       end
     else
       flash[:error] = "Could not save file."
     end
 
-      redirect_back(fallback_location: :back)
-    return
+    redirect_back(fallback_location: :back)
+    nil
   end
 
   # displays the form to upload a notice for a person
@@ -511,16 +508,16 @@ class Insured::FamiliesController < FamiliesController
   def trigger_ivl_to_cdc_transition_notice
     person =  @family.primary_applicant.person
     begin
-      IvlNoticesNotifierJob.perform_later(person.id.to_s, "ivl_to_coverall_transition_notice", {family: @family.id.to_s, result: {:people => @resident_people}} )
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "ivl_to_coverall_transition_notice", {family: @family.id.to_s, result: {:people => @resident_people}})
     rescue Exception => e
       Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
     end
   end
 
   def trigger_cdc_to_ivl_transition_notice
-    person =  @family.primary_applicant.person
+    person = @family.primary_applicant.person
     begin
-      IvlNoticesNotifierJob.perform_later(person.id.to_s, "coverall_to_ivl_transition_notice", {family: @family.id.to_s, result: {:people => @consumer_people}} )
+      IvlNoticesNotifierJob.perform_later(person.id.to_s, "coverall_to_ivl_transition_notice", {family: @family.id.to_s, result: {:people => @consumer_people}})
     rescue Exception => e
       Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
     end
@@ -565,9 +562,9 @@ class Insured::FamiliesController < FamiliesController
   def init_qualifying_life_events
     begin
       raise if @person.nil?
-    rescue => e
+    rescue StandardError => e
       message = "no person in init_qualifying_life_events"
-      message = message + "stacktrace: #{e.backtrace}"
+      message += "stacktrace: #{e.backtrace}"
       log(message, {:severity => "error"})
       raise e
     end
@@ -586,12 +583,10 @@ class Insured::FamiliesController < FamiliesController
       if current_user.has_hbx_staff_role?
         @qualifying_life_events += QualifyingLifeEventKind.send "#{employee_qle_market_scope}_admin" if @manually_picked_role == "shop_market_events" && is_shop_or_fehb_market_enabled?
         @qualifying_life_events += QualifyingLifeEventKind.send "#{@manually_picked_role}_without_transition_member_action" if @manually_picked_role == "individual_market_events"
-      else
-        if @manually_picked_role == "individual_market_events"
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
-        elsif @manually_picked_role && employee_qle_market_scope.present?
-          @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope
-        end
+      elsif @manually_picked_role == "individual_market_events"
+        @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
+      elsif @manually_picked_role && employee_qle_market_scope.present?
+        @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope
       end
     elsif @person.active_employee_roles.present? || @person.consumer_role.present? || @person.resident_role.present?
       role = if @person.active_employee_roles.present? && is_shop_or_fehb_market_enabled?
@@ -605,9 +600,7 @@ class Insured::FamiliesController < FamiliesController
 
   def check_for_address_info
     if @person.has_active_employee_role?
-      if @person.addresses.blank?
-        redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
-      end
+      redirect_to edit_insured_employee_path(@person.active_employee_roles.first) if @person.addresses.blank?
     elsif @person.is_consumer_role_active?
       if !(@person.addresses.present? || (@person.is_homeless || @person.is_temporarily_out_of_state))
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
@@ -650,14 +643,15 @@ class Insured::FamiliesController < FamiliesController
 
   def notice_upload_email
     if (@person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?) ||
-      (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
+       (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
       UserMailer.generic_notice_alert(@person.first_name, "You have a new message from #{site_short_name}", @person.work_email_or_best).deliver_now
     end
   end
 
   def notice_upload_secure_message(notice, subject)
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
+           "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents',
+                                                             notice.id)}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: site_short_name)
     @person.save!
@@ -676,10 +670,7 @@ class Insured::FamiliesController < FamiliesController
                       end
     @qle_date_calc = @qle_date - aca_qle_period.days
 
-    if @person.resident_role?
-      @resident_role_id = @person.resident_role.id
-    end
-
+    @resident_role_id = @person.resident_role.id if @person.resident_role?
   end
 
   def get_date(date_param)
