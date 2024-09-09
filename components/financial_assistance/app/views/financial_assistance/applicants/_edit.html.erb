@@ -213,16 +213,12 @@
         }
 
         $(".btn-confirmation").removeAttr('disabled');
-
-        var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
-        if (!$("input#applicant_same_with_primary").is(":checked")) {
-          $('#addressChangeConfirmation').modal('show');
-        }
-        else {
-          PersonValidations.manageRequiredValidations($('#confirm_member'));
-        }
-      } else {
-        PersonValidations.manageRequiredValidations($('#confirm_member'));
+      }
+      $(this).addClass("disabled").attr('tabindex', -1).blur();
+      PersonValidations.manageRequiredValidations($('#confirm_member'));
+      if (!$(this).closest('form')[0].checkValidity()) {
+        $(this).removeClass("disabled");
+        $(this).addClass("disabled").attr('tabindex', 0);
       }
     });
   </script>

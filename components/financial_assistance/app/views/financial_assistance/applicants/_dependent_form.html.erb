@@ -183,7 +183,11 @@
            $('#addressChangeConfirmation').modal('show');
         }
         else {
+          $(this).addClass("disabled").attr('tabindex', -1).blur();
           PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+          if (!$(this).closest('form')[0].checkValidity()) {
+            $(this).removeClass("disabled");
+          }
         }
 
       });
