@@ -105,7 +105,7 @@ module Exchanges
       params.require(:qualifying_life_event_kind_form).permit(
         :start_on,:end_on,:title,:tool_tip,:pre_event_sep_in_days,
         :is_self_attested, :reason, :post_event_sep_in_days,
-        :market_kind, :effective_on_kinds, :ordinal_position
+        :market_kind, :effective_on_kinds, :ordinal_position, :is_common
       ).to_h.symbolize_keys
     end
 

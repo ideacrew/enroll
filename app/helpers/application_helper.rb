@@ -764,7 +764,7 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    if plan.instance_of?(Plan) || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
+    if plan.instance_of?(::Plan) || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
       return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == 'health'
 
       (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
