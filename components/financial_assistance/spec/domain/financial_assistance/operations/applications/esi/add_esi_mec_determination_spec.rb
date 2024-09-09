@@ -82,17 +82,54 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Esi::H14::AddEsi
         end
 
         context 'when enrolled' do
-          let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members) }
+          context 'health' do
+            context 'with aptc' do
+              let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product, family: family, enrollment_members: family.family_members) }
 
-          it 'should return success' do
-            expect(@result).to be_success
+              it 'should return success' do
+                expect(@result).to be_success
+              end
+
+              it 'should move evidence to outstanding' do
+                @applicant.reload
+                expect(@applicant.esi_evidence.aasm_state).to eq "outstanding"
+                expect(@applicant.esi_evidence.request_results.present?).to eq true
+                expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+              end
+            end
+
+            context 'without aptc and csr' do
+              let(:enrollment) do
+                FactoryBot.create(:hbx_enrollment, :with_enrollment_members, product: FactoryBot.create(:benefit_markets_products_health_products_health_product, csr_variant_id: '00'),
+                                                                             family: family, enrollment_members: family.family_members, applied_aptc_amount: 0)
+              end
+
+              it 'should return success' do
+                expect(@result).to be_success
+              end
+
+              it 'should move evidence to negative_response_received' do
+                @applicant.reload
+                expect(@applicant.esi_evidence.aasm_state).to eq "negative_response_received"
+                expect(@applicant.esi_evidence.request_results.present?).to eq true
+                expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+              end
+            end
           end
 
-          it 'should update applicant verification' do
-            @applicant.reload
-            expect(@applicant.esi_evidence.aasm_state).to eq "outstanding"
-            expect(@applicant.esi_evidence.request_results.present?).to eq true
-            expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+          context 'dental' do
+            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_dental_product, family: family, enrollment_members: family.family_members) }
+
+            it 'should return success' do
+              expect(@result).to be_success
+            end
+
+            it 'should move evidence to negative_response_received' do
+              @applicant.reload
+              expect(@applicant.esi_evidence.aasm_state).to eq "negative_response_received"
+              expect(@applicant.esi_evidence.request_results.present?).to eq true
+              expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+            end
           end
         end
       end
