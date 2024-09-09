@@ -24,7 +24,15 @@
   </div>
   <div class="col-md-3 mb-2">
     <%= f.label :dob, l10n("broker_agencies.dob"), class: "required" %>
-    <%= f.date_field :dob, placeholder: l10n('dob_format'), min: 110.years.ago, max: 18.years.ago.end_of_month, required: true, class: 'form-control', oninput: 'validDob(this)' %>
+    <%= f.date_field :dob,
+      placeholder: l10n('dob_format'),
+      min: 110.years.ago,
+      max: 16.years.ago.beginning_of_month,
+      data: {input:"", invalid_dob_title: l10n('broker_agencies.invalid_dob_title'), invalid_dob_body: l10n('broker_agencies.invalid_dob_body'), invalid_dob_after: l10n("broker_agencies.invalid_dob_after", date: 16.years.ago.beginning_of_month.strftime('%m/%d/%Y')), invalid_dob_before: l10n("broker_agencies.invalid_dob_before", date: 110.years.ago.strftime('%m/%d/%Y'))},
+      required: true,
+      onblur: 'validDob(this)',
+      onkeydown: 'storeDateInput(event)'
+    %>
     <div class="invalid-feedback">
       <%= l10n("invalid_dob") %>
     </div>
