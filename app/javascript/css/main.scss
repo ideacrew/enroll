@@ -710,3 +710,9 @@ a.disabled {
 .pre-line {
   white-space: pre-line;
 }
+
+.two-column {
+  @include media-breakpoint-up(sm) {
+    columns: 2;
+  }
+}
