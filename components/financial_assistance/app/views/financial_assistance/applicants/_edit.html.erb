@@ -204,7 +204,6 @@
 
     $(document).off('click', '#confirm_member');
     $(document).on('click', '#confirm_member', function(e) {
-      console.log('clicked');
       if ($("input#applicant_same_with_primary").length) {
         if($("input#applicant_same_with_primary").is(":checked")){
           $("#applicant-home-address-area input.required, #applicant-home-address-area select.required, #applicant-home-address-area .address_required").removeAttr('required');
