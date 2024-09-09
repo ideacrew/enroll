@@ -88,12 +88,7 @@ module FinancialAssistance
                 relationships_changed = renewal_application_factory.relationships_changed
                 calculated_renewal_base_year = calculate_renewal_base_year(application)
                 additional_attrs = {
-                  aasm_state: find_aasm_state(
-                    application,
-                    family_members_changed,
-                    renewal_application,
-                    relationships_changed
-                  ),
+                  aasm_state: find_aasm_state(application, renewal_application_factory),
                   assistance_year: validated_params[:renewal_year],
                   years_to_renew: calculate_years_to_renew(application),
                   renewal_base_year: calculated_renewal_base_year,
@@ -123,26 +118,29 @@ module FinancialAssistance
               feature.enabled? && feature.settings(:annual_eligibility_redetermination).item
             end
 
-            def find_aasm_state(application, family_members_changed, renew_application, relationships_changed)
+            def find_aasm_state(application, renewal_application_factory)
               if application.years_to_renew == 0 || application.years_to_renew.nil?
                 @failure_reason = 'years_to_renew is 0 or nil'
                 'income_verification_extension_required'
-              elsif family_members_changed
+              elsif renewal_application_factory.family_members_changed
                 @failure_reason = 'family_members_changed'
                 'applicants_update_required'
-              elsif missing_relationships?(relationships_changed, renew_application)
+              elsif missing_relationships?(renewal_application_factory.relationships_changed)
                 @failure_reason = 'missing_relationships'
                 'applicants_update_required'
-              elsif !renew_application.valid_relationship_kinds?
+              elsif !renewal_application.valid_relationship_kinds?
                 @failure_reason = 'invalid_relationships'
+                'applicants_update_required'
+              elsif renewal_application_factory.claiming_applicants_missing
+                @failure_reason = 'claiming_applicants_missing'
                 'applicants_update_required'
               else
                 'renewal_draft'
               end
             end
 
-            def missing_relationships?(relationships_changed, renew_application)
-              relationships_changed && !renew_application.relationships_complete?
+            def missing_relationships?(relationships_changed)
+              relationships_changed && !renewal_application.relationships_complete?
             end
 
             def calculate_years_to_renew(application)
