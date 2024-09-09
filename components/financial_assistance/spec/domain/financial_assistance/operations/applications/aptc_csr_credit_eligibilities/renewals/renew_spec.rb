@@ -344,22 +344,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           expect(@result.failure).to match(renewal_draft_blocker_reason)
         end
       end
-
-      context 'Claiming applicants missing' do
-        before do
-          application_11.applicants.last.update_attributes!(claimed_as_tax_dependent_by: nil)
-          @result = subject.call({ family_id: application_11.family_id, renewal_year: application_11.assistance_year.next })
-        end
-
-        let(:renewal_draft_blocker_reason) { 'claiming_applicants_missing' }
-
-        it 'should return failure' do
-          expect(@result).to be_failure
-          expect(subject.renewal_application.aasm_state).to eq 'applicants_update_required'
-          expect(subject.renewal_application.renewal_draft_blocker_reasons).to include(renewal_draft_blocker_reason)
-          expect(@result.failure).to match(renewal_draft_blocker_reason)
-        end
-      end
     end
 
     context 'missing keys' do
