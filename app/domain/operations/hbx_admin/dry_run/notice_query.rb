@@ -31,7 +31,6 @@ module Operations
         # @return [Dry::Monads::Result] The result of the validation.
         def validate(params)
           return Failure("Titles cannot be blank") if params[:title_codes].blank?
-          return Failure("Person HBX IDs cannot be blank") if params[:person_hbx_ids].blank?
           return Failure("Start Date cannot be blank") if params[:start_date].blank?
           return Failure("End Date cannot be blank") if params[:end_date].blank?
 
@@ -48,31 +47,18 @@ module Operations
           end_date = params[:end_date]
           title_codes = params[:title_codes]
 
-          result = [
-            { "$match" => { "hbx_id" => { '$in' => person_hbx_ids } } },
-            { "$unwind" => "$documents" },
-            {
-              "$match" => {
-                "documents.created_at" => { '$gte' => start_date, '$lte' => end_date },
-                "documents.title" => { '$in' => title_codes }
-              }
-            },
-            {
-              "$group" => {
-                "_id" => "$documents.title",
-                "count" => { "$sum" => 1 }
-              }
-            },
-            {
-              "$project" => {
-                "_id" => 0,
-                "title" => "$_id",
-                "count" => 1
-              }
-            }
-          ]
+          result =[]
+          result << match_stage if person_hbx_ids.present?
+          result << { "$unwind" => "$documents" }
+          result << { "$match" => { "documents.created_at" => { '$gte' => start_date, '$lte' => end_date }, "documents.title" => { '$in' => title_codes } } }
+          result << { "$group" => { "_id" => "$documents.title", "count" => { "$sum" => 1 } } }
+          result << { "$project" => { "_id" => 0, "title" => "$_id", "count" => 1 } }
 
           Success(result)
+        end
+
+        def match_stage
+          { "$match" => { "hbx_id" => { '$in' => person_hbx_ids } } }
         end
       end
     end

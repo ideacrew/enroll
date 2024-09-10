@@ -18,7 +18,9 @@ module Operations
           NOTICE_TITLE_MAPPING = {
             "Open Enrollment - Medicaid" => "OEM",
             "Open Enrollment - Tax Credit" => "OEA",
-            "Open Enrollment - Marketplace Insurance" => "OEU"
+            "Open Enrollment - Marketplace Insurance" => "OEU",
+            "Your Eligibility Results - Health Coverage Eligibility" => "OEQ",
+            "Your Eligibility Results Consent or Missing Information Needed" => "OEG"
           }.freeze
 
           # @param [Hash] opts The options to fetch application status
@@ -29,8 +31,7 @@ module Operations
             eligible_families = yield fetch_eligible_families(coverage_years[0])
             mapped_application_states = yield application_states_by_year(coverage_years)
             enrollment_states = yield fetch_enrollment_states(coverage_years)
-            person_hbx_ids = yield primary_person_hbx_ids(coverage_years[0])
-            oe_determined_notices = yield oe_determined_notices_count(coverage_years[0], person_hbx_ids)
+            oe_determined_notices = yield oe_determined_notices_count(coverage_years[0])
 
             Success([eligible_families, mapped_application_states, benefit_coverage_values, oe_determined_notices, enrollment_states])
           end
@@ -118,21 +119,18 @@ module Operations
             Success(person_hbx_ids)
           end
 
-          def oe_determined_notices_count(year, person_hbx_ids)
-            return Success(skeleton_for_notices) if person_hbx_ids.blank?
-
-            notices = fetch_notices(year, person_hbx_ids)
+          def oe_determined_notices_count(year)
+            notices = fetch_notices(year)
             result = notices.count.zero? ? skeleton_for_notices : map_notices(notices)
 
             Success(result)
           end
 
-          def fetch_notices(year, person_hbx_ids)
+          def fetch_notices(year)
             start_date = Date.new(year, 1, 1) - 6.months
             end_date = Date.new(year, 1, 1)
 
             pipeline = ::Operations::HbxAdmin::DryRun::NoticeQuery.new.call(
-              person_hbx_ids: person_hbx_ids,
               start_date: start_date,
               end_date: end_date,
               title_codes: NOTICE_TITLE_MAPPING.keys
