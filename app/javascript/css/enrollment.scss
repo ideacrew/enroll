@@ -237,5 +237,8 @@
     line-height: 1.5;
     display: block;
     text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
