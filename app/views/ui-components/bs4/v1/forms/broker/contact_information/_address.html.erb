@@ -6,8 +6,8 @@
 <div id="address_info">
   <div class="row mb-2">
     <div class="col-md-6 col-sm-6 col-xs-12">
-      <%= f.label :address_1, l10n("address_1"), class: "required" %>
-      <%= f.text_field :address_1, class: "form-control mb-1", placeholder: l10n('address_1_placeholder'), required: true %>
+      <%= f.label :address_1, "#{l10n("address_1")} #{l10n("address_1_desc")}", class: "required" %>
+      <%= f.text_field :address_1, class: "form-control mb-1", placeholder: l10n('address_1'), required: true %>
       <div class="invalid-feedback">
         <%= l10n('address.address_1_error') %>
       </div>
