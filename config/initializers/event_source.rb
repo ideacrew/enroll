@@ -39,5 +39,7 @@ if ENV['SERVICE_POD_NAME'].present? || !Rails.env.production?
     config.async_api_schemas = async_api_resources.collect { |resource| EventSource.build_async_api_resource(resource) }
   end
 
-  EventSource.initialize!
+  Rails.application.config.after_initialize do
+    EventSource.initialize!
+  end
 end
