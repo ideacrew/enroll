@@ -609,7 +609,6 @@ jobs:
         with:
           name: code-coverage
           path: coverage
-          pattern: code-coverage-*
       - name: Setup .NET Core # Required to execute ReportGenerator
         uses: actions/setup-dotnet@v3
         with:
@@ -626,7 +625,7 @@ jobs:
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v3
         with:
-          name: code-coverage-report-${{ matrix.runs-on }}
+          name: code-coverage-report
           path: coveragereport/*
       - name: Write to Job Summary
         run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
