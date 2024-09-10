@@ -47,7 +47,7 @@ module Operations
           end_date = params[:end_date]
           title_codes = params[:title_codes]
 
-          result =[]
+          result = []
           result << match_stage if person_hbx_ids.present?
           result << { "$unwind" => "$documents" }
           result << { "$match" => { "documents.created_at" => { '$gte' => start_date, '$lte' => end_date }, "documents.title" => { '$in' => title_codes } } }
