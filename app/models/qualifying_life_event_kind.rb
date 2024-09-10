@@ -146,8 +146,8 @@ class QualifyingLifeEventKind
   scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
   scope :non_draft, ->{ where(:aasm_state.nin => [:draft]) }
-  scope :common, ->{ where(is_common: true) }
-  scope :rare, ->{ where(is_common: false) }
+  scope :common, -> { where(is_common: true) }
+  scope :rare, -> { where.not(is_common: true) }
   scope :by_date, lambda { |date = TimeKeeper.date_of_record|
                     where(
                       :"$or" => [
@@ -275,43 +275,43 @@ class QualifyingLifeEventKind
     end
 
     def shop_market_events
-      by_market_kind('shop').and(:is_visible.ne => false).active.to_a
+      by_market_kind('shop').and(:is_visible.ne => false).active
     end
 
     def shop_market_events_admin
-      by_market_kind('shop').active.to_a
+      by_market_kind('shop').active
     end
 
     def shop_market_non_self_attested_events
-      by_market_kind('shop').and(:is_visible.ne => true).active.to_a
+      by_market_kind('shop').and(:is_visible.ne => true).active
     end
 
     def fehb_market_events
-      by_market_kind('fehb').and(:is_visible.ne => false).active.to_a
+      by_market_kind('fehb').and(:is_visible.ne => false).active
     end
 
     def fehb_market_events_admin
-      by_market_kind('fehb').active.to_a
+      by_market_kind('fehb').active
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kind('fehb').and(:is_visible.ne => true).active.to_a
+      by_market_kind('fehb').and(:is_visible.ne => true).active
     end
 
     def individual_market_events
-      by_market_kind('individual').and(:is_visible.ne => false).active.to_a
+      by_market_kind('individual').and(:is_visible.ne => false).active
     end
 
     def individual_market_events_admin
-      by_market_kind('individual').active.to_a
+      by_market_kind('individual').active
     end
 
     def individual_market_non_self_attested_events
-      by_market_kind('individual').and(:is_visible.ne => true).active.to_a
+      by_market_kind('individual').and(:is_visible.ne => true).active
     end
 
     def individual_market_events_without_transition_member_action
-      by_market_kind('individual').active.to_a.reject {|qle| qle.action_kind == "transition_member"}
+      by_market_kind('individual').active.reject {|qle| qle.action_kind == "transition_member"}
     end
 
     def qualifying_life_events_for(role, hbx_staff = false)
