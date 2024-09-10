@@ -52,7 +52,7 @@ jobs:
       - name: Run tests
         run: bundle exec cucumber features/admin/new_plan_year.feature features/admin/paper_phone.feature features/admin/reset_password.feature features/admin/search_broker_agency.feature features/brokers/broker_manages_employee_account.feature features/brokers/employer_hires_broker.feature features/brokers/employer_terminates_and_hires_new_broker.feature features/cover_all/transition_family_member.feature features/financial_assistance/destroy_applicant.feature features/financial_assistance/job_income.feature features/financial_assistance/other_questions_page.feature features/financial_assistance/review_applications.feature features/general_agencies/ga_registration.feature features/general_agencies/update_general_agency_profile.feature features/insured/individual_with_existing_sep.feature features/permissions/extend_open_enrollment_cancelled.feature features/permissions/send_secure_message.feature features/employers/benefit_applications/create_off_cycle_benefit_application.feature --format json --out ci/cucumber/custom-cucumber-report.json -r features -q --tags 'not @wip and not @broken and not @flaky and not @ma_only'
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: custom-cucumber-report
           path: ci/cucumber/custom-cucumber-report.json
