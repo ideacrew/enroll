@@ -416,6 +416,9 @@ registry:
       - key: :bs4_broker_flow
         item: :bs4_broker_flow
         is_enabled: <%= ENV['BS4_BROKER_FLOW_IS_ENABLED'] || false %>
+      - key: :bs4_admin_flow
+        item: :bs4_admin_flow
+        is_enabled: <%= ENV['BS4_ADMIN_FLOW_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
