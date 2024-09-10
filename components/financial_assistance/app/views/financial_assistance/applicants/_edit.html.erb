@@ -139,7 +139,7 @@
       <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden") do %>
         <%= l10n("confirm_member") %>
       <% end %>
-      <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm_member')" id="confirm_member" class="btn btn-primary" onclick='PersonValidations.manageRequiredValidations($(this));'>
+      <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm_member')" id="confirm_member" class="btn btn-primary">
         <%= l10n("confirm_member") %>
       </span>
     </div>
@@ -202,9 +202,9 @@
       });
     }
 
-    $(document).off('click', '#confirm-member');
-    $(document).on('click', '#confirm-member', function(e) {
-      if ($("input#applicant_same_with_primary")) {
+    $(document).off('click', '#confirm_member');
+    $(document).on('click', '#confirm_member', function(e) {
+      if ($("input#applicant_same_with_primary").length) {
         if($("input#applicant_same_with_primary").is(":checked")){
           $("#applicant-home-address-area input.required, #applicant-home-address-area select.required, #applicant-home-address-area .address_required").removeAttr('required');
         } else {
@@ -212,14 +212,11 @@
         }
 
         $(".btn-confirmation").removeAttr('disabled');
-
-        var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
-        if (!$("input#applicant_same_with_primary").is(":checked")) {
-          $('#addressChangeConfirmation').modal('show');
-        }
-        else {
-          PersonValidations.manageRequiredValidations($('#confirm-dependent'));
-        }
+      }
+      $(this).addClass("disabled").attr('tabindex', -1).blur();
+      PersonValidations.manageRequiredValidations($('#confirm_member'));
+      if (!$(this).closest('form')[0].checkValidity()) {
+        $(this).removeClass("disabled").attr('tabindex', 0);
       }
     });
   </script>
