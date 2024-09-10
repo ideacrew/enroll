@@ -7,6 +7,7 @@
       required: true,
       class: 'form-control phone_number',
       minlength: '10', maxlength: '10',
+      pattern: "[0-9]{3}[0-9]{3}[0-9]{4}",
       onkeypress: 'return isNumberKey(event)',
       value: determine_phone_number(f.object)
     %>
