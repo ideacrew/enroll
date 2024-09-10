@@ -172,13 +172,13 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec
       - name: copy coverage report
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         run: |
           root=`pwd -P`
           cd $root/components/${{ matrix.engine-name }}
           cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage
@@ -250,12 +250,12 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: 'components/financial_assistance/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
@@ -346,12 +346,12 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         run: |
           cd components/benefit_sponsors
           cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage
@@ -449,12 +449,12 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/financial_assistance,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
@@ -576,12 +576,12 @@ jobs:
           WD_CHROME_PATH: ${{ github.workspace }}/chrome-linux64/chrome
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
@@ -599,7 +599,7 @@ jobs:
         if: needs[env.CHECK].result != 'success'
         run: exit 1
   code-coverage-summary:
-    if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+    if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
