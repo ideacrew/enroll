@@ -181,7 +181,7 @@ jobs:
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage
+          name: code-coverage-${{ matrix.runs-on }}
           path: ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   financial-assistance:
     needs: [brakeman-engines]
@@ -257,7 +257,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
-          name: code-coverage
+          name: code-coverage-${{ matrix.runs-on }}
           path: ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   benefit-sponsors:
     needs: [brakeman-engines]
@@ -354,7 +354,7 @@ jobs:
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage
+          name: code-coverage-${{ matrix.runs-on }}
           path: ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   rspec:
     needs: [brakeman, brakeman-engines]
@@ -456,7 +456,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
-          name: code-coverage
+          name: code-coverage-${{ matrix.runs-on }}
           path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   cucumber:
     needs: [brakeman, brakeman-engines]
@@ -583,7 +583,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
-          name: code-coverage
+          name: code-coverage-${{ matrix.runs-on }}
           path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   quality-workbench:
     needs: [engines, benefit-sponsors, rspec, cucumber]
