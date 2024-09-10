@@ -27,7 +27,7 @@ RSpec.describe SamlController do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:admin_account_autolock).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
-          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:notify_address_changed).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)

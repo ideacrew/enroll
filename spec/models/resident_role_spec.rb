@@ -86,6 +86,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         before do
           allow(EnrollRegistry).to receive(:feature?).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
           catalog_eligibility
         end
 
