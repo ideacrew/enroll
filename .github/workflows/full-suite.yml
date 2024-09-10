@@ -179,7 +179,7 @@ jobs:
           cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: code-coverage
           path: ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
@@ -254,7 +254,7 @@ jobs:
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage
@@ -352,7 +352,7 @@ jobs:
           cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: code-coverage
           path: ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
@@ -453,7 +453,7 @@ jobs:
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage
@@ -580,7 +580,7 @@ jobs:
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage
@@ -623,7 +623,7 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - name: Upload coverage report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: code-coverage-report
           path: coveragereport/*
