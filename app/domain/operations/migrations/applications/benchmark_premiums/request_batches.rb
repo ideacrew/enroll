@@ -40,12 +40,12 @@ module Operations
           # @param params [Hash] the parameters to validate
           # @return [Dry::Monads::Result] the result of the validation
           def validate_params(params)
-            @logger.info "Validating input params: #{params}." unless Rails.env.test?
+            @logger.info "Validating input params: #{params}."
 
-            return Failure("Invalid input batch size: #{params[:batch_size]}.") if params[:batch_size].nil?
+            return Failure("Missing input for batch_size: #{params[:batch_size]}.") if params[:batch_size].nil?
 
             batch_size = params[:batch_size].to_i
-            return Failure("Invalid input batch size: #{params[:batch_size]}.") if batch_size <= 0
+            return Failure("Invalid input batch size: #{params[:batch_size]}. Please provide a positive integer.") if batch_size <= 0
 
             Success(batch_size)
           end
@@ -57,13 +57,15 @@ module Operations
           def request_batches(batch_size)
             total_records = ::FinancialAssistance::Application.count
             records_processed = 0
-            @logger.info "Total records to process: #{total_records}." unless Rails.env.test?
+            @logger.info "Total records to process: #{total_records}."
             event_name = 'events.batch_processes.migrations.applications.benchmark_premiums.request_migration_event_batches'
 
             while records_processed < total_records
               request_batch(batch_size, event_name, records_processed)
               records_processed += batch_size
             end
+
+            Success("Successfully published event: #{event_name} for #{total_records} records.")
           end
 
           # Requests a single batch of records to process
@@ -73,14 +75,14 @@ module Operations
           # @param records_processed [Integer] the number of records already processed
           # @return [void]
           def request_batch(batch_size, event_name, records_processed)
-            @logger.info "Requesting migration event batches of size: #{batch_size}, processed records count: #{records_processed} of #{total_records}" unless Rails.env.test?
+            @logger.info "Requesting migration event batches of size: #{batch_size}, processed records count: #{records_processed} of #{total_records}"
             ev_event = build_event(batch_size, event_name, records_processed)
 
             if ev_event.success?
               ev_event.success.publish
-              @logger.info "Published event: #{event_name} for params #{params}" unless Rails.env.test?
+              @logger.info "Published event: #{event_name} for params #{params}"
             else
-              @logger.error "Failed to build event: #{event_name} for params #{params} - #{ev_event.failure}" unless Rails.env.test?
+              @logger.error "Failed to build event: #{event_name} for params #{params} - #{ev_event.failure}"
             end
           end
 

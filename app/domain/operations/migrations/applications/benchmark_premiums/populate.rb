@@ -6,6 +6,7 @@ module Operations
       module BenchmarkPremiums
         # Class for populating benchmark premiums for the input application
         class Populate
+          include Dry::Monads[:do, :result]
 
           # Populates benchmark premiums for the given application.
           #
@@ -48,7 +49,7 @@ module Operations
               @logger.error "-- FAILED -- app_id: #{params[:application_id]}. Message: #{failure_message}" unless Rails.env.test?
               Failure()
             else
-              Success(application_id)
+              Success(params[:application_id])
             end
           end
 

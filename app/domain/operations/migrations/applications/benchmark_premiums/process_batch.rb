@@ -43,9 +43,9 @@ module Operations
           # @option params [Integer] :skip the number of records to skip
           # @return [Dry::Monads::Result] the result of the validation
           def validate_params(params)
-            @logger.info "Validating input params: #{params}." unless Rails.env.test?
+            @logger.info "Validating input params: #{params}."
 
-            return Failure("Invalid input batch size: #{params[:batch_size]}.") if params[:batch_size].nil?
+            return Failure("Invalid params: #{params}. Include both batch_size and skip.") if params[:batch_size].nil? || params[:skip].nil?
 
             batch_size = params[:batch_size].to_i
             return Failure("Invalid input batch size: #{params[:batch_size]}.") if batch_size <= 0
@@ -63,11 +63,11 @@ module Operations
           # @return [Dry::Monads::Result] the result of the batch processing
           def process_batch(batch_size, skip_records)
             event_name = 'events.batch_processes.migrations.applications.benchmark_premiums.process_migration_event'
-            ::FinancialAssistance::Application.only(:_id).order(:_id.asc).skip(skip_records).limit(batch_size).each do |application|
+            ::FinancialAssistance::Application.only(:_id, :aasm_state).order(:_id.asc).skip(skip_records).limit(batch_size).each do |application|
               publish_event(application, event_name)
             end
 
-            Success("Processed batch of #{batch_size} records.")
+            Success("Successfully processed batch of #{batch_size} records.")
           end
 
           # Publishes an event for an application
@@ -76,14 +76,14 @@ module Operations
           # @param event_name [String] the name of the event to publish
           # @return [void]
           def publish_event(application, event_name)
-            @logger.info "Processing application: #{application.id}." unless Rails.env.test?
+            @logger.info "Processing application: #{application.id}."
             ev_event = build_event(application.id, event_name)
 
             if ev_event.success?
               ev_event.success.publish
-              @logger.info "Published event: #{event_name} for application: #{application.id}." unless Rails.env.test?
+              @logger.info "Published event: #{event_name} for application: #{application.id}."
             else
-              @logger.error "Failed to build event: #{event_name} for application: #{application.id} - #{ev_event.failure}" unless Rails.env.test?
+              @logger.error "Failed to build event: #{event_name} for application: #{application.id} - #{ev_event.failure}"
             end
           end
 

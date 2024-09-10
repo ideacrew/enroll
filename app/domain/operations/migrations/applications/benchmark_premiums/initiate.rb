@@ -5,12 +5,6 @@ module Operations
     module Applications
       module BenchmarkPremiums
         # Class for initiating applications benchmark premiums migration
-        #
-        # @example
-        #   result = Operations::Migrations::Applications::BenchmarkPremiums::Initiate.new.call(params)
-        #
-        # @see Dry::Monads
-        # @see EventSource::Command
         class Initiate
           include Dry::Monads[:do, :result]
           include EventSource::Command
@@ -38,7 +32,7 @@ module Operations
             if params[:batch_size].is_a?(Integer) && params[:batch_size] > 0
               Success(params[:batch_size])
             else
-              Failure("Invalid input batch size: #{params[:batch_size]}")
+              Failure("Invalid input batch size: #{params[:batch_size]}. Please provide a positive integer.")
             end
           end
 

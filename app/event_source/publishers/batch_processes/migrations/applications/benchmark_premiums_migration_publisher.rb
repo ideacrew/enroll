@@ -6,7 +6,7 @@ module Publishers
       module Applications
         # Class for publishing below listed registered events.
         class BenchmarkPremiumsMigrationPublisher
-          include ::EventSource::Publisher[amqp: 'batch_processes.migrations.applications.benchmark_premiums']
+          include ::EventSource::Publisher[amqp: 'enroll.batch_processes.migrations.applications.benchmark_premiums']
 
           # This event is to publish process migration event batch
           register_event 'process_migration_event_batch'
