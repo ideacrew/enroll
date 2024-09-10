@@ -37,7 +37,7 @@ jobs:
       - run: gem install brakeman
       - run: brakeman -i config/brakeman.ignore --add-checks-path checks --format html --out brakeman.html
       - name: upload brakeman failure report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Security Reports
@@ -68,7 +68,7 @@ jobs:
           cd components/${{ matrix.engine }}
           brakeman -i config/brakeman.ignore --add-checks-path ../../engine_checks/ --format html --out ../../${{ matrix.engine }}.brakeman.html
       - name: upload brakeman failure report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Security Reports
@@ -179,11 +179,10 @@ jobs:
           cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: code-coverage-${{ matrix.runs-on }}
+          name: code-coverage
           path: ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-          merge-multiple: true
   financial-assistance:
     needs: [brakeman-engines]
     runs-on: ubuntu-20.04
@@ -255,12 +254,11 @@ jobs:
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
-          name: code-coverage-${{ matrix.runs-on }}
+          name: code-coverage
           path: ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-          merge-multiple: true
   benefit-sponsors:
     needs: [brakeman-engines]
     runs-on: ubuntu-20.04
@@ -354,11 +352,10 @@ jobs:
           cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: code-coverage-${{ matrix.runs-on }}
+          name: code-coverage
           path: ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-          merge-multiple: true
   rspec:
     needs: [brakeman, brakeman-engines]
     runs-on: ubuntu-latest
@@ -456,12 +453,11 @@ jobs:
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
-          name: code-coverage-${{ matrix.runs-on }}
+          name: code-coverage
           path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-          merge-multiple: true
   cucumber:
     needs: [brakeman, brakeman-engines]
     runs-on: ubuntu-latest
@@ -584,12 +580,11 @@ jobs:
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/188251555_fix_gha')
         with:
-          name: code-coverage-${{ matrix.runs-on }}
+          name: code-coverage
           path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-          merge-multiple: true
   quality-workbench:
     needs: [engines, benefit-sponsors, rspec, cucumber]
     if: always()
@@ -610,12 +605,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download code coverage artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
-          name: code-coverage-${{ matrix.runs-on }}
+          name: code-coverage
           path: coverage
           pattern: code-coverage-*
-          merge-multiple: true
       - name: Setup .NET Core # Required to execute ReportGenerator
         uses: actions/setup-dotnet@v3
         with:
@@ -630,11 +624,10 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - name: Upload coverage report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: code-coverage-report-${{ matrix.runs-on }}
           path: coveragereport/*
-          merge-multiple: true
       - name: Write to Job Summary
         run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
       - name: copy coverage badge
