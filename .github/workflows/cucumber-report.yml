@@ -79,7 +79,7 @@ jobs:
       - name: Run tests
         run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only'
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.feature }}
           path: ci/cucumber/${{ matrix.feature }}-cucumber-report.json
@@ -95,7 +95,7 @@ jobs:
         with:
           individual-reports-folder: 'ci/cucumber/compressed-reports'
           output-report: 'cucumber-split-config.json'
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: cucumber-split-config
           path: cucumber-split-config.json
