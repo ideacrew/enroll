@@ -10,7 +10,7 @@ module Exchanges
     before_action :updateable?
     layout 'application', except: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
     layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
-    # before_action :enable_bs4_layout, only: [:new, :edit, :create, :update, :sorting_sep_types, :clone] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:new, :edit, :create, :update, :sorting_sep_types, :clone, :set_threshold] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
     def new
       @qle = Forms::QualifyingLifeEventKindForm.for_new
@@ -87,6 +87,7 @@ module Exchanges
 
     def sorting_sep_types
       @sortable = QualifyingLifeEventKind.all
+      
       respond_to do |format|
         format.html { render "/exchanges/manage_sep_types/sorting_sep_types.html.erb" }
       end
@@ -97,6 +98,11 @@ module Exchanges
       render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
     rescue StandardError
       render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
+    end
+
+    def set_threshold
+      EnrollRegistry.lookup(:sort_sep_type) { {params: params} }
+      render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
     end
 
     private

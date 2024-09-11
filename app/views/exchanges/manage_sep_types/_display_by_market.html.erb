@@ -1,15 +1,47 @@
-<div id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
-  <h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
-  <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
-  <div class="container">
-    <div class="row">
-      <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
-        <% @sortable.where(market_kind: market_kind).active_by_state.each_with_index do |sort, i|%>
-            <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
-              <%= sort.title%>
-            </div>
-        <%end%>
+<% if @bs4 %>
+  <div id="<%= market_kind %>">
+    <% qles = @sortable.where(market_kind: market_kind).active_by_state %>
+    <% threshold_index = qles.common.length %>
+
+    <div id="success-flash" class="hidden">
+      <%= render partial: "layouts/flash", locals: {message: "SEP type list successfully sorted", type: "success"} %>
+    </div>
+    <div id="error-flash" class="hidden">
+      <%= render partial: "layouts/flash", locals: {message: "SEP type list unsuccessfully sorted", type: "error"} %>
+    </div>
+
+    <div class="my-3" data-controller="qle-commonality-threshold">
+      <input type="number" min="0" data-target="qle-commonality-threshold.threshold" data-action="qle-commonality-threshold#update" value="<%= threshold_index %>">
+    </div>
+
+    <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
+      <% qles.each_with_index do |sort, i|%>
+        <% if i == threshold_index %>
+          <div id="threshold-marker">
+            <hr>
+            <h2>Less Common Life Changes</h2>
+          </div>
+        <% end %>
+        <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
+          <%= sort.title %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
+    <h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
+    <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
+    <div class="container">
+      <div class="row">
+        <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
+          <% @sortable.where(market_kind: market_kind).active_by_state.each_with_index do |sort, i|%>
+              <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
+                <%= sort.title%>
+              </div>
+          <%end%>
+        </div>
       </div>
     </div>
   </div>
-</div>
+<% end %>
