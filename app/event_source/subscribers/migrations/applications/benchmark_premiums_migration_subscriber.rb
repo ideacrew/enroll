@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Subscribers
+  # Subscribes to the benchmark premiums migration events
   class BenchmarkPremiumsMigrationSubscriber
     include ::EventSource::Subscriber[amqp: 'enroll.batch_processes.migrations.applications.benchmark_premiums']
 
