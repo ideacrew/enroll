@@ -1,17 +1,18 @@
 import { Controller } from "stimulus"
 import Rails from 'rails-ujs';
 
-export default class extends FlashableController {
+export default class extends Controller {
 
   static targets = ["threshold"]
 
   update() {
-    const threshold = this.thresholdTarget.value;
+    let thresholdTarget = this.thresholdTarget;
+    let threshold = thresholdTarget.value;
+    let marketKind = $(thresholdTarget).parents('.qle-list-tab').data('market-kind');
 
-    function showBanner(isSuccessful) { super.showBanner(isSuccessful) };
     fetch('/exchanges/manage_sep_types/set_threshold', {
       method: 'PATCH',
-      body: JSON.stringify({commonality_threshold: threshold}),
+      body: JSON.stringify({commonality_threshold: threshold, market_kind: marketKind}),
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-Token': Rails.csrfToken()
@@ -20,16 +21,10 @@ export default class extends FlashableController {
     .then(response => response.json())
     .then(data => {
       $('#threshold-marker').detach().insertBefore($(`div[data-index='${threshold}']`));
-      showBanner(true);
+      const banners = {success: $('#success-flash'), error: $('#error-flash')}
+      const isSuccessful = data['status'] === 'success';
+      banners[isSuccessful ? 'success' : 'error'].removeClass('hidden');
+      banners[isSuccessful ? 'error' : 'success'].addClass('hidden');
     })
-  }
-}
-
-
-class FlashableController extends Controller {
-  showBanner(isSuccessful) {
-    const banners = {success: $('#success-flash'), error: $('#error-flash')}
-    banners[isSuccessful ? 'success' : 'error'].removeClass('hidden');
-    banners[isSuccessful ? 'error' : 'success'].addClass('hidden');
   }
 }
