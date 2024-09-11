@@ -3,7 +3,7 @@
 RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::RequestBatches, type: :model do
 
   let(:event_name) do
-    'events.batch_processes.migrations.applications.benchmark_premiums.request_migration_event_batches'
+    'events.batch_processes.migrations.applications.benchmark_premiums.process_migration_event_batch'
   end
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }

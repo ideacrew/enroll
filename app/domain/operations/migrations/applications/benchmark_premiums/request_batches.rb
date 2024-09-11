@@ -58,7 +58,7 @@ module Operations
             total_records = ::FinancialAssistance::Application.count
             records_processed = 0
             @logger.info "Total records to process: #{total_records}."
-            event_name = 'events.batch_processes.migrations.applications.benchmark_premiums.request_migration_event_batches'
+            event_name = 'events.batch_processes.migrations.applications.benchmark_premiums.process_migration_event_batch'
 
             while records_processed < total_records
               trigger_batch(batch_size, event_name, records_processed)
