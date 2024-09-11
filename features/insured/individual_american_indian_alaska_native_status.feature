@@ -2,6 +2,7 @@
 
 Feature: UI Validations for American Indian Alaska Native
     Background:
+        Given bs4_consumer_flow feature is disable
         Given AI AN Details feature is enabled
         Given Featured Tribe Selection feature is enabled
         Given Individual has not signed up as an HBX user
@@ -13,7 +14,7 @@ Feature: UI Validations for American Indian Alaska Native
         Then Individual should see a successful sign up message
         And Individual sees Your Information page
         When user registers as an individual
-        When Individual clicks on continue
+        And the individual clicks on the Continue button of the Account Setup page
         And Individual enter personal information with american indian alaska native status with featured tribe
 
 
@@ -23,6 +24,6 @@ Feature: UI Validations for American Indian Alaska Native
         Then Individual should see a successful sign up message
         And Individual sees Your Information page
         When user registers as an individual
-        When Individual clicks on continue
+        And the individual clicks on the Continue button of the Account Setup page
         And Individual enter personal information with american indian alaska native status with other tribe
 

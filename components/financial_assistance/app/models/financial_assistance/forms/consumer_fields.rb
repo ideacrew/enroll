@@ -33,7 +33,9 @@ module FinancialAssistance
           end
 
           def expiration_date=(val)
-            @expiration_date = Date.strptime(val, '%m/%d/%Y') if val.to_s.present?
+            return unless val.to_s.present?
+            date_format = val.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+            @expiration_date = Date.strptime(val, date_format)
           end
 
           def us_citizen

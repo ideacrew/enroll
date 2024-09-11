@@ -43,14 +43,21 @@ module FinancialAssistance
       end
     end
 
-    # Checks if the application is a renewal draft and if so, sets a flash message and redirects to the applications path.
+    # Checks if the application is a renewal draft and, if so, sets a flash message and redirects to the applications path.
     #
     # @return [void]
     def check_for_uneditable_application
+      # If the application is a renewal draft, the user should not be able to edit it.
+      # The below line could be refactored to read from a constant or a setting in the future if we want to add more states where the application should not be editable.
       return unless @application&.renewal_draft?
 
       flash[:alert] = l10n('faa.flash_alerts.uneditable_application')
       redirect_to(applications_path) and return
+    end
+
+    def parse_date(string)
+      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+      Date.strptime(string, date_format)
     end
   end
 end
