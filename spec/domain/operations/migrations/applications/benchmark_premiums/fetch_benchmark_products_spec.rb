@@ -12,20 +12,20 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
       FactoryBot.create(
         :financial_assistance_application,
         family: family,
-        effective_date: TimeKeeper.date_of_record.beginning_of_year,
+        effective_date: TimeKeeper.date_of_record.beginning_of_year
       )
     end
 
     let(:applicant1) do
       appl1 = FactoryBot.create(
-                :financial_assistance_applicant,
-                :with_home_address,
-                dob: person1.dob,
-                family_member_id: family_member1.id,
-                person_hbx_id: person1.hbx_id,
-                is_primary_applicant: true,
-                application: application
-              )
+        :financial_assistance_applicant,
+        :with_home_address,
+        dob: person1.dob,
+        family_member_id: family_member1.id,
+        person_hbx_id: person1.hbx_id,
+        is_primary_applicant: true,
+        application: application
+      )
 
       appl1.rating_address.update_attributes!(county: 'York', zip: '04001', state: 'ME')
       appl1
@@ -33,14 +33,14 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
 
     let(:applicant2) do
       appl2 = FactoryBot.create(
-                :financial_assistance_applicant,
-                :with_home_address,
-                dob: person2.dob,
-                family_member_id: family_member2.id,
-                person_hbx_id: person2.hbx_id,
-                is_primary_applicant: false,
-                application: application
-              )
+        :financial_assistance_applicant,
+        :with_home_address,
+        dob: person2.dob,
+        family_member_id: family_member2.id,
+        person_hbx_id: person2.hbx_id,
+        is_primary_applicant: false,
+        application: application
+      )
 
       appl2.rating_address.update_attributes!(county: 'York', zip: '04001', state: 'ME')
       appl2
