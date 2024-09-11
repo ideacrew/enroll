@@ -9,7 +9,6 @@ module Operations
       include Dry::Monads[:do, :result]
 
       def call(input_params)
-        
         if input_params[:params].key?('commonality_threshold')
           persist_threshold(input_params[:params])
         else
@@ -21,7 +20,7 @@ module Operations
 
       def persist_threshold(params)
         threshold = params['commonality_threshold'].to_i
-        ::QualifyingLifeEventKind.all.each_with_index do |qlek, index|
+        ::QualifyingLifeEventKind.where(market_kind: params['market_kind']).each_with_index do |qlek, index|
           qlek.update(is_common: index < threshold)
         end
       rescue StandardError => e

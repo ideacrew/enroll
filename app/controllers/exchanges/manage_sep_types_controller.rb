@@ -102,7 +102,9 @@ module Exchanges
 
     def set_threshold
       EnrollRegistry.lookup(:sort_sep_type) { {params: params} }
-      render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
+      render json: { status: 'success' }, status: :ok
+    rescue StandardError
+      render json: { status: 'error' }, status: :internal_server_error
     end
 
     private
