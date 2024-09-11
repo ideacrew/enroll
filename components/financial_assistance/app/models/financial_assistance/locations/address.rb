@@ -61,13 +61,9 @@ module FinancialAssistance
 
       def county_check
         return unless EnrollRegistry.feature_enabled?(:display_county)
+        return if self.county.present?
         return if self.state&.downcase != EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase
-
-        if county.blank?
-          errors.add(:county, 'not present')
-        elsif ::BenefitMarkets::Locations::CountyZip.where(zip: zip, county_name: county).blank?
-          errors.add(:county, 'invalid county/zip')
-        end
+        errors.add(:county, 'not present')
       end
 
       def office_is_primary_location?
