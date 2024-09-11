@@ -11,6 +11,13 @@ module Operations
         class FetchBenchmarkProducts
           include Dry::Monads[:do, :result]
 
+          # Fetches benchmark premiums for the given application.
+          #
+          # @param params [Hash] the parameters for fetching benchmark premiums
+          # @option params [::FinancialAssistance::Application] :application the application object
+          # @option params [Date] :effective_date the effective date for the premiums
+          #
+          # @return [Dry::Monads::Result] the result of the operation
           def call(params)
             application, @effective_date  = yield validate(params)
             @applicants                   = yield fetch_applicants(application)
@@ -24,6 +31,10 @@ module Operations
 
           private
 
+          # Validates the input parameters.
+          #
+          # @param params [Hash] the parameters to validate
+          # @return [Dry::Monads::Result] the result of the validation
           def validate(params)
             if params[:application].is_a?(::FinancialAssistance::Application) && params[:effective_date].is_a?(Date)
               Success([params[:application], params[:effective_date]])
@@ -32,10 +43,17 @@ module Operations
             end
           end
 
+          # Fetches the applicants from the application.
+          #
+          # @param application [::FinancialAssistance::Application] the application object
+          # @return [Dry::Monads::Result] the result of fetching applicants
           def fetch_applicants(application)
             Success(application.applicants.only(:person_hbx_id, :is_primary_applicant, :addresses))
           end
 
+          # Finds the addresses of the primary applicants.
+          #
+          # @return [Dry::Monads::Result] the result of finding addresses
           def find_addresses
             geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
             members = @applicants.where(is_primary_applicant: true)
@@ -56,6 +74,10 @@ module Operations
             Success(address_combinations)
           end
 
+          # Fetches the silver products for the given addresses.
+          #
+          # @param addresses [Array] the addresses to fetch silver products for
+          # @return [Dry::Monads::Result] the result of fetching silver products
           def fetch_silver_products(addresses)
             silver_products = Operations::Products::FetchSilverProducts.new.call({ address: addresses.flatten[0], effective_date: @effective_date })
             return Failure("unable to fetch silver_products for - #{addresses.flatten[0]}") if silver_products.failure?
@@ -63,6 +85,10 @@ module Operations
             Success({ @applicants.collect(&:person_hbx_id) => silver_products.value! })
           end
 
+          # Fetches the member premiums for the given silver products.
+          #
+          # @param rating_silver_products [Hash] the silver products to fetch premiums for
+          # @return [Dry::Monads::Result] the result of fetching member premiums
           def fetch_member_premiums(rating_silver_products)
             member_premiums = {}
             min_age = @applicants.map { |app| app.age_on(@effective_date) }.min
@@ -90,6 +116,14 @@ module Operations
             Success(member_premiums)
           end
 
+          # Fetches and stores the premiums for the given products.
+          #
+          # @param member_premiums [Hash] the hash to store the premiums in
+          # @param hbx_ids [Array] the HBX IDs of the members
+          # @param products [Array] the products to fetch premiums for
+          # @param rating_area_code [String] the rating area code
+          # @param key [Symbol] the key to store the premiums under
+          # @return [Dry::Monads::Result] the result of fetching and storing premiums
           def fetch_and_store_premiums(member_premiums, hbx_ids, products, rating_area_code, key)
             premiums = fetch_product_premiums(products, rating_area_code)
             return Failure("unable to fetch #{key} premiums for - #{hbx_ids}") if premiums.failure?
@@ -97,14 +131,29 @@ module Operations
             Success(nil)
           end
 
+          # Determines if health and dental premiums should be fetched.
+          #
+          # @param benchmark_product_model [Symbol] the benchmark product model
+          # @param min_age [Integer] the minimum age of the applicants
+          # @return [Boolean] whether health and dental premiums should be fetched
           def should_fetch_health_and_dental?(benchmark_product_model, min_age)
             benchmark_product_model == :health_and_dental && min_age < 19
           end
 
+          # Determines if health and pediatric dental premiums should be fetched.
+          #
+          # @param benchmark_product_model [Symbol] the benchmark product model
+          # @param min_age [Integer] the minimum age of the applicants
+          # @return [Boolean] whether health and pediatric dental premiums should be fetched
           def should_fetch_health_and_ped_dental?(benchmark_product_model, min_age)
             benchmark_product_model == :health_and_ped_dental && min_age < 19
           end
 
+          # Fetches the product premiums for the given products and rating area code.
+          #
+          # @param products [Array] the products to fetch premiums for
+          # @param rating_area_exchange_provided_code [String] the rating area code
+          # @return [Dry::Monads::Result] the result of fetching product premiums
           def fetch_product_premiums(products, rating_area_exchange_provided_code)
             member_premiums = @applicants.inject({}) do |member_result, applicant|
               age = applicant.age_on(@effective_date)
@@ -127,6 +176,10 @@ module Operations
             Success(member_premiums)
           end
 
+          # Fetches the benchmark premiums for the given member premiums.
+          #
+          # @param premiums [Hash] the member premiums
+          # @return [Dry::Monads::Result] the result of fetching benchmark premiums
           def fetch_benchmark_premiums(premiums)
             applicant_hbx_ids = @applicants.collect(&:person_hbx_id)
             slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums)
@@ -138,6 +191,10 @@ module Operations
             Success(construct_benchmark_premiums(applicant_hbx_ids, slcsp_info.success, lcsp_info.success))
           end
 
+          # Builds zero member premiums for the given applicant HBX IDs.
+          #
+          # @param applicant_hbx_ids [Array] the applicant HBX IDs
+          # @return [Dry::Monads::Result] the result of building zero member premiums
           def build_zero_member_premiums(applicant_hbx_ids)
             member_premiums = applicant_hbx_ids.collect do |applicant_hbx_id|
               { member_identifier: applicant_hbx_id, monthly_premium: 0.0 }
@@ -146,6 +203,12 @@ module Operations
             Success({ health_only_lcsp_premiums: member_premiums, health_only_slcsp_premiums: member_premiums })
           end
 
+          # Constructs the benchmark premiums for the given applicant HBX IDs, SLCSP info, and LCSP info.
+          #
+          # @param applicant_hbx_ids [Array] the applicant HBX IDs
+          # @param slcsp_info [Hash] the SLCSP info
+          # @param lcsp_info [Hash] the LCSP info
+          # @return [Hash] the constructed benchmark premiums
           def construct_benchmark_premiums(applicant_hbx_ids, slcsp_info, lcsp_info)
             applicant_hbx_ids.inject({}) do |premiums, applicant_hbx_id|
               if slcsp_info[applicant_hbx_id].present?
