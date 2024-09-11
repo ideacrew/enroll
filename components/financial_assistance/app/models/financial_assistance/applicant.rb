@@ -1501,6 +1501,9 @@ module FinancialAssistance
       self.benchmark_premiums = calculated_benchmark_premiums
     end
 
+    # Returns the rating address of the applicant.
+    #
+    # @return [String, nil] the home address if present, otherwise the mailing address
     def rating_address
       home_address || mailing_address
     end
