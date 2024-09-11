@@ -50,20 +50,26 @@ module Operations
       end
 
       def notices_title_code_mapping
-        {"Your Plan Enrollment" => "IVL_ENR",
-         "Your Eligibility Results - Tax Credit" => "IVL_ERA",
-         "Your Eligibility Results - Medicaid" => "IVL_ERM",
-         "Your Eligibility Results - Marketplace Insurance" => "IVL_ERU",
-         "Action Needed - Submit Documents" => "IVL_DR0",
-         "Reminder - You Must Submit Documents" => "IVL_DR1",
-         "Don't Forget - You Must Submit Documents" => "IVL_DR2",
-         "Don't Miss the Deadline - You Must Submit Documents" => "IVL_DR3",
-         "Final Notice - You Must Submit Documents" => "IVL_DR4",
-         "Open Enrollment - Medicaid" => "IVL_OEM",
-         "Open Enrollment - Tax Credit" => "IVL_OEA",
-         "Open Enrollment - Marketplace Insurance" => "IVL_OEU",
-         "Review Your Insurance Plan Enrollment and Pay Your Bill Now" => "IVL_FRE",
-         "Open Enrollment - Action Needed" => "IVL_OEG"}
+        {
+          "Welcome to CoverME.gov!" => "IVLMWE",
+          "Your Plan Enrollment" => "IVLENR",
+          "Your Eligibility Results - Tax Credit" => "IVLERA",
+          "Your Eligibility Results - MaineCare or Cub Care" => "IVLERM",
+          "Your Eligibility Results - Marketplace Health Insurance" => "IVLERQ",
+          "Your Eligibility Results - Marketplace Insurance" => "IVLERU",
+          "Open Enrollment - Tax Credit" => "IVLOEA",
+          "Open Enrollment - Update Your Application" => "IVLOEM",
+          "Your Eligibility Results - Health Coverage Eligibility" => "IVLOEQ",
+          "Open Enrollment - Marketplace Insurance" => "IVLOEU",
+          "Your Eligibility Results Consent or Missing Information Needed" => "IVLOEG",
+          "Find Out If You Qualify For Health Insurance On CoverME.gov" => "IVLMAT",
+          "Your Plan Enrollment for 2022" => "IVLFRE",
+          "Action Needed - Submit Documents" => "IVLDR0",
+          "Reminder - You Must Submit Documents" => "IVLDR1",
+          "Don't Forget - You Must Submit Documents" => "IVLDR2",
+          "Don't Miss the Deadline - You Must Submit Documents" => "IVLDR3",
+          "Final Notice - You Must Submit Documents" => "IVLDR4"
+        }
       end
 
       def generate_report(people, values)

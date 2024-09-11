@@ -3,8 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Operations::Reports::GenerateNoticesReport, dbclean: :after_each do
+  let(:title) { "Your Eligibility Results Consent or Missing Information Needed" }
   let!(:person) { FactoryBot.create(:person)}
-  let(:document) { Document.new(title: "Open Enrollment - Action Needed") }
+  let(:document) { Document.new(title: title) }
 
   before :each do
     person.documents << document
@@ -28,7 +29,7 @@ RSpec.describe Operations::Reports::GenerateNoticesReport, dbclean: :after_each 
     end
 
     it 'should include notice code in the report' do
-      expect(@file_content).to include("IVL_OEG")
+      expect(@file_content).to include("IVLOEG")
     end
 
     it 'should include notice created_at in the report' do
