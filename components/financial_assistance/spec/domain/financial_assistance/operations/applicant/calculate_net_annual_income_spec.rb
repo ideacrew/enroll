@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNetAnnualIncome, dbclean: :after_each do
+RSpec.describe FinancialAssistance::Operations::Applicant::CalculateNetAnnualIncome, dbclean: :after_each do
 
   let(:family_id)    { BSON::ObjectId.new }
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: "draft") }
@@ -29,7 +29,9 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
     it "fails" do
       result = subject.call(params)
       expect(result).not_to be_success
-      expect(result.failure).to eq "Invalid Params"
+      expect(result.failure).to eq(
+        'Invalid input params. Expected application_assistance_year as Integer and applicant as FinancialAssistance::Applicant.'
+      )
       expect(applicant.net_annual_income).to eq nil
     end
   end
@@ -40,7 +42,9 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
     it "fails" do
       result = subject.call(params)
       expect(result).not_to be_success
-      expect(result.failure).to eq "Invalid Params"
+      expect(result.failure).to eq(
+        'Invalid input params. Expected application_assistance_year as Integer and applicant as FinancialAssistance::Applicant.'
+      )
       expect(applicant.net_annual_income).to eq nil
     end
   end
@@ -57,10 +61,9 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
         applicant.deductions << deduction
       end
 
-      it 'should pass, calculate and persist net annual income on applicant' do
+      it 'calculates the net annual income for applicant' do
         result = subject.call(params)
-        expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f.ceil).to eq 214
+        expect(result.success.to_f.ceil).to eq(214)
       end
     end
 
@@ -84,10 +87,9 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
         applicant.deductions << deduction
       end
 
-      it 'should pass, calculate and persist net annual income on applicant' do
+      it 'returns net annual income for applicant' do
         result = subject.call(params)
-        expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f.ceil).to eq 12_000
+        expect(result.success.to_f.ceil).to eq(12_000)
       end
     end
 
@@ -106,10 +108,9 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
         applicant.incomes << income
       end
 
-      it "should calculate net_annual_income correctly" do
+      it 'returns calculate net_annual_income correctly' do
         result = subject.call(params)
-        expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f.ceil).to eq 12_000
+        expect(result.success.to_f.ceil).to eq(12_000)
       end
     end
 
@@ -128,19 +129,17 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
         applicant.incomes << income
       end
 
-      it "should calculate net_annual_income correctly in non-leap year" do
+      it 'returns net_annual_income correctly in non-leap year' do
         unless Date.gregorian_leap?(application.assistance_year)
           result = subject.call(params)
-          expect(result.success).to eq applicant
-          expect(applicant.net_annual_income.to_f.ceil).to eq 7_003
+          expect(result.success.to_f.ceil).to eq(7_003)
         end
       end
 
-      it "should calculate net_annual_income correctly in a leap year" do
+      it "returns calculate net_annual_income correctly in a leap year" do
         if Date.gregorian_leap?(application.assistance_year)
           result = subject.call(params)
-          expect(result.success).to eq applicant
-          expect(applicant.net_annual_income.to_f.ceil).to eq 7_017
+          expect(result.success.to_f.ceil).to eq(7_017)
         end
       end
     end
@@ -165,11 +164,10 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
         applicant.deductions << deduction
       end
 
-      it 'should pass, and store 0 net income on applicant' do
+      it 'returns 0 as net income for the applicant' do
         result = subject.call(params)
 
-        expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f).to eq 0.0
+        expect(result.success.to_f).to eq(0.0)
       end
     end
   end

@@ -61,37 +61,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
 
-  let(:premiums_hash) do
-    {
-      [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}},
-      [person2.hbx_id] => {:health_only => {person2.hbx_id => [{:cost => 200.0, :member_identifier => person2.hbx_id, :monthly_premium => 200.0}]}},
-      [person3.hbx_id] => {:health_only => {person3.hbx_id => [{:cost => 200.0, :member_identifier => person3.hbx_id, :monthly_premium => 200.0}]}}
-    }
-  end
-
-  let(:slcsp_info) do
-    {
-      person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}},
-      person2.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person2.hbx_id, :monthly_premium => 200.0}},
-      person3.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person3.hbx_id, :monthly_premium => 200.0}}
-    }
-  end
-
-  let(:lcsp_info) do
-    {
-      person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}},
-      person2.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person2.hbx_id, :monthly_premium => 100.0}},
-      person3.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person3.hbx_id, :monthly_premium => 100.0}}
-    }
-  end
-
-  let(:premiums_double) { double(:success => premiums_hash) }
-  let(:slcsp_double) { double(:success => slcsp_info) }
-  let(:lcsp_double) { double(:success => lcsp_info) }
-
-  let(:fetch_double) { double(:new => double(call: premiums_double))}
-  let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
-  let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
@@ -102,16 +71,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
-    stub_const('::Operations::Products::Fetch', fetch_double)
-    stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
-    stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
-    allow(premiums_double).to receive(:failure?).and_return(false)
-    allow(slcsp_double).to receive(:failure?).and_return(false)
-    allow(lcsp_double).to receive(:failure?).and_return(false)
   end
 
   describe 'When Application in draft state is passed' do
-    let(:result) { subject.call(application) }
+    let(:result) do
+      update_benchmark_premiums
+      subject.call(application)
+    end
 
     before :each do
       application.update_attributes(aasm_state: "draft")
@@ -123,7 +89,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   describe 'When Application is in submitted state' do
-    let(:result) { subject.call(application) }
+    let(:result) do
+      update_benchmark_premiums
+      subject.call(application)
+    end
 
     before :each do
       applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present',
@@ -460,6 +429,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       before do
         applicant.update_attributes(person_hbx_id: person.hbx_id, citizen_status: 'alien_lawfully_present', eligibility_determination: nil_determination)
+        update_benchmark_premiums
         @result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
       end
@@ -483,7 +453,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   context 'for renewal application' do
-    let(:result) { subject.call(application) }
+    let(:result) do
+      update_benchmark_premiums
+      subject.call(application)
+    end
 
     before :each do
       family.family_members.first.update_attributes(person_id: person.id)
@@ -542,6 +515,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       @result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
     end
@@ -558,6 +532,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         application.relationships.destroy_all
         application.add_relationship(applicant, applicant2, 'father_or_mother_in_law')
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
@@ -580,6 +555,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         application.relationships.destroy_all
         application.add_relationship(applicant, applicant2, 'daughter_or_son_in_law')
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
@@ -602,6 +578,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         application.relationships.destroy_all
         application.add_relationship(applicant, applicant2, 'brother_or_sister_in_law')
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
@@ -624,6 +601,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         application.relationships.destroy_all
         application.add_relationship(applicant, applicant2, 'cousin')
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
@@ -647,6 +625,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         before do
           application.relationships.destroy_all
           application.add_relationship(applicant, applicant2, 'parents_domestic_partner')
+          update_benchmark_premiums
           result = subject.call(application.reload)
           @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
@@ -669,6 +648,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         before do
           application.relationships.destroy_all
           application.add_relationship(applicant, applicant2, 'domestic_partners_child')
+          update_benchmark_premiums
           result = subject.call(application.reload)
           @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
@@ -690,6 +670,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'mitc_relationships' do
       before do
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @mitc_relationships = result.success[:applicants].first[:mitc_relationships]
@@ -748,6 +729,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       @result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
     end
@@ -762,6 +744,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'for claimed_as_tax_dependent_by' do
       before do
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @child_applicant = result.success[:applicants][1]
@@ -791,6 +774,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @mitc_income = result.success[:applicants].first[:mitc_income]
@@ -854,6 +838,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @benefit = result.success[:applicants].first[:benefits].first
@@ -884,6 +869,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @benefit = result.success[:applicants].first[:benefits].first
@@ -911,6 +897,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @benefit = @entity_init.success.applicants.first.benefits.first
@@ -937,6 +924,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
     end
@@ -1001,6 +989,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        update_benchmark_premiums
         @result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
         @mitc_household = @result.success[:mitc_households].first
@@ -1027,6 +1016,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        update_benchmark_premiums
         @result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
         @mitc_household = @result.success[:mitc_households].first
@@ -1053,6 +1043,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        update_benchmark_premiums
         @result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
       end
@@ -1132,6 +1123,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        update_benchmark_premiums
         @result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
       end
@@ -1163,6 +1155,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'applicant addresses' do
       before do
+        update_benchmark_premiums
         @applicants = subject.call(application.reload).value![:applicants]
       end
 
@@ -1205,6 +1198,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @mitc_income = result.success[:applicants].first[:mitc_income]
@@ -1269,6 +1263,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @mitc_income = result.success[:applicants].first[:mitc_income]
@@ -1309,6 +1304,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     before :each do
       application.update_attributes!(assistance_year: application.assistance_year - 1)
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @mitc_income = result.success[:applicants].first[:mitc_income]
@@ -1331,6 +1327,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     before :each do
       application.update_attributes!(assistance_year: application.assistance_year + 1)
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @mitc_income = result.success[:applicants].first[:mitc_income]
@@ -1347,6 +1344,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @applicant = result.success[:applicants].first
@@ -1373,6 +1371,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       allow(setting).to receive(:setting).with("earned_income_filing_threshold_#{application.assistance_year}").and_return(double(item: 12_400))
       applicant.update_attributes!(is_required_to_file_taxes: false)
       create_income
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @applicant = result.success[:applicants].first
@@ -1484,6 +1483,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'deduction with end_on in previous year than assistance year' do
       before do
         applicant.deductions.first.update_attributes!(start_on: (Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
+        update_benchmark_premiums
       end
 
       it 'should have magi deductions be zero' do
@@ -1496,6 +1496,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'deduction with end_on in future year than assistance year' do
       before do
         applicant.deductions.first.update_attributes!(end_on: (Date.new(application.assistance_year) + 1.year))
+        update_benchmark_premiums
       end
 
       it "should have deduction end on be at the end of the application assistance year" do
@@ -1507,6 +1508,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'deduction with end_on in same year as assistance year in non-leap year' do
       before do
         applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
+        update_benchmark_premiums
       end
 
       it "should return deduction amount until the end date within the assistance year" do
@@ -1520,6 +1522,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'deduction with end_on in same year as assistance year in leap year' do
       before do
         applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
+        update_benchmark_premiums
       end
 
       it "should return deduction amount until the end date within the assistance year" do
@@ -1532,6 +1535,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'deduction with  nil end_on' do
       it "should return deduction for the entire assistance year" do
+        update_benchmark_premiums
         result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
         expect(result.to_i).to eql(5200)
       end
@@ -1542,6 +1546,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         applicant.deductions = []
         applicant.save
+        update_benchmark_premiums
       end
       it "should return 0" do
         result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
@@ -1557,6 +1562,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                            frequency_kind: 'monthly' })
         applicant.deductions << deduction
         applicant.save!
+        update_benchmark_premiums
       end
       it "should add the deductions together" do
         result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
@@ -1574,6 +1580,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                                          frequency_kind: 'monthly' })
       applicant.deductions << deduction
       applicant.save!
+      update_benchmark_premiums
     end
 
     before do
@@ -1593,6 +1600,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
   context 'for is_filing_as_head_of_household' do
     before do
+      premium_info = application.applicants.collect do |applicant|
+        { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }
+      end
+      application.applicants.each do |applicant|
+        applicant.update_attributes!(
+          { benchmark_premiums: { health_only_lcsp_premiums: premium_info, health_only_slcsp_premiums: premium_info } }
+        )
+      end
       result = subject.call(application)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @applicant = @entity_init.success.applicants.first
@@ -1621,6 +1636,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'income end_on is before TimeKeeper.date_of_record' do
       before do
+        premium_info = application.applicants.collect do |applicant|
+          { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }
+        end
+        application.applicants.each do |applicant|
+          applicant.update_attributes!(
+            { benchmark_premiums: { health_only_lcsp_premiums: premium_info, health_only_slcsp_premiums: premium_info } }
+          )
+        end
         result = subject.call(application)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @applicant = @entity_init.success.applicants.first
@@ -1650,6 +1673,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        premium_info = application.applicants.collect do |applicant|
+          { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }
+        end
+        application.applicants.each do |applicant|
+          applicant.update_attributes!(
+            { benchmark_premiums: { health_only_lcsp_premiums: premium_info, health_only_slcsp_premiums: premium_info } }
+          )
+        end
         result = subject.call(application)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @applicant = @entity_init.success.applicants.first
@@ -1670,6 +1701,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   describe 'had_prior_insurance & prior_insurance_end_date' do
     context 'success' do
       before do
+        premium_info = application.applicants.collect do |applicant|
+          { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }
+        end
+        application.applicants.each do |applicant|
+          applicant.update_attributes!(
+            { benchmark_premiums: { health_only_lcsp_premiums: premium_info, health_only_slcsp_premiums: premium_info } }
+          )
+        end
         result = subject.call(application)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @student = @entity_init.success.applicants.first.student
@@ -1697,7 +1736,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'success' do
       before do
         application.applicants.each do |applicant|
-          applicant.update_attributes!({ is_pregnant: true, pregnancy_due_on: nil })
+          applicant.update_attributes!(
+            {
+              is_pregnant: true,
+              pregnancy_due_on: nil,
+              benchmark_premiums: {
+                health_only_lcsp_premiums: [{ member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }],
+                health_only_slcsp_premiums: [{ member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }]
+              }
+            }
+          )
         end
         result = subject.call(application)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
@@ -1746,6 +1794,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       create_job_income2
       create_job_income3
       application.update_attributes!(assistance_year: prospective_year, effective_date: Date.new(prospective_year))
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @mitc_income = result.success[:applicants].first[:mitc_income]
@@ -1793,30 +1842,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
-  describe "#applicant_benchmark_premium" do
-    let(:result) { subject.call(application) }
-    context "when all applicants are valid" do
-
-      it "should successfully submit a cv3 application" do
-        expect(result).to be_success
-      end
-    end
-
-    context "when a family member is deleted" do
-      let(:slcsp_info) { {} }
-      let(:lcsp_info) { {} }
-
-      before do
-        family.family_members.last.delete
-        family.reload
-      end
-
-      it "should submit a cv3 application and get a success response" do
-        expect(result).to be_success
-      end
-    end
-  end
-
   describe "#applicant is not applying for coverage" do
     let!(:create_esi_benefit) do
       emp_add = FinancialAssistance::Locations::Address.new({
@@ -1856,6 +1881,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before do
+      update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
       @applicant = result.success[:applicants].first
@@ -1899,7 +1925,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:applicant2_has_eligible_health_coverage) { false }
     let(:applicant1_is_applying_coverage) { true }
 
-    let(:operation_result) { subject.call(application.reload) }
+    let(:operation_result) do
+      update_benchmark_premiums
+      subject.call(application.reload)
+    end
+
     let(:application_entity) do
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
     end
@@ -1916,7 +1946,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:applicant2_has_eligible_health_coverage) { true }
     let(:applicant1_is_applying_coverage) { true }
 
-    let(:operation_result) { subject.call(application.reload) }
+    let(:operation_result) do
+      update_benchmark_premiums
+      subject.call(application.reload)
+    end
     let(:application_entity) do
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
     end
@@ -1932,7 +1965,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:applicant1_has_job_income) { true }
     let(:applicant1_is_applying_coverage) { true }
 
-    let(:operation_result) { subject.call(application.reload) }
+    let(:operation_result) do
+      update_benchmark_premiums
+      subject.call(application.reload)
+    end
     let(:application_entity) do
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
     end
@@ -1948,7 +1984,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:applicant1_has_self_employment_income) { true }
     let(:applicant1_is_applying_coverage) { true }
 
-    let(:operation_result) { subject.call(application.reload) }
+    let(:operation_result) do
+      update_benchmark_premiums
+      subject.call(application.reload)
+    end
+
     let(:application_entity) do
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
     end
@@ -1964,7 +2004,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:applicant1_has_unemployment_income) { true }
     let(:applicant1_is_applying_coverage) { true }
 
-    let(:operation_result) { subject.call(application.reload) }
+    let(:operation_result) do
+      update_benchmark_premiums
+      subject.call(application.reload)
+    end
     let(:application_entity) do
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
     end
@@ -1980,7 +2023,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:applicant1_has_other_income) { true }
     let(:applicant1_is_applying_coverage) { true }
 
-    let(:operation_result) { subject.call(application.reload) }
+    let(:operation_result) do
+      update_benchmark_premiums
+      subject.call(application.reload)
+    end
     let(:application_entity) do
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
     end
@@ -1996,7 +2042,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     let(:applicant1_has_deductions) { true }
     let(:applicant1_is_applying_coverage) { true }
 
-    let(:operation_result) { subject.call(application.reload) }
+    let(:operation_result) do
+      update_benchmark_premiums
+      subject.call(application.reload)
+    end
+
     let(:application_entity) do
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
     end
@@ -2021,6 +2071,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @benefits = @entity_init.success.applicants.first.benefits.to_a
@@ -2046,6 +2097,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @benefits = @entity_init.success.applicants.first.benefits.to_a
@@ -2080,6 +2132,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @benefits = @entity_init.success.applicants.first.benefits.to_a
@@ -2114,6 +2167,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       before do
+        update_benchmark_premiums
         result = subject.call(application.reload)
         @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @benefits = @entity_init.success.applicants.first.benefits.to_a
@@ -2130,7 +2184,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   describe 'FinancialAssistanceRegistry' do
-    let(:result) { subject.call(application) }
+    let(:result) do
+      update_benchmark_premiums
+      subject.call(application)
+    end
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step)
@@ -2156,6 +2213,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         applicant.addresses.create!(in_state_address_params)
         applicant.save!
+        update_benchmark_premiums
         result = subject.call(application)
         @applicant = result.success[:applicants].first
       end
@@ -2168,6 +2226,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'applicant is homeless (and not temporarily out of state)' do
       before do
         applicant.update!(is_homeless: true)
+        update_benchmark_premiums
         result = subject.call(application)
         @applicant = result.success[:applicants].first
       end
@@ -2181,6 +2240,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         applicant.addresses.create!(out_of_state_address_params)
         applicant.update!(is_temporarily_out_of_state: true)
+        update_benchmark_premiums
         result = subject.call(application)
         @applicant = result.success[:applicants].first
       end
@@ -2194,6 +2254,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       before do
         applicant.addresses.create!(out_of_state_address_params)
         applicant.save!
+        update_benchmark_premiums
         result = subject.call(application)
         @applicant = result.success[:applicants].first
       end
@@ -2215,7 +2276,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(false)
+          update_benchmark_premiums
           result = subject.call(application.reload)
+
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           @applicant_entity = entity_init.success.applicants.first
         end
@@ -2237,7 +2300,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(true)
+          update_benchmark_premiums
           result = subject.call(application.reload)
+
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           @applicant_entity = entity_init.success.applicants.first
         end
@@ -2260,7 +2325,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       context 'when qnc is false on applicant' do
         before do
           applicant.update!(qualified_non_citizen: false)
+          update_benchmark_premiums
           result = subject.call(application.reload)
+
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           @applicant_entity = entity_init.success.applicants.first
         end
@@ -2273,7 +2340,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       context 'when qnc is true on applicant' do
         before do
           applicant.update!(qualified_non_citizen: true)
+          update_benchmark_premiums
           result = subject.call(application.reload)
+
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           @applicant_entity = entity_init.success.applicants.first
         end
@@ -2286,7 +2355,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       context 'when qnc is nil on applicant' do
         it 'should include qualified_non_citizen in payload' do
           applicant.update!(qualified_non_citizen: nil)
+          update_benchmark_premiums
           result = subject.call(application.reload)
+
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           applicant_entity = entity_init.success.applicants.first
           expect(applicant_entity.qualified_non_citizen).to eq(false)
@@ -2294,7 +2365,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
         it 'should return true if applicant is alien_lawfully_present ' do
           applicant.update!(qualified_non_citizen: nil, citizen_status: 'alien_lawfully_present')
+          update_benchmark_premiums
           result = subject.call(application.reload)
+
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           applicant_entity = entity_init.success.applicants.first
           expect(applicant_entity.qualified_non_citizen).to eq(true)
@@ -2302,7 +2375,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
         it 'should return true if applicant is us_citizen ' do
           applicant.update!(qualified_non_citizen: nil, citizen_status: 'us_citizen')
+          update_benchmark_premiums
           result = subject.call(application.reload)
+
           entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
           applicant_entity = entity_init.success.applicants.first
           expect(applicant_entity.qualified_non_citizen).to eq(false)
@@ -2315,6 +2390,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
         applicant.update!(qualified_non_citizen: false)
+        update_benchmark_premiums
         result = subject.call(application.reload)
         entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
         @applicant_entity = entity_init.success.applicants.first
@@ -2327,7 +2403,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   describe 'with local_mec_evidence' do
-    let(:operation_result) { subject.call(application.reload) }
+    let(:operation_result) do
+      update_benchmark_premiums
+      subject.call(application.reload)
+    end
+
     let(:application_entity) do
       AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
     end
@@ -2386,5 +2466,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         expect(local_mec_evidence_result).to eql(applicant.local_mec_evidence.verif_due_date)
       end
     end
+  end
+end
+
+def update_benchmark_premiums
+  ::FinancialAssistance::Application.each do |app|
+    applicant_hbx_ids = app.applicants.pluck(:person_hbx_id)
+    member_premiums = applicant_hbx_ids.collect do |applicant_hbx_id|
+      { member_identifier: applicant_hbx_id, monthly_premium: 90.0 }
+    end.compact
+    premiums_info = { health_only_lcsp_premiums: member_premiums, health_only_slcsp_premiums: member_premiums }
+    app.applicants.each { |applicant| applicant.benchmark_premiums = premiums_info }
+    app.save!
+    app.reload
   end
 end

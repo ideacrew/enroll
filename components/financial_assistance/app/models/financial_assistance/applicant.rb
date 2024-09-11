@@ -178,6 +178,10 @@ module FinancialAssistance
     field :family_member_id, type: BSON::ObjectId
     field :eligibility_determination_id, type: BSON::ObjectId
 
+    # @deprecated This field is implemented to soft delete the applicant from the system just like the family member.
+    # However, the applicant can be deleted from the system as it is only allowed for draft applications, so we are not using this field anymore.
+    # @!attribute [rw] is_active
+    #   @return [Boolean] Defaults to true.
     field :is_active, type: Boolean, default: true
 
     field :has_fixed_address, type: Boolean, default: true
@@ -306,6 +310,10 @@ module FinancialAssistance
     field :five_year_bar_applies, type: Boolean
     field :five_year_bar_met, type: Boolean
     field :qualified_non_citizen, type: Boolean
+
+    # @!attribute [rw] benchmark_premiums
+    #   @return [Hash] the SLCSP and LCSP premiums information calculated for Financial Assistance determination process
+    field :benchmark_premiums, type: Hash, default: {}
 
     embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType" #, cascade_callbacks: true, validate: true
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income", cascade_callbacks: true, validate: true
@@ -1466,6 +1474,31 @@ module FinancialAssistance
       when 'local_mec_evidence'
         local_mec_evidence
       end
+    end
+
+    # Calculates and assigns the total net annual income for the applicant.
+    #
+    # @return [void]
+    def calculate_and_assign_total_net_income
+      net_income = FinancialAssistance::Operations::Applicant::CalculateNetAnnualIncome.new.call(
+        { applicant: self, application_assistance_year: application.assistance_year }
+      )
+
+      if net_income.success?
+        self.net_annual_income = net_income.success
+      else
+        Rails.logger.error { "Failed to calculate net income for applicant: #{self.id}, error: #{net_income.failure}" }
+      end
+    end
+
+    # Assigns the benchmark premiums to the applicant.
+    #
+    # @param [Hash] calculated_benchmark_premiums The calculated benchmark premiums.
+    # @return [void]
+    def assign_benchmark_premiums(calculated_benchmark_premiums)
+      return unless calculated_benchmark_premiums.is_a?(Hash)
+
+      self.benchmark_premiums = calculated_benchmark_premiums
     end
 
     private
