@@ -91,7 +91,7 @@ gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
 gem 'redis-store',              '~> 1.10'
-gem 'rexml',                    '>= 3.3.3'
+gem 'rexml',                    '>= 3.3.6'
 gem 'resque',                   '~> 2.6.0'
 gem 'roo',                      '~> 2.10'
 gem 'rubyzip', '>= 1.3.0'
@@ -176,7 +176,7 @@ group :test do
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.18.0'
   gem 'webdrivers', '~> 5.3.1'
-  gem 'webmock',                      '~> 3.0.1'
+  gem 'webmock',                      '~> 3.9.0'
 end
 
 group :production do

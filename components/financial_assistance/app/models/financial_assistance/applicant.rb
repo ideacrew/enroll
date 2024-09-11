@@ -1370,6 +1370,7 @@ module FinancialAssistance
 
       evidence.verification_outstanding = true
       evidence.is_satisfied = false
+      evidence.due_on = schedule_verification_due_on unless evidence.aasm_state == 'review'
       evidence.move_to_rejected
       save!
     end

@@ -858,12 +858,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     result = ::Operations::HbxAdmin::DryRun::Individual::Analyzer.new.call
 
     if result.failure?
-      flash[:error], application_states = result.failure
+      flash[:error], skeleton = result.failure
       eligible_families = {}
+      application_states = skeleton["mapped_application_states"]
       benefit_coverage_values = {}
-      oe_determined_notices = {}
+      oe_determined_notices = skeleton["oe_determined_notices"]
+      enrollment_states = skeleton["enrollment_states"]
     else
-      eligible_families, application_states, benefit_coverage_values, oe_determined_notices = result.success
+      eligible_families, application_states, benefit_coverage_values, oe_determined_notices, enrollment_states = result.success
     end
 
     respond_to do |format|
@@ -872,7 +874,8 @@ class Exchanges::HbxProfilesController < ApplicationController
           eligible_families: eligible_families,
           application_states: application_states,
           benefit_coverage_values: benefit_coverage_values,
-          oe_determined_notices: oe_determined_notices
+          oe_determined_notices: oe_determined_notices,
+          enrollment_states: enrollment_states
         }
       end
     end

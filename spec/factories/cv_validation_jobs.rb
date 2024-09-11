@@ -10,20 +10,20 @@ FactoryBot.define do
     primary_person_hbx_id { '98765' }
     family_hbx_id { '12345' }
     family_updated_at { DateTime.now }
+    result { :success }
     job_id { 'job_123' }
     cv_errors { [] }
     logging_messages { [] }
-    cv_start_time { DateTime.now - 60.minutes }
-    cv_end_time { DateTime.now - 1.minute }
-    start_time { DateTime.now - 61.minutes }
-    end_time { DateTime.now }
-
-    trait :success do
-      result { :success }
-    end
+    cv_payload_transformation_time { 10.98 }
+    job_elapsed_time { 20.98 }
 
     trait :failure do
       result { :failure }
+      cv_errors { ["Error 1", "Error 2"] }
+    end
+
+    trait :with_cv_errors do
+      result { :error }
       cv_errors { ["Error 1", "Error 2"] }
     end
 

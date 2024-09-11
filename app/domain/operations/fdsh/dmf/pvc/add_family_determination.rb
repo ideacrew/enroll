@@ -144,10 +144,14 @@ module Operations
 
           def process_member(entity_member)
             person_entity = entity_member.person
-            alive_status_entity = person_entity.person_demographics.alive_status
+            alive_status_entity = person_entity&.person_demographics&.alive_status
+            return if alive_status_entity.nil?
+
             entity_verification_types = person_entity.verification_types
             alive_status_verification_entity = entity_verification_types.detect { |vt| vt.type_name == 'Alive Status' }
-            entity_validation_status = alive_status_verification_entity.validation_status
+            return unless alive_status_verification_entity.present?
+
+            entity_validation_status = alive_status_verification_entity&.validation_status
             return unless ['attested', 'outstanding'].include?(entity_validation_status)
 
             person = Person.by_hbx_id(person_entity.hbx_id).first

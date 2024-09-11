@@ -5,7 +5,7 @@ RSpec.describe CvValidationJob, type: :model do
     DatabaseCleaner.clean
   end
 
-  let!(:success_job)            { FactoryBot.create(:cv_validation_job, result: :success) }
+  let!(:success_job)            { FactoryBot.create(:cv_validation_job) }
   let!(:failure_job)            { FactoryBot.create(:cv_validation_job, result: :failure) }
   let!(:job_with_id)            { FactoryBot.create(:cv_validation_job, job_id: '12345') }
   let!(:job_with_family_hbx_id) { FactoryBot.create(:cv_validation_job, family_hbx_id: '67890') }
@@ -23,10 +23,52 @@ RSpec.describe CvValidationJob, type: :model do
     it { is_expected.to have_field(:result).of_type(Symbol) }
     it { is_expected.to have_field(:cv_errors).of_type(Array) }
     it { is_expected.to have_field(:logging_messages).of_type(Array) }
-    it { is_expected.to have_field(:cv_start_time).of_type(DateTime) }
-    it { is_expected.to have_field(:cv_end_time).of_type(DateTime) }
-    it { is_expected.to have_field(:start_time).of_type(DateTime) }
-    it { is_expected.to have_field(:end_time).of_type(DateTime) }
+    it { is_expected.to have_field(:cv_payload_transformation_time).of_type(BigDecimal) }
+    it { is_expected.to have_field(:job_elapsed_time).of_type(BigDecimal) }
+  end
+
+  describe 'validations' do
+    let(:params) do
+      {
+        cv_payload: 'Sample CV Payload',
+        cv_version: '3',
+        aca_version: '1.0.0',
+        aca_entities_sha: 'abc123',
+        primary_person_hbx_id: '98765',
+        family_hbx_id: '12345',
+        family_updated_at: DateTime.now,
+        job_id: 'job_123',
+        cv_errors: [],
+        logging_messages: [],
+        cv_payload_transformation_time: 10.98,
+        job_elapsed_time: 20.98,
+        result: result
+      }
+    end
+
+    context 'with invalid attributes' do
+      let(:result) { :invalid }
+
+      it 'fails to create and adds error message' do
+        cv_validation_job = CvValidationJob.new(params)
+
+        expect(cv_validation_job.save).to be_falsey
+        expect(cv_validation_job).not_to be_valid
+        expect(cv_validation_job.errors.messages[:result]).to include('invalid is not a valid result')
+      end
+    end
+
+    context 'with valid attributes' do
+      let(:result) { :error }
+
+      it 'fails to create and adds error message' do
+        cv_validation_job = CvValidationJob.new(params)
+
+        expect(cv_validation_job.save).to be_truthy
+        expect(cv_validation_job).to be_valid
+        expect(cv_validation_job.errors.messages[:result]).to be_empty
+      end
+    end
   end
 
   describe 'scopes' do
@@ -70,80 +112,6 @@ RSpec.describe CvValidationJob, type: :model do
     it { is_expected.to have_index_for(job_id: 1).with_options(name: 'job_id_index') }
     it { is_expected.to have_index_for(family_hbx_id: 1).with_options(name: 'family_hbx_id_index') }
     it { is_expected.to have_index_for(created_at: 1).with_options(name: 'created_at_index') }
-  end
-
-  describe '#cv_payload_transformation_time' do
-    let(:cv_start_time) { DateTime.now - 60.minutes }
-    let(:cv_end_time) { DateTime.now - 1.minute }
-    let(:cv_validation_job) { FactoryBot.create(:cv_validation_job, cv_start_time: cv_start_time, cv_end_time: cv_end_time) }
-
-    context 'when both cv_end_time and cv_start_time are set' do
-      it 'returns the difference in seconds between cv_end_time and cv_start_time' do
-        expect(cv_validation_job.cv_payload_transformation_time).to eq(3540)
-      end
-    end
-
-    context 'when cv_end_time is not set' do
-      let(:cv_end_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
-      end
-    end
-
-    context 'when cv_start_time is not set' do
-      let(:cv_start_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
-      end
-    end
-
-    context 'when both cv_end_time and cv_start_time are not set' do
-      let(:cv_start_time) { nil }
-      let(:cv_end_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_payload_transformation_time).to be_nil
-      end
-    end
-  end
-
-  describe '#cv_validation_job_time' do
-    let(:start_time) { DateTime.now - 60.minutes }
-    let(:end_time) { DateTime.now - 10.minutes }
-    let(:cv_validation_job) { FactoryBot.create(:cv_validation_job, start_time: start_time, end_time: end_time) }
-
-    context 'when both end_time and start_time are set' do
-      it 'returns the difference in seconds between end_time and start_time' do
-        expect(cv_validation_job.cv_validation_job_time).to eq(3000)
-      end
-    end
-
-    context 'when end_time is not set' do
-      let(:end_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_validation_job_time).to be_nil
-      end
-    end
-
-    context 'when start_time is not set' do
-      let(:start_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_validation_job_time).to be_nil
-      end
-    end
-
-    context 'when both end_time and start_time are not set' do
-      let(:start_time) { nil }
-      let(:end_time) { nil }
-
-      it 'returns nil' do
-        expect(cv_validation_job.cv_validation_job_time).to be_nil
-      end
-    end
   end
 
   describe '.latest_job_id' do

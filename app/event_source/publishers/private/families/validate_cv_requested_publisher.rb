@@ -3,7 +3,7 @@
 module Publishers
   module Private
     module Families
-      # This class resisters event 'enroll.private.families.validate_cv_requested'
+      # This class registers event 'enroll.private.families.validate_cv_requested'
       class ValidateCvRequestedPublisher
         include ::EventSource::Publisher[amqp: 'enroll.private.families']
 

@@ -150,8 +150,20 @@ describe Address, "with proper validations" do
 
       context 'when county present' do
 
-        it 'returns true' do
-          expect(address.valid?).to eq true
+        context 'with invalid county/zip combination' do
+          it 'returns false' do
+            expect(address.valid?).to eq false
+          end
+        end
+
+        context 'with valid county/zip' do
+          let(:county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip) }
+          let(:county) { county_zip.county_name }
+          let(:zip) { county_zip.zip }
+
+          it 'returns true' do
+            expect(address.valid?).to eq true
+          end
         end
       end
 

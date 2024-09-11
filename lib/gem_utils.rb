@@ -6,9 +6,11 @@ module GemUtils
 
   # Retrieves the SHA of the aca_entities gem.
   #
-  # @return [String, nil] The SHA of the aca_entities gem, or nil if not found.
+  # @return [String, nil] the SHA of the aca_entities gem, or nil if not found.
   def self.aca_entities_sha
+    return @aca_entities_sha if defined?(@aca_entities_sha)
+
     spec = Bundler.load.specs.find { |s| s.name == 'aca_entities' }
-    spec&.source&.revision
+    @aca_entities_sha = spec&.source&.revision
   end
 end

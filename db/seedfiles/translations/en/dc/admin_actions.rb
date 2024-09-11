@@ -49,5 +49,11 @@ ADMIN_ACTIONS_TRANSLATIONS = {
   'en.admin_actions.dry_run.benefits.renewal_bcp_end_date' => "Renewal benefit end date",
   'en.admin_actions.dry_run.benefits.renewal_slcsp_id_present' => "Renewal SLCSP id present?",
   'en.admin_actions.dry_run.benefits.number_of_benefit_packages' => "Number of benefit packages",
-  'en.admin_actions.dry_run.benefits.number_of_renewal_products' => "Number of renewal products"
+  'en.admin_actions.dry_run.benefits.number_of_renewal_products' => "Number of renewal products",
+  'en.admin_actions.dry_run.enrollments.enrollment_states' => "Enrollment States",
+  'en.admin_actions.dry_run.enrollments.type' => "Type",
+  'en.admin_actions.dry_run.enrollments.category' => "Category",
+  'en.admin_actions.dry_run.enrollments.auto_renewing' => "Auto Renewing",
+  'en.admin_actions.dry_run.enrollments.coverage_selected' => "Coverage Selected",
+  'en.admin_actions.dry_run.enrollments.renewing_coverage_selected' => "Renewing Coverage Selected"
 }

@@ -10,6 +10,13 @@ module FinancialAssistance
     before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
     before_action :set_cache_headers, only: [:other_questions, :step]
 
+    # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
+    # This before_action needs to be called after finding the application
+    #
+    # @before_action
+    # @private
+    before_action :check_for_uneditable_application
+
     def new
       authorize @application, :new?
       @applicant = FinancialAssistance::Forms::Applicant.new(:application_id => params.require(:application_id))
@@ -193,6 +200,8 @@ module FinancialAssistance
       @applicant = ::FinancialAssistance::Application.find(
         params[:application_id]
       ).applicants.find(params[:applicant_id])
+
+      @application = @applicant&.application
     end
 
     def format_date_params(model_params)

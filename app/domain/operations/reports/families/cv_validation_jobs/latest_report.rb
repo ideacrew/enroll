@@ -68,8 +68,7 @@ module Operations
                 :job_id,
                 :result,
                 :cv_errors,
-                :cv_start_time,
-                :cv_end_time
+                :cv_payload_transformation_time
               )
             )
           end
@@ -100,7 +99,7 @@ module Operations
                 'Job Id',
                 'Result',
                 'CV Errors',
-                'CV Payload Transform Time'
+                'CV Payload Transformation Time'
               ]
 
               jobs.each do |job|

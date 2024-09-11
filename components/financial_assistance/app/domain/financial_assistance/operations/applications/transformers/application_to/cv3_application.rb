@@ -248,16 +248,29 @@ module FinancialAssistance
                   local_mec_evidence: evidence_info(applicant.local_mec_evidence),
                   mitc_relationships: mitc_relationships(applicant),
                   mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes, assistance_year),
-                  mitc_state_resident: mitc_state_resident(applicant, application.us_state),
-                  reason_code: 'FullDetermination'
+                  mitc_state_resident: mitc_state_resident(applicant, application.us_state)
                 }
-                applicant_hash[:additional_reason_codes] = %w[FullDetermination GapFilling] if EnrollRegistry.feature_enabled?(:multiple_determination_submission_reasons) && applicant.is_gap_filling
+                primary_reason_code = select_primary_reason_code(applicant, application)
+                applicant_hash[:reason_code] = primary_reason_code if primary_reason_code
+                applicant_hash[:additional_reason_codes] = select_additional_reason_codes(application) if EnrollRegistry.feature_enabled?(:multiple_determination_submission_reasons)
                 result << applicant_hash
                 result
               end
             end
-                        # rubocop:enable Metrics/AbcSize
+            # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def select_primary_reason_code(applicant, application)
+              if applicant.is_gap_filling
+                "GapFilling"
+              elsif application.transfer_requested
+                "FullDetermination"
+              end
+            end
+
+            def select_additional_reason_codes(application)
+              application.previously_renewal_draft? ? ["Renewal"] : []
+            end
 
             def evidence_info(applicant_evidence)
               return if applicant_evidence.nil?

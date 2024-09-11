@@ -27,6 +27,7 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
 
   before do
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
     allow(trackable_event_instance).to receive(:publish).and_return(Dry::Monads::Success(true))
     allow(Operations::EventLogs::TrackableEvent).to receive(:new).and_return(trackable_event_instance)
     catalog_eligibility

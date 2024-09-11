@@ -19,8 +19,8 @@ module Operations
         def call(params)
           family_hbx_id             = yield validate_params(params)
           family                    = yield find_family(family_hbx_id)
-          family_entity             = yield transform_to_entity(family)
-          cv_validation_job_params  = yield construct_cv_validation_job_params(family, family_hbx_id, family_entity)
+          _transform_results        = yield transform_to_entity(family)
+          cv_validation_job_params  = yield construct_cv_validation_job_params(family, family_hbx_id)
           cv_validation_job         = yield create_cv_validation_job(cv_validation_job_params)
 
           Success(cv_validation_job)
@@ -30,9 +30,12 @@ module Operations
 
         # Validates the input parameters
         # @param params [Hash] the parameters to validate
+        # @option params [String] :family_hbx_id the family HBX ID
+        # @option params [Time] :family_updated_at the time the family was updated
+        # @option params [String] :job_id the job ID
         # @return [Dry::Monads::Result] the result of the validation
         def validate_params(params)
-          @start_time = Time.now
+          @job_monotonic_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
           if params.is_a?(Hash) && params[:family_hbx_id].present? && params[:family_updated_at].present? && params[:job_id].present?
             @family_updated_at = params[:family_updated_at].to_datetime
@@ -59,28 +62,40 @@ module Operations
           end
         end
 
-        # Transforms the family to an entity
-        # @param family [Family] the family object
-        # @return [Dry::Monads::Result] the result of the transformation
+        # Transforms a family object to an entity and records the process time.
         #
-        # @note This method always returns a success result, even if the transformation fails for storing the result and error message in the job.
+        # @param family [Object] The family object to be transformed.
+        # @return [Dry::Monads::Success] The result of the transformation. Returns a success result with the transformed entity or nil.
+        # @!attribute [r] @cv_monotonic_start_time
+        #   @return [Float] The start time of the transformation process.
+        # @!attribute [r] @cv_monotonic_end_time
+        #   @return [Float] The end time of the transformation process.
+        # @!attribute [r] @transform_result
+        #   @return [Object] The result of the transformation process.
+        # @!attribute [r] @json_family_entity
+        #   @return [String, nil] The JSON representation of the transformed entity if successful, otherwise nil.
+        # @!attribute [r] @cv_errors
+        #   @return [Array, nil] The errors encountered during the transformation if any, otherwise nil.
         def transform_to_entity(family)
-          @cv_start_time = Time.now
-          @cv_result = Operations::Families::TransformToEntity.new.call(family)
-          @cv_end_time = Time.now
+          @cv_monotonic_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          transform_instance = ::Operations::Families::TransformToEntity.new
+          result = transform_instance.call(family)
+          @cv_monotonic_end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          @transform_result = transform_instance.transform_result
+          @json_family_entity = result.success.to_json if result.success?
+          @cv_errors = [result.failure] if result.failure?
 
-          @cv_result.success? ? @cv_result : Success(nil)
+          result.success? ? result : Success(nil)
         end
 
         # Constructs the CV validation job parameters
-        # @param family [Family] the family object
+        # @param family [Object] the family object
         # @param family_hbx_id [String] the family HBX ID
-        # @param family_entity [Object] the family entity
         # @return [Dry::Monads::Result] the result of the construction
-        def construct_cv_validation_job_params(family, family_hbx_id, family_entity)
+        def construct_cv_validation_job_params(family, family_hbx_id)
           Success(
             {
-              cv_payload: family_entity.present? ? family_entity.to_json : nil,
+              cv_payload: @json_family_entity,
               cv_version: 3,
               aca_version: AcaEntities::VERSION,
               aca_entities_sha: GemUtils.aca_entities_sha,
@@ -88,12 +103,10 @@ module Operations
               family_hbx_id: family_hbx_id,
               family_updated_at: @family_updated_at,
               job_id: @job_id,
-              result: @cv_result.success? ? :success : :failure,
-              cv_errors: @cv_result.failure? ? [@cv_result.failure] : nil,
-              cv_start_time: @cv_start_time,
-              cv_end_time: @cv_end_time,
-              start_time: @start_time,
-              end_time: Time.now
+              result: @transform_result,
+              cv_errors: @cv_errors,
+              cv_payload_transformation_time: @cv_monotonic_end_time - @cv_monotonic_start_time,
+              job_elapsed_time: Process.clock_gettime(Process::CLOCK_MONOTONIC) - @job_monotonic_start_time
             }
           )
         end

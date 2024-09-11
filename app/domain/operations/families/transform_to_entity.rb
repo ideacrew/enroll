@@ -9,10 +9,17 @@ module Operations
     class TransformToEntity
       include Dry::Monads[:do, :result]
 
-      # Transforms a family object into a family entity.
+      # @!attribute [r] transform_result
+      #   @return [Symbol] The result of the transformation to entity operation.
+      #     :success - The transformation was successful.
+      #     :failure - The transformation failed.
+      #     :error - The transformation encountered an error.
+      attr_reader :transform_result
+
+      # Transforms a family object into an entity.
       #
-      # @param family [Object] The family object to be transformed.
-      # @return [Dry::Monads::Result::Success, Dry::Monads::Result::Failure] The result of the transformation.
+      # @param family [Family] The family object to be transformed.
+      # @return [Dry::Monads::Result] The result of the transformation.
       def call(family)
         validated_family  = yield validate_family(family)
         transformed_cv    = yield transform_cv(validated_family)
@@ -25,30 +32,46 @@ module Operations
 
       # Validates the family object.
       #
-      # @param family [Object] The family object to be validated.
-      # @return [Dry::Monads::Result::Success, Dry::Monads::Result::Failure] The result of the validation.
+      # @param family [Object] The object to be validated.
+      # @return [Dry::Monads::Result] The result of the validation.
       def validate_family(family)
         return Success(family) if family.is_a?(::Family)
 
-        Failure("The input object is expected to be a instance of Family. Input object: #{family}")
+        @transform_result = :failure
+        Failure("The input object is expected to be an instance of Family. Input object: #{family}")
       end
 
-      # Transforms the family object into a CV3 family object.
+      # Transforms the family object to a CV3 family.
       #
-      # @param family [Object] The family object to be transformed.
-      # @return [Dry::Monads::Result::Success, Dry::Monads::Result::Failure] The result of the transformation.
+      # @param family [Family] The validated family object.
+      # @return [Dry::Monads::Result] The result of the transformation.
       def transform_cv(family)
-        ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+        transform_result = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+        return transform_result if transform_result.success?
+
+        @transform_result = :failure
+        Failure(transform_result.failure)
       rescue StandardError => e
+        @transform_result = :error
         Failure("Failed to transform the input family to CV3 family: #{e.message}")
       end
 
-      # Creates a family entity from the transformed CV3 family object.
+      # Creates an entity from the transformed CV3 family.
       #
       # @param transformed_cv [Object] The transformed CV3 family object.
-      # @return [Dry::Monads::Result::Success, Dry::Monads::Result::Failure] The result of the entity creation.
+      # @return [Dry::Monads::Result] The result of the entity creation.
       def create_entity(transformed_cv)
-        ::AcaEntities::Operations::CreateFamily.new.call(transformed_cv)
+        entity_result = ::AcaEntities::Operations::CreateFamily.new.call(transformed_cv)
+        if entity_result.success?
+          @transform_result = :success
+          return entity_result
+        end
+
+        @transform_result = :failure
+        Failure(entity_result.failure)
+      rescue StandardError => e
+        @transform_result = :error
+        Failure("Failed to create entity: #{e.message}")
       end
     end
   end

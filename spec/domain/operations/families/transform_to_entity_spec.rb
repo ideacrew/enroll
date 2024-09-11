@@ -16,7 +16,9 @@ RSpec.describe Operations::Families::TransformToEntity do
       let(:input) { family }
 
       it 'returns success monad' do
-        expect(result.success).to be_a(AcaEntities::Families::Family)
+        expect(result).to be_success
+        expect(subject.transform_result).to eq(:success)
+        expect(result.success).to be_a(::AcaEntities::Families::Family)
       end
     end
 
@@ -25,8 +27,10 @@ RSpec.describe Operations::Families::TransformToEntity do
         let(:input) { 'family' }
 
         it 'returns failure monad' do
+          expect(result).to be_failure
+          expect(subject.transform_result).to eq(:failure)
           expect(result.failure).to eq(
-            'The input object is expected to be a instance of Family. Input object: family'
+            'The input object is expected to be an instance of Family. Input object: family'
           )
         end
       end
@@ -42,6 +46,8 @@ RSpec.describe Operations::Families::TransformToEntity do
         end
 
         it 'returns failure monad' do
+          expect(result).to be_failure
+          expect(subject.transform_result).to eq(:error)
           expect(result.failure).to eq(
             "Failed to transform the input family to CV3 family: #{error_message}"
           )
@@ -58,7 +64,26 @@ RSpec.describe Operations::Families::TransformToEntity do
         end
 
         it 'returns failure monad' do
+          expect(result).to be_failure
+          expect(subject.transform_result).to eq(:failure)
           expect(result.failure).to eq('Failed to create entity')
+        end
+      end
+
+      context 'create_entity raises an error' do
+        let(:input) { family }
+        let(:entity_operation) { double }
+        let(:error_message) { 'Errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr' }
+
+        before do
+          allow(::AcaEntities::Operations::CreateFamily).to receive(:new).and_return(entity_operation)
+          allow(entity_operation).to receive(:call).and_raise(StandardError, error_message)
+        end
+
+        it 'returns failure monad' do
+          expect(result).to be_failure
+          expect(subject.transform_result).to eq(:error)
+          expect(result.failure).to eq("Failed to create entity: #{error_message}")
         end
       end
     end

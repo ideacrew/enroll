@@ -10,20 +10,25 @@ RSpec.describe GemUtils do
     let(:source) { instance_double(Bundler::Source::Git, revision: 'abc123') }
 
     before do
-      allow(Bundler).to receive_message_chain(:load, :specs).and_return([spec])
-    end
+      # Removes the instance variable before each block to ensure the code is tested correctly with different scenarios.
+      GemUtils.remove_instance_variable(:@aca_entities_sha) if GemUtils.instance_variable_defined?(:@aca_entities_sha)
 
-    it 'returns the SHA of the aca_entities gem' do
-      expect(GemUtils.aca_entities_sha).to eq('abc123')
+      allow(Bundler).to receive_message_chain(:load, :specs).and_return(mocked_specs)
     end
 
     context 'when the aca_entities gem is not found' do
-      before do
-        allow(Bundler).to receive_message_chain(:load, :specs).and_return([])
-      end
+      let(:mocked_specs) { [] }
 
       it 'returns nil' do
         expect(GemUtils.aca_entities_sha).to be_nil
+      end
+    end
+
+    context 'when the aca_entities gem is found' do
+      let(:mocked_specs) { [spec] }
+
+      it 'returns the SHA of the aca_entities gem' do
+        expect(GemUtils.aca_entities_sha).to eq('abc123')
       end
     end
   end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Subscribers
-  module People
-    module PersonAliveStatus
+  module Private
+    module Families
       # Subscriber receives events to validate CV for a given family.
       class ValidateCvRequestedSubscriber
         include ::EventSource::Subscriber[amqp: 'enroll.private.families']
