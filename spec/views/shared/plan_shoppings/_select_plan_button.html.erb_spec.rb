@@ -4,8 +4,8 @@ RSpec.describe "shared/plan_shoppings/_select_plan_button.html.erb" do
 
   let(:person){ instance_double("Person") }
   let(:hbx_enrollment){ instance_double("HbxEnrollment")}
-  let(:product_1){ instance_double("Product1", id: "test")}
-  let(:product_2){ instance_double("Product2", id: "test")}
+  let(:product_1){ instance_double("Product1", id: "test", active_year: 2024)}
+  let(:product_2){ instance_double("Product2", id: "test", active_year: 2024)}
   let(:family){ instance_double("Family") }
 
   before :each do
@@ -22,7 +22,7 @@ RSpec.describe "shared/plan_shoppings/_select_plan_button.html.erb" do
 
   it "should show your current plan on plan comparison page" do
     render partial: "shared/plan_shoppings/select_plan_button", locals: {plan: product_1}
-    expect(rendered).to match(/YOUR CURRENT PLAN/m)
+    expect(rendered).to match(/YOUR CURRENT 2024 PLAN/m)
   end
 
   it "should match dependent count" do

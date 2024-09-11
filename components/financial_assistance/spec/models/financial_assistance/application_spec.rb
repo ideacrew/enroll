@@ -721,6 +721,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       allow(applicant1).to receive(:is_ia_eligible?).and_return(true)
       application.active_applicants.each do |applicant|
         applicant.incomes << income
@@ -1337,6 +1338,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1489,6 +1491,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1727,6 +1730,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
 
         application.active_applicants.each(&:create_evidences)
       end
@@ -1801,6 +1805,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
       application.send(:create_evidences)
       application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
@@ -1943,6 +1948,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',
@@ -2314,6 +2320,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',

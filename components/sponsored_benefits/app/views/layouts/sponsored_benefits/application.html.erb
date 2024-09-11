@@ -26,7 +26,7 @@
       <%= render 'general_agencies/profiles/menu' %>
     <% end %>
     <%= yield :horizontal_menu %>
-    <%= render_flash %>
+    <%= render_flash use_bs4: @bs4 %>
     <div class="content <%= controller_name %>">
       <%= yield %>
     </div>

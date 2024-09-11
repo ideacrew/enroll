@@ -1,24 +1,62 @@
-<% content_for :navigation do %>
-<%= render partial: 'ui-components/v1/navs/families_navigation' %>
-<% end %>
-<%= javascript_pack_tag 'benefit_sponsors' %>
-
-<div class="my-account-page">
-  <h1><%= l10n("manage_family") %></h1>
-</div>
-
-<% if @resident %>
-  <div class="content-bottom">
-    <%= render "profile_submenu", :active_subtab => "family-tab" %>
-    <div id="profile-content">
-      <%= render 'insured/families/coverall/family' %>
+<% if @bs4 %>
+  <%= render partial: '/shared/family_side_nav' %>
+  <div class="my-household-page">
+    <%# Add/Edit/Remove banners %>
+    <div id="qle_flow_info" class="hidden alert alert-info d-flex align-items-center justify-content-start p-3" role="alert">
+      <div class="info-icon icon align-self-start">&nbsp;</div>
+      <div class="col px-0 pb-1">
+        <p class="mb-1"><%= l10n("insured.families.add_or_remove_family_html") %></p>
+        <%= h(link_to l10n("insured.shop_for_plans"), find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)) %>
+      </div>
     </div>
+    <div id="faa_flow_info"></div>
+
+    <h1><%= l10n("my_household") %></h1>
+    <p><%= l10n("my_household_desc")%></p>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col" class="w-256px"><%= l10n("name") %></th>
+            <th scope="col"><%= l10n("hbx_id") %></th>
+            <th scope="col"><%= l10n("age") %></th>
+            <th scope="col"><%= l10n("sex") %></th>
+            <th scope="col"><%= l10n("relationship") %></th>
+            <th scope="col" class="w-256px" aria-label="actions"></th>
+          </tr>
+        </thead>
+        <tbody id="manage_family_content">
+          <%= render partial: 'insured/families/manage_family_table', locals: {members: @family.active_family_members} %>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="append_consumer_info"></div>
+    <%= h(link_to l10n("add_member_to_household"), new_insured_family_member_path({family_id: @family.id, bs4: @bs4}), remote: true, id: 'add-new-member', class: 'btn button close-2') %>
   </div>
 <% else %>
-  <div class="content-bottom">
-    <%= render "profile_submenu", :active_subtab => "family-tab" %>
-    <div id="profile-content">
-      <%= render 'family' %>
-    </div>
+  <% content_for :navigation do %>
+  <%= render partial: 'ui-components/v1/navs/families_navigation' %>
+  <% end %>
+  <%= javascript_pack_tag 'benefit_sponsors' %>
+
+  <div class="my-account-page">
+    <h1><%= l10n("manage_family") %></h1>
   </div>
+
+  <% if @resident %>
+    <div class="content-bottom">
+      <%= render "profile_submenu", :active_subtab => "family-tab" %>
+      <div id="profile-content">
+        <%= render 'insured/families/coverall/family' %>
+      </div>
+    </div>
+  <% else %>
+    <div class="content-bottom">
+      <%= render "profile_submenu", :active_subtab => "family-tab" %>
+      <div id="profile-content">
+        <%= render 'family' %>
+      </div>
+    </div>
+  <% end %>
 <% end %>

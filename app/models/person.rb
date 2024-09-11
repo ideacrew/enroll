@@ -360,6 +360,7 @@ class Person
   after_update :person_create_or_update_handler
   after_save :generate_person_saved_event
   after_update :publish_updated_event
+  after_initialize :set_default_tobacco_use
 
   def self.api_staff_roles
     Person.where(
@@ -532,6 +533,10 @@ class Person
 
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_member_id) if hbx_id.blank?
+  end
+
+  def set_default_tobacco_use
+    self.is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
   end
 
   def strip_empty_fields

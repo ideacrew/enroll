@@ -177,7 +177,6 @@ class BenefitCoveragePeriod
                    'csr_limited'
                  end
     end
-
     ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, american_indian_members: american_indian_members,
                                     hbx_enrollment: hbx_enrollment,
                                     effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids: shopping_family_member_ids, csr_kind: csr_kind }).uniq

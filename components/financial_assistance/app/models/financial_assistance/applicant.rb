@@ -341,7 +341,7 @@ module FinancialAssistance
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
 
-    validate :presence_of_attr_step_1, on: [:step_1, :submission]
+    validate :presence_of_attr_tax_info, on: [:tax_info, :submission]
 
     validate :presence_of_attr_other_qns, on: :other_qns
     validate :driver_question_responses, on: :submission
@@ -369,6 +369,7 @@ module FinancialAssistance
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
     before_save :generate_hbx_id
+    after_initialize :set_default_tobacco_use
 
     # Responsible for updating family member  when applicant is created/updated
     after_update :propagate_applicant
@@ -387,6 +388,10 @@ module FinancialAssistance
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+    end
+
+    def set_default_tobacco_use
+      self.is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
     end
 
     def accept(visitor)
@@ -620,53 +625,53 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
-    def valid_family_relationships?
-      valid_spousal_relationship? && valid_child_relationship? && valid_in_law_relationship? && valid_sibling_relationship?
+    def invalid_family_relationships
+      invalid_relations = [invalid_spousal_relationship, invalid_child_relationship, invalid_in_law_relationships, invalid_sibling_relationship]
+
+      invalid_relations.flatten.compact.collect(&:id)
     end
 
     # Checks that an applicant cannot have more than one spousal relationship
-    def valid_spousal_relationship?
+    def invalid_spousal_relationship
       partner_relationships = application.relationships.where({
                                                                 "$or" => [
-                                                                { :applicant_id => id, :kind.in => ['spouse', 'domestic_partner'] },
-                                                                { :relative_id => id, :kind.in => ['spouse', 'domestic_partner'] }
+                                                                  { :applicant_id => id, :kind.in => ['spouse', 'domestic_partner'] },
+                                                                  { :relative_id => id, :kind.in => ['spouse', 'domestic_partner'] }
                                                                 ]
                                                               })
-      return false if partner_relationships.size > 2
-      true
+      return partner_relationships.drop(1) if partner_relationships.size > 2
     end
 
-    def valid_sibling_relationship?
+    def invalid_sibling_relationship
       sibling_relationships = self.relationships.where(kind: 'sibling')
-      return true unless sibling_relationships.present?
-      sibling_relationships.each do |sibling_relationship|
-        return false unless sibling_relationship.relative.relationships.where(kind: 'sibling').count == sibling_relationships.count
+      return unless sibling_relationships.present?
+      sibling_relationships.collect do |sibling_relationship|
+        return sibling_relationship unless sibling_relationship.relative.relationships.where(kind: 'sibling').count == sibling_relationships.count
       end
-      true
     end
 
-    def valid_child_relationship?
+    def invalid_child_relationship
       child_relationship = relationships.where(kind: 'child').first
-      return true if child_relationship.blank?
+      return if child_relationship.blank?
 
       parent = child_relationship.relative
       domestic_partner_relationship = parent.relationships.where(kind: 'domestic_partner').first
-      return true if domestic_partner_relationship.blank?
+      return if domestic_partner_relationship.blank?
 
-      ['domestic_partners_child', 'child'].include?(relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
+      domestic_partner_relationship_relative = relationships.where(relative_id: domestic_partner_relationship.relative.id).first
+      return if domestic_partner_relationship_relative.blank?
+      return domestic_partner_relationship_relative unless ['domestic_partners_child', 'child'].include?(domestic_partner_relationship_relative.kind)
     end
 
-    def valid_in_law_relationship?
+    def invalid_in_law_relationships
       unrelated_relationships = relationships.where(kind: 'unrelated')
       spouse_relationship = relationships.where(:kind => 'spouse').first
-      return true unless unrelated_relationships.present? && spouse_relationship.present?
-      spouse_sibling_relationships = spouse_relationship.relative.relationships.where(:kind.in => ['sibling', 'brother_or_sister_in_law'])
-      return true unless spouse_sibling_relationships.present?
+      return unless unrelated_relationships.present? && spouse_relationship.present?
+      spouse_sibling_relationships = spouse_relationship&.relative&.relationships&.where(:kind.in => ['sibling', 'brother_or_sister_in_law'])
+      return unless spouse_sibling_relationships.present?
 
-      unrelated_relatives = unrelated_relationships.collect(&:relative_id)
-      spouse_siblings = spouse_sibling_relationships.collect(&:relative_id)
-      return false if unrelated_relatives.any? { |unrelated_relative| spouse_siblings.include?(unrelated_relative) }
-      true
+      spouse_sibling_ids = spouse_sibling_relationships.collect(&:relative_id)
+      unrelated_relationships.select { |unrelated_relationship| unrelated_relationship if spouse_sibling_ids.include?(unrelated_relationship.relative_id) }
     end
 
     # Checks to see if there is a relationship for Application where current applicant is spouse to PrimaryApplicant.
@@ -793,7 +798,8 @@ module FinancialAssistance
     end
 
     def tobacco_user
-      person.is_tobacco_user || "unknown"
+      default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
+      person.is_tobacco_user || default_tobacco_use
     end
 
     def eligibility_determination=(eg)
@@ -1580,7 +1586,7 @@ module FinancialAssistance
       end
     end
 
-    def presence_of_attr_step_1
+    def presence_of_attr_tax_info
       errors.add(:is_joint_tax_filing, "#{full_name} must answer 'Will this person be filing jointly?'") if is_required_to_file_taxes && is_joint_tax_filing.nil? && (is_spouse_of_primary || (is_primary_applicant && has_spouse))
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
       errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank") if is_required_to_file_taxes.nil?
@@ -1595,22 +1601,22 @@ module FinancialAssistance
       # Nil or "" means unanswered, true/or false boolean will be passed through
       elsif is_post_partum_period.nil? || is_post_partum_period == ""
         if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year)
-          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_year')}' should be answered")
+          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_year', subject: l10n('faa.this_person'))}' should be answered")
         else
           # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
-          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_60d')}' should be answered")
+          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_60d', subject: l10n('faa.this_person'))}' should be answered")
         end
       end
       # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
       if is_post_partum_period.present?
         # Enrolled on medicaid must check if nil
         is_enrolled_on_medicaid_not_answered = is_enrolled_on_medicaid.nil? && is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
-        errors.add(:is_enrolled_on_medicaid, "'#{l10n('faa.other_ques.is_enrolled_on_medicaid')}' #{l10n('faa.errors.should_be_answered')}") if is_enrolled_on_medicaid_not_answered
+        errors.add(:is_enrolled_on_medicaid, "'#{l10n('faa.other_ques.is_enrolled_on_medicaid', subject: l10n('faa.this_person'))}' #{l10n('faa.errors.should_be_answered')}") if is_enrolled_on_medicaid_not_answered
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 
       if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) && age_of_applicant >= 19 && is_applying_coverage == true && is_primary_caregiver.nil?
-        errors.add(:is_primary_caregiver, "'#{l10n('faa.primary_caretaker_question_text')}' should be answered")
+        errors.add(:is_primary_caregiver, "'#{l10n('faa.other_ques.primary_caretaker_question_text', subject: l10n('faa.this_person'))}' should be answered")
       end
 
       return unless is_applying_coverage
@@ -1625,12 +1631,12 @@ module FinancialAssistance
       end
 
       if is_student && FinancialAssistanceRegistry.feature_enabled?(:student_follow_up_questions)
-        errors.add(:student_kind, "' #{l10n('faa.other_ques.is_student')}' should be answered") if student_kind.blank?
+        errors.add(:student_kind, "' #{l10n('faa.other_ques.is_student', subject: l10n('faa.this_person'))}' should be answered") if student_kind.blank?
         errors.add(:student_status_end_on, "' Student status end on date?'  should be answered") if student_status_end_on.blank?
         errors.add(:student_school_kind, "' What type of school do you go to?' should be answered") if student_school_kind.blank?
       end
 
-      errors.add(:is_student, "' #{l10n('faa.other_ques.is_student')}' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
+      errors.add(:is_student, "' #{l10n('faa.other_ques.is_student', subject: l10n('faa.this_person'))}' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
       # TODO: Decide if these validations should be ended?
       # errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 

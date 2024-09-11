@@ -6,6 +6,7 @@ class HbxAdminController < ApplicationController
   before_action :find_values, only: [:update_aptc_csr, :calculate_aptc_csr, :edit_aptc_csr]
   before_action :validate_aptc, only: [:update_aptc_csr, :calculate_aptc_csr]
   before_action :set_cache_headers, only: [:edit_aptc_csr]
+  before_action :enable_bs4_layout, only: :update_aptc_csr if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
 
   def registry
     authorize EnrollRegistry, :show?
@@ -101,5 +102,9 @@ class HbxAdminController < ApplicationController
     @hbxs.each do |hbx|
       @enrollments_info[hbx.id]['osse_eligible'] = hbx.ivl_osse_eligible?
     end
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end
