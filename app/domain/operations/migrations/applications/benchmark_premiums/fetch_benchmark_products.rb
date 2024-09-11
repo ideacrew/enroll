@@ -5,7 +5,7 @@ module Operations
     module Applications
       module BenchmarkPremiums
         # @note This class is a copy and extension of 'Operations::Products::Fetch' with some modifications to fetch benchmark premiums for the given application based on the application's data and not family's data.
-        # @note The business logic is same as 'Operations::Products::Fetch' but the data source is different.
+        # @note The business logic of this class is an extension of 'Operations::Products::Fetch' with a different data source.
         # @note Class 'Operations::Products::Fetch' is not used as it uses the 'current' address of the primary person and not the address at the time of application.
         # @note Since this is migration process, we cannot depend on the primary person's address as it might have changed.
         class FetchBenchmarkProducts
@@ -28,14 +28,12 @@ module Operations
             if params[:application].is_a?(::FinancialAssistance::Application) && params[:effective_date].is_a?(Date)
               Success([params[:application], params[:effective_date]])
             else
-              Failure("invalid params - #{params}. Expected application and effective_date.")
+              Failure("Invalid params - #{params}. Expected application and effective_date.")
             end
           end
 
           def fetch_applicants(application)
-            Success(
-              application.applicants.only(:person_hbx_id, :is_primary_applicant, :addresses)
-            )
+            Success(application.applicants.only(:person_hbx_id, :is_primary_applicant, :addresses))
           end
 
           def find_addresses
@@ -131,10 +129,10 @@ module Operations
 
           def fetch_benchmark_premiums(premiums)
             applicant_hbx_ids = @applicants.collect(&:person_hbx_id)
-            slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
+            slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums)
             return build_zero_member_premiums(applicant_hbx_ids) if slcsp_info.failure?
 
-            lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
+            lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums)
             return build_zero_member_premiums(applicant_hbx_ids) if lcsp_info.failure?
 
             Success(construct_benchmark_premiums(applicant_hbx_ids, slcsp_info.success, lcsp_info.success))
