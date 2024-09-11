@@ -138,14 +138,15 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
   context 'failure' do
     context 'with no renewal eligible applications found' do
+      let(:target_year) { renewal_year - 5 }
+
       before do
-        application.set(assistance_year: current_year - 1)
-        @result = subject.call({ renewal_year: renewal_year })
+        @result = subject.call({ renewal_year: target_year })
       end
 
       it 'returns a failure result' do
         expect(@result.failure?).to be_truthy
-        expect(@result.failure).to eq("No renewal eligible applications found for renewal year: #{renewal_year}")
+        expect(@result.failure).to eq("No renewal eligible applications found for renewal year: #{target_year}")
       end
     end
   end
