@@ -113,7 +113,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::RequestB
     end
 
     it 'builds the event correctly' do
-      event = subject.send(:build_event, batch_size, event_name, records_processed)
+      event = subject.send(:build_event, event_name, { batch_size: batch_size, skip: records_processed })
       expect(event.success).to be_a(Events::BatchProcesses::Migrations::Applications::BenchmarkPremiums::RequestMigrationEventBatches)
     end
   end
