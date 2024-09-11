@@ -4,11 +4,11 @@ module Operations
   module Migrations
     module Applications
       module BenchmarkPremiums
-        # @note This class is a copy of 'Operations::Products::Fetch' with some modifications to fetch premiums for the given application based on the application's data and not family's data.
+        # @note This class is a copy and extension of 'Operations::Products::Fetch' with some modifications to fetch benchmark premiums for the given application based on the application's data and not family's data.
         # @note The business logic is same as 'Operations::Products::Fetch' but the data source is different.
         # @note Class 'Operations::Products::Fetch' is not used as it uses the 'current' address of the primary person and not the address at the time of application.
         # @note Since this is migration process, we cannot depend on the primary person's address as it might have changed.
-        class FetchProducts
+        class FetchBenchmarkProducts
           include Dry::Monads[:do, :result]
 
           def call(params)

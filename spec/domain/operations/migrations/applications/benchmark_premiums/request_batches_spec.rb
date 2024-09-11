@@ -12,8 +12,10 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::RequestB
     FactoryBot.create_list(:financial_assistance_application, 10, family: family, effective_date: TimeKeeper.date_of_record.beginning_of_year)
   end
 
-  let(:total_records) do
-    ::FinancialAssistance::Application.count
+  let(:total_records) { ::FinancialAssistance::Application.count }
+
+  let(:logger) do
+    Logger.new("#{Rails.root}/log/benchmark_premiums_migration_batch_requestor_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
   end
 
   after :all do
@@ -77,6 +79,10 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::RequestB
   describe '#request_batches' do
     let(:batch_size) { 10 }
 
+    before do
+      subject.instance_variable_set(:@logger, logger)
+    end
+
     it 'processes batches correctly' do
       create_applications
       expect(subject.send(:request_batches, batch_size).success).to eq(
@@ -85,18 +91,26 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::RequestB
     end
   end
 
-  describe '#request_batch' do
+  describe '#trigger_batch' do
     let(:batch_size) { 10 }
     let(:records_processed) { 0 }
 
+    before do
+      subject.instance_variable_set(:@logger, logger)
+    end
+
     it 'requests a single batch and publishes the event' do
-      expect { subject.send(:request_batch, batch_size, event_name, records_processed) }.not_to raise_error
+      expect { subject.send(:trigger_batch, batch_size, event_name, records_processed) }.not_to raise_error
     end
   end
 
   describe '#build_event' do
     let(:batch_size) { 10 }
     let(:records_processed) { 0 }
+
+    before do
+      subject.instance_variable_set(:@logger, logger)
+    end
 
     it 'builds the event correctly' do
       event = subject.send(:build_event, batch_size, event_name, records_processed)

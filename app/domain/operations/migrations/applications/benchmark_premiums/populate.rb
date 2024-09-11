@@ -42,14 +42,14 @@ module Operations
           # @param params [Hash] the parameters to validate
           # @return [Dry::Monads::Result] the result of the validation
           def validate_params(params)
-            @logger.info "Validating input params: #{params}." unless Rails.env.test?
+            @logger.info "Validating input params: #{params}."
 
             if params[:application_id].nil?
               failure_message = "Invalid input application id: #{params[:application_id]}."
-              @logger.error "-- FAILED -- app_id: #{params[:application_id]}. Message: #{failure_message}" unless Rails.env.test?
-              Failure()
+              @logger.error "-- FAILED -- app_id: #{params[:application_id]}. Message: #{failure_message}"
+              Failure(failure_message)
             else
-              Success(params[:application_id])
+              Success(params[:application_id].to_s)
             end
           end
 
@@ -58,21 +58,13 @@ module Operations
           # @param application_id [String] the ID of the application
           # @return [Dry::Monads::Result] the result of the find operation
           def find_application(application_id)
-            application = ::FinancialAssistance::Application.only(
-              :_id,
-              :aasm_state,
-              :effective_date,
-              :'applicants.person_hbx_id',
-              :'applicants.is_primary_applicant',
-              :'applicants.benchmark_premiums',
-              :'applicants.addresses'
-            ).where(_id: application_id).first
+            application = ::FinancialAssistance::Application.where(_id: application_id).first
 
             if application.present?
               Success(application)
             else
               failure_message = "Application not found for id: #{application_id}"
-              @logger.error "-- FAILED -- app_id: #{application_id}. Message: #{failure_message}" unless Rails.env.test?
+              @logger.error "-- FAILED -- app_id: #{application_id}. Message: #{failure_message}"
               Failure(failure_message)
             end
           end
@@ -86,7 +78,7 @@ module Operations
               Success(application)
             else
               failure_message = "Application is not in a valid state for processing: #{application.aasm_state} or benchmark premiums already exist."
-              @logger.error "-- FAILED -- app_id: #{application._id}. Message: #{failure_message}" unless Rails.env.test?
+              @logger.error "-- FAILED -- app_id: #{application.id}. Message: #{failure_message}"
               Failure(failure_message)
             end
           end
@@ -96,7 +88,7 @@ module Operations
           # @param application [FinancialAssistance::Application] the application instance
           # @return [Dry::Monads::Result] the result of the fetch operation
           def fetch_benchmark_premiums(application)
-            benchmark_member_premiums = ::Operations::Migrations::Applications::BenchmarkPremiums::FetchProducts.new.call(
+            benchmark_member_premiums = ::Operations::Migrations::Applications::BenchmarkPremiums::FetchBenchmarkProducts.new.call(
               application: application,
               effective_date: application.effective_date
             )
@@ -104,8 +96,8 @@ module Operations
             if benchmark_member_premiums.success?
               benchmark_member_premiums
             else
-              failure_message = "Failed to fetch benchmark premiums for application: #{application._id} - #{benchmark_member_premiums.failure}"
-              @logger.error "-- FAILED -- app_id: #{application._id}. Message: #{failure_message}" unless Rails.env.test?
+              failure_message = "Failed to fetch benchmark premiums for application: #{application.id} - #{benchmark_member_premiums.failure}"
+              @logger.error "-- FAILED -- app_id: #{application.id}. Message: #{failure_message}"
               Failure(failure_message)
             end
           end
@@ -122,6 +114,8 @@ module Operations
                 updated_at: DateTime.now.utc
               )
             end
+
+            Success("Successfully populated benchmark premiums for application: #{application.id}.")
           end
         end
       end

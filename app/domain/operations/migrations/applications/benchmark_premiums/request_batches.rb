@@ -61,7 +61,7 @@ module Operations
             event_name = 'events.batch_processes.migrations.applications.benchmark_premiums.request_migration_event_batches'
 
             while records_processed < total_records
-              request_batch(batch_size, event_name, records_processed)
+              trigger_batch(batch_size, event_name, records_processed)
               records_processed += batch_size
             end
 
@@ -74,13 +74,14 @@ module Operations
           # @param event_name [String] the name of the event
           # @param records_processed [Integer] the number of records already processed
           # @return [void]
-          def request_batch(batch_size, event_name, records_processed)
-            @logger.info "Requesting migration event batches of size: #{batch_size}, processed records count: #{records_processed} of #{total_records}"
-            ev_event = build_event(batch_size, event_name, records_processed)
+          def trigger_batch(batch_size, event_name, records_processed)
+            @logger.info "Requesting migration event batches of size: #{batch_size}, processed records count: #{records_processed}"
+            event_params = { batch_size: batch_size, skip: records_processed }
+            ev_event = build_event(event_name, event_params)
 
             if ev_event.success?
               ev_event.success.publish
-              @logger.info "Published event: #{event_name} for params #{params}"
+              @logger.info "Published event: #{event_name} with params #{event_params}"
             else
               @logger.error "Failed to build event: #{event_name} for params #{params} - #{ev_event.failure}"
             end
@@ -88,38 +89,16 @@ module Operations
 
           # Builds an event for the batch request
           #
-          # @param batch_size [Integer] the size of the batch
           # @param event_name [String] the name of the event
-          # @param records_processed [Integer] the number of records already processed
+          # @param event_params [Hash] the parameters for the event. Parameters include:
+          #  batch_size [Integer] the size of the batch
+          #  records_processed [Integer] the number of records already processed
           # @return [EventSource::Event] the event instance
-          def build_event(batch_size, event_name, records_processed)
-            event(
-              event_name,
-              attributes: {
-                batch_size: batch_size,
-                skip: records_processed
-              }
-            )
+          def build_event(event_name, event_params)
+            event(event_name, attributes: event_params)
           end
         end
       end
     end
   end
 end
-
-# def eligible_applications_query
-#   Success(
-#     ::FinancialAssistance::Application.where(
-#       :applicants => {
-#         :$exists => true,
-#         :$elemMatch => {
-#           :$or => [
-#             { :benchmark_premiums => { :$exists => false } },
-#             { :benchmark_premiums.in => [nil, {}] }
-#           ]
-#         }
-#       },
-#       :aasm_state.in => %w[submitted determined]
-#     )
-#   )
-# end
