@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <div id="<%= market_kind %>" class="qle-list-tab", data-market-kind="<%= market_kind %>">
+  <div id="<%= market_kind %>" class="qle-list-tab <%= display %>" data-market-kind="<%= market_kind %>">
     <% qles = @sortable.where(market_kind: market_kind).active_by_state %>
     <% threshold_index = qles.common.length %>
 
