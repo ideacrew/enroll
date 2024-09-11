@@ -107,6 +107,7 @@ Rails.application.routes.draw do
           get 'sep_types_dt'
           get 'sorting_sep_types'
           patch 'sort'
+          patch 'set_threshold'
           get 'sep_type_to_publish'
           get 'sep_type_to_expire'
           post 'publish_sep_type'
