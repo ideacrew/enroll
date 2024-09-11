@@ -1,6 +1,7 @@
 Feature: Broker Agency Registration
 
   Scenario: Primary Broker has not signed up on the HBX
+    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     And EnrollRegistry broker_attestation_fields feature is disabled
     And EnrollRegistry broker_approval_period feature is enabled
@@ -69,6 +70,7 @@ Feature: Broker Agency Registration
     And Employee Ricky Martin should only have phone with work kind
 
   Scenario: Broker registration without NPN
+    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     And EnrollRegistry broker_attestation_fields feature is disabled
     And EnrollRegistry broker_approval_period feature is enabled
@@ -83,6 +85,7 @@ Feature: Broker Agency Registration
     Then Primary Broker should see broker npn validation error message
 
   Scenario: Broker registration with already used NPN and then pass empty NPN
+    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     And EnrollRegistry broker_attestation_fields feature is disabled
     And EnrollRegistry broker_approval_period feature is enabled

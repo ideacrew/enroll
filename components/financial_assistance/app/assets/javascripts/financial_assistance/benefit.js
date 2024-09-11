@@ -15,7 +15,7 @@ function startEditingBenefit(benefit_kind) {
 };
 
 function currentlyEditing() {
-  return $('.interaction-click-control-continue').hasClass('disabled');
+  return $('.interaction-click-control-continue').hasClass('disabled') || $('#nav-buttons a').hasClass('disabled');
 };
 
 function afterDestroyHide(selector_id, kind){
@@ -23,7 +23,323 @@ function afterDestroyHide(selector_id, kind){
   $(".benefits #"+selector_id+" .add-more-link-"+kind).addClass('hidden');
 };
 
+// bs4 code until stop ----------------------------------
+// disable and lower the opacity of the form except pertinent sections
+function startEditing(parentContainer) {
+  $('#nav-buttons a').addClass('disabled');
+  $('.driver-question, .instruction-row, .add_new_benefit_kind').addClass('disabled');
+  $(parentContainer).removeClass("disabled");
+  $(parentContainer).find('.benefit').addClass("disabled");
+  $(parentContainer).find('.active').removeClass("disabled");
+  $('.driver-question input:not(input[type=submit]), .disabled a').attr('disabled', true);
+  $(parentContainer).find('.active input:not([type=submit])').removeAttr('disabled');
+  $('.disabled a').attr('tabindex', -1);
+  $('.disabled a').addClass('disabled');
+};
+
+// re-enable and raise the opacity of the form post editing
+function stopEditing() {
+  $('#nav-buttons a').removeClass('disabled');
+  $('.driver-question, .instruction-row, .add_new_benefit_kind', '.benefit').removeClass('disabled');
+  $('.disabled a').attr('tabindex', 0);
+  $('.disabled a').removeClass('disabled');
+  $('.disabled input:not(input[type=submit]), .disabled a').removeAttr('disabled');
+  $('.driver-question input:not(input[type=submit]), .disabled a').removeAttr('disabled');
+  $('.driver-question, .instruction-row, .disabled a, .benefits-list, #nav-buttons a, .benefit, .add_new_benefit_kind').removeClass('disabled');
+};
+
+function deleteAllBenefits(e, kind) {
+  benefitList = $('.benefits-list.is_' + kind + ' .benefit');
+  if (benefitList.length) {
+    e.preventDefault();
+    // prompt to delete all these benefits
+    $("#destroyAllBenefits").modal();
+
+    $("#destroyAllBenefits .modal-cancel-button").click(function(e) {
+      $("#destroyAllBenefits").modal('hide');
+      $('#has_' + kind + '_health_coverage_true').prop('checked', true).trigger('change');
+    });
+
+    $("#destroyAllBenefits .modal-continue-button").click(function(e) {
+      $("#destroyAllBenefits").modal('hide');
+
+      benefitList.each(function(i, benefit) {
+        var url = $(benefit).attr('id').replace('benefit_', 'benefits/');
+        $(benefit).remove();
+        $.ajax({
+          type: 'DELETE',
+          url: url
+        });
+      });
+
+      $('select#insurance_kind_is_' + kind).prop('selectedIndex', 0);
+    });
+  }
+}
+
+function handleEsiFields(form, isEsi, isHra, isMvsq) {
+
+  // do all the esi specific hiding and showing
+  if (isEsi == "true") {
+    // show non-hra questions if non-hra is the selected insurance kind
+    // show hra questions if hra is the selected insurance kind
+    // make the inputs of the non-selected kind non-reqquired
+    // make the inputs of the selected kind required
+    if (isHra || isHra == "true") {
+      form.querySelector('.hra-questions').classList.remove('hidden');
+      $(form).find('.non-hra-questions').remove();
+    } else {
+      form.querySelector('.non-hra-questions').classList.remove('hidden');
+      $(form).find('.hra-questions').remove();
+    }
+
+    // show mvsq if msqv is true
+    if (isMvsq == "true") {
+      form.querySelector('.mvsq-questions').classList.remove('hidden');
+    } else {
+      $(form).find('.mvsq-questions').remove();
+    }
+  }
+}
+
+// in order to make sure the input ids/labels are unique, we need to add a random string to the end
+// so we don't get WAVE errors
+function makeInputIdsUnique(formId, clonedForm) {
+  const myArray = new Uint32Array(10)
+  let newFormId = window.crypto.getRandomValues(myArray)[0]
+
+  clonedForm.querySelectorAll('label').forEach(function(label) {
+    var currentFor = label.getAttribute('for');
+    if (currentFor === null) {
+      return;
+    }
+    var newFor = currentFor.split("|")[0] + "|"+ newFormId;
+    label.setAttribute('for', newFor);
+  });
+  clonedForm.querySelectorAll('input, select').forEach(function(input) {
+    var currentId = input.getAttribute('id');
+    if (currentId === null) {
+      return;
+    }
+    var newId = currentId.split("|")[0] + "|"+ newFormId;
+    input.setAttribute('id', newId);
+  });
+}
+
+
 document.addEventListener("turbolinks:load", function() {
+
+  // if benefits already exist, show them and default to yes
+  if ($("#enrolled-benefit-kinds .benefit").length > 0) {
+    $('#has_enrolled_health_coverage_true').prop('checked', true).trigger('change');
+  } else {
+    $('#has_enrolled_health_coverage_true').removeAttr('checked')
+  }
+
+  if ($("#eligible-benefit-kinds .benefit").length > 0) {
+    $('#has_eligible_health_coverage_true').prop('checked', true).trigger('change');
+  } else {
+    $('#has_eligible_health_coverage_true').removeAttr('checked');
+  }
+
+  // add the new benefit form fields once the insurance kind is selected
+  $('.benefit-kinds').off('change', 'select.insurance-kind');
+  $('.benefit-kinds').on('change', 'select.insurance-kind', function(event) {
+    // get the benefit form for the proper esi kind
+    // clone it and append it to the benefit list
+    // set the insurance_kind to the insuranceKind
+    // and display it
+
+    var select = event.target;
+    var selected = select.options[select.selectedIndex];
+    if (selected.value !== "") {
+    const kind = select.dataset.kind;
+    const esi = selected.dataset.esi;
+    const mvsq = selected.dataset.mvsq;
+    const benefitList = document.querySelector('.benefits-list.' + kind);
+    var benefitForm = esi == "true" ? document.getElementById('new-benefit-esi-form-' + kind) : document.getElementById('new-benefit-non-esi-form-' + kind);
+    var clonedForm = benefitForm.cloneNode(true);
+    document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
+    var newLabelText = selected.innerText.split('$')[0]
+    var newLabel = document.createElement("h2")
+    newLabel.textContent = newLabelText
+    clonedForm.querySelector('.insurance-kind-label-container').prepend(newLabel);
+    //$(clonedForm.querySelector('.insurance-kind-label-container')).html($(document.createElement("h2")).text(selected.innerText.split('$')[0]));
+    clonedForm.querySelector('#benefit_insurance_kind').value = selected.value;
+    clonedForm.removeAttribute('id');
+    clonedForm.classList.remove('hidden');
+    clonedForm.classList.add(selected.value);
+    clonedForm.classList.add('benefit');
+    clonedForm.classList.add('active');
+    $(clonedForm).find('input').removeAttr('disabled');
+    let formId = clonedForm.querySelector('.benefit-form-container').id
+    makeInputIdsUnique(formId, clonedForm)
+    handleEsiFields(clonedForm, esi, selected.value == 'health_reimbursement_arrangement', mvsq);
+
+    select.closest(".new-benefit-form").classList.add('hidden');
+    benefitList.appendChild(clonedForm);
+    startEditing(select.closest(".driver-question"));
+  }
+  });
+
+  // show the field to select the insurance kind when the add new benefit button is clicked
+  $('.benefit-kinds').off('click keydown', 'button.add_new_benefit_kind');
+  $('.benefit-kinds').on('click keydown', 'button.add_new_benefit_kind', function(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+    var button = event.target;
+    var kind = button.dataset.kind;
+    button.classList.add('hidden');
+    var newBenefitFormEl = document.getElementById('new-benefit-form-' + kind);
+    newBenefitFormEl.classList.remove('hidden');
+    $(newBenefitFormEl).find('select').prop('selectedIndex', 0);
+    //document.getElementById('new-benefit-form-' + kind).querySelectorAll('.benefit-cancel-before-form').classList.remove('hidden')
+  });
+
+  // hide the select insurance kind field when the cancel button is clicked
+  $('.benefit-kinds').off('click keydown', '.benefit-cancel-before-form');
+  $('.benefit-kinds').on('click keydown', '.benefit-cancel-before-form', function(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+    var button = event.target;
+    var kind = button.dataset.kind;
+    var container = document.getElementById('new-benefit-form-' + kind);
+    var benefitList = $(button).parents('.benefit-kinds').find('.benefits-list');
+    container.classList.add('hidden');
+    if ($(benefitList).find('.benefit').length > 0) {
+      document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
+    } else {
+      benefitList.hide();
+      $('#has_' + (kind == 'is_enrolled' ? 'enrolled' : 'eligible') + '_health_coverage_true').prop('checked', false).trigger('change');
+    }
+    stopEditing()
+  });
+
+  // remove the benefit form when the cancel button is clicked
+  $('.benefit-kinds').off('click keydown', 'a.benefit-form-cancel');
+  $('.benefit-kinds').on('click keydown', 'a.benefit-form-cancel', function(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+    var button = event.target;
+    var kind = button.dataset.kind;
+    var container = button.closest('form').closest('div');
+    var benefitList = container.closest('.benefits-list');
+    container.remove();
+    if (benefitList.querySelectorAll('.benefit').length == 0) {
+      document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
+      $('select#insurance_kind_' + kind).prop('selectedIndex', 0);
+    } else {
+      document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
+    }
+    benefitList.querySelectorAll('.benefit.active').forEach(function(benefit) {
+      benefit.classList.remove('active');
+    });
+    stopEditing()
+  });
+
+  // remove the benefit form and replace with benefit show when the cancel button is clicked
+  // while the benefit is being edited
+  $('.benefit-kinds').off('click keydown', 'a.benefit-edit-cancel');
+  $('.benefit-kinds').on('click keydown', 'a.benefit-edit-cancel', function(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+    var button = event.target;
+    var kind = button.dataset.kind;
+    var container = button.closest('.benefit');
+    var benefitList = container.closest('.benefits-list');
+    var show = container.querySelector('.benefit-show');
+    var form = container.querySelector('.edit-benefit-form');
+    show.classList.remove('hidden');
+    form.classList.add('hidden');
+    if (benefitList.querySelectorAll('.benefit').length == 0) {
+      document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
+    } else {
+      document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
+    }
+    stopEditing()
+  });
+
+  // remove the benefit show and add the benefit form when the edit button is checked
+  $('.benefit-kinds').off('click keydown', 'a.edit-benefit');
+  $('.benefit-kinds').on('click keydown', 'a.edit-benefit', function(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+    var button = event.target;
+    var kind = button.dataset.kind;
+    var container = button.closest('.benefit');
+    var benefitList = container.closest('.benefits-list');
+    var show = container.querySelector('.benefit-show');
+    show.classList.add('hidden');
+    var form = container.querySelector('.edit-benefit-form');
+    handleEsiFields(form, show.dataset.esi, show.dataset.hra == "true", show.dataset.mvsq);
+    form.classList.remove('hidden');
+    document.getElementById('new-benefit-form-' + kind).classList.add('hidden');
+    document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
+    stopEditing()
+  });
+
+  // remove the benefit entirely when the delete button is checked
+  $('.benefit-kinds').off('click keydown', 'a.delete-benefit');
+  $('.benefit-kinds').on('click keydown', 'a.delete-benefit', function(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+    
+    event.preventDefault();
+    var self = this;
+    $("#destroyBenefit").modal();
+
+    $("#destroyBenefit .modal-cancel-button").off('click');
+    $("#destroyBenefit .modal-cancel-button").on('click', function() {
+      $("#destroyBenefit").modal('hide');
+    });
+
+    $("#destroyBenefit .modal-continue-button").off('click');
+    $("#destroyBenefit .modal-continue-button").on('click', function() {
+      $("#destroyBenefit").modal('hide');
+      
+      var benefit = $(self).parents('.benefit');
+      var url = $(benefit).attr('id').replace('benefit_', 'benefits/');
+      $.ajax({
+        type: 'DELETE',
+        url: url,
+        success: function() {
+          var benefitList = benefit.parents('.benefits-list')[0];
+          var kind = $(self).data('kind')
+      
+          $(benefit).remove();
+
+          if (benefitList.querySelectorAll('.benefit').length == 0) {
+            document.getElementById('new-benefit-form-' + kind).classList.remove('hidden');
+            $('select#insurance_kind_' + kind).prop('selectedIndex', 0);
+            document.getElementById('add_new_benefit_kind_' + kind).classList.add('hidden');
+          } else {
+            document.getElementById('add_new_benefit_kind_' + kind).classList.remove('hidden');
+          }
+          stopEditing()
+        }
+      });
+    });
+  });
+
+  /* DELETING all enrolled benefits on selcting 'no' on Driver Question */
+  $(document).off('change', '#has_enrolled_health_coverage_false');
+  $(document).on('change', '#has_enrolled_health_coverage_false', function(e) {
+    deleteAllBenefits(e, 'enrolled');
+  });
+
+  /* DELETING all eligible benefits on selcting 'no' on Driver Question */
+  $(document).off('change', '#has_eligible_health_coverage_false');
+  $(document).on('change', '#has_eligible_health_coverage_false', function(e) {
+    deleteAllBenefits(e, 'eligible');
+  });
+
+  // stop bs4 code ----------------------------------
   if ($('.benefit-kinds').length) {
     $(window).bind('beforeunload', function(e) {
       if (!currentlyEditing() || $('#unsavedBenefitChangesWarning:visible').length)
@@ -39,7 +355,7 @@ document.addEventListener("turbolinks:load", function() {
         var self = this;
 
         $('#unsavedBenefitChangesWarning').modal('show');
-        $('.btn.btn-danger').click(function() {
+        $('.btn.btn-danger, #leave').click(function() {
           window.location.href = $(self).attr('href');
         });
 
@@ -251,12 +567,18 @@ document.addEventListener("turbolinks:load", function() {
       } else{
         $("#denied-medicaid").addClass('hide');
         $("#eligibility-change-question").removeClass('hide');
+        if ($('#has_eligibility_changed_true').is(':checked')) {
+          $("#medicaid-chip-coverage-last-day").removeClass('hide');
+        }
       }
     });
 
     $("body").on("change", "#has_eligible_medicaid_cubcare_false", function(){
       if ($('#has_eligible_medicaid_cubcare_false').is(':checked')) {
         $("#eligibility-change-question").removeClass('hide');
+        if ($('#has_eligibility_changed_true').is(':checked')) {
+          $("#medicaid-chip-coverage-last-day").removeClass('hide');
+        }
         $("#denied-medicaid").addClass('hide');
       } else{
         $("#eligibility-change-question").addClass('hide');
@@ -287,6 +609,16 @@ document.addEventListener("turbolinks:load", function() {
     $("body").on("change", "#has_enrolled_health_coverage_true", function(){
       if ($('#has_enrolled_health_coverage_true').is(':checked')) {
         $("#enrolled-benefit-kinds").removeClass('hide');
+        $("#enrolled-benefit-kinds .benefits-list").show();
+        if ($("#enrolled-benefit-kinds .benefit").length > 0) {
+          $('#add_new_benefit_kind_is_enrolled').removeClass('hidden');
+        } else {
+          $('#add_new_benefit_kind_is_enrolled').addClass('hidden');
+          $("#new-benefit-form-is_enrolled").removeClass('hidden');
+          if ($("body").data('bs4')) {
+            startEditing($('#has_enrolled_health_coverage_true').closest(".driver-question"));
+          }
+        }
       } else{
         $("#enrolled-benefit-kinds").addClass('hide');
       }
@@ -303,6 +635,16 @@ document.addEventListener("turbolinks:load", function() {
     $("body").on("change", "#has_eligible_health_coverage_true", function(){
       if ($('#has_eligible_health_coverage_true').is(':checked')) {
         $("#eligible-benefit-kinds").removeClass('hide');
+        $("#eligible-benefit-kinds .benefits-list").show();
+        if ($("#eligible-benefit-kinds .benefit").length > 0) {
+          $('#add_new_benefit_kind_is_eligible').removeClass('hidden');
+        } else {
+          $('#add_new_benefit_kind_is_eligible').addClass('hidden');
+          $("#new-benefit-form-is_eligible").removeClass('hidden');
+          if ($("body").data('bs4')) {
+            startEditing($('#has_eligible_health_coverage_true').closest(".driver-question"));
+          }
+        }
       } else{
         $("#eligible-benefit-kinds").addClass('hide');
       }
@@ -352,7 +694,8 @@ document.addEventListener("turbolinks:load", function() {
     });
 
     /* Saving Responses to Income  Driver Questions */
-    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false,#has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false, #has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on, #medicaid_cubcare_due_on, #has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on, #medicaid_chip_ineligible_true, #medicaid_chip_ineligible_false, #immigration_status_changed_true, #immigration_status_changed_false').on('change', function(e) {
+    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false, #has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on, #medicaid_cubcare_due_on, #has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on, #medicaid_chip_ineligible_true, #medicaid_chip_ineligible_false, #immigration_status_changed_true, #immigration_status_changed_false').off('change');
+    $('#has_enrolled_health_coverage_false, #has_eligible_health_coverage_false, #has_enrolled_health_coverage_true, #has_eligible_health_coverage_true, #health_service_through_referral_true, #health_service_through_referral_false, #health_service_eligible_true, #health_service_eligible_false, #has_eligibility_changed_true, #has_eligibility_changed_false, #has_household_income_changed_true, #has_household_income_changed_false, #person_coverage_end_on, #medicaid_cubcare_due_on, #has_dependent_with_coverage_true, #has_dependent_with_coverage_false, #dependent_job_end_on, #medicaid_chip_ineligible_true, #medicaid_chip_ineligible_false, #immigration_status_changed_true, #immigration_status_changed_false').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -417,39 +760,51 @@ document.addEventListener("turbolinks:load", function() {
     });
   }
 
+  // masks from `application.js.erb` seem to be broken on the cloned forms, redefining the masks on the focus events seems to be the only reliable fix
+  $(document).on('focus', '.phone_number', function () {
+    $(this).mask('(000) 000-0000');
+  });
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
-        $(this).mask('(000) 000-0000');
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
+  $(document).on('focus', '.fien_field', function () {
+    $(this).mask('99-9999999');
+  });
 
-    });
+  $(document).on('focus', '.zip', function () {
+    $(this).mask("99999");
+  });
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_address_zip', function (e) {
-        var key = e.which || e.keyCode || e.charCode;
-        $(this).attr('maxlength', '5');
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
-    });
+  $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
+      $(this).mask('(000) 000-0000');
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
 
-    $('body').on('keyup keydown keypress', '#benefit_employer_id', function (e) {
-        var key = e.which || e.keyCode || e.charCode;
-        $(this).mask("00-0000000");
-        return (key == 8 ||
-            key == 9 ||
-            key == 46 ||
-            (key >= 37 && key <= 40) ||
-            (key >= 48 && key <= 57) ||
-            (key >= 96 && key <= 105) );
+  });
 
-    });
+  $('body').on('keyup keydown keypress', '#benefit_employer_address_zip', function (e) {
+      var key = e.which || e.keyCode || e.charCode;
+      $(this).attr('maxlength', '5');
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
+  });
+
+  $('body').on('keyup keydown keypress', '#benefit_employer_id', function (e) {
+      var key = e.which || e.keyCode || e.charCode;
+      $(this).mask("00-0000000");
+      return (key == 8 ||
+          key == 9 ||
+          key == 46 ||
+          (key >= 37 && key <= 40) ||
+          (key >= 48 && key <= 57) ||
+          (key >= 96 && key <= 105) );
+
+  });
 
 });

@@ -17,7 +17,7 @@ Given(/^that the user is on the FAA Household Info page$/) do
   # should be on application year select page now
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    find('a.interaction-click-control-continue').click
+    find('.interaction-click-control-continue').click
     sleep 2
   end
 
@@ -52,11 +52,11 @@ When(/^Will this person be claimed as a tax dependent for <system year>\? has a 
 end
 
 Then(/^the CONTINUE will be visibly disabled$/) do
-  expect(find('.interaction-click-control-continue')['disabled']).to eq("true")
+  expect(find('input[id="btn-continue"]')['disabled']).to eq("true")
 end
 
 Then(/^should not be actionable\.$/) do
-  expect(page).to have_selector('.interaction-click-control-continue', visible: false)
+  expect(page).to have_selector('input[id="btn-continue"]', visible: false)
 end
 
 When(/^Will this person file taxes for <system year>\? does not have a nil value stored$/) do
@@ -72,11 +72,11 @@ When(/^Will this person be claimed as a tax dependent for <system year>\? does n
 end
 
 Then(/^the CONTINUE will be visibly enabled$/) do
-  expect(find('.interaction-click-control-continue')['disabled']).to eq("false")
+  expect(find('#btn-continue')['disabled']).to eq("false")
 end
 
 Then(/^should be actionable\.$/) do
-  expect(page).to have_selector('.interaction-click-control-continue', visible: true)
+  expect(page).to have_selector('#btn-continue', visible: true)
 end
 
 Given(/^the user is on the Tax Info page for a given applicant$/) do
@@ -114,8 +114,7 @@ And(/^the user indicates that the dependent will be claimed as a tax dependent b
   choose('is_required_to_file_taxes_no')
   choose('is_claimed_as_tax_dependent_yes')
   # Click dropdown
-  page.find('.selectric-claimed-dependent-dropdown')
-  page.all('.selectric-claimed-dependent-dropdown')[0].click
+  page.all('.claimed-dependent span.label')[0].click
   # Click primary member
   page.all('li').detect { |li| li.text == application.applicants.first.full_name }.click
 end

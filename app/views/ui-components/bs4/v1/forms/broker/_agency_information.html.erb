@@ -1,0 +1,16 @@
+<div class="row mb-3">
+  <%= f.hidden_field :entity_kind, value: "s_corporation" %>
+
+  <div class="col-md-6">
+    <%= f.label :legal_name, l10n("legal_name"), class: "required" %>
+    <%= f.text_field :legal_name, placeholder: l10n('legal_name_placeholder'), required: true, class: 'form-control' %>
+    <div class="invalid-feedback">
+      <%= l10n('legal_name_error') %>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :dba, l10n('dba_caps') %>
+    <%= f.text_field :dba, placeholder: l10n('doing_business_as'), class: 'form-control' %>
+  </div>
+</div>

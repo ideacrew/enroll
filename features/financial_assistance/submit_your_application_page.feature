@@ -1,6 +1,7 @@
 Feature: This is the final review page before submiting an application
 
   Background: Submit Your Application page
+    Given bs4_consumer_flow feature is disable
     Given a consumer exists with family
     And the consumer is RIDP verified
     And is logged in

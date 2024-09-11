@@ -1,2 +1,7 @@
+var bs4 = document.documentElement.dataset.bs4;
+if (bs4 == "true") {
+  <%= @bs4 = true %>
+}
+
 $('.broker-agency-search .result').html("<%= escape_javascript(render "search_broker_agency") %>");
 $('.broker-agency-search a.search').button('reset');

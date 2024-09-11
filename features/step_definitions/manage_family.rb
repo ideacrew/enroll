@@ -1,9 +1,15 @@
+# frozen_string_literal: true
+
 Given(/^Employer exists and logs in$/) do
   login_as @staff_role
 end
 
 Then(/^Employee should click on Manage Family button$/) do
-  find('a.interaction-click-control-manage-family').click
+ #waiting for ajax request to complete
+  wait_for_ajax
+  find('.interaction-click-control-go-to-my-account').click unless page.has_content?("Manage Family")
+  expect(page).to have_content("Manage Family")
+  find(IvlHomepage.manage_family_btn, wait: 15).click
 end
 
 Then(/^Employee should click on the Personal Tab link$/) do

@@ -5,6 +5,11 @@ class Insured::FamiliesController < FamiliesController
   include Config::SiteConcern
   include Insured::FamiliesHelper
 
+  layout :resolve_layout
+  if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:home, :find_sep, :record_sep, :check_qle_date, :check_move_reason, :check_marriage_reason,
+                                             :check_insurance_reason, :verification, :personal, :inbox, :manage_family, :brokers, :enrollment_history]
+  end
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
   before_action :check_for_address_info, only: [:find_sep, :home]
@@ -139,7 +144,7 @@ class Insured::FamiliesController < FamiliesController
     end
 
     respond_to do |format|
-      format.html { render :layout => 'application' }
+      format.html { render :layout => EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "progress" : "application" }
     end
   end
 
@@ -151,7 +156,7 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
-      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+      special_enrollment_period.qle_on = get_date(:qle_date)
       special_enrollment_period.market_kind = qle.market_kind == "individual" ? "ivl" : qle.market_kind
       special_enrollment_period.save
     end
@@ -174,6 +179,7 @@ class Insured::FamiliesController < FamiliesController
     @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?
     @person.resident_role.build_nested_models_for_person if @person.is_resident_role_active?
     @resident = @person.is_resident_role_active?
+
     respond_to do |format|
       format.html
       format.js
@@ -247,7 +253,7 @@ class Insured::FamiliesController < FamiliesController
     today = TimeKeeper.date_of_record
     start_date = today - 30.days
     end_date = today + 30.days
-    @qle_event_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle_event_date = get_date(:date_val)
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
@@ -658,7 +664,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def calculate_dates
-    @qle_event_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle_event_date = get_date(:date_val)
     @qle = QualifyingLifeEventKind.find(params[:qle_id])
     @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : TimeKeeper.date_of_record
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
@@ -674,5 +680,18 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
+  end
+
+  def get_date(date_param)
+    date_format = @bs4 ? "%Y-%m-%d" : "%m/%d/%Y"
+    Date.strptime(params[date_param], date_format)
+  end
+
+  def conditionally_bs4_enabled_actions
+    %i[record_sep check_qle_date check_move_reason check_marriage_reason check_insurance_reason personal]
+  end
+
+  def enable_bs4_layout
+    @bs4 = conditionally_bs4_enabled_actions.include?(action_name) ? params[:bs4] == "true" : true
   end
 end

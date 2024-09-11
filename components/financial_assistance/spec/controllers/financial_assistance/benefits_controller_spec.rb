@@ -102,7 +102,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       it 'should load template work flow steps' do
         post :new, params: { application_id: application.id, applicant_id: applicant.id }
         expect(response).to render_template(:financial_assistance_nav)
-        expect(response).to render_template 'workflow/step'
+        expect(response).to render_template 'index'
       end
 
       context "when the request type is invalid" do
@@ -124,102 +124,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(response.status).to eq 406
           expect(response.body).to eq "<error>Unsupported format</error>"
         end
-      end
-    end
-
-    context 'POST step' do
-      before do
-        controller.instance_variable_set(:@modal, application)
-        controller.instance_variable_set(:@applicant, applicant)
-      end
-
-      it 'should show flash error message nil' do
-        expect(flash[:error]).to match(nil)
-      end
-
-      it 'should render step if no key present in params with modal_name' do
-        post_params = {
-          application_id: application.id,
-          applicant_id: applicant.id,
-          benefit: {start_on: '09/04/2017', end_on: '09/20/2017'}
-        }
-        post :step, params: post_params
-        expect(response).to render_template 'financial_assistance/benefits/create'
-      end
-
-      context 'when params has application key' do
-        it 'When model is saved' do
-          post_params = {
-            application_id: application.id,
-            applicant_id: applicant.id,
-            id: benefit.id,
-            employer_address: employer_address,
-            employer_phone: employer_phone
-          }
-          post :step, params: post_params
-          expect(applicant.save).to eq true
-        end
-
-        it 'should redirect to find_applicant_path when passing params last step' do
-          post_params = {
-            application_id: application.id,
-            applicant_id: applicant.id,
-            id: benefit.id,
-            benefit: valid_params1,
-            employer_address: employer_address,
-            employer_phone: employer_phone,
-            commit: 'CONTINUE',
-            last_step: true
-          }
-          post :step, params: post_params
-          expect(response.headers['Location']).to have_content 'benefits'
-          expect(response.status).to eq 302
-          expect(flash[:notice]).to match('Benefit Info Added.')
-          expect(response).to redirect_to(application_applicant_benefits_path(application, applicant))
-        end
-
-        it 'should not redirect to find_applicant_path when not passing params last step' do
-          post_params = {
-            application_id: application.id,
-            applicant_id: applicant.id,
-            id: benefit.id,
-            benefit: valid_params1,
-            employer_address: employer_address,
-            employer_phone: employer_phone,
-            commit: 'CONTINUE'
-          }
-          post :step, params: post_params
-          expect(response.status).to eq 200
-          expect(response).to render_template 'workflow/step'
-        end
-
-        it 'should render workflow/step when we are not params last step' do
-          post_params = {
-            application_id: application.id,
-            applicant_id: applicant.id,
-            id: benefit.id,
-            benefit: valid_params1,
-            employer_address: employer_address,
-            employer_phone: employer_phone,
-            commit: 'CONTINUE'
-          }
-          post :step, params: post_params
-          expect(response).to render_template 'workflow/step'
-        end
-      end
-
-      it 'should render step if model is not saved' do
-        post_params = {
-          application_id: application.id,
-          applicant_id: applicant.id,
-          id: benefit.id,
-          benefit: invalid_params,
-          employer_address: employer_address,
-          employer_phone: employer_phone
-        }
-        post :step, params: post_params
-        expect(flash[:error]).to match('Pp Is Not A Valid Benefit Kind Type')
-        expect(response).to render_template 'workflow/step'
       end
     end
 

@@ -1,6 +1,7 @@
 Feature: Individual ability to update family information
 
   Background: Individual setup
+    Given bs4_consumer_flow feature is disable
     Given a consumer exists
     And the consumer is logged in
     And consumer has successful ridp

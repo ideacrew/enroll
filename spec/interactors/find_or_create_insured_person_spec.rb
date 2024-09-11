@@ -72,6 +72,7 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
     end
 
     it "will throw an error if the SSN consists of only zeroes" do
