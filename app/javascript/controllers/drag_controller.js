@@ -13,7 +13,9 @@ export default class extends Controller {
 		let index = event.item.dataset.index
 		let rowId = event.item.dataset.id
 		let prevPosition = parseInt(index) + 1
-		let market_kind = event.item.dataset.market_kind
+		// TODO: Add FF for market_kind read
+		// let market_kind = event.item.dataset.market_kind
+		let marketKind = $(event.item).parents('.qle-list-tab').data('market-kind');
 		let data = []
 		var cards = document.querySelectorAll('.card.mb-4')
 		var textContent = event.item.textContent

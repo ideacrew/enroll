@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <div id="<%= market_kind %>">
+  <div id="<%= market_kind %>" class="qle-list-tab", data-market-kind="<%= market_kind %>">
     <% qles = @sortable.where(market_kind: market_kind).active_by_state %>
     <% threshold_index = qles.common.length %>
 
@@ -11,7 +11,7 @@
     </div>
 
     <div class="my-3" data-controller="qle-commonality-threshold">
-      <input type="number" min="0" data-target="qle-commonality-threshold.threshold" data-action="qle-commonality-threshold#update" value="<%= threshold_index %>">
+      <input type="number" min="0" max=<%= qles.length %> data-target="qle-commonality-threshold.threshold" data-action="qle-commonality-threshold#update" value="<%= threshold_index %>">
     </div>
 
     <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
@@ -22,7 +22,7 @@
             <h2>Less Common Life Changes</h2>
           </div>
         <% end %>
-        <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
+        <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" class="card card-body mb-4">
           <%= sort.title %>
         </div>
       <% end %>
