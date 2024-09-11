@@ -2,6 +2,7 @@ import { Controller } from "stimulus"
 import Sortable from "sortablejs"
 import Rails from 'rails-ujs';
 
+var bs4 = document.documentElement.dataset.bs4 == "true";
 export default class extends Controller {
 	connect() {
 		this.sortable = Sortable.create(this.element, {
@@ -13,9 +14,7 @@ export default class extends Controller {
 		let index = event.item.dataset.index
 		let rowId = event.item.dataset.id
 		let prevPosition = parseInt(index) + 1
-		// TODO: Add FF for market_kind read
-		// let market_kind = event.item.dataset.market_kind
-		let market_kind = $(event.item).parents('.qle-list-tab').data('market-kind');
+		let market_kind = bs4 ? $(event.item).parents('.qle-list-tab').data('market-kind') : event.item.dataset.market_kind;
 		let data = []
 		var cards = document.querySelectorAll('.card.mb-4')
 		var textContent = event.item.textContent
