@@ -568,7 +568,7 @@ class Insured::FamiliesController < FamiliesController
       log(message, {:severity => "error"})
       raise e
     end
-    @qualifying_life_events = Mongoid::Criteria.new(QualifyingLifeEventKind)
+
     employee_qle_market_scope = nil
     if @person.has_multiple_roles?
       @multiroles = @person.has_multiple_roles?
@@ -581,12 +581,12 @@ class Insured::FamiliesController < FamiliesController
       end
 
       if current_user.has_hbx_staff_role?
-        @qualifying_life_events.merge QualifyingLifeEventKind.send "#{employee_qle_market_scope}_admin" if @manually_picked_role == "shop_market_events" && is_shop_or_fehb_market_enabled?
+        @qualifying_life_events = QualifyingLifeEventKind.send "#{employee_qle_market_scope}_admin" if @manually_picked_role == "shop_market_events" && is_shop_or_fehb_market_enabled?
         @qualifying_life_events.merge QualifyingLifeEventKind.send "#{@manually_picked_role}_without_transition_member_action" if @manually_picked_role == "individual_market_events"
       elsif @manually_picked_role == "individual_market_events"
-        @qualifying_life_events.merge QualifyingLifeEventKind.individual_market_events
+        @qualifying_life_eventsQualifyingLifeEventKind.individual_market_events
       elsif @manually_picked_role && employee_qle_market_scope.present?
-        @qualifying_life_events.merge QualifyingLifeEventKind.send employee_qle_market_scope
+        @qualifying_life_events = QualifyingLifeEventKind.send employee_qle_market_scope
       end
     elsif @person.active_employee_roles.present? || @person.consumer_role.present? || @person.resident_role.present?
       role = if @person.active_employee_roles.present? && is_shop_or_fehb_market_enabled?
@@ -594,7 +594,7 @@ class Insured::FamiliesController < FamiliesController
              elsif is_individual_market_enabled?
                @person.consumer_role || @person.resident_role
              end
-      @qualifying_life_events.merge QualifyingLifeEventKind.qualifying_life_events_for(role, current_user.has_hbx_staff_role?)
+      @qualifying_life_events = QualifyingLifeEventKind.qualifying_life_events_for(role, current_user.has_hbx_staff_role?)
     end
   end
 
