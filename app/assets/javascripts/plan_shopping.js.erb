@@ -377,7 +377,6 @@ $(function() {
         },
         success: function(data){
           response = JSON.parse(JSON.stringify(data));
-          console.log(response.checkbook_url);
           $("#plan_match_redirection .modal-footer a").attr("href",response.checkbook_url);
         },
       });
