@@ -39,10 +39,8 @@ export default class extends Controller {
     let thresholdMarker = $('#threshold-marker').show();
     let newBoundaryQLE = $(`div[data-index='${threshold}']`);
     if (newBoundaryQLE.length) {
-      console.log('moving marker');
       thresholdMarker.detach().insertBefore(newBoundaryQLE);
     } else {
-      console.log('not moving marker');
       thresholdMarker.hide();
     }
   }
@@ -57,9 +55,15 @@ export default class extends Controller {
     if (isSuccess) {
       successBanner.removeClass('hidden');
       errorBanner.addClass('hidden');
+      var flashDiv = successBanner;
     } else {
       errorBanner.removeClass('hidden');
       successBanner.addClass('hidden');
+      var flashDiv = errorBanner;
     }
+
+    setTimeout(function() {
+      flashDiv.hide();
+    }, 3500);
   }
 }
