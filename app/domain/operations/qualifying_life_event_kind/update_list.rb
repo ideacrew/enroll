@@ -27,7 +27,10 @@ module Operations
       end
 
       def persist_threshold(market_kind, threshold)
-        ::QualifyingLifeEventKind.where(market_kind: market_kind).each_with_index do |qlek, index|
+        qleks = ::QualifyingLifeEventKind.where(market_kind: market_kind)
+        return Failure("Invalid threshold") unless threshold >= 0 && threshold <= qleks.count
+
+        qleks.each_with_index do |qlek, index|
           qlek.update(is_common: index < threshold)
         end
         Success('Successfully clamped Qualifying Life Event Kind objects on the commonality threshold')
