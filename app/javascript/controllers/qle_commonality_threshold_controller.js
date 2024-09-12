@@ -21,10 +21,18 @@ export default class extends Controller {
     .then(response => response.json())
     .then(data => {
       $('#threshold-marker').detach().insertBefore($(`div[data-index='${threshold}']`));
-      const banners = {success: $('#success-flash'), error: $('#error-flash')}
-      const isSuccessful = data['status'] === 'success';
-      banners[isSuccessful ? 'success' : 'error'].removeClass('hidden');
-      banners[isSuccessful ? 'error' : 'success'].addClass('hidden');
+      
+      const successBanner =  $('#success-flash')
+      const errorBanner = $('#error-flash')
+      if (data['status'] == 'success') {
+        successBanner.removeClass('hidden');
+        errorBanner.addClass('hidden');
+        var flashDiv = successBanner;
+      } else {
+        errorBanner.removeClass('hidden');
+        successBanner.addClass('hidden');
+        var flashDiv = errorBanner;
+      }
     })
   }
 }
