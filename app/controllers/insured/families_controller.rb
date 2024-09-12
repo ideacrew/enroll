@@ -130,8 +130,8 @@ class Insured::FamiliesController < FamiliesController
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
 
-    @common_seps = @qualifying_life_events.common
-    @rare_seps = @qualifying_life_events.rare
+    @common_seps = @qualifying_life_events&.common
+    @rare_seps = @qualifying_life_events&.rare
 
     @resident_role_id = if params[:resident_role_id].present? && params[:resident_role_id]
                           params[:resident_role_id]
