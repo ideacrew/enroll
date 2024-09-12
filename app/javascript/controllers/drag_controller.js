@@ -6,7 +6,8 @@ var bs4 = document.documentElement.dataset.bs4 == "true";
 export default class extends Controller {
 	connect() {
 		this.sortable = Sortable.create(this.element, {
-			onEnd: this.end.bind(this)
+			onEnd: this.end.bind(this),
+			filter: '#threshold-marker'
 		})
 	}
 
