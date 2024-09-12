@@ -47,6 +47,7 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.manage_sep_types.sep_type_list" => "List SEP Types",
   "en.exchange.manage_sep_types.titles" => "SEPs",
   "en.exchange.manage_sep_types.sort_description" => "Drag and drop to change the order that the SEPs appear to customer or admin. This list includes all SEPs. SEPs with Admin Only visibility will show on this list and on the Admin SEP menu and carousel, but will not show on the customer SEP carousel.",
+  "en.exchange.manage_sep_types.rare_header" => "Less Common Life Changes",
   "en.exchange.security_questions.error_cant_save" => "prohibited this question from being saved:",
   "en.exchange.securty_questions.edit_question" => "Edit Question",
   "en.exchange.securty_questions.back" => "Back",
