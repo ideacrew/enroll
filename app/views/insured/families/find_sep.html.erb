@@ -6,33 +6,51 @@
   <div>
     <div class="mb-4">
       <h1><%= l10n("insured.families.special_enrollment_period") %></h1>
-      <p class="mb-4">You may be eligible to enroll in health insurance outside of Open Enrollment, or enroll with an earlier effective date, by qualifying for a Special Enrollment Period (SEP). In order to qualify for a Special Enrollment Period you must first be experiencing or have experienced a qualifying life event.</p>
-      <section>
-        <h2>Common Life Changes</h2>
-        <% if @common_seps %>
-          <ul class="<%= 'two-column' if @common_seps.length > 5  %>">
-            <% @common_seps.each_with_index do |qle, index| %>
-              <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
+      <% if EnrollRegistry.feature_enabled?(:qle_commonality_threshold) %>
+        <p class="mb-4"><%= l10n('insured.families.specual_enrollment_period.disclaimer') %></p>
+        <section>
+          <h2><%= l10n('insured.families.special_enrollment_period.common_header') %></h2>
+          <% if @common_seps %>
+            <ul class="<%= 'two-column' if @common_seps.length > 5  %>">
+              <% @common_seps.each_with_index do |qle, index| %>
+                <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
+              <% end %>
+            </ul>
+          <% end %>
+        </section>
+        <% if @rare_seps %>
+          <button id="showMoreLink" class="button secondary my-3"><%= l10n('insured.families.special_enrollment_period.show_rare') %></button>
+          <section class="hidden mt-3" id="showLifeChanges">
+            <h2><%= l10n('insured.families.special_enrollment_period.rare_header') %></h2>
+            <ul class="two-column">
+              <% @rare_seps.each_with_index do |qle, index| %>
+                <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
+              <% end %>
+            </ul>
+            <div class="align-content-center my-4">
+              <label class="weight-n">
+                <input type="checkbox" id="no_qle_checkbox" data-toggle="modal" data-target="#outside-open-enrollment" name="no_qualifying_event" value="true">
+                <%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
+              </label>
+            </div>
+          </section>
+        <% end %>
+      <% else %>
+        <p class="mb-4"><%= l10n("insured.families.final_sep_experienced_any_events") %></p>
+        <h2><%= l10n("insured.top_life_changes") %></h2>
+        <% if @qualifying_life_events %>
+          <ul>
+            <% @qualifying_life_events.each_with_index do |qle, index| %>
+              <li class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generator(qle, index) %></li>
             <% end %>
           </ul>
         <% end %>
-      </section>
-      <% if @rare_seps %>
-        <button id="showMoreLink" class="button secondary my-3">Show Other Qualifying Life Events</button>
-        <section class="hidden mt-3" id="showLifeChanges">
-          <h2>Other Qualifying Life Events</h2>
-          <ul class="two-column">
-            <% @rare_seps.each_with_index do |qle, index| %>
-              <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
-            <% end %>
-          </ul>
-          <div class="align-content-center my-4">
-            <label class="weight-n">
-              <input type="checkbox" id="no_qle_checkbox" data-toggle="modal" data-target="#outside-open-enrollment" name="no_qualifying_event" value="true">
-              <%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
-            </label>
-          </div>
-        </section>
+        <div class="align-content-center">
+          <label class="weight-n">
+            <input type="checkbox" id="no_qle_checkbox" data-toggle="modal" data-target="#outside-open-enrollment" name="no_qualifying_event" value="true">
+            <%= l10n("insured.families.final_sep_none_of_the_situations_listed") %>
+          </label>
+        </div>
       <% end %>
     </div>
     <%= form_tag record_sep_insured_families_path, :method => :post, class: "qle-detail-for-existing-kind", id: 'qle_form' do %>

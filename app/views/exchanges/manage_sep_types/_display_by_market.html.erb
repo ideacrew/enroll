@@ -13,9 +13,9 @@
     <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
       <% qles.each_with_index do |sort, i| %>
         <% if is_commonality_threshold_enabled && i == threshold_index %>
-          <div id="threshold-marker">
+          <div class="exclude" id="threshold-marker">
             <hr>
-            <h2>Less Common Life Changes</h2>
+            <h2><%= l10n('exchange.manage_sep_types.rare_header') %></h2>
           </div>
         <% end %>
         <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" class="card card-body mb-4">
