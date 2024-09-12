@@ -20,19 +20,46 @@ export default class extends Controller {
     })
     .then(response => response.json())
     .then(data => {
-      $('#threshold-marker').detach().insertBefore($(`div[data-index='${threshold}']`));
-      
-      const successBanner =  $('#success-flash')
-      const errorBanner = $('#error-flash')
-      if (data['status'] == 'success') {
-        successBanner.removeClass('hidden');
-        errorBanner.addClass('hidden');
-        var flashDiv = successBanner;
+      let isSuccess = data['status'] == 'success';
+      if (isSuccess) {
+        this.updateThresholdMarker(threshold);
+        this.showBanner(true);
       } else {
-        errorBanner.removeClass('hidden');
-        successBanner.addClass('hidden');
-        var flashDiv = errorBanner;
+        thresholdTarget.value = thresholdTarget.dataset.initialValue;
+        this.showBanner(false);
       }
     })
+  }
+
+  /**
+   * Handle updating the threshold marker element by moving it after the updated threshold index, or hiding it if the new index is out of bounds.
+   * @param {integer} threshold The updated index of the commonality threshold to move the marker to.
+   */
+  updateThresholdMarker(threshold) {
+    let thresholdMarker = $('#threshold-marker').show();
+    let newBoundaryQLE = $(`div[data-index='${threshold}']`);
+    if (newBoundaryQLE.length) {
+      console.log('moving marker');
+      thresholdMarker.detach().insertBefore(newBoundaryQLE);
+    } else {
+      console.log('not moving marker');
+      thresholdMarker.hide();
+    }
+  }
+
+  /**
+   * Show or hide the respective response banner.
+   * @param {boolean} isSuccess The success status of the threshold update request.
+   */
+  showBanner(isSuccess) {
+    const successBanner =  $('#success-flash');
+    const errorBanner = $('#error-flash');
+    if (isSuccess) {
+      successBanner.removeClass('hidden');
+      errorBanner.addClass('hidden');
+    } else {
+      errorBanner.removeClass('hidden');
+      successBanner.addClass('hidden');
+    }
   }
 }
