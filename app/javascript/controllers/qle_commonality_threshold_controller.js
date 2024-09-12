@@ -34,6 +34,7 @@ export default class extends Controller {
   /**
    * Handle updating the threshold marker element by moving it after the updated threshold index, or hiding it if the new index is out of bounds.
    * @param {integer} threshold The updated index of the commonality threshold to move the marker to.
+   * @param {string} marketKind The market kind of the QLE list to update the threshold marker for.
    */
   updateThresholdMarker(marketKind, threshold) {
     let thresholdMarker = $('#threshold-marker').show();
