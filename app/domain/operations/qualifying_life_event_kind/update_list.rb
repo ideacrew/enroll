@@ -16,7 +16,7 @@ module Operations
       private
 
       def persist_data(input_params)
-        @market_kind = input_params[:params][:market_kind]
+        @qleks = ::QualifyingLifeEventKind.where(market_kind: input_params[:params][:market_kind]).active_by_state
         if input_params.dig(:params, :commonality_threshold).present?
           persist_threshold(input_params[:params][:commonality_threshold].to_i)
         elsif input_params.dig(:params, :sort_data).present?
@@ -27,10 +27,9 @@ module Operations
       end
 
       def persist_threshold(threshold)
-        qleks = ::QualifyingLifeEventKind.where(market_kind: @market_kind)
-        return Failure("Invalid threshold") unless threshold >= 0 && threshold <= qleks.count
+        return Failure("Invalid threshold") unless threshold >= 0 && threshold <= @qleks.count
 
-        qleks.each_with_index do |qlek, index|
+        @qleks.each_with_index do |qlek, index|
           qlek.update(is_common: index < threshold)
         end
 
@@ -40,13 +39,12 @@ module Operations
       end
 
       def persist_order(sort_data)
-        qleks = ::QualifyingLifeEventKind.by_market_kind(@market_kind)
-        threshold = qleks.where(is_common: true).count
-        threshold = 10 if qleks.all? { |qlek| qlek.is_common.nil? }
+        threshold = @qleks.common.count
+        threshold = 10 if @qleks.all? { |qlek| qlek.is_common.nil? }
 
-        qleks.each do |qlek|
-          sorted_index = sort_data.find { |sort| sort['id'] == qlek.id }['position']
-          qleks.update(ordinal_position: sorted_index, is_common: sorted_index < threshold)
+        @qleks.each do |qlek|
+          position = sort_data.find { |sort| sort['id'] == qlek.id.to_s }['position']
+          qlek.update(ordinal_position: position, is_common: position - 1 < threshold)
         end
 
         Success('Successfully sorted Qualifying Life Event Kind objects')
