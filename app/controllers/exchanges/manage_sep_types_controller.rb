@@ -92,21 +92,12 @@ module Exchanges
       end
     end
 
-    def sort
+    def update_list
       result = EnrollRegistry.lookup(:update_sep_types_list) { {params: params} }
       if result.success?
         render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
       else
         render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
-      end
-    end
-
-    def set_threshold
-      result = EnrollRegistry.lookup(:update_sep_types_list) { {params: params} }
-      if result.success?
-        render json: { status: 'success' }, status: :ok
-      else
-        render json: { status: 'error' }, status: :internal_server_error
       end
     end
 
