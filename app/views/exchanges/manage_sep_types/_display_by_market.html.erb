@@ -6,7 +6,7 @@
 
     <% if is_commonality_threshold_enabled %>
       <div class="my-3" data-controller="qle-commonality-threshold">
-        <input type="number" min="0" max=<%= qles.length %> data-target="qle-commonality-threshold.threshold" data-action="qle-commonality-threshold#update" value="<%= threshold_index %>">
+        <input type="number" min="0" max=<%= qles.length %> data-target="qle-commonality-threshold.threshold" data-action="qle-commonality-threshold#update" data-initial-value="<%= threshold_index %>" value="<%= threshold_index %>">
       </div>
     <% end %>
 
