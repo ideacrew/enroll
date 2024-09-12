@@ -36,26 +36,39 @@ export default class extends Controller {
 		})
 		.then(response => response.json())
   		.then(data => {
-				let flashDiv = $("#sort_notification_msg");
+			if (bs4) {
+				const successBanner =  $('#success-flash')
+				const errorBanner = $('#error-flash')
+				if (data['status'] == 'success') {
+					successBanner.removeClass('hidden');
+					errorBanner.addClass('hidden');
+					var flashDiv = successBanner;
+				} else {
+					errorBanner.removeClass('hidden');
+					successBanner.addClass('hidden');
+					var flashDiv = errorBanner;
+				}
+			} else {
+				var flashDiv = $("#sort_notification_msg");
 				flashDiv.show()
-  			if (data['status'] === "success"){
-				flashDiv.addClass("success")
-				flashDiv.removeClass("error")
-				flashDiv.find(".toast-header").addClass("success")
-				flashDiv.find(".toast-header").removeClass("error")
-  			}else{
+				if (data['status'] === "success") {
+					flashDiv.addClass("success")
+					flashDiv.removeClass("error")
+					flashDiv.find(".toast-header").addClass("success")
+					flashDiv.find(".toast-header").removeClass("error")
+				} else {
 					flashDiv.addClass("error")
 					flashDiv.removeClass("success")
 					flashDiv.find(".toast-header").addClass("error")
 					flashDiv.find(".toast-header").removeClass("success")
-  			}
+				}
 				flashDiv.find(".toast-header strong").text(data['message'])
 				flashDiv.find(".toast-body").text(textContent)
+			}
 			setTimeout(function() {
-			  flashDiv.hide();
+				flashDiv.hide();
 			}, 3500);
-
-  		})
+		})
 	}
 }
 
