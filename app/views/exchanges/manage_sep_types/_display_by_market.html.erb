@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div id="<%= market_kind %>" class="qle-list-tab <%= display %>" data-market-kind="<%= market_kind %>">
     <% is_commonality_threshold_enabled = EnrollRegistry.feature_enabled?(:qle_commonality_threshold) %>
-    <% qles = @sortable.where(market_kind: market_kind).active_by_state %>
+    <% qles = @sortable.by_market_kind(market_kind).active_by_state %>
     <% threshold_index = qles.common.length %>
 
     <% if is_commonality_threshold_enabled %>
@@ -26,6 +26,7 @@
   </div>
 <% else %>
   <div id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
+
     <h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
     <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
     <div class="container">
