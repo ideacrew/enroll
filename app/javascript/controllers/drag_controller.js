@@ -26,7 +26,7 @@ export default class extends Controller {
 			}
 		}
 
-		fetch('sort',{
+		fetch('update_list',{
 			method: 'PATCH',
 			body: JSON.stringify({market_kind: market_kind, sort_data: data}),
 			headers: {

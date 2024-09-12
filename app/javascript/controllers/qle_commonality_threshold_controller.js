@@ -10,7 +10,7 @@ export default class extends Controller {
     let threshold = thresholdTarget.value;
     let marketKind = $(thresholdTarget).parents('.qle-list-tab').data('market-kind');
 
-    fetch('/exchanges/manage_sep_types/set_threshold', {
+    fetch('update_list', {
       method: 'PATCH',
       body: JSON.stringify({commonality_threshold: threshold, market_kind: marketKind}),
       headers: {
