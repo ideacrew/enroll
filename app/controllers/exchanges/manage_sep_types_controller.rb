@@ -87,24 +87,27 @@ module Exchanges
 
     def sorting_sep_types
       @sortable = QualifyingLifeEventKind.all
-      
       respond_to do |format|
         format.html { render "/exchanges/manage_sep_types/sorting_sep_types.html.erb" }
       end
     end
 
     def sort
-      EnrollRegistry.lookup(:sort_sep_type) { {params: params} }
-      render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
-    rescue StandardError
-      render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
+      result = EnrollRegistry.lookup(:update_sep_types_list) { {params: params} }
+      if result.success?
+        render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
+      else
+        render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
+      end
     end
 
     def set_threshold
-      EnrollRegistry.lookup(:sort_sep_type) { {params: params} }
-      render json: { status: 'success' }, status: :ok
-    rescue StandardError
-      render json: { status: 'error' }, status: :internal_server_error
+      result = EnrollRegistry.lookup(:update_sep_types_list) { {params: params} }
+      if result.success?
+        render json: { status: 'success' }, status: :ok
+      else
+        render json: { status: 'error' }, status: :internal_server_error
+      end
     end
 
     private
