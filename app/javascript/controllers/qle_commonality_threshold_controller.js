@@ -22,7 +22,7 @@ export default class extends Controller {
     .then(data => {
       let isSuccess = data['status'] == 'success';
       if (isSuccess) {
-        this.updateThresholdMarker(threshold);
+        this.updateThresholdMarker(marketKind, threshold);
         this.showBanner(true);
       } else {
         thresholdTarget.value = thresholdTarget.dataset.initialValue;
@@ -35,9 +35,9 @@ export default class extends Controller {
    * Handle updating the threshold marker element by moving it after the updated threshold index, or hiding it if the new index is out of bounds.
    * @param {integer} threshold The updated index of the commonality threshold to move the marker to.
    */
-  updateThresholdMarker(threshold) {
+  updateThresholdMarker(marketKind, threshold) {
     let thresholdMarker = $('#threshold-marker').show();
-    let newBoundaryQLE = $(`div[data-index='${threshold}']`);
+    let newBoundaryQLE = $(`#${marketKind} .qle-list > .card:eq(${threshold})`);
     if (newBoundaryQLE.length) {
       thresholdMarker.detach().insertBefore(newBoundaryQLE);
     } else {
