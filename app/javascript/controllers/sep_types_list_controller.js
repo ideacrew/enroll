@@ -11,14 +11,82 @@ export default class extends Controller {
 
   // Lifecycle
 
+  initialize() {
+    this.sortController = new SortController(this.marketTabTarget.id, this.qleListTarget);
+    this.thresholdInputController = new ThresholdInputController(this.marketTabTarget.id, this.qleListTarget, this.thresholdInputTarget);
+  }
+
 	connect() {
-		this.sortable = Sortable.create(this.qleListTarget, {
-			onEnd: this.endDrag.bind(this),
-			filter: "#threshold-marker"
-		})
+    this.sortController.connect();
 	}
 
   // Actions
+
+  setThreshold() {
+    this.thresholdInputController.set();
+  }
+}
+
+// Base controller used to handle update list requests and response banners.
+class UpdateListController {
+
+  constructor(marketKind) {
+    this.marketKind = marketKind;
+  }
+
+  /**
+   * Perform a PATCH request to update the sort order of the QLE list.
+   * @param {Object} body The request body containing the updated sort order data.
+   * @returns {Promise} The fetch request promise.
+   */
+  async updateList(body) {
+    body.market_kind = this.marketKind; // TODO: figure out legacy
+		const response = await fetch('update_list', {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': Rails.csrfToken()
+      }
+    });
+    return await response.json();
+  }
+
+  /**
+   * Show or hide the respective response banner.
+   * @param {boolean} isSuccess The success status of the request.
+   */
+  showBanner(isSuccess) {
+    const successBanner = $('#success-flash');
+    const errorBanner = $('#error-flash');
+    successBanner.toggleClass('hidden', !isSuccess)
+    errorBanner.toggleClass('hidden', isSuccess)
+    var flashDiv = isSuccess ? successBanner : errorBanner;
+
+    setTimeout(function() {
+      flashDiv.addClass('hidden');
+    }, 3500);
+  }
+}
+
+// Manages the sorting of the SEP types list.
+class SortController extends UpdateListController {
+  
+  constructor(marketKind, qleListTarget) {
+    super(marketKind);
+    this.qleListTarget = qleListTarget;
+  }
+
+  // 
+  /** 
+  * Initialize the sortable library and set the endDrag callback.
+  */
+  connect() {
+		this.sortable = Sortable.create(this.qleListTarget, {
+			onEnd: this.endDrag.bind(this),
+			filter: "#threshold-marker"
+		});
+  }
 
   /** 
   * Handle updating the sort order for a QLE list.
@@ -39,95 +107,67 @@ export default class extends Controller {
 			}
 		}
 
-    this.updateList({sort_data: data})
-  		.then(data => {
-			if (bs4) {
-        this.showBanner(data['status'] === "success");
-			} else {
-				var flashDiv = $("#sort_notification_msg");
-				flashDiv.show()
-				if (data['status'] === "success") {
-					flashDiv.addClass("success")
-					flashDiv.removeClass("error")
-					flashDiv.find(".toast-header").addClass("success")
-					flashDiv.find(".toast-header").removeClass("error")
-				} else {
-					flashDiv.addClass("error")
-					flashDiv.removeClass("success")
-					flashDiv.find(".toast-header").addClass("error")
-					flashDiv.find(".toast-header").removeClass("success")
-				}
-				flashDiv.find(".toast-header strong").text(data['message'])
-				flashDiv.find(".toast-body").text(textContent)
-			}
+    super.updateList({sort_data: data})
+      .then(data => {
+        if (bs4) {
+          super.showBanner(data['status'] === "success");
+        } else {
+          var flashDiv = $("#sort_notification_msg");
+          flashDiv.show()
+          if (data['status'] === "success") {
+            flashDiv.addClass("success")
+            flashDiv.removeClass("error")
+            flashDiv.find(".toast-header").addClass("success")
+            flashDiv.find(".toast-header").removeClass("error")
+          } else {
+            flashDiv.addClass("error")
+            flashDiv.removeClass("success")
+            flashDiv.find(".toast-header").addClass("error")
+            flashDiv.find(".toast-header").removeClass("success")
+          }
+          flashDiv.find(".toast-header strong").text(data['message'])
+          flashDiv.find(".toast-body").text(textContent)
+        }
 		})
 	}
+}
+
+// Manages the commonality threshold input and marker for the SEP types list.
+class ThresholdInputController extends UpdateListController {
+
+  constructor(marketKind, qleListTarget, thresholdInputTarget) {
+    super(marketKind);
+    this.thresholdInputTarget = thresholdInputTarget;
+    this.qleList = $(qleListTarget);
+  }
 
   /** 
   * Handle updating the commonality threshold for a QLE list.
   * Performs the patch request, then updates the threshold marker element and shows the banner based on the response.
   */
-  updateThreshold() {
-    let thresholdInputTarget = this.thresholdInputTarget;
-    let threshold = thresholdInputTarget.value;
+  set() {
+    let threshold = this.thresholdInputTarget.value;
 
-    this.updateList({commonality_threshold: threshold})
+    super.updateList({commonality_threshold: threshold})
       .then(data => {
         let isSuccess = data['status'] === 'success';
         if (isSuccess) {
-          thresholdInputTarget.dataset.initialValue = threshold;
-          this.showBanner(true);
+          this.thresholdInputTarget.dataset.initialValue = threshold;
+          super.showBanner(true);
 
           // move the threshold marker to the new threshold index or hide it if out of bounds
-          let qleList = $(this.qleListTarget);
-          let thresholdMarker = qleList.find('#threshold-marker').removeClass('hidden');
-          let newBoundaryQLE = qleList.find(`.card:eq(${threshold})`);
+          let thresholdMarker = this.qleList.find('#threshold-marker').removeClass('hidden');
+          let newBoundaryQLE = this.qleList.find(`.card:eq(${threshold})`);
           if (newBoundaryQLE.length) {
             thresholdMarker.detach().insertBefore(newBoundaryQLE);
           } else {
             thresholdMarker.addClass('hidden');
           }
         } else {
-          thresholdInputTarget.value = thresholdInputTarget.dataset.initialValue;
-          this.showBanner(false);
+          this.thresholdInputTarget.value = this.thresholdInputTarget.dataset.initialValue;
+          super.showBanner(false);
         }
       })
-  }
-
-  // Shared helpers
-
-  /**
-   * Perform a PATCH request to update the sort order of the QLE list.
-   * @param {Object} body The request body containing the updated sort order data.
-   * @returns {Promise} The fetch request promise.
-   */
-  async updateList(body) {
-    body.market_kind = this.marketTabTarget.id; // TODO: figure out legacy
-		const response = await fetch('update_list', {
-      method: 'PATCH',
-      body: JSON.stringify(body),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': Rails.csrfToken()
-      }
-    });
-    return await response.json();
-  }
-
-  /**
-   * Show or hide the respective response banner.
-   * @param {boolean} isSuccess The success status of the request.
-   */
-  showBanner(isSuccess) {
-    const successBanner =  $('#success-flash');
-    const errorBanner = $('#error-flash');
-    successBanner.toggleClass('hidden', !isSuccess)
-    errorBanner.toggleClass('hidden', isSuccess)
-    var flashDiv = isSuccess ? successBanner : errorBanner;
-
-    setTimeout(function() {
-      flashDiv.addClass('hidden');
-    }, 3500);
   }
 }
 
