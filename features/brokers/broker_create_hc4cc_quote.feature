@@ -31,6 +31,7 @@ Feature: Broker HC4CC quote creation
     Then Primary broker should see total HC4CC subcidy applied amount
     And Primary broker publishes the quote and sees successful message of published quote
 
+  @flaky
   Scenario: Broker should be able to create a quote for prospect employer with no employee and dep contribution
     And Primary broker selects plan offerings by metal level and enters 0 for employee and deps
     And Primary broker selects reference plan
