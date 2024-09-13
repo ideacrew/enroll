@@ -29,7 +29,7 @@ module Operations
       end
 
       def persist_threshold(threshold)
-        return Failure("Invalid threshold") unless threshold >= 0 && threshold <= @qleks.count
+        return Failure("Invalid threshold") unless threshold >= 1 && threshold <= @qleks.count
 
         @qleks.each_with_index do |qlek, index|
           qlek.update(is_common: index < threshold)

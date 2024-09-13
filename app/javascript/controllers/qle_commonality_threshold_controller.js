@@ -43,12 +43,12 @@ export default class extends Controller {
    * @param {string} threshold The updated index of the commonality threshold to move the marker to.
    */
   updateThresholdMarker(marketKind, threshold) {
-    let thresholdMarker = $('#threshold-marker').show();
+    let thresholdMarker = $('#threshold-marker').removeClass('hidden');
     let newBoundaryQLE = $(`#${marketKind} .qle-list > .card:eq(${threshold})`);
     if (newBoundaryQLE.length) {
       thresholdMarker.detach().insertBefore(newBoundaryQLE);
     } else {
-      thresholdMarker.hide();
+      thresholdMarker.addClass('hidden');
     }
   }
 
