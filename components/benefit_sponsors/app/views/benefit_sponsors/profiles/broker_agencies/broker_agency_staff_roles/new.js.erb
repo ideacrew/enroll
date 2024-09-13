@@ -1,1 +1,5 @@
+var bs4 = document.documentElement.dataset.bs4;
+if (bs4 == "true") {
+  <%= @bs4 = true %>
+}
 $('#add_staff').hide().after('<%= j render("form") %>');

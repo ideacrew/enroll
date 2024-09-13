@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="<%= ENV['CLIENT'] %>" data-contrast="<%= EnrollRegistry.feature_enabled?(:contrast_level_aa) %>">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -9,7 +9,6 @@
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= stylesheet_link_tag "application", :media => "all" %>
     <%= javascript_include_tag "application" %>
-
     <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
     <%= javascript_include_tag "sponsored_benefits/application" %>
     <%= javascript_pack_tag ENV['CLIENT'] %>
@@ -43,7 +42,7 @@
 
     <%= render partial: './ui-components/v1/navs/header' %>
     <%= yield :horizontal_menu %>
-    <%= render_flash %>
+    <%= render_flash use_bs4: @bs4 %>
     <%= render 'users/security_question_responses/modal' %>
 
     <div class="content <%= controller_name %> content-bottom">

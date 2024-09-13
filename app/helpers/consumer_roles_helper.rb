@@ -88,6 +88,6 @@ module ConsumerRolesHelper
     id_verified = consumer.identity_verified?
     app_verified = consumer.application_verified?
     return consumer_redirection_path if app_verified || id_verified
-    consumer.admin_bookmark_url
+    consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : request.env['PATH_INFO']
   end
 end

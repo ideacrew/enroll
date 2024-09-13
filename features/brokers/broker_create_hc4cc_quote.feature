@@ -1,6 +1,7 @@
 Feature: Broker HC4CC quote creation
 
   Background: Broker Quoting Tool
+    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     Given the osse subsidy feature is enabled
     And a CCA site exists with a benefit market

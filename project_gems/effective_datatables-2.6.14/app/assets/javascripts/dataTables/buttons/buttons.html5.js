@@ -339,7 +339,7 @@ var _filename = function ( config, incExtension )
 	}
 
 	if ( filename.indexOf( '*' ) !== -1 ) {
-		filename = $.trim( filename.replace( '*', $('title').text() ) );
+		filename = $.trim( filename.replace( /\*/g, $('title').first().text() ) );
 	}
 
 	// Strip characters which the OS will object to
@@ -380,7 +380,7 @@ var _title = function ( config )
 	}
 
 	return title.indexOf( '*' ) !== -1 ?
-		title.replace( '*', $('title').text() || 'Exported data' ) :
+		title.replace( /\*/g, $('title').first().text() || 'Exported data' ) :
 		title;
 };
 
@@ -885,15 +885,14 @@ DataTable.ext.buttons.copyHtml5 = {
 			try {
 				var successful = document.execCommand( 'copy' );
 				hiddenDiv.remove();
-
 				if (successful) {
 					dt.buttons.info(
 						dt.i18n( 'buttons.copyTitle', 'Copy to clipboard' ),
 						dt.i18n( 'buttons.copySuccess', {
-							1: 'Copied one row to clipboard',
-							_: 'Copied %d rows to clipboard'
+							1: 'Row(s) copied to clipboard',
+							_: 'Row(s) copied to clipboard'
 						}, exportData.rows ),
-						2000
+						2000, "success"
 					);
 					return;
 				}

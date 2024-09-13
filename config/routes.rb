@@ -266,6 +266,7 @@ Rails.application.routes.draw do
         post 'terminate'
         post 'set_elected_aptc'
         get 'plan_selection_callback'
+        get 'choose_shopping_method'
       end
     end
 
@@ -366,6 +367,7 @@ Rails.application.routes.draw do
       get :new_resident_dependent, on: :collection
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
+      get :show_ssn, on: :member
     end
 
     resources :group_selections, format: false, controller: "group_selection", only: [:new, :create] do

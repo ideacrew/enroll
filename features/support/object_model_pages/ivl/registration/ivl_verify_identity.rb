@@ -9,27 +9,51 @@ class IvlVerifyIdentity
   end
 
   def self.pick_answer_a
-    'label[for="interactive_verification_questions_attributes_0_response_id_a"] span'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '#interactive_verification_questions_attributes_0_response_id_a'
+    else
+      'label[for="interactive_verification_questions_attributes_0_response_id_a"] span'
+    end
   end
 
   def self.pick_answer_b
-    'label[for="interactive_verification_questions_attributes_0_response_id_b"] span'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '#interactive_verification_questions_attributes_0_response_id_b'
+    else
+      'label[for="interactive_verification_questions_attributes_0_response_id_b"] span'
+    end
   end
 
   def self.pick_answer_c
-    'label[for="interactive_verification_questions_attributes_1_response_id_c"] span'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '#interactive_verification_questions_attributes_1_response_id_c'
+    else
+      'label[for="interactive_verification_questions_attributes_1_response_id_c"] span'
+    end
   end
 
   def self.pick_answer_d
-    'label[for="interactive_verification_questions_attributes_1_response_id_d"] span'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '#interactive_verification_questions_attributes_1_response_id_d'
+    else
+      'label[for="interactive_verification_questions_attributes_1_response_id_d"] span'
+    end
   end
 
   def self.submit_btn
-    'input[value="Submit"]'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '.interaction-click-control-submit'
+    else
+      'input[value="Submit"]'
+    end
   end
 
   def self.continue_application_btn
-    '.interaction-click-control-continue-application'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '.interaction-click-control-continue-to-next-step'
+    else
+      '.interaction-click-control-continue'
+    end
   end
 
   def self.upload_identity_docs_btn

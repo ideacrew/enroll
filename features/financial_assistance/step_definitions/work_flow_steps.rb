@@ -5,7 +5,11 @@ Then(/^The user will navigate to the Help Paying for Coverage page$/) do
 end
 
 When(/^the user clicks CONTINUE$/) do
-  find(IvlChooseCoverage.continue_btn, wait: 5).click
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+    ''
+  else
+    find(IvlChooseCoverage.continue_btn, wait: 5).click
+  end
 end
 
 When(/^the user clicks the PREVIOUS link$/) do
@@ -102,7 +106,7 @@ Given(/^that the user is on the Application Checklist page$/) do
 end
 
 Then(/^the user will navigate to the FAA Household Infor: Family Members page$/) do
-  expect(page).to have_content("#{l10n('family_information')}")
+  expect(page).to have_content('Family Information')
 end
 
 Then(/^the next time the user logs in the user will see Application checklist page$/) do

@@ -1,9 +1,10 @@
 Feature: The page that appears while the user is waiting for eligibility results to be returned
 
   Scenario: User is waiting for eligibility results
+    Given bs4_consumer_flow feature is disable
     Given the FAA feature configuration is enabled
     And the user is on FAA Household Info: Family Members page
-    And all applicants are in Info Completed state
+    And primary applicant is in Info Completed state
     And the user clicks CONTINUE
     And the user is on the Review Your Application page
     And the user clicks CONTINUE

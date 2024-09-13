@@ -19,13 +19,14 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     FactoryBot.create(:financial_assistance_application, params)
   end
   let(:params) do
+    default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
     {:family_id => BSON::ObjectId(family.id),
      :assistance_year => 2020,
      :benchmark_product_id => BSON::ObjectId('5f6020f26e81d9c148d3db34'),
      :integrated_case_id => '2000',
      :applicants =>
          [{"_id" => BSON::ObjectId('5f5eaff32e1423c05646b14a'),
-           "is_tobacco_user" => "unknown",
+           "is_tobacco_user" => default_tobacco_use,
            "assisted_income_validation" => "pending",
            "assisted_mec_validation" => "pending",
            "aasm_state" => "verification_pending",

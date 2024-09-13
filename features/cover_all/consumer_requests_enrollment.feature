@@ -6,6 +6,7 @@ Feature: Consumer requests enrollment in CoverAll
   process their application through the families index page.
 
   Background: Enables features
+    Given bs4_consumer_flow feature is disable
     Given EnrollRegistry no_transition_families feature is enabled
     Given individual Qualifying life events are present
 

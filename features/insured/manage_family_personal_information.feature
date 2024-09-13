@@ -1,6 +1,7 @@
 Feature: Insured Plan Shopping on Individual market Document Errors
 
   Background:
+    Given bs4_consumer_flow feature is disable
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
     Given AI AN Details feature is enabled
@@ -9,7 +10,7 @@ Feature: Insured Plan Shopping on Individual market Document Errors
     Then Individual should see a successful sign up message
     And Individual sees Your Information page
     When user registers as an individual
-    When Individual clicks on continue
+    And the individual clicks on the Continue button of the Account Setup page
     And Individual sees form to enter personal information
 
   Scenario: Individual should see consumer fields when applying for coverage.

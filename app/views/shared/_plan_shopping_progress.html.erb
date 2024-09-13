@@ -1,0 +1,4 @@
+<% current_page = current_page.to_sym %>
+<% current_step = nav_options.detect {|f| f[:page_key] == current_page}&.dig(:step) || 1 %>
+
+<%= render partial: 'shared/progress_side_nav', locals: {nav: plan_shopping_nav_options(current_step, nav_options)} %>

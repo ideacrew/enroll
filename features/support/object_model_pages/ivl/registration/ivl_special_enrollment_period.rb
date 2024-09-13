@@ -40,7 +40,8 @@ class IvlSpecialEnrollmentPeriod
   end
 
   def self.outside_open_enrollment_back_to_my_account_btn
-    '.interaction-click-control-back-to-my-account'
+    '.btn.btn-primary.interaction-click-control-back-to-my-account'
+    #'.interaction-click-control-back-to-my-account'
   end
 
   def self.qle_date

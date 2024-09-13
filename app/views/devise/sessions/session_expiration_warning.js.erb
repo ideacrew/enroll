@@ -1,5 +1,5 @@
 <% if @time_left <= 30 %>
-$('.navbar.navbar-default').before("<%= escape_javascript(render partial: "devise/sessions/session_expiration_warning") %>");
+$('nav.top-nav').before("<%= escape_javascript(render partial: "devise/sessions/session_expiration_warning") %>");
 $('#sessionExpirationWarningModal').show();
 // make time left count down
 var countdown_timer = setInterval(session_countdown, 1000);
@@ -14,7 +14,15 @@ function session_countdown (){
     $('#sessionExpirationWarningModal p').text("Your session has timed out due to inactivity. Please log back in.");
     $('h4.modal-title').text("Session Ended");
     $('.modal-footer .btn-default').hide();
+    $("#stay-logged-in").remove();
     $('.modal-footer .btn-primary').attr('tabindex', '0').text('<%= l10n("faa.login") %>').on('keydown', function(event) { handleButtonKeyDown(event, 'stay-logged-in'); });
+    $('.modal-footer .outline')
+      .attr('tabindex', '0')
+      .text("<%= l10n("go_to_login") %>")
+      .on('keydown', function(event) {
+        handleButtonKeyDown(event, 'stay-logged-in')
+      });
+    $('.modal-footer .outline').removeClass('outline').addClass('primary');
   }
 }
 
