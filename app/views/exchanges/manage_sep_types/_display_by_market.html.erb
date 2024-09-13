@@ -1,17 +1,17 @@
 <% if @bs4 %>
-  <div id="<%= market_kind %>" class="qle-list-tab <%= display %>" data-market-kind="<%= market_kind %>">
+  <div id="<%= market_kind %>" class="<%= display %>" data-controller="drag" data-target="drag.marketTab">
     <% is_commonality_threshold_enabled = EnrollRegistry.feature_enabled?(:qle_commonality_threshold) %>
     <% qles = @sortable.by_market_kind(market_kind).active_by_state %>
     <% common_number = qles.common.length %>
     <% threshold_index = common_number - 1 %>
 
     <% if is_commonality_threshold_enabled %>
-      <div class="my-3" data-controller="qle-commonality-threshold">
-        <input type="number" min="1" max=<%= qles.length %> data-target="qle-commonality-threshold.threshold" data-action="qle-commonality-threshold#update" data-initial-value="<%= common_number %>" value="<%= common_number %>">
+      <div class="my-3">
+        <input type="number" min="1" max=<%= qles.length %> data-target="drag.thresholdInput" data-action="drag#updateThreshold" data-initial-value="<%= common_number %>" value="<%= common_number %>">
       </div>
     <% end %>
-
-    <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move" class="qle-list">
+  
+    <div data-target="drag.qleList">
       <% qles.each_with_index do |sort, i| %>
         <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" class="card card-body mb-4">
           <%= sort.title %>
@@ -26,13 +26,13 @@
     </div>
   </div>
 <% else %>
-  <div id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
+  <div data-controller="drag" id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
 
     <h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
     <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
     <div class="container">
       <div class="row">
-        <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
+        <div>
           <% @sortable.where(market_kind: market_kind).active_by_state.each_with_index do |sort, i|%>
               <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
                 <%= sort.title%>
