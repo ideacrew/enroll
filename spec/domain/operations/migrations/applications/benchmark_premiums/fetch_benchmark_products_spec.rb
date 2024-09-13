@@ -31,6 +31,10 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
       appl1
     end
 
+    let(:valid_county_zip_params) { { county: 'York', zip: '04001', state: 'ME' } }
+
+    let(:invalid_county_zip_params) { { county: 'Dummy', zip: '11111', state: 'NY' } }
+
     let(:applicant2) do
       appl2 = FactoryBot.create(
         :financial_assistance_applicant,
@@ -42,7 +46,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
         application: application
       )
 
-      appl2.rating_address.update_attributes!(county: 'York', zip: '04001', state: 'ME')
+      appl2.rating_address.update_attributes!(valid_county_zip_params)
       appl2
     end
 
@@ -54,6 +58,140 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
       before do
         applicant1
         applicant2
+      end
+
+      let(:input_params) do
+        { application: application, effective_date: application.effective_date }
+      end
+
+      let(:benchmark_premiums) do
+        {
+          health_only_slcsp_premiums: [
+            { member_identifier: person1.hbx_id, monthly_premium: 590.0 },
+            { member_identifier: person2.hbx_id, monthly_premium: 590.0 }
+          ],
+          health_only_lcsp_premiums: [
+            { member_identifier: person1.hbx_id, monthly_premium: 200.0 },
+            { member_identifier: person2.hbx_id, monthly_premium: 200.0 }
+          ]
+        }
+      end
+
+      it 'returns lcsp and slcsp benchmark premiums' do
+        result = subject.call(input_params)
+        expect(result).to be_success
+        expect(result.success).to eq(benchmark_premiums)
+      end
+    end
+
+    context "when:
+      - primary applicant's home address is not within state
+      - primary applicant's mailing address is within state
+      " do
+
+      before do
+        applicant1.home_address.update_attributes!(**invalid_county_zip_params)
+        applicant1.addresses.create(
+          {
+            kind: 'mailing',
+            address_1: '1234 Main St',
+            address_2: 'Apt 1',
+            city: 'Portland',
+          }.merge(valid_county_zip_params)
+        )
+        applicant2
+      end
+
+      let(:input_params) do
+        { application: application, effective_date: application.effective_date }
+      end
+
+      let(:benchmark_premiums) do
+        {
+          health_only_slcsp_premiums: [
+            { member_identifier: person1.hbx_id, monthly_premium: 590.0 },
+            { member_identifier: person2.hbx_id, monthly_premium: 590.0 }
+          ],
+          health_only_lcsp_premiums: [
+            { member_identifier: person1.hbx_id, monthly_premium: 200.0 },
+            { member_identifier: person2.hbx_id, monthly_premium: 200.0 }
+          ]
+        }
+      end
+
+      it 'returns lcsp and slcsp benchmark premiums' do
+        result = subject.call(input_params)
+        expect(result).to be_success
+        expect(result.success).to eq(benchmark_premiums)
+      end
+    end
+
+    context "when:
+      - primary applicant's home address is not within state
+      - primary applicant's mailing address is not within state
+      - primary person's home address is within state
+      " do
+
+      before do
+        applicant1.home_address.update_attributes!(**invalid_county_zip_params)
+        applicant1.addresses.create(
+          {
+            kind: 'mailing',
+            address_1: '1234 Main St',
+            address_2: 'Apt 1',
+            city: 'Portland',
+          }.merge(invalid_county_zip_params)
+        )
+        applicant2
+      end
+
+      let(:input_params) do
+        { application: application, effective_date: application.effective_date }
+      end
+
+      let(:benchmark_premiums) do
+        {
+          health_only_slcsp_premiums: [
+            { member_identifier: person1.hbx_id, monthly_premium: 590.0 },
+            { member_identifier: person2.hbx_id, monthly_premium: 590.0 }
+          ],
+          health_only_lcsp_premiums: [
+            { member_identifier: person1.hbx_id, monthly_premium: 200.0 },
+            { member_identifier: person2.hbx_id, monthly_premium: 200.0 }
+          ]
+        }
+      end
+
+      it 'returns lcsp and slcsp benchmark premiums' do
+        result = subject.call(input_params)
+        expect(result).to be_success
+        expect(result.success).to eq(benchmark_premiums)
+      end
+    end
+
+    context "when:
+      - primary applicant's home address is not within state
+      - primary applicant's mailing address is not within state
+      - primary person's home address is not within state
+      - primary person's mailing address is within state
+      " do
+
+      before do
+        applicant1.home_address.update_attributes!(**invalid_county_zip_params)
+        applicant1.addresses.create(
+          {
+            kind: 'mailing',
+            address_1: '1234 Main St',
+            address_2: 'Apt 1',
+            city: 'Portland',
+          }.merge(invalid_county_zip_params)
+        )
+        applicant2
+        per_home_add = person1.home_address
+        per_mailing_add = person1.mailing_address
+        per_home_add.assign_attributes(invalid_county_zip_params)
+        per_mailing_add.assign_attributes(valid_county_zip_params)
+        person1.save!
       end
 
       let(:input_params) do

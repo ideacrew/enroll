@@ -22,9 +22,7 @@ module Operations
             application, @effective_date  = yield validate(params)
             @applicants                   = yield fetch_applicants(application)
             addresses                     = yield find_addresses
-            rating_silver_products        = yield fetch_silver_products(addresses)
-            premiums                      = yield fetch_member_premiums(rating_silver_products)
-            benchmark_premiums            = yield fetch_benchmark_premiums(premiums)
+            benchmark_premiums            = yield fetch_slcsp_and_lcsp_premiums(addresses)
 
             Success(benchmark_premiums)
           end
@@ -51,6 +49,43 @@ module Operations
             Success(application.applicants.only(:person_hbx_id, :is_primary_applicant, :addresses))
           end
 
+          def county_zips
+            return @county_zips if defined?(@county_zips)
+
+            @county_zips = BenefitMarkets::Locations::CountyZip.all
+          end
+
+          def fetch_slcsp_and_lcsp_premiums(addresses)
+            applicant_hbx_ids = @applicants.collect(&:person_hbx_id)
+
+            rating_silver_products = fetch_silver_products(addresses)
+            return build_zero_member_premiums(applicant_hbx_ids) if rating_silver_products.failure?
+
+            premiums = fetch_member_premiums(rating_silver_products.success)
+            return build_zero_member_premiums(applicant_hbx_ids) if premiums.failure?
+
+            fetch_benchmark_premiums(premiums.success)
+          end
+
+          def best_address(applicant)
+            home_add = applicant.home_address
+            mail_add = applicant.mailing_address
+            primary_home_add = applicant.application.family.primary_person.home_address
+            primary_mail_add = applicant.application.family.primary_person.mailing_address
+
+            if home_add && county_zips.where(zip: home_add.zip, state: home_add.state, county_name: home_add.county).present?
+              home_add
+            elsif mail_add && county_zips.where(zip: mail_add.zip, state: mail_add.state, county_name: mail_add.county).present?
+              mail_add
+            elsif primary_home_add && county_zips.where(zip: primary_home_add.zip, state: primary_home_add.state, county_name: primary_home_add.county).present?
+              primary_home_add
+            elsif primary_mail_add && county_zips.where(zip: primary_mail_add.zip, state: primary_mail_add.state, county_name: primary_mail_add.county).present?
+              primary_mail_add
+            else
+              primary_home_add || primary_mail_add || home_add || mail_add
+            end
+          end
+
           # Finds the addresses of the primary applicants.
           #
           # @return [Dry::Monads::Result] the result of finding addresses
@@ -60,13 +95,13 @@ module Operations
 
             address_combinations = case geographic_rating_area_model
                                    when 'single'
-                                     members.group_by {|fm| [fm.rating_address.state]}
+                                     members.group_by { |appl| [best_address(appl).state] }
                                    when 'county'
-                                     members.group_by {|fm| [fm.rating_address.county]}
+                                     members.group_by { |appl| [best_address(appl).county] }
                                    when 'zipcode'
-                                     members.group_by {|fm| [fm.rating_address.zip]}
+                                     members.group_by { |appl| [best_address(appl).zip] }
                                    else
-                                     members.group_by {|fm| [fm.rating_address.county, fm.rating_address.zip]}
+                                     members.group_by { |appl| [best_address(appl).county, best_address(appl).zip] }
                                    end
 
             address_combinations = address_combinations.transform_values {|v| v.map(&:rating_address).compact }.values
