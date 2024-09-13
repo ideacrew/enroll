@@ -98,7 +98,6 @@ class SortController extends UpdateListController {
 		let prevPosition = parseInt(index) + 1
 		let data = []
 		var cards = document.querySelectorAll('.card.mb-4')
-		var textContent = event.item.textContent
 		data = [...cards].reduce(function(data, card, index) { return [...data, { id: card.dataset.id, position: index + 1 }] }, [])
 
 		for (var i = 0; i < data.length; i++) {
@@ -109,12 +108,13 @@ class SortController extends UpdateListController {
 
     super.updateList({sort_data: data})
       .then(data => {
+        let isSuccess = data['status'] === "success";
         if (bs4) {
-          super.showBanner(data['status'] === "success");
+          super.showBanner(isSuccess);
         } else {
           var flashDiv = $("#sort_notification_msg");
           flashDiv.show()
-          if (data['status'] === "success") {
+          if (isSuccess) {
             flashDiv.addClass("success")
             flashDiv.removeClass("error")
             flashDiv.find(".toast-header").addClass("success")
@@ -126,7 +126,7 @@ class SortController extends UpdateListController {
             flashDiv.find(".toast-header").removeClass("success")
           }
           flashDiv.find(".toast-header strong").text(data['message'])
-          flashDiv.find(".toast-body").text(textContent)
+          flashDiv.find(".toast-body").text(event.item.textContent)
         }
 		})
 	}
