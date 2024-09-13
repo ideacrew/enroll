@@ -147,7 +147,7 @@ class QualifyingLifeEventKind
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
   scope :non_draft, ->{ where(:aasm_state.nin => [:draft]) }
   scope :common, -> { where(is_common: true) }
-  scope :rare, -> { where.not(is_common: true) }
+  scope :rare, -> { where(is_common: false) }
   scope :by_date, lambda { |date = TimeKeeper.date_of_record|
                     where(
                       :"$or" => [
