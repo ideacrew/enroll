@@ -31,24 +31,19 @@ export default class extends Controller {
 			method: 'PATCH',
 			body: JSON.stringify({market_kind: market_kind, sort_data: data}),
 			headers: {
-								'Content-Type': 'application/json',
-								'X-CSRF-Token': Rails.csrfToken()
-								}
+				'Content-Type': 'application/json',
+				'X-CSRF-Token': Rails.csrfToken()
+				}
 		})
 		.then(response => response.json())
   		.then(data => {
 			if (bs4) {
-				const successBanner =  $('#success-flash')
-				const errorBanner = $('#error-flash')
-				if (data['status'] == 'success') {
-					successBanner.removeClass('hidden');
-					errorBanner.addClass('hidden');
-					var flashDiv = successBanner;
-				} else {
-					errorBanner.removeClass('hidden');
-					successBanner.addClass('hidden');
-					var flashDiv = errorBanner;
-				}
+				let isSuccess = data['status'] == 'success';
+				const successBanner =  $('#success-flash');
+				const errorBanner = $('#error-flash');
+				successBanner.toggleClass('hidden', !isSuccess)
+				errorBanner.toggleClass('hidden', isSuccess)
+				var flashDiv = isSuccess ? successBanner : errorBanner;
 			} else {
 				var flashDiv = $("#sort_notification_msg");
 				flashDiv.show()
