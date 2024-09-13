@@ -22,6 +22,7 @@ export default class extends Controller {
     .then(data => {
       let isSuccess = data['status'] == 'success';
       if (isSuccess) {
+        thresholdTarget.dataset.initialValue = threshold;
         this.updateThresholdMarker(marketKind, threshold);
         this.showBanner(true);
       } else {
