@@ -24,6 +24,8 @@ module Operations
         else
           Failure('Invalid parameters')
         end
+      rescue StandardError => e
+        Failure(e.message)
       end
 
       def persist_threshold(threshold)
