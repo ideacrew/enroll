@@ -13,7 +13,9 @@ export default class extends Controller {
 
   initialize() {
     this.sortController = new SortController(this.marketTabTarget.id, this.qleListTarget);
-    this.thresholdInputController = new ThresholdInputController(this.marketTabTarget.id, this.qleListTarget, this.thresholdInputTarget);
+    if ($('#is_commonality_threshold_enabled').val() == "true") {
+      this.thresholdInputController = new ThresholdInputController(this.marketTabTarget.id, this.qleListTarget, this.thresholdInputTarget);
+    }
   }
 
 	connect() {

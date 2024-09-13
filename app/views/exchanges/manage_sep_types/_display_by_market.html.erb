@@ -5,6 +5,7 @@
     <% common_number = qles.common.length %>
     <% threshold_index = common_number - 1 %>
 
+    <%= hidden_field_tag :is_commonality_threshold_enabled, is_commonality_threshold_enabled %> <%# used to drive sep_types_list_controller init %>
     <% if is_commonality_threshold_enabled %>
       <div class="my-3">
         <input type="number" min="1" max=<%= qles.length %> data-target="sep-types-list.thresholdInput" data-action="sep-types-list#setThreshold" data-initial-value="<%= common_number %>" value="<%= common_number %>">
@@ -26,13 +27,13 @@
     </div>
   </div>
 <% else %>
-  <div data-controller="sep-types-list" id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
+  <div data-controller="sep-types-list" data-target="sep-types-list.marketTab"  id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
 
     <h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
     <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
     <div class="container">
       <div class="row">
-        <div>
+        <div data-target="sep-types-list.qleList">
           <% @sortable.where(market_kind: market_kind).active_by_state.each_with_index do |sort, i|%>
               <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
                 <%= sort.title%>
