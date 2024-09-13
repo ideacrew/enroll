@@ -1,10 +1,15 @@
 import { Controller } from "stimulus"
 import Rails from 'rails-ujs';
 
+// The Stimulus Controller handling the commonality threshold input updates for some QLE list.
 export default class extends Controller {
 
   static targets = ["threshold"]
 
+  /**
+   * Handle updating the commonality threshold for a QLE list.
+   * Performs the patch request and updates the UI based on the response.
+   */
   update() {
     let thresholdTarget = this.thresholdTarget;
     let threshold = thresholdTarget.value;
