@@ -70,20 +70,22 @@ module Operations
           def best_address(applicant)
             home_add = applicant.home_address
             mail_add = applicant.mailing_address
-            primary_home_add = applicant.application.family.primary_person.home_address
-            primary_mail_add = applicant.application.family.primary_person.mailing_address
+            primary_home_add, primary_mail_add = primary_person_addresses(applicant)
 
-            if home_add && county_zips.where(zip: home_add.zip, state: home_add.state, county_name: home_add.county).present?
-              home_add
-            elsif mail_add && county_zips.where(zip: mail_add.zip, state: mail_add.state, county_name: mail_add.county).present?
-              mail_add
-            elsif primary_home_add && county_zips.where(zip: primary_home_add.zip, state: primary_home_add.state, county_name: primary_home_add.county).present?
-              primary_home_add
-            elsif primary_mail_add && county_zips.where(zip: primary_mail_add.zip, state: primary_mail_add.state, county_name: primary_mail_add.county).present?
-              primary_mail_add
-            else
-              primary_home_add || primary_mail_add || home_add || mail_add
-            end
+            valid_address(home_add) || valid_address(mail_add) || valid_address(primary_home_add) || valid_address(primary_mail_add) || fallback_address(primary_home_add, primary_mail_add, home_add, mail_add)
+          end
+
+          def primary_person_addresses(applicant)
+            primary_person = applicant.application.family.primary_person
+            [primary_person.home_address, primary_person.mailing_address]
+          end
+
+          def valid_address(address)
+            address if address && county_zips.where(zip: address.zip, state: address.state, county_name: address.county).present?
+          end
+
+          def fallback_address(primary_home_add, primary_mail_add, home_add, mail_add)
+            primary_home_add || primary_mail_add || home_add || mail_add
           end
 
           # Finds the addresses of the primary applicants.

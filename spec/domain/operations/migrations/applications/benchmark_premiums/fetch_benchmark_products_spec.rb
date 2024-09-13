@@ -96,7 +96,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
             kind: 'mailing',
             address_1: '1234 Main St',
             address_2: 'Apt 1',
-            city: 'Portland',
+            city: 'Portland'
           }.merge(valid_county_zip_params)
         )
         applicant2
@@ -139,7 +139,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
             kind: 'mailing',
             address_1: '1234 Main St',
             address_2: 'Apt 1',
-            city: 'Portland',
+            city: 'Portland'
           }.merge(invalid_county_zip_params)
         )
         applicant2
@@ -183,7 +183,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
             kind: 'mailing',
             address_1: '1234 Main St',
             address_2: 'Apt 1',
-            city: 'Portland',
+            city: 'Portland'
           }.merge(invalid_county_zip_params)
         )
         applicant2
