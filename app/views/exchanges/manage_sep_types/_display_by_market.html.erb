@@ -13,7 +13,7 @@
     <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move" class="qle-list">
       <% qles.each_with_index do |sort, i| %>
         <% if is_commonality_threshold_enabled && i == threshold_index %>
-          <div class="exclude" id="threshold-marker">
+          <div id="threshold-marker">
             <hr>
             <h2><%= l10n('exchange.manage_sep_types.rare_header') %></h2>
           </div>
