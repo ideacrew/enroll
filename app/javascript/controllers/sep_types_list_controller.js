@@ -4,7 +4,7 @@ import Rails from 'rails-ujs';
 
 var bs4 = document.documentElement.dataset.bs4 == "true";
 
-// Manages the sorting and commonality thresholding clamping for the SEP types list.
+// Manages the sorting and commonality threshold clamping for the SEP types list.
 export default class extends Controller {
 
   static targets = ["marketTab", "thresholdInput", "qleList"]
