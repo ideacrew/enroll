@@ -53,15 +53,9 @@ export default class extends Controller {
   showBanner(isSuccess) {
     const successBanner =  $('#success-flash');
     const errorBanner = $('#error-flash');
-    if (isSuccess) {
-      successBanner.removeClass('hidden');
-      errorBanner.addClass('hidden');
-      var flashDiv = successBanner;
-    } else {
-      errorBanner.removeClass('hidden');
-      successBanner.addClass('hidden');
-      var flashDiv = errorBanner;
-    }
+    successBanner.toggleClass('hidden', !isSuccess)
+    errorBanner.toggleClass('hidden', isSuccess)
+    var flashDiv = isSuccess ? successBanner : errorBanner;
 
     setTimeout(function() {
       flashDiv.addClass('hidden');
