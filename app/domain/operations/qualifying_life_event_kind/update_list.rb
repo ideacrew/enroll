@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module QualifyingLifeEventKind
-    # This class is responsible for updating the order and commonality thresholds of Qualifying Life Event Kind objects
+    # This class is responsible for updating the order and commonality threshold of Qualifying Life Event Kind objects
     class UpdateList
       include Dry::Monads[:do, :result]
 
