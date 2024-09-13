@@ -1,5 +1,5 @@
 <% if @bs4 %>
-  <div id="<%= market_kind %>" class="<%= display %>" data-controller="drag" data-target="drag.marketTab">
+  <div id="<%= market_kind %>" class="<%= display %>" data-controller="sep-types-list" data-target="sep-types-list.marketTab">
     <% is_commonality_threshold_enabled = EnrollRegistry.feature_enabled?(:qle_commonality_threshold) %>
     <% qles = @sortable.by_market_kind(market_kind).active_by_state %>
     <% common_number = qles.common.length %>
@@ -7,11 +7,11 @@
 
     <% if is_commonality_threshold_enabled %>
       <div class="my-3">
-        <input type="number" min="1" max=<%= qles.length %> data-target="drag.thresholdInput" data-action="drag#updateThreshold" data-initial-value="<%= common_number %>" value="<%= common_number %>">
+        <input type="number" min="1" max=<%= qles.length %> data-target="sep-types-list.thresholdInput" data-action="sep-types-list#updateThreshold" data-initial-value="<%= common_number %>" value="<%= common_number %>">
       </div>
     <% end %>
   
-    <div data-target="drag.qleList">
+    <div data-target="sep-types-list.qleList">
       <% qles.each_with_index do |sort, i| %>
         <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" class="card card-body mb-4">
           <%= sort.title %>
@@ -26,7 +26,7 @@
     </div>
   </div>
 <% else %>
-  <div data-controller="drag" id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
+  <div data-controller="sep-types-list" id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
 
     <h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
     <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
