@@ -10,15 +10,13 @@
         <p class="mb-4"><%= l10n('insured.families.specual_enrollment_period.disclaimer') %></p>
         <section>
           <h2><%= l10n('insured.families.special_enrollment_period.common_header') %></h2>
-          <% if @common_seps %>
-            <ul class="<%= 'two-column' if @common_seps.length > 5  %>">
-              <% @common_seps.each_with_index do |qle, index| %>
-                <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
-              <% end %>
-            </ul>
-          <% end %>
+          <ul class="<%= 'two-column' if @common_seps.length > 5  %>">
+            <% @common_seps.each_with_index do |qle, index| %>
+              <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
+            <% end %>
+          </ul>
         </section>
-        <% if @rare_seps %>
+        <% if @rare_seps.present? %>
           <button id="showMoreLink" class="button secondary my-3"><%= l10n('insured.families.special_enrollment_period.show_rare') %></button>
           <section class="hidden mt-3" id="showLifeChanges">
             <h2><%= l10n('insured.families.special_enrollment_period.rare_header') %></h2>
