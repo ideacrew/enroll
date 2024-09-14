@@ -9,12 +9,17 @@ export default class extends Controller {
 
   static targets = ["marketTab", "thresholdInput", "qleList"]
 
+  get marketKind() {
+    return this.marketTabTarget.id;
+  }
+
   // Lifecycle
 
   initialize() {
-    this.sortController = new SortController(this.marketTabTarget.id, this.qleListTarget);
-    if ($('#is_commonality_threshold_enabled').val() == "true") {
-      this.thresholdInputController = new ThresholdInputController(this.marketTabTarget.id, this.qleListTarget, this.thresholdInputTarget);
+    this.sortController = new SortController(this.marketKind, this.qleListTarget);
+    console.log(this.hasThresholdInputTarget ? "truthy" : "falsy");
+    if (this.hasThresholdInputTarget) {
+      this.thresholdInputController = new ThresholdInputController(this.marketKind, this.qleListTarget, this.thresholdInputTarget);
     }
   }
 

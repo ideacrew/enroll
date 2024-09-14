@@ -5,7 +5,6 @@
     <% common_number = qles.common.length %>
     <% threshold_index = common_number - 1 %>
 
-    <%= hidden_field_tag :is_commonality_threshold_enabled, is_commonality_threshold_enabled %> <%# used to drive sep_types_list_controller init %>
     <% if is_commonality_threshold_enabled %>
       <div class="my-3">
         <input type="number" min="1" max=<%= qles.length %> data-target="sep-types-list.thresholdInput" data-action="sep-types-list#setThreshold" data-initial-value="<%= common_number %>" value="<%= common_number %>">
