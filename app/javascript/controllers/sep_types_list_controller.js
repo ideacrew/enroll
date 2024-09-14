@@ -16,25 +16,25 @@ export default class extends Controller {
   // Lifecycle
 
   initialize() {
-    this.sortController = new SortController(this.marketKind, this.qleListTarget);
+    this.orderManager = new UpdateOrderManager(this.marketKind, this.qleListTarget);
     if (this.hasThresholdInputTarget) {
-      this.thresholdInputController = new ThresholdInputController(this.marketKind, this.qleListTarget, this.thresholdInputTarget);
+      this.thresholdManager = new UpdateThresholdManager(this.marketKind, this.qleListTarget, this.thresholdInputTarget);
     }
   }
 
 	connect() {
-    this.sortController.connect();
+    this.orderManager.connect();
 	}
 
   // Actions
 
   setThreshold() {
-    this.thresholdInputController.set();
+    this.thresholdManager.set();
   }
 }
 
 // Base controller used to handle update list requests and response banners.
-class UpdateListController {
+class ListUpdateManager {
 
   constructor(marketKind) {
     this.marketKind = marketKind;
@@ -76,7 +76,7 @@ class UpdateListController {
 }
 
 // Manages the sorting of the SEP types list.
-class SortController extends UpdateListController {
+class UpdateOrderManager extends ListUpdateManager {
   
   constructor(marketKind, qleListTarget) {
     super(marketKind);
@@ -139,7 +139,7 @@ class SortController extends UpdateListController {
 }
 
 // Manages the commonality threshold input and marker for the SEP types list.
-class ThresholdInputController extends UpdateListController {
+class UpdateThresholdManager extends ListUpdateManager {
 
   constructor(marketKind, qleListTarget, thresholdInputTarget) {
     super(marketKind);
