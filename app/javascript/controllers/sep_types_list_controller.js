@@ -17,7 +17,6 @@ export default class extends Controller {
 
   initialize() {
     this.sortController = new SortController(this.marketKind, this.qleListTarget);
-    console.log(this.hasThresholdInputTarget ? "truthy" : "falsy");
     if (this.hasThresholdInputTarget) {
       this.thresholdInputController = new ThresholdInputController(this.marketKind, this.qleListTarget, this.thresholdInputTarget);
     }
