@@ -23,7 +23,7 @@ export default class extends Controller {
   }
 
 	connect() {
-    this.orderManager.connect();
+    this.orderManager.configureSortable();
 	}
 
   // Actions
@@ -87,7 +87,7 @@ class UpdateOrderManager extends ListUpdateManager {
   /** 
   * Initialize the sortable library and set the endDrag callback.
   */
-  connect() {
+  configureSortable() {
 		this.sortable = Sortable.create(this.qleListTarget, {
 			onEnd: this.endDrag.bind(this),
 			filter: "#threshold-marker"
@@ -177,8 +177,10 @@ class UpdateThresholdManager extends ListUpdateManager {
   }
 }
 
-$( document ).ready(function() {
-	$( "#sort_notification_msg .close" ).click(function() {
-		$("#sort_notification_msg").hide();
-	});
-});
+if (!bs4) {
+  $( document ).ready(function() {
+    $( "#sort_notification_msg .close" ).click(function() {
+      $("#sort_notification_msg").hide();
+    });
+  });
+}
