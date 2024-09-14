@@ -33,7 +33,7 @@ export default class extends Controller {
   }
 }
 
-// Base controller used to handle update list requests and response banners.
+// Base manager used to handle update list requests and response banners.
 class ListUpdateManager {
 
   constructor(marketKind) {
