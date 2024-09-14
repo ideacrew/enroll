@@ -13,8 +13,11 @@ export default class extends Controller {
     return this.marketTabTarget.id;
   }
 
-  // Lifecycle
+  // -- Lifecycle --
 
+  /** 
+  * Create the managers used to handle update list requests.
+  */
   initialize() {
     this.orderManager = new UpdateOrderManager(this.marketKind, this.qleListTarget);
     if (this.hasThresholdInputTarget) {
@@ -22,12 +25,18 @@ export default class extends Controller {
     }
   }
 
+  /** 
+  * Configure the order manager to handle sorting the QLE list.
+  */
 	connect() {
     this.orderManager.configureSortable();
 	}
 
-  // Actions
+  // -- Actions --
 
+  /** 
+  * Update the threshold in the threshold manager.
+  */
   setThreshold() {
     this.thresholdManager.set();
   }
@@ -83,7 +92,6 @@ class UpdateOrderManager extends ListUpdateManager {
     this.qleListTarget = qleListTarget;
   }
 
-  // 
   /** 
   * Initialize the sortable library and set the endDrag callback.
   */
