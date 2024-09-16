@@ -51,7 +51,7 @@ class ListUpdateManager {
    * @returns {Promise} The fetch request promise.
    */
   async updateList(body) {
-    body.market_kind = this.marketKind; // TODO: figure out legacy
+    body.market_kind = this.marketKind;
 		const response = await fetch('update_list', {
       method: 'PATCH',
       body: JSON.stringify(body),
