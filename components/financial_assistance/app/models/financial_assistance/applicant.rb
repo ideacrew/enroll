@@ -178,8 +178,8 @@ module FinancialAssistance
     field :family_member_id, type: BSON::ObjectId
     field :eligibility_determination_id, type: BSON::ObjectId
 
-    # @deprecated This field is implemented to soft delete the applicant from the system just like the family member.
-    # However, the applicant can be deleted from the system as it is only allowed for draft applications, so we are not using this field anymore.
+    # @deprecated This field was implemented to soft delete the applicant from the system just like the family member.
+    # However, the applicant can now be deleted from the system as it is only allowed for draft applications, so we are not using this field anymore.
     # @!attribute [rw] is_active
     #   @return [Boolean] Defaults to true.
     field :is_active, type: Boolean, default: true
@@ -1499,6 +1499,13 @@ module FinancialAssistance
       return unless calculated_benchmark_premiums.is_a?(Hash)
 
       self.benchmark_premiums = calculated_benchmark_premiums
+    end
+
+    # Returns the rating address of the applicant.
+    #
+    # @return [String, nil] the home address if present, otherwise the mailing address
+    def rating_address
+      home_address || mailing_address
     end
 
     private
