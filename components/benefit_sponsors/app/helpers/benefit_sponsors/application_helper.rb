@@ -228,5 +228,10 @@ module BenefitSponsors
     rescue JSON::ParserError, TypeError
       page_param
     end
+
+    def kind_addresses(office_locations)
+      addresses = office_locations.collect(&:address).compact
+      ['primary', 'mailing', 'branch'].map { |kind| addresses.select {|address| address.kind == kind } }
+    end
   end
 end

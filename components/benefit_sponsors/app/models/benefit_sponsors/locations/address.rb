@@ -284,6 +284,10 @@ module BenefitSponsors
         OFFICE_KINDS
       end
 
+      def display_address
+        to_s.gsub("<br>", ", ").gsub(", ,", ",")
+      end
+
       private
 
       def attribute_matches?(attribute, other)

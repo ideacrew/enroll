@@ -2,12 +2,23 @@
 <% if @bs4 %>
   <% if office_locations.present? %>
     <h2><%= l10n("broker_agencies.profiles.office_locations")%></h2>
-    <div class="d-flex align-items-start mb-4">
-      <% office_locations.each_with_index do |office_location, index| %>
-        <div class="mr-3"><%= index + 1 %>.</div>
-        <div><%= office_location.address.to_s.gsub("<br>", ", ").gsub(", ,", ",") %></div>
+    <% kind_addresses(office_locations).each do |kind_addresses| %>
+      <% if kind_addresses.present? %>
+        <div class="mb-2">
+          <% address_count = kind_addresses.length %>
+          <h3 class="mb-0"><%= kind_addresses.first.kind.pluralize(address_count).titleize %></h3>
+          <% if address_count == 1 %>
+            <%= kind_addresses.first.display_address %>
+          <% else %>
+            <ol>
+              <% kind_addresses.each do |address| %>
+                <li><%= address.display_address %></li>
+              <% end %>
+            </ol>
+          <% end %>
+        </div>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
 <% else %>
 <h3><%= l10n("broker_agencies.profiles.office_locations")%></h3>
