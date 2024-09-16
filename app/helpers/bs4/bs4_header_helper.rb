@@ -53,10 +53,9 @@ module Bs4
       end
     end
 
-    def my_portal_link(_controller)
+    def my_portal_link_roles
       return nil unless user_has_multiple_roles?
-      roles = all_non_admin_roles
-      render partial: 'ui-components/bs4/v1/navs/multi_role_my_portal_links', locals: roles
+      all_non_admin_roles
     end
 
     def get_broker_profile_path # rubocop:disable Naming/AccessorMethodName
