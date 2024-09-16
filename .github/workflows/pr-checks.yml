@@ -18,7 +18,12 @@ jobs:
         with:
           bundler-cache: true
           rubygems: 3.3.26
-      - run: |
+      - name: Config git and fetch comparison branch
+        run: |
           git config diff.renameLimit 800
           git fetch --no-tags --depth=1 origin trunk
-          bundle exec rubocop-git origin/trunk | grep "no offenses detected"
+      - name: Run rubocop
+        run: |
+          bundle exec rubocop-git origin/trunk &> rubocop.out || true
+          cat rubocop.out
+          grep --silent "no offenses detected" rubocop.out
