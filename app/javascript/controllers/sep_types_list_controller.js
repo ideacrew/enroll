@@ -50,8 +50,8 @@ class ListUpdateManager {
   }
 
   /**
-   * Perform a PATCH request to update the sort order of the QLE list.
-   * @param {Object} body The request body containing the updated sort order data.
+   * Perform a PATCH request to update the QLE list.
+   * @param {Object} body The request body containing the list update data.
    * @returns {Promise} The fetch request promise.
    */
   async updateList(body) {
