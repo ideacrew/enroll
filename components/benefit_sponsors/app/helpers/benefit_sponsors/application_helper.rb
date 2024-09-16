@@ -229,9 +229,8 @@ module BenefitSponsors
       page_param
     end
 
-    def kind_addresses(office_locations)
-      addresses = office_locations.collect(&:address).compact
-      ['primary', 'mailing', 'branch'].map { |kind| addresses.select {|address| address.kind == kind } }
+    def addresses_by_kind(office_locations)
+      office_locations.collect(&:address).compact.group_by(&:kind)
     end
   end
 end
