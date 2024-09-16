@@ -973,13 +973,7 @@ end
 Then(/^.+ should see the receipt page$/) do
   find('h1.darkblue', wait: 10)
   expect(page).to have_content('Enrollment Submitted')
-
-
-
-  screenshot("receipt_page")
-
-
-
+  #screenshot("receipt_page")
   find(EmployeeEnrollmentSubmitted.continue_btn).click
 end
 
