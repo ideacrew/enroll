@@ -21,9 +21,9 @@ jobs:
       - name: Config git and fetch comparison branch
         run: |
           git config diff.renameLimit 800
-          git fetch --no-tags --depth=1 origin trunk
+          git fetch --no-tags --depth=1 origin ${{ github.base_ref }}
       - name: Run rubocop
         run: |
-          bundle exec rubocop-git origin/trunk &> rubocop.out || true
+          bundle exec rubocop-git origin/${{ github.base_ref }} &> rubocop.out || true
           cat rubocop.out
           grep --silent "no offenses detected" rubocop.out
