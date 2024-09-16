@@ -108,6 +108,9 @@ module BenefitSponsors
         sanitize_html([address_1, address_2, line3].reject(&:blank?).join(use_break_separator ? '<br/>' : ', '))
       end
 
+      # Get the full address formatted as a comma-delimited string
+      #
+      # @return [ String ] the full address
       def to_s_without_breaks
         to_s(use_break_separator: false)
       end
