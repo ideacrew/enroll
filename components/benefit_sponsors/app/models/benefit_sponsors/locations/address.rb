@@ -102,10 +102,10 @@ module BenefitSponsors
       #   model.to_s
       #
       # @return [ String ] the full address
-      def to_s
-        city.present? ? city_delim = city + "," : city_delim = city
+      def to_s(use_break_separator: true)
+        city_delim = city.present? ? "#{city}," : city
         line3 = [city_delim, state, zip].reject(&:blank?).join(' ')
-        sanitize_html([address_1, address_2, line3].reject(&:blank?).join(EnrollRegistry.feature_enabled?(:bs4_broker_flow) ? ', ' : '<br/>'))
+        sanitize_html([address_1, address_2, line3].reject(&:blank?).join(use_break_separator ? '<br/>' : ', '))
       end
 
       def to_a
