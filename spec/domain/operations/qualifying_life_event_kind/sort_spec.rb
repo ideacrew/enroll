@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-RSpec.describe Operations::QualifyingLifeEventKind::Sort, type: :model, dbclean: :after_each do
+RSpec.describe Operations::QualifyingLifeEventKind::UpdateList, type: :model, dbclean: :after_each do
 
   before :all do
     DatabaseCleaner.clean

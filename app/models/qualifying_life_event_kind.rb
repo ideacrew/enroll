@@ -100,7 +100,7 @@ class QualifyingLifeEventKind
   field :date_options_available, type: Mongoid::Boolean
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
-  field :is_common, type: Mongoid::Boolean, default: false
+  field :is_common, type: Mongoid::Boolean, default: true
   field :aasm_state, type: Symbol, default: :draft
 
   field :is_active, type: Boolean, default: false
