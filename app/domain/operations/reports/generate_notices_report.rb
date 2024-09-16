@@ -49,6 +49,9 @@ module Operations
         ['HBX ID', 'Notice Title', 'Notice Code', 'Date']
       end
 
+      # NOTE: ME and DC have different title codes and different titles
+      # Ideally, these titles should be grouped according to function
+      # i.e. Enrollment, Eligibility, DR Notice, etc.
       def notices_title_code_mapping
         {
           "Welcome to CoverME.gov!" => "IVLMWE",
