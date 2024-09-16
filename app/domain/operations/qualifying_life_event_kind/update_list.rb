@@ -5,16 +5,29 @@ require 'dry/monads/do'
 
 module Operations
   module QualifyingLifeEventKind
-    # This class is responsible for updating the order and commonality threshold of Qualifying Life Event Kind objects
+    # This class is responsible for updating and persisting the QualifyingLifeEventKind list based on two sub-operations:
+    # 1. Updating the commonality threshold, which sets the `is_common` attribute of the objects bassed on the threshold index.
+    # 2. Sorting the QLEK objects based on the sort data, which sets the `ordinal_position` attribute of the objects based on the position.
     class UpdateList
       include Dry::Monads[:do, :result]
 
+      # Updates the QLEK object list based on the params.
       def call(input_params)
         persist_data(input_params)
       end
 
       private
 
+      # @method persist_data(input_params)
+      # Saves the QualifyingLifeEventKind list based on the input parameters:
+      # When the params contain a commonality threshold, the QLEK objects are clamped on the threshold.
+      # When the params contain sort data, the QLEK objects are sorted based on the position.
+      #
+      # @param [Hash] input_params The params used to save the QLEK list.
+      #
+      # @return [Result]
+      #   returns a Success if the save operation suceeded.
+      #   returns a Failure if the save operation failed.
       def persist_data(input_params)
         @qleks = ::QualifyingLifeEventKind.where(market_kind: input_params[:params][:market_kind]).active_by_state
         if input_params.dig(:params, :commonality_threshold).present?
@@ -28,8 +41,16 @@ module Operations
         Failure(e.message)
       end
 
+      # @method persist_threshold(threshold)
+      # Clamps the QLEK objects on the commonality threshold by updating the `is_common` attribute based on the index, and save.
+      #
+      # @param [Integer] threshold The "commonality" index separating common and uncommon QLEK objects.
+      #
+      # @return [Result]
+      #   returns a Success if the QLEK objects were successfully clamped on the threshold and saved.
+      #   returns a Failure if the save operation failed.
       def persist_threshold(threshold)
-        return Failure("Invalid threshold") unless threshold >= 0 && threshold <= @qleks.count
+        return Failure("Invalid threshold") unless threshold >= 1 && threshold <= @qleks.count
 
         @qleks.each_with_index do |qlek, index|
           qlek.update(is_common: index < threshold)
@@ -40,9 +61,19 @@ module Operations
         Failure(e.message)
       end
 
+      # Sorts the QLEK objects based on the sort data by updating the `ordinal_position` attributes, and save.
+      # This will also update the `is_common` attribute based on the saved threshold, as the new order may change where some QLEKs are relative to the threshold.
+      
+      # @method persist_order(sort_data)
+      # Clamps the QLEK objects on the commonality threshold by updating the `is_common` attribute based on the index, and save.
+      #
+      # @param [Array] sort_data The array of QLEK object ids and their new positions.
+      #
+      # @return [Result]
+      #   returns a Success if the QLEK objects were successfully sorted and saved.
+      #   returns a Failure if the save operation failed.
       def persist_order(sort_data)
         threshold = @qleks.common.count
-        threshold = 10 if @qleks.all? { |qlek| qlek.is_common.nil? }
 
         @qleks.each do |qlek|
           position = sort_data.find { |sort| sort['id'] == qlek.id.to_s }['position']

@@ -10,7 +10,7 @@ module Exchanges
     before_action :updateable?
     layout 'application', except: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
     layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
-    before_action :enable_bs4_layout, only: [:new, :edit, :create, :update, :sorting_sep_types, :clone, :set_threshold] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:sorting_sep_types] if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
 
     def new
       @qle = Forms::QualifyingLifeEventKindForm.for_new
