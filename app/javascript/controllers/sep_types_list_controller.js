@@ -13,8 +13,6 @@ export default class extends Controller {
     return this.marketTabTarget.id;
   }
 
-  // -- Lifecycle --
-
   /** 
   * Create the managers used to handle update list requests.
   */
@@ -31,8 +29,6 @@ export default class extends Controller {
 	connect() {
     this.orderManager.configureSortable();
 	}
-
-  // -- Actions --
 
   /** 
   * Update the threshold in the threshold manager.
