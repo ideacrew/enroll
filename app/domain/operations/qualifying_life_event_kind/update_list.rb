@@ -5,7 +5,9 @@ require 'dry/monads/do'
 
 module Operations
   module QualifyingLifeEventKind
-    # This class is responsible for updating the order and commonality threshold of Qualifying Life Event Kind objects
+    # This class is responsible for updating and persisting the QualifyingLifeEventKind list based on two sub-operations:
+    # 1. Updating the commonality threshold, which sets the `is_common` attribute of the objects bassed on the threshold index.
+    # 2. Sorting the QLEK objects based on the sort data, which sets the `ordinal_position` attribute of the objects based on the position.
     class UpdateList
       include Dry::Monads[:do, :result]
 
