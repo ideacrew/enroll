@@ -63,7 +63,7 @@ module Operations
 
       # Sorts the QLEK objects based on the sort data by updating the `ordinal_position` attributes, and save.
       # This will also update the `is_common` attribute based on the saved threshold, as the new order may change where some QLEKs are relative to the threshold.
-      
+      #
       # @method persist_order(sort_data)
       # Clamps the QLEK objects on the commonality threshold by updating the `is_common` attribute based on the index, and save.
       #

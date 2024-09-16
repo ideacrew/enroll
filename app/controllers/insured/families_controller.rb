@@ -405,7 +405,7 @@ class Insured::FamiliesController < FamiliesController
         @person.save!
         send_notice_upload_notifications(notice_document, params[:subject])
         flash[:notice] = "File Saved"
-      rescue StandardError => e
+      rescue StandardError
         flash[:error] = "Could not save file."
       end
     else
