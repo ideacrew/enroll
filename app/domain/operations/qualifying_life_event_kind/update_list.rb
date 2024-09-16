@@ -74,7 +74,6 @@ module Operations
       #   returns a Failure if the save operation failed.
       def persist_order(sort_data)
         threshold = @qleks.common.count
-        threshold = 10 if @qleks.all? { |qlek| qlek.is_common.nil? }
 
         @qleks.each do |qlek|
           position = sort_data.find { |sort| sort['id'] == qlek.id.to_s }['position']
