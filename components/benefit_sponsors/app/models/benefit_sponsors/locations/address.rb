@@ -108,6 +108,10 @@ module BenefitSponsors
         sanitize_html([address_1, address_2, line3].reject(&:blank?).join(use_break_separator ? '<br/>' : ', '))
       end
 
+      def to_s_without_breaks
+        to_s(use_break_separator: false)
+      end
+
       def to_a
         [kind, address_1, address_2.to_s, city, state, zip]
       end
