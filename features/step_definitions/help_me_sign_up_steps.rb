@@ -16,7 +16,7 @@ And(/Individual has broker assigned to them/) do
 end
 
 And(/^Individual clicks on the Help Me Sign Up link?/) do
-  find("#help_with_plan_shopping_btn").click
+  find('.interaction-click-control-help-me-sign-up').click unless EnrollRegistry[:bs4_consumer_flow].enabled?
 end
 
 And(/^Individual clicks on the Get Help Signing Up button?/) do
@@ -24,8 +24,13 @@ And(/^Individual clicks on the Get Help Signing Up button?/) do
 end
 
 And(/^Individual clicks on the Help from an Expert link?/) do
-  path = benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path
-  find("a[href='#{path}']").click
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+    find('.interaction-click-control-help-me-sign-up').click
+    find('.interaction-click-control-help-from-an-expert').click
+  else
+    path = benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path
+    find("a[href='#{path}']").click
+  end
 end
 
 And(/^Individual selects a broker?/) do

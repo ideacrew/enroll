@@ -88,7 +88,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
 
   it "should display standard plan indicator" do
     render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
-    expect(rendered).to have_selector('i', text: 'STANDARD PLAN')
+    expect(rendered).to have_content(/STANDARD PLAN/i)
   end
 
   it 'should display premium amount' do
@@ -106,11 +106,11 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     end
 
     it "should not have coinsurance text" do
-      expect(rendered).to have_selector('th', text: 'COINSURANCE')
+      expect(rendered).not_to have_selector('th', text: 'COINSURANCE')
     end
 
     it "should not have copay text" do
-      expect(rendered).to have_selector('th', text: 'CO-PAY')
+      expect(rendered).not_to have_selector('th', text: 'CO-PAY')
     end
   end
 
@@ -198,7 +198,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
       allow(view).to receive(:display_carrier_logo).and_return('logo/carrier/uhic.jpg')
       sign_in hbx_staff_user
@@ -300,7 +300,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(true)
       allow(view).to receive(:display_carrier_logo).and_return('logo/carrier/uhic.jpg')

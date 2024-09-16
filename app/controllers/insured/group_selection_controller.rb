@@ -4,10 +4,31 @@ class Insured::GroupSelectionController < ApplicationController
   include L10nHelper
   include Insured::FamiliesHelper
 
+  CANCELATION_REASONS = [
+    "medicare_cancel",
+    "medicaid_cancel",
+    "employer_cancel",
+    "spouse_cancel",
+    "parents_cancel",
+    "other_coverage_cancel",
+    "move_cancel",
+    "cost_cancel",
+    "unwanted_cancel",
+    "other_cancel"
+  ].freeze
+
+
+  layout 'progress', only: [:new, :edit_plan] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:new, :edit_plan] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
   before_action :is_user_authorized?
+
+  helper_method :cancelation_reasons
+  helper_method :show_cancellation_reason
+  helper_method :show_termination_calendar?
 
   def new
     set_bookmark_url
@@ -105,7 +126,7 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
-    update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+    update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if show_tobacco_field
 
     if @market_kind == 'shop' || @market_kind == 'fehb'
       raise @adapter.no_employer_benefits_error_message(hbx_enrollment) unless hbx_enrollment.sponsored_benefit_package.shoppable?
@@ -162,11 +183,19 @@ class Insured::GroupSelectionController < ApplicationController
         hbx_enrollment.update_osse_childcare_subsidy
         redirect_to thankyou_insured_plan_shopping_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, id: hbx_enrollment.id, plan_id: @adapter.previous_hbx_enrollment.product_id)
       elsif @change_plan.present?
-        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
+        if EnrollRegistry.feature_enabled?(:choose_shopping_method) && @adapter.coverage_kind == 'health'
+          redirect_to choose_shopping_method_insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
+        else
+          redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
+        end
       else
         # FIXME: models should update relationships, not the controller
         hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
-        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
+        if EnrollRegistry.feature_enabled?(:choose_shopping_method) && @adapter.coverage_kind == 'health'
+          redirect_to choose_shopping_method_insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
+        else
+          redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @adapter.coverage_kind, enrollment_kind: @adapter.enrollment_kind)
+        end
       end
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"
@@ -229,11 +258,18 @@ class Insured::GroupSelectionController < ApplicationController
     # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
     # Redirects to root path unless RIDP is verified for the given market kind and family.
     (redirect_to(root_path) and return) unless ridp_verified?(hbx_enrollment.kind, hbx_enrollment.family)
-    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel]})
-
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post(
+      enrollment_id: params.require(:hbx_enrollment_id),
+      term_date: params[:term_date],
+      term_or_cancel: params[:term_or_cancel],
+      cancellation_reason: params[:cancellation_reason]
+    )
     if @self_term_or_cancel_form.errors.present?
       flash[:error] = @self_term_or_cancel_form.errors.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
       redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
+    elsif params[:bs4]
+      redirect_to edit_plan_insured_group_selections_path(hbx_enrollment_id: params[:hbx_enrollment_id], family_id: params[:family_id])
+      flash[:success] = l10n("plan_canceled")
     else
       redirect_to family_account_path
     end
@@ -249,14 +285,16 @@ class Insured::GroupSelectionController < ApplicationController
     aptc_applied_total = revise_aptc_applied_total(params, enrollment_id)
     applied_aptc_pct = calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f)
     attrs = {enrollment_id: enrollment_id, elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
-
     begin
       message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
-      flash[:notice] = message
+      if params[:bs4]
+        flash[:success] = l10n('aptc_updated')
+      else
+        flash[:notice] = message
+      end
     rescue StandardError => e
       flash[:error] = "Unable to update tax credits for enrollment"
     end
-
     redirect_to family_account_path
   end
 
@@ -310,7 +348,12 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)
-    (aptc_applied_amount / aggregate_aptc_amount).round(2)
+    return 0.00 if aggregate_aptc_amount.zero?
+    if params[:bs4]
+      (aptc_applied_amount / aggregate_aptc_amount).round(4)
+    else
+      (aptc_applied_amount / aggregate_aptc_amount).round(2)
+    end
   end
 
   def is_user_authorized?
@@ -508,5 +551,21 @@ class Insured::GroupSelectionController < ApplicationController
       member = members.where(applicant_id: id).first
       member.update_attributes(tobacco_use: params["is_tobacco_user_#{id}"])
     end
+  end
+
+  def cancelation_reasons
+    CANCELATION_REASONS.map { |reason| l10n(reason) }
+  end
+
+  def show_cancellation_reason
+    ::EnrollRegistry.feature_enabled?(:cancellation_reason)
+  end
+
+  def show_termination_calendar?
+    @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl == 'terminate'
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end

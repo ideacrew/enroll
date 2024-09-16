@@ -239,6 +239,62 @@ RSpec.describe PeopleController, dbclean: :after_each do
         expect(primary_address.same_address?(dependent_address)).to eq true
       end
     end
+
+    describe 'change ssn' do
+      let(:ssn) { '523456989' }
+
+      before do
+        allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
+      end
+
+      context 'a primary with no ssn' do
+        before do
+          person.update(no_ssn: '1')
+          person.reload
+
+          person_attributes['ssn'] = ssn
+          person_attributes['no_ssn'] = '0'
+
+          post :update, params: { id: person.id, person: person_attributes }
+        end
+
+        it 'can update (add) ssn' do
+          expect(response).to redirect_to(family_account_path)
+          expect(flash[:notice]).to eq 'Person was successfully updated.'
+        end
+
+        it 'will be updated with the new ssn' do
+          person.reload
+          expect(person.ssn).to eq ssn
+        end
+      end
+
+      context 'a primary with an ssn' do
+        let(:new_ssn) { '373639485' }
+
+        before do
+          person.update(ssn: ssn, no_ssn: '0')
+          person.reload
+        end
+
+        it 'cannot update ssn' do
+          person_attributes['ssn'] = new_ssn
+          person_attributes['no_ssn'] = '0'
+
+          post :update, params: { id: person.id, person: person_attributes }
+
+          person.reload
+          expect(person.ssn).to_not eq new_ssn
+        end
+
+        it 'cannot update no_ssn' do
+          person_attributes['no_ssn'] = '0'
+
+          expect(response).to redirect_to(family_account_path)
+          expect(flash[:notice]).to eq 'Person was successfully updated.'
+        end
+      end
+    end
   end
 
   context 'populate county information on dependent address' do

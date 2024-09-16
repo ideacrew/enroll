@@ -156,7 +156,7 @@ Then(/^fill the form with hired date as future date$/) do
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//span[@class='label'][contains(., 'Select State')]").click
   find(:xpath, "//li[contains(., 'GA')]").click
 
   fill_in 'census_employee[address_attributes][zip]', :with => "30228"

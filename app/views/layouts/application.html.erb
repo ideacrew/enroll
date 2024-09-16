@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="<%= ENV['CLIENT'] %>" data-contrast="<%= EnrollRegistry.feature_enabled?(:contrast_level_aa) %>">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -14,6 +14,8 @@
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
     <%= csrf_meta_tags %>
+
+
 
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
@@ -53,7 +55,7 @@
         <%= render 'users/security_question_responses/modal' %>
       <% end %>
 
-      <%= render_flash %>
+      <%= render_flash use_bs4: @bs4 %>
       <div class="container">
         <%= yield :horizontal_status %>
 
