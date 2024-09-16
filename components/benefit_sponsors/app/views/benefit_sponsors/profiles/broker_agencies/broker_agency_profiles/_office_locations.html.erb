@@ -5,15 +5,13 @@
     <% addresses_by_kind(office_locations).each do |kind, addresses| %>
       <div class="mb-2">
         <% address_count = addresses.length %>
-        <% if office_locations.length > 1 %> <%# we can omit the kind header if only one (inferred "Primary" address kind) location exists %>
-          <h3 class="mb-0"><%= kind.pluralize(address_count).titleize %></h3>
-        <% end %>
+        <h3 class="mb-0"><%= kind.pluralize(address_count).titleize %></h3>
         <% if address_count == 1 %>
-          <%= addresses.first.display_address %>
+          <%= addresses.first %>
         <% else %>
           <ol>
             <% addresses.each do |address| %>
-              <li><%= address.display_address %></li>
+              <li><%= address %></li>
             <% end %>
           </ol>
         <% end %>

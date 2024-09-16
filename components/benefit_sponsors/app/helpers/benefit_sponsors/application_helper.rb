@@ -229,8 +229,14 @@ module BenefitSponsors
       page_param
     end
 
+    # addresses_by_kind(office_locations)
+    # Maps the office locations by kind to their respective display addresses.
+    #
+    # @param [[Location]] office_locations The array of office locations to map.
+    #
+    # @return [{String: [String]}] A hash of kind string keys to an array of addresses display strings.
     def addresses_by_kind(office_locations)
-      office_locations.collect(&:address).compact.group_by(&:kind)
+      office_locations.collect(&:address).compact.group_by(&:kind).transform_values{ |addresses| addresses.map(&:display_address) }
     end
   end
 end
