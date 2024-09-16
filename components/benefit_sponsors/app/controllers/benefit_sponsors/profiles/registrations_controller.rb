@@ -75,8 +75,9 @@ module BenefitSponsors
 
       def update
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_update(registration_params)
-        authorize @agency
+        # authorize @agency
         updated, result_url = @agency.update
+        binding.irb
         result_url = self.send(result_url)
         if updated
           flash[:notice] = 'Employer successfully Updated.' if is_employer_profile?

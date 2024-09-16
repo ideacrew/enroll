@@ -68,9 +68,18 @@ export default class extends Controller {
           input.value = '';
         }
 
+        if (bs4 == "true" && input.id.includes('full_number_without_extension')) {
+          input.setAttribute('minLength', 14);
+          input.setAttribute('maxLength', 14);
+          input.getAttribute('onInput');
+        }
+
         var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
         input.setAttribute('name', name);
-        input.setAttribute('id', name);
+
+        var id = input.getAttribute('name').replaceAll('][', '_').replaceAll('[', '_').replaceAll(']', '');
+        input.setAttribute('id', id);
+
         if (input?.previousElementSibling) input.previousElementSibling.setAttribute('for', name);
       })
 
@@ -102,7 +111,9 @@ export default class extends Controller {
 
         var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
         input.setAttribute('name', name);
-        input.setAttribute('id', name);
+
+        var id = name.replaceAll('][', '_').replaceAll('[', '_').replaceAll(']', '');
+        input.setAttribute('id', id);
         input.previousElementSibling.setAttribute('for', name);
       })
 

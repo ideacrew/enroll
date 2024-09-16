@@ -6,9 +6,11 @@
       placeholder: "(000) 000-0000",
       required: true,
       class: 'form-control phone_number',
-      minlength: '10', maxlength: '10',
-      pattern: "[0-9]{3}[0-9]{3}[0-9]{4}",
+      minlength: '14',
+      maxlength: '14',
       onkeypress: 'return isNumberKey(event)',
+      oninvalid: "this.setCustomValidity('#{l10n('phone_number.error')}')",
+      oninput: "this.setCustomValidity('')",
       value: determine_phone_number(f.object)
     %>
     <div class="invalid-feedback">
