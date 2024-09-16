@@ -660,8 +660,6 @@ Then(/^employer should see gold metal level type$/) do
 end
 
 And(/^employer clicked on gold metal level$/) do
-  screenshot 'TMP'
-
   find("#benefit_package_sponsored_benefits_attributes_0_product_option_choice_gold", :visible => false).click
 end
 
