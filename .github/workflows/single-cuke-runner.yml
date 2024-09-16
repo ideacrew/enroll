@@ -1,0 +1,102 @@
+# This may be useful if a faster iteration on a broken cucumber is wanted. Suggested workflow is
+# to push changes, cancel resulting automatic workflows, and run this one. Example `gh` command line
+# invocation:
+#   $ gh workflow run 'single cucumber runner' --ref example_branch -f feature=features/employers/benefit_applications/create_off_cycle_benefit_application.feature:11
+
+name: single cucumber runner
+on:
+  workflow_dispatch:
+    inputs:
+      feature:
+        description: 'Feature specification'
+        required: true
+        type: string
+      screenshots:
+        description: 'Enable screenshots. This may break some tests when enabled, so be wary of it.'
+        required: false
+        type: boolean
+        default: false
+
+  # temp to get this to register in the GHA ui - REMOVE ME
+  push:
+
+env:
+  CLIENT: 'dc'
+  BUNDLE_GITHUB__COM: ${{ secrets.dchbx_deployments_token }}
+
+jobs:
+  cucumber:
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --name "rabbitmq"
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+        options: >-
+          --name "mongo"
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:3.2-alpine
+        ports:
+          - 6379
+        options: >-
+          --name "redis"
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: 3.3.26
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - name: Install Legacy Chrome
+        run: |
+          wget https://storage.googleapis.com/chrome-for-testing-public/124.0.6367.207/linux64/chrome-linux64.zip
+          unzip chrome-linux64.zip
+      - name: Run tests
+        env:
+          WD_VERSION: "124.0.6367.207"
+          WD_CHROME_PATH: ${{ github.workspace }}/chrome-linux64/chrome
+          SCREENSHOTS: ${{ inputs.screenshots }}
+          RAILS_ENV: test
+        # may need to be run via `gh` cmd line until this workflow is in main branch
+        run: bundle exec cucumber ${{ inputs.feature }}
+      - name: Upload screenshots
+        if: ${{ inputs.screenshots && (success() || failure()) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: ${{ github.workspace }}/tmp/capybara/tmp
+          retention-days: 1
+          if-no-files-found: ignore
