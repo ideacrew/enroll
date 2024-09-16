@@ -1368,4 +1368,66 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       expect(@new_document.updated_at).not_to be_nil
     end
   end
+
+  describe 'date_of_action is nil on esi_evidence records' do
+    let!(:esi_evidence) do
+      application.applicants.first.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+    end
+
+    let!(:verification_history) do
+      esi_evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+    end
+
+    let!(:request_result) do
+      esi_evidence.request_results.create(result: 'verified', source: 'FDSH IFSV', raw_payload: 'raw_payload')
+    end
+
+    let!(:workflow_state_transition) do
+      esi_evidence.workflow_state_transitions.create(to_state: "approved", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation", user_id: BSON::ObjectId.from_time(DateTime.now))
+    end
+
+    let!(:document) do
+      esi_evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier', source: 'enroll_system', language: 'en')
+    end
+
+    let(:result) { subject.call(application_id: application.id) }
+
+    context 'when date_of_action is nil on verification_history' do
+      before do
+        esi_evidence.verification_histories.first.set(date_of_action: nil)
+      end
+
+      it 'should not error out' do
+        expect { result }.not_to raise_error
+      end
+
+      it 'should return success' do
+        expect(result.success).to be_truthy
+      end
+
+      it 'should have esi_evidence verification_history date_of_action present' do
+        verification_history = result.success.applicants.first.esi_evidence.verification_histories.first
+        expect(verification_history.date_of_action).not_to be_nil
+      end
+    end
+
+    context 'when date_of_action is nil on request_result' do
+      before do
+        esi_evidence.request_results.first.set(date_of_action: nil)
+      end
+
+      it 'should not error out' do
+        expect { result }.not_to raise_error
+      end
+
+      it 'should return success' do
+        expect(result.success).to be_truthy
+      end
+
+      it 'should have esi_evidence request_result date_of_action present' do
+        request_result = result.success.applicants.first.esi_evidence.request_results.first
+        expect(request_result.date_of_action).not_to be_nil
+      end
+    end
+  end
 end
