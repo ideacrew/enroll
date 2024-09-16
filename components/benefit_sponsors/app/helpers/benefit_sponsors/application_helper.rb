@@ -236,7 +236,7 @@ module BenefitSponsors
     #
     # @return [{String: [String]}] A hash of kind string keys to arrays of address display strings.
     def addresses_by_kind(office_locations)
-      office_locations.collect(&:address).compact.group_by(&:kind).transform_values{ |addresses| addresses.map(&:display_address) }
+      office_locations.collect(&:address).compact.group_by(&:kind).transform_values { |addresses| addresses.map(&:to_s) }
     end
   end
 end

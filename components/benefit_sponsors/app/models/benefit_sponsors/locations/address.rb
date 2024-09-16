@@ -104,8 +104,8 @@ module BenefitSponsors
       # @return [ String ] the full address
       def to_s
         city.present? ? city_delim = city + "," : city_delim = city
-        line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
-        sanitize_html([address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>'))
+        line3 = [city_delim, state, zip].reject(&:blank?).join(' ')
+        sanitize_html([address_1, address_2, line3].reject(&:blank?).join(EnrollRegistry.feature_enabled?(:bs4_broker_flow) ? ', ' : '<br/>'))
       end
 
       def to_a
@@ -282,10 +282,6 @@ module BenefitSponsors
 
       def office_kinds
         OFFICE_KINDS
-      end
-
-      def display_address
-        to_s.gsub("<br>", ", ").gsub(", ,", ",")
       end
 
       private
