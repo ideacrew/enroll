@@ -175,3 +175,17 @@ Feature: IVL plan purchase
     And individual selects dental for coverage kind
     And consumer clicked on shop for new plan
     Then employee should see dental title content
+
+  Scenario: when sensor tobacco feature is enabled
+    Given EnrollRegistry sensor_tobacco_carrier_usage feature is enabled
+    And a consumer exists
+    And the consumer is logged in
+    And consumer has successful ridp
+    When consumer visits home page
+    And consumer clicked on "Married" qle
+    And I select a past qle date
+    Then I should see confirmation and continue
+    And ivl clicked continue on household info page
+    And consumer should see all the family members names
+    And consumer reselects family member
+    Then consumer should not see tobacco use question

@@ -497,8 +497,8 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'census_employee[address_attributes][address_2]', :with => 'Apt ABC'
   fill_in 'census_employee[address_attributes][city]', :with => 'Alpharetta'
 
-  find(:xpath, '//span[@class="label"][contains(., "SELECT STATE")]').click
-  find(:xpath, '//div[div/span[contains(., "SELECT STATE")]]//li[contains(., "GA")]').click
+  find(:xpath, '//span[@class="label"][contains(., "Select State")]').click
+  find(:xpath, '//div[div/span[contains(., "Select State")]]//li[contains(., "GA")]').click
   fill_in 'census_employee[address_attributes][zip]', :with => '30228'
   find(:xpath, '//span[@class="label"][contains(., "SELECT KIND")]').click
   find(:xpath, '//div[div/span[contains(., "SELECT KIND")]]//li[contains(., "home")]').click
@@ -552,7 +552,8 @@ end
 When (/^(.*) logs? out$/) do |someone|
   find_link('Logout', wait: 5)
   click_link "Logout"
-  visit "/"
+  sleep 5
+  visit "http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"
   find('.container.welcome', wait: 5) do |element|
     element.find('.heading-text', text: /Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}/i)
     element.find('.sub-text', text: /#{EnrollRegistry[:enroll_app].setting(:byline).item}/i)
@@ -886,14 +887,14 @@ end
 
 When(/^.+ filters plans by Carrier/) do
   find_all('.interaction-choice-control-carrier').first.click
-  carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
+  carrier_option = find('li .interaction-choice-control-carrier-2', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
   find(".interaction-click-control-apply", match: :first, wait: 5).click
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do
-  sleep(2)
+  sleep(5)
   find_all('.plan-row', wait: 5).each do |row|
     expect(row.find('h3 small', wait: 5).text).to eq @carrier_selected
   end

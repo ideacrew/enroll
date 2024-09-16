@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- extract to helper rather than use the ENV directly -->
+<html lang="en" data-theme="<%= ENV['CLIENT'] %>" data-contrast="<%= EnrollRegistry.feature_enabled?(:contrast_level_aa) %>" data-bs4="<%= @bs4 %>">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => EnrollRegistry[:enroll_app].settings(:favicon_tab_icon).item %>
+
+    <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
+
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag "application", 'data-turbolinks-track': 'reload' %>
+    <%= yield :head %>
+    <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload', media: "all" %>
+
+    <%= javascript_pack_tag ENV['CLIENT'] %>
+    <%= stylesheet_pack_tag ENV['CLIENT'] %>
+
+    <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
+      <%= javascript_pack_tag 'contrast_level_aa' %>
+      <%= stylesheet_pack_tag 'contrast_level_aa' %>
+    <% end %>
+
+    <%= action_cable_meta_tag %>
+    <%= csrf_meta_tags %>
+
+    <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
+      <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
+    <% end %>
+
+    <% if EnrollRegistry.feature_enabled?(:jquery_migrate) %>
+      <% if EnrollRegistry[:jquery_migrate].setting(:show_warnings).item == true %>
+        <script src="https://code.jquery.com/jquery-migrate-3.4.1.js" integrity="sha384-cG5RCHYtwmrSoNV1o0el92fuszs0g3Q7LmgwVE5f6u2Yn/LWDcUeEsDdmAhV0D3e" crossorigin="anonymous"></script>
+      <% else %>
+        <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js" integrity="sha384-ez4i72z0XhJqm0ZRoQkpPN0bDV8Kw8PK3n8kjEZsWhRDrfICLd0AGghHJB+vytx0" crossorigin="anonymous"></script>
+      <% end %>
+    <% end %>
+
+    <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
+  </head>
+  <body class="font <%= ENV['CLIENT'] || "ic" %>-sbm d-flex flex-column justify-content-between min-vh-100">
+    <%= render partial: './ui-components/bs4/v1/navs/header' %>
+    <%= yield :horizontal_menu %>
+    <main class="pb-5 <%= controller_name %> flex-grow-1">
+      <% if aca_security_questions %>
+        <%= render 'users/security_question_responses/modal' %>
+      <% end %>
+      <% side_nav = content_for?(:side_nav) ? yield(:side_nav) : "" %>
+      <% if content_for?(:side_nav) %>
+        <div class="mt-4 mb-4">
+          <div class="container mt-4">
+            <div class="row">
+              <% nav_width = content_for?(:nav_width) ? yield(:nav_width).to_i : 3 %>
+              <div class="col-sm-12 col-md-12 col-lg-<%= nav_width %> mr-auto p-2 p-md-0 progress-nav-container">
+                <%= side_nav %>
+              </div>
+              <div class="col-sm-12 col-md-12 col-lg-<%= 12 - nav_width %> pl-4">
+                <% unless @override_flash %>
+                  <%= render_flash use_bs4: @bs4 %>
+                <% end %>
+                <% if content_for? :content %>
+                  <%= yield :content %>
+                <% else %>
+                  <%= yield %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="container px-0">
+          <div class=<%= "mt-4" if @bs4 %>>
+            <%= render_flash use_bs4: @bs4 %>
+          </div>
+          <% if content_for? :content %>
+            <%= yield :content %>
+          <% else %>
+            <%= yield %>
+          <% end %>
+        </div>
+      <% end %>
+    </main>
+
+    <%= render partial: './ui-components/bs4/v1/footers/footer' %>
+  </body>
+  <% if @bs4 %>
+    <script>
+      disableSelectric = true;
+    </script>
+  <% end %>
+ </html>

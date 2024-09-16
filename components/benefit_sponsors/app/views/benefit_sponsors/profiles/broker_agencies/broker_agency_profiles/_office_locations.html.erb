@@ -1,5 +1,16 @@
-<h2><%= l10n("broker_agencies.profiles.office_locations")%></h3>
 
+<% if @bs4 %>
+  <% if office_locations.present? %>
+    <h2><%= l10n("broker_agencies.profiles.office_locations")%></h2>
+    <div class="d-flex align-items-start mb-4">
+      <% office_locations.each_with_index do |office_location, index| %>
+        <div class="mr-3"><%= index + 1 %>.</div>
+        <div><%= office_location.address.to_s.gsub("<br>", ", ").gsub(", ,", ",") %></div>
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+<h3><%= l10n("broker_agencies.profiles.office_locations")%></h3>
 <div class="table-border">
 <% if office_locations.present? %>
   <table class="table">
@@ -11,3 +22,4 @@
   </table>
 <% end %>
 </div>
+<% end %>

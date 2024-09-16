@@ -1,6 +1,7 @@
 Feature: Assign Broker Agency Staff to Broker Agency
 
   Scenario: Broker Staff has not signed up on the HBX
+    Given bs4_consumer_flow feature is disable
     Given the shop market configuration is enabled
     Given there is a Broker Agency exists for District Brokers Inc
     Given all permissions are present
@@ -32,6 +33,7 @@ Feature: Assign Broker Agency Staff to Broker Agency
     Then Broker should see the staff successfully removed message
 
   Scenario: Adding Existing person as Broker Staff to Broker Agency
+    Given bs4_consumer_flow feature is disable
     Given there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
     And person record exists for John Doe
@@ -43,6 +45,7 @@ Feature: Assign Broker Agency Staff to Broker Agency
     And the Broker will now appear within the “Broker Staff” table as Active and Linked
 
   Scenario: Adding Non Existing person as Broker Staff to Broker Agency
+    Given bs4_consumer_flow feature is disable
     Given there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
     And Max Planck logs on to the Broker Agency Portal

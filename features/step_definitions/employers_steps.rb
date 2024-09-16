@@ -150,7 +150,7 @@ Then(/^.+ should see a form to enter information about employee, address and dep
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'Select State')]").click
   find(:xpath, "//li[contains(., 'GA')]").click
 
   fill_in 'census_employee[address_attributes][zip]', :with => "30228"
@@ -810,7 +810,7 @@ And(/^employer populates the address field$/) do
   fill_in 'census_employee[address_attributes][address_1]', :with => " NE"
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
-  find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//span[@class='label'][contains(., 'Select State')]").click
   find(:xpath, "//li[contains(., 'GA')]").click
 
   fill_in 'census_employee[address_attributes][zip]', :with => "30228"

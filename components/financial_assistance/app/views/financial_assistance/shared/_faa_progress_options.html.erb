@@ -1,0 +1,3 @@
+<% step = (defined? step) ? step.to_i : 1 %>
+<% nav = faa_nav_options(step, @application, @applicant) %>
+<%= render partial: 'shared/progress_side_nav', locals: {nav: nav} %>

@@ -1,0 +1,43 @@
+<!-- FILEPATH: /Users/kristinmerbach/Projects/enroll/app/views/welcome/index.html.slim -->
+<div class="container welcome">
+  <h1 class="text-center heading-text mb-0 welcome-text pt-5">
+    <strong>
+      <%= l10n('.welcome_to_site_name', short_name: site_short_name) %>
+    </strong>
+  </h1>
+  <h2 class="text-center mt-1 gamma sub-text">
+    <%= l10n('.welcome_to_site_sub_header') %>
+  </h2>
+  <br>
+  <div id="welcome-nav-options">
+    <div class="row justify-content-center">
+      <% if ::EnrollRegistry[:aca_shop_market].enabled? %>
+        <%= sanitize(link_to l10n(".employee_portal"), privacy_insured_employee_index_path, class: "btn btn-outline-primary mr-2 mb-2") %>
+      <% end %>
+      <% if individual_market_is_enabled? %>
+        <%= link_to_with_noopener_noreferrer(l10n(".consumer_family_portal"), privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-outline-primary mr-2 mb-2") %>
+      <% end %>
+      <% if medicaid_tax_credits_link_is_enabled? %>
+        <%= link_to_with_noopener_noreferrer(l10n(".assisted_consumer_family_portal"), privacy_insured_consumer_role_index_path(aqhp: true), class: "btn btn-outline-primary mr-2 mb-2") %>
+      <% end %>
+      <%= sanitize(link_to l10n(".returning_user"), family_account_path, class: "btn btn-outline-primary mr-2 mb-2") %>
+      <% if ::EnrollRegistry[:aca_shop_market].enabled? %>
+        <%= link_to_with_noopener_noreferrer(l10n(".employer_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :benefit_sponsor), class: "btn btn-outline-primary mr-2 mb-2") %>
+      <% end %>
+      <%= link_to_with_noopener_noreferrer(l10n(".broker_agency_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency, portal: true), class: "btn btn-outline-primary mr-2 mb-2") %>
+      <% if general_agency_enabled? %>
+        <%= link_to_with_noopener_noreferrer(l10n(".general_agency_portal"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency, portal: true), class: "btn btn-outline-primary mr-2 mb-2") %>
+      <% end %>
+      <%= sanitize(link_to l10n(".hbx_portal"), exchanges_hbx_profiles_root_path, class: "btn btn-outline-primary mr-2 mb-2 hbx-portal") %>
+      <% if !user_signed_in? %>
+        <%= link_to_with_noopener_noreferrer(l10n(".broker_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :broker_agency), class: "btn btn-outline-primary mr-2 mb-2 broker-registration") %>
+        <% if general_agency_enabled? %>
+          <%= link_to_with_noopener_noreferrer(l10n(".general_agency_registration"), benefit_sponsors.new_profiles_registration_path(:profile_type => :general_agency), class: "btn btn-outline-primary mr-2 mb-2") %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+  <% if ::EnrollRegistry.feature_enabled?(:special_cover_header) %>
+    <%= image_tag(EnrollRegistry[:special_cover_header].setting(:filename).item, class: "special-cover-header mb-5", id: "special-cover-header", alt: "Time to get covered!") %>
+  <% end %>
+</div>

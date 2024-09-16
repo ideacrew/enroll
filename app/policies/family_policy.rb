@@ -67,6 +67,13 @@ class FamilyPolicy < ApplicationPolicy
     false
   end
 
+  def can_show_ssn?
+    return false unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+    return true if individual_market_non_ridp_primary_family_member?
+
+    show?
+  end
+
   def request_help?
     return true if individual_market_non_ridp_primary_family_member?
     show?

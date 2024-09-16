@@ -53,6 +53,38 @@ module FinancialAssistance
       edit?
     end
 
+    # Determines if the current user has permission to get to the preferences page of the application.
+    # The user can proceed if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to proceed to get to the preferences page of the application, false otherwise.
+    def preferences?
+      edit?
+    end
+
+    # Determines if the current user has permission to save the preferences page of the application.
+    # The user can proceed if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to proceed to save the preferences page of the application, false otherwise.
+    def save_preferences?
+      edit?
+    end
+
+    # Determines if the current user has permission to get to the submit your application page of the application.
+    # The user can proceed if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to proceed to get to the submit your application page of the application, false otherwise.
+    def submit_your_application?
+      edit?
+    end
+
+    # Determines if the current user has permission to submit the application.
+    # The user can proceed if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to submit the application, false otherwise.
+    def submit?
+      edit?
+    end
+
     # Determines if the current user has permission to copy the application.
     # The user can copy the application if they have permission to edit it.
     #

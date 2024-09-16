@@ -8,11 +8,19 @@ class IvlAuthorizationAndConsent
   end
 
   def self.i_disagree_radiobtn
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '#agreement_disagree'
+    else
     'label[for="agreement_disagree"] span'
+    end
   end
 
   def self.continue_btn
-    '#btn-continue'
+    if EnrollRegistry[:bs4_consumer_flow].enabled?
+      '.interaction-click-control-continue-to-next-step'
+    else
+      '.interaction-click-control-continue'
+    end
   end
 
   def self.previous_link

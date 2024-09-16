@@ -401,7 +401,8 @@ And(/^Primary Broker should see HC4CC option$/) do
 end
 
 Then(/^Primary broker should see plan names in employee costs$/) do
-  expect(page).to have_content(/Lowest Cost Plan/)
+  wait_for_ajax
+  expect(page).to have_content(/Lowest Cost Plan/, wait: 5)
 end
 
 Then(/^Primary broker should see total HC4CC subcidy applied amount$/) do
