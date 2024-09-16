@@ -91,7 +91,9 @@ jobs:
           SCREENSHOTS: ${{ inputs.screenshots }}
           RAILS_ENV: test
         # may need to be run via `gh` cmd line until this workflow is in main branch
-        run: bundle exec cucumber ${{ inputs.feature }}
+
+        # TEMP - avoid running all cukes. just want this workflow to get recognized by GHA interface.
+        run: bundle exec cucumber ${{ inputs.feature || 'nonsense' }}
       - name: Upload screenshots
         if: ${{ inputs.screenshots && (success() || failure()) }}
         uses: actions/upload-artifact@v4
