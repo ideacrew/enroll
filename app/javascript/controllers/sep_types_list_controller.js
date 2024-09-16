@@ -104,7 +104,7 @@ class UpdateOrderManager extends ListUpdateManager {
 
   /** 
   * Handle updating the sort order for a QLE list.
-  * Performs the patch request and shows the response banner.
+  * Performs the PATCH request and shows the response banner.
   */
 	endDrag(event) {
 		let index = event.item.dataset.index
@@ -157,7 +157,7 @@ class UpdateThresholdManager extends ListUpdateManager {
 
   /** 
   * Handle updating the commonality threshold for a QLE list.
-  * Performs the patch request, then updates the threshold marker element and shows the banner based on the response.
+  * Performs the PATCH request, then updates the threshold marker element and shows the banner based on the response.
   */
   set() {
     let threshold = this.thresholdInputTarget.value;
