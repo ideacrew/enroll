@@ -3,10 +3,9 @@
 module Exchanges
   class IssuersController < HbxProfilesController
     before_action :check_hbx_staff_role, only: [:index]
-    # before_action :check_issuers_tab_enabled, only: [:index]
-    layout 'progress'
-    before_action :enable_bs4_layout
-
+    before_action :check_issuers_tab_enabled, only: [:index]
+    layout 'progress' if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+    before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
 
     def index
       issuers = ::BenefitSponsors::Services::IssuerDataTableService.new
