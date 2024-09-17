@@ -29,11 +29,17 @@ module Operations
       #   returns a Success if the save operation suceeded.
       #   returns a Failure if the save operation failed.
       def persist_data(input_params)
-        @qleks = ::QualifyingLifeEventKind.where(market_kind: input_params[:params][:market_kind]).active_by_state
-        if input_params.dig(:params, :commonality_threshold).present?
-          persist_threshold(input_params[:params][:commonality_threshold].to_i)
-        elsif input_params.dig(:params, :sort_data).present?
-          persist_order(input_params[:params][:sort_data])
+        market_kind = input_params.dig(:params, 'market_kind')
+        return Failure('Invalid parameters') if market_kind.nil?
+
+        @qleks = ::QualifyingLifeEventKind.where(market_kind: market_kind).active_by_state
+
+        commonality_threshold_param = input_params.dig(:params, 'commonality_threshold')&.to_i
+        sort_data_param = input_params.dig(:params, 'sort_data')
+        if commonality_threshold_param.present?
+          persist_threshold(commonality_threshold_param)
+        elsif sort_data_param.present?
+          persist_order(sort_data_param)
         else
           Failure('Invalid parameters')
         end
