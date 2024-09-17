@@ -104,6 +104,8 @@ class HbxEnrollmentMember
   end
 
   def tobacco_use_value_for_edi
+    return "unknown" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
+
     case tobacco_use
     when 'Y'
       'true'
@@ -132,8 +134,7 @@ class HbxEnrollmentMember
 
   def self.new_from(coverage_household_member:)
     is_tobacco_user = coverage_household_member&.family_member&.person&.is_tobacco_user
-    default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
-    tobacco_use = is_tobacco_user == default_tobacco_use ? 'NA' : is_tobacco_user
+    tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : (is_tobacco_user == "unknown" ? 'NA' : is_tobacco_user)
 
     new(
       applicant_id: coverage_household_member.family_member_id,
