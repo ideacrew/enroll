@@ -583,11 +583,11 @@ class Insured::FamiliesController < FamiliesController
       if current_user.has_hbx_staff_role?
         @qualifying_life_events = QualifyingLifeEventKind.send "#{employee_qle_market_scope}_admin" if @manually_picked_role == "shop_market_events" && is_shop_or_fehb_market_enabled?
         manual_individual_events = QualifyingLifeEventKind.send "#{@manually_picked_role}_without_transition_member_action" if @manually_picked_role == "individual_market_events"
-        if @qualifying_life_events.present?
-          @qualifying_life_events = @qualifying_life_events.or(manual_individual_events)
-        else 
-          @qualifying_life_events = manual_individual_events
-        end
+        @qualifying_life_events = if @qualifying_life_events.present?
+                                    @qualifying_life_events.or(manual_individual_events)
+                                  else
+                                    manual_individual_events
+                                  end
       elsif @manually_picked_role == "individual_market_events"
         @qualifying_life_events = QualifyingLifeEventKind.individual_market_events
       elsif @manually_picked_role && employee_qle_market_scope.present?
