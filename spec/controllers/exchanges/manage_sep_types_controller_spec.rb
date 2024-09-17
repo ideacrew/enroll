@@ -593,7 +593,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       before do
         sign_in(current_user)
-        patch :sort, params: params
+        patch :update_list, params: params
       end
 
       context 'success case' do
@@ -622,7 +622,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         before do
           person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
           sign_in(current_user)
-          patch :sort, params: params
+          patch :update_list, params: params
         end
 
         context 'NotAuthorized to access page' do
