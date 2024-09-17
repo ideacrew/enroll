@@ -158,5 +158,17 @@ module Exchanges
     def enable_bs4_layout
       @bs4 = true
     end
+
+    def resolve_layout
+      return "progress" if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+      case action_name
+      when "sep_types_dt"
+        'single_column'
+      when 'new', 'edit', "create", "update", "sorting_sep_types", "clone"
+        'bootstrap_4'
+      else
+        'application'
+      end
+    end
   end
 end
