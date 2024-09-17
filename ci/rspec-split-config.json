@@ -272,7 +272,7 @@
       "spec/models/importers/conversion_employee_policy_delete_spec.rb",
       "spec/models/plan_selection_scopes_spec.rb",
       "spec/domain/operations/benefit_group_assignments/build_spec.rb",
-      "spec/domain/operations/qualifying_life_event_kind/sort_spec.rb",
+      "spec/domain/operations/qualifying_life_event_kind/update_list_spec.rb",
       "components/benefit_sponsors/spec/views/benefit_sponsors/profiles/registrations/confirmation.html.erb_spec.rb",
       "components/transport_gateway/spec/models/transport_gateway/adapters/s3_adapter_spec.rb",
       "spec/controllers/welcome_controller_spec.rb",
