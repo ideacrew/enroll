@@ -71,10 +71,13 @@ export default class extends Controller {
         var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
         input.setAttribute('name', name);
 
-        var id = name.replaceAll('][', '_').replaceAll('[', '_').replaceAll(']', '');
-        input.setAttribute('id', id);
+        if (bs4 == 'true') {
+          // reformat ids of all newOfficeLocation node fields to match default rails form_for helper pattern
+          var id = name.replaceAll('][', '_').replaceAll('[', '_').replaceAll(']', '');
+          input.setAttribute('id', id);
 
-        if (input?.previousElementSibling) input.previousElementSibling.setAttribute('for', id);
+          if (input?.previousElementSibling) input.previousElementSibling.setAttribute('for', id);
+        }
       })
 
       if (bs4 == "true") {
@@ -84,9 +87,6 @@ export default class extends Controller {
         removeButton.id = removeButtonId;
         removeButton.setAttribute('onkeydown', `handleButtonKeyDown(event, '${removeButtonId}')`);
         newLocation.querySelector('input[placeholder="00000"]').setAttribute('data-action', "");
-        newLocation.querySelector(".phone_number").addEventListener('input', (event) => {
-          event.target.value = this.fullPhoneMask(event.target.value);
-        });
 
         // need to explicitly add event listeners for onInput and onInvalid for phone number fields:
         // when copied from a preexisting lastLocation node, the timing with setting 'setCustomValidity'
@@ -95,6 +95,7 @@ export default class extends Controller {
         ['input', 'invalid'].forEach(handler => {
           newLocation.querySelector(".phone_number").addEventListener(handler, (event) => {
             this.checkBrokerPhone(event.target);
+            if (handler == 'input') { event.target.value = this.fullPhoneMask(event.target.value) };
           });
         });
       } else {
@@ -116,9 +117,13 @@ export default class extends Controller {
         var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
         input.setAttribute('name', name);
 
-        var id = name.replaceAll('][', '_').replaceAll('[', '_').replaceAll(']', '');
-        input.setAttribute('id', id);
-        input.previousElementSibling.setAttribute('for', id);
+        if (bs4 == 'true') {
+          // reformat ids of all newOfficeLocation node fields to match default rails form_for helper pattern
+          var id = name.replaceAll('][', '_').replaceAll('[', '_').replaceAll(']', '');
+          input.setAttribute('id', id);
+
+          input.previousElementSibling.setAttribute('for', id);
+        }
       })
 
       this.officeLocationsTarget.appendChild(newLocation);

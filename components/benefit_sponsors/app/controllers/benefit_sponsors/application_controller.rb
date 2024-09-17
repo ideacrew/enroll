@@ -167,7 +167,7 @@ module BenefitSponsors
       flash[:error] = "Access not allowed for #{error_type}, (Pundit policy)" unless broker_agency_or_general_agency?
       respond_to do |format|
         format.json { render nothing: true, status: :forbidden }
-        format.html { redirect_to(session[:custom_url] || request.referrer || main_app.root_path)}
+        format.html { redirect_to(session[:custom_url] || request.referrer || main_app.root_path) }
         format.js   { render nothing: true, status: :forbidden }
       end
     end

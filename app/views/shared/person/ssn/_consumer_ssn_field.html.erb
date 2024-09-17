@@ -3,7 +3,7 @@
     placeholder: "000-00-0000",
     class: "required keep-label mask-ssn",
     pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
-    oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+    oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
     oninput: "this.setCustomValidity('')",
     disabled: defined?(default_disabled) && default_disabled
   %>
@@ -15,7 +15,7 @@
       class: "keep-label mask-ssn hidden ssn-input ssn-input-#{presenter.person_id}",
       target: 'person.ssn',
       pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
-      oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+      oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
       oninput: "this.setCustomValidity('')"
     %>
     <span class="ssn-facade ssn-facade-<%= presenter.person_id %>">
