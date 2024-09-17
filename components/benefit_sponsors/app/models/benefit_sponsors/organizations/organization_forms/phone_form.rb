@@ -19,7 +19,7 @@ module BenefitSponsors
 
         validates_presence_of :kind, :area_code, :number
 
-        # ensure_valid_phone_number will validate the phone number (both area code and number) when bs4_broker_flow is enabled
+        # ensure_valid_phone_number will validate the phone number (both area code and number) when bs4_broker_flow is set to true
         # for this reason, these validations can be skipped when bs4_broker_flow is enabled
         validates :area_code,
                   unless: ->(_object) { EnrollRegistry.feature_enabled?(:bs4_broker_flow) },
