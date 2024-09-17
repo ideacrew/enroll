@@ -73,16 +73,23 @@
       <!-- Start: Section for Magi Medicaid / Medicaid CHIP Applicants -->
       <% medicaid_or_chip_applicants = ed.medicaid_or_chip_applicants %>
       <% if medicaid_or_chip_applicants.present? %>
-        <h3 data-cuke='medicaid_or_chip_heading'><%= l10n("faa.results.medicaid_or_chip_heading", medicaid_or_chip_program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item) %></h3>
+        <h3 data-cuke='medicaid_or_chip_heading'><%= l10n("faa.results.medicaid_or_chip_heading", medicaid_or_chip_program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", "")) %></h3>
         <p data-cuke='medicaid_or_chip_text'><%= l10n("faa.results.medicaid_or_chip_text",
                                                       medicaid_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_long_name].setting(:name).item,
-                                                      medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item,
+                                                      medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", ""),
                                                       state_medicaid_agency_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_agency_long_name].setting(:name).item,
                                                       medicaid_agency_phone: EnrollRegistry[:enroll_app].setting(:medicaid_agency_phone).item,
                                                       medicaid_agency_phone_ttd: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item) %>
         </p>
-        <p><%= l10n("faa.results.medicaid_or_chip_text2",
-                    medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item,
+        <p>
+          <%= l10n("faa.results.medicaid_or_chip_text2a", medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", ""), short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+          <b><%= l10n("faa.results.medicaid_or_chip_text2b", medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", "")) %></b><%= l10n("faa.results.medicaid_or_chip_text2c",
+                    medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", ""),
+                    medicaid_agency_phone: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
+                    contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item,
+                    short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+          <b><%= l10n("faa.results.medicaid_or_chip_text2d", medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", "")) %></b><%= l10n("faa.results.medicaid_or_chip_text2e",
+                    medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", ""),
                     medicaid_agency_phone: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
                     contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item,
                     short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
@@ -128,11 +135,16 @@
       <% applicants_with_non_magi_reasons = ed.applicants_with_non_magi_reasons %>
       <% if FinancialAssistanceRegistry.feature_enabled?(:non_magi_referral_display) && applicants_with_non_magi_reasons.present? %>
         <h3 data-cuke='non_magi_referral_heading'><%= l10n("faa.results.non_magi_referral_heading") %></h3>
-        <p data-cuke='non_magi_referral_text'><%= l10n("faa.results.non_magi_referral_text",
-                                                        medicaid_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_long_name].setting(:name).item,
-                                                        medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item,
-                                                        medicaid_or_chip_agency_long_name: EnrollRegistry[:medicaid_or_chip_agency_long_name].settings(:name).item,
-                                                        short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
+        <p data-cuke='non_magi_referral_text'>
+          <%= l10n("faa.results.non_magi_referral_text",
+          medicaid_long_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_long_name].setting(:name).item&.gsub(" or Cub Care", ""),
+          medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", ""),
+          medicaid_or_chip_agency_long_name: EnrollRegistry[:medicaid_or_chip_agency_long_name].settings(:name).item,
+          short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+          <b><%= l10n("faa.results.non_magi_referral_text2",
+          medicaid_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item&.gsub(" or Cub Care", "")) %></b><%= l10n("faa.results.non_magi_referral_text3",
+          short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+        </p>
         <ul>
           <% applicants_with_non_magi_reasons.each do |applicant| %>
             <li><b><%= full_name(applicant) %></b></li>
