@@ -79,10 +79,11 @@ RSpec.describe ::Operations::Eligibilities::Notices::BuildCvPayload,
 
       it 'should return success' do
         result = subject.call(params)
-        expect(result.success?).to be_truthy
 
         # add logging if this spec fails again
         puts result.failure.inspect if result.failure?
+
+        expect(result.success?).to be_truthy
       end
     end
   end
