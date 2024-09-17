@@ -11,7 +11,7 @@
           </tr>
         </thead>
         <% @broker_agency_profiles.each do |agency| %>
-          <tbody class="select-broker">
+          <tbody class="staff-select-broker">
             <tr>
               <td class="col-5"><%= agency.legal_name %></td>
               <td class="col-1"><%= agency.primary_broker_role&.npn %></td>
@@ -43,7 +43,7 @@
         <th style='width: 18%'> <%= l10n("select_this_broker_button") %></th>
         </thead>
         <% @broker_agency_profiles.each do |agency| %>
-          <tbody class="select-broker">
+          <tbody class="staff-select-broker">
           <tr style='border: 1px solid #d5d5d5; height: 50px;'>
             <td><%= agency.legal_name %></td>
             <td><%= agency.primary_broker_role&.npn %></td>
