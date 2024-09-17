@@ -373,7 +373,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "should get individual market events" do
-        expect(assigns(:qualifying_life_events)).to eq QualifyingLifeEventKind.individual_market_events
+        expect(assigns(:qualifying_life_events).to_a).to eq QualifyingLifeEventKind.individual_market_events.to_a
       end
 
       context "who has not passed ridp" do
