@@ -16,10 +16,10 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :set_cache_headers, only: [:show, :family_index_dt, :user_account_index, :identity_verification, :broker_agency_index, :outstanding_verification_dt, :configuration, :inbox]
   before_action :redirect_if_general_agency_is_disabled, only: [:general_agency_index]
   before_action :redirect_if_employer_datatable_is_disabled, only: [:employer_datatable]
-  before_action :enable_bs4_layout # if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
-  layout 'progress'
+  layout :resolve_layout
 
   # SHOP Feature
   def oe_extendable_applications
@@ -1122,5 +1122,9 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def enable_bs4_layout
     @bs4 = true
+  end
+
+  def resolve_layout
+    EnrollRegistry.feature_enabled?(:bs4_admin_flow) ? "progress" : "single_column"
   end
 end

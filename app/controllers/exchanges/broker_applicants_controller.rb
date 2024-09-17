@@ -2,12 +2,12 @@
 
 class Exchanges::BrokerApplicantsController < ApplicationController
   include Exchanges::BrokerApplicantsHelper
-  layout 'progress'
+  layout :resolve_layout
 
   before_action :check_hbx_staff_role
   before_action :find_broker_applicant, only: [:edit, :update]
   before_action :set_cache_headers, only: [:index, :edit]
-  before_action :enable_bs4_layout
+  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
 
   def index
     @people = Person.broker_role_having_agency
@@ -139,5 +139,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
   def enable_bs4_layout
     @bs4 = true
+  end
+
+  def resolve_layout
+    EnrollRegistry.feature_enabled?(:bs4_admin_flow) ? "progress" : "single_column"
   end
 end
