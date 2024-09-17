@@ -19,12 +19,12 @@ module Eligibilities
     field :aasm_state, type: String
     field :date_of_action, type: DateTime
 
-    after_create :set_date_of_action
+    before_create :set_date_of_action, unless: -> { date_of_action.present? }
 
     private
 
     def set_date_of_action
-      update_attributes!(date_of_action: DateTime.now) unless date_of_action.present?
+      write_attribute(:date_of_action, DateTime.now)
     end
   end
 end
