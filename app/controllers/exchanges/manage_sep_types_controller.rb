@@ -123,6 +123,7 @@ module Exchanges
           "event_kind_label",
           "is_self_attested",
           "is_visible",
+          "is_common",
           "market_kind",
           "post_event_sep_in_days",
           "pre_event_sep_in_days",

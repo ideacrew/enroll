@@ -15,6 +15,7 @@ module Validators
         required(:market_kind).filled(:string)
         required(:effective_on_kinds).array(:string)
         optional(:ordinal_position).filled(:integer)
+        required(:is_common).filled(:bool)
         optional(:_id).maybe(:string)
         optional(:coverage_start_on).maybe(:date)
         optional(:coverage_end_on).maybe(:date)
@@ -39,6 +40,7 @@ module Validators
           other_params[:termination_on_kinds] = [] if result_hash[:market_kind].to_s == 'individual' || result_hash[:termination_on_kinds].nil?
           other_params[:published_by] = '' if result_hash[:publish] != 'Publish'
           other_params[:updated_by] = ''
+          other_params[:is_common] = false
           result_hash.merge(other_params)
         end
       end
