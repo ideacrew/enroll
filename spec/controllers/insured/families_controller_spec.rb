@@ -193,12 +193,12 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should return shop visible qles only" do
           allow(@controller).to receive(:params).and_return(shop_params)
-          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [shop_visible_qle]
+          expect(@controller.instance_eval { init_qualifying_life_events }.to_a).to eq [shop_visible_qle]
         end
 
         it "should return ivl visible qles only" do
           allow(@controller).to receive(:params).and_return(ivl_params)
-          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [ivl_visible_qle]
+          expect(@controller.instance_eval { init_qualifying_life_events }.to_a).to eq [ivl_visible_qle]
         end
       end
 
@@ -220,7 +220,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should return ivl visible qles only" do
           allow(@controller).to receive(:params).and_return(ivl_params)
-          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [ivl_visible_qle]
+          expect(@controller.instance_eval { init_qualifying_life_events }.to_a).to eq [ivl_visible_qle]
         end
       end
 
@@ -239,7 +239,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should return shop visible qles only" do
           allow(@controller).to receive(:params).and_return(shop_params)
-          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [shop_visible_qle]
+          expect(@controller.instance_eval { init_qualifying_life_events }.to_a).to eq [shop_visible_qle]
         end
       end
 
@@ -264,7 +264,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should return fehb visible qles only" do
           allow(@controller).to receive(:params).and_return(shop_params)
-          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [fehb_visible_qle]
+          expect(@controller.instance_eval { init_qualifying_life_events }.to_a).to eq [fehb_visible_qle]
         end
       end
 
@@ -286,13 +286,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         it "should return all shop qles" do
           allow(@controller).to receive(:params).and_return(shop_params)
           @controller.instance_eval { init_qualifying_life_events }
-          expect(@controller.instance_variable_get(:@qualifying_life_events)).to eq [shop_visible_qle, shop_non_visible_qle]
+          expect(@controller.instance_variable_get(:@qualifying_life_events).to_a).to eq [shop_visible_qle, shop_non_visible_qle]
         end
 
         it "should return all ivl qles" do
           allow(@controller).to receive(:params).and_return(ivl_params)
           @controller.instance_eval { init_qualifying_life_events }
-          expect(@controller.instance_variable_get(:@qualifying_life_events)).to eq [ivl_visible_qle, ivl_non_visible_qle]
+          expect(@controller.instance_variable_get(:@qualifying_life_events).to_a).to eq [ivl_visible_qle, ivl_non_visible_qle]
         end
       end
     end
@@ -327,7 +327,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "should assign variables" do
-        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Mongoid::Criteria)
         expect(assigns(:hbx_enrollments)).to eq(hbx_enrollments)
         expect(assigns(:employee_role)).to eq(employee_role)
       end
@@ -367,7 +367,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "should assign variables" do
-        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Mongoid::Criteria)
         expect(assigns(:hbx_enrollments)).to eq(hbx_enrollments)
         expect(assigns(:employee_role)).to be_nil
       end
@@ -448,7 +448,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         end
 
         it "should assign variables" do
-          expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+          expect(assigns(:qualifying_life_events)).to be_an_instance_of(Mongoid::Criteria)
           expect(assigns(:hbx_enrollments)).to eq([display_hbx])
           expect(assigns(:employee_role)).to eq(employee_role)
         end
@@ -474,7 +474,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         end
 
         it "should assign variables" do
-          expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+          expect(assigns(:qualifying_life_events)).to be_an_instance_of(Mongoid::Criteria)
           expect(assigns(:hbx_enrollments)).to eq([display_hbx])
           expect(assigns(:employee_role)).to eq(employee_role)
         end
@@ -552,7 +552,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     it "should assign variables" do
       allow(person).to receive(:has_multiple_roles?).and_return(false)
       get :manage_family
-      expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+      expect(assigns(:qualifying_life_events)).to be_an_instance_of(Mongoid::Criteria)
       expect(assigns(:family_members)).to eq(family_members)
     end
 
