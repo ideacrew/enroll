@@ -250,7 +250,7 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
           let(:addresses) { ActionController::Parameters.new({ "0" => home_address, "1" => mailing_address }) }
 
           before :each do
-            allow(employee_dependent).to receive(:addresses).and_return(addresses)
+            allow(employee_dependent).to receive(:addresses).and_return(addresses.permit!)
             allow(addresses).to receive(:values).and_return [mailing_address]
           end
 
