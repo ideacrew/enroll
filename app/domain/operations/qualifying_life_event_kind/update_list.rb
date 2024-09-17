@@ -83,7 +83,7 @@ module Operations
         threshold = @qleks.common.count
 
         @qleks.each do |qlek|
-          position = sort_data.find { |sort| sort['id'] == qlek.id.to_s }['position']
+          position = sort_data.find { |sort| sort['id'] == qlek.id.to_s }['position'].to_i
           qlek.update(ordinal_position: position, is_common: position - 1 < threshold)
         end
 
