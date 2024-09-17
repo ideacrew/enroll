@@ -134,7 +134,10 @@ class HbxEnrollmentMember
 
   def self.new_from(coverage_household_member:)
     is_tobacco_user = coverage_household_member&.family_member&.person&.is_tobacco_user
-    tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : (is_tobacco_user == "unknown" ? 'NA' : is_tobacco_user)
+    tobacco_use = if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
+                    "U"
+                  else
+                    is_tobacco_user == "unknown" ? 'NA' : is_tobacco_user
 
     new(
       applicant_id: coverage_household_member.family_member_id,
