@@ -138,6 +138,7 @@ class HbxEnrollmentMember
                     "U"
                   else
                     is_tobacco_user == "unknown" ? 'NA' : is_tobacco_user
+                  end
 
     new(
       applicant_id: coverage_household_member.family_member_id,
