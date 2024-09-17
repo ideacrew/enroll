@@ -48,6 +48,10 @@ $(document).on('click', '#back_to_help', function(){
 })
 
 $(document).on('click', '.select-broker', function(){
+  let person = $('#help_requestor').html();
+  console.log('person', person);
+  console.log("HELP ME!!!!");
+
   $.ajax({
     type: 'GET',
     data: {assister: this.getAttribute('data-assister'), broker: this.getAttribute('data-broker'),

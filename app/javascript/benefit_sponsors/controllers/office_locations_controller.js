@@ -23,6 +23,10 @@ export default class extends Controller {
       if (bs4 != "true") {
         document.getElementById('kindSelect')[0].remove();
         document.getElementById('agency_organization_profile_attributes_office_locations_attributes_0_phone_attributes_kind')[0].remove();
+      } else {
+        document.querySelectorAll('.phone_number').forEach(inputField => {
+          this.addPhoneValidityCheck(inputField);
+        })
       }
     }
     this.officeLocationTargets.forEach(target => {
@@ -92,11 +96,10 @@ export default class extends Controller {
         // when copied from a preexisting lastLocation node, the timing with setting 'setCustomValidity'
         // and rendering a new office location form is off,
         // resulting in the onInvalid and onInput events not firing
-        ['input', 'invalid'].forEach(handler => {
-          newLocation.querySelector(".phone_number").addEventListener(handler, (event) => {
-            this.checkBrokerPhone(event.target);
-            if (handler == 'input') { event.target.value = this.fullPhoneMask(event.target.value) };
-          });
+        let newPhone = newLocation.querySelector(".phone_number");
+        this.addPhoneValidityCheck(newPhone);
+        newPhone.addEventListener('input', (event) => {
+          event.target.value = this.fullPhoneMask(event.target.value);
         });
       } else {
         newLocation.querySelector('input[placeholder="ZIP"]').setAttribute('data-action', "");
@@ -128,6 +131,14 @@ export default class extends Controller {
 
       this.officeLocationsTarget.appendChild(newLocation);
     }
+  }
+
+  addPhoneValidityCheck(inputField) {
+    ['input', 'invalid'].forEach(handler => {
+      inputField.addEventListener(handler, (event) => {
+        this.checkBrokerPhone(event.target);
+      });
+    });
   }
 
   removeLocation(event) {
