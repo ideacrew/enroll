@@ -22,7 +22,8 @@ class Exchanges::HbxProfilesController < ApplicationController
       :new_secure_message,
       :edit_dob_ssn,
       :get_user_info,
-      :hide_form
+      :hide_form,
+      :outstanding_verification_dt
     ]
   end
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]

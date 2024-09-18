@@ -154,6 +154,14 @@ module Exchanges
       redirect_to root_path, :flash => { :error => l10n("controller.manage_sep_type.not_authorized") }
     end
 
+    def resolve_layout
+      return "application" unless EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+      case action_name
+      when "sep_types_dt", "new", "edit", "create", "update", "sorting_sep_types", "clone"
+        "bootstrap_4"
+      end
+    end
+  
     def enable_bs4_layout
       @bs4 = true
     end
