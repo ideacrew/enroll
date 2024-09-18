@@ -17,7 +17,7 @@
             <%= l10n("broker_form.languages_warning") %>
           </div>
           <div class="d-flex pl-1">
-            <%= link_to '#', class: 'close-icon icon icon-sm pr-1', alt: l10n('close'), onkeydown: "handleButtonKeyDown(event, 'languageWarning')", onclick: 'closeLanguageWarning(event)' do %>
+            <%= link_to '#', class: 'close-icon icon icon-sm pr-1', alt: l10n('close'), onkeydown: "handleButtonKeyDown(event, 'languageWarning')", onclick: "closeWarning(event, 'languageWarning')" do %>
               <span class="sr-only"><%= l10n('close') %></span>
             <% end %>
           </div>
