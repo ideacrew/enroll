@@ -1,3 +1,14 @@
+// the value of the date input is always empty if the user doesn't input a valid date
+// to check that if the user was just tabbing through the form, we store the input in a dataset
+// to check if the user partially inputted an invalid date as the actual user input is only in the
+// shadow DOM
+function storeDateInput(event) {
+  var input = event.target;
+  if (event.key !== "Tab") {
+    input.dataset.input += event.key;
+  }
+}
+
 function checkOLKind(element) {
   var addressKind = $(element).val();
   var row = $(element).closest(".row").next(".row").next(".row");
@@ -23,6 +34,13 @@ function checkOLKind(element) {
   }
 }
 
-module.exports = {
-  checkOLKind: checkOLKind
-};
+function closeLanguageWarning(event) {
+  event.preventDefault();
+
+  let warning = document.getElementById("languageWarning");
+  warning.classList.add("hidden");
+}
+
+window.storeDateInput = storeDateInput;
+window.checkOLKind = checkOLKind;
+window.closeLanguageWarning = closeLanguageWarning;
