@@ -10,8 +10,6 @@
       minlength: '14',
       maxlength: '14',
       onkeypress: 'return isNumberKey(event)',
-      oninvalid: "this.setCustomValidity('#{phone_error}')",
-      oninput: "this.setCustomValidity('')",
       value: determine_phone_number(f.object),
       data: { :"error-message" => phone_error }
     %>
