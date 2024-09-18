@@ -109,35 +109,26 @@ class UpdateOrderManager extends UpdateListManager {
 
     // map the card elements to an array of card ids and their ordinal positions
     let enumeratedCards = cards.entries();
-    let sort_data = [...enumeratedCards].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } }); 
-    super.updateList({sort_data: sort_data})
+    for (const [index, card] of enumeratedCards) {
+      card.dataset.index = index;
+      card.dataset.ordinal_position = index + 1;
+    }
+    let sortData = [...enumeratedCards].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } });
+    super.updateList({sort_data: sortData})
       .then(data => {
         let isSuccess = data['status'] === "success";
         if (bs4) {
           var flashDiv = super.showBanner(isSuccess);
         } else {
           var flashDiv = $("#sort_notification_msg");
-          flashDiv.show()
-          if (isSuccess) {
-            flashDiv.addClass("success")
-            flashDiv.removeClass("error")
-            flashDiv.find(".toast-header").addClass("success")
-            flashDiv.find(".toast-header").removeClass("error")
-          } else {
-            flashDiv.addClass("error")
-            flashDiv.removeClass("success")
-            flashDiv.find(".toast-header").addClass("error")
-            flashDiv.find(".toast-header").removeClass("success")
-          }
-          flashDiv.find(".toast-header strong").text(data['message'])
-          flashDiv.find(".toast-body").text(event.item.textContent)
-        }
-
-        if (isSuccess) {
-          for (const [index, card] of enumeratedCards) {
-            card.dataset.index = index;
-            card.dataset.ordinal_position = index + 1;
-          }
+          flashDiv.show();
+          flashDiv.toggleClass("success", isSuccess);
+          flashDiv.removeClass("error", !isSuccess);
+          flashHeader = flashDiv.find(".toast-header");
+          flashHeader.toggleClass("success", isSuccess);
+          flashHeader.removeClass("error", !isSuccess);
+          flashDiv.find(".toast-header strong").text(data['message']);
+          flashDiv.find(".toast-body").text(event.item.textContent);
         }
 
         setTimeout(function() {
