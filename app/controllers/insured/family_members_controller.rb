@@ -185,7 +185,7 @@ class Insured::FamilyMembersController < ApplicationController
     @bs4 = true if params[:bs4] == "true"
 
     if @dependent.family_member.try(:person).present? && @dependent.family_member.try(:person).is_resident_role_active?
-      if @address_errors.blank? && @dependent.update_attributes(params[:dependent])
+      if @address_errors.blank? && @dependent.update_attributes(dependent_person_params[:dependent])
         respond_to do |format|
           format.html { render 'show_resident' }
           format.js { render 'show_resident' }
