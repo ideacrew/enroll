@@ -39,7 +39,7 @@ export default class extends Controller {
 }
 
 // Base manager used to handle update list requests and response banners.
-class ListUpdateManager {
+class UpdateListManager {
 
   constructor(marketKind) {
     this.marketKind = marketKind;
@@ -77,7 +77,7 @@ class ListUpdateManager {
 }
 
 // Manages the sorting of the SEP types list.
-class UpdateOrderManager extends ListUpdateManager {
+class UpdateOrderManager extends UpdateListManager {
   
   constructor(marketKind, qleListTarget) {
     super(marketKind);
@@ -148,7 +148,7 @@ class UpdateOrderManager extends ListUpdateManager {
 }
 
 // Manages the commonality threshold input and marker for the SEP types list.
-class UpdateThresholdManager extends ListUpdateManager {
+class UpdateThresholdManager extends UpdateListManager {
 
   constructor(marketKind, qleListTarget, thresholdInputTarget) {
     super(marketKind);
