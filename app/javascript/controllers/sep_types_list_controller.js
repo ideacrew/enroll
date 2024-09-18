@@ -103,20 +103,17 @@ class UpdateOrderManager extends ListUpdateManager {
   * Performs the PATCH request and shows the response banner.
   */
 	endDrag(event) {
-		let index = event.item.dataset.index
-		let rowId = event.item.dataset.id
-		let prevPosition = parseInt(index) + 1
-		let data = []
-		var cards = document.querySelectorAll('.card.mb-4')
-		data = [...cards].reduce(function(data, card, index) { return [...data, { id: card.dataset.id, position: index + 1 }] }, [])
+    let card = event.item
+    let originalPosition = parseInt(card.dataset.index);
+    
+    let cards = $(this.qleListTarget).find('.card').get();
+    if (cards[originalPosition].dataset.id === card.dataset.id) { // If the card was unmoved, do not sort the list
+      return;
+    }
 
-		for (var i = 0; i < data.length; i++) {
-			if (data[i]['id'] === rowId && prevPosition === parseInt(data[i]['position'])){
-				return;
-			}
-		}
-
-    super.updateList({sort_data: data})
+    // map the card elements to an array of card ids and their ordinal positions
+    let sort_data = [...cards.entries()].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } }); 
+    super.updateList({sort_data: sort_data})
       .then(data => {
         let isSuccess = data['status'] === "success";
         if (bs4) {
