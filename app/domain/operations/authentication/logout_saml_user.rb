@@ -9,6 +9,7 @@ module Operations
       include Dry::Monads[:do, :result, :try]
 
       def call(session)
+        return Success(:ok) unless EnrollRegistry.feature_enabled?(:saml_single_logout)
         saml_settings = yield ConstructSamlSettings.new.call
         saml_logout_url = yield construct_saml_request(saml_settings, session)
         execute_saml_logout(saml_logout_url)
@@ -30,6 +31,10 @@ module Operations
 
       def execute_saml_logout(saml_logout_url)
         logger = Rails.logger
+
+        logger.tagged("SAMLLogoutAttempt") do
+          logger.info "Submitted: #{saml_logout_url}"
+        end
 
         result = Try do
           saml_url = URI(saml_logout_url)

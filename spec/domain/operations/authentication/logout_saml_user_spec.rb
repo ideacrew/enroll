@@ -9,6 +9,7 @@ RSpec.describe Operations::Authentication::LogoutSamlUser do
   let(:session) { double }
 
   before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:saml_single_logout).and_return(true)
     allow(session).to receive(:[]).with(:__saml_name_id).and_return(saml_name_id)
     allow(session).to receive(:[]).with(:__saml_session_index).and_return(saml_session_index)
   end
