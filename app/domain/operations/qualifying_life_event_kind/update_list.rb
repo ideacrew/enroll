@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module QualifyingLifeEventKind
     # This class is responsible for updating and persisting the QualifyingLifeEventKind list based on two sub-operations:
-    # 1. Updating the commonality threshold, which sets the `is_common` attribute of the objects bassed on the threshold index param.
+    # 1. Updating the commonality threshold, which sets the `is_common` attribute of the objects based on the threshold index param.
     # 2. Updating the order, which mainly sets the `ordinal_position` attribute of the objects based on the sort_data param,
     # and also updates `is_common` attribute of the objects based on the new order.
     class UpdateList
