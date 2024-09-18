@@ -35,7 +35,8 @@ module SponsoredBenefits
         return true if broker_agency_profile.default_general_agency_profile_id.blank?
         broker_role_id = broker_agency_profile.primary_broker_role.id
         ids.each do |id|
-          create_general_agency_account(id, broker_role_id, start_on, broker_agency_profile.default_general_agency_profile_id, broker_agency_profile.id) if plan_design_organization(id).active_general_agency_account.present?
+          next if plan_design_organization(id).active_general_agency_account.present?
+          create_general_agency_account(id, broker_role_id, start_on, broker_agency_profile.default_general_agency_profile_id, broker_agency_profile.id)
         end
       end
 
@@ -44,15 +45,12 @@ module SponsoredBenefits
           plan_design_organization(id).general_agency_accounts.active.each do |account|
             account.terminate!
             employer_profile = account.plan_design_organization.employer_profile
-            if employer_profile
-              send_message({
-                employer_profile: employer_profile,
-                general_agency_profile: account.general_agency_profile,
-                broker_agency_profile: account.broker_agency_profile,
-                status: 'Terminate'
-              })
-              notify("acapi.info.events.employer.general_agent_terminated", {timestamp: Time.now.to_i, employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
-            end
+            next unless employer_profile && account&.general_agency_profile
+            send_message({ employer_profile: employer_profile,
+                           general_agency_profile: account.general_agency_profile,
+                           broker_agency_profile: account.broker_agency_profile,
+                           status: 'Terminate' })
+            notify("acapi.info.events.employer.general_agent_terminated", {timestamp: Time.now.to_i, employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
           end
         end
       end
