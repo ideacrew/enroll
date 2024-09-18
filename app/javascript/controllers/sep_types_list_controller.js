@@ -121,13 +121,14 @@ class UpdateOrderManager extends UpdateListManager {
           var flashDiv = super.showBanner(isSuccess);
         } else {
           var flashDiv = $("#sort_notification_msg");
+          var flashHeader = flashDiv.find(".toast-header");
           flashDiv.show();
           flashDiv.toggleClass("success", isSuccess);
           flashDiv.removeClass("error", !isSuccess);
-          flashHeader = flashDiv.find(".toast-header");
           flashHeader.toggleClass("success", isSuccess);
           flashHeader.removeClass("error", !isSuccess);
-          flashDiv.find(".toast-header strong").text(data['message']);
+          
+          flashHeader.find("strong").text(data['message']);
           flashDiv.find(".toast-body").text(event.item.textContent);
         }
 
