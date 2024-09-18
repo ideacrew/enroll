@@ -72,11 +72,7 @@ class ListUpdateManager {
     const errorBanner = $('#error-flash');
     successBanner.toggleClass('hidden', !isSuccess)
     errorBanner.toggleClass('hidden', isSuccess)
-    var flashDiv = isSuccess ? successBanner : errorBanner;
-
-    setTimeout(function() {
-      flashDiv.addClass('hidden');
-    }, 3500);
+    return isSuccess ? successBanner : errorBanner;
   }
 }
 
@@ -103,21 +99,22 @@ class UpdateOrderManager extends ListUpdateManager {
   * Performs the PATCH request and shows the response banner.
   */
 	endDrag(event) {
-    let card = event.item
+    let card = event.item;
     let originalPosition = parseInt(card.dataset.index);
     
     let cards = $(this.qleListTarget).find('.card').get();
-    if (cards[originalPosition].dataset.id === card.dataset.id) { // If the card was unmoved, do not sort the list
+    if (cards[originalPosition].dataset.id === card.dataset.id) { // If the card was not moved, do not sort the list
       return;
     }
 
     // map the card elements to an array of card ids and their ordinal positions
-    let sort_data = [...cards.entries()].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } }); 
+    let enumeratedCards = cards.entries();
+    let sort_data = [...enumeratedCards].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } }); 
     super.updateList({sort_data: sort_data})
       .then(data => {
         let isSuccess = data['status'] === "success";
         if (bs4) {
-          super.showBanner(isSuccess);
+          var flashDiv = super.showBanner(isSuccess);
         } else {
           var flashDiv = $("#sort_notification_msg");
           flashDiv.show()
@@ -135,6 +132,17 @@ class UpdateOrderManager extends ListUpdateManager {
           flashDiv.find(".toast-header strong").text(data['message'])
           flashDiv.find(".toast-body").text(event.item.textContent)
         }
+
+        if (isSuccess) {
+          for (const [index, card] of enumeratedCards) {
+            card.dataset.index = index;
+            card.dataset.ordinal_position = index + 1;
+          }
+        }
+
+        setTimeout(function() {
+          flashDiv.addClass('hidden');
+        }, 3500);
 		})
 	}
 }
