@@ -36,7 +36,7 @@ module Operations
           unless sp_cert.blank? || sp_pk.blank?
             settings.private_key = sp_pk
             settings.certificate = sp_cert
-            settings.security.logout_requests_signed = true
+            settings.security[:logout_requests_signed] = true
           end
         end
 
