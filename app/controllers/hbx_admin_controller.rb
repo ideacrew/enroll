@@ -57,7 +57,7 @@ class HbxAdminController < ApplicationController
   end
 
   # For AJAX Calculations.
-  def calculate_aptc_csr # needed to render validation_error modal in household_header - conditional?
+  def calculate_aptc_csr
     authorize HbxProfile
 
     @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])
