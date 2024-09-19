@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe FinancialAssistance::Operations::Families::CreateOrUpdateMember, dbclean: :after_each do
 
   let(:params) do
-    default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
+    default_tobacco_use = "unknown"
     {applicant_params: {
         :first_name => "John",
         :last_name => "Smith5",
