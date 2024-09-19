@@ -33,9 +33,9 @@
 
       <% if show_exit_button %>
         <li>
-          <button class="text-button" href=<%= main_app.destroy_user_session_path %>>
+          <%= button_to main_app.destroy_user_session_path, method: :delete, class: "text-button" do %>
             <%= l10n("log_out") %>
-          </button>
+          <% end %>
         </li>
       <% end %>
     </ul>
