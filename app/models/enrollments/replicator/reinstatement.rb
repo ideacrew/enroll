@@ -221,7 +221,7 @@ module Enrollments
         enr_members.inject([]) do |members, hbx_enrollment_member|
           member = latest_enrollment.hbx_enrollment_members.where(applicant_id: hbx_enrollment_member.applicant_id).first
 
-          tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : (member&.tobacco_use || "N")
+          tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "NA" : (member&.tobacco_use || "N")
 
           members << HbxEnrollmentMember.new({
                                                applicant_id: hbx_enrollment_member.applicant_id,
