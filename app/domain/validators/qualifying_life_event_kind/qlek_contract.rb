@@ -15,6 +15,7 @@ module Validators
         required(:market_kind).filled(:string)
         required(:effective_on_kinds).array(:string)
         optional(:ordinal_position).filled(:integer)
+        required(:is_common).filled(:bool)
         optional(:_id).maybe(:string)
         optional(:coverage_start_on).maybe(:date)
         optional(:coverage_end_on).maybe(:date)

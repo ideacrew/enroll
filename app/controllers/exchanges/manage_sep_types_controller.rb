@@ -10,7 +10,7 @@ module Exchanges
     before_action :updateable?
     layout 'application', except: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
     layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
-    # before_action :enable_bs4_layout, only: [:new, :edit, :create, :update, :sorting_sep_types, :clone] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout, only: [:sorting_sep_types] if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
 
     def new
       @qle = Forms::QualifyingLifeEventKindForm.for_new
@@ -92,11 +92,13 @@ module Exchanges
       end
     end
 
-    def sort
-      EnrollRegistry.lookup(:sort_sep_type) { {params: params} }
-      render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
-    rescue StandardError
-      render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
+    def update_list
+      result = EnrollRegistry.lookup(:update_sep_types_list) { {params: params} }
+      if result.success?
+        render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
+      else
+        render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
+      end
     end
 
     private
@@ -105,7 +107,7 @@ module Exchanges
       params.require(:qualifying_life_event_kind_form).permit(
         :start_on,:end_on,:title,:tool_tip,:pre_event_sep_in_days,
         :is_self_attested, :reason, :post_event_sep_in_days,
-        :market_kind, :effective_on_kinds, :ordinal_position
+        :market_kind, :effective_on_kinds, :ordinal_position, :is_common
       ).to_h.symbolize_keys
     end
 
@@ -121,6 +123,7 @@ module Exchanges
           "event_kind_label",
           "is_self_attested",
           "is_visible",
+          "is_common",
           "market_kind",
           "post_event_sep_in_days",
           "pre_event_sep_in_days",
