@@ -10,9 +10,11 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
     before_action :enable_bs4_layout, only: [
+      :show,
       :family_index_dt,
       :add_sep_form,
       :new_eligibility,
+      :process_eligibility,
       :show_sep_history,
       :cancel_enrollment,
       :terminate_enrollment,
