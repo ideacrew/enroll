@@ -78,7 +78,6 @@ module Exchanges
     end
 
     def sep_types_dt
-      @bs4 = true
       @datatable = Effective::Datatables::SepTypeDataTable.new
       respond_to do |format|
         format.html {  render '/exchanges/manage_sep_types/sep_type_datatable.html.erb'}
