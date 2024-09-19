@@ -12,7 +12,7 @@
         <section>
           <h2><%= l10n('insured.families.special_enrollment_period.common_header') %></h2>
           <ul class=<%= list_class(@common_seps) %>>
-            <% @common_seps.each_with_index do |qle, index| %>
+            <% @common_seps&.each_with_index do |qle, index| %>
               <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
             <% end %>
           </ul>
