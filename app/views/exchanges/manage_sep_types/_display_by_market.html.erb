@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <div id="<%= market_kind %>" class="<%= display %>" data-controller="sep-types-list" data-target="sep-types-list.marketTab">
     <% is_commonality_threshold_enabled = EnrollRegistry.feature_enabled?(:qle_commonality_threshold) %>
-    <% qles = @sortable.by_market_kind(market_kind).active_by_state %>
+    <% qles = @sortable.by_market_kind(market_kind).active_by_state %> <%# TODO: possibly move this into the controller when we uplift this page %>
     <% common_number = qles.common.length %>
     <% threshold_index = common_number - 1 %>
 
