@@ -404,7 +404,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def outstanding_verification_dt #implement this
+  def outstanding_verification_dt
     authorize HbxProfile, :outstanding_verification_dt?
 
     @selector = params[:scopes][:selector] if params[:scopes].present?
@@ -746,7 +746,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
-  def create_eligibility #conditional?
+  def create_eligibility
     authorize HbxProfile, :create_eligibility?
 
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)

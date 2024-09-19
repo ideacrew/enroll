@@ -4,7 +4,8 @@ module Exchanges
   class ProductsController < HbxProfilesController
     before_action :check_hbx_staff_role
 
-    def index # this renders the issuers show plans table, somehow is inheriting the hbx_profiles_controller context (@bs4) - suppose due to the above inheritance?
+    def index
+      @bs4 = true if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
       @service = ::BenefitSponsors::Services::ProductDataTableService.new(issuer_params)
       table_data = @service.retrieve_table_data
       @data = ::BenefitSponsors::Serializers::ProductDatatableSerializer.new(table_data).serialized_json
