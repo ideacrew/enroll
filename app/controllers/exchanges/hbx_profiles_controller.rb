@@ -119,7 +119,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.set_binder_paid(params[:ids])
         flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
         render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
-      rescue StandardError => e
+      rescue StandardError
         render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
       end
     end
@@ -802,7 +802,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
       flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-    rescue Exception => e
+    rescue StandardError => e
       flash[:error] = "Failed to set date of record, " + e.message
     end
     redirect_to exchanges_hbx_profiles_root_path
@@ -942,9 +942,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     enrs_mapping_by_year_and_market = group_enrollments_by_year_and_market(enrollments)
     return [] if enrs_mapping_by_year_and_market.blank?
 
-    enrs_mapping_by_year_and_market.inject([]) do |duplicate_ids, (_market_year, enrollments)|
-      next duplicate_ids unless enrollments.count > 1
-      dups = get_duplicate_enrs(enrollments)
+    enrs_mapping_by_year_and_market.inject([]) do |duplicate_ids, (_market_year, enrllmnts)|
+      next duplicate_ids unless enrllmnts.count > 1
+      dups = get_duplicate_enrs(enrllmnts)
       next duplicate_ids if dups.empty?
       effective_date = dups.map(&:effective_on).max
       dups.each do |enr|

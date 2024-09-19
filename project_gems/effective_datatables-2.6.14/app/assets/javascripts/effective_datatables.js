@@ -39,10 +39,7 @@ if (bs4) {
           "<'col-sm-12 col-md-12 px-0'tr>"+
           ">" +
           "<'d-flex justify-content-between align-items-center w-100'" +
-          "il" +
-          ">" +
-          "<'d-flex align-items-center justify-content-center w-100 my-4'" +
-          "p" +
+          "<'d-flex align-items-center'"+"il"+">"+"p"+
           ">"
   });
 } else {

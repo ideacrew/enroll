@@ -2,9 +2,17 @@ class Exchanges::AnnouncementsController < ApplicationController
   before_action :check_hbx_staff_role, except: [:dismiss]
   before_action :updateable?, :only => [:create, :destroy]
   before_action :set_cache_headers, only: [:index]
+  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+
+  layout 'progress' if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+
   def dismiss
     if params[:content].present?
-      dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
+      dismiss_announcements = begin
+        JSON.parse(session[:dismiss_announcements] || "[]")
+      rescue StandardError # Empty rescue clause to handle potential parsing errors # rubocop:disable Lint/EmptyRescueClause
+        # Do nothing, an empty array will be used
+      end
       dismiss_announcements << params[:content].strip
       dismiss_announcements.uniq!
       session[:dismiss_announcements] = dismiss_announcements.to_json
@@ -47,8 +55,10 @@ class Exchanges::AnnouncementsController < ApplicationController
   end
 
   def check_hbx_staff_role
-    unless current_user.has_hbx_staff_role?
-      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end
