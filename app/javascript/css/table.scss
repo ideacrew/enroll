@@ -197,6 +197,29 @@ table {
   }
 }
 
+// these styles are all for tha datatables, which is why they live in this file.
 .custom_filter {
-  margin-bottom: $spacer * 2;
+  .custom_level_1, .custom_level_2 {
+    margin-left: 0;
+    padding-left: 0;
+  }
+}
+
+.dataTables_length {
+  margin-left: $spacer / 2;
+  label {font-weight: 400}
+}
+
+.container:has(#effective_datatable_wrapper) {
+  padding: 0
+}
+
+#effective_datatable_wrapper {
+  margin-top: $spacer;
+  .container {
+    padding: 0;
+  }
+  .row {
+    margin: 0
+  }
 }

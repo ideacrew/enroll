@@ -25,7 +25,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { render "shared/brokers/applicants.html.slim" }
+      format.html { render "shared/brokers/applicants" }
       format.js
     end
   end

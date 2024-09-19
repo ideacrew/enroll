@@ -605,10 +605,6 @@ module FinancialAssistance
                       end
       { path: application_publish_error_application_path(@application), flash: flash_message }
     end
-
-    def enable_bs4_layout
-      @bs4 = true
-    end
   end
 end
 

@@ -1,0 +1,17 @@
+<%= render "ui-components/v1/navs/primary_nav" %>
+<% @broker_applicants = @broker_applicants.sort_by { |broker_applicant| broker_applicant.broker_role.latest_transition_time }.reverse if @status == 'applicant' %>
+<% if @bs4 %>
+  <%= render "shared/brokers/applicants_index", url: exchanges_broker_applicants_path, index_url: exchanges_broker_applicants_path(status: @status) %>
+<% else %>
+  <br>
+  <br>
+  <div class="container">
+    <%= render "shared/brokers/applicants_index", url: exchanges_broker_applicants_path, index_url: exchanges_broker_applicants_path(status: @status) %>
+  </div>
+<% end %>
+<script>
+  (function() {
+    enableBrokerApplicantFilters();
+  })();
+</script>
+
