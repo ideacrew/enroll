@@ -85,7 +85,6 @@ module Effective
                          transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?)) ? 'ajax' : 'disabled']
           end
 
-          # TODO (maybe): add localized strings to keep that functionality in dropdown helper (which will require moving pundit in partial)
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_dropdown(dropdown) : dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end

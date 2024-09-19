@@ -759,7 +759,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call(
         {
           family: family,
-          th_group_info: th_group_info,
+          th_group_info: th_group_info
         }
       )
 
