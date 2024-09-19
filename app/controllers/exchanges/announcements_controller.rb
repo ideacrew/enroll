@@ -10,8 +10,8 @@ class Exchanges::AnnouncementsController < ApplicationController
     if params[:content].present?
       dismiss_announcements = begin
         JSON.parse(session[:dismiss_announcements] || "[]")
-      rescue StandardError # rubocop:disable Lint/EmptyRescueClause
-        [] # Do nothing, an empty array will be used
+      rescue StandardError # Empty rescue clause to handle potential parsing errors # rubocop:disable Lint/EmptyRescueClause
+        # Do nothing, an empty array will be used
       end
       dismiss_announcements << params[:content].strip
       dismiss_announcements.uniq!

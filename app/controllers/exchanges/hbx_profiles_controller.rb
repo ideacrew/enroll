@@ -576,7 +576,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :update_enrollment_terminated_on_date?
 
     begin
-      params[:new_termination_date] = parse_date(params[:new_termination_date]).strftime("%m/%d/%Y")
       @row = params[:family_actions_id]
       @element_to_replace_id = params[:family_actions_id]
       result = Operations::HbxEnrollments::EndDateChange.new.call(params: params)
@@ -678,10 +677,9 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
-    new_dob = parse_date(params[:new_dob])
-    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, new_dob)
+    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, params[:new_dob])
     respond_to do |format|
-      format.js { render "edit_enrollment", person: @person, :new_ssn => params[:new_ssn], :new_dob => new_dob, :family_actions_id => params[:family_actions_id]}
+      format.js { render "edit_enrollment", person: @person, :new_ssn => params[:new_ssn], :new_dob => params[:new_dob],  :family_actions_id => params[:family_actions_id]}
     end
   end
 
@@ -752,14 +750,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       @element_to_replace_id = params[:tax_household_group][:family_actions_id]
       family = Person.find(params[:tax_household_group][:person_id]).primary_family
-      th_group_info = params.require(:tax_household_group).permit(
-        :person_id, :family_actions_id, :effective_date, tax_households: {}
-      ).to_h
-      th_group_info[:effective_date] = parse_date(th_group_info[:effective_date]).strftime("%m/%d/%Y")
       result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call(
         {
           family: family,
-          th_group_info: th_group_info
+          th_group_info: params.require(:tax_household_group).permit(
+            :person_id, :family_actions_id, :effective_date, tax_households: {}
+          ).to_h
         }
       )
 
@@ -792,13 +788,21 @@ class Exchanges::HbxProfilesController < ApplicationController
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
 
+  def inbox
+    authorize HbxProfile, :inbox?
+
+    respond_to do |format|
+      format.html { render "exchanges/hbx_profiles/inbox_messages.html.slim" }
+    end
+  end
+
   def set_date
     authorize HbxProfile, :modify_admin_tabs?
     forms_time_keeper = Forms::TimeKeeper.new(timekeeper_params.to_h)
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
       flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-    rescue Exception => e # rubocop:disable Lint/RescueException
+    rescue StandardError => e
       flash[:error] = "Failed to set date of record, " + e.message
     end
     redirect_to exchanges_hbx_profiles_root_path
