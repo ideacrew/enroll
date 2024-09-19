@@ -11,13 +11,15 @@
       <div id="languageWarning" class="hidden">
         <div class="alert alert-warning d-flex align-items-start">
           <div class="d-flex pl-1">
-            <div class="warning-icon icon" alt="info">&nbsp;</div>
+            <div class="warning-icon icon" alt="info"></div>
           </div>
           <div class="col mr-auto p-0 align-self-center">
             <%= l10n("broker_form.languages_warning") %>
           </div>
           <div class="d-flex pl-1">
-            <a class="close-icon icon icon-sm pr-1" alt="Close" href="#">&nbsp;<span class="sr-only">Close</span></a>
+            <%= link_to '#', class: 'close-icon icon icon-sm pr-1', alt: l10n('close'), onkeydown: "handleButtonKeyDown(event, 'languageWarning')", onclick: "closeWarning(event, 'languageWarning')" do %>
+              <span class="sr-only"><%= l10n('close') %></span>
+            <% end %>
           </div>
         </div>
       </div>
