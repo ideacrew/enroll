@@ -31,7 +31,7 @@ module Effective
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => row.primary_applicant.person.id),"static"]
           ]
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: map_dropdown(dropdown), row_actions_id: "family_actions_#{row.id}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_dropdown(dropdown) : dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
