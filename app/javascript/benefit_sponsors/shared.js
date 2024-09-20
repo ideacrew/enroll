@@ -23,6 +23,14 @@ function checkOLKind(element) {
   }
 }
 
-module.exports = {
-  checkOLKind: checkOLKind
-};
+// ideally, this would be reused as there are a few similar banners
+// in benefit_sponsors that reload the page when closed
+function closeWarning(event, elementId) {
+  event.preventDefault();
+
+  let warning = document.getElementById(elementId);
+  warning.classList.add("hidden");
+}
+
+window.checkOLKind = checkOLKind;
+window.closeWarning = closeWarning;

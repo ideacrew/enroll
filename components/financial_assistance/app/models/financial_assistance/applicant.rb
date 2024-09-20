@@ -391,7 +391,7 @@ module FinancialAssistance
     end
 
     def set_default_tobacco_use
-      self.is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
+      self.is_tobacco_user = "unknown" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
     end
 
     def accept(visitor)
@@ -798,8 +798,7 @@ module FinancialAssistance
     end
 
     def tobacco_user
-      default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
-      person.is_tobacco_user || default_tobacco_use
+      EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "unknown" : (person.is_tobacco_user || "unknown")
     end
 
     def eligibility_determination=(eg)

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: :after_each do
   let(:params) do
-    default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
+    default_tobacco_use = "unknown"
     {:family_id => BSON::ObjectId.new,
      :assistance_year => 2020,
      :benchmark_product_id => BSON::ObjectId.new,

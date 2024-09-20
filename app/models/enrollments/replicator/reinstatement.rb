@@ -220,8 +220,9 @@ module Enrollments
         latest_enrollment = base_enrollment.family.active_household.hbx_enrollments.where(:aasm_state.nin => ['shopping']).order_by(:created_at.desc).first
         enr_members.inject([]) do |members, hbx_enrollment_member|
           member = latest_enrollment.hbx_enrollment_members.where(applicant_id: hbx_enrollment_member.applicant_id).first
-          default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "N"
-          tobacco_use = member&.tobacco_use || default_tobacco_use
+
+          tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "NA" : (member&.tobacco_use || "N")
+
           members << HbxEnrollmentMember.new({
                                                applicant_id: hbx_enrollment_member.applicant_id,
                                                eligibility_date: new_effective_date,

@@ -68,10 +68,10 @@
 
           <div class="d-flex mb-md-4 <%= 'new_dependent' unless is_editing %>">
             <div class="col-md-6 col-lg-3 p-0 ">
-              <%= f.label :ssn, "Social Security" %>
+              <%= f.label :ssn, l10n("social_security") %>
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
                 <%= f.text_field :ssn, placeholder: "000-00-0000", id: "dependent_ssn", class: "required keep-label mask-ssn",
-                  pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+                  pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
                   oninput: "this.setCustomValidity('')", disabled: false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
               <% else %>
                 <%= f.text_field :ssn, placeholder: "000-00-0000", id: "dependent_ssn", class: "required", disabled: false,

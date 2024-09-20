@@ -27,7 +27,18 @@ module Operations
         #   add_attribute :name => "Name", :name_format => "Name Format", :friendly_name => "Friendly Name"
         # end
 
-        settings.idp_slo_service_url = SamlInformation.idp_slo_target_url
+        if EnrollRegistry.feature_enabled?(:saml_single_logout)
+          settings.idp_slo_service_url = SamlInformation.idp_slo_target_url
+          settings.sp_entity_id = EnrollRegistry[:saml_single_logout].setting(:saml_sp_name).item
+          sp_cert = EnrollRegistry[:saml_single_logout].setting(:saml_sp_certificate).item
+          sp_pk = EnrollRegistry[:saml_single_logout].setting(:saml_sp_private_key).item
+          settings.idp_slo_service_binding = "redirect"
+          unless sp_cert.blank? || sp_pk.blank?
+            settings.private_key = sp_pk
+            settings.certificate = sp_cert
+            settings.security[:logout_requests_signed] = true
+          end
+        end
 
         Success(settings)
       end

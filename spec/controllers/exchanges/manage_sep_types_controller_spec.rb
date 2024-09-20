@@ -86,6 +86,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       coverage_end_on: TimeKeeper.date_of_record.next_month.end_of_month.strftime("%Y-%m-%d"),
                                                       event_kind_label: 'event kind label',
                                                       is_visible: true,
+                                                      is_common: false,
                                                       qle_event_date_kind: :qle_on,
                                                       updated_by: '',
                                                       published_by: '',
@@ -252,6 +253,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       event_kind_label: 'event kind label',
                                                       qle_event_date_kind: :qle_on,
                                                       is_visible: true,
+                                                      is_common: false,
                                                       updated_by: '',
                                                       published_by: '',
                                                       created_by: current_user.id,
@@ -319,6 +321,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                         event_kind_label: 'event kind label',
                                                         qle_event_date_kind: :qle_on,
                                                         is_visible: true,
+                                                        is_common: false,
                                                         publish: "Publish",
                                                         updated_by: '',
                                                         published_by: current_user.id,
@@ -593,7 +596,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       before do
         sign_in(current_user)
-        patch :sort, params: params
+        patch :update_list, params: params
       end
 
       context 'success case' do
@@ -622,7 +625,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         before do
           person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
           sign_in(current_user)
-          patch :sort, params: params
+          patch :update_list, params: params
         end
 
         context 'NotAuthorized to access page' do
