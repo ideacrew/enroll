@@ -71,6 +71,7 @@
           <%= f.hidden_field :created_by, value: current_user.id %>
           <%= f.hidden_field :updated_by, value: '' %>
           <%= f.hidden_field :published_by, value: '' %>
+          <%= f.hidden_field :is_common, value: false %>
           <%= f.submit l10n("exchange.manage_sep_types.create_draft"), class:"btn btn-outline-primary" %>
           <%= link_to l10n("exchange.manage_sep_types.cancel"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-outline-primary' %>
         </div>

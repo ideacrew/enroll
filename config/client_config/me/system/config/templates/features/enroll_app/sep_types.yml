@@ -225,8 +225,8 @@ registry:
               description: ''
               is_required: true
               is_visible: true
-      - key: :sort_sep_type
-        item: Operations::QualifyingLifeEventKind::Sort.new
+      - key: :update_sep_types_list
+        item: Operations::QualifyingLifeEventKind::UpdateList.new
         is_enabled: true
       - key: :sep_effective_date_match 
         item: :sep_effective_date_match

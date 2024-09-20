@@ -20,6 +20,7 @@ module Forms
     attribute :market_kind, Types::String
     attribute :effective_on_kinds, Types::Array.of(Types::String)
     attribute :ordinal_position, Types::Integer.default(0)
+    attribute :is_common, Types::Bool
     attribute :_id, Types::String.optional
     attribute :coverage_start_on, Types::Date
     attribute :coverage_end_on, Types::Date

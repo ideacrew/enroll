@@ -117,6 +117,13 @@ $(function () {
     }
   };
 
+  $(document).on('click', "#showMoreLink", function () {
+    var showRareSepsLink = document.getElementById("showMoreLink");
+      event.preventDefault();
+      document.getElementById("showLifeChanges").classList.toggle("hidden");
+      showRareSepsLink.classList.add("hide")
+  });
+
   $(document).on('click', 'a.qle-menu-item', function(e) {
     e.preventDefault();
     init_qle_message();
@@ -316,9 +323,5 @@ $(function () {
         $("#no_qle_checkbox").prop("checked",false)
       });
     }
-  });
-
-  $(document).on('click', '#shop-link', function() {
-		$('#qle_success_submit').trigger('click');
   });
 });
