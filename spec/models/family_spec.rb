@@ -1493,7 +1493,7 @@ describe "set_due_date_on_verification_types" do
   end
 end
 
-describe Family, ".fail_negative_and_pending_verifications", dbclean: :after_each do
+describe Family, ".update_verification_types", dbclean: :after_each do
   let!(:person1) do
     FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role,
                       first_name: 'test10', last_name: 'test30', gender: 'male')
@@ -1534,7 +1534,7 @@ describe Family, ".fail_negative_and_pending_verifications", dbclean: :after_eac
         end
       end
 
-      family.fail_negative_and_pending_verifications
+      family.update_verification_types
 
       people.each do |person|
         person.reload.verification_types.active.each do |verification_type|
@@ -1552,7 +1552,7 @@ describe Family, ".fail_negative_and_pending_verifications", dbclean: :after_eac
         end
       end
 
-      family.fail_negative_and_pending_verifications
+      family.update_verification_types
 
       people.each do |person|
         person.reload.verification_types.active.each do |verification_type|
@@ -1579,7 +1579,7 @@ describe Family, ".fail_negative_and_pending_verifications", dbclean: :after_eac
         end
       end
 
-      family.fail_negative_and_pending_verifications
+      family.update_verification_types
 
       person1.reload.verification_types.active.each do |verification_type|
         expect(verification_type.validation_status).to eq 'outstanding'
@@ -1587,6 +1587,20 @@ describe Family, ".fail_negative_and_pending_verifications", dbclean: :after_eac
 
       person2.reload.verification_types.active.each do |verification_type|
         expect(verification_type.validation_status).to eq 'negative_response_received'
+      end
+    end
+
+    context 'when dependent has outstanding verification type' do
+      before do
+        person2.verification_types.each{ |vt| vt.update!(validation_status: 'outstanding') }
+      end
+
+      it 'update verification type to negative_response_received' do
+        family.update_verification_types
+
+        person2.reload.verification_types.active.each do |verification_type|
+          expect(verification_type.validation_status).to eq 'negative_response_received'
+        end
       end
     end
   end

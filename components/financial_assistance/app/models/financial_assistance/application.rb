@@ -359,7 +359,8 @@ module FinancialAssistance
     end
 
     def enrolled_with(enrollment)
-      active_enrollments = enrollment.family.hbx_enrollments.enrolled_and_renewing
+      family = enrollment.family
+      active_enrollments = family.hbx_enrollments.enrolled_and_renewing
 
       enrollment.hbx_enrollment_members.each do |enrollment_member|
         family_member_id =  enrollment_member.applicant_id
@@ -367,6 +368,15 @@ module FinancialAssistance
         next if ineligible_for_evidence_update?(enrollment, active_enrollments, family_member_id)
 
         applicant&.enrolled_with(enrollment)
+      end
+
+      enrolled_member_ids = active_enrollments.by_health.by_year(enrollment.effective_on.year).flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
+
+      family.active_family_members.where(:id.nin => enrollment.hbx_enrollment_members.map(&:applicant_id)).each do |family_member|
+        next if enrolled_member_ids.include?(family_member.id)
+
+        applicant = applicants.where(family_member_id: family_member.id).first
+        applicant&.move_outstanding_to_nrr_status
       end
     end
 
