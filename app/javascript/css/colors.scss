@@ -100,9 +100,9 @@
   --input-text-color: #454545;
   --form-element-text-color: #454545;
 
-  --button-default-color: #a21e1f;
-  --button-default-hover-color: #85191a;
-  --button-default-active-color: #671314;
+  --button-default-color: var(--primary-color);
+  --button-default-hover-color: var(--primary-hover-color);
+  --button-default-active-color: var(--primary-color-darker);
 
   --button-outline-hover-bg: #e2e9ee;
   --button-outline-active-bg: #cedae3;
@@ -125,9 +125,9 @@
   --button-tertiary-hover-color: #50662e;
   --button-tertiary-active-color: #3c4c23;
 
-  --button-error-color: var(--status-red);
-  --button-error-hover-color: var(--status-red-hover);
-  --button-error-active-color: var(--status-red-active);
+  --button-error-color: #a21e1f;
+  --button-error-hover-color: #85191a;
+  --button-error-active-color: #671314;
 
   --badge-current-bg: hsla(206, 30%, 82%, 1);
   --badge-current-border: hsla(206, 33%, 66%, 1);
