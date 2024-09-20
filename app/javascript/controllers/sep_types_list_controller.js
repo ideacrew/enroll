@@ -145,7 +145,7 @@ class UpdateOrderManager extends UpdateListManager {
       card.dataset.ordinal_position = index + 1;
     }
 
-    let sortData = [...enumeratedCards].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } });
+    let sortData = enumeratedCards.map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } });
     super.updateList({sort_data: sortData}, event.item.textContent);
 	}
 }
