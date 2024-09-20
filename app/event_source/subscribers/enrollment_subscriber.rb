@@ -101,7 +101,7 @@ module Subscribers
       assistance_year = enrollment.effective_on.year
 
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
-        family.fail_negative_and_pending_verifications
+        family.update_verification_types
         application = fetch_application(enrollment)
         subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}"
         application&.enrolled_with(enrollment)
