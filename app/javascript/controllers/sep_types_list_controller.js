@@ -46,9 +46,10 @@ class UpdateListManager {
   }
 
   /**
-   * Perform a PATCH request to update the QLE list.
+   * Perform a PATCH request to update the QLE list and shows the response banner.
    * @param {Object} body The request body containing the list update data.
-   * @returns {Promise} The fetch request promise.
+   * @param {String} bannerDescription The message to use in the legacy response banner subheader.
+   * @returns {Bool} The success status of the request.
    */
   async updateList(body, bannerDescription) {
     body.market_kind = this.marketKind;
@@ -71,6 +72,8 @@ class UpdateListManager {
   /**
    * Show or hide the respective response banner.
    * @param {boolean} isSuccess The success status of the request.
+   * @param {string} bannerTitle The message to use in the legacy response banner header.
+   * @param {string} bannerDescription The message to use in the legacy response banner subheader.
    */
   showBanner(isSuccess, bannerTitle, bannerDescription) {
     if (bs4) {
