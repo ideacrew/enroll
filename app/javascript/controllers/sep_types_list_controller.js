@@ -63,7 +63,7 @@ class UpdateListManager {
 
     let data = await response.json();
     let isSuccess = data["status"] === "success";
-    this.showBanner(data, data["message"], bannerDescription);
+    this.showBanner(isSuccess, data["message"], bannerDescription);
 
     return isSuccess;
   }
@@ -83,16 +83,17 @@ class UpdateListManager {
       var flashDiv = $("#sort_notification_msg");
       var flashHeader = flashDiv.find(".toast-header");
       flashDiv.show();
-      flashDiv.toggleClass("success", isSuccess);
-      flashDiv.toggleClass("error", !isSuccess);
-      flashHeader.toggleClass("success", isSuccess);
-      flashHeader.toggleClass("error", !isSuccess);
+      
+      flashDiv.removeClass("success").removeClass("error");
+      flashDiv.toggleClass("success", isSuccess).toggleClass("error", !isSuccess);
+      flashHeader.removeClass("success").removeClass("error");
+      flashHeader.toggleClass("success", isSuccess).toggleClass("error", !isSuccess);
       
       flashHeader.find("strong").text(bannerTitle);
+     
       var flashBody = flashDiv.find(".toast-body");
       if (bannerDescription) {
-        flashBody.removeClass("hidden");
-        flashBody.text(bannerDescription);
+        flashBody.removeClass("hidden").text(bannerDescription);
       } else {
         flashBody.addClass("hidden");
       }
@@ -142,7 +143,7 @@ class UpdateOrderManager extends UpdateListManager {
     }
 
     let sortData = [...enumeratedCards].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } });
-    super.updateList({sort_data: sortData}, bs4 ? nil : event.item.textContent);
+    super.updateList({sort_data: sortData}, event.item.textContent);
 	}
 }
 
