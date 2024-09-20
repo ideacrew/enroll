@@ -1,11 +1,8 @@
 module UserWorld
   def employee(employer = nil)
-  def employee(employer = nil)
     if @employee
       @employee
     else
-      employer_staff_role = FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer.profiles.first.id)
-      person = FactoryBot.create(:person, employer_staff_roles: [employer_staff_role])
       employer_staff_role = FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer.profiles.first.id)
       person = FactoryBot.create(:person, employer_staff_roles: [employer_staff_role])
       @employee = FactoryBot.create(:user, :person => person)
@@ -14,11 +11,9 @@ module UserWorld
 
   def employer_staff
     @employer_staff || @employer_staff = FactoryBot.create(:user, :employer_staff, email: "employer@example.com")
-    @employer_staff || @employer_staff = FactoryBot.create(:user, :employer_staff, email: "employer@example.com")
   end
 
   def employee_role
-    @employee_role || @employee_role = FactoryBot.create(:user, :employee, email: "employee@example.com")
     @employee_role || @employee_role = FactoryBot.create(:user, :employee, email: "employee@example.com")
   end
 
@@ -81,23 +76,7 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) l
          when "Employer"
            employee(employer)
          when "Broker"
-  user = case type
-         when "Employer"
-           employee(employer)
-         when "Broker"
     # in features/step_definitions/broker_employee_quote_steps.rb BrokerWorld module
-           broker(email: "broker@example.com")
-         when "HBX staff"
-           admin(subrole)
-         when 'Employer Role'
-           employer_staff
-         when 'Employee Role'
-           employee_role
-         when 'HBX CSR Tier1'
-           admin('hbx_csr_tier1')
-         else
-           users_by_role(type)
-         end
            broker(email: "broker@example.com")
          when "HBX staff"
            admin(subrole)
@@ -115,10 +94,6 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) l
     login_as(user, :scope => :user)
   when 'is not'
     nil
-  when 'is'
-    login_as(user, :scope => :user)
-  when 'is not'
-    nil
   end
 end
 
@@ -130,16 +105,6 @@ end
 
 And(/^user with (.*?) role is (.*?)$/) do |type, locked_status|
   case type
-  when "Employer"
-    user = employee(employer)
-  when "Broker"
-    user = broker
-  when "HBX staff"
-    user = admin(subrole)
-  when 'Employer Role'
-    user = employer_staff
-  when 'Employee Role'
-    user = employee_role
   when "Employer"
     user = employee(employer)
   when "Broker"
@@ -187,23 +152,23 @@ When(/^the user clicks Action for that Employer$/) do
 end
 
 Then(/^the user will see the Extend Open Enrollment button$/) do
-  expect(page).to have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
+  expect(page).to have_css('.action-item', text: 'Extend Open Enrollment')
 end
 
 And(/^the user clicks the Plan Years button$/) do
-  find('.btn.btn-xs', text: 'Plan Years', wait: 5).click
+  find('.action_item', text: 'Plan Years', wait: 5).click
 end
 
 Then(/^the user will see the Plan Years button$/) do
-  find('.btn.btn-xs', text: 'Plan Years', wait: 5).click
+  find('.action_item', text: 'Plan Years', wait: 5).click
 end
 
 Then(/^the user will not see the Extend Open Enrollment button$/) do
-  expect(page).to_not have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
+  expect(page).to_not have_css('.action_item', text: 'Extend Open Enrollment')
 end
 
 When(/^the user clicks Extend Open Enrollment$/) do
-  find('.btn.btn-xs', text: 'Extend Open Enrollment').click
+  find('.action_item', text: 'Extend Open Enrollment').click
 end
 
 When(/^the user clicks Edit Open Enrollment$/) do
@@ -216,7 +181,6 @@ end
 
 Then(/^the user enters a new open enrollment end date$/) do
   input = find('input.hasDatepicker')
-  input.set(Date.today + 1.week)
   input.set(Date.today + 1.week)
 end
 
@@ -262,7 +226,6 @@ When(/^the user clicks the X icon on the Create Plan Year form$/) do
 end
 
 Then(/^the Effective End Date will populate with a date equal to one year minus (\d+) day from the Effective Start Date$/) do |_arg1|
-Then(/^the Effective End Date will populate with a date equal to one year minus (\d+) day from the Effective Start Date$/) do |_arg1|
   pending # Write code here that turns the phrase above into concrete actions
 end
 
@@ -272,17 +235,17 @@ end
 
 Then(/^the user will( not)? see the Change FEIN button$/) do |visible|
   if visible.blank?
-    expect(page).to have_css('.btn.btn-xs', text: 'Change FEIN')
+    expect(page).to have_css('.action_button', text: 'Change FEIN')
   else
-    expect(page).to_not have_css('.btn.btn-xs', text: 'Change FEIN')
+    expect(page).to_not have_css('.action_button', text: 'Change FEIN')
   end
 end
 
 Then(/^the user will( not)? see the Force Publish button$/) do |visible|
   if visible.blank?
-    expect(page).to have_css('.btn.btn-xs', text: 'Force Publish')
+    expect(page).to have_css('.action_button', text: 'Force Publish')
   else
-    expect(page).to_not have_css('.btn.btn-xs', text: 'Force Publish')
+    expect(page).to_not have_css('.action_button', text: 'Force Publish')
   end
 end
 
