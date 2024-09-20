@@ -378,13 +378,13 @@ end
 And(/^Primary broker clicks Actions dropdown and clicks Create Quote$/) do
   find(BrokerEmployersPage.actions_dropdown).click
   wait_for_ajax
-  expect(page).to have_css('.btn.btn-xs', text: 'Create Quote')
+  expect(page).to have_css('.action_item', text: 'Create Quote')
   find(:css,'div[id^="plan_design_"]').find(:css, 'ul>li:nth-child(2)>a').click
 end
 
 And(/^Primary broker clicks Actions dropdown and clicks Assign General Agency$/) do
   find(BrokerEmployersPage.actions_dropdown).click
-  expect(page).to have_css('.btn.btn-xs', text: 'Assign General Agency')
+  expect(page).to have_css('.action_item', text: 'Assign General Agency')
   find(BrokerEmployersPage.assign_general_agency).click
 end
 
