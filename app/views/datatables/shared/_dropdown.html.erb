@@ -35,30 +35,30 @@
           <% if line[0] == 'Edit APTC / CSR' %>
             <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "edit_aptc_csr_#{row_actions_id}", disabled: true, remote: true) %>
           <% else %>
-            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "", disabled: true) %>
+            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "action_item", disabled: true) %>
           <% end %>
         <%when "static"%>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "", data: {turbolinks: false}) %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "action_item", data: {turbolinks: false}) %>
         <% when "post" %>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "") %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "action_item") %>
         <%when "post_ajax"%>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "",remote: true) %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "action_item",remote: true) %>
         <%when "post_ajax_with_confirmation"%>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "", remote: true, data: { confirm: line[3] }) %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], method: :post, class: "action_item", remote: true, data: { confirm: line[3] }) %>
         <%when "ajax"%>
           <% if line[0] == l10n('admin_actions.edit_aptc_csr') %>
             <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "edit-aptc-csr-enabled", remote: true) %>
           <% else %>
-            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "", remote: true) %>
+            <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "action_item", remote: true) %>
           <% end %>
         <%when "ajax with confirm"%>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "", remote: true, data: { confirm: line[3] }) %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "action_item", remote: true, data: { confirm: line[3] }) %>
         <%when "delete with confirm"%>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "", :method => 'delete', data: { confirm: line[3] }) %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "action_item", :method => 'delete', data: { confirm: line[3] }) %>
         <% when "delete ajax with confirm"%>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "", :method=> 'delete', data: { confirm: line[3] }) %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "action_item", :method=> 'delete', data: { confirm: line[3] }) %>
         <% when "delete ajax with confirm and elementId"%>
-          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4]) %>
+          <%= link_to_with_noopener_noreferrer(line[0], line[1], class: "action_item", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4]) %>
         <%end%>
       </li>
     <% end %>
