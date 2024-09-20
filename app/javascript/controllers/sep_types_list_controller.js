@@ -50,7 +50,7 @@ class UpdateListManager {
    * @param {Object} body The request body containing the list update data.
    * @returns {Promise} The fetch request promise.
    */
-  async updateList(body) {
+  async updateList(body, bannerDescription) {
     body.market_kind = this.marketKind;
 		const response = await fetch('update_list', {
       method: 'PATCH',
@@ -60,19 +60,47 @@ class UpdateListManager {
         'X-CSRF-Token': Rails.csrfToken()
       }
     });
-    return await response.json();
+
+    let data = await response.json();
+    let isSuccess = data["status"] === "success";
+    this.showBanner(data, data["message"], bannerDescription);
+
+    return isSuccess;
   }
 
   /**
    * Show or hide the respective response banner.
    * @param {boolean} isSuccess The success status of the request.
    */
-  showBanner(isSuccess) {
-    const successBanner = $('#success-flash');
-    const errorBanner = $('#error-flash');
-    successBanner.toggleClass('hidden', !isSuccess)
-    errorBanner.toggleClass('hidden', isSuccess)
-    return isSuccess ? successBanner : errorBanner;
+  showBanner(isSuccess, bannerTitle, bannerDescription) {
+    if (bs4) {
+      const successBanner = $('#success-flash');
+      const errorBanner = $('#error-flash');
+      successBanner.toggleClass('hidden', !isSuccess)
+      errorBanner.toggleClass('hidden', isSuccess)
+      var flashDiv = isSuccess ? successBanner : errorBanner;
+    } else {
+      var flashDiv = $("#sort_notification_msg");
+      var flashHeader = flashDiv.find(".toast-header");
+      flashDiv.show();
+      flashDiv.toggleClass("success", isSuccess);
+      flashDiv.toggleClass("error", !isSuccess);
+      flashHeader.toggleClass("success", isSuccess);
+      flashHeader.toggleClass("error", !isSuccess);
+      
+      flashHeader.find("strong").text(bannerTitle);
+      var flashBody = flashDiv.find(".toast-body");
+      if (bannerDescription) {
+        flashBody.removeClass("hidden");
+        flashBody.text(bannerDescription);
+      } else {
+        flashBody.addClass("hidden");
+      }
+    }
+
+    setTimeout(function() {
+      flashDiv.addClass('hidden');
+    }, 3500);
   }
 }
 
@@ -107,35 +135,14 @@ class UpdateOrderManager extends UpdateListManager {
       return;
     }
 
-    // map the card elements to an array of card ids and their ordinal positions
-    let enumeratedCards = cards.entries();
+    let enumeratedCards = [...cards.entries()];
     for (const [index, card] of enumeratedCards) {
       card.dataset.index = index;
       card.dataset.ordinal_position = index + 1;
     }
-    let sortData = [...enumeratedCards].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } });
-    super.updateList({sort_data: sortData})
-      .then(data => {
-        let isSuccess = data['status'] === "success";
-        if (bs4) {
-          var flashDiv = super.showBanner(isSuccess);
-        } else {
-          var flashDiv = $("#sort_notification_msg");
-          var flashHeader = flashDiv.find(".toast-header");
-          flashDiv.show();
-          flashDiv.toggleClass("success", isSuccess);
-          flashDiv.removeClass("error", !isSuccess);
-          flashHeader.toggleClass("success", isSuccess);
-          flashHeader.removeClass("error", !isSuccess);
-          
-          flashHeader.find("strong").text(data['message']);
-          flashDiv.find(".toast-body").text(event.item.textContent);
-        }
 
-        setTimeout(function() {
-          flashDiv.addClass('hidden');
-        }, 3500);
-		})
+    let sortData = [...enumeratedCards].map((entry) => { return { id: entry[1].dataset.id, position: entry[0] + 1 } });
+    super.updateList({sort_data: sortData}, bs4 ? nil : event.item.textContent);
 	}
 }
 
@@ -156,11 +163,9 @@ class UpdateThresholdManager extends UpdateListManager {
     let threshold = this.thresholdInputTarget.value;
 
     super.updateList({commonality_threshold: threshold})
-      .then(data => {
-        let isSuccess = data['status'] === 'success';
+      .then(isSuccess => {
         if (isSuccess) {
           this.thresholdInputTarget.dataset.initialValue = threshold;
-          super.showBanner(true);
 
           // move the threshold marker to the new threshold index or hide it if out of bounds
           let thresholdMarker = this.qleList.find('#threshold-marker').removeClass('hidden');
@@ -172,7 +177,6 @@ class UpdateThresholdManager extends UpdateListManager {
           }
         } else {
           this.thresholdInputTarget.value = this.thresholdInputTarget.dataset.initialValue;
-          super.showBanner(false);
         }
       })
   }
