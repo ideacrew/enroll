@@ -152,23 +152,23 @@ When(/^the user clicks Action for that Employer$/) do
 end
 
 Then(/^the user will see the Extend Open Enrollment button$/) do
-  expect(page).to have_css('.action-item', text: 'Extend Open Enrollment')
+  expect(page).to have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
 end
 
 And(/^the user clicks the Plan Years button$/) do
-  find('.action_item', text: 'Plan Years', wait: 5).click
+  find('.btn.btn-xs', text: 'Plan Years', wait: 5).click
 end
 
 Then(/^the user will see the Plan Years button$/) do
-  find('.action_item', text: 'Plan Years', wait: 5).click
+  find('.btn.btn-xs', text: 'Plan Years', wait: 5).click
 end
 
 Then(/^the user will not see the Extend Open Enrollment button$/) do
-  expect(page).to_not have_css('.action_item', text: 'Extend Open Enrollment')
+  expect(page).to_not have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
 end
 
 When(/^the user clicks Extend Open Enrollment$/) do
-  find('.action_item', text: 'Extend Open Enrollment').click
+  find('.btn.btn-xs', text: 'Extend Open Enrollment').click
 end
 
 When(/^the user clicks Edit Open Enrollment$/) do
@@ -243,9 +243,9 @@ end
 
 Then(/^the user will( not)? see the Force Publish button$/) do |visible|
   if visible.blank?
-    expect(page).to have_css('.action_button', text: 'Force Publish')
+    expect(page).to have_css('.btn.btn-xs', text: 'Force Publish')
   else
-    expect(page).to_not have_css('.action_button', text: 'Force Publish')
+    expect(page).to_not have_css('.btn.btn-xs', text: 'Force Publish')
   end
 end
 
