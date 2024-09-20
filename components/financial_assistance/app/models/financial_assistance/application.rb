@@ -1779,6 +1779,11 @@ module FinancialAssistance
 
     def delete_eligibility_determinations
       eligibility_determinations.destroy_all
+      applicants.each do |applicant|
+        applicant.eligibility_determination_id = nil
+        applicant.tax_filer_kind = nil
+      end
+      self.save!
     end
 
     def create_evidences

@@ -1043,6 +1043,14 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
             it 'should transition application to renewal_draft' do
               expect(application.reload.renewal_draft?).to be_truthy
             end
+
+            it 'applicants should not have eligibility determination references' do
+              expect(application.applicants.pluck(:eligibility_determination_id).uniq).to eq [nil]
+            end
+
+            it 'applicants should not have tax_filer_kind' do
+              expect(application.applicants.pluck(:tax_filer_kind).uniq).to eq [nil]
+            end
           end
 
           context 'guard failure' do
