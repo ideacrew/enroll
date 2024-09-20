@@ -11,20 +11,6 @@ module Operations
         class LatestReport
           include Dry::Monads[:do, :result]
 
-          # @!attribute [r] jobs_per_iteration
-          #   @return [Integer] The number of jobs to process per iteration.
-          # @!attribute [r] job_id
-          #   @return [Integer] The ID of the latest job.
-          # @!attribute [r] logger_name
-          #   @return [String] The name of the logger.
-          # @!attribute [r] logger
-          #   @return [Logger] The logger instance.
-          # @!attribute [r] jobs
-          #   @return [Array<CvValidationJob>] The list of CV validation jobs.
-          # @!attribute [r] csv_field_names
-          #   @return [Array<String>] The field names for the CSV report.
-          attr_reader :jobs_per_iteration, :job_id, :logger_name, :logger, :jobs, :csv_field_names
-
           # Generates the latest CV Validation Job report.
           #
           # @param params [Hash] The parameters for generating the report.
@@ -49,7 +35,7 @@ module Operations
           # @return [Dry::Monads::Result::Success<String>, Dry::Monads::Result::Failure<String>]
           def fetch_logger_name
             Success(
-              "#{Rails.root}/latest_cv_validation_job_logger_#{job_id}_#{DateTime.now.strftime('%Y_%m_%d_%H_%M_%S')}.log"
+              "#{Rails.root}/latest_cv_validation_job_logger_#{DateTime.now.strftime('%Y_%m_%d_%H_%M_%S')}.log"
             )
           end
 
@@ -57,7 +43,7 @@ module Operations
           #
           # @return [Dry::Monads::Result::Success<Logger>, Dry::Monads::Result::Failure<String>]
           def generate_log_file
-            Success(Logger.new(logger_name))
+            Success(Logger.new(@logger_name))
           end
 
           # Validates the parameters.
@@ -68,10 +54,10 @@ module Operations
           def validate(params)
             if params[:jobs_per_iteration].to_i < 0
               failure_msg = "Invalid jobs_per_iteration: #{params[:jobs_per_iteration]}. Please pass jobs_per_iteration as a positive integer."
-              logger.error failure_msg
+              @logger.error failure_msg
               Failure(failure_msg)
             else
-              logger.info "Validating jobs_per_iteration: #{params[:jobs_per_iteration]}."
+              @logger.info "Validating jobs_per_iteration: #{params[:jobs_per_iteration]}."
               Success(params[:jobs_per_iteration].to_i)
             end
           end
@@ -83,11 +69,11 @@ module Operations
             latest_job_id = CvValidationJob.latest_job_id
 
             if latest_job_id.present?
-              logger.info "Latest CV Validation Job ID: #{latest_job_id}."
+              @logger.info "Latest CV Validation Job ID: #{latest_job_id}."
               Success(latest_job_id)
             else
               msg = 'No CV Validation Job found'
-              logger.error msg
+              @logger.error msg
               Failure(msg)
             end
           end
@@ -97,7 +83,7 @@ module Operations
           # @return [Dry::Monads::Result::Success<Array<CvValidationJob>>, Dry::Monads::Result::Failure<String>]
           def fetch_cv_validation_jobs
             Success(
-              CvValidationJob.by_job_id(job_id).order(:_id.asc).only(
+              CvValidationJob.by_job_id(@job_id).order(:_id.asc).only(
                 :_id,
                 :primary_person_hbx_id,
                 :family_hbx_id,
@@ -132,17 +118,17 @@ module Operations
           # @param counter [Integer] The current iteration counter.
           # @return [void]
           def process_jobs(counter)
-            offset_count = jobs_per_iteration * counter
-            file_name = "#{Rails.root}/latest_cv_validation_job_report_#{job_id}_#{counter.next}_#{DateTime.now.strftime('%Y_%m_%d_%H_%M_%S')}.csv"
+            offset_count = @jobs_per_iteration * counter
+            file_name = "#{Rails.root}/latest_cv_validation_job_report_#{@job_id}_#{counter.next}_#{DateTime.now.strftime('%Y_%m_%d_%H_%M_%S')}.csv"
 
-            logger.info "---- Processing jobs from offset: #{offset_count} and limit: #{jobs_per_iteration}"
+            @logger.info "---- Processing jobs from offset: #{offset_count} and limit: #{@jobs_per_iteration}"
 
             CSV.open(file_name, 'w', force_quotes: true) do |csv|
-              csv << csv_field_names
-              logger.info "Writing to CSV: #{file_name}."
+              csv << @csv_field_names
+              @logger.info "Writing to CSV: #{file_name}."
 
-              jobs.skip(offset_count).limit(jobs_per_iteration).each do |job|
-                logger.info "Processing job: #{job.id}"
+              @jobs.skip(offset_count).limit(@jobs_per_iteration).each do |job|
+                @logger.info "Processing job: #{job.id}"
 
                 csv << [
                   job.primary_person_hbx_id,
@@ -154,9 +140,9 @@ module Operations
                   job.cv_payload_transformation_time
                 ]
 
-                logger.info "Processed job: #{job.job_id}"
+                @logger.info "Processed job: #{job.job_id}"
               rescue StandardError => e
-                logger.error "Error processing job: #{job.job_id} - #{e.message}"
+                @logger.error "Error processing job: #{job.job_id} - #{e.message}"
               end
             end
           end
@@ -165,8 +151,8 @@ module Operations
           #
           # @return [Dry::Monads::Result::Success<String>, Dry::Monads::Result::Failure<String>]
           def generate_report
-            total_jobs = jobs.count
-            number_of_iterations = (total_jobs / jobs_per_iteration.to_f).ceil
+            total_jobs = @jobs.count
+            number_of_iterations = (total_jobs / @jobs_per_iteration.to_f).ceil
             counter = 0
 
             while counter < number_of_iterations
@@ -175,7 +161,7 @@ module Operations
             end
 
             Success(
-              "Latest CV Validation Job report generated with multiple CSVs named 'latest_cv_validation_job_report_#{job_id}_*.csv' and log file: #{logger_name}"
+              "Latest CV Validation Job report generated with multiple CSVs named 'latest_cv_validation_job_report_#{@job_id}_*.csv' and log file: #{@logger_name}"
             )
           end
         end
