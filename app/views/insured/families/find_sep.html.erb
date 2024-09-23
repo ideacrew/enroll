@@ -11,7 +11,7 @@
         <% def list_class(qles) "qle-menu #{'two-column' if qles.length > 5}" end %>
         <section>
           <h2><%= l10n('insured.families.special_enrollment_period.common_header') %></h2>
-          <ul class=<%= list_class(@common_seps) %>>
+          <ul class="<%= list_class(@common_seps) %>">
             <% @common_seps&.each_with_index do |qle, index| %>
               <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
             <% end %>
@@ -21,7 +21,7 @@
           <button id="showMoreLink" class="button secondary my-3"><%= l10n('insured.families.special_enrollment_period.show_rare') %></button>
           <section class="hidden mt-3" id="showLifeChanges">
             <h2><%= l10n('insured.families.special_enrollment_period.rare_header') %></h2>
-            <ul class=<%= list_class(@rare_seps) %>>
+            <ul class="<%= list_class(@rare_seps) %>">
               <% @rare_seps.each_with_index do |qle, index| %>
                 <li class="<%=pundit_class Family, :updateable?%> mb-3"><%= qle_link_generator(qle, index) %></li>
               <% end %>
