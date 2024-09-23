@@ -75,7 +75,9 @@
           <br />
           <table  class="table table-striped">
             <tr>
-              <th></th>
+              <% unless @bs4 %>
+                <th></th>
+              <% end %>
               <th>HBX ID</th>
               <th>Plan</th>
               <th>Effective Date</th>
@@ -85,19 +87,47 @@
             </tr>
             <% @enrollments.each_with_index do |hbx, index| %>
                 <tr>
-                  <td> <%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %> </td>
-                  <td><%= hbx.hbx_id %></td>
+                  <% unless @bs4 %>
+                    <td><%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %></tr>
+                  <% end %>
+                  <td>
+                    <% if @bs4 %>
+                      <label>
+                        <%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %>
+                        <%= hbx.hbx_id  %>
+                      </label>
+                    <% else %>
+                      <%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %>
+                    <% end %>
+                  </td>
                   <td><%= hbx.product.name %></td>
                   <td id="enrollment_effective_on"><%= hbx.effective_on %></td>
                   <% term_or_expire_date = hbx.fetch_term_or_expiration_date %>
                   <td><%= term_or_expire_date %></td>
                   <% max_date = hbx.prior_plan_year_coverage? || hbx.active_plan_year_coverage? ? (hbx.is_shop? ? hbx.sponsored_benefit_package.end_on : hbx.effective_on.end_of_year) : hbx.terminated_on %> 
                     <% if @bs4 %>
-                      <td><%= date_field_tag :new_termination_date, nil, disabled: true, value: term_or_expire_date, id: "termination-date-picker_#{hbx.id}", min: date_field_value(hbx.effective_on), max: date_field_value(max_date)  %></td>
+                      <td>
+                        <% id = "termination-date-picker_#{hbx.id}" %>
+                        <label>
+                          <span class="text-nowrap pr-2"><%= l10n("end_date") %></span>
+                          <%= date_field_tag :new_termination_date, nil, disabled: true, value: term_or_expire_date, id: id, min: date_field_value(hbx.effective_on), max: date_field_value(max_date)  %>
+                        </label>
+                      </td>
                     <% else %>
                       <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value: term_or_expire_date, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" => hbx.effective_on, "data-date-max" => max_date  %></td>
                     <% end %>
-                  <td><%= check_box_tag "edi_required", hbx.id, false,  disabled: true%></td>
+                  <td>
+                    <% if @bs4 %>
+                      <div class="d-flex flex-column">
+                        <label class="align-self-start">
+                          <%= check_box_tag "edi_required", hbx.id, false,  disabled: true%>
+                          <%= l10n("Transmit") %>
+                        </label>
+                      </div>
+                    <% else %>
+                      <%= check_box_tag "edi_required", hbx.id, false,  disabled: true%>
+                    <% end %>
+                  </td>
                 </tr>
             <% end %>
             <tr><td colspan = "7"><br /></td></tr>
@@ -114,7 +144,7 @@
       <h4 class='title'>No Enrollments to terminate</h4>
   <%end%>
 
-  <div class="modal <%= 'fade' unless @bs4 %>" id="termiante_with_earlier_date" tabindex="-1" role="dialog" aria-labelledby="RetermConfirm" role="document">
+  <div class="modal <%= 'fade' unless @bs4 %>" id="termiante_with_earlier_date" tabindex="-1" role="dialog" aria-labelledby=<%= "RetermConfirm" unless @bs4 %> role="document">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header" style="border-bottom:none">
