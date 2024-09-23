@@ -8,27 +8,6 @@ class Exchanges::HbxProfilesController < ApplicationController
   include HtmlScrubberUtil
   include StringScrubberUtil
 
-  if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
-    before_action :enable_bs4_layout, only: [
-      :show,
-      :family_index_dt,
-      :add_sep_form,
-      :new_eligibility,
-      :process_eligibility,
-      :show_sep_history,
-      :cancel_enrollment,
-      :terminate_enrollment,
-      :drop_enrollment_member,
-      :view_enrollment_to_update_end_date,
-      :view_terminated_hbx_enrollments,
-      :new_secure_message,
-      :edit_dob_ssn,
-      :get_user_info,
-      :hide_form,
-      :outstanding_verification_dt,
-      :user_account_index
-    ]
-  end
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :configuration, :broker_agency_index, :inbox, :show, :binder_index]

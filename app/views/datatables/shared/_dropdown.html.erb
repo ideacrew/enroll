@@ -1,4 +1,4 @@
-<% if false # @bs4 %>
+<% if @bs4 %>
   <% row_actions_id = local_assigns[:row_actions_id].present? ? local_assigns[:row_actions_id] : nil %>
    <div class="dropdown" id="<%= row_actions_id %>">
     <button class="btn outline p-2 px-3 dropdown-toggle" type="button" data-display="static" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdown_for_<%= row_actions_id %>">
