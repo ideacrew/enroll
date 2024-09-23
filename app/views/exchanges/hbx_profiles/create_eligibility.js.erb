@@ -14,3 +14,5 @@ if ( $parent_row.next().hasClass('child-row') || $parent_row.next().hasClass('ch
 else {
   $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "create_eligibility"%></td></tr>');
 }
+
+$(".edit_aptc_csr_<%= @element_to_replace_id %>").removeAttr('disabled')
