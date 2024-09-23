@@ -45,7 +45,7 @@
                 <label>
                   <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer') %>
                   <%= l10n('yes') %>
-                <label>
+                </label>
               <% else %>
                 <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer') %>
                 <label>Yes</label>
