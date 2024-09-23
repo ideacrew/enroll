@@ -45,14 +45,14 @@ module UserWorld
       hbx_profile_id = FactoryBot.create(:hbx_profile).id
       person = FactoryBot.create(:person)
       raise "No subrole was provided" if subrole.blank?
-      if Permission.where(name: subrole).present?
+      if Permission.where(name: subrole).present? # rubocop:disable Style/GuardClause
         permission = Permission.where(name: subrole).first
         permission.update_attributes(can_modify_plan_year: true)
         permission_id = permission.id
       else
         raise "No permission was found for subrole #{subrole}"
       end
-      hbx_staff_role = HbxStaffRole.create!(person: person, permission_id: permission_id, subrole: subrole, hbx_profile_id: hbx_profile_id)
+      HbxStaffRole.create!(person: person, permission_id: permission_id, subrole: subrole, hbx_profile_id: hbx_profile_id)
       @admin = FactoryBot.create(:user,:with_hbx_staff_role, :person => person)
     end
   end
