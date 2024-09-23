@@ -6,13 +6,21 @@
 		<div class="col-md-8 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
 			<div class="radio skinned-form-controls skinned-form-controls-mac">
 				<%= radio_button_tag "market_kind", "shop", value: true, class: "required floatlabel"  %>
-				<label><span>SHOP</span></label>
+        <% if @bs4 %>
+          <label for="market_kind_shop" class="required"><%= l10n('shop') %></label>
+        <% else %>
+				  <label><span>SHOP</span></label>
+        <% end %>
 			</div>
 		</div>
 		<div class="col-md-4 col-sm-4 col-xs-4 form-group form-group-lg no-pd">
 			<div class="radio skinned-form-controls skinned-form-controls-mac">
 				<%= radio_button_tag "market_kind", "ivl", value: true, class: "required floatlabel"  %>
-				<label><span>IVL</span></label>
+        <% if @bs4 %>
+          <label for="market_kind_ivl" class="required"><%= l10n('ivl') %></label>
+        <% else %>
+				  <label><span>IVL</span></label>
+        <% end %>
 			</div>
 		</div>
 	</div>
@@ -31,31 +39,34 @@
         <div class = "kind">
           <%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
         </div>
-        <div class='admin_selected_sep_reason col-md-3 col-sm-3 col-xs-12 px-0'>
-          <%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'form-control', required: true, prompt: "SEP REASON" %>
+        <div class='d-flex flex-column admin_selected_sep_reason col-md-3 col-sm-3 col-xs-12 px-0'>
+          <label for="qle_id" class="align-self-start required">SEP Reason</label>
+          <%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'form-control', required: true, prompt: l10n('select') %>
         </div>
-        <div class='init_event_date col-sm-3 col-xs-12 px-0 '>
-          <label for="event_date">EVENT DATE</label>
+        <div class='d-flex flex-column init_event_date col-sm-3 col-xs-12 px-0 '>
+          <label for="event_date" class="align-self-start required">Event Date</label>
           <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: date_field_value(110.years.ago), max: date_field_value(110.years.from_now), required: true, class: "qle-date-picker" %>
         </div>
-        <div class='admin_effective_on_kind_options col-sm-3 col-xs-12 px-0'>
-          <%= select_tag :effective_on_date, class: "form-control qle-date-kind", required: true,  prompt: "EFFECTIVE DATE RULE" %>
+        <div class='d-flex flex-column admin_effective_on_kind_options col-sm-3 col-xs-12 px-0'>
+          <label for="effective_on_date" class="align-self-start required">Event Date</label>
+          <%= select_tag :effective_on_date, class: "form-control qle-date-kind", required: true %>
         </div>
-        <div class='csl_num_options col-sm-3 col-xs-12 px-0 csl_width'>
-          <%= text_field_tag :csl_num, "", maxlength: 10, class: "floatlabel form-control mask-csl csl_width", placeholder: "CSL#" %>
+        <div class='d-flex flex-column csl_num_options col-sm-3 col-xs-12 px-0 csl_width'>
+          <label for="csl_num" class="align-self-start">CSL #</label>
+          <%= text_field_tag :csl_num, "", maxlength: 10, class: "align-items-center mask-csl csl_width", placeholder: "0000000000" %>
         </div>
       </div>
       <div class='row p-2 sep_dates_filter justify-content-around'>
-        <div class="start_btn start_end_date col-sm-4 col-xs-12 px-0 start_input">
-          <label for="start_on">SEP Start Date</label>
+        <div class="d-flex flex-column start_btn start_end_date col-sm-4 col-xs-12 px-0 start_input">
+          <label for="start_on" class="align-self-start required">SEP Start Date</label>
           <%= date_field_tag :start_on, nil, value: date_field_value, min: date_field_value, max: date_field_value, required: true, disabled: true %>
         </div>
-        <div class="end_btn start_end_date col-sm-4 col-xs-12 px-0 end_input">
-          <label for="end_on">SEP End Date</label>
+        <div class="d-flex flex-column end_btn start_end_date col-sm-4 col-xs-12 px-0 end_input">
+          <label for="end_on" class="align-self-start required">SEP End Date</label>
           <%= date_field_tag :end_on, nil, value: date_field_value(60.days.from_now), min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
-        <div class='init_effective_date col-sm-4 col-xs-12 px-0'>
-          <label for="next_poss_effective_date">Next Possible Start Date</label>
+        <div class='d-flex flex-column init_effective_date col-sm-4 col-xs-12 px-0'>
+          <label for="next_poss_effective_date" class="align-self-start required">Next Possible Start Date</label>
           <%= date_field_tag :next_poss_effective_date, nil, value: date_field_value, min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
       </div>
@@ -84,8 +95,9 @@
         </div>
       <% end %>
       <div class='row p-2 row-form-wrapper no-buffer'>
-        <div class="col-sm-12 col-xs-12 px-0">
-            <%= text_area_tag :admin_comment, "", class: "floatlabel interaction-control-broker-message-body custom-textarea", rows: 3, placeholder: "Enter Comments Here"%>
+        <div class="d-flex flex-column col-md-3 col-xs-12 px-0">
+          <label for="admin_comment" class="align-self-start required">Enter Comments Here</label>
+          <%= text_area_tag :admin_comment, "", class: "floatlabel interaction-control-broker-message-body custom-textarea", rows: 3 %>
         </div>
       </div>
       <div class="px-0">
