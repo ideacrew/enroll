@@ -16,10 +16,6 @@ Then(/^they should not see the Issuers tab$/) do
   expect(page).to_not have_content("Issuers")
 end
 
-Given(/inbox feature is enabled?/) do
-  enable_feature(:inbox_tab)
-end
-
 Given(/notices feature is enabled?/) do
   enable_feature(:notices_tab)
 end
@@ -38,18 +34,6 @@ end
 
 Then(/^they should not see the Notices tab$/) do
   expect(page).to_not have_content("Notices")
-end
-
-Given(/inbox feature is disabled?/) do
-  disable_feature(:inbox_tab)
-end
-
-Then(/^they should see the Inbox tab$/) do
-  expect(page).to have_content("Inbox")
-end
-
-Then(/^they should not see the Inbox tab$/) do
-  expect(page).to_not have_content("Inbox")
 end
 
 And(/calendar feature is enabled?/) do
