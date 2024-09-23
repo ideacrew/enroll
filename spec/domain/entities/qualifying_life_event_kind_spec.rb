@@ -19,6 +19,7 @@ RSpec.describe ::Entities::QualifyingLifeEventKind, dbclean: :after_each do
         :market_kind => 'individual',
         :effective_on_kinds => ['date_of_event'],
         :ordinal_position => 1,
+        is_common: false,
         coverage_effective_on: TimeKeeper.date_of_record,
         coverage_start_on: TimeKeeper.date_of_record,
         coverage_end_on: (TimeKeeper.date_of_record + 25.days),
