@@ -12,7 +12,7 @@ module FinancialAssistance
           # This Operation determines applicants rrv medicare eligibility
           # Operation receives the Application with renewal medicare determination values
           class AddRrvMedicareDetermination
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
 
             # @param [Hash] opts The options to add rrv medicare determination to applicants
             # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params

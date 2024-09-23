@@ -9,7 +9,7 @@ module Operations
     # If given termination date is greater than enrollment termination and is a prior year enrollment
     # - it generates a new enrollment.
     class EndDateChange
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ EnrollmentId ] enrollment_id bson_id of a enrollment
       # @param [ NewTerminationDate ] termination_date to update the enrollment
@@ -35,7 +35,7 @@ module Operations
       end
 
       def fetch_enrollment(enrollment_id)
-        Operations::HbxEnrollments::Find.new.call(id: enrollment_id)
+        ::Operations::HbxEnrollments::Find.new.call(id: enrollment_id.to_s)
       end
 
       def check_enrollment_eligibility(termination_date)

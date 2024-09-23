@@ -7,7 +7,7 @@ module Operations
   module Individual
     # Create new enrollments based on new eligibility determination
     class OnNewDetermination
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include FloatHelper
 
       def call(params)

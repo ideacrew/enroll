@@ -112,7 +112,7 @@
               <td><%= record.modifier %></td>
               <td><%= record.update_reason %></td>
               <td>
-                <% if request_response_details(person, record, v_type) %>
+                <% if record.event_request_record_id || record.event_response_record_id %>
                     <button type="button" data-toggle="modal" data-target=<%="#record_details_#{record.id}" %>>Payload</button>
                 <% end %>
               </td>

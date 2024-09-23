@@ -7,7 +7,7 @@ module Operations
   module Determinations
     # Create Determination
     class Create
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to create determination entity
       # @return [Dry::Monad] result

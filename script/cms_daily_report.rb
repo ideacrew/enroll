@@ -843,7 +843,6 @@ def process_ivl_families_with_qhp_assistance(families, offset_count)
           medicaid_eligible = thhm_medicaid_members.any? { |th_member| th_member.applicant_id.to_s == aptc_thhm.applicant_id.to_s }
           if aptc_thhm&.person&.is_applying_coverage && !medicaid_eligible
             @total_members_with_qhp_assistance << aptc_thhm&.person&.hbx_id
-            csv << [primary.hbx_id, primary.full_name, aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
           end
         end
         @total_member_counter_qhp_assistance += thhm_aptc_members.count

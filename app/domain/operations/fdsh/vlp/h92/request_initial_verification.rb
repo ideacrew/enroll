@@ -11,7 +11,7 @@ module Operations
         class RequestInitialVerification
           # primary request from fdsh gateway
 
-          include Dry::Monads[:result, :do, :try]
+          include Dry::Monads[:do, :result]
           include EventSource::Command
 
           def call(person)

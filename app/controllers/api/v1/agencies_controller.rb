@@ -1,4 +1,5 @@
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
+  include StringScrubberUtil
 
   before_action :authenticate_user!
 
@@ -39,7 +40,7 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
   end
 
   def terminate
-    permitted = params.permit(:person_id, :role_id)
+    permitted = { person_id: sanitize_to_hex(params[:person_id]), role_id: sanitize_to_hex(params[:role_id])}
     terminate_agency_staff = Operations::TerminateAgencyStaff.new(permitted[:person_id], permitted[:role_id])
     authorize terminate_agency_staff, :terminate_agency_staff?
     case terminate_agency_staff.call

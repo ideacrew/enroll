@@ -4,7 +4,7 @@ module Operations
   module HbxEnrollments
     # Terminate enrollment operation for SHOP and IVL enrollments
     class Terminate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] params
       # @option params [String] :enrollment_hbx_id

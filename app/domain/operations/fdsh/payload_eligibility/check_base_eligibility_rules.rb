@@ -7,13 +7,14 @@ module Operations
     # The process method calls each validation rule for the given request type and returns a Success result if all rules pass, or a Failure result if any rule fails.
       class CheckBaseEligibilityRules
         # run tests after splitting - ensure existing tests pass
-        include Dry::Monads[:result, :do, :try]
+        include Dry::Monads[:do, :result]
 
         # # Define the validation rules for each request type
         RULES = {
           ssa: [:validate_ssn],
           dhs: [:validate_vlp_documents],
           local_residency: [],
+          alive_status: [:validate_ssn, :is_member_enrolled?],
           income: [:validate_ssn],
           esi_mec: [:validate_ssn],
           non_esi_mec: [:validate_ssn],

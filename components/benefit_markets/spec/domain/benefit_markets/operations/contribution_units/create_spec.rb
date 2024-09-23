@@ -42,11 +42,11 @@ RSpec.describe BenefitMarkets::Operations::ContributionUnits::Create, dbclean: :
     let(:params)                      { {contribution_unit_params: ee_contribution_unit, sponsor_contribution_kind: sponsor_contribution_kind} }
 
     it 'should be successful' do
-      expect(subject.call(params).success?).to be_truthy
+      expect(subject.call(**params).success?).to be_truthy
     end
 
     it 'should create fixed percent contribution unit entity' do
-      expect(subject.call(params).success).to be_a BenefitMarkets::Entities::FixedPercentContributionUnit
+      expect(subject.call(**params).success).to be_a BenefitMarkets::Entities::FixedPercentContributionUnit
     end
   end
 
@@ -55,11 +55,11 @@ RSpec.describe BenefitMarkets::Operations::ContributionUnits::Create, dbclean: :
     let(:params)                      { {contribution_unit_params: ee_contribution_unit_cap, sponsor_contribution_kind: cap_sponsor_contribution_kind} }
 
     it 'should be successful' do
-      expect(subject.call(params).success?).to be_truthy
+      expect(subject.call(**params).success?).to be_truthy
     end
 
     it 'should create percent with cap contribution unit entity' do
-      expect(subject.call(params).success).to be_a BenefitMarkets::Entities::PercentWithCapContributionUnit
+      expect(subject.call(**params).success).to be_a BenefitMarkets::Entities::PercentWithCapContributionUnit
     end
   end
 end

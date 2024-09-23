@@ -177,7 +177,6 @@ class BenefitCoveragePeriod
                    'csr_limited'
                  end
     end
-
     ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, american_indian_members: american_indian_members,
                                     hbx_enrollment: hbx_enrollment,
                                     effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids: shopping_family_member_ids, csr_kind: csr_kind }).uniq
@@ -187,7 +186,7 @@ class BenefitCoveragePeriod
   end
   # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Style/ConditionalAssignment
 
-  def get_benefit_packages(**attrs)
+  def get_benefit_packages(attrs)
     any_member_greater_than_30 = attrs[:hbx_enrollment].any_member_greater_than_30?
     fetch_benefit_packages(any_member_greater_than_30, attrs[:csr_kind], attrs[:coverage_kind]).inject([]) do |result, bg|
       satisfied = true
@@ -208,7 +207,7 @@ class BenefitCoveragePeriod
     end
   end
 
-  def product_entries(**attrs)
+  def product_entries(attrs)
     factory = product_factory.new({market_kind: attrs[:market]})
     elected_products = factory.by_coverage_kind_year_and_csr(attrs[:coverage_kind], start_on.year, csr_kind: attrs[:csr_kind]).by_product_ids(attrs[:elected_product_ids])
 

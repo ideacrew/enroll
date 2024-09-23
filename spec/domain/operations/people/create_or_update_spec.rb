@@ -71,6 +71,18 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
           expect(@result).to be_a(Dry::Monads::Result::Success)
         end
       end
+
+      context 'nil incarceration status' do
+        before do
+          person_params.merge!({is_incarcerated: nil})
+          @result = subject.call(params: person_params)
+        end
+
+        it 'should return success' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+          expect(@result.value!.is_incarcerated).to eq false
+        end
+      end
     end
 
     context 'for failed case' do

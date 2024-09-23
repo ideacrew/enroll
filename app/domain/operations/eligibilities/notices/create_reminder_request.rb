@@ -8,7 +8,7 @@ module Operations
     module Notices
       # Create document reminder notice for the family
       class CreateReminderRequest
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
         include EventSource::Command
         include EventSource::Logging
 

@@ -4,7 +4,7 @@ module Operations
   module Transmittable
     # add an error to a transmittable object.
     class AddError
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate_params(params)

@@ -470,7 +470,7 @@ module BenefitSponsors
                       :_destroy => "false",
                       :phone_attributes =>
                       {
-                        :kind => "phone main",
+                        :kind => "work",
                         :area_code => "879",
                         :number => phone_number,
                         :extension => "",
@@ -531,6 +531,11 @@ module BenefitSponsors
 
         it 'should update address' do
           expect(broker_organization.broker_agency_profile.primary_office_location.address.city).to eq city
+        end
+
+        it 'should update work phone number on the person' do
+          person.reload
+          expect(person.work_phone.number).to eq phone_number
         end
 
         context 'update npn' do
@@ -635,7 +640,7 @@ module BenefitSponsors
                       :_destroy => "false",
                       :phone_attributes =>
                       {
-                        :kind => "phone main",
+                        :kind => "work",
                         :area_code => "786",
                         :number => phone_number,
                         :extension => "",
@@ -677,6 +682,11 @@ module BenefitSponsors
 
         it 'should update address' do
           expect(general_agency.general_agency_profile.primary_office_location.address.city).to eq city
+        end
+
+        it 'should update work phone number on the person' do
+          person.reload
+          expect(person.work_phone.number).to eq phone_number
         end
       end
     end

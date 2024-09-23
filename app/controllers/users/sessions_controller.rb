@@ -4,6 +4,8 @@ class Users::SessionsController < Devise::SessionsController
   respond_to :html, :js
   after_action :log_failed_login, :only => :new
   before_action :set_ie_flash_by_announcement, only: [:new]
+  before_action :enable_bs4_layout, only: [:create, :new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_updated_layout, only: [:create, :new]
 
   def new
     super do
@@ -23,6 +25,10 @@ class Users::SessionsController < Devise::SessionsController
 
   def destroy
     current_user.revoke_all_jwts!
+    saml_logout_attempt = Operations::Authentication::LogoutSamlUser.new.call(session)
+    logger.tagged("SAMLLogoutAttempt") do
+      logger.error saml_logout_attempt.failure.inspect unless saml_logout_attempt.success?
+    end
     super
   end
 
@@ -45,5 +51,13 @@ class Users::SessionsController < Devise::SessionsController
 
   def failed_login?
    (options = Rails.env["warden.options"]) && options[:action] == "unauthenticated"
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
+  end
+
+  def enable_updated_layout
+    @use_bs4_layout = true
   end
 end

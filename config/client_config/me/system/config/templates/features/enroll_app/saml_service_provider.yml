@@ -1,0 +1,16 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :saml_service_provider
+    features:
+      - key: :saml_single_logout
+        item: :saml_single_logout
+        is_enabled: <%= ENV['ENROLL_SAML_SLO_IS_ENABLED'] || false %>
+        settings:
+          - key: :saml_sp_name
+            item: <%= ENV['ENROLL_SAML_SP_NAME'] || "enroll" %>
+          - key: :saml_sp_certificate
+            item: <%= ENV['ENROLL_SAML_SP_CERTIFICATE'] || "" %>
+          - key: :saml_sp_private_key
+            item: <%= ENV['ENROLL_SAML_SP_PRIVATE_KEY'] || "" %>

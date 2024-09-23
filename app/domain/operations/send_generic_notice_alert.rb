@@ -5,11 +5,12 @@ require 'dry/monads/do'
 
 module Operations
   class SendGenericNoticeAlert
-    send(:include, Dry::Monads[:result, :do, :try])
+    include Dry::Monads[:do, :result]
 
     include Config::SiteHelper
 
-    def call(resource:)
+    def call(params)
+      resource = params[:resource]
       return Failure({:message => ['Please find valid resource to send the alert message']}) if resource.blank?
 
       @resource = resource

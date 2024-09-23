@@ -5,7 +5,7 @@ module Operations
     # Publish events to begin IVL enrollment coverages
     class BeginCoverageHandler
       include EventSource::Command
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       attr_reader :job, :logger
 

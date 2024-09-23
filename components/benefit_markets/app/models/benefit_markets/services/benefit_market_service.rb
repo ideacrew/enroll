@@ -17,14 +17,20 @@ module BenefitMarkets
       def form_params_to_attributes(form, benefit_market)
         configuration = case form.kind
         when 'aca_shop'
-          BenefitMarkets::Factories::AcaShopConfiguration.call form.aca_shop_configuration.attributes.merge({
-            initial_application_configuration: form.aca_shop_configuration.initial_application_configuration.attributes,
-            renewal_application_configuration: form.aca_shop_configuration.renewal_application_configuration.attributes
-          })
+          BenefitMarkets::Factories::AcaShopConfiguration.call(
+            **form.aca_shop_configuration.attributes.merge(
+              {
+                initial_application_configuration: form.aca_shop_configuration.initial_application_configuration.attributes,
+                renewal_application_configuration: form.aca_shop_configuration.renewal_application_configuration.attributes
+              }
+            )
+          )
         when 'aca_individual'
-          BenefitMarkets::Factories::AcaIndividualConfiguration.call form.aca_individual_configuration.attributes.merge({
-            initial_application_configuration: form.aca_individual_configuration.initial_application_configuration.attributes
-          })
+          BenefitMarkets::Factories::AcaIndividualConfiguration.call(
+            **form.aca_individual_configuration.attributes.merge(
+              { initial_application_configuration: form.aca_individual_configuration.initial_application_configuration.attributes }
+            )
+          )
         end
 
         model_attributes = {
@@ -81,17 +87,21 @@ module BenefitMarkets
 
       def save(form)
         if form.kind == "aca_shop"
-          initial_application_configuration = BenefitMarkets::Factories::AcaShopInitialApplicationConfiguration.call form.aca_shop_configuration.initial_application_configuration.attributes
-          renewal_application_configuration = BenefitMarkets::Factories::AcaShopRenewalApplicationConfiguration.call form.aca_shop_configuration.renewal_application_configuration.attributes
-          configuration = BenefitMarkets::Factories::AcaShopConfiguration.call form.aca_shop_configuration.attributes.merge(
+          initial_application_configuration = BenefitMarkets::Factories::AcaShopInitialApplicationConfiguration.call(**form.aca_shop_configuration.initial_application_configuration.attributes)
+          renewal_application_configuration = BenefitMarkets::Factories::AcaShopRenewalApplicationConfiguration.call(**form.aca_shop_configuration.renewal_application_configuration.attributes)
+          configuration = BenefitMarkets::Factories::AcaShopConfiguration.call(
+            **form.aca_shop_configuration.attributes.merge(
               initial_application_configuration: initial_application_configuration,
               renewal_application_configuration: renewal_application_configuration
             )
+          )
         elsif form.kind == "aca_individual"
-          initial_application_configuration = BenefitMarkets::Factories::AcaIndividualInitialApplicationConfiguration.call form.aca_individual_configuration.initial_application_configuration.attributes
-          configuration = BenefitMarkets::Factories::AcaIndividualConfiguration.call form.aca_individual_configuration.attributes.merge(
+          initial_application_configuration = BenefitMarkets::Factories::AcaIndividualInitialApplicationConfiguration.call(**form.aca_individual_configuration.initial_application_configuration.attributes)
+          configuration = BenefitMarkets::Factories::AcaIndividualConfiguration.call(
+            **form.aca_individual_configuration.attributes.merge(
               initial_application_configuration: initial_application_configuration
             )
+          )
         end
 
         benefit_market = BenefitMarkets::Factories::BenefitMarket.call description: form.description,

@@ -12,6 +12,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
   def reset_premium_tuples
     p_table = @product.premium_tables.first
     p_table.premium_tuples.each { |pt| pt.update_attributes!(cost: pt.age)}
+    ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   end
 
   before do

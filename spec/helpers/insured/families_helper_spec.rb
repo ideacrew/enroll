@@ -404,7 +404,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     }
     context "when building ShopForPlan link" do
       it "should have class 'existing-sep-item' for a SEP with date options QLE and optional_effective_on populated " do
-        expect(helper.build_link_for_sep_type(sep_with_date_options, family.id.to_s)).to include "class=\"existing-sep-item\""
+        expect(helper.build_link_for_sep_type(sep_with_date_options, family.id.to_s)).to include "class=\"existing-sep-item \""
       end
 
       it "should be a link to 'insured/family_members' for a QLE type without date options available" do
@@ -453,9 +453,20 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     let(:person) { FactoryBot.create(:person)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
 
-    it "should build consumer role for a person" do
+    before do
+      allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
       helper.build_consumer_role(person,family)
-      expect(person.consumer_role.present?). to eq true
+    end
+
+    it "should build consumer role for a person" do
+      expect(person.consumer_role.present?).to eq true
+    end
+
+    it 'should build demographics_group and alive_status for a person' do
+      demographics_group = person.demographics_group
+
+      expect(demographics_group).to be_a DemographicsGroup
+      expect(demographics_group.alive_status).to be_a AliveStatus
     end
   end
 
@@ -745,7 +756,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       end
 
       it "returns the #{expected_label} label" do
-        expect(enrollment_state_label(enrollment)).to include(*expected_label)
+        expect(enrollment_state_label(enrollment, false)).to include(*expected_label)
       end
     end
 
@@ -755,7 +766,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       end
 
       it 'returns nil' do
-        expect(enrollment_state_label(enrollment)).to be_nil
+        expect(enrollment_state_label(enrollment, false)).to be_nil
       end
     end
 

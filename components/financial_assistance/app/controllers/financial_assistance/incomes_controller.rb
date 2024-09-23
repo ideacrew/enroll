@@ -2,14 +2,21 @@
 
 module FinancialAssistance
   class IncomesController < FinancialAssistance::ApplicationController
-    include ::UIHelpers::WorkflowController
     include NavigationHelper
 
     before_action :find_application_and_applicant
-    before_action :load_support_texts, only: [:index, :other]
     before_action :set_cache_headers, only: [:index, :other]
+    before_action :enable_bs4_layout, only: [:other, :index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :conditionally_enable_bs4_layout, only: [:create, :update] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-    layout "financial_assistance_nav", only: [:index, :other, :new, :step]
+    # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
+    # This before_action needs to be called after finding the application
+    #
+    # @before_action
+    # @private
+    before_action :check_for_uneditable_application
+
+    layout :resolve_layout
 
     def index
       authorize @applicant, :index?
@@ -25,10 +32,7 @@ module FinancialAssistance
 
     def new
       authorize @applicant, :new?
-      @model = @applicant.incomes.build
-      load_steps
-      current_step
-      render 'workflow/step'
+      render 'other'
     end
 
     def edit
@@ -40,35 +44,9 @@ module FinancialAssistance
     end
 
     def step
-      authorize @model, :step?
-      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
-      set_admin_bookmark_url
-      flash[:error] = nil
-      model_name = @model.class.to_s.split('::').last.downcase
-      model_params = params[model_name]
-      format_date_params model_params if model_params.present?
-
-      @model.assign_attributes(permit_params(model_params)) if model_params.present?
-      update_employer_contact(@model, params) if @model.income_type == job_income_type
-      if params.key?(model_name)
-        if @model.save(context: "step_#{@current_step.to_i}".to_sym)
-          @current_step = @current_step.next_step if @current_step.next_step.present?
-          if params.key? :last_step
-            @model.update_attributes!(workflow: { current_step: 1 })
-            flash[:notice] = "Income Added - (#{@model.kind})"
-            redirect_to application_applicant_incomes_path(@application, @applicant)
-          else
-            @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-            render 'workflow/step'
-          end
-        else
-          @model.workflow = { current_step: @current_step.to_i }
-          flash[:error] = build_error_messages(@model)
-          render 'workflow/step'
-        end
-      else
-        render 'workflow/step'
-      end
+      @income = @applicant.incomes.find params[:id]
+      authorize @income, :step?
+      redirect_to action: :other
     end
 
     def create
@@ -86,7 +64,6 @@ module FinancialAssistance
       format_date(params)
       @income = @applicant.incomes.find params[:id]
       authorize @income, :update?
-
       if @income.update_attributes permit_params(params[:income])
         render :update
       else
@@ -107,8 +84,13 @@ module FinancialAssistance
 
     def format_date(params)
       return if params[:income].blank?
-      params[:income][:start_on] = Date.strptime(params[:income][:start_on].to_s, "%m/%d/%Y")
-      params[:income][:end_on] = Date.strptime(params[:income][:end_on].to_s, "%m/%d/%Y") if params[:income][:end_on].present?
+      params[:income][:start_on] = format_date_string(params[:income][:start_on].to_s)
+      params[:income][:end_on] = format_date_string(params[:income][:end_on].to_s) if params[:income][:end_on].present?
+    end
+
+    def format_date_string(string)
+      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+      Date.strptime(string, date_format)
     end
 
     def job_income_type
@@ -151,6 +133,23 @@ module FinancialAssistance
       FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
     rescue StandardError
       ''
+    end
+
+    def conditionally_enable_bs4_layout
+      enable_bs4_layout if params[:bs4] == "true"
+    end
+
+    def enable_bs4_layout
+      @bs4 = true
+    end
+
+    def resolve_layout
+      case action_name
+      when "index", "other"
+        EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "financial_assistance_progress" : "financial_assistance_nav"
+      else
+        "financial_assistance_nav"
+      end
     end
   end
 end

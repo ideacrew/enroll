@@ -8,7 +8,7 @@ module Operations
     # This opeartion gets hit every 1st of and month and processes based on the yml settings to determine if the operations should be running annualy/monthly.
     class DependentAgeOff
       include Config::SiteConcern
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(new_date:, enrollment_query: nil)
         yield can_process_event(new_date)

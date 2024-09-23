@@ -12,7 +12,7 @@ module FinancialAssistance
           # This Operation determines applicants rrv ifsv eligibility
           # Operation receives the Application with renewal ifsv determination values
           class AddRrvIfsvDetermination
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
 
             # @param [Hash] opts The options to add rrv ifsv determination to applicants
             # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params

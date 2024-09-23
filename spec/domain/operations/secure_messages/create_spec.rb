@@ -7,7 +7,7 @@ module Operations
     RSpec.describe Create do
 
       subject do
-        described_class.new.call(params)
+        described_class.new.call(**params)
       end
 
       let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }

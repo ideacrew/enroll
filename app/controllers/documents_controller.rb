@@ -145,15 +145,22 @@ class DocumentsController < ApplicationController
   def fed_hub_request
     authorize HbxProfile, :can_call_hub?
 
-    request_hash = { person_id: @person.id, verification_type: @verification_type.type_name }
-    result = ::Operations::CallFedHub.new.call(request_hash)
+    raise "Call hub feature is not available for #{@verification_type.type_name}" unless VerificationType::ADMIN_CALL_HUB_VERIFICATION_TYPES.include?(@verification_type.type_name)
+
+    result = ::Operations::CallFedHub.new.call(
+      person_id: @person.id,
+      verification_type: @verification_type.type_name
+    )
+
     key, message = result.failure? ? result.failure : result.success
     if result.failure?
       @verification_type.fail_type
       @verification_type.add_type_history_element(action: "Hub Request Failed",
                                                   modifier: "System",
                                                   update_reason: "#{@verification_type.type_name} Request Failed due to #{message}")
-      ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: @person.primary_family, effective_date: TimeKeeper.date_of_record)
+      @person.families.each do |family|
+        ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
+      end
     end
 
     respond_to do |format|
@@ -284,7 +291,11 @@ class DocumentsController < ApplicationController
     set_verification_type
     @document = @verification_type.vlp_documents.where(id: params[:id]).first
     # Handles the specific exception where an ID of a non existing document is called.
-    Rails.logger.warn("Unable to find document with ID #{params[:id]} for person with hbx_id: #{@person&.full_name || Person.where(_id: params[:person_id])&.first&.full_name}") if @document.blank?
+    if @document.blank?
+      Rails.logger.warn(
+        "Unable to find document with ID #{params[:id]} for person with hbx_id: #{@person&.hbx_id || Person.where(_id: params[:person_id])&.first&.hbx_id}"
+      )
+    end
     error_message = l10n("documents.controller.missing_document_message", contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item) if @document.blank?
     redirect_back(fallback_location: verification_insured_families_path, :flash => {error: error_message}) if @document.blank?
   end

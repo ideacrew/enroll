@@ -29,6 +29,8 @@ class Person
   # transmittable subject
   include Transmittable::Subject
 
+  include Orms::Mongoid::DomainModel
+
   track_history :on => [:first_name,
                         :middle_name,
                         :last_name,
@@ -48,6 +50,9 @@ class Person
                         :is_homeless,
                         :is_temporarily_out_of_state,
                         :is_active,
+                        # There is suspicion that hbx_id is being updated for a Person. Ideally, hbx_id should not be updated for a Person record.
+                        # By adding hbx_id to the track_history, we can track when the hbx_id is being updated to figure out the root cause.
+                        :hbx_id,
                         :no_ssn],
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
@@ -349,13 +354,13 @@ class Person
   before_save :strip_empty_fields
   before_save :check_indian if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
   before_save :check_crm_updates
-  #after_save :generate_family_search
   after_create :create_inbox
   after_create :notify_created
   after_update :notify_updated
   after_update :person_create_or_update_handler
   after_save :generate_person_saved_event
   after_update :publish_updated_event
+  after_initialize :set_default_tobacco_use
 
   def self.api_staff_roles
     Person.where(
@@ -476,9 +481,32 @@ class Person
   end
 
   def generate_person_saved_event
-    cv_person = Operations::Transformers::PersonTo::Cv3Person.new.call(self)
-    event = event('events.person_saved', attributes: {gid: self.to_global_id.uri, payload: cv_person})
-    event.success.publish if event.success?
+    if EnrollRegistry.feature_enabled?(:async_publish_updated_families)
+
+      # TODO: Refactor to capture embedded changed attributes in Person object changed_attributes
+      embedded_changed_attributes = {
+        changed_person_attributes: changed_attributes,
+        changed_address_attributes: changed_address_attributes,
+        changed_phone_attributes: changed_phone_attributes,
+        changed_email_attributes: changed_email_attributes,
+        changed_relationship_attributes: changed_relationship_attributes
+      }
+      event(
+        'events.private.person_saved',
+        headers: {
+          after_updated_at: updated_at,
+          before_updated_at: changed_attributes.deep_symbolize_keys[:updated_at]
+        },
+        attributes: {
+          after_save_version: to_hash,
+          changed_attributes: embedded_changed_attributes
+        }
+      ).success&.publish
+    else
+      cv_person = Operations::Transformers::PersonTo::Cv3Person.new.call(self)
+      event = event('events.person_saved', attributes: {gid: self.to_global_id.uri, payload: cv_person})
+      event.success.publish if event.success?
+    end
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate person save event due to #{e.backtrace}" }
   end
@@ -503,19 +531,12 @@ class Person
     user.identity_verified?
   end
 
-  #after_save :update_family_search_collection
-
-  # before_save :notify_change
-  # def notify_change
-  #   notify_change_event(self, {"identifying_info"=>IDENTIFYING_INFO_ATTRIBUTES, "address_change"=>ADDRESS_CHANGE_ATTRIBUTES, "relation_change"=>RELATIONSHIP_CHANGE_ATTRIBUTES})
-  # end
-
-  def update_family_search_collection
-    #  ViewFunctions::Person.run_after_save_search_update(self.id)
-  end
-
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_member_id) if hbx_id.blank?
+  end
+
+  def set_default_tobacco_use
+    self.is_tobacco_user = "unknown" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
   end
 
   def strip_empty_fields
@@ -627,7 +648,8 @@ class Person
       rel.relative_id.to_s == person.id.to_s
     end
     if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+      existing_relationship.kind = relationship
+      save
     elsif id != person.id
       self.person_relationships << PersonRelationship.new({
                                                             :kind => relationship,
@@ -1373,7 +1395,101 @@ class Person
     @alive_status = verification_types.where(type_name: VerificationType::ALIVE_STATUS).first
   end
 
+  # In order to avoid adding another callback,
+  # this method is used after consumer_role is created for person
+  # 1.) Factories::EnrollmentFactory -> self.build_consumer_role
+  #   - used for consumer sign-up
+  # 2.) Family -> build_consumer_role
+  #   - used when creating a family_member from the 'Manage Family' from a user's homepage
+  # 3.) Insured::FamiliesHelper -> build_consumer_role
+  #   - used as a failsafe in case any family_members are missing a consumer role
+  # 4.) Operations::People::CreateOrUpdateConsumerRole -> create_consumer_role
+  #   - used when the legacy ::FinancialAssistance::Operations::Families::CreateOrUpdateMember propagates an applicant to a family_member
+  def build_demographics_group
+    return unless EnrollRegistry.feature_enabled?(:alive_status)
+    Operations::People::BuildDemographicsGroup.new.call(self)
+  end
+
+  # Returns a list of all active role names for the person.
+  # This method caches the result to avoid recalculating the active roles on subsequent calls.
+  #
+  # @return [Array<String>] An array of strings representing the active roles.
+  def all_active_role_names
+    return @all_active_role_names if defined?(@all_active_role_names)
+
+    @all_active_role_names = role_names_based_on_status_of_roles
+  end
+
   private
+
+  def changed_address_attributes
+    addresses.collect do |address|
+      address_changed_attributes = address.changed_attributes
+      address_changed_attributes.merge!({:kind => address.kind})
+    end
+  end
+
+  def changed_phone_attributes
+    phones.collect do |phone|
+      phone_changed_attributes = phone.changed_attributes
+      phone_changed_attributes.merge!({:kind => phone.kind})
+    end
+  end
+
+  def changed_email_attributes
+    emails.collect do |email|
+      email_changed_attributes = email.changed_attributes
+      email_changed_attributes.merge!({:kind => email.kind})
+    end
+  end
+
+  def changed_relationship_attributes
+    person_relationships.collect do |person_relationship|
+      person_relationship_changed_attributes = person_relationship.changed_attributes
+      person_relationship_changed_attributes.merge!({:relative_id => person_relationship.relative_id})
+    end
+  end
+
+  # Determines the active roles based on specific conditions for each role.
+  # It utilizes a hash where each key is a role (localized string) and its value is a boolean
+  # indicating whether the role is active or not. Only roles with true conditions are kept.
+  #
+  # @return [Array<String>] An array of strings representing the active roles.
+  def role_names_based_on_status_of_roles
+    {
+      l10n('user_roles.assister') => assister_role.present?,
+      l10n('user_roles.broker') => active_broker_role?,
+      l10n('user_roles.broker_agency_staff') => has_active_broker_staff_role?,
+      l10n('user_roles.consumer') => active_consumer_role?,
+      l10n('user_roles.csr') => csr_role.present?,
+      l10n('user_roles.employee') => has_active_employee_role?,
+      l10n('user_roles.employer_staff') => has_active_employer_staff_role?,
+      l10n('user_roles.general_agency_staff') => has_active_general_agency_staff_role?,
+      l10n('user_roles.hbx_staff') => hbx_staff_role.present?,
+      l10n('user_roles.resident') => active_resident_role?
+    }.select { |_role, condition| condition }.keys
+  end
+
+  # Checks if the resident role is active.
+  #
+  # @return [Boolean] True if the resident role is present and active, false otherwise.
+  def active_resident_role?
+    resident_role.present? && is_resident_role_active?
+  end
+
+  # Checks if the consumer role is active.
+  #
+  # @return [Boolean] True if the consumer role is present and active, false otherwise.
+  def active_consumer_role?
+    consumer_role.present? && is_consumer_role_active?
+  end
+
+  # Checks if the broker role is active.
+  #
+  # @return [Boolean] True if the broker role is present and active, false otherwise.
+  def active_broker_role?
+    broker_role&.active?
+  end
 
   def assign(collection, association)
     collection.each do |attributes|

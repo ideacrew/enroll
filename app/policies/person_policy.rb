@@ -6,7 +6,7 @@
 class PersonPolicy < ApplicationPolicy
   def initialize(user, record)
     super
-    @family = record.primary_family if record.is_a?(Person)
+    @family = (record.primary_family || record.families.first) if record.is_a?(Person)
   end
 
   # Is the given entity allowed to complete RIDP on behalf of a given
@@ -29,8 +29,20 @@ class PersonPolicy < ApplicationPolicy
     allowed_to_modify?
   end
 
+  # Determines if the current user has permission to download a document.
+  # The user can download the document if they are the account holder,
+  # an active associated broker of the Broker Agency Profile, an active associated broker agency staff of Broker Agency Profile
+  # or if they have permission to download SBC documents.
+  #
+  # @return [Boolean] Returns true if the user has permission to download the document, false otherwise.
   def can_download_document?
-    allowed_to_download?
+    return true if account_holder_person == record
+
+    broker = record.broker_role
+    broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.active
+    return true if broker.present? && broker_staff_roles.present? && broker_staff_roles.any? { |role| role.broker_agency_profile_id == broker.broker_agency_profile_id }
+
+    can_download_sbc_documents?
   end
 
   def can_delete_document?

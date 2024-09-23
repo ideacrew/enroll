@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   before :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 10, 1))

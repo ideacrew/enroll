@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(Rails.root, "components/benefit_sponsors/spec/support/benefit_sponsors_product_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -71,7 +73,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it "should render json template" do
-      get :binder_index_datatable, {format: :json}
+      get :binder_index_datatable, params: { format: :json }
       expect(response).to render_template("exchanges/hbx_profiles/binder_index_datatable")
     end
 
@@ -135,90 +137,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       post :employer_invoice_datatable, params: {search: search_params}, xhr: true
       expect(response).to have_http_status(:success)
     end
-
   end
-=begin
-  describe "#create" do
-    let(:user) { double("User")}
-    let(:person) { double("Person")}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
-    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
-    let(:organization){ Organization.new }
-    let(:organization_params) { {hbx_profile: {organization: organization.attributes}}}
-
-    before :each do
-      sign_in(user)
-      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      allow(Organization).to receive(:new).and_return(organization)
-      allow(organization).to receive(:build_hbx_profile).and_return(hbx_profile)
-    end
-
-    it "create new organization if params valid" do
-      allow(hbx_profile).to receive(:save).and_return(true)
-      post :create, organization_params
-      expect(response).to have_http_status(:redirect)
-    end
-
-    it "renders new if params invalid" do
-      allow(hbx_profile).to receive(:save).and_return(false)
-      post :create, organization_params
-      expect(response).to render_template("exchanges/hbx_profiles/new")
-    end
-  end
-
-  describe "#update" do
-    let(:user) { FactoryBot.create(:user, :hbx_staff) }
-    let(:person) { double }
-    let(:new_hbx_profile){ HbxProfile.new }
-    let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
-    let(:hbx_profile_params) { {hbx_profile: new_hbx_profile.attributes, id: hbx_profile.id }}
-    let(:hbx_staff_role) {double}
-
-    before :each do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      allow(user).to receive(:person).and_return person
-      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
-      allow(HbxProfile).to receive(:find).and_return(hbx_profile)
-      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
-      allow(hbx_staff_role).to receive(:hbx_profile).and_return hbx_profile
-      sign_in(user)
-    end
-
-    it "updates profile" do
-      allow(hbx_profile).to receive(:update).and_return(true)
-      put :update, hbx_profile_params
-      expect(response).to have_http_status(:redirect)
-    end
-
-    it "renders edit if params not valid" do
-      allow(hbx_profile).to receive(:update).and_return(false)
-      put :update, hbx_profile_params
-      expect(response).to render_template("edit")
-    end
-  end
-
-  describe "#destroy" do
-    let(:user){ double("User") }
-    let(:person){ double("Person") }
-    let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
-    let(:hbx_staff_role) {double}
-
-    it "destroys hbx_profile" do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
-      allow(user).to receive(:person).and_return person
-      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
-      allow(hbx_staff_role).to receive(:hbx_profile).and_return hbx_profile
-      allow(HbxProfile).to receive(:find).and_return(hbx_profile)
-      allow(hbx_profile).to receive(:destroy).and_return(true)
-      sign_in(user)
-      delete :destroy, id: hbx_profile.id
-      expect(response).to have_http_status(:redirect)
-    end
-
-  end
-=end
 
   describe "employer_datatable" do
     let(:user) { double("User")}
@@ -410,14 +329,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
-          org
         end
       end
       let(:person) do
         FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
           FactoryBot.create(:permission, :super_admin).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
-            person
           end
         end
       end
@@ -448,14 +365,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
-          org
         end
       end
       let(:person) do
         FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
           FactoryBot.create(:permission, :super_admin).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
-            person
           end
         end
       end
@@ -754,6 +669,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
       let(:params) do
         {
+          format: :js,
           "tax_household_group" => {
             "person_id" => primary.id.to_s,
             "family_actions_id" => "family_actions_#{family.id}",
@@ -795,15 +711,107 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         }
       end
 
-      it "should render create_eligibility if save successful" do
-        allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(
+          :temporary_configuration_enable_multi_tax_household_feature
+        ).and_return(true)
         sign_in(user)
+      end
+
+      context 'when CreateEligibility operation returns a failure monad' do
+        let(:failure_message) { 'Dummy Message' }
+        let(:eligibility_operation_instance) { instance_double('::Operations::TaxHouseholdGroups::CreateEligibility') }
+
+        before do
+          allow(::Operations::TaxHouseholdGroups::CreateEligibility).to receive(:new).and_return(eligibility_operation_instance)
+          allow(eligibility_operation_instance).to receive(:call).with(
+            hash_including(family: family)
+          ).and_return(Dry::Monads::Result::Failure.new(failure_message))
+        end
+
+        it 'sets @result with failure message when result.success? returns false' do
+          post :create_eligibility, params: params, xhr: true
+          expect(assigns(:result)).to eq({ success: false, error: failure_message })
+        end
+      end
+
+      it "should render create_eligibility if save successful" do
         post :create_eligibility, params: params, xhr: true, format: :js
         eligibility_determination = family.reload.eligibility_determination
         grants = eligibility_determination.grants
 
         expect(eligibility_determination.effective_date).to eq TimeKeeper.date_of_record
         expect(grants.size).to eq 2
+      end
+
+      context "when request format type is invalid" do
+        it "should not render create_eligibility" do
+          post :create_eligibility, params: params, xhr: true, format: :fake
+          expect(response.status).to eq 406
+          expect(response.body).to eq "Unsupported format"
+        end
+
+
+        it "should not render create_eligibility" do
+          post :create_eligibility, params: params, xhr: true, format: :xml
+          expect(response.status).to eq 406
+          expect(response.body).to eq "<error>Unsupported format</error>"
+        end
+      end
+    end
+  end
+
+  describe 'GET request_help' do
+    let(:person) { FactoryBot.create(:person, :with_family) }
+    let(:permission) { FactoryBot.create(:permission, :full_access_super_admin, can_send_secure_message: true) }
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let(:params) {{"firstname" => "test_first", "lastname" => "test_last", "type" => "CSR", "person" => person.id, "email" => "admin@dc.gov"}}
+
+    before do
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
+      sign_in(user)
+    end
+
+    context "when request format type is invalid" do
+      it "should not render create_eligibility" do
+        get :request_help, params:  params, format: :fake
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render create_eligibility" do
+        get :request_help, params:  params, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+  end
+
+  describe 'GET new_secure_message' do
+    render_views
+
+    let(:person) { FactoryBot.create(:person, :with_family) }
+    let(:permission) { double('Permission', can_send_secure_message: true)}
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let(:profile_valid_params) {{"family_actions_id" => "family_actions_65faef2c62f4893277702cb7", "person_id" => person.id}}
+
+    before do
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
+      sign_in(user)
+    end
+
+    context "when request format type is invalid" do
+      it "should not render create_eligibility" do
+        get :create_send_secure_message, params:  profile_valid_params, format: :fake
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render create_eligibility" do
+        get :create_send_secure_message, params:  profile_valid_params, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
       end
     end
   end
@@ -939,7 +947,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
       @params = {:person => {:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('edit_enrollment')
     end
 
@@ -949,7 +957,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => person.id, :ssn => valid_ssn, :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('update_enrollment')
     end
 
@@ -960,14 +968,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => person1.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template('update_enrollment')
     end
 
     it "should return authorization error for Non-Admin users" do
       allow(user).to receive(:has_hbx_staff_role?).and_return false
       sign_in(user)
-      get :update_dob_ssn, xhr: true
+      post :update_dob_ssn, xhr: true
       expect(response).not_to have_http_status(:success)
     end
 
@@ -977,7 +985,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(assigns(:dont_update_ssn)).to eq true
     end
 
@@ -986,7 +994,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template("update_enrollment")
       expect(response.body).to have_content((/SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN/))
     end
@@ -997,7 +1005,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(assigns(:dont_update_ssn)).to eq nil
     end
 
@@ -1007,7 +1015,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
-      get :update_dob_ssn, xhr:  true, params:  @params
+      post :update_dob_ssn, xhr:  true, params:  @params
       expect(response).to render_template("update_enrollment")
       expect(response.body).to have_content(("DOB / SSN Update Successful"))
     end
@@ -1092,6 +1100,20 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return staff_person
       sign_in(user)
+    end
+
+    context "when request format type is invalid" do
+      it "should not render create_eligibility" do
+        get :view_terminated_hbx_enrollments, params:  params, format: :fake
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render create_eligibility" do
+        get :view_terminated_hbx_enrollments, params:  params, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
     end
 
     it "should render the view_terminated_hbx_enrollments partial" do
@@ -1207,6 +1229,20 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       allow(user).to receive(:person).and_return staff_person
       sign_in user
+    end
+
+    context "when request format type is invalid" do
+      it "should not render create_eligibility" do
+        post :view_enrollment_to_update_end_date, params: {person_id: person.id.to_s, family_actions_id: family.id}, format: :fake
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+      it "should not render create_eligibility" do
+        post :view_enrollment_to_update_end_date, params: {person_id: person.id.to_s, family_actions_id: family.id}, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
     end
 
     it "should render template" do
@@ -1718,6 +1754,21 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
     end
 
+    context "when request format type is invalid" do
+      it "should not render create_eligibility" do
+        get :get_user_info, params: {family_actions_id: family_id, person_id: person.id}, format: :fake
+        expect(response.status).to eq 406
+        expect(response.body).to eq "Unsupported format"
+      end
+
+
+      it "should not render create_eligibility" do
+        get :get_user_info, params: {family_actions_id: family_id, person_id: person.id}, format: :xml
+        expect(response.status).to eq 406
+        expect(response.body).to eq "<error>Unsupported format</error>"
+      end
+    end
+
     context "when action called through employers datatable" do
 
       before do
@@ -1914,7 +1965,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
     end
 
-    context '.new_benefit_application' do
+    context '#new_benefit_application' do
       before :each do
         get :new_benefit_application, params: {benefit_sponsorship_id: benefit_sponsorship.id.to_s}, xhr: true
       end
@@ -1967,14 +2018,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
-          org
         end
       end
       let(:person) do
         FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
           FactoryBot.create(:permission, :super_admin, can_change_fein: true).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
-            person
           end
         end
       end
@@ -2053,14 +2102,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         FactoryBot.create(:benefit_sponsors_organizations_general_organization,  "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site).tap do |org|
           benefit_sponsorship = org.employer_profile.add_benefit_sponsorship
           benefit_sponsorship.save
-          org
         end
       end
       let(:person) do
         FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
           FactoryBot.create(:permission, :super_admin, can_change_fein: true).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
-            person
           end
         end
       end

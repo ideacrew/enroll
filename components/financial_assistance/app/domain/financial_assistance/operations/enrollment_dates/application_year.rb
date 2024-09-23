@@ -7,7 +7,7 @@ module FinancialAssistance
   module Operations
     module EnrollmentDates
       class ApplicationYear
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ Date ] application_date Application Created Date
         # @return [ Date ] earliest_effective_date Application Earliest Effective Date

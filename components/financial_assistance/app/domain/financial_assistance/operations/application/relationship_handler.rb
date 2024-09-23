@@ -7,7 +7,7 @@ module FinancialAssistance
   module Operations
     module Application
       class RelationshipHandler
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ Hash ] params Applicant Attributes
         # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant

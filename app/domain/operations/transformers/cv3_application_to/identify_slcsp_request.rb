@@ -8,7 +8,7 @@ module Operations
     module Cv3ApplicationTo
       # Cv3Application will be transformed to request payload that is needed for IdentifySlcspWithPediatricDentalCosts.
       class IdentifySlcspRequest
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(cv3_application)
           cv3_application = yield validate(cv3_application)

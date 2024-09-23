@@ -8,7 +8,7 @@ module Operations
       # Operation terminates enrollments with aged of dependents and creates new enrollments excluding the aged off dependents.
       class Terminate
         include Config::SiteConcern
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         def call(enrollment_hbx_id:, new_date:)
           shop_logger = yield initialize_logger("shop")

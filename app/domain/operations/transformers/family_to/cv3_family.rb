@@ -11,7 +11,7 @@ module Operations
       class Cv3Family
         # Constructs cv3 payload including family and FA Application
 
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
         include Acapi::Notifiers
         require 'securerandom'
 
@@ -33,7 +33,7 @@ module Operations
 
         private
 
-        def construct_payload(family, exclude_applications, args)
+        def construct_payload(family, _exclude_applications, _args)
           @family_hbx_id = family.hbx_assigned_id.to_s
           payload = {
             hbx_id: @family_hbx_id,
@@ -43,18 +43,28 @@ module Operations
             payment_transactions: transform_payment_transactions(family.payment_transactions),
             magi_medicaid_applications: @transformed_applications,
             documents: transform_documents(family.documents),
-            timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime} # ,
+            timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime}
             # foreign_keys TO DO ??
             # general_agency_accounts = transform_general_agency_accounts(family.general_agency_accounts), #TO DO
             # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             # updated_by: construct_updated_by(updated_by)
           }
+          eligibility_determination = family.eligibility_determination
+          irs_groups = family.irs_groups
+          tax_household_groups = family.tax_household_groups
+
+          payload.merge!(eligibility_determination: transform_eligibility_determinination(eligibility_determination)) if eligibility_determination.present?
           payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
-          payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
+          payload.merge!(irs_groups: transform_irs_groups(irs_groups)) if irs_groups.present?
           payload.merge!(households: @transformed_households) if @transformed_households.present?
-          payload.merge!(tax_household_groups: transform_tax_household_groups(family.tax_household_groups)) if family.tax_household_groups.present?
+          payload.merge!(tax_household_groups: transform_tax_household_groups(tax_household_groups)) if tax_household_groups.present?
 
           Success(payload)
+        end
+
+        def transform_eligibility_determinination(eligibility_determination)
+          return {} if eligibility_determination.nil?
+          eligibility_determination.serializable_cv_hash
         end
 
         def transform_applications(family, exclude_applications)
@@ -62,6 +72,7 @@ module Operations
           return Success([]) if exclude_applications
 
           applications = ::FinancialAssistance::Application.where(family_id: family.id).determined
+
           transformed_applications = applications.collect do |application|
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end.compact
@@ -86,7 +97,7 @@ module Operations
               csl_num: period.csl_num,
               market_kind: period.market_kind,
               admin_flag: period.admin_flag,
-              timestamp: {created_at: period.created_at.to_datetime, modified_at: period.updated_at.to_datetime}
+              timestamp: { created_at: period.created_at.to_datetime, modified_at: period.updated_at.to_datetime }
             }
             sep_hash.merge!(next_poss_effective_date: period.next_poss_effective_date) if period.next_poss_effective_date.present?
             sep_hash.merge!(option1_date: period.option1_date) if period.option1_date.present?

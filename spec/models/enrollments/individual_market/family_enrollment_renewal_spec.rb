@@ -937,6 +937,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_ivl_osse_eligibility_#{enrollment.effective_on.year}").and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:total_minimum_responsibility).and_return(false)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
             enrollment.update_osse_childcare_subsidy
           end
 
@@ -975,6 +976,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
               allow(subject).to receive(:populate_aptc_hash).and_return(true)
               allow(subject).to receive(:subscriber_dropped?).and_return(false)
+              allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
             end
 
             it "should renew and apply child care subsidy" do

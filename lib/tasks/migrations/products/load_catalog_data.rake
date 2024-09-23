@@ -28,7 +28,7 @@ namespace :products do
   task :load_rating_areas, [:year] => :environment do |t, args|
     puts ':::: Loading Rating Areas ::::'
 
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/xls_templates/rating_areas", args[:year], "*.{xlsx, xls}"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/xls_templates/rating_areas", args[:year], "*.{xlsx,xls}"))
 
     files.each do |file|
       puts "processing file: #{file}"
@@ -48,7 +48,7 @@ namespace :products do
   task :load_service_areas, [:year] => :environment do |t, args|
     puts ':::: Loading Service Areas ::::'
 
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/xls_templates/service_areas", args[:year], "*.{xlsx, xls}"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/xls_templates/service_areas", args[:year], "*.{xlsx,xls}"))
 
     files.each do |file|
       puts "processing file: #{file}"

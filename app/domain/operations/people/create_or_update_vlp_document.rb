@@ -7,7 +7,7 @@ module Operations
   module People
     # Class for creating and uploading VLP Documents
     class CreateOrUpdateVlpDocument
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params:)
         values = yield validate(params[:applicant_params])

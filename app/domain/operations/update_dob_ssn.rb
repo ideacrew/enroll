@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   class UpdateDobSsn
-    send(:include, Dry::Monads[:result, :do])
+    include Dry::Monads[:do, :result]
 
     def call(person_id:, params:, current_user:, ssn_require:)
       person = yield fetch_person(person_id)
@@ -34,7 +34,7 @@ module Operations
       if params[:person][:ssn].blank?
         if ssn_require
           dont_update_ssn = true
-        else
+        elsif params[:person][:ssn] == '' # meaning they have deliberately been set to blank vs. not updating them
           person.unset(:encrypted_ssn)
         end
       else

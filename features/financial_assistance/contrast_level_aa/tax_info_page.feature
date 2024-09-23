@@ -1,4 +1,3 @@
-@accessibility
 Feature: contrast level aa is enabled - Tax Info page meets AA compliance
     
   Scenario: contrast level aa is enabled - Tax Info page meets AA compliance

@@ -7,7 +7,7 @@ module Operations
     # Operation check for date range (enrollment effective..current month) and processes based on the yml settings to determine if the operations should be running annualy/monthly.
     # Operation used to handle enrollment that missed terminating aged of dependents on a enrollment.
     class DependentAgeOff
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ HbxEnrollment ] hbx_enrollment
       # @return [ HbxEnrollment ] hbx_enrollment

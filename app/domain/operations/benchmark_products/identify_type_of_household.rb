@@ -4,7 +4,7 @@ module Operations
   module BenchmarkProducts
     # This class is to identify the type of household. Types: 'adult_only', 'adult_and_child', 'child_only'.
     class IdentifyTypeOfHousehold
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(benchmark_product_model)
         bpm_params = yield find_age_of_every_member_of_each_household(benchmark_product_model)

@@ -8,7 +8,7 @@ module Operations
     # Class for creating and updating family members in cooperation with Financial Assistance engine
     class CreateMember
       include EventSource::Command
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Creates a new family member.
       #
@@ -77,8 +77,10 @@ module Operations
         Failure("Relationship creation failed: #{e}")
       end
 
-      def persist_family(family_member, _family)
+      def persist_family(family_member, family)
         family_member.save!
+
+        family.active_household.coverage_households.each { |ch| ch.save! if ch.changed? }
         # family.save!
         Success(family_member.id)
       end

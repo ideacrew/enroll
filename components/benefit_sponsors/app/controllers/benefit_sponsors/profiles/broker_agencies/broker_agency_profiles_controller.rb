@@ -16,10 +16,11 @@ module BenefitSponsors
         before_action :set_current_person, only: [:staff_index]
         before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
         before_action :set_cache_headers, only: [:show]
+        before_action :enable_bs4_layout, only: [:show, :messages, :inbox, :family_index] if EnrollRegistry.feature_enabled?(:bs4_broker_flow)
 
         skip_before_action :verify_authenticity_token, only: :create
 
-        layout 'single_column'
+        layout :resolve_layout
 
         EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
           "2" => "legal_name",
@@ -44,9 +45,17 @@ module BenefitSponsors
         def staff_index
           # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
           authorize BenefitSponsors::Organizations::BrokerAgencyProfile
+          bs4 = params.permit(:bs4)[:bs4]
+          @bs4 = bs4 == "true" if bs4
           @q = params.permit(:q)[:q]
+
           @staff = eligible_brokers
-          @page_alphabets = page_alphabets(@staff, "last_name")
+          @page_alphabets = if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+                              grouped_alphabet(@staff, "last_name")
+                            else
+                              page_alphabets(@staff, "last_name")
+                            end
+          @alph_labels = @page_alphabets.map{|alph| [alph.first, alph.last].join("–")} if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
           page_no = cur_page_no(@page_alphabets.first)
           @staff = if @q.nil?
                      @staff.where(last_name: /^#{page_no}/i)
@@ -94,7 +103,8 @@ module BenefitSponsors
           @q = params.permit(:q)[:q]
 
           respond_to do |format|
-            format.js {}
+            format.js
+            format.html { render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/family_datatable.html.erb" } if @bs4
           end
         end
 
@@ -154,7 +164,7 @@ module BenefitSponsors
           authorize @broker_agency_profile
 
           respond_to do |format|
-            format.js {}
+            format.js
           end
         end
 
@@ -182,7 +192,7 @@ module BenefitSponsors
           notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
           flash[:notice] = notice
           UserMailer.broker_registration_guide(params).deliver_now
-          render 'benefit_sponsors/profiles/registrations/confirmation', :layout => 'single_column'
+          render 'benefit_sponsors/profiles/registrations/confirmation'
         end
 
         private
@@ -241,6 +251,15 @@ module BenefitSponsors
         def collect_and_sort_commission_statements(_sort_order = 'ASC')
           @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
           @statements.sort_by!(&:date).reverse!
+        end
+
+        def enable_bs4_layout
+          @bs4 = true
+        end
+
+        def resolve_layout
+          return "single_column" unless EnrollRegistry.feature_enabled?(:bs4_broker_flow)
+          "progress"
         end
       end
     end

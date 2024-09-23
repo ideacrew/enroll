@@ -6,6 +6,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::SepAll
   include ::Config::AcaHelper
   include HtmlScrubberUtil
+  include StringScrubberUtil
 
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -19,6 +20,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
 
+  # SHOP Feature
   def oe_extendable_applications
     authorize HbxProfile, :oe_extendable_applications?
 
@@ -26,6 +28,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  # SHOP Feature
   def oe_extended_applications
     authorize HbxProfile, :oe_extended_applications?
 
@@ -33,12 +36,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  # SHOP Feature
   def edit_open_enrollment
     authorize HbxProfile, :edit_open_enrollment?
 
     @benefit_application = @benefit_sponsorship.benefit_applications.find(params[:id])
   end
 
+  # SHOP Feature
   def extend_open_enrollment
     authorize HbxProfile, :extend_open_enrollment?
 
@@ -48,6 +53,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully extended employer(s) open enrollment." }
   end
 
+  # SHOP Feature
   def close_extended_open_enrollment
     authorize HbxProfile, :close_extended_open_enrollment?
 
@@ -56,6 +62,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "Successfully closed employer(s) open enrollment." }
   end
 
+  # SHOP Feature
   def new_benefit_application
     authorize HbxProfile, :new_benefit_application?
 
@@ -63,6 +70,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  # SHOP Feature
   def create_benefit_application
     authorize HbxProfile, :create_benefit_application?
 
@@ -72,6 +80,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @element_to_replace_id = params[:employer_actions_id]
   end
 
+  # SHOP Feature
   def edit_fein
     authorize HbxProfile, :edit_fein?
 
@@ -83,6 +92,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def update_fein
     authorize HbxProfile, :update_fein?
 
@@ -99,6 +109,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def binder_paid
     authorize HbxProfile, :binder_paid?
 
@@ -120,6 +131,8 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @resource = get_resource_for_secure_form(params)
     @element_to_replace_id = params[:employer_actions_id] || params[:family_actions_id]
+
+    respond_to :js
   end
 
   def create_send_secure_message
@@ -147,6 +160,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def disable_ssn_requirement
     authorize HbxProfile, :disable_ssn_requirement?
 
@@ -171,6 +185,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "SSN/TIN requirement has been successfully updated for the roster of selected employer" }
   end
 
+  # SHOP Feature
   def generate_invoice
     authorize HbxProfile, :generate_invoice?
 
@@ -189,6 +204,7 @@ class Exchanges::HbxProfilesController < ApplicationController
      end
   end
 
+  # SHOP Feature
   def edit_force_publish
     authorize HbxProfile, :edit_force_publish?
 
@@ -200,6 +216,7 @@ class Exchanges::HbxProfilesController < ApplicationController
    end
   end
 
+  # SHOP Feature
   def force_publish
     authorize HbxProfile, :force_publish?
 
@@ -218,6 +235,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def employer_invoice
     authorize HbxProfile, :employer_invoice?
 
@@ -233,6 +251,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  # SHOP Feature
   def employer_datatable
     authorize HbxProfile, :employer_datatable?
 
@@ -291,9 +310,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     else
       @staff = @staff.where(last_name: @q)
     end
+
+    respond_to :js
   end
 
   def request_help
+    raise ActionController::UnknownFormat unless request.format.html?
+
     insured = Person.where(_id: params[:person]).first
     authorize insured.primary_family, :request_help?
 
@@ -332,9 +355,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     else
       status_text = call_customer_service params[:firstname].strip, params[:lastname].strip
     end
+    status_text = l10n("broker_agencies.successfully_assigned") if params[:broker].present?
     @person = Person.find(params[:person])
     broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
-    render :plain => {broker: broker_view, status: status_text}.to_json, layout: false
+    render :plain => {broker: broker_view, status: status_text, broker_id: broker_role_id}.to_json, layout: false
   end
 
   def family_index
@@ -399,6 +423,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :hide_form?
 
     @element_to_replace_id = params[:family_actions_id]
+
+    respond_to :js
   end
 
   def add_sep_form
@@ -406,6 +432,8 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
+
+    respond_to :js
   end
 
   def show_sep_history
@@ -413,8 +441,11 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
+
+    respond_to :js
   end
 
+  # SHOP and IVL Feature
   def get_user_info
     authorize HbxProfile, :get_user_info?
 
@@ -431,6 +462,8 @@ class Exchanges::HbxProfilesController < ApplicationController
         BenefitSponsors::Organizations::Organization.find(@element_to_replace_id.split("_").last)
       end
     end
+
+    respond_to :js
   end
 
   def update_effective_date
@@ -447,9 +480,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :calculate_sep_dates?
 
     calculateDates
-    respond_to do |format|
-      format.js {}
-    end
+    respond_to :js
   end
 
   def add_new_sep
@@ -493,7 +524,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
     end
-
   end
 
   def update_terminate_enrollment
@@ -543,6 +573,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     @enrollments = @person.primary_family.terminated_and_expired_enrollments
     @coverage_ended_enrollments = @person.primary_family.hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending", "coverage_expired"])
     @dup_enr_ids = fetch_duplicate_enrollment_ids(@coverage_ended_enrollments).map(&:to_s)
+
+    respond_to :js
   end
 
   def update_enrollment_terminated_on_date
@@ -569,10 +601,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :broker_agency_index?
 
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new
-
-    #@q = params.permit(:q)[:q]
-    #@broker_agency_profiles = HbxProfile.search_random(@q)
-
 
     respond_to do |format|
       format.html { render 'exchanges/hbx_profiles/broker_agency_index_datatable.html.slim' }
@@ -611,6 +639,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_and_expired_enrollments
+
+    respond_to :js
   end
 
   def reinstate_enrollment
@@ -727,20 +757,28 @@ class Exchanges::HbxProfilesController < ApplicationController
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       @element_to_replace_id = params[:tax_household_group][:family_actions_id]
       family = Person.find(params[:tax_household_group][:person_id]).primary_family
-      ::Operations::TaxHouseholdGroups::CreateEligibility.new.call({
-                                                                     family: family,
-                                                                     th_group_info: params.require(:tax_household_group).permit(
-                                                                       :person_id,
-                                                                       :family_actions_id,
-                                                                       :effective_date,
-                                                                       :tax_households => {}
-                                                                     ).to_h
-                                                                   })
+      result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call(
+        {
+          family: family,
+          th_group_info: params.require(:tax_household_group).permit(
+            :person_id, :family_actions_id, :effective_date, tax_households: {}
+          ).to_h
+        }
+      )
+
+      @result = if result.success?
+                  { success: true, message: result.success }
+                else
+                  { success: false, error: result.failure }
+                end
     else
       @element_to_replace_id = params[:person][:family_actions_id]
       family = Person.find(params[:person][:person_id]).primary_family
       family.active_household.create_new_tax_household(params[:person])
+      @result = { success: true, message: l10n('eligibility.created') }
     end
+
+    respond_to :js
   end
 
   # GET /exchanges/hbx_profiles/1
@@ -812,6 +850,35 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
     redirect_to exchanges_hbx_profiles_root_path
 
+  end
+
+  def ivl_dry_run_dashboard
+    authorize HbxProfile, :can_view_dry_run_dashboard?
+
+    result = ::Operations::HbxAdmin::DryRun::Individual::Analyzer.new.call
+
+    if result.failure?
+      flash[:error], skeleton = result.failure
+      eligible_families = {}
+      application_states = skeleton["mapped_application_states"]
+      benefit_coverage_values = {}
+      oe_determined_notices = skeleton["oe_determined_notices"]
+      enrollment_states = skeleton["enrollment_states"]
+    else
+      eligible_families, application_states, benefit_coverage_values, oe_determined_notices, enrollment_states = result.success
+    end
+
+    respond_to do |format|
+      format.html do
+        render 'dry_run_dashboard', locals: {
+          eligible_families: eligible_families,
+          application_states: application_states,
+          benefit_coverage_values: benefit_coverage_values,
+          oe_determined_notices: oe_determined_notices,
+          enrollment_states: enrollment_states
+        }
+      end
+    end
   end
 
   private
@@ -935,7 +1002,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def new_ba_params
-    params.merge!({ admin_datatable_action: true }).permit(:benefit_sponsorship_id, :admin_datatable_action)
+    { benefit_sponsorship_id: sanitize_to_hex(params[:benefit_sponsorship_id]), admin_datatable_action: true }
   end
 
   def create_ba_params
@@ -1016,7 +1083,9 @@ class Exchanges::HbxProfilesController < ApplicationController
       result.deliver_now
       puts result.to_s if Rails.env.development?
     else
-      Rails.logger.warn("No email found for #{full_name} with hbx_id #{hbx_id}")
+      Rails.logger.warn(
+        "No email found for person with hbx_id #{hbx_id}, person_id: #{params[:consumer_person_id] || params[:person]}"
+      )
     end
   end
 

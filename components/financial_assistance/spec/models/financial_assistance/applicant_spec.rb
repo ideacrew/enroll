@@ -1075,7 +1075,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns false" do
-          expect(applicant.valid_spousal_relationship?).to eq false
+          expect(applicant.invalid_spousal_relationship.present?).to eq true
         end
       end
 
@@ -1097,7 +1097,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns true" do
-          expect(applicant.valid_spousal_relationship?).to eq true
+          expect(applicant.invalid_spousal_relationship.present?).to eq false
         end
       end
     end
@@ -1122,7 +1122,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns false" do
-          expect(applicant3.valid_family_relationships?).to eql(false)
+          expect(applicant3.invalid_family_relationships.present?).to eql(true)
         end
       end
 
@@ -1144,7 +1144,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns true" do
-          expect(applicant.valid_family_relationships?).to eql(true)
+          expect(applicant.invalid_family_relationships.present?).to eql(false)
         end
       end
     end
@@ -1188,7 +1188,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns false" do
-          expect(applicant5.valid_family_relationships?).to eql(false)
+          expect(applicant5.invalid_family_relationships.present?).to eql(true)
         end
       end
 
@@ -1214,7 +1214,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns true" do
-          expect(applicant5.valid_family_relationships?).to eql(true)
+          expect(applicant5.invalid_family_relationships.present?).to eql(false)
         end
       end
     end
@@ -1260,7 +1260,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         it "returns true" do
           application.applicants.each do |applicant|
-            expect(applicant.valid_family_relationships?).to eql(true)
+            expect(applicant.invalid_family_relationships.present?).to eql(false)
           end
         end
       end
@@ -1287,7 +1287,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns false" do
-          expect(applicant4.valid_family_relationships?).to eql(false)
+          expect(applicant4.invalid_family_relationships.present?).to eql(true)
         end
       end
     end
@@ -1598,6 +1598,80 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           current_evidence.reload
           expect(current_evidence.verification_outstanding).to be_truthy
           expect(current_evidence.is_satisfied).to be_falsey
+        end
+      end
+    end
+
+    context 'set evidence to rejected' do
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context 'for income evidence' do
+        before do
+          applicant.create_income_evidence(key: :income, title: "Income", aasm_state: 'pending', verification_outstanding: false, is_satisfied: true)
+        end
+
+        let(:current_evidence) { applicant.income_evidence }
+
+        let(:due_on) { TimeKeeper.date_of_record + 96.days }
+        let(:desired_due_date) { TimeKeeper.date_of_record + 1.month }
+
+        it 'should move evidence to rejected and set due date' do
+          applicant.set_evidence_rejected(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.due_on).to eq due_on
+          expect(current_evidence.aasm_state).to eql('rejected')
+        end
+
+        context "with evidence in review" do
+
+          before do
+            current_evidence.update_attributes!(aasm_state: 'review', due_on: desired_due_date)
+          end
+          it 'should move evidence to rejected and set due date' do
+            applicant.set_evidence_rejected(current_evidence)
+            current_evidence.reload
+            expect(current_evidence.due_on).to eq desired_due_date
+            expect(current_evidence.aasm_state).to eql('rejected')
+          end
+        end
+      end
+
+      context 'for esi mec evidence' do
+
+        let(:due_on) { TimeKeeper.date_of_record + 96.days }
+        let(:desired_due_date) { TimeKeeper.date_of_record + 1.month }
+
+        before do
+          applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', verification_outstanding: false, is_satisfied: true)
+        end
+
+        let(:current_evidence) { applicant.esi_evidence }
+
+        it 'should move evidence to rejected and set due date' do
+          applicant.set_evidence_rejected(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.due_on).to eq due_on
+          expect(current_evidence.aasm_state).to eql('rejected')
+        end
+
+        context "with evidence in review" do
+
+          before do
+            applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'review', verification_outstanding: false, is_satisfied: true, due_on: desired_due_date)
+          end
+
+          it 'should move evidence to rejected and set due date' do
+            applicant.set_evidence_rejected(current_evidence)
+            current_evidence.reload
+            expect(current_evidence.due_on).to eq desired_due_date
+            expect(current_evidence.aasm_state).to eql('rejected')
+          end
         end
       end
     end

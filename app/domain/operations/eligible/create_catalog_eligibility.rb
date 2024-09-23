@@ -55,7 +55,7 @@ module Operations
 
     # Operation to support yearly catalog eligibility configuration creation
     class CreateCatalogEligibility
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       attr_reader :subject, :calender_year, :eligibility_feature
 

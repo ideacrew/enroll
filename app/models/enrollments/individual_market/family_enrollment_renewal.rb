@@ -363,7 +363,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     latest_enrollment = @enrollment.family.active_household.hbx_enrollments.where(:aasm_state.nin => ['shopping']).order_by(:created_at.desc).first
     old_enrollment_members.inject([]) do |members, hbx_enrollment_member|
       member = latest_enrollment.hbx_enrollment_members.where(applicant_id: hbx_enrollment_member.applicant_id).first
-      tobacco_use = member&.tobacco_use || 'N'
+
+      tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "NA" : (member&.tobacco_use || "N")
+
       members << HbxEnrollmentMember.new({ applicant_id: hbx_enrollment_member.applicant_id,
                                            eligibility_date: renewal_coverage_start,
                                            coverage_start_on: renewal_coverage_start,

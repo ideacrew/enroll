@@ -3,10 +3,21 @@
 module Operations
   module Individual
     class CancelRenewalEnrollment
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
       include FloatHelper
 
-      def call(hbx_enrollment:)
+      # Executes the process of cancelling renewal enrollments.
+      # This method takes a hash of parameters, validates the enrollment, filters it, and then cancels the renewals.
+      #
+      # @param params [Hash] A hash containing :hbx_enrollment.
+      #   - :hbx_enrollment [HbxEnrollment] The enrollment to cancel renewals for.
+      #
+      # @return [Dry::Monads::Result] A Success or Failure monad.
+      #   - Success: Contains the cancelled renewals.
+      #   - Failure: Contains an error message.
+      def call(params)
+        hbx_enrollment = params[:hbx_enrollment]
+
         validated_enrollment = yield validate(hbx_enrollment)
         filter_enrollment = yield filter_enrollment(validated_enrollment)
         cancel_renewals = cancel_renewals(filter_enrollment)

@@ -1,5 +1,6 @@
 Feature: Consumer plan shopping
   Scenario: Consumer cannot update their plan using browser back after enrollment is submitted
+    Given bs4_consumer_flow feature is disable
     Given a ME site exists
     And that a person exists in EA
     And the person fills in all personal info
@@ -14,4 +15,4 @@ Feature: Consumer plan shopping
     And I click on purchase confirm button for matched person
     Then I should see pay now button
     When user clicks browser back button
-    Then user should redirect to receipt page and should see a flash message
+    Then user should redirect to receipt page

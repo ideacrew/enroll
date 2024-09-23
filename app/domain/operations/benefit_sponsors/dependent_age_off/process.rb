@@ -10,9 +10,11 @@ module Operations
       class Process
         include Config::SiteConcern
         include EventSource::Command
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
-        def call(new_date:, enrollment_query: nil)
+        def call(params)
+          new_date, enrollment_query = params.values_at(:new_date, :enrollment_query)
+
           yield can_process_event(new_date)
           shop_logger = yield initialize_logger("shop")
           query_criteria = yield shop_query_criteria(enrollment_query)
@@ -48,7 +50,7 @@ module Operations
             payload = { enrollment_hbx_id: enrollment.hbx_id.to_s, new_date: new_date }
 
             if Rails.env.test?
-              Operations::BenefitSponsors::DependentAgeOff::Terminate.new.call(payload)
+              Operations::BenefitSponsors::DependentAgeOff::Terminate.new.call(**payload)
             else
               event = event('events.benefit_sponsors.non_congressional.dependent_age_off_termination.requested', attributes: payload).value!
               event.publish

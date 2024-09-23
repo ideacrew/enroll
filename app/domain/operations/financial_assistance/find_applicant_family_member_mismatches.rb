@@ -7,7 +7,7 @@ module Operations
   module FinancialAssistance
     # Find application family mismatches on the members
     class FindApplicantFamilyMemberMismatches
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to find applicant family member mismatches
       # @option opts [String] :assistance_year required

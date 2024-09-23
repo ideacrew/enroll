@@ -7,7 +7,7 @@ module Operations
   module HbxEnrollments
     # Publish event on enrollment change
     class PublishChangeEvent
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
 
       def call(event_name:, enrollment:)

@@ -8,7 +8,7 @@ module Operations
     module ProcessRequests
       # This Operation processes DetemineSlcsp Request and adds benchmark_product to Cv3Application.
       class DetermineSlcsp
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
         include EventSource::Command
 
         def call(params)

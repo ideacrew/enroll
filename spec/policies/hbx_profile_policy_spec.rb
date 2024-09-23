@@ -316,7 +316,13 @@ describe HbxProfilePolicy do
     subject { described_class.new(user, HbxProfile) }
 
     shared_examples_for 'access without role' do |def_name, result|
-      let(:user) { double(User, person: double(hbx_staff_role: nil, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil, primary_family: nil)) }
+      let(:user) do
+        double(
+          User,
+          identity_verified?: false,
+          person: double(hbx_staff_role: nil, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil, primary_family: nil)
+        )
+      end
 
       it "#{def_name} returns #{result}" do
         expect(subject.send(def_name)).to eq result
@@ -389,7 +395,13 @@ describe HbxProfilePolicy do
     it_behaves_like 'access without role', :login_history?
 
     shared_examples_for 'with role and permission' do |def_name, permission_name, permission_val, result|
-      let(:user) { double(User, person: double(hbx_staff_role: staff_role, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil, primary_family: nil)) }
+      let(:user) do
+        double(
+          User,
+          identity_verified?: false,
+          person: double(hbx_staff_role: staff_role, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil, primary_family: nil)
+        )
+      end
       let(:staff_role) { double(permission: permission) }
       let(:permission) { double(:permission) }
 
@@ -662,6 +674,7 @@ RSpec.describe HbxProfilePolicy, "given a linked, admin user without the #can_ed
   let(:user) do
     instance_double(
       User,
+      :identity_verified? => false,
       :person => person
     )
   end
@@ -699,6 +712,7 @@ RSpec.describe HbxProfilePolicy, "given a linked, admin user with the #can_edit_
   let(:user) do
     instance_double(
       User,
+      :identity_verified? => false,
       :person => person
     )
   end

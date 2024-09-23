@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module VerificationHelper
   include DocumentsVerificationStatus
   include HtmlScrubberUtil
@@ -37,6 +39,45 @@ module VerificationHelper
     end
   end
 
+  def display_verification_type_name(v_type)
+    case v_type
+    when 'ME Residency'
+      'Income'
+    when 'Alive Status'
+      'Deceased'
+    else
+      v_type
+    end
+  end
+
+  # method added specifically to handle the displaying of 'Alive Status'
+  # this verification type should always be visible to admin
+  # but should only display for consumers/brokers/broker agency staff if the validation_status is 'outstanding'
+  def can_display_type?(verif_type)
+    return true unless verif_type.type_name == 'Alive Status'
+    return false unless EnrollRegistry.feature_enabled?(:enable_alive_status)
+    return true if current_user.has_hbx_staff_role?
+
+    previous_states = verif_type.type_history_elements.pluck(:from_validation_status).compact
+    return true if previous_states.include?('outstanding')
+    return true if verif_type.validation_status == 'outstanding'
+
+    false
+  end
+
+  def ridp_status_translated(type, person)
+    case ridp_type_status(type, person)
+    when 'in review'
+      l10n("ridp_status.in_review")
+    when 'valid'
+      l10n("ridp_status.verified")
+    when 'rejected'
+      l10n('verification_type.validation_status')
+    else
+      l10n("ridp_status.outstanding")
+    end
+  end
+
   def verification_type_class(status)
     case status
     when 'verified', 'valid'
@@ -46,7 +87,7 @@ module VerificationHelper
     when 'outstanding', 'rejected'
       'danger'
     when 'curam', 'attested', 'expired', 'unverified'
-      'default'
+      @bs4 ? 'absent' : 'default'
     when 'pending'
       'info'
     end
@@ -149,7 +190,7 @@ module VerificationHelper
   def get_person_v_type_status(people)
     v_type_status_list = []
     people.each do |person|
-      person.verification_types.each do |v_type|
+      person.verification_types.without_alive_status_type.each do |v_type|
         v_type_status_list << verification_type_status(v_type, person)
       end
     end
@@ -239,7 +280,8 @@ module VerificationHelper
   end
 
   def build_admin_actions_list(v_type, f_member)
-    if f_member.consumer_role.aasm_state == 'unverified'
+    rejected_list = EnrollRegistry.feature_enabled?(:enable_call_hub_for_ai_an) ? ['Alive Status', 'American Indian Status'] : ['Alive Status']
+    if f_member.consumer_role.aasm_state == 'unverified' || rejected_list.include?(v_type.type_name)
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
     elsif verification_type_status(v_type, f_member) == 'outstanding'
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
@@ -274,6 +316,8 @@ module VerificationHelper
   end
 
   def request_response_details(person, record, v_type)
+    return show_deceased_verification_response(person, record) if v_type == VerificationType::ALIVE_STATUS
+
     local_residency = EnrollRegistry[:enroll_app].setting(:state_residency).item
     if record.event_request_record_id
       v_type == local_residency ? show_residency_request(person, record) : show_ssa_dhs_request(person, record)
@@ -287,6 +331,13 @@ module VerificationHelper
         |request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)
     }
     raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no request record"
+  end
+
+  def show_deceased_verification_response(person, history)
+    return unless history.event_response_record_id
+
+    event_response = person.consumer_role.alive_status_responses.select{ |response| response.id == BSON::ObjectId.from_string(history.event_response_record_id) }.first
+    event_response.present? ? JSON.parse(event_response.body) : "no response record"
   end
 
   def show_ssa_dhs_request(person, record)

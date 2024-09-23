@@ -1,0 +1,32 @@
+<div class="row">
+  <%= f.hidden_field :kind, value: 'work', id: "phoneType" %>
+  <div class="col-md-3 mb-3">
+    <% phone_error = l10n('phone_number.error') %>
+    <%= f.label :full_number_without_extension, l10n("phone_number"), class: "required" %>
+    <%= f.text_field :full_number_without_extension,
+      placeholder: "(000) 000-0000",
+      required: true,
+      class: 'form-control phone_number',
+      minlength: '14',
+      maxlength: '14',
+      onkeypress: 'return isNumberKey(event)',
+      value: determine_phone_number(f.object),
+      data: { :"error-message" => phone_error }
+    %>
+    <div class="invalid-feedback">
+      <%= phone_error %>
+    </div>
+  </div>
+  <% unless EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == "dc" %>
+    <div class="col-md-3 mb-3">
+      <%= f.label :extension, l10n('phone_number.extension') %>
+      <%= f.text_field :extension, class: 'form-control', maxlength: '10' %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  $(document).ready( function() {
+    $.inputMasks();
+  });
+</script>

@@ -1,0 +1,14 @@
+.ssn-eye-off, .ssn-eye-on {
+  cursor: pointer;
+}
+
+.admin-ssn-block {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  .ssn-facade {
+    // this is a magic number that makes placeholders the same width as the numbers
+    letter-spacing: 0.055em;
+  }
+}

@@ -7,7 +7,7 @@ module Operations
   module Individual
     # Fetches open enrollment start on benefit coverage period based on the provided date
     class OpenEnrollmentStartOn
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(params)
         effective_date = yield validate_date(params[:date])

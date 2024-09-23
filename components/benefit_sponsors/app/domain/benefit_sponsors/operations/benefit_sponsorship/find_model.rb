@@ -7,7 +7,7 @@ module BenefitSponsors
   module Operations
     module BenefitSponsorship
       class FindModel
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param  [ String ] benefit_sponsorship_id Benefit Sponsorship ID as string
         # @return [ BenefitSponsorship ] BenefitSponsorship object

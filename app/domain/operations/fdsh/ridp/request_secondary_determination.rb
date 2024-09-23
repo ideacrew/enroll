@@ -10,7 +10,7 @@ module Operations
       class RequestSecondaryDetermination
         # Secondary request from fdsh gateway
 
-        include Dry::Monads[:result, :do, :try]
+        include Dry::Monads[:do, :result]
         include Acapi::Notifiers
 
         def call(family, interactive_verification)

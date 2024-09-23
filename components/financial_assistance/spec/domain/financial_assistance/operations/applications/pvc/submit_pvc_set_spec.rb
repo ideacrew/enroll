@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSet, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:person2) { FactoryBot.create(:person, hbx_id: "732021") }
@@ -64,7 +64,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
 
-    allow(Family).to receive(:with_active_coverage_and_aptc_csr_grants_for_year).and_return([family.id])
+    allow(Family).to receive(:with_applied_aptc_or_csr_active_enrollments).and_return([family.id])
   end
 
   context 'success' do

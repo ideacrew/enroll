@@ -4,11 +4,11 @@
 class IvlIapJobIncomeInformationPage
 
   def self.has_job_income_yes_radiobtn
-    'has_job_income_true'
+    '#has_job_income_true' unless EnrollRegistry[:bs4_consumer_flow].enabled?
   end
 
   def self.has_job_income_no_radiobtn
-    'has_job_income_false'
+    '.interaction-choice-control-value-has-job-income-false' unless EnrollRegistry[:bs4_consumer_flow].enabled?
   end
 
   def self.not_sure_has_job_income_link
@@ -24,15 +24,15 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.income_how_often_dropdown
-    'div[class="selectric-wrapper selectric-interaction-choice-control-income-frequency-kind"] span'
+    'div[class="fa-frequency-kind"] span.label'
   end
 
   def self.select_bi_weekly
-    'li[class="interaction-choice-control-income-frequency-kind-1 interaction-choice-control-income-employer-address-state-1"]'
+    '.fa-frequency-kind li[data-index="1"]'
   end
 
   def self.select_yearly
-    'li[class="interaction-choice-control-income-frequency-kind-7 last interaction-choice-control-income-employer-address-state-7"]'
+    '.fa-frequency-kind li[data-index="7"]'
   end
 
   def self.income_from
@@ -64,7 +64,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.select_dc
-    'li[class="interaction-choice-control-income-employer-address-state-9 interaction-choice-control-income-frequency-kind-9"]'
+    '.employer-state li[data-index="9"]'
   end
 
   def self.select_va_state
@@ -84,7 +84,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.add_another_job_income
-    '.interaction-click-control-add-another-job-income'
+    '#new-income'
   end
 
   def self.income_cancel_btn
@@ -100,11 +100,11 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.has_self_employee_income_yes_radiobtn
-    'has_self_employment_income_true'
+    '#has_self_employment_income_true' unless EnrollRegistry[:bs4_consumer_flow].enabled?
   end
 
   def self.has_self_employee_income_no_radiobtn
-    'has_self_employment_income_false'
+    '#has_self_employment_income_false' unless EnrollRegistry[:bs4_consumer_flow].enabled?
   end
 
   def self.self_employee_income_amount
@@ -118,6 +118,7 @@ class IvlIapJobIncomeInformationPage
   def self.self_employed_yearly
     '#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7'
   end
+
   def self.self_employee_income_from
     'income[start_on]'
   end
@@ -143,7 +144,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.self_add_another_self_employment
-    '.interaction-click-control-add-another--self-employed-income'
+    '#new-self-income'
   end
 
   def self.self_employee_edit_btn
@@ -163,7 +164,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.continue_btn
-    '.interaction-click-control-continue'
+    '.interaction-click-control-continue' unless EnrollRegistry[:bs4_consumer_flow].enabled?
   end
 
   def self.start_date_warning

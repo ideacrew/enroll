@@ -13,7 +13,7 @@ module FinancialAssistance
           class Cv3Application # rubocop:disable Metrics/ClassLength
             # constructs cv3 payload for medicaid gateway.
 
-            include Dry::Monads[:result, :do]
+            include Dry::Monads[:do, :result]
             include Acapi::Notifiers
 
             FAA_MITC_RELATIONSHIP_MAP = {
@@ -66,8 +66,8 @@ module FinancialAssistance
               application     = yield validate(application)
               notice_options  = yield notice_options_for_app(application)
               oe_start_on     = yield fetch_oe_start_on(application)
-              benchmark_premiums = yield applicant_benchmark_premium(application)
-              request_payload = yield construct_payload(application, notice_options, oe_start_on, benchmark_premiums)
+              request_payload = yield construct_payload(application, notice_options, oe_start_on)
+
               Success(request_payload)
             end
 
@@ -84,7 +84,7 @@ module FinancialAssistance
             end
 
             def paper_notification(application)
-              family = find_family(application.family_id)
+              family = family(application.family_id)
               consumer_role = family.primary_person&.consumer_role
 
               # default to paper if we are unable to find out contact method
@@ -98,30 +98,33 @@ module FinancialAssistance
               ::Operations::Individual::OpenEnrollmentStartOn.new.call({date: application.effective_date.to_date})
             end
 
-            def construct_payload(application, notice_options, oe_start_on, benchmark_premiums)
-              payload = {family_reference: {hbx_id: find_family(application.family_id)&.hbx_assigned_id.to_s},
-                         assistance_year: application.assistance_year,
-                         aptc_effective_date: application.effective_date,
-                         years_to_renew: application.renewal_base_year,
-                         renewal_consent_through_year: application.years_to_renew,
-                         is_ridp_verified: application.is_ridp_verified.present?,
-                         is_renewal_authorized: application.is_renewal_authorized.present?,
-                         applicants: applicants(application, benchmark_premiums),
-                         relationships: application_relationships(application),
-                         tax_households: tax_households(application),
-                         us_state: application.us_state,
-                         hbx_id: application.hbx_id,
-                         oe_start_on: oe_start_on,
-                         submitted_at: application.submitted_at,
-                         notice_options: notice_options,
-                         mitc_households: mitc_households(application),
-                         mitc_tax_returns: mitc_tax_returns(application)}
-              payload.merge!({full_medicaid_determination: application.full_medicaid_determination}) if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
+            def construct_payload(application, notice_options, oe_start_on)
+              payload = {
+                family_reference: {hbx_id: family(application.family_id)&.hbx_assigned_id.to_s},
+                assistance_year: application.assistance_year,
+                aptc_effective_date: application.effective_date,
+                years_to_renew: application.renewal_base_year,
+                renewal_consent_through_year: application.years_to_renew,
+                is_ridp_verified: application.is_ridp_verified.present?,
+                is_renewal_authorized: application.is_renewal_authorized.present?,
+                applicants: applicants(application),
+                relationships: application_relationships(application),
+                tax_households: tax_households(application),
+                us_state: application.us_state,
+                hbx_id: application.hbx_id,
+                oe_start_on: oe_start_on,
+                submitted_at: application.submitted_at,
+                notice_options: notice_options,
+                mitc_households: mitc_households(application),
+                mitc_tax_returns: mitc_tax_returns(application)
+              }
+
+              payload.merge!({ full_medicaid_determination: application.full_medicaid_determination }) if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step)
               Success(payload)
             end
 
-            def find_family(family_id)
-              ::Family.find(family_id)
+            def family(id)
+              @family ||= ::Family.only(:hbx_assigned_id, :'family_members.is_primary_applicant', :'family_members.is_active', :'family_members.person_id', :'family_members._id', :'family_members.created_at').find(id)
             end
 
             def encrypt(value)
@@ -130,120 +133,147 @@ module FinancialAssistance
             end
 
             def applicant_qnc_code(applicant)
-              return true if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+              return true if use_defaults_for_qnc_and_five_year_bar_data?
               return applicant.qualified_non_citizen if applicant.qualified_non_citizen.present?
 
               applicant.eligible_immigration_status ? true : false
             end
 
             def applicant_five_year_bar_met(applicant)
-              return false if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+              return false if use_defaults_for_qnc_and_five_year_bar_data?
 
               applicant.five_year_bar_met.present?
             end
 
             def applicant_five_year_bar_applies(applicant)
-              return false if EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+              return false if use_defaults_for_qnc_and_five_year_bar_data?
 
               applicant.five_year_bar_applies.present?
             end
 
+            def use_defaults_for_qnc_and_five_year_bar_data?
+              @use_defaults_for_qnc_and_five_year_bar_data ||= EnrollRegistry.feature_enabled?(:use_defaults_for_qnc_and_five_year_bar_data)
+            end
+
             # rubocop:disable Metrics/AbcSize
             # rubocop:disable Metrics/MethodLength
-            def applicants(application, benchmark_premiums)
-              application.applicants.inject([]) do |result, applicant|
+            def applicants(application)
+              assistance_year = application.assistance_year
+              applicants = application.applicants
+
+              applicants.inject([]) do |result, applicant|
                 mitc_eligible_incomes = eligible_incomes_for_mitc(applicant)
                 prior_insurance_benefit = prior_insurance(applicant)
                 enrolled_benefits = enrolled_health_coverage?(applicant)
                 eligible_benefits = eligible_health_coverage?(applicant)
-                result << {name: name(applicant),
-                           identifying_information: identifying_information(applicant),
-                           demographic: demographic(applicant),
-                           attestation: attestation(applicant),
-                           is_primary_applicant: applicant.is_primary_applicant.present?,
-                           native_american_information: native_american_information(applicant),
-                           citizenship_immigration_status_information: { citizen_status: applicant.citizen_status,
-                                                                         is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
-                                                                         is_resident_post_092296: applicant.is_resident_post_092296 },
-                           is_consumer_role: applicant.is_consumer_role.present?,
-                           is_resident_role: applicant.is_resident_role.present?,
-                           is_applying_coverage: applicant.is_applying_coverage.present?,
-                           five_year_bar_applies: applicant_five_year_bar_applies(applicant),
-                           five_year_bar_met: applicant_five_year_bar_met(applicant),
-                           qualified_non_citizen: applicant_qnc_code(applicant),
-                           is_consent_applicant: applicant.is_consent_applicant.present?,
-                           vlp_document: vlp_document(applicant),
-                           family_member_reference: {family_member_hbx_id: applicant.person_hbx_id.to_s,
-                                                     first_name: applicant.first_name,
-                                                     last_name: applicant.last_name,
-                                                     person_hbx_id: applicant.person_hbx_id,
-                                                     is_primary_family_member: applicant.is_primary_applicant.present?},
-                           person_hbx_id: applicant.person_hbx_id.to_s,
-                           is_required_to_file_taxes: applicant.is_required_to_file_taxes.present?,
-                           is_filing_as_head_of_household: applicant.is_filing_as_head_of_household.present?,
-                           is_joint_tax_filing: applicant.is_joint_tax_filing.present?,
-                           is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent.present?,
-                           claimed_as_tax_dependent_by: applicant_reference_by_applicant_id(application, applicant.claimed_as_tax_dependent_by),
-                           tax_filer_kind: applicant.tax_filer_kind,
-                           student: student_information(applicant),
-                           is_refugee: applicant.is_refugee.present?,
-                           is_trafficking_victim: applicant.is_trafficking_victim.present?,
-                           foster_care: foster(applicant),
-                           pregnancy_information: pregnancy_information(applicant),
-                           is_primary_caregiver: applicant.is_primary_caregiver,
-                           is_subject_to_five_year_bar: applicant.is_subject_to_five_year_bar.present?,
-                           is_five_year_bar_met: applicant.is_five_year_bar_met.present?,
-                           is_forty_quarters: applicant.is_forty_quarters.present?,
-                           is_ssn_applied: applicant.is_ssn_applied.present?,
-                           non_ssn_apply_reason: applicant.non_ssn_apply_reason,
-                           moved_on_or_after_welfare_reformed_law: applicant.moved_on_or_after_welfare_reformed_law.present?,
-                           is_currently_enrolled_in_health_plan: applicant.is_currently_enrolled_in_health_plan.present?,
-                           has_daily_living_help: applicant.has_daily_living_help.present?,
-                           need_help_paying_bills: applicant.need_help_paying_bills.present?,
-                           has_job_income: applicant.has_job_income.present? ? applicant.incomes.present? : false,
-                           has_self_employment_income: applicant.has_self_employment_income.present? ? applicant.incomes.present? : false,
-                           has_unemployment_income: applicant.has_unemployment_income.present? ? applicant.incomes.present? : false,
-                           has_other_income: applicant.has_other_income.present? ? applicant.incomes.present? : false,
-                           has_deductions: applicant.has_deductions.present? ? applicant.deductions.present? : false,
-                           has_enrolled_health_coverage: enrolled_benefits,
-                           has_eligible_health_coverage: eligible_benefits,
-                           job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage.present?,
-                           job_coverage_end_date: applicant.dependent_job_end_on,
-                           medicaid_and_chip: medicaid_and_chip(applicant),
-                           other_health_service: {has_received: applicant.health_service_through_referral.present?,
-                                                  is_eligible: applicant.health_service_eligible.present?},
-                           addresses: addresses(applicant),
-                           emails: emails(applicant),
-                           phones: phones(applicant),
-                           incomes: incomes(applicant),
-                           benefits: benefits(applicant, enrolled_benefits, eligible_benefits),
-                           deductions: deductions(applicant),
-                           is_medicare_eligible: applicant.enrolled_or_eligible_in_any_medicare?,
-                           # Does this person need help with daily life activities, such as dressing or bathing?
-                           is_self_attested_long_term_care: applicant.has_daily_living_help.present?,
-                           has_insurance: applicant.is_enrolled_in_insurance?,
-                           has_state_health_benefit: applicant.has_state_health_benefit?,
-                           had_prior_insurance: prior_insurance_benefit.present?,
-                           prior_insurance_end_date: prior_insurance_benefit&.end_on,
-                           age_of_applicant: applicant.age_of_the_applicant,
-                           hours_worked_per_week: applicant.total_hours_worked_per_week,
-                           is_temporarily_out_of_state: applicant.is_temporarily_out_of_state.present?,
-                           is_claimed_as_dependent_by_non_applicant: false, # as per sb notes
-                           benchmark_premium: benchmark_premiums,
-                           is_homeless: applicant.is_homeless.present?,
-                           mitc_income: mitc_income(applicant, mitc_eligible_incomes),
-                           income_evidence: evidence_info(applicant.income_evidence),
-                           esi_evidence: evidence_info(applicant.esi_evidence),
-                           non_esi_evidence: evidence_info(applicant.non_esi_evidence),
-                           local_mec_evidence: evidence_info(applicant.local_mec_evidence),
-                           mitc_relationships: mitc_relationships(applicant),
-                           mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes),
-                           mitc_state_resident: mitc_state_resident(applicant, application.us_state)}
+                applicant_hash = {
+                  name: name(applicant),
+                  identifying_information: identifying_information(applicant),
+                  demographic: demographic(applicant),
+                  attestation: attestation(applicant),
+                  is_primary_applicant: applicant.is_primary_applicant.present?,
+                  native_american_information: native_american_information(applicant),
+                  citizenship_immigration_status_information: { citizen_status: applicant.citizen_status,
+                                                                is_lawful_presence_self_attested: applicant.eligible_immigration_status.present?,
+                                                                is_resident_post_092296: applicant.is_resident_post_092296 },
+                  is_consumer_role: applicant.is_consumer_role.present?,
+                  is_resident_role: applicant.is_resident_role.present?,
+                  is_applying_coverage: applicant.is_applying_coverage.present?,
+                  five_year_bar_applies: applicant_five_year_bar_applies(applicant),
+                  five_year_bar_met: applicant_five_year_bar_met(applicant),
+                  qualified_non_citizen: applicant_qnc_code(applicant),
+                  is_consent_applicant: applicant.is_consent_applicant.present?,
+                  vlp_document: vlp_document(applicant),
+                  family_member_reference: {family_member_hbx_id: applicant.person_hbx_id.to_s,
+                                            first_name: applicant.first_name,
+                                            last_name: applicant.last_name,
+                                            person_hbx_id: applicant.person_hbx_id,
+                                            is_primary_family_member: applicant.is_primary_applicant.present?},
+                  person_hbx_id: applicant.person_hbx_id.to_s,
+                  is_required_to_file_taxes: applicant.is_required_to_file_taxes.present?,
+                  is_filing_as_head_of_household: applicant.is_filing_as_head_of_household.present?,
+                  is_joint_tax_filing: applicant.is_joint_tax_filing.present?,
+                  is_claimed_as_tax_dependent: applicant.is_claimed_as_tax_dependent.present?,
+                  claimed_as_tax_dependent_by: applicant_reference_by_applicant_id(applicants, applicant.claimed_as_tax_dependent_by),
+                  tax_filer_kind: applicant.tax_filer_kind,
+                  student: student_information(applicant),
+                  is_refugee: applicant.is_refugee.present?,
+                  is_trafficking_victim: applicant.is_trafficking_victim.present?,
+                  foster_care: foster(applicant),
+                  pregnancy_information: pregnancy_information(applicant),
+                  is_primary_caregiver: applicant.is_primary_caregiver,
+                  is_subject_to_five_year_bar: applicant.is_subject_to_five_year_bar.present?,
+                  is_five_year_bar_met: applicant.is_five_year_bar_met.present?,
+                  is_forty_quarters: applicant.is_forty_quarters.present?,
+                  is_ssn_applied: applicant.is_ssn_applied.present?,
+                  non_ssn_apply_reason: applicant.non_ssn_apply_reason,
+                  moved_on_or_after_welfare_reformed_law: applicant.moved_on_or_after_welfare_reformed_law.present?,
+                  is_currently_enrolled_in_health_plan: applicant.is_currently_enrolled_in_health_plan.present?,
+                  has_daily_living_help: applicant.has_daily_living_help.present?,
+                  need_help_paying_bills: applicant.need_help_paying_bills.present?,
+                  has_job_income: applicant.has_job_income.present? ? applicant.incomes.present? : false,
+                  has_self_employment_income: applicant.has_self_employment_income.present? ? applicant.incomes.present? : false,
+                  has_unemployment_income: applicant.has_unemployment_income.present? ? applicant.incomes.present? : false,
+                  has_other_income: applicant.has_other_income.present? ? applicant.incomes.present? : false,
+                  has_deductions: applicant.has_deductions.present? ? applicant.deductions.present? : false,
+                  has_enrolled_health_coverage: enrolled_benefits,
+                  has_eligible_health_coverage: eligible_benefits,
+                  job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage.present?,
+                  job_coverage_end_date: applicant.dependent_job_end_on,
+                  medicaid_and_chip: medicaid_and_chip(applicant),
+                  other_health_service: {
+                    has_received: applicant.health_service_through_referral.present?,
+                    is_eligible: applicant.health_service_eligible.present?
+                  },
+                  addresses: addresses(applicant),
+                  emails: emails(applicant),
+                  phones: phones(applicant),
+                  incomes: incomes(applicant),
+                  benefits: benefits(applicant, enrolled_benefits, eligible_benefits),
+                  deductions: deductions(applicant),
+                  is_medicare_eligible: applicant.enrolled_or_eligible_in_any_medicare?,
+                  # Does this person need help with daily life activities, such as dressing or bathing?
+                  is_self_attested_long_term_care: applicant.has_daily_living_help.present?,
+                  has_insurance: applicant.is_enrolled_in_insurance?,
+                  has_state_health_benefit: applicant.has_state_health_benefit?,
+                  had_prior_insurance: prior_insurance_benefit.present?,
+                  prior_insurance_end_date: prior_insurance_benefit&.end_on,
+                  age_of_applicant: applicant.age_of_the_applicant,
+                  hours_worked_per_week: applicant.total_hours_worked_per_week,
+                  is_temporarily_out_of_state: applicant.is_temporarily_out_of_state.present?,
+                  is_claimed_as_dependent_by_non_applicant: false, # as per sb notes
+                  benchmark_premium: applicant.benchmark_premiums,
+                  is_homeless: applicant.is_homeless.present?,
+                  mitc_income: mitc_income(applicant, mitc_eligible_incomes),
+                  income_evidence: evidence_info(applicant.income_evidence),
+                  esi_evidence: evidence_info(applicant.esi_evidence),
+                  non_esi_evidence: evidence_info(applicant.non_esi_evidence),
+                  local_mec_evidence: evidence_info(applicant.local_mec_evidence),
+                  mitc_relationships: mitc_relationships(applicant),
+                  mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes, assistance_year),
+                  mitc_state_resident: mitc_state_resident(applicant, application.us_state)
+                }
+                primary_reason_code = select_primary_reason_code(applicant, application)
+                applicant_hash[:reason_code] = primary_reason_code if primary_reason_code
+                applicant_hash[:additional_reason_codes] = select_additional_reason_codes(application) if EnrollRegistry.feature_enabled?(:multiple_determination_submission_reasons)
+                result << applicant_hash
                 result
               end
             end
-                        # rubocop:enable Metrics/AbcSize
+            # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def select_primary_reason_code(applicant, application)
+              if applicant.is_gap_filling
+                "GapFilling"
+              elsif application.transfer_requested
+                "FullDetermination"
+              end
+            end
+
+            def select_additional_reason_codes(application)
+              application.previously_renewal_draft? ? ["Renewal"] : []
+            end
 
             def evidence_info(applicant_evidence)
               return if applicant_evidence.nil?
@@ -285,7 +315,7 @@ module FinancialAssistance
               end
             end
 
-            def applicant_is_required_to_file_taxes(applicant, eligible_incomes)
+            def applicant_is_required_to_file_taxes(applicant, eligible_incomes, assistance_year)
               return true if applicant.is_required_to_file_taxes
 
               total_earned_income = mitc_eligible_earned_incomes(eligible_incomes).inject(0) do |tot, inc|
@@ -296,15 +326,14 @@ module FinancialAssistance
                 tot + inc.calculate_annual_income
               end.to_f
 
-              assistance_year = applicant.application.assistance_year
               unearned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("unearned_income_filing_threshold_#{assistance_year}").item
               earned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("earned_income_filing_threshold_#{assistance_year}").item
               (total_earned_income > earned_threshold_income) || (total_unearned_income > unearned_threshold_income)
             end
 
-            def applicant_reference_by_applicant_id(application, applicant_id)
+            def applicant_reference_by_applicant_id(applicants, applicant_id)
               return nil unless applicant_id
-              appli = application&.applicants&.find(applicant_id)
+              appli = applicants&.find(applicant_id)
               return nil unless appli
               applicant_reference(appli)
             end
@@ -608,10 +637,6 @@ module FinancialAssistance
             end
             # rubocop:enable Metrics/CyclomaticComplexity
 
-            def monthly_amount(frequency, amount)
-              annual_amount(frequency, amount) / 12
-            end
-
             # Was the applicant receiving coverage that has expired?
             # Benefit of type is_enrolled and end dated.
             def prior_insurance(applicant)
@@ -781,45 +806,6 @@ module FinancialAssistance
             # Match with AcaEntities Deduction Kind
             def get_deduction_kind(deduction_kind)
               deduction_kind == 'deductable_part_of_self_employment_taxes' ? 'deductible_part_of_self_employment_taxes' : deduction_kind
-            end
-
-            def applicant_benchmark_premium(application)
-              family = find_family(application.family_id) if application.family_id.present?
-              return unless family.present?
-              # family_member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
-              applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)
-              # return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
-              premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
-              return build_zero_member_premiums(applicant_hbx_ids) if premiums.failure?
-
-              slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
-              return build_zero_member_premiums(applicant_hbx_ids) if slcsp_info.failure?
-
-              lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
-              return build_zero_member_premiums(applicant_hbx_ids) if lcsp_info.failure?
-
-              slcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
-                next applicant_hbx_id unless slcsp_info.success[applicant_hbx_id].present?
-
-                result << slcsp_info.success[applicant_hbx_id][:health_only_slcsp_premiums]
-              end.compact
-
-              lcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
-                next applicant_hbx_id unless lcsp_info.success[applicant_hbx_id].present?
-
-                result << lcsp_info.success[applicant_hbx_id][:health_only_lcsp_premiums]
-              end.compact
-
-              Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
-            end
-
-            # return zero premiums only when there is a failure monad
-            def build_zero_member_premiums(applicant_hbx_ids)
-              member_premiums = applicant_hbx_ids.collect do |applicant_hbx_id|
-                {cost: 0.0, member_identifier: applicant_hbx_id, monthly_premium: 0.0}
-              end.compact
-
-              Success({ health_only_lcsp_premiums: member_premiums, health_only_slcsp_premiums: member_premiums })
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.

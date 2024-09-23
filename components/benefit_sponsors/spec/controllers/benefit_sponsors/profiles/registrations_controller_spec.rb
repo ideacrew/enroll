@@ -59,12 +59,15 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
     end
 
     let(:broker_profile_attributes) do
-      { :ach_account_number => "1234567890",
+      {
+        :ach_account_number => "1234567890",
         :ach_routing_number => "011000015",
         :ach_routing_number_confirmation => "011000015",
         :market_kind => :shop,
         :office_locations_attributes => office_locations_attributes,
-        :contact_method => :paper_and_electronic}
+        :contact_method => :paper_and_electronic,
+        :languages_spoken => ['en']
+      }
     end
 
     let(:general_agency_profile_attributes) do
@@ -344,6 +347,15 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
             it "should redirect to new for general agency" do
               expect(response.location.include?("new?profile_type=general_agency")).to eq true if profile_type == "general_agency"
+            end
+
+            it "should create staff person with no ssn" do
+              person = Person.where(
+                first_name: staff_roles_attributes[0][:first_name],
+                last_name: staff_roles_attributes[0][:last_name],
+                dob: staff_roles_attributes[0][:dob]
+              ).first
+              expect("1").to eq person.no_ssn
             end
           end
 

@@ -8,7 +8,7 @@ module FinancialAssistance
     module Applications
       # This Operation creates a new application for a given application identifier(BSON ID),
       class Copy
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
         include AddressValidator
         include I18n
 

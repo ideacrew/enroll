@@ -7,7 +7,7 @@ module Operations
   module EligibilityItems
     # Create eligibility item domain entity
     class Create
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to create eligibility item
 

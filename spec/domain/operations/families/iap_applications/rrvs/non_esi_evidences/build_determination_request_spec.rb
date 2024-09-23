@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::BuildDeterminationRequest, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}

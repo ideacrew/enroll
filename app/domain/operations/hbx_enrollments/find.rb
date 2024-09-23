@@ -7,7 +7,7 @@ module Operations
   module HbxEnrollments
     # find enrollment
     class Find
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(query_hash)
         q_hash = yield validate(query_hash)
@@ -19,10 +19,12 @@ module Operations
       private
 
       def validate(query_hash)
-        if query_hash.is_a?(Hash)
-          Success(query_hash)
+        result = Validators::HbxEnrollments::FindContract.new.call(query_hash)
+
+        if result.success?
+          Success(result.to_h)
         else
-          Failure('expected input to be in Hash format')
+          Failure(result.errors.to_h)
         end
       end
 

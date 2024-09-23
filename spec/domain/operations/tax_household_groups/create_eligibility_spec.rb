@@ -94,4 +94,45 @@ RSpec.describe ::Operations::TaxHouseholdGroups::CreateEligibility, dbclean: :af
       expect(eligibility_determination.grants.size).to eq 2
     end
   end
+
+  describe '#call' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+    let(:spouse_person) do
+      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+      person.ensure_relationship_with(per, 'spouse')
+      per
+    end
+
+    let(:child_person) do
+      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+      person.ensure_relationship_with(per, 'child')
+      per
+    end
+
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:spouse_member) { FactoryBot.create(:family_member, family: family, person: spouse_person, is_active: spouse_member_active) }
+    let(:child_member) { FactoryBot.create(:family_member, family: family, person: child_person) }
+
+    let(:params) do
+      { family: spouse_member.family, th_group_info: {} }
+    end
+
+    context 'with:
+      - none of the active family members are applying for coverage
+      - spouse_member is applying for coverage but is a destroyed member(not an active family member)
+    ' do
+
+      let(:spouse_member_active) { false }
+
+      before do
+        child_member.person.consumer_role.update_attributes(is_applying_coverage: false)
+        person.consumer_role.update_attributes(is_applying_coverage: false)
+      end
+
+      it 'returns a failure monad' do
+        expect(subject.call(params).failure).to eq(l10n('create_eligibility_tool.no_members_applying_coverage'))
+      end
+    end
+  end
 end

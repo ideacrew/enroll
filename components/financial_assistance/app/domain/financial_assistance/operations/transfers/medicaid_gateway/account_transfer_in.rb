@@ -132,18 +132,24 @@ module FinancialAssistance
             person_params_result = sanitize_person_params(family_hash['family_members'].select { |a| a["is_primary_applicant"] == true}.first)
             return person_params_result if person_params_result.failure?
             person_params = person_params_result.value!
-            match_criteria, records = ::Operations::People::Match.new.call({:dob => person_params[:dob],
-                                                                            :last_name => person_params[:last_name],
-                                                                            :first_name => person_params[:first_name],
-                                                                            :ssn => person_params[:ssn]})
-            return Success(nil) unless records.present?
-            return Success(nil) unless [:ssn_present, :dob_present].include?(match_criteria)
-            return Success(nil) if match_criteria == :dob_present && person_params[:ssn].present? && records.first.ssn != person_params[:ssn]
+            person = fetch_person(person_params)
+            return Success(nil) if person.blank?
 
-            person = records.first
             Success(person.primary_family)
           rescue StandardError => e
             Failure("find family error #{e}")
+          end
+
+          def fetch_person(person_params)
+            match_criteria, records =  ::Operations::People::Match.new.call({:dob => person_params[:dob],
+                                                                             :last_name => person_params[:last_name],
+                                                                             :first_name => person_params[:first_name],
+                                                                             :ssn => person_params[:ssn]})
+            return unless records.present?
+            return unless [:ssn_present, :dob_present].include?(match_criteria)
+            return if match_criteria == :dob_present && person_params[:ssn].present? && records.first.ssn != person_params[:ssn]
+
+            records.first
           end
 
           def build_family(family_hash)
@@ -198,7 +204,8 @@ module FinancialAssistance
             person_params_result = sanitize_person_params(family_member_hash)
             return person_params_result unless person_params_result.success?
             person_params = person_params_result.value!
-            person_result = create_or_update_person(person_params)
+            updated_person_params = fetch_updated_person_params(person_params)
+            person_result = create_or_update_person(updated_person_params)
             if person_result.success?
               @person = person_result.success
               fam_result = create_or_update_family_member(@person, @family, family_member_hash)
@@ -217,6 +224,18 @@ module FinancialAssistance
             Failure("create_member: #{e}")
           end
 
+          def fetch_updated_person_params(person_params)
+            person = fetch_person(person_params)
+            return person_params if person.blank?
+
+            if person_params[:indian_tribe_member].nil?
+              attributes_to_exclude = [:tribal_name, :tribal_state, :tribal_id,
+                                       :tribe_codes,
+                                       :indian_tribe_member]
+            end
+            person_params.except(*attributes_to_exclude)
+          end
+
           def create_or_update_person(person_params)
             ::Operations::People::CreateOrUpdate.new.call(params: person_params)
           rescue StandardError => e
@@ -228,7 +247,13 @@ module FinancialAssistance
             # assign_citizen_status
             params = applicant_params.except("lawful_presence_determination")
             merge_params = params.merge(citizen_status: applicant_params["lawful_presence_determination"]["citizen_status"])
-            ::Operations::People::CreateOrUpdateConsumerRole.new.call(params: { applicant_params: merge_params, family_member: family_member })
+            ::Operations::People::CreateOrUpdateConsumerRole.new.call(
+              params: {
+                applicant_params: merge_params,
+                family_member: family_member,
+                optimistic_upstream_coverage_attestation_interpretation: EnrollRegistry.feature_enabled?(:optimistic_upstream_coverage_attestation)
+              }
+            )
           rescue StandardError => e
             Failure("create_or_update_consumer_role: #{e}")
           end
@@ -338,7 +363,7 @@ module FinancialAssistance
                 is_veteran_or_active_military: applicant_hash['demographic']['is_veteran_or_active_military'],
                 is_vets_spouse_or_child: applicant_hash['demographic']['is_vets_spouse_or_child'],
                 same_with_primary: address_result.value!,
-                is_incarcerated: applicant_hash["is_incarcerated"],
+                is_incarcerated: family_member.person.is_incarcerated,
                 is_physically_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_disabled: applicant_hash['attestation']['is_self_attested_disabled'],
                 is_self_attested_blind: applicant_hash['attestation']['is_self_attested_blind'],
@@ -429,10 +454,11 @@ module FinancialAssistance
                 had_prior_insurance: applicant_hash['had_prior_insurance'],
                 age_of_applicant: applicant_hash['age_of_applicant'],
                 hours_worked_per_week: applicant_hash['hours_worked_per_week'],
-                indian_tribe_member: applicant_hash['indian_tribe_member'],
-                tribal_id: applicant_hash['tribal_id'],
-                tribal_name: applicant_hash['tribal_name'],
-                tribal_state: applicant_hash['tribal_state'],
+                indian_tribe_member: family_member.person.indian_tribe_member,
+                tribal_id: family_member.person.tribal_id,
+                tribal_name: family_member.person.tribal_name,
+                tribal_state: family_member.person.tribal_state,
+                tribe_codes: family_member.person.tribe_codes,
                 transfer_referral_reason: applicant_hash['transfer_referral_reason']
               }
             end
@@ -474,9 +500,11 @@ module FinancialAssistance
               race: consumer_role_hash['is_applying_coverage'] ? person_hash['race'] : nil,
               ethnicity: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['ethnicity'] : [],
               is_incarcerated: consumer_role_hash['is_applying_coverage'] ? person_hash['person_demographics']['is_incarcerated'] : nil,
+              indian_tribe_member: person_hash['person_demographics']['indian_tribe_member'],
               tribal_id: person_hash['person_demographics']['tribal_id'],
               tribal_name: person_hash['person_demographics']['tribal_name'],
               tribal_state: person_hash['person_demographics']['tribal_state'],
+              tribe_codes: person_hash['person_demographics']['tribe_codes'],
               language_code: person_hash['person_demographics']['language_code'],
               is_tobacco_user: person_hash['person_health']['is_tobacco_user'],
               is_physically_disabled: person_hash['person_health']['is_physically_disabled'],

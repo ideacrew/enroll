@@ -3,17 +3,11 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
-# eligibility_items_requested = [
-#   aptc_csr_credit: {
-#     evidence_items: [:esi_evidence]
-#   }
-# ]
-
 module Operations
   module Eligibilities
     # Build determination for subjects passed with effective date
     class BuildFamilyDetermination
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to build determination
       # @option opts [Family] :family required
@@ -46,7 +40,9 @@ module Operations
         if (is_any_member_applying_for_coverage && primary_person.consumer_role.present?) || values[:is_migrating]
           BuildDetermination.new.call(subjects: subjects, effective_date: values[:effective_date], family: family)
         else
-          Failure("Person don't have consumer role or is not applying for coverage")
+          Failure(
+            "Determination cannot be built as None of the family members are applying for coverage or Primary person's Consumer Role is missing."
+          )
         end
       end
 

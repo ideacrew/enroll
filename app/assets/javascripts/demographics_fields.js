@@ -2,13 +2,17 @@ function isApplyingCoverage(target) {
   fields = "input[name='" + target + "[is_applying_coverage]']";
   $('#employer-coverage-msg').hide();
   $('#ssn-coverage-msg').hide();
+  $('.ssn-coverage-msg').hide();
   if ($(fields).length > 0) {
     addEventOnNoSsn(target);
     addEventOnSsn(target);
     if ($(fields).not(':checked').val() == 'true') {
       $('.consumer_fields_for_applying_coverage').hide();
       $('#employer-coverage-msg').show();
-      if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
+      if (
+        $("input[name='" + target + "[ssn]']").val() == '' &&
+        !$("input[name='" + target + "[no_ssn]']").is(':checked')
+      ) {
         $('#ssn-coverage-msg').show();
       }
     }
@@ -16,13 +20,18 @@ function isApplyingCoverage(target) {
       if ($(fields).not(':checked').val() == 'true') {
         $('.consumer_fields_for_applying_coverage').hide();
         $('#employer-coverage-msg').show();
-        if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
+        if (
+          $("input[name='" + target + "[ssn]']").val() == '' &&
+          !$("input[name='" + target + "[no_ssn]']").is(':checked')
+        ) {
           $('#ssn-coverage-msg').show();
+          $('.ssn-coverage-msg').show();
         }
       } else {
         $('.consumer_fields_for_applying_coverage').show();
         $('#employer-coverage-msg').hide();
         $('#ssn-coverage-msg').hide();
+        $('.ssn-coverage-msg').hide();
       }
     });
   }
@@ -32,7 +41,12 @@ function addEventOnNoSsn(target) {
   $("input[name='" + target + "[no_ssn]']").change(function () {
     if ($(this).is(':checked')) {
       $('#ssn-coverage-msg').hide();
-    } else if ($("input[name='" + target + "[ssn]']").val() == '' && $("input[name='" + target + "[is_applying_coverage]']").not(':checked').val() == 'true') {
+    } else if (
+      $("input[name='" + target + "[ssn]']").val() == '' &&
+      $("input[name='" + target + "[is_applying_coverage]']")
+        .not(':checked')
+        .val() == 'true'
+    ) {
       $('#ssn-coverage-msg').show();
     }
   });
@@ -53,9 +67,17 @@ function addEventOnSsn(target) {
   });
 }
 
+function enableContinueButton() {
+  var continueButton = $('.interaction-click-control-continue.hidden');
+  if (continueButton.is(':disabled')) {
+    continueButton.prop('disabled', false);
+  }
+}
+
 function applyListenersFor(target) {
   // target is person or dependent
   $("input[name='" + target + "[us_citizen]']").change(function () {
+    enableContinueButton();
     $('#vlp_documents_container').hide();
     $('#vlp_documents_container .vlp_doc_area').html('');
     $("input[name='" + target + "[naturalized_citizen]']").prop(
@@ -67,19 +89,20 @@ function applyListenersFor(target) {
       false
     );
     if ($(this).val() == 'true') {
-      $('#naturalized_citizen_container').show();
-      $('#immigration_status_container').hide();
-      $('#' + target + '_naturalized_citizen_true').prop('required');
-      $('#' + target + '_naturalized_citizen_false').prop('required');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#naturalized_citizen_container').removeClass('hidden_field');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#immigration_status_container').addClass('hidden_field');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_true').attr('required', true);
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_false').attr('required', true);
     } else {
-      $('#naturalized_citizen_container').hide();
-      $('#immigration_status_container').show();
-      $('#' + target + '_naturalized_citizen_true').removeAttr('required');
-      $('#' + target + '_naturalized_citizen_false').removeAttr('required');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#naturalized_citizen_container').addClass('hidden_field');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#immigration_status_container').removeClass('hidden_field');
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_true').removeAttr('required')
+      $(this).closest('.consumer_fields_for_applying_coverage').find('#' + target + '_naturalized_citizen_false').removeAttr('required')
     }
   });
 
   $("input[name='" + target + "[naturalized_citizen]']").change(function () {
+    enableContinueButton();
     var selected_doc_type = $('#naturalization_doc_type').val();
     if ($(this).val() == 'true') {
       $('#vlp_documents_container').show();
@@ -96,6 +119,7 @@ function applyListenersFor(target) {
 
   $("input[name='" + target + "[eligible_immigration_status]']").change(
     function () {
+      enableContinueButton();
       var selected_doc_type = $('#immigration_doc_type').val();
       if ($(this).val() == 'true' && this.checked) {
         $('#vlp_documents_container').show();
@@ -112,7 +136,7 @@ function applyListenersFor(target) {
   );
 
   //start tribe option controls
-  $("input[name='" + target + "[indian_tribe_member]']").change(function() {
+  $("input[name='" + target + "[indian_tribe_member]']").change(function () {
     if (this.value === 'true') {
       $('.tribal-container').removeClass('hide');
     } else {
@@ -121,23 +145,33 @@ function applyListenersFor(target) {
   });
 
   // tribal-state change - select from options
-  $('select#tribal-state').on("change", function() {
+  $('select#tribal-state').on('change', function () {
+    enableContinueButton();
     var enroll_state_abbr = $('#enroll_state_abbr').val();
-    var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
+    var is_indian_alaskan_tribe_details_enabled =
+      $('#is_indian_alaskan_tribe_details_enabled').val() === 'true';
 
     if (is_indian_alaskan_tribe_details_enabled) {
-      var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
-      var tribe_codes_array = $('.tribe_codes:checked').map(function() {
-        return $(this).val();
-      }).get();
-      var tribal_name_container_show_on_select = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
+      var is_featured_tribes_selection_enabled =
+        $('#is_featured_tribes_selection_enabled').val() === 'true';
+      var tribe_codes_array = $('.tribe_codes:checked')
+        .map(function () {
+          return $(this).val();
+        })
+        .get();
+      var tribal_name_container_show_on_select =
+        typeof tribe_codes_array != 'undefined' &&
+        tribe_codes_array.includes('OT');
 
-      if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
+      if (
+        is_featured_tribes_selection_enabled &&
+        this.value == enroll_state_abbr
+      ) {
         $('.featured-tribe-container').removeClass('hide');
         if (tribal_name_container_show_on_select) {
           $('.tribal-name-container').removeClass('hide');
         } else {
-          $('#tribal-name').val("");
+          $('#tribal-name').val('');
           $('.tribal-name-container').addClass('hide');
         }
       } else {
@@ -148,14 +182,38 @@ function applyListenersFor(target) {
     }
   });
 
-  $("input#" + target + "_tribe_codes_ot").change(function() {
-    if (this.checked){
+  $('input#' + target + '_tribe_codes_ot').change(function () {
+    if (this.checked) {
       $('.tribal-name-container').removeClass('hide');
     } else {
       $('.tribal-name-container').addClass('hide');
     }
   });
   //end tribe option controls
+
+  $('input[name="person[is_incarcerated]"]').change(function () {
+    enableContinueButton();
+  });
+
+  $('input[name="person[tribal_id]"]').change(function () {
+    enableContinueButton();
+  });
+
+  $('input[name="person[tribal_name]"]').change(function () {
+    enableContinueButton();
+  });
+
+  $('.mobile-phone-number').change(function () {
+    enableContinueButton();
+  });
+
+  $('.tribe_codes').change(function () {
+    enableContinueButton();
+  });
+
+  $('input[name="person[indian_tribe_member]"]').change(function () {
+    enableContinueButton();
+  });
 }
 
 function showOnly(selected) {
@@ -191,6 +249,7 @@ function showOnly(selected) {
   $('.vlp_doc_area').html('<span>waiting...</span>');
   var target_id = $('input#vlp_doc_target_id').val();
   var target_type = $('input#vlp_doc_target_type').val();
+  var bs4 = document.documentElement.dataset.bs4;
   $.ajax({
     type: 'get',
     url: '/insured/consumer_role/immigration_document_options',
@@ -200,6 +259,7 @@ function showOnly(selected) {
       target_type: target_type,
       vlp_doc_target: vlp_doc_target,
       vlp_doc_subject: selected,
+      bs4: bs4,
     },
   });
 }
@@ -221,6 +281,14 @@ function applyListeners() {
 }
 
 var PersonValidations = (function (window, undefined) {
+  function resetConfirmButton() {
+    var btn = document.querySelector('.applicant-confirm-member');
+    if (btn) {
+      btn.textContent = 'Confirm Member';
+      btn.classList.remove('disabled');
+    }
+  }
+
   function manageRequiredValidations(this_obj) {
     $('[required]').not(':visible').removeAttr('required');
     this_obj.closest('div').find('button[type="submit"]').trigger('click');
@@ -243,6 +311,7 @@ var PersonValidations = (function (window, undefined) {
       return true;
     }
     if ($('input[name="person[us_citizen]"]').not(':checked').length == 2) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Is this person a US Citizen or US National?'
       );
@@ -251,67 +320,86 @@ var PersonValidations = (function (window, undefined) {
   }
 
   function validationForIndianTribeMember(e) {
-    if ($('#indian_tribe_area').length == 0){
+    if ($('#indian_tribe_area').length == 0) {
       return false;
     }
 
-    $('.close').click(function() {
+    $('.close').click(function () {
       $('#tribal-id-alert').addClass('hide');
       $('#tribal-state-alert').addClass('hide');
       $('#tribal-name-alert').addClass('hide');
     });
 
-    if ($('input[name="person[is_applying_coverage]"]').length > 0
-    && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+    if (
+      $('input[name="person[is_applying_coverage]"]').length > 0 &&
+      $('input[name="person[is_applying_coverage]"]').not(':checked').val() ==
+        'true'
+    ) {
       return true;
     }
 
-    var tribe_member_yes = $("input#indian_tribe_member_yes").is(':checked');
-    var tribe_member_no = $("input#indian_tribe_member_no").is(':checked');
-    var tribe_member_visible = $(".no_coverage_tribe_details").is(':visible')
+    var tribe_member_yes = $('input#indian_tribe_member_yes').is(':checked');
+    var tribe_member_no = $('input#indian_tribe_member_no').is(':checked');
+    var tribe_member_visible = $('.no_coverage_tribe_details').is(':visible');
 
-    if (!tribe_member_yes && !tribe_member_no && tribe_member_visible){
-      alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
+    if (!tribe_member_yes && !tribe_member_no && tribe_member_visible) {
+      resetConfirmButton();
+      alert(
+        "Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'"
+      );
       PersonValidations.restoreRequiredAttributes(e);
-    };
+    }
 
-    if (tribe_member_no){
-      $('#tribal-state').val("");
-      $('input#tribal-name').val("");
-      $('#tribal-id').val("");
+    if (tribe_member_no) {
+      $('#tribal-state').val('');
+      $('input#tribal-name').val('');
+      $('#tribal-id').val('');
       $('.tribe_codes:checked').removeAttr('checked');
     }
 
-    if (tribe_member_yes){
-      if ($('#tribal-state').length > 0 && $('#tribal-state').val() == ""){
+    if (tribe_member_yes) {
+      if ($('#tribal-state').length > 0 && $('#tribal-state').val() == '') {
+        resetConfirmButton();
         $('#tribal-state-alert').show();
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
-        var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
+      if (
+        $('.featured_tribes_selection').length > 0 &&
+        $('#tribal-state').val() == $('#enroll_state_abbr').val()
+      ) {
+        var tribe_codes_array = $('.tribe_codes:checked')
+          .map(function () {
+            return $(this).val();
+          })
+          .get();
         if (tribe_codes_array.length < 1) {
-          alert("At least one tribe must be selected.");
+          resetConfirmButton();
+          alert('At least one tribe must be selected.');
           PersonValidations.restoreRequiredAttributes(e);
         }
 
-        if (tribe_codes_array.includes("OT") && $('input#tribal-name').val() == ""){
-            alert("Please provide an answer for 'Other' tribe name.");
-            PersonValidations.restoreRequiredAttributes(e);
+        if (
+          tribe_codes_array.includes('OT') &&
+          $('input#tribal-name').val() == ''
+        ) {
+          resetConfirmButton();
+          alert("Please provide an answer for 'Other' tribe name.");
+          PersonValidations.restoreRequiredAttributes(e);
         }
 
-        if (!tribe_codes_array.includes("OT")){
-          $('input#tribal-name').val("");
+        if (!tribe_codes_array.includes('OT')) {
+          $('input#tribal-name').val('');
         }
+      } else if ($('input#tribal-name').val() == '') {
+        $('#tribal-name-alert').show();
+        PersonValidations.restoreRequiredAttributes(e);
       }
-      else if ($('input#tribal-name').val() == ""){
-          $('#tribal-name-alert').show();
-          PersonValidations.restoreRequiredAttributes(e);
-      }
 
-      if ($('#tribal-id').length > 0 && $('#tribal-id').val() == ""){
-          $('#tribal-id-alert').show();
-          PersonValidations.restoreRequiredAttributes(e);
+      if ($('#tribal-id').length > 0 && $('#tribal-id').val().length != 9) {
+        resetConfirmButton();
+        $('#tribal-id-alert').show();
+        PersonValidations.restoreRequiredAttributes(e);
       }
     }
   }
@@ -327,6 +415,7 @@ var PersonValidations = (function (window, undefined) {
     if (
       $('input[name="person[is_incarcerated]"]').not(':checked').length == 2
     ) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Is this person currently incarcerated?'
       );
@@ -346,6 +435,7 @@ var PersonValidations = (function (window, undefined) {
       !$('#tobacco_user_container').hasClass('hidden_field') &&
       $('input[name="person[is_tobacco_user]"]').not(':checked').length == 2
     ) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Is this person a tobacco user?'
       );
@@ -365,6 +455,7 @@ var PersonValidations = (function (window, undefined) {
       $('#naturalized_citizen_container').is(':visible') &&
       $('input[name="person[naturalized_citizen]"]').not(':checked').length == 2
     ) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Is this person a naturalized or derived citizen?'
       );
@@ -379,6 +470,7 @@ var PersonValidations = (function (window, undefined) {
         .length == 2 &&
       !$('#immigration-checkbox').is(':visible')
     ) {
+      resetConfirmButton();
       alert(
         'Please provide an answer for question: Do you have eligible immigration status?'
       );
@@ -390,15 +482,17 @@ var PersonValidations = (function (window, undefined) {
     const immigration_field =
       document.getElementById('immigration_doc_type').value == '';
     if (!document.getElementById('dependent_ul') && immigration_field) {
-      return (
-        document.getElementById('person_us_citizen_false').checked ||
-        document.getElementById('person_naturalized_citizen_true').checked
-      );
+      var us_citizen =
+        document.getElementById('person_us_citizen_false') ||
+        document.getElementById('us_citizen_false');
+      var naturalized_citizen =
+        document.getElementById('person_naturalized_citizen_true') ||
+        document.getElementById('naturalized_citizen_true');
+      return us_citizen.checked || naturalized_citizen.checked;
     } else if (immigration_field) {
-      return (
-        document.getElementById('dependent_us_citizen_false').checked ||
-        document.getElementById('dependent_naturalized_citizen_true').checked
-      );
+      var us_citizen = document.getElementById('dependent_us_citizen_false') || document.getElementById('us_citizen_false');
+      var naturalized_citizen = document.getElementById('dependent_naturalized_citizen_true') || document.getElementById('naturalized_citizen_true');
+      return ( us_citizen.checked || naturalized_citizen.checked );
     }
   }
 
@@ -611,30 +705,41 @@ var PersonValidations = (function (window, undefined) {
       $('.contact-method input').each(function (i, el) {
         if ($(el).prop('checked')) {
           isChecked = true;
-        }});
+        }
+      });
       if (isChecked == false) {
-        var alertMsg = 'Warning: You must select at least one contact method.'
-        if($('.contact-method').hasClass('flag-enabled')){
-          alertMsg += ' An additional method must be checked if selecting Text.';
+        var alertMsg = 'Warning: You must select at least one contact method.';
+        if ($('.contact-method').hasClass('flag-enabled')) {
+          alertMsg +=
+            ' An additional method must be checked if selecting Text.';
         }
         alert(alertMsg);
         PersonValidations.restoreRequiredAttributes(e);
       }
 
-      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-email').prop('checked')) {
+      if ($('#contact_type_email').prop('checked')) {
         if (!$('#person_emails_attributes_0_address').val()) {
-          alert('You must enter an email address to receive notices and updates by email.');
+          alert(
+            'You must enter an email address to receive notices and updates by email.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
 
-      if ($('.interaction-choice-control-value-person-consumer-role-attributes-contact-method-text').prop('checked')) {
+      if ($('#contact_type_text').prop('checked')) {
         if (document.querySelector('.mobile-phone-number').value.length < 1) {
-          alert('You must enter a mobile phone number to receive notices and updates by text.');
+          alert(
+            'You must enter a mobile phone number to receive notices and updates by text.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
-        if ($('.contact-method input:checked').length <= 1 && $('.contact-method').hasClass('flag-enabled')){
-          alert('An additional contact method is required if only Text is selected.');
+        if (
+          $('.contact-method input:checked').length <= 1 &&
+          $('.contact-method').hasClass('flag-enabled')
+        ) {
+          alert(
+            'An additional contact method is required if only Text is selected.'
+          );
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
@@ -646,7 +751,8 @@ var PersonValidations = (function (window, undefined) {
     manageRequiredValidations: manageRequiredValidations,
     validationForUsCitizenOrUsNational: validationForUsCitizenOrUsNational,
     validationForNaturalizedCitizen: validationForNaturalizedCitizen,
-    validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
+    validationForEligibleImmigrationStatuses:
+      validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
     validationForTobaccoUser: validationForTobaccoUser,
@@ -663,8 +769,10 @@ $(document).on('turbolinks:load', function () {
 function demographicValidations() {
   applyListeners();
 
-  $('form.edit_person, form.new_dependent, form.edit_dependent').submit(
+  $('form.edit_person, form.new_dependent, form.edit_dependent').on(
+    'submit',
     function (e) {
+      $('.mailing-div .stateInput').not(':visible').val('');
       PersonValidations.validationForUsCitizenOrUsNational(e);
       PersonValidations.validationForNaturalizedCitizen(e);
       PersonValidations.validationForEligibleImmigrationStatuses(e);
@@ -673,12 +781,22 @@ function demographicValidations() {
       PersonValidations.validationForTobaccoUser(e);
       PersonValidations.validationForVlpDocuments(e);
       PersonValidations.validationForContactMethod(e);
-      if ($('#showWarning').length && !$('#showWarning').hasClass('hidden') && !$('#showWarning').hasClass('shown')) {
+      if (
+        $('#showWarning').length &&
+        !$('#showWarning').hasClass('hidden') &&
+        !$('#showWarning').hasClass('shown')
+      ) {
+        var btn = document.querySelector('.applicant-confirm-member');
+        if (btn) {
+          btn.textContent = 'Confirm Member';
+          btn.classList.remove('disabled');
+        }
         $('#showWarning').addClass('shown');
         e.preventDefault();
         return false;
       }
-    });
+    }
+  );
 
   isApplyingCoverage('person');
 }

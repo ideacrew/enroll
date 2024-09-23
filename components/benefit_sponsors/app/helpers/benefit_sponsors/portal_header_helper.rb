@@ -1,6 +1,6 @@
 module BenefitSponsors
   module PortalHeaderHelper
-    include L10nHelper
+    include ::L10nHelper
 
     # rubocop:disable Layout/SpaceAroundOperators
     def benefit_sponsors_portal_display_name(controller)

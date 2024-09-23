@@ -1,3 +1,7 @@
 <div class="container bottom-pd">
-  <h4 class="title">THH & Eligibility created successfully</h4>
+  <% if @result[:success] %>
+    <h4 class="title"><%= @result[:message] %></h4>
+  <% else %>
+    <h4 class="title">Error: <%= @result[:error] %></h4>
+  <% end %>
 </div>

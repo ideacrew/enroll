@@ -1,15 +1,18 @@
+# frozen_string_literal: true
+
+# This rake task is used to create Individual Market Benefit Coverage Periods and Packages with Products for a given year.
 namespace :import do
   desc "Create current year benefit coverage period and packages with products"
-  task :create_ivl_packages_ME => :environment do
+  task :create_ivl_packages_ME, [:mock_year, :mock_hios_id] => :environment do |_t, args|
     puts "::: Creating IVL packages :::" unless Rails.env.test?
 
     hbx = HbxProfile.current_hbx
 
-    raise "please pass year" unless ENV['year'].present?
+    raise "please pass year" unless ENV['year'] || args[:mock_year]
 
-    year = ENV['year'].to_i
-    hios_id = ENV['hios_id']
-    
+    year = ENV['year'].present? ? ENV['year'].to_i : args[:mock_year]
+    hios_id = ENV['year'].present? ? ENV['hios_id'] : args[:mock_hios_id]
+
     # Second lowest cost silver plan
     slcs_products = BenefitMarkets::Products::Product.by_year(year).where(hios_id: hios_id)
     slcsp = slcs_products.select{|a| a.active_year == year}.first if slcs_products.present?

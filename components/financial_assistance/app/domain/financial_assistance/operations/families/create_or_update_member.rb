@@ -8,7 +8,7 @@ module FinancialAssistance
     module Families
       # Create of update a family member
       class CreateOrUpdateMember
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         def call(params:)
           values = yield validate(params[:applicant_params])

@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Families
     class DropFamilyMember
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       #family id and person hbx_id
       def call(params)

@@ -9,15 +9,13 @@ RSpec.describe ::Operations::HbxEnrollments::PublishChangeEvent, dbclean: :after
 
   describe 'with Invalid params' do
     it "failes with invalid enrollment " do
-      invalid_params = {event_name: 'auto_renew', enrollment: "dummy"}
-      result = described_class.new.call(invalid_params)
+      result = described_class.new.call(event_name: 'auto_renew', enrollment: 'dummy')
       expect(result.success?).to be_falsey
       expect(result.failure).to eq("Invalid Enrollment object dummy")
     end
 
     it "failes with invalid event_name " do
-      invalid_params = {event_name: 'test_event', enrollment: enrollment}
-      result = described_class.new.call(invalid_params)
+      result = described_class.new.call(event_name: 'test_event', enrollment: enrollment)
       expect(result.success?).to be_falsey
       expect(result.failure).to eq("Invalid event_name test_event")
     end
@@ -25,8 +23,7 @@ RSpec.describe ::Operations::HbxEnrollments::PublishChangeEvent, dbclean: :after
 
   describe 'with valid params' do
     it "failes with invalid enrollment " do
-      valid_params = {event_name: 'auto_renew', enrollment: enrollment}
-      result = described_class.new.call(valid_params)
+      result = described_class.new.call(event_name: 'auto_renew', enrollment: enrollment)
       expect(result.success?).to be_truthy
     end
   end

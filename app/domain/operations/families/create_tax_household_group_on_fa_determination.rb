@@ -7,7 +7,7 @@ module Operations
   module Families
     # creates taxhousehold groups and it's associations on every financial assistance application determination
     class CreateTaxHouseholdGroupOnFaDetermination
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(params)
         application_entity = yield validate(params)

@@ -994,7 +994,7 @@ describe "Enabled/Disabled IVL market" do
         let(:ridp_verified) { false }
 
         before do
-          expect(user).to receive(:consumer_identity_verified?).and_return(ridp_verified)
+          expect(user).to receive(:identity_verified?).and_return(ridp_verified)
         end
 
         context 'with RIDP' do
@@ -1017,7 +1017,7 @@ describe "Enabled/Disabled IVL market" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
 
       before do
-        allow(user).to receive(:consumer_identity_verified?).and_return(false)
+        allow(user).to receive(:identity_verified?).and_return(false)
       end
 
       context 'feature is disabled' do
@@ -1039,7 +1039,7 @@ describe "Enabled/Disabled IVL market" do
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
 
       before do
-        allow(user).to receive(:consumer_identity_verified?).and_return(true)
+        allow(user).to receive(:identity_verified?).and_return(true)
       end
 
       context 'feature is disabled' do
@@ -1095,7 +1095,7 @@ describe "Enabled/Disabled IVL market" do
       context 'resource registry feature is disabled' do
         context 'with RIDP verified' do
           before do
-            allow(user).to receive(:consumer_identity_verified?).and_return(true)
+            allow(user).to receive(:identity_verified?).and_return(true)
           end
 
           it 'returns true' do
@@ -1105,7 +1105,7 @@ describe "Enabled/Disabled IVL market" do
 
         context 'without RIDP verified' do
           before do
-            allow(user).to receive(:consumer_identity_verified?).and_return(false)
+            allow(user).to receive(:identity_verified?).and_return(false)
           end
 
           it 'returns false' do

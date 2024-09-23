@@ -8,7 +8,7 @@ module Operations
   module People
     # Class for initializing a new VLP document
     class InitializeVlpDocument
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # Initializes a new VLP document.
       #

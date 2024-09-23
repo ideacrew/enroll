@@ -20,7 +20,13 @@ module SponsoredBenefits
 
       before :each do
         sign_in user_with_broker_role
-        get :index, params: {plan_design_organization_id: plan_design_organization.id, selected_carrier_level: "single_carrier", kind: "health", carrier_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, format: :js}
+        get :index, params: {
+          plan_design_organization_id: plan_design_organization.id,
+          selected_carrier_level: 'single_carrier',
+          kind: 'health',
+          carrier_id: carrier_profile_id,
+          active_year: TimeKeeper.date_of_record.year
+        }, xhr: true
       end
 
       it "returns a success response" do

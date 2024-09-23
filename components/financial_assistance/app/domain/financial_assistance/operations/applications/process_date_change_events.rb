@@ -8,7 +8,7 @@ module FinancialAssistance
     module Applications
       # This Operation processes all the date change events based on the date.
       class ProcessDateChangeEvents
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
         include Acapi::Notifiers
 
         # @param [Hash] opts The options to submit renewal_draft application

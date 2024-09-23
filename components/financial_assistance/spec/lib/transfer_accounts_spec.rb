@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/lib/transfer_accounts"
 
 RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
   let!(:person2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021") }
   let!(:person3) { FactoryBot.create(:person, :with_ssn, hbx_id: "732022") }

@@ -11,7 +11,7 @@ module Operations
           # vlp close case request
           class RequestCloseCase
 
-            include Dry::Monads[:result, :do, :try]
+            include Dry::Monads[:do, :result]
             include EventSource::Command
 
             def call(payload, hbx_id)

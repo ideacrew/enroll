@@ -9,24 +9,15 @@ class Products::QhpController < ApplicationController
   before_action :set_cache_headers, only: [:summary]
 
   def comparison
-    params.permit("standard_component_ids", :hbx_enrollment_id)
+    @bs4 = true if params[:bs4] == "true"
+    params.permit("standard_component_ids", :hbx_enrollment_id, :bs4)
     found_params = params["standard_component_ids"].map { |str| str[0..13] }
 
     @standard_component_ids = params[:standard_component_ids]
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @active_year = params[:active_year]
     if (@market_kind == 'aca_shop' || @market_kind == 'fehb') && (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
-      sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-      effective_on = @hbx_enrollment.sponsored_benefit_package.start_on
-      products = @hbx_enrollment.sponsored_benefit.products(effective_on)
-      @member_groups = sponsored_cost_calculator.groups_for_products(products)
-      employee_cost_hash = {}
-      @member_groups.each do |member_group|
-        employee_cost_hash[member_group.group_enrollment.product.hios_id] = (member_group.group_enrollment.product_cost_total.to_f - member_group.group_enrollment.sponsor_contribution_total.to_f).round(2)
-      end
-      @qhps = find_qhp_cost_share_variances.each do |qhp|
-        qhp[:total_employee_cost] = employee_cost_hash[qhp.product_for(@market_kind).hios_id]
-      end
+      build_shop_comparison_details
     else
       @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, 'individual')
       @qhps = find_qhp_cost_share_variances
@@ -47,6 +38,7 @@ class Products::QhpController < ApplicationController
   end
 
   def summary
+    @bs4 = true if params[:bs4] == "true"
     @standard_component_ids = [] << @new_params[:standard_component_id]
     active_year_result = Validators::ControllerParameters::ProductsQhpParameters::SummaryActiveYearContract.new.call(params.permit(:active_year).to_h)
     if active_year_result.success?
@@ -77,8 +69,10 @@ class Products::QhpController < ApplicationController
       @plan ||= UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)
     end
 
+    summary_layout = @bs4 ? 'progress' : 'application'
+
     respond_to do |format|
-      format.html
+      format.html {render :layout => summary_layout}
       format.js
     end
   end
@@ -103,8 +97,8 @@ class Products::QhpController < ApplicationController
     if @hbx_enrollment.blank?
       error_message = {
         :error => {
-          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person.try(:id)}",
-        },
+          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person&.id}"
+        }
       }
       log(JSON.dump(error_message), {:severity => 'critical'})
       render file: 'public/500.html', status: 500
@@ -121,10 +115,10 @@ class Products::QhpController < ApplicationController
                      "aca_individual"
                    end
     @coverage_kind = if @hbx_enrollment.product.present?
-      @hbx_enrollment.product.kind.to_s
-    else
-      (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
-    end
+                       @hbx_enrollment.product.kind.to_s
+                     else
+                       (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
+                     end
 
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
@@ -133,6 +127,20 @@ class Products::QhpController < ApplicationController
 
   def find_qhp_cost_share_variances
     Products::QhpCostShareVariance.find_qhp_cost_share_variances(@standard_component_ids, @active_year.to_i, @coverage_kind)
+  end
+
+  def build_shop_comparison_details
+    sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
+    effective_on = @hbx_enrollment.sponsored_benefit_package.start_on
+    products = @hbx_enrollment.sponsored_benefit.products(effective_on)
+    @member_groups = sponsored_cost_calculator.groups_for_products(products)
+    employee_cost_hash = {}
+    @member_groups.each do |member_group|
+      employee_cost_hash[member_group.group_enrollment.product.hios_id] = (member_group.group_enrollment.product_cost_total.to_f - member_group.group_enrollment.sponsor_contribution_total.to_f).round(2)
+    end
+    @qhps = find_qhp_cost_share_variances.each do |qhp|
+      qhp[:total_employee_cost] = employee_cost_hash[qhp.product_for(@market_kind).hios_id]
+    end
   end
 
 end

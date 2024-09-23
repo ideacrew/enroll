@@ -27,7 +27,7 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
 
     let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 1, :silver) }
     let(:premium_table) { products.first.premium_tables.first }
-    let(:rating_area_id) { premium_table.rating_area_id }
+    let(:rating_area_exchange_provided_code) { premium_table.exchange_provided_code }
 
     let(:effective_date) { TimeKeeper.date_of_record }
 
@@ -36,8 +36,12 @@ RSpec.describe ::Operations::Products::FetchSilverProductPremiums, dbclean: :aft
         products: products,
         family: family,
         effective_date: effective_date,
-        rating_area_id: rating_area_id
+        rating_area_exchange_provided_code: rating_area_exchange_provided_code
       }
+    end
+
+    before do
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
     end
 
     context 'when address, rating area, service area exists' do

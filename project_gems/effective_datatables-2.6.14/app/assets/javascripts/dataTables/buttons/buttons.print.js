@@ -112,7 +112,7 @@ DataTable.ext.buttons.print = {
 		}
 
 		if ( title.indexOf( '*' ) !== -1 ) {
-			title= title.replace( '*', $('title').text() );
+			title= title.replace( /\*/g, $('title').first().text() );
 		}
 
 		win.document.close();
@@ -125,13 +125,6 @@ DataTable.ext.buttons.print = {
 		$('style, link').each( function () {
 			head += _relToAbs( this );
 		} );
-
-		try {
-			win.document.head.innerHTML = head; // Work around for Edge
-		}
-		catch (e) {
-			$(win.document.head).html( head ); // Old IE
-		}
 
 		// Inject the table and other surrounding information
 		win.document.body.innerHTML =

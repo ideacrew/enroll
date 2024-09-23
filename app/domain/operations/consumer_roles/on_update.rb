@@ -8,7 +8,7 @@ module Operations
     # This class is to Trigger all ConsumerRole OnUpdate events.
     #   1. Determine Verifications(SSA/VLP)
     class OnUpdate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values                   = yield validate_params(params)

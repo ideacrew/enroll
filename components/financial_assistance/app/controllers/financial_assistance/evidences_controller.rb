@@ -9,6 +9,13 @@ module FinancialAssistance
     before_action :fetch_applicant
     before_action :find_type
 
+    # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
+    # This before_action needs to be called after finding the application
+    #
+    # @before_action
+    # @private
+    before_action :check_for_uneditable_application
+
     def update_evidence
       authorize @applicant, :edit?
       update_reason = params[:verification_reason]
@@ -82,16 +89,7 @@ module FinancialAssistance
       return if params[:evidence_kind].blank?
       evidence_kind = params[:evidence_kind].to_s
       return unless ['income_evidence', 'esi_evidence', 'non_esi_evidence', 'local_mec_evidence'].include?(evidence_kind)
-      @evidence = case evidence_kind
-                  when 'income_evidence'
-                    @docs_owner.income_evidence
-                  when 'esi_evidence'
-                    @docs_owner.esi_evidence
-                  when 'non_esi_evidence'
-                    @docs_owner.non_esi_evidence
-                  when 'local_mec_evidence'
-                    @docs_owner.local_mec_evidence
-                  end
+      @evidence = @docs_owner.fetch_evidence(evidence_kind)
     end
 
     def fetch_applicant_succeeded?
@@ -112,6 +110,8 @@ module FinancialAssistance
                    elsif current_user.try(:person).try(:agent?) && session[:person_id].present?
                      FinancialAssistance::Applicant.find(session[:person_id])
                    end
+
+      @application = @applicant&.application if @application.blank?
 
       redirect_to main_app.logout_saml_index_path unless fetch_applicant_succeeded?
     end

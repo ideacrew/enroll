@@ -4,7 +4,7 @@ module Operations
   module Transmittable
     # create Transmission that takes params of key (required), job (required), started_at(required)
     class CreateTransmission
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate_params(params)

@@ -7,8 +7,8 @@ module Operations
   module People
     # This class uses different criteria for person match
     class Match
-      send(:include, Dry::Monads[:result, :do])
-      send(:include, Dry::Monads[:try])
+      include Dry::Monads[:do, :result, :try]
+
       attr_reader :has_ssn, :has_dob
 
       SPECIAL_CHAR = %r([!@#$%^&*()_+{}\[\]:;'"/\\?><.,]).freeze
@@ -57,7 +57,14 @@ module Operations
         end
 
         if result
-          Success({first_name: /^#{params[:first_name]}$/i, last_name: /^#{params[:last_name]}$/i, dob: params[:dob].to_date, encrypted_ssn: Person.encrypt_ssn(params[:ssn]&.delete('^0-9'))})
+          Success(
+            {
+              first_name: params[:first_name].is_a?(String) ? /^#{Regexp.escape(params[:first_name])}$/i : params[:first_name],
+              last_name: params[:last_name].is_a?(String) ? /^#{Regexp.escape(params[:last_name])}$/i : params[:last_name],
+              dob: params[:dob].to_date,
+              encrypted_ssn: Person.encrypt_ssn(params[:ssn]&.delete('^0-9'))
+            }
+          )
         else
           Failure("invalid params")
         end

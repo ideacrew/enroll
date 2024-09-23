@@ -86,7 +86,8 @@ class ApplicationPolicy # rubocop:disable Metrics/ClassLength
   #
   # @return [Boolean] Returns true if the user has verified their identity in the individual market, false otherwise.
   def individual_market_ridp_verified?
-    individual_market_role&.identity_verified?
+    # Note here, for now, we need to support the identity verification also present on the user.
+    individual_market_role&.identity_verified? || user.identity_verified?
   end
 
   # Determines if the primary person of the family has verified their identity (RIDP).
@@ -99,7 +100,11 @@ class ApplicationPolicy # rubocop:disable Metrics/ClassLength
     consumer_role = primary.consumer_role
     return false if consumer_role.blank?
 
-    consumer_role.identity_verified?
+    return true if consumer_role.identity_verified?
+
+    return false if primary.user.blank?
+
+    primary.user.identity_verified?
   end
 
   # Checks if the current user is a primary family member who has verified their identity and is an active associated individual market family broker staff.

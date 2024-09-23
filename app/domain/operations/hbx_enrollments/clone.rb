@@ -8,7 +8,7 @@ module Operations
     # irrespective of the aasm_state of the input hbx_enrollment.
     # Also, the result hbx_enrollment is a non-persisted object.
     class Clone
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ HbxEnrollment ] hbx_enrollment
       # @param [ Date ] effective_on for new hbx_enrollment

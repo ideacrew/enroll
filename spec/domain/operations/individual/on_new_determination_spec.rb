@@ -100,7 +100,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
       @product.save!
       enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "coverage_selected")
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), "R-#{site_key}001", 'N').and_return(679.8)
+      ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       cr1 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
       family.family_members[1].person.consumer_role = cr1
       cr2 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")

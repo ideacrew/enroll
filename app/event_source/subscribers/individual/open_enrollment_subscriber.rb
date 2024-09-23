@@ -85,10 +85,8 @@ module Subscribers
         enrollments = family.active_household.hbx_enrollments.where(query).order(:effective_on.desc)
         enrollments.each do |enrollment|
           result = ::Operations::Individual::RenewEnrollment.new.call(
-            {
-              hbx_enrollment: enrollment,
-              effective_on: @renewal_effective_on
-            }
+            hbx_enrollment: enrollment,
+            effective_on: @renewal_effective_on
           )
 
           if result.failure?

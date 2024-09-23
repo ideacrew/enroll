@@ -8,7 +8,7 @@ module BenefitSponsors
     module BenefitSponsorCatalog
       # Build BenefitSponsorCatalog entity
       class Build
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:do, :result]
 
         # @param [ Date ] effective_date Effective date of the benefit application
         # @param [ String ] sponsorship_id Benefit Sponsorship Id

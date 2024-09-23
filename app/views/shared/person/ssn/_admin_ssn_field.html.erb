@@ -1,0 +1,35 @@
+<% if f.object.ssn.blank? %>
+  <%= f.text_field :ssn,
+    placeholder: "#{l10n("social_security").to_s.upcase}",
+    class: "required mask-ssn input_txt",
+    pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
+    oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
+    oninput: "this.setCustomValidity('')",
+    value: params[:new_ssn].present? ? params[:new_ssn] : @person.ssn,
+    required: params[:new_ssn].present? ? true : false,
+    :input_html => {:maxlength => 15, :size => 40, :width => '100%'}
+  %>
+<% else %>
+  <div data-controller='person' id='#admin-ssn-input-field'>
+    <%= javascript_pack_tag 'effective_table_add_ons' %>
+
+    <%= l10n('new_ssn') %>
+    <%= f.text_field :ssn,
+      disabled: true,
+      class: "hidden mask-ssn ssn-input-#{presenter.person_id}",
+      target: 'person.ssn',
+      pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
+      oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
+      oninput: "this.setCustomValidity('')",
+      value: nil,
+      data: { :"admin-can-enable" => true }
+    %>
+    <input
+      type="text"
+      placeholder="<%= presenter.obscured_ssn %>"
+      class="mask-ssn <%= "ssn-facade-#{presenter.person_id}" %>"
+      readonly='true'
+    >
+    <%= render partial: 'shared/person/ssn/show_hide_ssn_buttons', locals: { presenter: presenter } %>
+  </div>
+<% end %>

@@ -294,6 +294,17 @@ class User
     end
   end
 
+  # Retrieves all active role names for the associated person.
+  # This method caches the result to minimize database queries on subsequent calls.
+  # If the person is nil, it returns an empty array.
+  #
+  # @return [Array<String>] An array of strings representing the names of all active roles.
+  def all_active_role_names
+    return @all_active_role_names if defined?(@all_active_role_names)
+
+    @all_active_role_names = person&.all_active_role_names || []
+  end
+
   private
   # Remove indexed, unique, empty attributes from document
   def strip_empty_fields

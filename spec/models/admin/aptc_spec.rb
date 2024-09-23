@@ -245,6 +245,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
+      before do
+        ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+      end
+
       it "should calculate slcsp value" do
         expect(Admin::Aptc.calculate_slcsp_value(TimeKeeper.date_of_record.year, family_5)).to eq '400.00'
       end

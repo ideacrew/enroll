@@ -9,7 +9,7 @@ module BenefitSponsors
       module ShopOsseEligibilities
         # Operation to support renew eligibility
         class RenewShopOsseEligibility
-          send(:include, Dry::Monads[:result, :do])
+          include Dry::Monads[:do, :result]
           include EventSource::Command
 
           # @param [Hash] opts Options to trigger shop osse eligibility renewals

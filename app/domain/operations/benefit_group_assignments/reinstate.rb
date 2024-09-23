@@ -6,7 +6,7 @@ module Operations
     # is a new benefit_group_assignment. The start_on of the newly
     # created benefit_group_assignment depends on the input benefit package.
     class Reinstate
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [ BenefitGroupAssignment ] benefit_group_assignment
       # @param [ Hash ] options include new benefit package which will

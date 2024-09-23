@@ -11,7 +11,7 @@ module FinancialAssistance
         # Sends the result of the transfer to EA back to MG for reporting
         class AccountTransferResponse
 
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           include Acapi::Notifiers
 
           # Pass the payload from the subscriber

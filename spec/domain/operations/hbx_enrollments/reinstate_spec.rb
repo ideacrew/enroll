@@ -340,7 +340,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         application.cancel!
         enrollment.reload
         enrollment.update_attributes(terminate_reason: '')
-        reinstated_app = BenefitSponsors::Operations::BenefitApplications::Reinstate.new.call({params: {benefit_application: application}}).success
+        reinstated_app = BenefitSponsors::Operations::BenefitApplications::Reinstate.new.call({ benefit_application: application }).success
         reinstated_package = reinstated_app.benefit_packages.first
         census_employee.reload
         @reinstated_enrollment = HbxEnrollment.where(sponsored_benefit_package_id: reinstated_package.id, effective_on: reinstated_app.start_on).first

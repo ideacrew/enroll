@@ -7,7 +7,7 @@ module FinancialAssistance
   module Operations
     module Application
       class FindDraft
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         def call(params:)
           values = yield validate(params)

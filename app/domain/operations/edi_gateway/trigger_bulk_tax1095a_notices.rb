@@ -7,7 +7,7 @@ module Operations
   module EdiGateway
     # Publish event to generate bulk 1095a notices
     class TriggerBulkTax1095aNotices
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
 
       TAX_FORM_TYPES = %w[IVL_TAX Corrected_IVL_TAX IVL_VTA IVL_CAP].freeze

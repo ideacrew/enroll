@@ -35,7 +35,7 @@ module Importers::Transcripts
       build_new_hbx_enrollment
 
       family = @enrollment.family
-      family_member = family.add_family_member(matching_person, is_primary_applicant: false)
+      family_member = family.add_family_member(matching_person, { is_primary_applicant: false })
 
       @enrollment.hbx_enrollment_members.build({
         applicant_id: family_member.id,

@@ -8,7 +8,7 @@ module FinancialAssistance
     module Applicants
       # This Operation is for destroying/deleting an Applicant.
       class Destroy
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
         # @param [::FinancialAssistance::Applicant] opts The options to destroy Applicant
         # @option opts [::FinancialAssistance::Applicant]

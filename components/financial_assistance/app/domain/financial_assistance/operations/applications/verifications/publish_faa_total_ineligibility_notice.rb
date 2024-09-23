@@ -11,7 +11,7 @@ module FinancialAssistance
           # Notifies families of totally ineligible members
         class PublishFaaTotalIneligibilityNotice
 
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           include Acapi::Notifiers
 
           # @param [ Hash ] params Applicant Attributes

@@ -3,7 +3,7 @@
 module FinancialAssistance
   # Rake task to bulk transfer accounts out
   class TransferAccounts
-    include Dry::Monads[:result, :do]
+    include Dry::Monads[:do, :result]
     include EventSource::Command
     include EventSource::Logging
 

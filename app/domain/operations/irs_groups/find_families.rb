@@ -7,7 +7,7 @@ module Operations
   module IrsGroups
     # Publish event on finding enrolled family
     class FindFamilies
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
       include EventSource::Command
 
       def call(params)

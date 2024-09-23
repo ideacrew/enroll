@@ -4,6 +4,7 @@ module ApplicationHelper
   include FloatHelper
   include ::FinancialAssistance::VerificationHelper
   include HtmlScrubberUtil
+  include DropdownHelper
 
   def add_external_links_enabled?
     EnrollRegistry.feature_enabled?(:add_external_links)
@@ -123,6 +124,12 @@ module ApplicationHelper
     cost > 0 ? cost.round(2) : 0
   end
   # rubocop:enable Style/OptionalBooleanParameter
+
+  def min_premium_with_aptc(plan_cost, plan_ehb_cost, subsidy_amount, can_use_aptc)
+    can_use_aptc ||= false
+    premium = shopping_group_premium(plan_cost, plan_ehb_cost, subsidy_amount, can_use_aptc)
+    premium > 1 ? premium : 1
+  end
 
   def link_to_with_noopener_noreferrer(name, path, options = {})
     link_to(name, path, options.merge(rel: 'noopener noreferrer'))
@@ -269,7 +276,18 @@ module ApplicationHelper
   def number_to_obscured_ssn(number)
     return unless number
     number_to_ssn(number)
-    number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
+    if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
+      '●●●●●●●●●'
+    else
+      number.to_s.gsub!(/\w{3}-\w{2}/, '***-**')
+    end
+  end
+
+  def organize_ssn_params(form_object, family_member_id = nil)
+    return unless form_object.ssn
+
+    presenter = ::Presenters::SsnFormPresenter.new(form_object, family_member_id)
+    presenter.sanitize_ssn_params
   end
 
   # Formats a number into a nine-digit US Federal Entity Identification Number string (nn-nnnnnnn)
@@ -316,13 +334,11 @@ module ApplicationHelper
     "#{li_start}#{link_to(label, path)}</li>"
   end
 
-  # rubocop:disable Naming/MethodParameterName
   def active_dropdown_classes(*args)
     args.map(&:to_s).include?(params[:controller].to_s) ? "dropdown active" : "dropdown"
   end
-  # rubocop:enable Naming/MethodParameterName
 
-  # rubocop:disable Naming/MethodParameterName
+    # rubocop:disable Naming/MethodParameterName
   def link_to_add_fields(name, f, association, classes = '')
   # rubocop:enable Naming/MethodParameterName
     new_object = f.object.send(association).klass.new
@@ -348,27 +364,41 @@ module ApplicationHelper
             '#', class: "add_fields #{classes}", data: {id: id, fields: fields.gsub("\n", "")})
   end
 
-  def render_flash
+  def render_flash(use_bs4: false)
     rendered = []
     flash.each do |type, messages|
       next if messages.blank? || (messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string"))
 
       if messages.respond_to?(:each)
         messages.each do |m|
-          rendered << get_flash(type, m) if m.present?
+          rendered << get_flash(use_bs4, type, m) if m.present?
         end
       else
-        rendered << get_flash(type, messages)
+        rendered << get_flash(use_bs4, type, messages)
       end
     end
     sanitize_html(rendered.join)
   end
 
-  def get_flash(type, msg)
+  def get_flash(use_bs4, type, msg)
+    type = use_bs4 ? get_flash_type(type) : type
     if is_announcement?(msg)
       render(:partial => 'layouts/announcement_flash', :locals => {:type => type, :message => msg[:announcement]})
     else
       render(:partial => 'layouts/flash', :locals => {:type => type, :message => msg})
+    end
+  end
+
+  def get_flash_type(type)
+    case type
+    when "notice"
+      "info"
+    when "warning", "message"
+      "warning"
+    when "success"
+      "success"
+    else
+      "error"
     end
   end
 
@@ -734,7 +764,7 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    if plan.instance_of?(Plan) || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
+    if plan.instance_of?(::Plan) || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
       return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == 'health'
 
       (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""
@@ -746,6 +776,7 @@ module ApplicationHelper
   end
 
   def ivl_hsa_status(plan_hsa_status, plan)
+    return unless plan_hsa_status.present?
     (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
   end
 
@@ -970,7 +1001,7 @@ module ApplicationHelper
     end
   end
 
-  def show_component(url) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+  def show_component(url)
     if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
       false
     else
@@ -1058,7 +1089,7 @@ module ApplicationHelper
     return true if user.has_employee_role?
     return true unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
 
-    user.has_consumer_role? && user.consumer_identity_verified?
+    user.has_consumer_role? && RemoteIdentityProofingStatus.is_complete_for_person?(user.person)
   end
 
   # @method insured_role_exists?(user)
@@ -1080,9 +1111,32 @@ module ApplicationHelper
     if EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
       user.has_consumer_role?
     else
-      user.has_consumer_role? && user.consumer_identity_verified?
+      user.has_consumer_role? && RemoteIdentityProofingStatus.is_complete_for_person?(user.person)
     end
   end
 
   # => END: Broker Role Consumer Role(Dual Roles) Enhancement
+
+  # @method ridp_step_2_disabled
+  # Used to determine if the continue button should be disabled on ridp pages.
+  def ridp_step_2_disabled(person, application_verified, identity_verified)
+    return !identity_verified unless current_user.has_hbx_staff_role? && (person.primary_family.application_type == "Phone" || person.primary_family.application_type == "Paper")
+    (application_verified || identity_verified) ? false : true
+  end
+
+  def ridp_modal_options
+    {
+      :driver_license => "Driver's License issued by state or territory",
+      :school_id => "School identification card",
+      :military_id => "U.S. military card or draft record",
+      :passport => "Identification card issued by the federal, state or local government, including a U.S. Passport",
+      :military_dependent => "Military dependent's identification card",
+      :native_american => "Native American tribal document",
+      :coast_guard => "U.S. Coast Guard Merchant Mariner card"
+    }
+  end
+
+  def imm_docs_requried_class
+    FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required"
+  end
 end

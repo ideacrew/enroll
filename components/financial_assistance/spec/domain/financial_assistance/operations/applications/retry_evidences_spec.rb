@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   before :all do
     DatabaseCleaner.clean

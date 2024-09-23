@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module People
     class Find
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         yield validate(params)

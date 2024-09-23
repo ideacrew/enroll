@@ -106,7 +106,7 @@ Rails.application.routes.draw do
         collection do
           get 'sep_types_dt'
           get 'sorting_sep_types'
-          patch 'sort'
+          patch 'update_list'
           get 'sep_type_to_publish'
           get 'sep_type_to_expire'
           post 'publish_sep_type'
@@ -119,6 +119,11 @@ Rails.application.routes.draw do
     resources :issuers, only: [:index] do
       post :bulk_upload
       resources :products, only: [:index]
+    end
+
+    resource :time_keeper, :controller => "time_keeper" do
+      post :hop_to_date if EnrollRegistry.feature_enabled?(:time_jump)
+      post :set_date
     end
 
     resources :hbx_profiles do
@@ -186,6 +191,7 @@ Rails.application.routes.draw do
         get :identity_verification
         post :identity_verification_datatable
         get :new_eligibility
+        get :ivl_dry_run_dashboard
       end
 
       member do
@@ -260,6 +266,7 @@ Rails.application.routes.draw do
         post 'terminate'
         post 'set_elected_aptc'
         get 'plan_selection_callback'
+        get 'choose_shopping_method'
       end
     end
 
@@ -360,6 +367,7 @@ Rails.application.routes.draw do
       get :new_resident_dependent, on: :collection
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
+      get :show_ssn, on: :member
     end
 
     resources :group_selections, format: false, controller: "group_selection", only: [:new, :create] do
@@ -594,8 +602,8 @@ Rails.application.routes.draw do
   match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"
 
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
-  match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
-  match "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, via: [:get], defaults: { format: 'js' }
+  post "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, defaults: { format: 'js' }
+  post "hbx_profiles/verify_dob_change" => "exchanges/hbx_profiles#verify_dob_change", as: :verify_dob_change, defaults: { format: 'js' }
   match "hbx_profiles/create_eligibility" => "exchanges/hbx_profiles#create_eligibility", as: :create_eligibility, via: [:post], defaults: { format: 'js' }
   match "hbx_profiles/process_eligibility" => "exchanges/hbx_profiles#process_eligibility", as: :process_eligibility, via: [:post], defaults: { format: 'js' }
 

@@ -7,7 +7,7 @@ module TransportGateway
         log(:error, "transport_gateway.file_adapter") { "source file not provided" }
         raise ArgumentError.new "source file not provided" 
       end
-      Sources::FileSource.new(URI.decode(message.from.path))
+      Sources::FileSource.new(CGI.unescape(message.from.path))
     end
 
     def send_message(message)
@@ -20,7 +20,7 @@ module TransportGateway
         log(:error, "transport_gateway.file_adapter") { "source file not provided" }
         raise ArgumentError.new "source file not provided"
       end
-      to_path = URI.decode(message.to.path)
+      to_path = CGI.unescape(message.to.path)
 
       ensure_directory_for(to_path)
       source = provide_source_for(message)

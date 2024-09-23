@@ -14,10 +14,11 @@ RSpec.describe SamlController do
       let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: admin_person) }
       sample_xml = File.read("spec/saml/invalid_saml_response.xml")
       let(:name_id) { admin_user.oim_id }
-      let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id)}
+      let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id, sessionindex: "12345")}
       let(:attributes_double) { { 'mail' => admin_user.email} }
 
       before :each do
+        allow(valid_saml_response).to receive(:is_a?).with(OneLogin::RubySaml::Response).and_return(true)
         allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return(valid_saml_response)
       end
 
@@ -31,6 +32,9 @@ RSpec.describe SamlController do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:notify_address_changed).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_publish_updated_families).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:saml_single_logout).and_return(false)
           hbx_staff_role
         end
 
@@ -84,10 +88,11 @@ RSpec.describe SamlController do
     context "with valid saml response" do
       sample_xml = File.read("spec/saml/invalid_saml_response.xml")
       let(:name_id) { user.oim_id }
-      let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id)}
+      let(:valid_saml_response) { double(is_valid?: true, :"settings=" => true, attributes: attributes_double, name_id: name_id, sessionindex: "12345")}
       let(:attributes_double) { { 'mail' => user.email} }
 
       before do
+        allow(valid_saml_response).to receive(:is_a?).with(OneLogin::RubySaml::Response).and_return(true)
         allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return( valid_saml_response )
       end
 
@@ -122,7 +127,7 @@ RSpec.describe SamlController do
         let!(:user3) { FactoryBot.create(:user, last_portal_visited: family_account_path)}
         let!(:user4) { FactoryBot.create(:user, last_portal_visited: family_account_path)}
         let!(:person4) { FactoryBot.create :person, :with_family, :user => user4}
-        let(:valid_saml_response) { double(is_valid?: true, name_id: 'Testing@test.com', :"settings=" => true, attributes: attributes_double)}
+        let(:valid_saml_response) { double(is_valid?: true, name_id: 'Testing@test.com', :"settings=" => true, attributes: attributes_double, sessionindex: "12345") }
         let(:attributes_double) { { 'mail' => user4.email} }
         let(:relay_state_url) { "/employers/employer_profiles/new" }
 

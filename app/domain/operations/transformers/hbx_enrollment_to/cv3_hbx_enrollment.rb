@@ -10,7 +10,7 @@ module Operations
       # Person params to be transformed.
       class Cv3HbxEnrollment
 
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
         include Acapi::Notifiers
         require 'securerandom'
 

@@ -8,7 +8,7 @@ module Operations
     module Ridp
       # Publish class will build event and publish the payload
       class PublishPrimaryRequest
-        send(:include, Dry::Monads[:result, :do, :try])
+        include Dry::Monads[:do, :result]
         include EventSource::Command
 
         def call(payload)

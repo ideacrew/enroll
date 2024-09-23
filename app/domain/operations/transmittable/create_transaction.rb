@@ -4,7 +4,7 @@ module Operations
   module Transmittable
     # create Transaction that takes params of key (required), started_at(required), and transmission (required)
     class CreateTransaction
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate_params(params)

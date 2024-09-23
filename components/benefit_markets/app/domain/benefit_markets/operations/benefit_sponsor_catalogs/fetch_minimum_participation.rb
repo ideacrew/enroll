@@ -4,12 +4,18 @@ module BenefitMarkets
 
       class FetchMinimumParticipation
 
-        include Dry::Monads[:result, :do]
+        include Dry::Monads[:do, :result]
 
-        # @param [ Hash ] params Benefit Sponsor Catalog attributes
-        # @param [ Array<BenefitMarkets::Products::ProductPackage> ] product_packages ProductPackage
-        # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog Benefit Sponsor Catalog
-        def call(product_package:,  calender_year:)
+        # Fetches the minimum participation from a product package for a given calendar year.
+        #
+        # @param params [Hash] A hash containing :product_package and :calender_year keys.
+        #   - :product_package [BenefitMarkets::Products::ProductPackage] The product package to fetch the minimum participation from.
+        #   - :calender_year [Integer] The calendar year to fetch the minimum participation for.
+        #
+        # @return [Dry::Monads::Result] A Success monad with the minimum participation.
+        def call(params)
+          product_package,  calender_year = params.values_at(:product_package, :calender_year)
+
           minimum_participation  = yield fetch(product_package, calender_year)
     
           Success(minimum_participation)

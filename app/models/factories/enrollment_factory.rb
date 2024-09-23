@@ -4,11 +4,10 @@ module Factories
 
     def self.add_consumer_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
                                new_is_state_resident:, new_citizen_status:)
-
-      [:new_is_incarcerated, :new_is_applicant, :new_is_state_resident, :new_citizen_status].each do |value|
-        name = value.id2name
-        raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
-      end
+      raise ArgumentError, 'missing value: new_is_incarcerated, expected as keyword' if new_is_incarcerated.blank?
+      raise ArgumentError, 'missing value: new_is_applicant, expected as keyword' if new_is_applicant.blank?
+      raise ArgumentError, 'missing value: new_is_state_resident, expected as keyword' if new_is_state_resident.blank?
+      raise ArgumentError, 'missing value: new_citizen_status, expected as keyword' if new_citizen_status.blank?
 
       ssn = new_ssn
       dob = new_dob
@@ -36,11 +35,10 @@ module Factories
 
     def self.add_resident_role(person:, new_ssn: nil, new_dob: nil, new_gender: nil, new_is_incarcerated:, new_is_applicant:,
                                new_is_state_resident:, new_citizen_status:)
-
-      [:new_is_incarcerated, :new_is_applicant, :new_is_state_resident, :new_citizen_status].each do |value|
-        name = value.id2name
-        raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
-      end
+      raise ArgumentError, 'missing value: new_is_incarcerated, expected as keyword' if new_is_incarcerated.blank?
+      raise ArgumentError, 'missing value: new_is_applicant, expected as keyword' if new_is_applicant.blank?
+      raise ArgumentError, 'missing value: new_is_state_resident, expected as keyword' if new_is_state_resident.blank?
+      raise ArgumentError, 'missing value: new_citizen_status, expected as keyword' if new_citizen_status.blank?
 
       ssn = new_ssn
       dob = new_dob
@@ -104,7 +102,11 @@ module Factories
 
     def self.build_consumer_role(person, person_new)
       role = find_or_build_consumer_role(person)
-      family, primary_applicant =  initialize_family(person,[])
+
+      # all users w/consumer_role required to have a demographics_group
+      person.build_demographics_group
+
+      family, primary_applicant = initialize_family(person,[])
       family.family_members.map(&:__association_reload_on_person)
       saved = save_all_or_delete_new(family, primary_applicant, role)
       if saved
@@ -122,12 +124,9 @@ module Factories
     end
 
     def self.add_broker_role(person:, new_kind:, new_npn:, new_mailing_address:)
-
-      [:new_kind, :new_npn, :new_mailing_address].each do |value|
-        name = value.id2name
-
-        raise ArgumentError.new("missing value: #{name}, expected as keyword ") if eval(name).blank?
-      end
+      raise ArgumentError, 'missing value: new_kind, expected as keyword' if new_kind.blank?
+      raise ArgumentError, 'missing value: new_npn, expected as keyword' if new_npn.blank?
+      raise ArgumentError, 'missing value: new_mailing_address, expected as keyword' if new_mailing_address.blank?
 
       kind = new_kind
       npn = new_npn
@@ -379,7 +378,7 @@ module Factories
     end
 
     def self.initialize_primary_applicant(family, person)
-      family.add_family_member(person, is_primary_applicant: true) unless family.find_family_member_by_person(person)
+      family.add_family_member(person, { is_primary_applicant: true }) unless family.find_family_member_by_person(person)
     end
 
     def self.person_relationship_for(census_relationship)

@@ -33,13 +33,13 @@ RSpec.describe "benefit_sponsors/profiles/employers/employer_profiles/_show_prof
 
   it "should display the dashboard content" do
     @tab = 'home'
-    render template: "benefit_sponsors/profiles/employers/employer_profiles/show.html.erb"
+    render template: 'benefit_sponsors/profiles/employers/employer_profiles/show'
     expect(rendered).to have_selector('h1', text: 'My Health Benefits Program')
   end
 
   it 'should display employer attestation table based on settings' do
     @tab = 'documents'
-    render template: "benefit_sponsors/profiles/employers/employer_profiles/show.html.erb"
+    render template: 'benefit_sponsors/profiles/employers/employer_profiles/show'
     if ApplicationHelperModStubber.employer_attestation_is_enabled?
       expect(rendered).to have_selector('h1', text: 'Verification of Employer Eligibility')
     else

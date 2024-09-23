@@ -42,13 +42,13 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
 
     it 'should display for HBX admin' do
       allow(view).to receive(:policy_helper).and_return(double("EmployerProfile", updateable?: true, can_modify_employer?:true))
-      render template: "benefit_sponsors/profiles/employers/employer_profiles/my_account/_census_employees.html.erb"
+      render template: "benefit_sponsors/profiles/employers/employer_profiles/my_account/_census_employees"
       expect(rendered).to match(/Terminate Employee Roster Enrollments/)
     end
 
     it 'should not display for employer' do
       allow(view).to receive(:policy_helper).and_return(double("EmployerProfile", updateable?: true, can_modify_employer?: false))
-      render template: "benefit_sponsors/profiles/employers/employer_profiles/my_account/_census_employees.html.erb"
+      render template: "benefit_sponsors/profiles/employers/employer_profiles/my_account/_census_employees"
       expect(rendered).to_not match(/Terminate Employee Roster Enrollments/)
     end
   end

@@ -7,7 +7,7 @@ module Operations
   module EventLogs
     # Create Event Log entity
     class Create
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       attr_accessor :resource_class
 

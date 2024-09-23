@@ -10,7 +10,7 @@ module FinancialAssistance
         module Renewals
           # Publish class will build event and publish the renewal payload
           class PublishRenewalRequest
-            include Dry::Monads[:result, :do, :try]
+            include Dry::Monads[:do, :result]
             include EventSource::Command
 
             REGISTERED_EVENTS = %w[renewal.requested renewed determination_submission.requested determination_requested determination_added notice.determined_uqhp_eligible notice.determined_mixed_determination

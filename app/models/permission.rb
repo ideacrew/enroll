@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Permission
   include Mongoid::Document
   include SetCurrentUser
@@ -6,6 +8,8 @@ class Permission
   PERMISSION_KINDS = %w(hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin)
 
   field :name, type: String
+
+  # ******* NOTE: As we add new permission fields, we need to add to update Validators::Permissions::FindAndUpdateContract::PERMISSION_FIELD_NAMES. *******
 
   field :modify_family, type: Boolean, default: false
   field :modify_employer, type: Boolean, default: false

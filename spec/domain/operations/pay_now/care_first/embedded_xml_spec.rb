@@ -38,6 +38,10 @@ RSpec.describe Operations::PayNow::CareFirst::EmbeddedXml do
     "      <is_subscriber>false</is_subscriber>\n    </member>\n  </members>\n"
   end
 
+  before do
+    ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+  end
+
   context "valid payload is created" do
     before do
       allow(::AcaEntities::PayNow::CareFirst::Operations::GenerateXml).to receive_message_chain("new.call").and_return(Dry::Monads::Result::Success.new("sample xml"))

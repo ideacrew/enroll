@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Documents
     class Create
-      send(:include, Dry::Monads[:result, :do, :try])
+      include Dry::Monads[:do, :result]
 
       def call(resource:, document_params:, doc_identifier:)
         return Failure({ :message => ["Please find valid resource to create document for params: #{document_params}"] }) if resource.blank?

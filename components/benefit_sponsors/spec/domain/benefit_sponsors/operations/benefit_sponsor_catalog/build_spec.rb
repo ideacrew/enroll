@@ -46,7 +46,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorCatalog::Build,
       }
     end
 
-    let(:result) { subject.call(params) }
+    let(:result) { subject.call(**params) }
 
     it "should be success" do
       expect(result.success?).to be_truthy
@@ -98,7 +98,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorCatalog::Build,
 
     context "when employer has effectuated eligibilities" do
       it "should create benefit sponsor catalog with eligibilities" do
-        result = subject.call(params)
+        result = subject.call(**params)
 
         expect(result.success?).to be_truthy
       end

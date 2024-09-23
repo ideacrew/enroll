@@ -5,7 +5,7 @@ require 'aca_entities/serializers/xml/medicaid/atp'
 require 'aca_entities/atp/transformers/cv/family'
 
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   let(:xml_file_path) { ::FinancialAssistance::Engine.root.join('spec', 'shared_examples', 'medicaid_gateway', 'Simple_Test_Case_E_New.xml') }
   let(:xml) do
@@ -226,6 +226,206 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           attributes = attestation_vals.keys.map { |name| [name, application.attributes[name]] }.to_h
           expect(attributes).to eq attestation_vals
         end
+      end
+    end
+  end
+
+  context 'Incarceration status' do
+    context "when incarceration indicator does not exists for any applicant" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//hix-ee:InsuranceApplicantIncarceration', 'hix-ee' => "http://hix.cms.gov/0.1/hix-ee").each(&:remove)
+        document
+      end
+
+      it "should default the person/applicant incarceration status to false" do
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.is_incarcerated).to eq false
+        expect(Person.all.first.is_incarcerated).to eq false
+      end
+    end
+
+    context "when incarceration indicator is set to true for all applicants" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:IncarcerationIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core").each do |node|
+          node.content = 'true'
+        end
+        document
+      end
+
+      it "should default the person/applicant incarceration status to false" do
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.is_incarcerated).to eq true
+        expect(Person.all.first.is_incarcerated).to eq true
+      end
+    end
+
+    context "when person records exits and the payload has incarceration set to nil in the payload" do
+      let!(:person) do
+        FactoryBot.create(:person, first_name: "Junior", last_name: "Banfield",
+                                   dob: Date.new(2014,1,1), is_incarcerated: true)
+      end
+
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:IncarcerationIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core")[1].remove
+        document
+      end
+
+      it "should default the incarceration status to existing person value" do
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        family_member = @transformed["family"]["family_members"].detect do |member|
+          member if member["person"]["person_name"]["first_name"] == person.first_name
+        end
+        matching_person = Person.all.where(first_name: "Junior").first
+        expect(matching_person).to be_present
+        expect(matching_person.is_incarcerated).to eq true
+        expect(family_member["person"]["person_demographics"]["is_incarcerated"]).not_to eq matching_person.is_incarcerated
+      end
+    end
+  end
+
+  context 'AI/AN status' do
+    context "when PersonAmericanIndianOrAlaskaNativeIndicator does not exists for any applicant" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core").each(&:remove)
+        document
+      end
+
+      it "should default the person/applicant indian_tribe_member to false" do
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.indian_tribe_member).to eq false
+        expect(Person.all.first.indian_tribe_member).to eq false
+      end
+    end
+
+    context "when PersonAmericanIndianOrAlaskaNativeIndicator is set to false for all applicants" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core").each do |node|
+          node.content = 'false'
+        end
+        document
+      end
+
+      it "should default the person/applicant indian_tribe_member to false" do
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.indian_tribe_member).to eq false
+        expect(Person.all.first.indian_tribe_member).to eq false
+      end
+    end
+
+    context "when PersonAmericanIndianOrAlaskaNativeIndicator is set to true for all applicants" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core").each do |node|
+          node.content = 'true'
+        end
+        document
+      end
+
+      it "should default the person/applicant indian_tribe_member to true" do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.indian_tribe_member).to eq true
+        expect(Person.all.first.indian_tribe_member).to eq true
+        expect(Person.all.first.tribe_codes).to eq ["OT"]
+      end
+    end
+
+    context "when tribe is set to Houlton Maliseets for an applicants" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator',
+                       'ns4' => "http://hix.cms.gov/0.1/hix-core")[0].content = 'true'
+        document.xpath('//ns4:PersonTribeName',
+                       'ns4' => "http://hix.cms.gov/0.1/hix-core")[0].content = 'Houlton Maliseets'
+        document
+      end
+
+      it "should default the person/applicant indian_tribe_member to true" do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.applicants.first.indian_tribe_member).to eq true
+        expect(Person.all.first.indian_tribe_member).to eq true
+        expect(Person.all.first.tribe_codes).to eq ["HM"]
+      end
+    end
+
+    context "when PersonAmericanIndianOrAlaskaNativeIndicator is set to true but no tribe name and tribe state" do
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator',
+                       'ns4' => "http://hix.cms.gov/0.1/hix-core")[0].content = 'true'
+        document.xpath('//ns4:PersonTribeName',
+                       'ns4' => "http://hix.cms.gov/0.1/hix-core")[0].content = ''
+        document.xpath('//ns2:LocationStateUSPostalServiceCode',
+                       'ns2' => "http://niem.gov/niem/niem-core/2.0")[0].content = ''
+        document
+      end
+
+      it "should default the person/applicant indian_tribe_member to false" do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        person = Person.all.where(first_name: "Junior").first
+        expect(person.indian_tribe_member).to eq false
+        expect(person.tribe_codes).to eq nil
+      end
+    end
+
+    context "when person records exits and the payload is missing PersonAmericanIndianOrAlaskaNativeIndicator element" do
+      let!(:person) do
+        FactoryBot.create(:person, first_name: "Junior", last_name: "Banfield",
+                                   dob: Date.new(2014,1,1), is_incarcerated: true,
+                                   tribal_name: "Tribe name", tribal_state: "ME", indian_tribe_member: true)
+      end
+
+      let(:document) do
+        document = Nokogiri::XML(xml)
+        document.xpath('//ns4:PersonAmericanIndianOrAlaskaNativeIndicator', 'ns4' => "http://hix.cms.gov/0.1/hix-core")[1].remove
+        document
+      end
+
+      it "should not override the existing tribal_name/tribal_state/indian_tribe_member values" do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        record = serializer.parse(document.root.canonicalize, :single => true)
+        @transformed = transformer.transform(record.to_hash(identifier: true))
+        @result = subject.call(@transformed)
+        family_member = @transformed["family"]["family_members"].detect do |member|
+          member if member["person"]["person_name"]["first_name"] == person.first_name
+        end
+        matching_person = Person.all.where(first_name: "Junior").first
+        expect(matching_person).to be_present
+        expect(matching_person.tribal_name).to eq person.tribal_name
+        expect(matching_person.tribal_state).to eq person.tribal_state
+        expect(matching_person.indian_tribe_member).to eq person.indian_tribe_member
+        expect(family_member["person"]["person_demographics"]["tribal_name"]).not_to eq matching_person.tribal_name
+        expect(family_member["person"]["person_demographics"]["tribal_state"]).not_to eq matching_person.tribal_state
+        expect(family_member["person"]["person_demographics"]["indian_tribe_member"]).not_to eq matching_person.indian_tribe_member
       end
     end
   end

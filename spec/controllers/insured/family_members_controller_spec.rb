@@ -288,12 +288,24 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     describe "with a valid dependent" do
-      let(:save_result) { true }
+      let(:dependent_properties) do
+        {
+          family_id: test_family.id,
+          first_name: 'Robert',
+          last_name: 'Roberts',
+          relationship: 'child',
+          gender: 'male',
+          dob: "2024-04-23",
+          is_applying_coverage: false,
+          same_with_primary: true,
+          is_consumer_role: true
+        }
+      end
 
       before :each do
+        allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
         sign_in(user)
-        allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
-        post :create, params: {dependent: dependent_properties}, :format => "js"
+        post :create, params: { dependent: dependent_properties }, format: :js
       end
 
       it "should assign the dependent" do
@@ -308,6 +320,15 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       it "should render the show template" do
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
+      end
+
+      it "should create a demographics_group for the new family_member" do
+        test_family.reload
+        dependent = test_family.family_members.max_by(&:created_at)
+        demographics_group = dependent&.person&.demographics_group
+
+        expect(demographics_group).to be_a DemographicsGroup
+        expect(demographics_group.alive_status).to be_a AliveStatus
       end
     end
 
@@ -455,7 +476,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     it "should render the edit template" do
       expect(response).to have_http_status(:success)
-      expect(response).to render_template("edit")
+      expect(response).to render_template("edit.js.erb")
     end
   end
 
@@ -498,7 +519,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       it "should render the edit template" do
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: invalid_dependent_properties}
         expect(response).to have_http_status(:success)
-        expect(response).to render_template("edit")
+        expect(response).to render_template("edit.js.erb")
       end
 
       it "addresses should be an array" do
@@ -536,7 +557,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         allow(controller).to receive(:update_vlp_documents).and_return(false)
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
-        expect(response).to render_template("edit")
+        expect(response).to render_template("edit.js.erb")
       end
     end
 
@@ -554,7 +575,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       it "should render the edit template" do
         put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
-        expect(response).to render_template("edit")
+        expect(response).to render_template("edit.js.erb")
       end
 
       it "should assign the address_errors" do
@@ -573,6 +594,43 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
       FactoryBot.create(:consumer_role, person: test_family.primary_person)
       test_family.primary_person.consumer_role.move_identity_documents_to_verified
+      allow(EnrollRegistry[:mask_ssn_ui_fields].feature).to receive(:is_enabled).and_return(true)
+    end
+
+    context 'a primary' do
+      before :each do
+        sign_in(user)
+      end
+
+      context ':show_ssn' do
+        it 'should be able to view own ssn' do
+          get :show_ssn, params: { id: test_family.primary_person.id, family_id: test_family.id }
+
+          expect(response).to have_http_status(:success)
+
+          parsed_response = JSON.parse(response.body)
+          sanitized_response = parsed_response["payload"].gsub('-', '')
+          expect(test_family.primary_person.ssn).to eq(sanitized_response)
+        end
+        context 'other family members' do
+          let(:dependent) { test_family.dependents.first.person }
+
+          before do
+            dependent.update(ssn: '234769373')
+            test_family.reload
+          end
+
+          it 'should be able to view ssns of other household members' do
+            get :show_ssn, params: { id: dependent.id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:success)
+
+            parsed_response = JSON.parse(response.body)
+            sanitized_response = parsed_response["payload"].gsub('-', '')
+            expect(sanitized_response).to eq(dependent.ssn)
+          end
+        end
+      end
     end
 
     context 'a user without permissions' do
@@ -627,7 +685,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
           expect(response).to have_http_status(:redirect)
           expect(response).to_not render_template("show")
-          expect(response).to_not render_template("edit")
+          expect(response).to_not render_template("edit.js.erb")
         end
 
         it "can't delete family members on behalf of another user" do
@@ -655,7 +713,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           get :edit, params: { id: dependent_id }
 
           expect(response).to have_http_status(:redirect)
-          expect(response).to_not render_template("edit")
+          expect(response).to_not render_template("edit.js.erb")
+        end
+
+        it ":show_ssn will not return the ssn" do
+          get :show_ssn, params: { id: test_family.primary_person.id, family_id: test_family.id }
+
+          expect(response).to have_http_status(:unauthorized)
         end
       end
     end
@@ -720,7 +784,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         end
       end
 
-      context 'new, show, edit, update, destroy' do
+      context 'new, show, edit, update, destroy, show_ssn' do
         let(:valid_addresses_attributes) do
           {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
            "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
@@ -788,7 +852,17 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             get :edit, params: { id: dependent_id }
 
             expect(response).to have_http_status(:success)
-            expect(response).to render_template("edit")
+            expect(response).to render_template("edit.js.erb")
+          end
+
+          it ":show_ssn will return ssn" do
+            get :show_ssn, params: { id: test_family.primary_person.id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:success)
+
+            parsed_response = JSON.parse(response.body)
+            sanitized_response = parsed_response["payload"].gsub('-', '')
+            expect(test_family.primary_person.ssn).to eq(sanitized_response)
           end
         end
 
@@ -801,7 +875,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
             expect(response).to have_http_status(:redirect)
             expect(response).to_not render_template("show")
-            expect(response).to_not render_template("edit")
+            expect(response).to_not render_template("edit.js.erb")
           end
 
           it "can't delete family members for a user" do
@@ -829,7 +903,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             get :edit, params: { id: dependent_id }
 
             expect(response).to have_http_status(:redirect)
-            expect(response).to_not render_template("edit")
+            expect(response).to_not render_template("edit.js.erb")
+          end
+
+          it ":show_ssn will not return the ssn" do
+            get :show_ssn, params: { id: test_family.primary_person.id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:unauthorized)
           end
         end
       end
@@ -901,7 +981,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         end
       end
 
-      context 'new, show, edit, update, destroy' do
+      context 'new, show, edit, update, destroy, show_ssn' do
         let(:valid_addresses_attributes) do
           {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
            "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
@@ -975,7 +1055,17 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             get :edit, params: { id: dependent_id }
 
             expect(response).to have_http_status(:success)
-            expect(response).to render_template("edit")
+            expect(response).to render_template("edit.js.erb")
+          end
+
+          it ":show_ssn will return ssn" do
+            get :show_ssn, params: { id: test_family.primary_person.id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:success)
+
+            parsed_response = JSON.parse(response.body)
+            sanitized_response = parsed_response["payload"].gsub('-', '')
+            expect(test_family.primary_person.ssn).to eq(sanitized_response)
           end
         end
 
@@ -986,7 +1076,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
             expect(response).to have_http_status(:redirect)
             expect(response).to_not render_template("show")
-            expect(response).to_not render_template("edit")
+            expect(response).to_not render_template("edit.js.erb")
           end
 
           it "can't delete family members for a user" do
@@ -1014,7 +1104,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
             get :edit, params: { id: dependent_id }
 
             expect(response).to have_http_status(:redirect)
-            expect(response).to_not render_template("edit")
+            expect(response).to_not render_template("edit.js.erb")
+          end
+
+          it ":show_ssn will not return the ssn" do
+            get :show_ssn, params: { id: test_family.primary_person.id, family_id: test_family.id }
+
+            expect(response).to have_http_status(:unauthorized)
           end
         end
       end

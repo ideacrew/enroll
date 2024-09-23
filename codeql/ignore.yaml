@@ -1,0 +1,40 @@
+- fingerprint:
+    primaryLocationLineHash: 2b582675ce41ca:1
+    primaryLocationStartColumnFingerprint: "25"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/exchanges/employer_applications_controller.rb:18"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
+- fingerprint:
+    primaryLocationLineHash: b20c58d8092896a0:1
+    primaryLocationStartColumnFingerprint: "25"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/employers/employer_attestations_controller.rb:9"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
+- fingerprint:
+    primaryLocationLineHash: 809e267505a89381:1
+    primaryLocationStartColumnFingerprint: "60"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/employers/employer_attestations_controller.rb:21"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
+- fingerprint:
+    primaryLocationLineHash: "bb403573672ab05d:1"
+    primaryLocationStartColumnFingerprint: "21"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/employers/employer_attestations_controller.rb:72"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.
+- fingerprint:
+    primaryLocationLineHash: 5bb6dbcd76a34e15:1
+    primaryLocationStartColumnFingerprint: "20"
+  ruleId: "rb/sensitive-get-query"
+  location: "app/controllers/exchanges/residents_controller.rb:149"
+  comment: |
+    While typically it would not be good to pass sensitive information in
+    a GET request, the parameters in question are not sensitive.

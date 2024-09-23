@@ -16,6 +16,8 @@ disable-default-queries: true
 packs:
   ruby:
     - codeql/ruby-queries
+  javascript:
+    - codeql/javascript-queries
 query-filters:
   - exclude:
      id: rb/csrf-protection-disabled
@@ -29,3 +31,13 @@ query-filters:
      id: rb/reflected-xss
   - exclude:
      id: rb/regexp-injection
+  - exclude:
+     id: js/incomplete-sanitization
+  - exclude:
+     id: js/redos
+  - exclude:
+     id: js/cross-window-information-leak
+  - exclude:
+     id: js/unsafe-jquery-plugin
+  - exclude:
+     id: js/xss-through-dom

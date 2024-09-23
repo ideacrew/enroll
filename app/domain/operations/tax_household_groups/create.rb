@@ -7,7 +7,7 @@ module Operations
   module TaxHouseholdGroups
     # this operation is to create taxhouseholdgroups
     class Create
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values = yield validate(params)

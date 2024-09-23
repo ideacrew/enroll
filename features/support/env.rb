@@ -53,7 +53,7 @@ ActionController::Base.allow_rescue = false
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
 begin
   load "#{Rails.root}/db/seedfiles/english_translations_seed.rb"
-  DatabaseCleaner.strategy = :deletion, {:except => %w[translations]}
+  DatabaseCleaner.strategy = DatabaseCleaner::Mongoid::Deletion.new(except: %w[translations])
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end
@@ -81,6 +81,9 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 # Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 # Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
+
+Webdrivers::Chromedriver.required_version = ENV['WD_VERSION'] if ENV['WD_VERSION']
+Selenium::WebDriver::Chrome.path = ENV['WD_CHROME_PATH'] if ENV['WD_CHROME_PATH']
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
 

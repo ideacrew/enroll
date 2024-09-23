@@ -4,7 +4,7 @@ module Operations
   module Products
     # This class is to load county zip combinations.
     class ImportCountyZip
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       def call(params)
         values  = yield validate(params)

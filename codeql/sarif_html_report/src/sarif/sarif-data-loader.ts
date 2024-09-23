@@ -1,5 +1,23 @@
+import { parse } from "yaml"
 import { Log, Run, ToolComponent, ReportingDescriptor, Result, Notification } from 'sarif';
 import * as data from "../data/codeql.json";
+
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import yamlContent from "!!raw-loader!../data/ignore.yaml";
+
+
+interface FingerPrint {
+  primaryLocationLineHash: string,
+  primaryLocationStartColumnFingerprint: string;
+}
+
+interface IgnoreEntry {
+  fingerprint: FingerPrint;
+  ruleId: string;
+  location: string;
+  comment: string;
+}
 
 export class SarifData {
   public errors = 0;
@@ -11,12 +29,21 @@ export class SarifData {
   public rules = new Map<string, ReportingDescriptor>();
   public notificationTypes = new Map<string, ReportingDescriptor>();
   private log = <Log | null>data;
+  public ignores = new Array<IgnoreEntry>();
 
   constructor() {
-    this.analyze();
+    console.log(yamlContent);
+    this.analyze(yamlContent);
+    console.log(this.ignores);
   }
 
-  public analyze() {
+  public analyze(yamldata : string) {
+    if (yamldata) {
+      const ignoreData = <Array<IgnoreEntry> | null>parse(yamldata);
+      if (ignoreData) {
+        this.ignores = ignoreData;
+      }
+    }
     if (this.log) {
       for (const run of this.log.runs) {
         this.processRun(run);

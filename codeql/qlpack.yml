@@ -2,3 +2,4 @@ name: ideacrew/enroll-ql
 version: 0.0.0
 dependencies:
   codeql/ruby-all: "*"
+  codeql/javascript-all: "*"

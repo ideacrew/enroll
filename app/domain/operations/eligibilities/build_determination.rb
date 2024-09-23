@@ -13,7 +13,7 @@ module Operations
   module Eligibilities
     # Build determination for subjects passed with effective date
     class BuildDetermination
-      send(:include, Dry::Monads[:result, :do])
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts Options to build determination
       # @option opts [Array<GlobalID>] :subjects required

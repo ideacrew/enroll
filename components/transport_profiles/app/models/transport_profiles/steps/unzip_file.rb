@@ -49,7 +49,7 @@ module TransportProfiles
                 output_name = File.join(tmp_dir, entry.name)
                 entry.extract(output_name)
                 process_context.update(@files_key, []) do |f_list|
-                  f_list + [URI.join("file://", URI.escape(output_name))]
+                  f_list + [URI.join("file://", CGI.escape(output_name))]
                 end
               end
             end

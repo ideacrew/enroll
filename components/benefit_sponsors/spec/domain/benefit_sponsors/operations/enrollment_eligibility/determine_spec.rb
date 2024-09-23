@@ -38,7 +38,7 @@ RSpec.describe BenefitSponsors::Operations::EnrollmentEligibility::Determine, db
       }
     end
 
-    let(:result) { subject.call(params) }
+    let(:result) { subject.call(**params) }
 
     it 'should be success' do
       expect(result.success?).to be_truthy
@@ -72,7 +72,7 @@ RSpec.describe BenefitSponsors::Operations::EnrollmentEligibility::Determine, db
         benefit_sponsorship: benefit_sponsorship_entity
       }
     end
-    let(:result) { subject.call(params) }
+    let(:result) { subject.call(**params) }
 
     context "with termination_pending application" do
       let(:ba_aasm_state) {"termination_pending"}
@@ -113,7 +113,7 @@ RSpec.describe BenefitSponsors::Operations::EnrollmentEligibility::Determine, db
       }
     end
 
-    let(:result) { subject.call(params) }
+    let(:result) { subject.call(**params) }
 
     it 'should be success' do
       expect(result.success?).to be_truthy

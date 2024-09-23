@@ -7,7 +7,7 @@ module Operations
   module Families
     # Operation finds family using primary person hbx_id and generats a Family CV
     class FindBy
-      include Dry::Monads[:result, :do]
+      include Dry::Monads[:do, :result]
 
       # @param [Hash] opts The options to generate family_cv for a given primary person Hbx ID
       # @option opts [String] :person_hbx_id

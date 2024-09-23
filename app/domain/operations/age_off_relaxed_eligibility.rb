@@ -7,9 +7,24 @@ module Operations
   # through out the defined eligibility period(annual/monthly) from yml based on the market settings.
   class AgeOffRelaxedEligibility
     include Config::SiteConcern
-    include Dry::Monads[:result, :do]
+    include Dry::Monads[:do, :result]
 
-    def call(effective_on:, family_member:, market_key:, relationship_kind:)
+    # Executes the age-off eligibility check for a family member.
+    # This method takes a hash of parameters, performs a series of operations
+    # to validate the inputs, fetch the age-off period and cut-off age, validate the relationship, and check if the person is eligible on enrollment.
+    #
+    # @param params [Hash] A hash containing :effective_on, :family_member, :market_key, and :relationship_kind.
+    #   - :effective_on [Date] The effective date of the enrollment.
+    #   - :family_member [FamilyMember] The family member to check eligibility for.
+    #   - :market_key [Symbol] The key of the market to check eligibility in.
+    #   - :relationship_kind [Symbol] The relationship of the family member to the subscriber.
+    #
+    # @return [Dry::Monads::Result] A Success or Failure monad.
+    #   - Success: Contains a boolean indicating whether the person is eligible on enrollment.
+    #   - Failure: Contains an error message.
+    def call(params)
+      effective_on, family_member, market_key, relationship_kind = params.values_at(:effective_on, :family_member, :market_key, :relationship_kind)
+
       _values        = yield validate(effective_on, family_member, market_key)
       age_off_period = yield fetch_age_off_period(market_key)
       cut_off_age    = yield fetch_cut_off_age(market_key)

@@ -272,7 +272,7 @@
 				ariaDisabled: stateName == 'disabled' ? 'true' : 'false',
 				title: this.title + ( shortcut ? ' (' + shortcut.display + ')' : '' ),
 				ariaShortcut: shortcut ? editor.lang.common.keyboardShortcut + ' ' + shortcut.aria : '',
-				titleJs: env.gecko && !env.hc ? '' : ( this.title || '' ).replace( "'", '' ),
+				titleJs: env.gecko && !env.hc ? '' : ( this.title || '' ).replace( /'/g, '' ),
 				hasArrow: this.hasArrow ? 'true' : 'false',
 				keydownFn: keydownFn,
 				focusFn: focusFn,

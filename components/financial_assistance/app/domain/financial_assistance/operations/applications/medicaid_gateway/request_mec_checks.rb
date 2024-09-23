@@ -12,7 +12,7 @@ module FinancialAssistance
         class RequestMecChecks
           # Requests MEC Checks for an entire application from Medicaid Gateway
 
-          include Dry::Monads[:result, :do]
+          include Dry::Monads[:do, :result]
           include Acapi::Notifiers
 
           def call(application_id:, transmittable_message_id: nil)

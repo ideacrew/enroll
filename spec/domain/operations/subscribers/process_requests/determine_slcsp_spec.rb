@@ -4,7 +4,7 @@ require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gatew
 require File.join(Rails.root, 'spec/shared_contexts/benchmark_products')
 
 RSpec.describe Operations::Subscribers::ProcessRequests::DetermineSlcsp, type: :model, dbclean: :after_each do
-  include Dry::Monads[:result, :do]
+  include Dry::Monads[:do, :result]
 
   describe '#call' do
     subject { described_class.new.call(mm_application) }

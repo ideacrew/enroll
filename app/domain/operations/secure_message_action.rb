@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   class SecureMessageAction
-    send(:include, Dry::Monads[:result, :do, :try])
+    include Dry::Monads[:do, :result]
 
     def call(params:, user: nil)
       validate_params = yield validate_params(params)

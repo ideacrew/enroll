@@ -6,7 +6,7 @@ module Operations
   module Fdsh
     # This class is responsible for validating a person object and constructing a payload entity for FDSH service.
     class BuildAndValidatePersonPayload
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:do, :result]
 
       def call(person, request_type, can_check_rules: true)
         payload_param = yield construct_payload_hash(person)
