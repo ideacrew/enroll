@@ -716,3 +716,9 @@ a.disabled {
     columns: 2;
   }
 }
+
+.qle-menu {
+  li::marker {
+    color: var(--primary-color);
+  }
+}

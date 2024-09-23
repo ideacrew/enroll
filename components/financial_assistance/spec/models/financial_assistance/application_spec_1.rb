@@ -121,5 +121,30 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         end
       end
     end
+
+    context 'when only primary applicant is enrolled' do
+      let!(:health_enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :with_enrollment_members,
+          :individual_assisted,
+          family: family,
+          applied_aptc_amount: Money.new(44_500),
+          consumer_role_id: person.consumer_role.id,
+          enrollment_members: [family.primary_applicant],
+          coverage_kind: "health"
+        )
+      end
+
+      before do
+        applicant2.income_evidence.move_to_outstanding!
+      end
+
+      it 'move dependent outstanding evidence to nrr' do
+        application.enrolled_with(health_enrollment)
+        applicant2.income_evidence.reload
+        expect(applicant2.income_evidence).to be_negative_response_received
+      end
+    end
   end
 end
