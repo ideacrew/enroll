@@ -182,5 +182,5 @@ end
 group :production do
   gem 'newrelic_rpm', '~> 9.6'
   gem 'unicorn',      '~> 4.8'
-  gem 'puma',         '~> 5.6', '>= 5.6.8'
+  gem 'puma',         '~> 5.6.9'
 end
