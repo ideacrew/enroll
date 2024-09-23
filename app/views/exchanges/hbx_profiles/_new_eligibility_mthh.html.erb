@@ -41,8 +41,15 @@
               <%= select_tag "person[family_members][#{member_id}][tax_group]", options_for_select([1, 2, 3, 4], @tax_household_group_data&.dig(member_id, 'tax_group')), prompt: 'Select one', class: 'form-control', required: true %>
             </td>
             <td>
-              <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer') %>
-              <label>Yes</label>
+              <% if @bs4 %>
+                <label>
+                  <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer') %>
+                  <%= l10n('yes') %>
+                <label>
+              <% else %>
+                <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer') %>
+                <label>Yes</label>
+              <% end %>
             </td>
           </tr>
         <% end %>
