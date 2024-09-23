@@ -428,7 +428,7 @@ module FinancialAssistance
       year = TimeKeeper.date_of_record.year
       Date.new(year, month, day)
     end
-    
+
     def renewal_year_select_options
       options = []
       (1..5).reverse_each do |year|
