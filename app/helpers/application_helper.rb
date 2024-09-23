@@ -494,8 +494,6 @@ module ApplicationHelper
     case provider.model_name.name
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
-    when "HbxProfile"
-      inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
       benefit_sponsors.inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
     when "Person"
