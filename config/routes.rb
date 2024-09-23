@@ -198,7 +198,6 @@ Rails.application.routes.draw do
         post :transmit_group_xml
         get :transmit_group_xml
         get :home
-        get :inbox
       end
 
       # resources :hbx_staff_roles, shallow: true do
