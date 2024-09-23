@@ -478,8 +478,6 @@ module ApplicationHelper
       employers_inbox_path(provider, message_id: message.id)
     when "BrokerAgencyProfile"
       benefit_sponsors.inboxes_message_path(provider, message_id: message.id)
-    when "HbxProfile"
-      exchanges_inbox_path(provider, message_id: message.id)
     when "GeneralAgencyProfile"
       general_agencies_inbox_path(provider, message_id: message.id)
     end
