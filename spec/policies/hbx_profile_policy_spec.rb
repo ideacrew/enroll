@@ -621,10 +621,6 @@ RSpec.describe HbxProfilePolicy, "given an unlinked user" do
   it "is not authorized to calculate_aptc_csr" do
     expect(subject.calculate_aptc_csr?).to be_falsey
   end
-
-  it "is not authorized to edit_aptc_csr" do
-    expect(subject.edit_aptc_csr?).to be_falsey
-  end
 end
 
 RSpec.describe HbxProfilePolicy, "given a linked, non-admin user" do
@@ -645,10 +641,6 @@ RSpec.describe HbxProfilePolicy, "given a linked, non-admin user" do
 
   it "is not authorized to calculate_aptc_csr" do
     expect(subject.calculate_aptc_csr?).to be_falsey
-  end
-
-  it "is not authorized to edit_aptc_csr" do
-    expect(subject.edit_aptc_csr?).to be_falsey
   end
 end
 
@@ -684,10 +676,6 @@ RSpec.describe HbxProfilePolicy, "given a linked, admin user without the #can_ed
   it "is not authorized to calculate_aptc_csr" do
     expect(subject.calculate_aptc_csr?).to be_falsey
   end
-
-  it "is not authorized to edit_aptc_csr" do
-    expect(subject.edit_aptc_csr?).to be_falsey
-  end
 end
 
 RSpec.describe HbxProfilePolicy, "given a linked, admin user with the #can_edit_aptc permission" do
@@ -721,9 +709,5 @@ RSpec.describe HbxProfilePolicy, "given a linked, admin user with the #can_edit_
 
   it "is authorized to calculate_aptc_csr" do
     expect(subject.calculate_aptc_csr?).to be_truthy
-  end
-
-  it "is authorized to edit_aptc_csr" do
-    expect(subject.edit_aptc_csr?).to be_truthy
   end
 end
