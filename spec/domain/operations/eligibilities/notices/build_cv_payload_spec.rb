@@ -42,33 +42,11 @@ RSpec.describe ::Operations::Eligibilities::Notices::BuildCvPayload,
       FactoryBot.create(:family_member, family: family, person: person2)
     end
 
-    let(:household) { FactoryBot.create(:household, family: family) }
-
-    let(:issuer) do
-      create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM')
-    end
-    let(:product) do
-      create(
-        :benefit_markets_products_health_products_health_product,
-        :ivl_product,
-        issuer_profile: issuer
-      )
-    end
-
     let!(:hbx_enrollment1) do
       FactoryBot.create(
         :hbx_enrollment,
-        :with_enrollment_members,
-        enrollment_members: family.family_members,
-        kind: 'individual',
-        product: product,
-        household: family.latest_household,
         effective_on: TimeKeeper.date_of_record.beginning_of_year,
-        enrollment_kind: 'open_enrollment',
-        family: family,
-        aasm_state: 'coverage_selected',
-        consumer_role: person1.consumer_role,
-        enrollment_signature: true
+        family: family
       )
     end
 
@@ -101,6 +79,10 @@ RSpec.describe ::Operations::Eligibilities::Notices::BuildCvPayload,
 
       it 'should return success' do
         result = subject.call(params)
+
+        # add logging if this spec fails again
+        puts result.failure.inspect if result.failure?
+
         expect(result.success?).to be_truthy
       end
     end

@@ -992,6 +992,7 @@ describe Person, :dbclean => :after_each do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       end
 
       context "when the validates_ssn feature flag is disabled" do

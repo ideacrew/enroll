@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="<%= ENV['CLIENT'] %>" data-contrast="<%= EnrollRegistry.feature_enabled?(:contrast_level_aa) %>">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -36,7 +36,6 @@
     <%= yield :head %>
   </head>
   <body class="font" data-controller="<%= controller.controller_name %>" data-action="<%= action_name %>">
-
     <%= render partial: './ui-components/v1/navs/header' %>
 
     <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
@@ -47,7 +46,7 @@
           </div>
           <div class="col-md-10">
             <div class="col-xs-12 notice">
-              <%= render_flash %>
+              <%= render_flash use_bs4: @bs4 %>
             </div>
             <%= yield %>
           </div>

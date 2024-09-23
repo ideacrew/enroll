@@ -6,10 +6,11 @@ Given(/^all applicants fill all pages except other questions$/) do
     sleep 1
     find('#is_required_to_file_taxes_no').click
     find('#is_claimed_as_tax_dependent_no').click
-    find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
+    find("#btn-continue").click
     sleep 1
     find('#has_job_income_true').click
     sleep 1
+
     fill_in 'income[employer_name]', with: 'GloboGym'
     fill_in 'income[amount]', with: '100'
     fill_in 'income[start_on]', with: '1/1/2018'
@@ -62,7 +63,7 @@ Given(/^all applicants fill all pages except other questions$/) do
     find(:xpath, '//*[@id="btn-continue"]').click
 
     find('#has_enrolled_health_coverage_false').click
-    find('#has_eligible_health_coverage_false').click
+    find(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn).click
 
     find(:xpath, '//*[@id="btn-continue"]').click
   end
@@ -158,9 +159,9 @@ And(/^the user enters a pregnancy end date of one month ago$/) do
 end
 
 And(/^the user answers two for how many children$/) do
-  find(".selectric-interaction-choice-control-children-expected-count").click
+  find('div[class="col-lg-3 col-md-3 fa-select select-box"]').click
   sleep 1
-  find('.interaction-choice-control-children-expected-count-2', match: :first).click
+  find('li[data-index="2"]').click
 end
 
 Given(/^the user answers yes to being a primary caregiver$/) do
@@ -172,11 +173,11 @@ Given(/^the user answers no to being a primary caregiver$/) do
 end
 
 Then(/^the caregiver relationships should display$/) do
-  expect(page).to have_content(l10n('faa.primary_caretaker_for_text'))
+  expect(page).to have_content(l10n('faa.other_ques.primary_caretaker_for_text', subject: l10n("faa.this_person")))
 end
 
 Then(/^the caregiver relationships should not display$/) do
-  expect(page).to_not have_content(l10n('faa.primary_caretaker_for_text'))
+  expect(page).to_not have_content(l10n('faa.other_ques.primary_caretaker_for_text', subject: l10n("faa.this_person")))
 end
 
 And(/^the user selects an applicant they are the primary caregiver for$/) do
@@ -267,7 +268,7 @@ Then(/^pregnancy end date question should display$/) do
 end
 
 Then(/^the is this person a student question should display$/) do
-  expect(page).to have_content(l10n('faa.other_ques.is_student'))
+  expect(page).to have_content(l10n('faa.other_ques.is_student', subject: l10n("faa.this_person")))
 end
 
 Given(/^the user answers yes to being a student$/) do

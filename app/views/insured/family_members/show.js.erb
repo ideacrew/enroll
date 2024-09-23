@@ -1,15 +1,35 @@
-if ($("#add_member_list_<%= @dependent.id %>").length) {
-  $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent,person: @person) %>");
+if (!$(".my-household-page").length) {
+  if ($("#add_member_list_<%= @dependent.id %>").length) {
+    $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent, person: @person) %>");
+  } else {
+    $("#new_employee_dependent_form").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent, person: @person) %>");
+  }
 
+  $("#dependent_buttons").removeClass('hidden');
 } else {
-  $("#new_employee_dependent_form").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent,person: @person) %>");
+  $(".edit-member").removeClass('disabled').attr('tabindex', 0);
+  $("#add-new-member").removeClass("hidden");
+  $("#new_employee_dependent_form").html($(document.createElement("div")).attr("id", "append_consumer_info"));
+  <% member = @dependent.family_member %>
+  <% person_id = member.person.id %>
+  member_row = $(".member-<%= person_id %>-row");
+  if (member_row.length) {
+    $("#person-<%= person_id %>").remove();
+    $(member_row).replaceWith("<%= escape_javascript(render partial: 'insured/families/family_member_row', locals: {member: member}) %>");
+  } else {
+    $('#manage_family_content tr:last').after("<%= escape_javascript(render partial: 'insured/families/family_member_row', locals: {member: member}) %>");
+  }
 }
 
-<% if @created %>
-  $('#qle_flow_info').removeClass('hidden');
-<% end %>
-
-$("#dependent_buttons").removeClass('hidden');
 <% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['create', 'update', 'destroy'].include? controller.action_name) && (@person.consumer_role.present?) %>
-  $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
+  if ($('#faa_flow_info').length) {
+    $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
+    $("#faa_flow_info").get(0).scrollIntoView({behavior: 'smooth'});
+  }
+<% end %>
+<% if @created %>
+  if ($('#qle_flow_info').length) {
+    $('#qle_flow_info').removeClass('hidden');
+    $("#qle_flow_info").get(0).scrollIntoView({behavior: 'smooth'});
+  }
 <% end %>

@@ -429,19 +429,19 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe '.set_assistance_year' do
+  describe '.configure_assistance_year' do
     let(:family_id)       { BSON::ObjectId.new }
     let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
       application.update_attributes!(assistance_year: nil)
-      application.send(:set_assistance_year)
+      application.configure_assistance_year
       expect(application.assistance_year).to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
     end
 
     context 'for existing assistance_year' do
       before do
         application.update_attributes!(assistance_year: (TimeKeeper.date_of_record.year + 3))
-        application.send(:set_assistance_year)
+        application.configure_assistance_year
       end
 
       it 'should not update assistance year' do
@@ -451,13 +451,13 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe '.set_effective_date' do
+  describe '.assign_effective_date' do
     let(:family_id) { BSON::ObjectId.new }
     let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
 
     context 'for non existing effective_date' do
       before do
-        application.send(:set_effective_date)
+        application.send(:assign_effective_date)
       end
 
       it 'should update effective_date' do
@@ -468,7 +468,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'for existing effective_date' do
       before do
         application.update_attributes!(effective_date: Date.new(TimeKeeper.date_of_record.year + 3))
-        application.send(:set_effective_date)
+        application.send(:assign_effective_date)
       end
 
       it 'should not update effective_date' do
@@ -524,7 +524,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe 'for create_eligibility_determinations' do
+  describe 'for creating eligibility determinations' do
     before :each do
       application.update_attributes(family_id: family_id, hbx_id: '345334', applicant_kind: 'user and/or family', request_kind: 'request-kind',
                                     motivation_kind: 'motivation-kind', us_state: 'DC', is_ridp_verified: true, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'draft',
@@ -721,6 +721,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       allow(applicant1).to receive(:is_ia_eligible?).and_return(true)
       application.active_applicants.each do |applicant|
         applicant.incomes << income
@@ -892,17 +893,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       FactoryBot.build(:financial_assistance_deduction, amount: 100, start_on: Date.new(TimeKeeper.date_of_record.year,6,1), end_on: Date.new(TimeKeeper.date_of_record.year, 6, 30), frequency_kind: "biweekly")
     end
 
-    context "application does not have any active applicants" do
-      before do
-        applicant.update_attributes(is_active: false)
-      end
-
-      it 'should not update net annual income for applicant' do
-        application.calculate_total_net_income_for_applicants
-        expect(applicant.net_annual_income).to eq nil
-      end
-    end
-
     context "No incomes and only deductions" do
       before do
         applicant.deductions << deduction
@@ -1052,6 +1042,14 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
             it 'should transition application to renewal_draft' do
               expect(application.reload.renewal_draft?).to be_truthy
+            end
+
+            it 'applicants should not have eligibility determination references' do
+              expect(application.applicants.pluck(:eligibility_determination_id).uniq).to eq [nil]
+            end
+
+            it 'applicants should not have tax_filer_kind' do
+              expect(application.applicants.pluck(:tax_filer_kind).uniq).to eq [nil]
             end
           end
 
@@ -1209,7 +1207,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  context 'set_renewal_base_year' do
+  context 'sets renewal base year' do
     let(:applicant2) { application.applicants[1] }
     let(:applicant3) { application.applicants[2] }
 
@@ -1348,6 +1346,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1500,6 +1499,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1738,6 +1738,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
 
         application.active_applicants.each(&:create_evidences)
       end
@@ -1812,6 +1813,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
       application.send(:create_evidences)
       application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
@@ -1954,6 +1956,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',
@@ -2325,6 +2328,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',

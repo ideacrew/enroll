@@ -5,6 +5,9 @@ class Insured::FamilyMembersController < ApplicationController
   include ApplicationHelper
   include ::L10nHelper
 
+  layout 'progress', only: [:index] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+  before_action :enable_bs4_layout, only: [:index, :destroy] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
   before_action :set_dependent_and_family, only: [:destroy, :show, :edit, :update]
@@ -59,6 +62,8 @@ class Insured::FamilyMembersController < ApplicationController
 
     @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
     set_view_person
+
+    @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
       format.html
       format.js
@@ -97,6 +102,7 @@ class Insured::FamilyMembersController < ApplicationController
       @created = true
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       fire_consumer_roles_create_for_vlp_docs(consumer_role) if consumer_role
+      @bs4 = true if params[:bs4] == "true"
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -130,10 +136,30 @@ class Insured::FamilyMembersController < ApplicationController
     authorize @family, :show?
 
     set_view_person
+
+    @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
       format.html
       format.js
     end
+  end
+
+  # NOTE: ensure that current user is either
+  # 1.) hbx admin, or
+  # 2.) the current user is the primary for the family AND the subject is a member of that family
+  def show_ssn
+    @family = Family.find(params[:family_id]) if params[:family_id]
+    authorize @family, :can_show_ssn?
+    @person = Person.find(params[:id]) unless @person.id == params[:id]
+
+    if @family.person_is_family_member?(@person)
+      payload = number_to_ssn(@person.ssn)
+      render json: { payload: payload, status: 200 }
+    else
+      render json: { message: "Unauthorized" }, status: 401
+    end
+  rescue Pundit::NotAuthorizedError, Mongoid::Errors::DocumentNotFound
+    render json: { message: "Unauthorized" }, status: 401
   end
 
   def edit
@@ -142,9 +168,11 @@ class Insured::FamilyMembersController < ApplicationController
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
     set_view_person
+
+    @bs4 = true if params[:bs4] == "true"
     respond_to do |format|
-      format.html
-      format.js
+      format.html { render 'edit.js.erb' }
+      format.js { render 'edit.js.erb' }
     end
   end
 
@@ -154,8 +182,10 @@ class Insured::FamilyMembersController < ApplicationController
     @dependent.skip_consumer_role_callbacks = true
     @address_errors = validate_address_params(params)
 
+    @bs4 = true if params[:bs4] == "true"
+
     if @dependent.family_member.try(:person).present? && @dependent.family_member.try(:person).is_resident_role_active?
-      if @address_errors.blank? && @dependent.update_attributes(params[:dependent])
+      if @address_errors.blank? && @dependent.update_attributes(dependent_person_params[:dependent])
         respond_to do |format|
           format.html { render 'show_resident' }
           format.js { render 'show_resident' }
@@ -193,8 +223,8 @@ class Insured::FamilyMembersController < ApplicationController
       @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
       init_address_for_dependent
       respond_to do |format|
-        format.html { render 'edit' }
-        format.js { render 'edit' }
+        format.html { render 'edit.js.erb' }
+        format.js { render 'edit.js.erb' }
       end
     end
   end
@@ -289,8 +319,8 @@ class Insured::FamilyMembersController < ApplicationController
                        end
       @family = @person.primary_family
     when 'consumer'
-      @consumer_role = @person.consumer_role
-      @family = @consumer_role.person.primary_family
+      @consumer_role = @person&.consumer_role
+      @family = @consumer_role&.person&.primary_family
     end
 
     @family = Family.find(params[:family_id]) if params[:family_id]
@@ -372,5 +402,9 @@ class Insured::FamilyMembersController < ApplicationController
     # an admin accessing family members on an unrelated user account
 
     @person = @family.primary_person if @person != @family.primary_person
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end

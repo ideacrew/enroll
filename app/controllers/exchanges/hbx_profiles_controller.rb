@@ -355,10 +355,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     else
       status_text = call_customer_service params[:firstname].strip, params[:lastname].strip
     end
+    status_text = l10n("broker_agencies.successfully_assigned") if params[:broker].present?
     @person = Person.find(params[:person])
     broker_view = render_to_string 'insured/families/_consumer_brokers_widget', :layout => false
-
-    render :plain => {broker: broker_view, status: status_text}.to_json, layout: false
+    render :plain => {broker: broker_view, status: status_text, broker_id: broker_role_id}.to_json, layout: false
   end
 
   def family_index
@@ -858,12 +858,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     result = ::Operations::HbxAdmin::DryRun::Individual::Analyzer.new.call
 
     if result.failure?
-      flash[:error], application_states = result.failure
+      flash[:error], skeleton = result.failure
       eligible_families = {}
+      application_states = skeleton["mapped_application_states"]
       benefit_coverage_values = {}
-      oe_determined_notices = {}
+      oe_determined_notices = skeleton["oe_determined_notices"]
+      enrollment_states = skeleton["enrollment_states"]
     else
-      eligible_families, application_states, benefit_coverage_values, oe_determined_notices = result.success
+      eligible_families, application_states, benefit_coverage_values, oe_determined_notices, enrollment_states = result.success
     end
 
     respond_to do |format|
@@ -872,7 +874,8 @@ class Exchanges::HbxProfilesController < ApplicationController
           eligible_families: eligible_families,
           application_states: application_states,
           benefit_coverage_values: benefit_coverage_values,
-          oe_determined_notices: oe_determined_notices
+          oe_determined_notices: oe_determined_notices,
+          enrollment_states: enrollment_states
         }
       end
     end

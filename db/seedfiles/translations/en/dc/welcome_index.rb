@@ -16,6 +16,7 @@ WELCOME_INDEX_TRANSLATIONS = {
   "en.welcome.index.welcome_email" => "Welcome %{current_user}",
   "en.welcome.index.welcome_to_site_name" => "Welcome to %{short_name}",
   "en.welcome.index.site_byline" => "The Right Place for the Right Plan",
+  "en.welcome.index.logo_title" => "home page link",
   "en.welcome.index.welcome_to_site_sub_header" => EnrollRegistry[:enroll_app].setting(:byline).item,
   "en.welcome.index.welcome_to_site_header" => EnrollRegistry[:enroll_app].setting(:header_message).item
 }

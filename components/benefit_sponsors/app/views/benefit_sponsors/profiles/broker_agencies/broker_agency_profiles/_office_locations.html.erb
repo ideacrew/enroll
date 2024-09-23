@@ -1,5 +1,25 @@
-<h2><%= l10n("broker_agencies.profiles.office_locations")%></h3>
 
+<% if @bs4 %>
+  <% if office_locations.present? %>
+    <h2><%= l10n("broker_agencies.profiles.office_locations")%></h2>
+    <% addresses_by_kind(office_locations).each do |kind, addresses| %>
+      <section class="mb-2">
+        <% address_count = addresses.length %>
+        <h3 class="mb-0"><%= kind.pluralize(address_count).titleize %></h3>
+        <% if address_count == 1 %>
+          <%= addresses.first %>
+        <% else %>
+          <ol class="pl-4">
+            <% addresses.each do |address| %>
+              <li><%= address %></li>
+            <% end %>
+          </ol>
+        <% end %>
+      </section>
+    <% end %>
+  <% end %>
+<% else %>
+<h3><%= l10n("broker_agencies.profiles.office_locations")%></h3>
 <div class="table-border">
 <% if office_locations.present? %>
   <table class="table">
@@ -11,3 +31,4 @@
   </table>
 <% end %>
 </div>
+<% end %>

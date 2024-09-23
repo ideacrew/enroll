@@ -95,7 +95,7 @@ gem 'rexml',                    '>= 3.3.6'
 gem 'resque',                   '~> 2.6.0'
 gem 'roo',                      '~> 2.10'
 gem 'rubyzip', '>= 1.3.0'
-gem 'ruby-saml',                '~> 1.3'
+gem 'ruby-saml',                '~> 1.17.0'
 gem 'sassc',                    '~> 2.0'
 gem 'sass-rails',               '~> 5'
 gem 'slim',                     '~> 3.0'
@@ -182,5 +182,5 @@ end
 group :production do
   gem 'newrelic_rpm', '~> 9.6'
   gem 'unicorn',      '~> 4.8'
-  gem 'puma',         '~> 5.6', '>= 5.6.8'
+  gem 'puma',         '~> 5.6.9'
 end

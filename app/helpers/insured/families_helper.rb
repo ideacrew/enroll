@@ -6,9 +6,9 @@ module Insured::FamiliesHelper
 
   def display_change_tax_credits_button?(hbx_enrollment)
     hbx_enrollment.has_at_least_one_aptc_eligible_member?(hbx_enrollment.effective_on.year) &&
-    hbx_enrollment.product.can_use_aptc? &&
-    !hbx_enrollment.is_coverall? &&
-    hbx_enrollment.coverage_kind != 'dental'
+      hbx_enrollment.product.can_use_aptc? &&
+      !hbx_enrollment.is_coverall? &&
+      hbx_enrollment.coverage_kind != 'dental'
   end
 
   def plan_shopping_dependent_text(hbx_enrollment)
@@ -32,21 +32,38 @@ module Insured::FamiliesHelper
     end
   end
 
-  def current_premium hbx_enrollment
-    begin
-      if hbx_enrollment.is_shop?
-        hbx_enrollment.total_employee_cost
-      else
-        cost = float_fix(hbx_enrollment.total_premium - [hbx_enrollment.total_ehb_premium, hbx_enrollment.applied_aptc_amount.to_f].min - hbx_enrollment.eligible_child_care_subsidy.to_f)
-        cost > 0 ? cost.round(2) : 0
-      end
-    rescue Exception => e
-      exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id.to_s}"
-      Rails.logger.error(exception_message) unless Rails.env.test?
-      puts(exception_message) unless Rails.env.test?
-      'Not Available.'
+  def plan_shopping_dependent_text_without_modal(hbx_enrollment)
+    subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
+    if subscriber.present? && dependents.count == 0
+      sanitize_html("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>")
+    elsif subscriber.blank? && dependents.count == 1
+      sanitize_html("<span class='dependent-text'>#{dependents.first.person.full_name}</span>")
+    elsif subscriber.blank? && dependents.count > 1
+      sanitize_html("<span class='dependent-text'>#{dependents.first.person.full_name}</span>") +
+        link_to(pluralize(dependents.count, "dependent"), "#", id: 'dependentList') +
+        render(partial: "shared/dependents_list_table", locals: {subscriber: subscriber, dependents: dependents})
+    else
+      sanitize_html("<span class='dependent-text'>#{subscriber.first.person.full_name}</span> + ") +
+        link_to(pluralize(dependents.count, "dependent"), "#", id: 'dependentList') +
+        render(partial: "shared/dependents_list_table", locals: {subscriber: subscriber, dependents: dependents})
     end
   end
+
+  # rubocop:disable Lint/RescueException, Lint/UselessAssignment
+  def current_premium(hbx_enrollment)
+    if hbx_enrollment.is_shop?
+      hbx_enrollment.total_employee_cost
+    else
+      cost = float_fix(hbx_enrollment.total_premium - [hbx_enrollment.total_ehb_premium, hbx_enrollment.applied_aptc_amount.to_f].min - hbx_enrollment.eligible_child_care_subsidy.to_f)
+      cost > 0 ? cost.round(2) : 0
+    end
+  rescue Exception => e
+    exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id}"
+    Rails.logger.error(exception_message) unless Rails.env.test?
+    puts(exception_message) unless Rails.env.test?
+    'Not Available.'
+  end
+  # rubocop:enable Lint/RescueException, Lint/UselessAssignment
 
   def hide_policy_selected_date?(hbx_enrollment)
     return true if hbx_enrollment.created_at.blank?
@@ -88,9 +105,7 @@ module Insured::FamiliesHelper
       plan_details << "<span class=\"#{plan_level.try(:downcase)}-icon\">#{metal_level}</span>"
     end
 
-    if plan.try(:nationwide)
-      plan_details << "NATIONWIDE NETWORK"
-    end
+    plan_details << "NATIONWIDE NETWORK" if plan.try(:nationwide)
 
     sanitize_html(
       plan_details.inject([]) do |data, element|
@@ -116,8 +131,8 @@ module Insured::FamiliesHelper
     )
   end
 
-  def qle_link_generater(qle, index)
-    options = {class: 'qle-menu-item'}
+  def qle_link_generator(qle, index)
+    options = {class: "qle-menu-item"}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
@@ -127,7 +142,11 @@ module Insured::FamiliesHelper
     }
 
     if qle.tool_tip.present?
-      data.merge!(toggle: 'tooltip', placement: index > 2 ? 'top' : 'bottom')
+      if @bs4
+        data.merge!(toggle: 'tooltip', placement: "right", trigger: "hover focus")
+      else
+        data.merge!(toggle: 'tooltip', placement: index > 2 ? 'top' : 'bottom', trigger: "hover")
+      end
       options.merge!(data: data, title: qle.tool_tip)
     else
       options.merge!(data: data)
@@ -135,18 +154,18 @@ module Insured::FamiliesHelper
 
     qle_title_html = sanitize_html("<u>#{qle.title}</u>") if qle.reason == 'covid-19'
 
-    link_to qle_title_html || qle.title, "javascript:void(0)", options
+    link_to qle_title_html || qle.title, @bs4 ? "#" : "javascript:void(0)", options
   end
 
-  def qle_link_generator_for_an_existing_qle(qle, link_title=nil)
-    options = {class: 'existing-sep-item'}
+  def qle_link_generator_for_an_existing_qle(qle, link_title = nil, link_class = nil)
+    options = {class: "existing-sep-item #{link_class}"}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     }
     options.merge!(data: data)
-    link_to link_title.present? ? link_title: "Shop for Plans", "javascript:void(0)", options
+    link_to link_title.present? ? link_title : "Shop for Plans", "javascript:void(0)", options
   end
 
   def generate_options_for_effective_on_kinds(qle, qle_date)
@@ -171,18 +190,26 @@ module Insured::FamiliesHelper
   end
 
   def hbx_member_names(hbx_enrollment_members)
-    member_names = Array.new
+    member_names = []
     hbx_enrollment_members.each do |hem|
       member_names.push(Person.find(hem.family_member.person_id.to_s).full_name)
     end
-    return member_names.join(", ")
+    member_names.join(", ")
   end
 
   def has_writing_agent?(employee_role_or_person)
     if employee_role_or_person.is_a?(EmployeeRole)
-      employee_role_or_person.employer_profile.active_broker_agency_account.writing_agent rescue false
+      begin
+        employee_role_or_person.employer_profile.active_broker_agency_account.writing_agent
+      rescue StandardError
+        false
+      end
     elsif employee_role_or_person.is_a?(Person)
-       employee_role_or_person.primary_family.current_broker_agency.writing_agent.present? rescue false
+      begin
+        employee_role_or_person.primary_family.current_broker_agency.writing_agent.present?
+      rescue StandardError
+        false
+      end
     end
   end
 
@@ -217,7 +244,7 @@ module Insured::FamiliesHelper
   #
   # @param enrollment [Object] The hbx enrollment object for which the label is generated.
   # @return [String, nil] An HTML string representing the label or nil if the enrollment is blank.
-  def enrollment_state_label(enrollment)
+  def enrollment_state_label(enrollment, bs4)
     return if enrollment.blank?
 
     # The colors correspond to those set in enrollment.scss as label-{color}. We use color as an indicator of the
@@ -263,7 +290,8 @@ module Insured::FamiliesHelper
     label = group[condition] || { text: enrollment.aasm_state.to_s.titleize, color: 'grey' }
     # Coverage reinstated is a special case where the aasm state is something else but we want to show it as reinstated in "green" (active) scenarios
     label = state_groups[:coverage_reinstated][:default] if enrollment.is_reinstated_enrollment? && label[:color] == 'green'
-    content_tag(:span, label[:text], class: "label label-#{label[:color]}")
+    return content_tag(:span, label[:text], class: "label label-#{label[:color]}") unless bs4
+    content_tag(:span, label[:text], class: "badge badge-pill badge-status badge-#{label[:color]}")
   end
 
   def determine_condition(enrollment, enrollment_state)
@@ -306,19 +334,19 @@ module Insured::FamiliesHelper
     end
   end
 
-  def build_link_for_sep_type(sep, link_title = nil, family_id = nil)
+  def build_link_for_sep_type(sep, link_title = nil, family_id = nil, link_class = nil)
     return if sep.blank?
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
     return if qle.blank?
     if qle.date_options_available && sep.optional_effective_on.present?
       # Take to the QLE like flow of choosing Option dates if available
-       qle_link_generator_for_an_existing_qle(qle, link_title)
+      qle_link_generator_for_an_existing_qle(qle, link_title, link_class)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
       # Use turbolinks: false, to avoid calling controller action twice.
       # TODO: Refactor Shop For Planss as a translation at some point
       link_path = family_id.present? ? insured_family_members_path(sep_id: sep.id, qle_id: qle.id, family_id: family_id) : insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
-      link_to link_title.presence || l10n("insured.shop_for_plans"), link_path, data: {turbolinks: false}
+      link_to link_title.presence || l10n("insured.shop_for_plans"), link_path, data: {turbolinks: false}, class: link_class
     end
   end
 
@@ -352,6 +380,7 @@ module Insured::FamiliesHelper
       true
     end
   end
+
   def is_applying_coverage_value_personal(person)
     first_checked = true
     second_checked = false
@@ -359,7 +388,7 @@ module Insured::FamiliesHelper
       first_checked = person.consumer_role.is_applying_coverage
       second_checked = !person.consumer_role.is_applying_coverage
     end
-    return first_checked, second_checked
+    [first_checked, second_checked]
   end
 
   def current_market_kind(person)

@@ -8,6 +8,10 @@ FinancialAssistance::Engine.routes.draw do
 
   resources :applications, except: feature_flagged_exceptions do
     get :copy, on: :member
+    get :preferences, on: :member
+    put :save_preferences, on: :member
+    get :submit_your_application, on: :member
+    put :submit_your_application_save, on: :member
     put :step, on: :member
     put ':step/:step', on: :member, action: 'step'
     post :step, on: :collection
@@ -46,6 +50,8 @@ FinancialAssistance::Engine.routes.draw do
       get :applicant_is_eligible_for_joint_filing
       get 'other_questions', on: :member, action: 'other_questions', as: 'other_questions'
       get 'save_questions', on: :member, action: 'save_questions', as: 'save_questions'
+      get 'tax_info', on: :member, action: 'tax_info', as: 'tax_info'
+      put :save_tax_info, on: :member
       get :immigration_document_options, on: :collection
       post :update, on: :member
       delete :destroy, on: :member

@@ -9,6 +9,7 @@ RSpec.describe Operations::Authentication::LogoutSamlUser do
   let(:session) { double }
 
   before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:saml_single_logout).and_return(true)
     allow(session).to receive(:[]).with(:__saml_name_id).and_return(saml_name_id)
     allow(session).to receive(:[]).with(:__saml_session_index).and_return(saml_session_index)
   end
@@ -54,7 +55,11 @@ RSpec.describe Operations::Authentication::LogoutSamlUser do
 
     before :each do
       allow(SamlInformation).to receive(:idp_slo_target_url).and_return("https://my.logout.example/saml/logout_endpoint")
-      stub_request(:post, "https://my.logout.example/saml/logout_endpoint").to_return(body: "OK")
+      stub_request(:get, %r{https://my.logout.example/saml/logout_endpoint}).with do |req|
+        path_matches = req.uri.path == "/saml/logout_endpoint"
+        query = Rack::Utils.parse_nested_query req.uri.query
+        path_matches && !query["SAMLRequest"].nil?
+      end.to_return(body: "OK")
     end
 
     it "constructs and submits the logout payload" do

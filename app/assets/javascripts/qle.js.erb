@@ -1,3 +1,5 @@
+var bs4 = document.documentElement.dataset.bs4 == "true";
+
 var QLE = ( function( window, undefined ) {
   function initialize() {
     $(document).on('change', 'input[type=radio][name=reason]', function() {
@@ -9,7 +11,7 @@ var QLE = ( function( window, undefined ) {
   function qle_question(url){
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), bs4: $("#bs4").val()},
       url: "/insured/families/" + url
     });
   }
@@ -41,7 +43,7 @@ var QLE = ( function( window, undefined ) {
 } )( window );
 
 $(function () {
-	function check_qle_date() {
+	function validate_qle_date_input() {
 		var date_value = $('#qle_date').val();
 		if(date_value == "" || isNaN(Date.parse(date_value))) { return false; }
 		return true;
@@ -52,14 +54,15 @@ $(function () {
     $('#qle-details .error-info').addClass('hidden');
     $('#qle-details #qle-date-chose').removeClass('hidden');
     $("#qle_date").val("");
+    $('#qle-nav').removeClass('hidden');
     var errorNotice = "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at <%= EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item %> to give us more information so we can see if you qualify.";
     $("#qle-details .error-text").html(errorNotice);
   }
 
-  function get_qle_date() {
+  function check_qle_date() {
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), bs4: $("#bs4").val()},
       url: "/insured/families/check_qle_date.js"
     });
   }
@@ -81,7 +84,6 @@ $(function () {
     }else{
       var dateMax = pre_days + 'd';
     }
-    var cur_qle_title = $('.qle-details-title').html();
     $(target).val('');
     $(target).datepicker('destroy');
     $(target).datepicker({
@@ -90,23 +92,51 @@ $(function () {
       dateFormat: 'mm/dd/yy',
       defaultDate: cdate
 		});
+
+    if (bs4) {
+      $("#qle_date").on("change", function(){
+        if ($("#qle_date").val()) {
+          $('#qle_submit').removeAttr('disabled');
+        } else {
+          $('#qle_submit').attr('disabled', 'disabled');
+        }
+      });
+    }
   }
 
-  $(document).on('click', 'a.qle-menu-item', function() {
+  function set_details_title(event_element) {
+    const title = $(event_element).data('title');
+    var header = document.createElement("h3");
+    if($(event_element).data('reason') == 'covid-19') {
+      var underlined_title = $(document.createElement("u")).text(title);
+      $('.qle-details-title-container').html($(header).html(underlined_title));
+      $('.qle-details-title').html(underlined_title); // legacy
+    } else {
+      $('.qle-details-title-container').html($(header).text(title));
+      $('.qle-details-title').html(title); // legacy
+    }
+  };
+
+  $(document).on('click', "#showMoreLink", function () {
+    var showRareSepsLink = document.getElementById("showMoreLink");
+      event.preventDefault();
+      document.getElementById("showLifeChanges").classList.toggle("hidden");
+      showRareSepsLink.classList.add("hide")
+  });
+
+  $(document).on('click', 'a.qle-menu-item', function(e) {
+    e.preventDefault();
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
 
-    if($(this).data('reason') == 'covid-19'){
-      $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
-    } else {
-      $('.qle-details-title').html($(this).data('title'));
-    }
+    set_details_title(this);
 
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
-    $('#qle_reason .special_qle_reasons').addClass('hidden');
+    $('#qle_reason > *').addClass('hidden');
     $('#qle-date-chose').show();
+    $('#qle-nav').addClass('hidden');
     var is_self_attested = $(this).data('is-self-attested');
     if (!is_self_attested) {
       $('#qle-date-chose').addClass('hidden');
@@ -128,22 +158,24 @@ $(function () {
 
     $('#qle-details').removeClass('hidden');
     $('#qle-details-for-existing-sep').addClass('hidden');
+    if (bs4) {
+      $('#qle_submit').attr('disabled', 'disabled');
+      $("#qle-details").get(0).scrollIntoView({behavior: 'smooth'});
+      $('.tooltip').remove();
+    }
   });
 
 
   $(document).on('click', 'a.existing-sep-item', function() {
     $('#choose_flow').modal('hide');
+    $('.modal-backdrop').remove();
     //window.scrollTo(0, 0);
     $('html,body').animate({scrollTop: 0});
     init_qle_message();
     $('.seps-panel').addClass('hidden');
     $('#no_qle_checkbox').parent().addClass('hidden');
     $('#qle_flow_info #qle-menu').hide();
-    if($(this).data('reason') == 'covid-19'){
-      $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
-    } else {
-      $('.qle-details-title').html($(this).data('title'));
-    }
+    set_details_title(this);
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
@@ -162,6 +194,11 @@ $(function () {
 		$('#qle_flow_info #qle-menu').show();
 	});
 
+  $('.sep-modal.modal').on('hide.bs.modal', function() {
+    init_qle_message();
+		$('#qle-details').addClass('hidden');
+  });
+
   $(document).on('click', '#qle-details-for-existing-sep .close-popup, #qle-details-for-existing-sep .cancel', function() {
     //init_qle_message();
     //$('.seps-panel').removeClass('hidden');
@@ -170,8 +207,27 @@ $(function () {
     //$('#qle_flow_info #qle-menu').show();
   });
 
+  // Disable form submit on Enter - the user must manually use the Continue button to submit
+  $(document).on('keydown', '#qle_form', function(e) {
+    if (bs4 && e.key == 'Enter') {
+      e.preventDefault();
+      return;
+    }
+  });
+
+  // Override above `#qle_form` listener to allow default Enter behavior for buttons and links within the form
+  $(document).on('keydown', '#qle_form a, #qle_form button', function(e) {
+    if (bs4) {
+      e.stopImmediatePropagation();
+      return;
+    }
+  });
+
   // Disable form submit on pressing Enter, instead click Submit link
   $('#qle_form').on('keydown', function(e) {
+    if (bs4) {
+      return;
+    }
     var code = e.keyCode || e.which;
     if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
       e.preventDefault();
@@ -187,11 +243,11 @@ $(function () {
 	/* QLE Date Validator */
   $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
-    if(check_qle_date()) {
+    if(validate_qle_date_input()) {
       $('#qle_date').removeClass('input-error');
 
       if(QLE.check_qle_reason()){
-        get_qle_date();
+        check_qle_date();
       }
     } else {
       $('#qle_date').addClass('input-error');
@@ -203,7 +259,7 @@ $(function () {
     var not_expected_response = ( health_message ) ? 'no' : 'yes';
 
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
-      get_qle_date();
+      check_qle_date();
     } else {
       $('#qle_reason').hide();
       var errorNoticeAction = "Based on the information you have provided, you are not eligible for this special enrollment period. If you have questions or would like to provide additional information, please contact <%= EnrollRegistry[:enroll_app].setting(:short_name).item %> customer service at <%= EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item %>.";
@@ -240,6 +296,14 @@ $(function () {
       e.preventDefault()
     }else{
       $('#qle_effective_on_kind_alert').addClass('hidden');
+    }
+  });
+
+  $(document).on('change', '#effective_on_kind', function(e) {
+    if ($('#effective_on_kind').find(":selected").val()){
+      $('#qle_success_submit').removeAttr('disabled');
+    } else {
+      $('#qle_success_submit').attr('disabled', 'disabled');
     }
   });
 
