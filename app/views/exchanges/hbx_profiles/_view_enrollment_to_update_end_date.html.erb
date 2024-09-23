@@ -107,7 +107,6 @@
                   <% max_date = hbx.prior_plan_year_coverage? || hbx.active_plan_year_coverage? ? (hbx.is_shop? ? hbx.sponsored_benefit_package.end_on : hbx.effective_on.end_of_year) : hbx.terminated_on %> 
                     <% if @bs4 %>
                       <td>
-                        <% id = "termination-date-picker_#{hbx.id}" %>
                         <label>
                           <span class="text-nowrap pr-2"><%= l10n("end_date") %></span>
                           <%= date_field_tag :new_termination_date, nil, disabled: true, value: term_or_expire_date, id: id, min: date_field_value(hbx.effective_on), max: date_field_value(max_date)  %>
