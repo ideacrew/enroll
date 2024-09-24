@@ -39,20 +39,20 @@
         <div class = "kind">
           <%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
         </div>
-        <div class='d-flex flex-column admin_selected_sep_reason col-md-3 col-sm-3 col-xs-12 px-0'>
-          <label for="qle_id" class="align-self-start required"><%= l10n('hbx_profiles.sep_reason') %></label>
+        <div class='admin_selected_sep_reason col-md-3 col-sm-3 col-xs-12 px-0'>
+          <label for="qle_id" class="d-block required"><%= l10n('hbx_profiles.sep_reason') %></label>
           <%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'form-control', required: true, prompt: l10n('select') %>
         </div>
         <div class='d-flex flex-column init_event_date col-sm-3 col-xs-12 px-0 '>
-          <label for="event_date" class="align-self-start required"><%= l10n('hbx_profiles.sep_event_date') %></label>
+          <label for="event_date" class="d-block required"><%= l10n('hbx_profiles.sep_event_date') %></label>
           <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: date_field_value(110.years.ago), max: date_field_value(110.years.from_now), required: true, class: "qle-date-picker" %>
         </div>
         <div class='d-flex flex-column admin_effective_on_kind_options col-sm-3 col-xs-12 px-0'>
-          <label for="effective_on_date" class="align-self-start required"><%= l10n('hbx_profiles.sep_effective_date_rule') %></label>
+          <label for="effective_on_date" class="d-block required"><%= l10n('hbx_profiles.sep_effective_date_rule') %></label>
           <%= select_tag :effective_on_date, class: "form-control qle-date-kind", required: true %>
         </div>
         <div class='d-flex flex-column csl_num_options col-sm-3 col-xs-12 px-0 csl_width'>
-          <label for="csl_num" class="align-self-start"><%= l10n('hbx_profiles.csl_number') %></label>
+          <label for="csl_num" class="d-block"><%= l10n('hbx_profiles.csl_number') %></label>
           <%= text_field_tag :csl_num, "", maxlength: 10, class: "align-items-center mask-csl csl_width", placeholder: "0000000000" %>
         </div>
       </div>
@@ -94,11 +94,9 @@
           </div>
         </div>
       <% end %>
-      <div class='row p-2 row-form-wrapper no-buffer'>
-        <div class="d-flex flex-column col-md-3 col-xs-12 px-0">
-          <label for="admin_comment" class="align-self-start required"><%= l10n('hbx_profiles.enter_comments') %></label>
-          <%= text_area_tag :admin_comment, "", class: "floatlabel interaction-control-broker-message-body custom-textarea", rows: 3 %>
-        </div>
+      <div class='p-2'>
+        <label for="admin_comment" class="d-block required"><%= l10n('hbx_profiles.enter_comments') %></label>
+        <%= text_area_tag :admin_comment, nil, rows: 3 %>
       </div>
       <div class="px-0">
         <%= submit_tag "Submit",  class: "btn btn-primary", onclick: "PriorPySepModal()", id: "confirm_add_sep"%>
