@@ -51,9 +51,9 @@
           <label for="effective_on_date" class="d-block required"><%= l10n('hbx_profiles.sep_effective_date_rule') %></label>
           <%= select_tag :effective_on_date, class: "form-control qle-date-kind", required: true %>
         </div>
-        <div class='d-flex flex-column csl_num_options col-sm-3 col-xs-12 px-0 csl_width'>
+        <div class='d-flex flex-column csl_num_options col-sm-3 col-xs-12 px-0'>
           <label for="csl_num" class="d-block"><%= l10n('hbx_profiles.csl_number') %></label>
-          <%= text_field_tag :csl_num, "", maxlength: 10, class: "align-items-center mask-csl csl_width", placeholder: "0000000000" %>
+          <%= text_field_tag :csl_num, "", maxlength: 10, class: "align-items-center mask-csl", placeholder: "0000000000" %>
         </div>
       </div>
       <div class='d-flex p-2 justify-content-between sep_dates_filter'>
