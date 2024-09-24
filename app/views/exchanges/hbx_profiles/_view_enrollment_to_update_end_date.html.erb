@@ -67,10 +67,12 @@
       });
     }
 
-    $('#confirm-modal').on('click', function(event) {
-      confirmUpdateEndDate(event); 
-      return false;
-    });
+    <% if @bs4 %>
+      $('.btn-confirmation').on('click', function(event) {
+        confirmUpdateEndDate(event); 
+        return false;
+      });
+    <% end %>
 </script>
 
 <% if @bs4 %>
@@ -135,7 +137,6 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header" style="border-bottom:none">
-
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -161,7 +162,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal"><%= l10n('close') %></button>
-            <button type="button" class="btn btn-primary btn-confirmation" id="confirm-modal"><%= l10n('confirm_selection') %></button>
+            <button type="button" class="btn btn-primary btn-confirmation"><%= l10n('confirm_selection') %></button>
           </div>
         </div>
       </div>

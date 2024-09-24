@@ -1,51 +1,92 @@
 <%= javascript_pack_tag 'effective_table_add_ons' if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+<% if @bs4 %>
+  <div>
+    <% if !@dont_allow_change && !@dont_update_ssn %>
+      <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.success') %></h3>
+        <% @person.reload %>
+        <table class="table table-border">
+          <thead></thead>
+          <tbody>
+            <tr>
+              <td><%= l10n('name') %>: <b><%= @person.first_name %> <%= @person.last_name %></b></td>
+              <td><%= l10n('hbx_id') %>: <b><%= @person.hbx_id %></b></td>
+            </tr>
+            <tr>
+              <td><%= l10n('dob') %>: <b><%=@person.dob%></b></td>
+              <td>
+              <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+                <%= render partial: 'shared/person/ssn/admin_ssn_block',
+                  locals: { presenter: organize_ssn_params(@person), include_label: true }
+                %>
+              <% else %>
+                <%= l10n('ssn') %>: <b><%= @person.ssn %></b>
+              <% end %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    <% elsif  @dont_update_ssn %>
+      <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.cannot_remove') %></h3>
+    <% else %>
+      <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.failure') %></h3> 
+      <h4><%= l10n('hbx_profiles.edit_dob_ssn.result.failure.subheader') %></h4>
+      <div><%= l10n('first_name') %>: <b><%= @ssn_match.first_name%></b></div>
+      <div><%= l10n('last_name') %>: <b><%= @ssn_match.last_name%></b></div>
+      <div><%= l10n('hbx_id') %>: <b><%= @ssn_match.hbx_id%></b></div>
+      <div><%= l10n('dob') %>: <b><%= @ssn_match.dob %></b></div>
+      <div><%= l10n('ssn') %>: <b><%= @ssn_match.ssn%></b></div>
+      <h4><%= l10n('hbx_profiles.edit_dob_ssn.result.failure.resolve') %></h4>
+    <% end %>
+  </div>
+<% else %>
+  <div class="container bottom-pd">
+    <%if !@dont_allow_change && !@dont_update_ssn %>
 
-<div class="container bottom-pd">
-  <%if !@dont_allow_change && !@dont_update_ssn %>
+      <h4 class="title">DOB / SSN Update Successful</h4>
+        <% @person.reload %>
+        <table class="table table-border">
+          <thead></thead>
+          <tbody>
+            <tr>
+              <td><h5> <b>Name:</b> <%=@person.first_name%> <%=@person.last_name%></h5></td>
+              <td><h5> <b>HBX ID:</b> <%=@person.hbx_id%></h5></tb>
+            </tr>
+            <tr>
+              <td><h5> <b>DOB:</b> <%=@person.dob%> </h5></td>
+              <td>
+              <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+                <%= render partial: 'shared/person/ssn/admin_ssn_block',
+                  locals: { presenter: organize_ssn_params(@person), include_label: true }
+                %>
+              <% else %>
+                <h5> <b>SSN:</b> <%=@person.ssn%> </h5>
+              <% end %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <h4 class="title">DOB / SSN Update Successful</h4>
-      <% @person.reload %>
-      <table class="table table-border">
-        <thead></thead>
-        <tbody>
-          <tr>
-            <td><h5> <b>Name:</b> <%=@person.first_name%> <%=@person.last_name%></h5></td>
-            <td><h5> <b>HBX ID:</b> <%=@person.hbx_id%></h5></tb>
-          </tr>
-          <tr>
-            <td><h5> <b>DOB:</b> <%=@person.dob%> </h5></td>
-            <td>
-            <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
-              <%= render partial: 'shared/person/ssn/admin_ssn_block',
-                locals: { presenter: organize_ssn_params(@person), include_label: true }
-              %>
-            <% else %>
-              <h5> <b>SSN:</b> <%=@person.ssn%> </h5>
-            <% end %>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <%elsif  @dont_update_ssn %>
+      <h4 class="title">SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN</h4>
 
-  <%elsif  @dont_update_ssn %>
-    <h4 class="title">SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN</h4>
+    <%else%>
 
-  <%else%>
+      <div class="row"> <h3 class="title-inline">DOB / SSN Update Failed</h3> </div>
+      <h5>
+        <h4>SSN matches with the following user:</h4>
+        First Name :<b><%=@ssn_match.first_name%></b> <br />
+        Last Name:  <b><%=@ssn_match.last_name%></b>  <br />
+        HBX ID:     <b><%=@ssn_match.hbx_id%></b>     <br />
+        Date of Birth: <b><%=@ssn_match.dob%></b>     <br />
+        SSN: <b><%=@ssn_match.ssn%></b>     <br />
+      </h5>
+      <h5>Please resolve the match issue.</h5>
 
-    <div class="row"> <h3 class="title-inline">DOB / SSN Update Failed</h3> </div>
-    <h5>
-      <h4>SSN matches with the following user:</h4>
-      First Name :<b><%=@ssn_match.first_name%></b> <br />
-      Last Name:  <b><%=@ssn_match.last_name%></b>  <br />
-      HBX ID:     <b><%=@ssn_match.hbx_id%></b>     <br />
-      Date of Birth: <b><%=@ssn_match.dob%></b>     <br />
-      SSN: <b><%=@ssn_match.ssn%></b>     <br />
-    </h5>
-    <h5>Please resolve the match issue.</h5>
+    <%end%>
 
-  <%end%>
-
-</div>
+  </div>
+<% end %>
 
 <%#= link_to "Back to Edit", edit_dob_ssn_path(id: @person.id), remote: true, class: 'btn btn-default' %>

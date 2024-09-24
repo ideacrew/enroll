@@ -47,7 +47,7 @@
       <div class="modal-dialog" style="width: 500px;">
         <div class="modal-content">
           <div class="modal-body" style="text-align: center;">
-            <p><%= l10n('en.hbx_profiles.send_message.modal.body') %></p>
+            <p><%= l10n('hbx_profiles.send_message.modal.body') %></p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary btn-confirmation"><%= l10n('confirm_selection') %></button>
@@ -147,17 +147,16 @@
       processData: false,
     });
   }
+  <% if @bs4 %>
+    $('.btn-confirmation').on('click', function() {
+        confirmSecureMsg(event); 
+        return false;
+    });
 
-  $('.btn-confirmation').on('click', function() {
-    <%= if @bs4 %>
-      confirmSecureMsg(event); 
-      return false;
-    <% end %>
-  });
-
-  $('#secure_message_form').on('submit', function(e) {
-    return false;
-  });
+    $('#secure_message_form').on('submit', function(e) {
+        return false;
+    });
+  <% end %>
 
   function closeRow(element) {
     element.closest('tr').remove();
