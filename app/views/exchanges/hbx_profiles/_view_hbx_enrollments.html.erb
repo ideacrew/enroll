@@ -244,8 +244,8 @@
     })
     $("div#reinstate_confirm").on('shown.bs.modal', function(event){
         $('#terminated_enrollemnts :radio:checked').each(function (){
-            $('#reinstate-plan-name').html($(this).closest('tr').find("#name").text());
-            $('#effective-date').html($(this).closest('tr').find("td#reinstate").text());
+            $('#reinstate-plan-name').text($(this).closest('tr').find("#name").text());
+            $('#effective-date').text($(this).closest('tr').find("td#reinstate").text());
             var employee_status = $(this).closest('tr').find("td#employee_status").text();
             var effective_date = $(this).closest('tr').find("td#reinstate").text();
             var enrollment_can_be_reinstated = $(this).closest('tr').find("td#enrollment_can_be_reinstated").text();
