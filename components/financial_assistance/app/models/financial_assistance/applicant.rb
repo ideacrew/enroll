@@ -1323,6 +1323,15 @@ module FinancialAssistance
       end
     end
 
+    def move_outstanding_to_nrr_status
+      EVIDENCES.each do |evidence_type|
+        evidence = self.send(evidence_type)
+        next if evidence.blank? || evidence.aasm_state != 'outstanding'
+
+        set_evidence_to_negative_response(evidence)
+      end
+    end
+
     def set_income_evidence_verified
       return unless income_evidence.may_move_to_verified?
 
