@@ -29,7 +29,7 @@
   <% if @bs4 %>
     <div id="personal_info">
       <h3 class='title'><%= l10n('hbx_profiles.add_sep') %></h3>
-      <div class="row p-2 d-flex align-items-end">
+      <div class="d-flex p-2">
         <%= hidden_field_tag "person", f.id %>
         <%= hidden_field_tag "firstName", f.primary_applicant.person.first_name %>
         <%= hidden_field_tag "lastName", f.primary_applicant.person.last_name %>
@@ -56,31 +56,31 @@
           <%= text_field_tag :csl_num, "", maxlength: 10, class: "align-items-center mask-csl csl_width", placeholder: "0000000000" %>
         </div>
       </div>
-      <div class='row p-2 sep_dates_filter'>
-        <div class="d-flex flex-column start_btn start_end_date col-sm-4 col-xs-12 px-0 start_input">
-          <label for="start_on" class="align-self-start required"><%= l10n('hbx_profiles.sep_start_date') %></label>
+      <div class='d-flex p-2 justify-content-between sep_dates_filter'>
+        <div class="col-auto pl-0 start_btn start_end_date start_input">
+          <label for="start_on" class="d-block required"><%= l10n('hbx_profiles.sep_start_date') %></label>
           <%= date_field_tag :start_on, nil, value: date_field_value, min: date_field_value, max: date_field_value, required: true, disabled: true %>
         </div>
-        <div class="d-flex flex-column end_btn start_end_date col-sm-4 col-xs-12 px-0 end_input">
-          <label for="end_on" class="align-self-start required"><%= l10n('hbx_profiles.sep_end_date') %></label>
+        <div class="col-auto end_btn start_end_date end_input">
+          <label for="end_on"class="d-block required"><%= l10n('hbx_profiles.sep_end_date') %></label>
           <%= date_field_tag :end_on, nil, value: date_field_value(60.days.from_now), min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
-        <div class='d-flex flex-column init_effective_date col-sm-4 col-xs-12 px-0'>
-          <label for="next_poss_effective_date" class="align-self-start required"><%= l10n('hbx_profiles.sep_next_possible_start_date') %></label>
+        <div class='col-auto pr-0 init_effective_date'>
+          <label for="next_poss_effective_date" class="d-block required"><%= l10n('hbx_profiles.sep_next_possible_start_date') %></label>
           <%= date_field_tag :next_poss_effective_date, nil, value: date_field_value, min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
       </div>
-      <div class='row p-2 optional_date'>
-        <div class="d-flex flex-column col-sm-4 col-xs-12 px-0">
-          <label for="option1_date" class="align-self-start"><%= l10n('hbx_profiles.date_option', index: 1) %></label>
+      <div class='d-flex p-2 justify-content-between optional_date'>
+        <div class="col-auto pl-0">
+          <label for="option1_date" class="d-block"><%= l10n('hbx_profiles.date_option', index: 1) %></label>
           <%= date_field_tag :option1_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>
         </div>
-        <div class="d-flex flex-column col-sm-4 col-xs-12 px-0">
-          <label for="option2_date" class="align-self-start"><%= l10n('hbx_profiles.date_option', index: 2) %></label>
+        <div class="col-auto">
+          <label for="option2_date" class="d-block"><%= l10n('hbx_profiles.date_option', index: 2) %></label>
           <%= date_field_tag :option2_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>				
         </div>
-        <div class="d-flex flex-column col-sm-4 col-xs-12 px-0">
-          <label for="option3_date" class="align-self-start"><%= l10n('hbx_profiles.date_option', index: 3) %></label>
+        <div class="col-auto pr-0">
+          <label for="option3_date" class="d-block"><%= l10n('hbx_profiles.date_option', index: 3) %></label>
           <%= date_field_tag :option3_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>				
         </div>
       </div>
