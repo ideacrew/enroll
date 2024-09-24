@@ -45,7 +45,7 @@
         </div>
         <div class='d-flex flex-column init_event_date col-sm-3 col-xs-12 px-0 '>
           <label for="event_date" class="d-block required"><%= l10n('hbx_profiles.sep_event_date') %></label>
-          <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: date_field_value(110.years.ago), max: date_field_value(110.years.from_now), required: true, class: "qle-date-picker" %>
+          <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: date_field_value(110.years.ago), max: date_field_value(date_field_value(110.years.from_now)), required: true, class: "qle-date-picker", class: "qle-date-picker" %>
         </div>
         <div class='d-flex flex-column admin_effective_on_kind_options col-sm-3 col-xs-12 px-0'>
           <label for="effective_on_date" class="d-block required"><%= l10n('hbx_profiles.sep_effective_date_rule') %></label>
