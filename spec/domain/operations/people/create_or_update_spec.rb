@@ -85,6 +85,33 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
       end
     end
 
+    context 'for failure case when there is an existing ssn' do
+      let!(:person) {FactoryBot.create(:person, ssn: '345343243')}
+
+      let(:person_params) do
+        {first_name: 'ivl40', last_name: '41',
+         dob: '1940-09-17', ssn: '345343243',
+         gender: 'male', is_incarcerated: false,
+         person_hbx_id: '23232323',
+         same_with_primary: true, indian_tribe_member: true, citizen_status: 'true',
+         addresses: [kind: 'home', address_1: '123 NE', address_2: '', address_3: '',
+                     city: 'was', county: '', state: 'DC', location_state_code: nil,
+                     full_text: nil, zip: '12321', country_name: '', tracking_version: 1,
+                     modifier_id: nil], phones: [], emails: []}
+
+      end
+
+      context 'valid params' do
+        before :each do
+          @result = subject.call(params: person_params)
+        end
+
+        it 'should return failure' do
+          expect(@result).to be_a(Dry::Monads::Result::Failure)
+        end
+      end
+    end
+
     context 'for failed case' do
       let(:person_params) do
         {first_name: 'ivl40', last_name: '41',
