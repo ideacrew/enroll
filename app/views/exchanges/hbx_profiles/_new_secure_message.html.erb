@@ -6,68 +6,109 @@
   </div>
 <%end%>
 
-<form id="secure_message_form" onsubmit="return false;" >
-  <div>
-    <div class="bottom-pd">
-      <div class="row no-buffer">
-        <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
-          <h3>New Message</h3>
-          <table class="table table-message-wrapper">
-            <tbody>
-            <tr>
-              <th style="text-transform: capitalize;">Recipient:</th>
-              <td>&nbsp; &nbsp;<b><%=  @resource.try(:full_name) ||  @resource.try(:legal_name) %></b></td>
-            </tr>
-            <tr>
-              <% if @bs4 %>
+<% if @bs4 %>
+  <form id="secure_message_form">
+    <div>
+      <div class="bottom-pd">
+        <div class="row no-buffer">
+          <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
+            <h3><%= l10n('new_message') %></h3>
+            <table class="table">
+              <tbody>
+              <tr>
+                <th><%= l10n('recipient') %>:</th>
+                <td><b><%=  @resource.try(:full_name) ||  @resource.try(:legal_name) %></b></td>
+              </tr>
+              <tr>
                 <th><label for="subject" class="weight-n required"><%= l10n('subject') %></label></th>
-              <% else %>
-                <th style="text-transform: capitalize;">Subject<span class="text-danger">*</span>:</th>
-              <% end %>
-              <td><%= text_field_tag :subject, @subject, :size => "55", placeholder: 'Subject', include_blank: false, required: true %></td>
-            </tr>
-            <tr>
-              <% if @bs4 %>
+                <td><%= text_field_tag :subject, @subject, :size => "55", placeholder: l10n('subject'), include_blank: false, required: true %></td>
+              </tr>
+              <tr>
                 <th><label for="body" class="weight-n required"><%= l10n('content') %></label></th>
-              <% else %>
-                <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
-              <% end %>
-              <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: 'Write here...', include_blank: false, required: true  %></td>
-            </tr>
-            <tr>
-              <% if @bs4 %>
+                <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: l10n('hbx_profiles.send_message.write_here'), include_blank: false, required: true  %></td>
+              </tr>
+              <tr>
                 <th><label for="file" class="weight-n required"><%= l10n('document') %></label></th>
-              <% else %>
+                <td><%= file_field_tag "file", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file"%></td>
+              </tr>
+              </tbody>
+            </table>
+            <% resource = @resource %>
+            <%= hidden_field_tag :resource_id, resource.id %>
+            <%= hidden_field_tag :resource_name, resource.class %>
+            <%= hidden_field_tag :actions_id, @element_to_replace_id %>
+            <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
+            <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="sendSecure" role="dialog">
+      <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+          <div class="modal-body" style="text-align: center;">
+            <p><%= l10n('en.hbx_profiles.send_message.modal.body') %></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-confirmation"><%= l10n('confirm_selection') %></button>
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><%= l10n('cancel') %></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+<% else %>
+  <form id="secure_message_form" onsubmit="return false;" >
+    <div>
+      <div class="bottom-pd">
+        <div class="row no-buffer">
+          <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
+            <h3>New Message</h3>
+            <table class="table table-message-wrapper">
+              <tbody>
+              <tr>
+                <th style="text-transform: capitalize;">Recipient:</th>
+                <td>&nbsp; &nbsp;<b><%=  @resource.try(:full_name) ||  @resource.try(:legal_name) %></b></td>
+              </tr>
+              <tr>
+                <th style="text-transform: capitalize;">Subject<span class="text-danger">*</span>:</th>
+                <td><%= text_field_tag :subject, @subject, :size => "55", placeholder: 'Subject', include_blank: false, required: true %></td>
+              </tr>
+              <tr>
+                <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
+                <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: 'Write here...', include_blank: false, required: true  %></td>
+              </tr>
+              <tr>
                 <th style="vertical-align: top; text-transform: capitalize;">Document: (optional)<span class="text-danger"></span></th>
-              <% end %>
-              <td><%= file_field_tag "file", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file"%></td>
-            </tr>
-            </tbody>
-          </table>
-          <% resource = @resource %>
-          <%= hidden_field_tag :resource_id, resource.id %>
-          <%= hidden_field_tag :resource_name, resource.class %>
-          <%= hidden_field_tag :actions_id, @element_to_replace_id %>
-          <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
-          <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
+                <td><%= file_field_tag "file", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file"%></td>
+              </tr>
+              </tbody>
+            </table>
+            <% resource = @resource %>
+            <%= hidden_field_tag :resource_id, resource.id %>
+            <%= hidden_field_tag :resource_name, resource.class %>
+            <%= hidden_field_tag :actions_id, @element_to_replace_id %>
+            <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
+            <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="modal" id="sendSecure" role="dialog">
-    <div class="modal-dialog" style="width: 500px;">
-      <div class="modal-content">
-        <div class="modal-body" style="text-align: center;">
-          <p>Are you sure you want to <b>Send/Upload</b> this message?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmSecureMsg(event); return false;'>Confirm</button>
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+    <div class="modal" id="sendSecure" role="dialog">
+      <div class="modal-dialog" style="width: 500px;">
+        <div class="modal-content">
+          <div class="modal-body" style="text-align: center;">
+            <p>Are you sure you want to <b>Send/Upload</b> this message?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmSecureMsg(event); return false;'>Confirm</button>
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</form>
+  </form>
+<% end %>
 
 
 <script type="text/javascript">
@@ -106,6 +147,17 @@
       processData: false,
     });
   }
+
+  $('.btn-confirmation').on('click', function() {
+    <%= if @bs4 %>
+      confirmSecureMsg(event); 
+      return false;
+    <% end %>
+  });
+
+  $('#secure_message_form').on('submit', function(e) {
+    return false;
+  });
 
   function closeRow(element) {
     element.closest('tr').remove();

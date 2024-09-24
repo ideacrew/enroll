@@ -90,8 +90,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmReinstate(event); return false;'>Confirm</button>
+          <button type="button" class="btn btn-default btn-default" data-dismiss="modal"><%= l10n('cancel') %></button>
+          <button type="button" class="btn btn-primary btn-confirmation"><%= l10n('confirm_selection') %></button>
         </div>
       </div>
     </div>
@@ -287,4 +287,11 @@
             }
         });
     });
+
+  $('.btn-confirmation').on('click', function() {
+    <%= if @bs4 %>
+      confirmReinstate(event); 
+      return false;
+    <% end %>
+  });
 </script>
