@@ -1,46 +1,46 @@
 <% if @bs4 %>
-<table class="table table-striped">
-  <%if @result[:success].present?%>
-    <h3><%= l10n('hbx_profiles.cancel.result.success')%></h3>
-    <tr>
-      <th><%= l10n('insured.families.hbx_id') %></th>
-      <th><%= l10n('plan') %></th>
-      <th><%= l10n('hbx_profiles.effective_date') %></th>
-      <th><%= l10n('hbx_profiles.cancel.cancellation_date') %></th>
-      <th><%= l10n('hbx_profiles.cancel.cancel_enrollment') %></th>
-    </tr>
-    <% @result[:success].each do |hbx| %>
+  <table class="table table-striped">
+    <%if @result[:success].present?%>
+      <h3><%= l10n('hbx_profiles.cancel.result.success')%></h3>
       <tr>
-        <td><%= hbx.hbx_id %></td>
-        <td><%= hbx.product.title %></td>
-        <td><%= hbx.effective_on %></td>
-        <td><%= hbx.effective_on %></td>
-        <td><i class="fa fa-check" aria-hidden="true"></i></td>
+        <th><%= l10n('insured.families.hbx_id') %></th>
+        <th><%= l10n('plan') %></th>
+        <th><%= l10n('hbx_profiles.effective_date') %></th>
+        <th><%= l10n('hbx_profiles.cancel.cancellation_date') %></th>
+        <th><%= l10n('hbx_profiles.cancel.cancel_enrollment') %></th>
       </tr>
-    <% end %>
-  <%elsif @result[:failure].present? %>
-    <h3><%= l10n('hbx_profiles.cancel.result.failure')%></h3>
-    <tr>
-      <th><%= l10n('insured.families.hbx_id') %></th>
-      <th><%= l10n('plan') %></th>
-      <th><%= l10n('hbx_profiles.effective_date') %></th>
-      <th><%= l10n('hbx_profiles.cancel.cancellation_date') %></th>
-      <th><%= l10n('hbx_profiles.cancel.cancel_enrollment') %></th>
-    </tr>
-    <% @result[:failure].each do |hbx| %>
+      <% @result[:success].each do |hbx| %>
+        <tr>
+          <td><%= hbx.hbx_id %></td>
+          <td><%= hbx.product.title %></td>
+          <td><%= hbx.effective_on %></td>
+          <td><%= hbx.effective_on %></td>
+          <td><i class="fa fa-check" aria-hidden="true"></i></td>
+        </tr>
+      <% end %>
+    <%elsif @result[:failure].present? %>
+      <h3><%= l10n('hbx_profiles.cancel.result.failure')%></h3>
       <tr>
-        <td><%= hbx.hbx_id %></td>
-        <td><%= hbx.product.title %></td>
-        <td><%= hbx.effective_on %></td>
-        <td><%= hbx.effective_on %></td>
+        <th><%= l10n('insured.families.hbx_id') %></th>
+        <th><%= l10n('plan') %></th>
+        <th><%= l10n('hbx_profiles.effective_date') %></th>
+        <th><%= l10n('hbx_profiles.cancel.cancellation_date') %></th>
+        <th><%= l10n('hbx_profiles.cancel.cancel_enrollment') %></th>
       </tr>
+      <% @result[:failure].each do |hbx| %>
+        <tr>
+          <td><%= hbx.hbx_id %></td>
+          <td><%= hbx.product.title %></td>
+          <td><%= hbx.effective_on %></td>
+          <td><%= hbx.effective_on %></td>
+        </tr>
+      <% end %>
+    <% else %>
+      <h3><%= l10n('hbx_profiles.cancel.result.empty')%></h3>
     <% end %>
-  <% else %>
-    <h3><%= l10n('hbx_profiles.cancel.result.empty')%></h3>
-  <% end %>
-</table>
+  </table>
 
-<%= link_to "Close", hide_form_exchanges_hbx_profiles_path(family_id: @family_id, family_actions_id: "family_actions_#{@family_id.to_s}"), class: "btn btn-info", remote: true %>
+  <%= link_to l10n('close'), hide_form_exchanges_hbx_profiles_path(family_id: @family_id, family_actions_id: "family_actions_#{@family_id.to_s}"), class: "btn btn-info", remote: true %>
 <% else %>
   <table class="table table-striped">
     <%if @result[:success].present?%>
