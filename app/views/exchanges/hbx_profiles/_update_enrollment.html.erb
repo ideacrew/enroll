@@ -3,39 +3,38 @@
   <div>
     <% if !@dont_allow_change && !@dont_update_ssn %>
       <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.success') %></h3>
-        <% @person.reload %>
-        <table class="table table-border">
-          <thead></thead>
-          <tbody>
-            <tr>
-              <td><%= l10n('name') %>: <b><%= @person.first_name %> <%= @person.last_name %></b></td>
-              <td><%= l10n('hbx_id') %>: <b><%= @person.hbx_id %></b></td>
-            </tr>
-            <tr>
-              <td><%= l10n('dob') %>: <b><%=@person.dob%></b></td>
-              <td>
-              <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
-                <%= render partial: 'shared/person/ssn/admin_ssn_block',
-                  locals: { presenter: organize_ssn_params(@person), include_label: true }
-                %>
-              <% else %>
-                <%= l10n('ssn') %>: <b><%= @person.ssn %></b>
-              <% end %>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <% @person.reload %>
+      <table class="table table-border">
+        <thead></thead>
+        <tbody>
+          <tr>
+            <td><%= l10n('name') %>: <b><%= @person.first_name %> <%= @person.last_name %></b></td>
+            <td><%= l10n('hbx_id') %>: <b><%= @person.hbx_id %></b></td>
+          </tr>
+          <tr>
+            <td><%= l10n('dob') %>: <b><%= @person.dob %></b></td>
+            <td>
+            <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
+              <%= render partial: 'shared/person/ssn/admin_ssn_block',
+                locals: { presenter: organize_ssn_params(@person), include_label: true }
+              %>
+            <% else %>
+              <%= l10n('ssn') %>: <b><%= @person.ssn %></b>
+            <% end %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     <% elsif  @dont_update_ssn %>
       <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.cannot_remove') %></h3>
     <% else %>
       <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.failure') %></h3> 
       <h4><%= l10n('hbx_profiles.edit_dob_ssn.result.failure.subheader') %></h4>
-      <div><%= l10n('first_name') %>: <b><%= @ssn_match.first_name%></b></div>
-      <div><%= l10n('last_name') %>: <b><%= @ssn_match.last_name%></b></div>
-      <div><%= l10n('hbx_id') %>: <b><%= @ssn_match.hbx_id%></b></div>
+      <div><%= l10n('first_name') %>: <b><%= @ssn_match.first_name %></b></div>
+      <div><%= l10n('last_name') %>: <b><%= @ssn_match.last_name %></b></div>
+      <div><%= l10n('hbx_id') %>: <b><%= @ssn_match.hbx_id %></b></div>
       <div><%= l10n('dob') %>: <b><%= @ssn_match.dob %></b></div>
-      <div><%= l10n('ssn') %>: <b><%= @ssn_match.ssn%></b></div>
+      <div><%= l10n('ssn') %>: <b><%= @ssn_match.ssn %></b></div>
       <h4><%= l10n('hbx_profiles.actions.failure.resolve') %></h4>
     <% end %>
   </div>

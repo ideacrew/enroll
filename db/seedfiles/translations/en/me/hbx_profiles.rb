@@ -35,7 +35,9 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.financial_assistance.applications.cant_determine_eligibility" => "We’re sorry, but we can’t determine your eligibility right now. Please call %{site_short_name} at %{contact_center_phone_number} TTY: %{contact_center_tty_number} to report this issue.",
 	"en.financial_assistance.applications.report_error" => "Report the error code %{determination_http_status_code} to help us fix the problem as soon as possible.",
 	"en.financial_assistance.applications.response_error" => "Eligibility Response Error",
+	# Actions
 	"en.hbx_profiles.actions.failure.resolve" => "Please resolve the match issue.",
+	# Families Tab Actions
 	"en.hbx_profiles.add_sep" => "Add SEP",
 	"en.hbx_profiles.sep_reason" => "SEP Reason",
 	"en.hbx_profiles.sep_start_date" => "SEP Start Date",
@@ -102,8 +104,12 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_info.person_roles" => "Person Roles",
 	"en.hbx_profiles.user_info.requested_by" => "Requested by @%{name}",
 	"en.hbx_profiles.user_info.nil" => "Nil",
+	# User Accounts Tab Actions
 	"en.hbx_profiles.user_accounts.actions.edit.header" => "Edit User Credentials",
 	"en.hbx_profiles.user_accounts.actions.edit.username" => "New Username",
 	"en.hbx_profiles.user_accounts.actions.edit.email" => "New Email",
+	"en.hbx_profiles.user_accounts.actions.edit.result.success" => "User Account Updated Successfully",
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure" => "User Account Update Failed",
+	"en.hbx_profiles.user_accounts.actions.edit.result.failure.username_subheader" => "The username matches with the following user:",
+	"en.hbx_profiles.user_accounts.actions.edit.result.failure.email_subheader" => "The email matches with the following user:",
 }
