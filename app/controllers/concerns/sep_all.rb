@@ -219,9 +219,10 @@ module SepAll
     special_enrollment_period.coverage_renewal_flag = sep_params[:coverage_renewal_flag].to_s == "true"
     
     if special_enrollment_period.save
-      @message_for_partial = "SEP Added for #{@name}"
+      @message_for_partial = @bs4 ? l10n('hbx_profiles.add_sep.result.success', name: @name) : "SEP Added for #{@name}"
     else
-      @message_for_partial = "SEP not saved. (Error: " + special_enrollment_period.errors.full_messages.join(", ") + ")"
+      errors = special_enrollment_period.errors.full_messages.join(", ")
+      @message_for_partial = @bs4 ? l10n('hbx_profiles.add_sep.result.failure', errors: errors) : "SEP not saved. (Error: \"#{errors}\")"
     end
   end
 
