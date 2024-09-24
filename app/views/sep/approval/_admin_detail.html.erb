@@ -56,7 +56,7 @@
           <%= text_field_tag :csl_num, "", maxlength: 10, class: "align-items-center mask-csl csl_width", placeholder: "0000000000" %>
         </div>
       </div>
-      <div class='row p-2 sep_dates_filter justify-content-around'>
+      <div class='row p-2 sep_dates_filter'>
         <div class="d-flex flex-column start_btn start_end_date col-sm-4 col-xs-12 px-0 start_input">
           <label for="start_on" class="align-self-start required"><%= l10n('hbx_profiles.sep_start_date') %></label>
           <%= date_field_tag :start_on, nil, value: date_field_value, min: date_field_value, max: date_field_value, required: true, disabled: true %>
@@ -70,17 +70,17 @@
           <%= date_field_tag :next_poss_effective_date, nil, value: date_field_value, min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
       </div>
-      <div class='row optional_date'>
-        <div class="col-sm-4 col-xs-12 px-0 mr-3">
-          <label for="option1_date"><%= l10n('hbx_profiles.date_option', index: 1) %></label>
+      <div class='row p-2 optional_date'>
+        <div class="d-flex flex-column col-sm-4 col-xs-12 px-0">
+          <label for="option1_date" class="align-self-start"><%= l10n('hbx_profiles.date_option', index: 1) %></label>
           <%= date_field_tag :option1_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>
         </div>
-        <div class="col-sm-4 col-xs-12 px-0 mr-3">
-          <label for="option2_date"><%= l10n('hbx_profiles.date_option', index: 2) %></label>
+        <div class="d-flex flex-column col-sm-4 col-xs-12 px-0">
+          <label for="option2_date" class="align-self-start"><%= l10n('hbx_profiles.date_option', index: 2) %></label>
           <%= date_field_tag :option2_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>				
         </div>
-        <div class="col-sm-4 col-xs-12 px-0 mr-3">
-          <label for="option3_date"><%= l10n('hbx_profiles.date_option', index: 3) %></label>
+        <div class="d-flex flex-column col-sm-4 col-xs-12 px-0">
+          <label for="option3_date" class="align-self-start"><%= l10n('hbx_profiles.date_option', index: 3) %></label>
           <%= date_field_tag :option3_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>				
         </div>
       </div>
