@@ -52,13 +52,13 @@
           <%= select_tag :effective_on_date, class: "form-control qle-date-kind", required: true %>
         </div>
         <div class='d-flex flex-column csl_num_options col-sm-3 col-xs-12 px-0 csl_width'>
-          <label for="csl_num" class="align-self-start">CSL #</label>
+          <label for="csl_num" class="align-self-start"><%= l10n('hbx_profiles.csl_number') %></label>
           <%= text_field_tag :csl_num, "", maxlength: 10, class: "align-items-center mask-csl csl_width", placeholder: "0000000000" %>
         </div>
       </div>
       <div class='row p-2 sep_dates_filter justify-content-around'>
         <div class="d-flex flex-column start_btn start_end_date col-sm-4 col-xs-12 px-0 start_input">
-          <label for="start_on" class="align-self-start required"><%= l10n('hbx_profiles.csl_number') %></label>
+          <label for="start_on" class="align-self-start required"><%= l10n('hbx_profiles.sep_start_date') %></label>
           <%= date_field_tag :start_on, nil, value: date_field_value, min: date_field_value, max: date_field_value, required: true, disabled: true %>
         </div>
         <div class="d-flex flex-column end_btn start_end_date col-sm-4 col-xs-12 px-0 end_input">
