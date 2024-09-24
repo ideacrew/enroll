@@ -52,7 +52,7 @@ module Operations
                         end
         Success(person_record)
       rescue StandardError => e
-        Failure(person.errors.messages)
+        Failure(e.message)
       end
 
       def create_new_person(person_entity)
