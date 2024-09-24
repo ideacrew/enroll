@@ -28,7 +28,7 @@
 <div class='add_sep_form' id="add_sep">
   <% if @bs4 %>
     <div id="personal_info">
-      <h3 class='title'>Add SEP</h3>
+      <h3 class='title'><%= l10n('hbx_profiles.add_sep') %></h3>
       <div class="row p-2 d-flex align-items-end">
         <%= hidden_field_tag "person", f.id %>
         <%= hidden_field_tag "firstName", f.primary_applicant.person.first_name %>
@@ -40,15 +40,15 @@
           <%= hidden_field_tag :effective_on_kind, "first_of_next_month" %>
         </div>
         <div class='d-flex flex-column admin_selected_sep_reason col-md-3 col-sm-3 col-xs-12 px-0'>
-          <label for="qle_id" class="align-self-start required">SEP Reason</label>
+          <label for="qle_id" class="align-self-start required"><%= l10n('hbx_profiles.sep_reason') %></label>
           <%= select_tag :qle_id, options_for_select(qle.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")}]  }), class: 'form-control', required: true, prompt: l10n('select') %>
         </div>
         <div class='d-flex flex-column init_event_date col-sm-3 col-xs-12 px-0 '>
-          <label for="event_date" class="align-self-start required">Event Date</label>
+          <label for="event_date" class="align-self-start required"><%= l10n('hbx_profiles.sep_event_date') %></label>
           <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: date_field_value(110.years.ago), max: date_field_value(110.years.from_now), required: true, class: "qle-date-picker" %>
         </div>
         <div class='d-flex flex-column admin_effective_on_kind_options col-sm-3 col-xs-12 px-0'>
-          <label for="effective_on_date" class="align-self-start required">Event Date</label>
+          <label for="effective_on_date" class="align-self-start required"><%= l10n('hbx_profiles.sep_effective_date_rule') %></label>
           <%= select_tag :effective_on_date, class: "form-control qle-date-kind", required: true %>
         </div>
         <div class='d-flex flex-column csl_num_options col-sm-3 col-xs-12 px-0 csl_width'>
@@ -58,29 +58,29 @@
       </div>
       <div class='row p-2 sep_dates_filter justify-content-around'>
         <div class="d-flex flex-column start_btn start_end_date col-sm-4 col-xs-12 px-0 start_input">
-          <label for="start_on" class="align-self-start required">SEP Start Date</label>
+          <label for="start_on" class="align-self-start required"><%= l10n('hbx_profiles.csl_number') %></label>
           <%= date_field_tag :start_on, nil, value: date_field_value, min: date_field_value, max: date_field_value, required: true, disabled: true %>
         </div>
         <div class="d-flex flex-column end_btn start_end_date col-sm-4 col-xs-12 px-0 end_input">
-          <label for="end_on" class="align-self-start required">SEP End Date</label>
+          <label for="end_on" class="align-self-start required"><%= l10n('hbx_profiles.sep_end_date') %></label>
           <%= date_field_tag :end_on, nil, value: date_field_value(60.days.from_now), min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
         <div class='d-flex flex-column init_effective_date col-sm-4 col-xs-12 px-0'>
-          <label for="next_poss_effective_date" class="align-self-start required">Next Possible Start Date</label>
+          <label for="next_poss_effective_date" class="align-self-start required"><%= l10n('hbx_profiles.sep_next_possible_start_date') %></label>
           <%= date_field_tag :next_poss_effective_date, nil, value: date_field_value, min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
       </div>
       <div class='row optional_date'>
         <div class="col-sm-4 col-xs-12 px-0 mr-3">
-          <label for="option1_date">Date 1 Option</label>
+          <label for="option1_date"><%= l10n('hbx_profiles.date_option', index: 1) %></label>
           <%= date_field_tag :option1_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>
         </div>
         <div class="col-sm-4 col-xs-12 px-0 mr-3">
-          <label for="option2_date">Date 2 Option</label>
+          <label for="option2_date"><%= l10n('hbx_profiles.date_option', index: 2) %></label>
           <%= date_field_tag :option2_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>				
         </div>
         <div class="col-sm-4 col-xs-12 px-0 mr-3">
-          <label for="option3_date">Date 3 Option</label>
+          <label for="option3_date"><%= l10n('hbx_profiles.date_option', index: 3) %></label>
           <%= date_field_tag :option3_date, nil, placeholder: "MM/DD/YYYY", min: sep_optional_date(@family, 'min'), max: sep_optional_date(@family, 'max') %>				
         </div>
       </div>
@@ -96,7 +96,7 @@
       <% end %>
       <div class='row p-2 row-form-wrapper no-buffer'>
         <div class="d-flex flex-column col-md-3 col-xs-12 px-0">
-          <label for="admin_comment" class="align-self-start required">Enter Comments Here</label>
+          <label for="admin_comment" class="align-self-start required"><%= l10n('hbx_profiles.enter_comments') %></label>
           <%= text_area_tag :admin_comment, "", class: "floatlabel interaction-control-broker-message-body custom-textarea", rows: 3 %>
         </div>
       </div>

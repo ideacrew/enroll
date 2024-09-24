@@ -100,7 +100,6 @@ $(document).on('change','#option1_date, #option2_date, #option3_date', function(
 
 
 $(document).on('change','.admin_effective_on_kind_options select', function(){
-  console.log("HERE", $(this).val());
   if($(this).val() == ''){
     $('.init_effective_date input').val("");
     hideElement($('.sep_dates_filter'));
