@@ -10,9 +10,7 @@ class CustomFailureApp < Devise::FailureApp
       # with the exception of the flash[:timedout] && flash[:alert] condition
       # which will return a flash message solely consisting of the word "true" if flash[:timedout] is present
       store_location!
-      if is_flashing_format?
-        flash[:alert] = i18n_message unless flash[:timedout] && flash[:alert]
-      end
+      flash[:alert] = i18n_message if is_flashing_format? && !(flash[:timedout] && flash[:alert])
       redirect_to redirect_url
     end
   end
