@@ -37,8 +37,8 @@
       <% end %>
     </div>
 
-    <div class="row no-buffer bottom-pd">
-      <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+    <div class="py-2">
+      <div class="col-md-12 px-0 col-sm-12 col-xs-12">
         <%= button_tag 'Cancel', :class => 'btn btn-default', type: 'button', onclick: "$('tr.child-row-mthh:visible').remove();" %>
         <%= button_tag 'Previous Page', :class => 'btn btn-default', type: 'button', onclick: "onPreviousPageClick()" %>
         <%= f.submit "Save Changes", :class => "btn btn-primary save_eligibility", id: 'save_eligibility', :size => '100px' %>
