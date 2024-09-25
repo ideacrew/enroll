@@ -12,18 +12,18 @@
       <% if @bs4 %>
         <h3 class="title">Edit DOB / SSN</h3>
         <div class="mb-3">
-          <div class="d-flex flex-column">
-            <%= f.label :dob, l10n('new_dob'), class: "align-self-start" %>
+          <div>
+            <%= f.label :dob, l10n('new_dob'), class: "weight-n align-self-start d-block" %>
             <% dob = params[:new_dob].present? ? params[:new_dob] : @person.dob.strftime('%Y-%m-%d') %>
             <%= f.date_field :dob, required: true, :value => dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", class: "col-2" %>
           </div>
-          <div class="d-flex flex-column mt-2">
+          <div>
             <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
             <div class="col-2 px-0">
               <%= render partial: 'shared/person/ssn/admin_ssn_field', locals: { f: f, presenter: organize_ssn_params(f.object) } %>
             </div>
             <% else %>
-              <%= f.label :ssn, l10n('new_ssn'), class: "align-self-start" %>
+              <%= f.label :ssn, l10n('new_ssn'), class: "align-self-start d-block" %>
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
                 <%= f.text_field :ssn, placeholder: "000-00-0000", class: "col-2 mask-ssn",
                   pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')", oninput: "this.setCustomValidity('')",
@@ -86,7 +86,7 @@
       <%= f.hidden_field :pid, :value => @person.id  %>
       <%= f.hidden_field :family_actions_id, :value => "family_actions_#{@person.primary_family.id.to_s}" %>
       <div class="row no-buffer child-row">
-        <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+        <div class="col-md-12 <%= @bs4 ? 'px-0' : 'no-pd' %> col-sm-12 col-xs-12">
           <%= link_to "Reset", edit_dob_ssn_path(id: @person.id, family_actions_id: "family_actions_#{@person.primary_family.id.to_s}"), class: "btn btn-info", remote: true %>
           <%= f.submit "Update", 'data-disable-with' => l10n("please_wait"), data: { confirm: 'Are you sure?' }, :class => "btn btn-primary", :size => '100px'%>
         </div>
