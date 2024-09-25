@@ -2,6 +2,7 @@ module Effective
   module Datatables
     class UserAccountDatatable < Effective::MongoidDatatable
       include Config::SiteModelConcern
+      include DropdownHelper
 
       datatable do
         table_column :name, :label => 'USERNAME', :proc => proc { |row| row.oim_id }, :filter => false, :sortable => true
@@ -26,12 +27,8 @@ module Effective
             dropdown << ['Reset Password', edit_user_path(row.id), 'ajax']
           end
           dropdown << ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id}"), 'ajax'] if current_user_permission&.can_lock_unlock
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_dropdown(dropdown) : dropdown, row_actions_id: "user_action_#{row.id}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "user_action_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
-      end
-
-      def map_dropdown(dropdown)
-        super
       end
 
       def collection

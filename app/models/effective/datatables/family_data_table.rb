@@ -8,6 +8,7 @@ module Effective
       include Config::SiteModelConcern
       include ApplicationHelper
       include HtmlScrubberUtil
+      include DropdownHelper
 
       datatable do
         #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
@@ -85,12 +86,8 @@ module Effective
                          transition_family_members_link_type(row, pundit_allow(Family, :can_transition_family_members?)) ? 'ajax' : 'disabled']
           end
 
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_dropdown(dropdown) : dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
-      end
-
-      def map_dropdown(dropdown)
-        super
       end
 
       scopes do

@@ -14,6 +14,14 @@ module DropdownHelper
     construct_options(option_args)
   end
 
+  # map legacy dropdowns to BS4 dropdowns
+  # NOTE: should remove & refactor dropdowns from callers once BS4 is turned on
+  def map_legacy_dropdown(options)
+    options.each { |option| option[2] = map_legacy_dropdown_type(option[2]) }
+    options.select! { |option| option[2].present? }
+    construct_options(options)
+  end
+
   private
 
   # dropdown type link attributes
@@ -45,5 +53,20 @@ module DropdownHelper
     return options unless current_user.has_hbx_staff_role?
     options << (['faa.applications.actions.transfer_history', transfer_history_application_path(application), :default] if FinancialAssistanceRegistry.feature_enabled?(:transfer_history_page))
     options << (['faa.applications.actions.full_application', raw_application_application_path(application), :default] if current_user.has_hbx_staff_role? && application.is_reviewable?)
+  end
+
+  # map legacy dropdown types to BS4 dropdown types
+  # NOTE: should remove & update dropdown types from callers once BS4 is turned on
+  def map_legacy_dropdown_type(legacy_type)
+    case legacy_type
+    when "static"
+      :default
+    when "ajax"
+      :remote
+    when "edit_aptc_csr"
+      :remote_edit_aptc_csr
+    when "disabled"
+      nil # disabled dropdowns are not rendered on BS4
+    end
   end
 end

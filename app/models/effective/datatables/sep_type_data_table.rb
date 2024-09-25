@@ -6,6 +6,7 @@ module Effective
       include Config::AcaModelConcern
       include Config::SiteModelConcern
       include ApplicationHelper
+      include DropdownHelper
 
       datatable do
         table_column :title, :label => l10n("datatables.sep_type_data_table.title"), :proc => proc { |row|
@@ -25,12 +26,8 @@ module Effective
               [l10n("datatables.sep_type_data_table.clone"), clone_exchanges_manage_sep_types_path(id: row.id), 'static']
             ]
           end
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_dropdown(dropdown) : dropdown, row_actions_id: "sep_type_actions_#{row.id}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "sep_type_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
-      end
-
-      def map_dropdown(dropdown)
-        super
       end
 
       def collection
