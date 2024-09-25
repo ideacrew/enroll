@@ -142,11 +142,7 @@ module Insured::FamiliesHelper
     }
 
     if qle.tool_tip.present?
-      if @bs4
-        data.merge!(toggle: 'tooltip', placement: "right", trigger: "hover focus")
-      else
-        data.merge!(toggle: 'tooltip', placement: index > 2 ? 'top' : 'bottom', trigger: "hover")
-      end
+      data.merge!(toggle: 'tooltip', placement: index > 2 ? 'top' : 'bottom', trigger: "hover #{'focus' if @bs4}")
       options.merge!(data: data, title: qle.tool_tip)
     else
       options.merge!(data: data)

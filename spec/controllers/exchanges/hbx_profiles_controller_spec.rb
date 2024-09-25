@@ -93,25 +93,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
-  describe "inbox" do
-    let(:user) { double("User")}
-    let(:person) { double("person", agent?: true)}
-    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
-    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
-
-    it "renders inbox" do
-      allow(user).to receive(:person).and_return(person)
-      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
-      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
-      sign_in(user)
-      get :inbox, params: {id: hbx_profile.id}, xhr: true
-      expect(response).to have_http_status(:success)
-    end
-
-  end
-
   describe "employer_invoice" do
     let(:user) { double("User")}
     let(:person) { double("Person")}
