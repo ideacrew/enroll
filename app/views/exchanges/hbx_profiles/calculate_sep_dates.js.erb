@@ -1,14 +1,13 @@
 $('.sep_dates_filter').show();
-var bs4 = document.documentElement.dataset.bs4 == "true";
-if (!bs4) {
-  $('.start_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @start_on %>");
-  $('.end_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @end_on %>");
-  $('.init_effective_date input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @effective_on %>");
-} else {
+<% if @bs4 %>
   $('.start_btn input').val("<%= @start_on.strftime('%Y-%m-%d') %>");
   $('.end_btn input').val("<%= @end_on.strftime('%Y-%m-%d') %>");
   $('.init_effective_date input').val("<%= @effective_on.strftime('%Y-%m-%d') %>");
-}
+<% else %>
+  $('.start_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @start_on %>");
+  $('.end_btn input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @end_on %>");
+  $('.init_effective_date input').datepicker({changeMonth: true, changeYear: true}).datepicker('setDate', "<%= @effective_on %>");
+<% end %>
 
 $('.kind input').val("<%= @eff_kind %>")
 "<%= @date_options %>" == "true" ? $('.optional_date').show() : $('.optional_date').hide();
