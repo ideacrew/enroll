@@ -43,19 +43,18 @@ $(document).on('change','.admin_selected_sep_reason select',function(){
     $('.csl_num_options input:text').val("");
   }
   else{
-    if (document.documentElement.dataset.bs4 != "true") {
-      var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
-      var getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
-      self_attested = getObj.data('is-self-attested');
-      arrEffectiveDate = getObj.data('effective-on-kinds');
-      console.log(arrEffectiveDate);
-      idVal = getObj.data('id');  
-    } else {
+    <% if @bs4 %>
       idVal = $(this).val();
       const selected = $(this).find('option:selected');
       self_attested = $(selected).data('is-self-attested');
       arrEffectiveDate = $(selected).data('effective-on-kinds');
-    }
+    <% else %>
+      var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
+      var getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
+      self_attested = getObj.data('is-self-attested');
+      arrEffectiveDate = getObj.data('effective-on-kinds');
+      idVal = getObj.data('id');  
+    <% end %>
 
     $.ajax({
       type: "GET",
