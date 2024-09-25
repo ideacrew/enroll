@@ -788,14 +788,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
 
-  def inbox
-    authorize HbxProfile, :inbox?
-
-    respond_to do |format|
-      format.html { render "exchanges/hbx_profiles/inbox_messages.html.slim" }
-    end
-  end
-
   def set_date
     authorize HbxProfile, :modify_admin_tabs?
     forms_time_keeper = Forms::TimeKeeper.new(timekeeper_params.to_h)
