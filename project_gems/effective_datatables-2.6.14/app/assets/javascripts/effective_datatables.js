@@ -26,20 +26,38 @@ $.extend( $.fn.dataTable.defaults, {
 });
 */
 
-$.extend( $.fn.dataTable.defaults, {
-  'dom': "<'row'" +
-            "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" + 
+var bs4 = document.documentElement.dataset.bs4;
+if (bs4) {
+  $.extend( $.fn.dataTable.defaults, {
+    'dom': "<'d-flex align-items-center w-100 justify-content-between mb-4'" +
+          "Bf" +
+          ">" +
+          "<'d-flex align-items-center w-100 '" +
+          "<'col-sm-12 col-md-12'>" +
+          ">" +
+          "<'d-flex align-items-center w-100 '" +
+          "<'col-sm-12 col-md-12 px-0'tr>"+
+          ">" +
+          "<'d-flex justify-content-between align-items-center w-100'" +
+          "<'d-flex align-items-center'"+"il"+">"+"p"+
+          ">"
+  });
+} else {
+  $.extend( $.fn.dataTable.defaults, {
+    'dom': "<'row'" +
+            "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +
           ">" +
           "<'row'" +
-            "<'col-sm-12 col-md-12'>" + 
+            "<'col-sm-12 col-md-12'>" +
           ">" +
-          "<'row'" + 
+          "<'row'" +
             "<'col-sm-12 col-md-12'tr>"+
-          ">" + 
-          "<'row'" + 
+          ">" +
+          "<'row'" +
             "<'col-sm-11 col-md-11'i><'col-sm-1 col-md-1'l>" +
-          ">" + 
-          "<'row'" + 
+          ">" +
+          "<'row'" +
             "<'col-sm-12 col-md-12'p>" +
           ">"
-});
+  });
+}

@@ -206,6 +206,10 @@ When(/^bs4_consumer_flow feature is disable$/) do
   disable_feature :bs4_consumer_flow
 end
 
+Given(/^bs4_admin_flow feature is disable$/) do
+  disable_feature :bs4_admin_flow
+end
+
 When(/^choose_shopping_method feature is disabled$/) do
   disable_feature :choose_shopping_method
 end

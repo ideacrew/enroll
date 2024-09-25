@@ -19,7 +19,7 @@ DT = (function() {
   var clear_button_todojf = function() {          // Need to put this in the base framework
     setTimeout(
       function() {
-        $($('.dataTables_filter label')[0]).append("<div class='datatable_clear btn btn-sm btn-default' style='display:inline'><i class='fas fa-times'></i></div>")
+        $($('.dataTables_filter label')[0]).append("<div class='datatable_clear btn btn-sm btn-default d-inline'><i class='fas fa-times'></i></div>")
         $('.datatable_clear.btn.btn-sm.btn-default').on('click', function(){
           window.dt_search_string = ''
           $('input[type=search]').val('').trigger('keyup');
@@ -28,6 +28,7 @@ DT = (function() {
       300
     )
   }
+  var bs4 = document.documentElement.dataset.bs4;
   var filters = function(){
     $('.custom_level_1').removeClass('hide')
     $('.custom_filter .btn-default').click(function() {
@@ -46,7 +47,9 @@ DT = (function() {
     $('#date_range_apply').click(function() {
       $('.effective-datatable').DataTable().draw()
     })
-    clear_button_todojf();
+    if (!bs4) {
+      clear_button_todojf();
+    }
     extendDatatableServerParams = function(){
       var keys = {}
       DT.filter_params(keys, 1)

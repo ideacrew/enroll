@@ -8,9 +8,8 @@ module Exchanges
 
     before_action :set_cache_headers, only: [:sep_types_dt, :sorting_sep_types, :clone, :new, :edit]
     before_action :updateable?
-    layout 'application', except: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
-    layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
-    before_action :enable_bs4_layout, only: [:sorting_sep_types] if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+    before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+    layout :resolve_layout
 
     def new
       @qle = Forms::QualifyingLifeEventKindForm.for_new
@@ -81,7 +80,7 @@ module Exchanges
     def sep_types_dt
       @datatable = Effective::Datatables::SepTypeDataTable.new
       respond_to do |format|
-        format.html {  render '/exchanges/manage_sep_types/sep_type_datatable.html.erb', :layout => 'single_column'}
+        format.html {  render '/exchanges/manage_sep_types/sep_type_datatable.html.erb'}
       end
     end
 
@@ -157,6 +156,18 @@ module Exchanges
 
     def enable_bs4_layout
       @bs4 = true
+    end
+
+    def resolve_layout
+      return "progress" if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+      case action_name
+      when "sep_types_dt"
+        'single_column'
+      when 'new', 'edit', "create", "update", "sorting_sep_types", "clone"
+        'bootstrap_4'
+      else
+        'application'
+      end
     end
   end
 end

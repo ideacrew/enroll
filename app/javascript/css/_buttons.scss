@@ -20,7 +20,7 @@
     background-color: $hover;
     color: $color;
   }
-  &:active {
+  &:active, &.active {
     background-color: var(--button-default-active-color);
     color: $color;
   }

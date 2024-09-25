@@ -1,0 +1,38 @@
+<h1 class="heading-text"><%= @service.legal_name %></h1>
+
+<div class="col-12 px-0">
+  <div id="subFilters">
+    <div class="row pl-1">
+      <div class="col-md-2">
+        By Year
+      </div>
+      <div class="col-md-2">
+        By Market
+      </div>
+      <div class="col-md-2">
+        By Coverage
+      </div>
+    </div>
+  </div>
+  <div id="subFilters">
+    <table id="products-ajax-dt" class="table table-striped">
+      <thead>
+        <tr>
+          <th>
+            <input class="all-product-chkbx" type="checkbox" onclick="selectAllCheckboxes(this)">
+          </th>
+          <th>Plan</th>
+          <th>Year</th>
+          <th>Market</th>
+          <th>Coverage</th>
+          <th>Doc Status</th>
+          <th>Doc Name</th>
+          <th>Size</th>
+          <th>Submitted at</th>
+          <th>Deleted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+</div>
