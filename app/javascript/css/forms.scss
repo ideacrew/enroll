@@ -98,6 +98,7 @@ dt.required:after,
   margin-left: 0.25ch;
   color: var(--enrollment-status-red);
   font-weight: 600;
+  display: inline;
 }
 
 input:not([type='submit']),
@@ -320,6 +321,10 @@ input[type='date']:invalid::-webkit-datetime-edit {
   margin-left: 0.25ch;
   color: var(--enrollment-status-red);
   font-weight: 600;
+  &::after {
+    content:"";
+    display:block;
+  }
 }
 
 #broker_agency_form.bs4-active {
