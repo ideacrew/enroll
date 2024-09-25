@@ -1,69 +1,112 @@
-$('.sep_dates_filter').hide();
+function hideElement(element) {
+  <% if @bs4 %>
+    element.addClass('hidden');
+  <% else %>
+    element.hide();
+  <% end %>
+}
+
+function showElement(element) {
+  <% if @bs4 %>
+    element.removeClass('hidden');
+  <% else %>
+    element.show();
+  <% end %>
+}
+
+hideElement($('.sep_dates_filter'));
 $('.init_effective_date input').val("");
-$('.optional_date').hide();
-$('.init_event_date').show();
+hideElement($('.optional_date'));
+showElement($('.init_event_date'));
 if (!disableSelectric) {
   $('.admin_effective_on_kind_options .selectric-hide-select select').html("<%= escape_javascript options_for_select([['EFFECTIVE DATE RULE', '']]) + options_for_select(@effective_kinds)%>").selectric("refresh");
 } else {
-  $('.admin_effective_on_kind_options select').html("<%= escape_javascript options_for_select([['EFFECTIVE DATE RULE', '']]) + options_for_select(@effective_kinds)%>");
+  $('.admin_effective_on_kind_options select').html("<%= escape_javascript options_for_select([[l10n('select'), '']]) + options_for_select(@effective_kinds)%>");
 }
 
-var bs4 = document.documentElement.dataset.bs4 == "true";
 var date_inputs =  $('#start_on, #end_on, #next_poss_effective_date');
 if("<%= @qle.is_self_attested %>" == 'true'){
-  if (!bs4) {
-    date_inputs.addClass("disabled-input");
-  } else {
+  <% if @bs4 %>
     date_inputs.attr("disabled", true);
-  }
+  <% else %>
+    date_inputs.addClass("disabled-input");
+  <% end %>
 }
 else{
-  if (!bs4) {
-    date_inputs.removeClass("disabled-input");
-  } else {
+  <% if @bs4 %>
     date_inputs.removeAttr("disabled");
-  }
+  <% else %>
+    date_inputs.removeClass("disabled-input");
+  <% end %>
 }
 
 function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, eligibilty_start_date, eligibilty_end_date, cdate) {
   var target = $('.qle-date-picker');
-  if("<%= @qle.is_self_attested %>" == 'false'){
-    dateMin = '-110y';
-    dateMax = '+110y';
-  }
+  if("<%= @qle.is_self_attested %>" == 'false') {
+    <% if @bs4 %>
+      dateMin = '<%= date_field_value(110.years.ago) %>';
+      dateMax = '<%= date_field_value(110.years.from_now) %>';
+    <% else %>
+      dateMin = '-110y';
+      dateMax = '+110y';
+    <% end %>
+  } 
   else{
-    var splitdate = cdate.split('/');
-    var cur_date = new Date(splitdate[2], splitdate[0]-1, splitdate[1]);
-    var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
-    var post_days = (idays - post_event_sep_in_days);
-    var pre_days = (idays + pre_event_sep_in_days);
-    if (post_days >= 0){
-      dateMin = '+' + post_days + 'd';
-    }else{
-      dateMin = post_days + 'd';
-    }
-    if (pre_days >= 0){
-      dateMax = '+' + pre_days + 'd';
-    }else{
-      dateMax = pre_days + 'd';
-    }
+    <% if @bs4 %>
+      var preDate = new Date();
+      preDate.setTime(preDate.getTime() + pre_event_sep_in_days * 24 * 60 * 60 * 1000)
+      var postDate = new Date();
+      postDate.setTime(postDate.getTime() - post_event_sep_in_days * 24 * 60 * 60 * 1000)
+
+      dateMin = postDate.toISOString().split('T')[0]
+      dateMax = preDate.toISOString().split('T')[0]
+    <% else %>
+      var splitdate = cdate.split('/');
+      var cur_date = new Date(splitdate[2], splitdate[0]-1, splitdate[1]);
+      var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
+      var post_days = (idays - post_event_sep_in_days);
+      var pre_days = (idays + pre_event_sep_in_days);
+      if (post_days >= 0){
+        dateMin = '+' + post_days + 'd';
+      }else{
+        dateMin = post_days + 'd';
+      }
+      if (pre_days >= 0){
+        dateMax = '+' + pre_days + 'd';
+      }else{
+        dateMax = pre_days + 'd';
+      }
+    <% end %>
+
     if ("<%= @qle.coverage_start_on.present? && @qle.coverage_start_on.present? %>" == 'true'){
-      dateMin = eligibilty_start_date
-      dateMax = eligibilty_end_date
+      <% if @bs4 %>
+        dateMin = '<%= date_field_value(@qle.coverage_start_on) %>';
+        dateMax = '<%= date_field_value(@qle.coverage_end_on) %>';
+      <% else %>
+        dateMin = eligibilty_start_date
+        dateMax = eligibilty_end_date
+      <% end %>
     }
   }
+
   $(target).val('');
-  $(target).datepicker('destroy');
-  $(target).datepicker({
-    changeMonth: true,
-    changeYear: true,
-    dateFormat: 'mm/dd/yy',
-    defaultDate: cdate,
-    minDate: dateMin,
-    maxDate: dateMax});
-  $('input.floatlabel').floatlabel({
-      slideInput: false
-  });
+  
+  <% if @bs4 %>
+    target.attr('max', dateMax);
+    target.attr('min', dateMin);
+  <% else %>
+    $(target).datepicker('destroy');
+    $(target).datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: 'mm/dd/yy',
+      defaultDate: cdate,
+      minDate: dateMin,
+      maxDate: dateMax});
+    $('input.floatlabel').floatlabel({
+        slideInput: false
+    });
+  <% end %>
 };
 
 function getDate(){
@@ -85,18 +128,18 @@ if("<%= @qle.qle_event_date_kind %>" == 'submitted_at' && "<%= @qle.reason %>" =
   $('#event_date').val("<%= TimeKeeper.date_of_record.to_s %>");
   $('#event_date').attr('readonly',true);
   $('#event_date').each(function (){ this.style.pointerEvents = 'none'; });
-  $('.admin_effective_on_kind_options').show();
+  showElement($('.admin_effective_on_kind_options'));
 }
 else if("<%= @qle.qle_event_date_kind %>" == 'submitted_at') {
   $('#event_date').attr('readonly',false);
   $('#event_date').each(function (){ this.style.pointerEvents = 'auto'; });
-  $('.admin_effective_on_kind_options').hide();
+  hideElement($('.admin_effective_on_kind_options'));
 }
 else {
   $('#event_date').attr('readonly',false);
   $('#event_date').each(function (){ this.style.pointerEvents = 'auto'; });
   init_datepicker_for_qle_date('<%= @qle.pre_event_sep_in_days %>', '<%= @qle.post_event_sep_in_days %>','<%= @qle.coverage_start_on %>', '<%= @qle.coverage_end_on %>', getDate())
-  $('.admin_effective_on_kind_options').hide();
+  hideElement($('.admin_effective_on_kind_options'));
 }
 
 $('input.floatlabel').floatlabel({

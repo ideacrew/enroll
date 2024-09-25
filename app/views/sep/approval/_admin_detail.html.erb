@@ -36,7 +36,7 @@
         </div>
         <div class='init_event_date col-sm-3 col-xs-12 px-0 '>
           <label for="event_date">EVENT DATE</label>
-          <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: 110.years.ago, max: 110.years.from_now, required: true %>
+          <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: date_field_value(110.years.ago), max: date_field_value(110.years.from_now), required: true, class: "qle-date-picker" %>
         </div>
         <div class='admin_effective_on_kind_options col-sm-3 col-xs-12 px-0'>
           <%= select_tag :effective_on_date, class: "form-control qle-date-kind", required: true,  prompt: "EFFECTIVE DATE RULE" %>
@@ -48,15 +48,15 @@
       <div class='row p-2 sep_dates_filter justify-content-around'>
         <div class="start_btn start_end_date col-sm-4 col-xs-12 px-0 start_input">
           <label for="start_on">SEP Start Date</label>
-          <%= date_field_tag :start_on, nil, value: Date.current.strftime('%Y-%m-%d'), min: 0, max: 0, required: true, disabled: true %>					 		
+          <%= date_field_tag :start_on, nil, value: date_field_value, min: date_field_value, max: date_field_value, required: true, disabled: true %>
         </div>
         <div class="end_btn start_end_date col-sm-4 col-xs-12 px-0 end_input">
           <label for="end_on">SEP End Date</label>
-          <%= date_field_tag :end_on, nil, value: (Date.current + 60).strftime('%Y-%m-%d'), min: 0, max: 60.days.from_now, required: true, disabled: true %>	
+          <%= date_field_tag :end_on, nil, value: date_field_value(60.days.from_now), min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
         <div class='init_effective_date col-sm-4 col-xs-12 px-0'>
           <label for="next_poss_effective_date">Next Possible Start Date</label>
-          <%= date_field_tag :next_poss_effective_date, nil, value: Date.current.strftime('%Y-%m-%d'), min: 0, max: 60.days.from_now, required: true, disabled: true %>
+          <%= date_field_tag :next_poss_effective_date, nil, value: date_field_value, min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
       </div>
       <div class='row optional_date'>

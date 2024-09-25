@@ -1135,4 +1135,9 @@ module ApplicationHelper
   def imm_docs_requried_class
     FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required"
   end
+
+  def date_field_value(date = nil)
+    date = Date.current if date.nil? || date.to_s == "0"
+    date.strftime("%Y-%m-%d")
+  end
 end
