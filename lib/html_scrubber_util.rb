@@ -15,7 +15,8 @@ module HtmlScrubberUtil
           'style',
           'data-toggle',
           'data-slide-to',
-          'data-target'
+          'data-target',
+          'data-dismiss'
         ]
       )
     ).html_safe
