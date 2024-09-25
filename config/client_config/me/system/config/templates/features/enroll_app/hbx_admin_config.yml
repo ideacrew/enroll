@@ -11,8 +11,6 @@ registry:
     features:
         - key: :issuers_tab
           is_enabled: true
-        - key: :inbox_tab
-          is_enabled: true
         - key: :notices_tab
           is_enabled: false
         - key: :staff_tab
