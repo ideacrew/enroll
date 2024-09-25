@@ -76,4 +76,13 @@ RSpec.describe HtmlScrubberUtil do
       expect(result).to include("data-target")
     end
   end
+
+  context "given a data-dismiss attribute" do
+    let(:source_html) { "<div data-dismiss=\"#some-element\"></div>" }
+    let(:result) { TestingScrubber.sanitize_html(source_html) }
+
+    it "does not scrub the data-dismiss attribute" do
+      expect(result).to include("data-dismiss")
+    end
+  end
 end
