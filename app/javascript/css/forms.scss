@@ -57,21 +57,34 @@ label,
 legend,
 .label,
 .legend {
-  display: block;
   font-size: 16px;
   line-height: 24px;
   font-weight: 600;
   margin-bottom: 0.5ch;
   color: var(--text-secondary);
+  display: inline;
+  &::before {
+    content:"";
+    display:block;
+  }
+  &::after {
+    content:"";
+    display:block;
+  }
 }
 
 button,
 .btn {
   label {
-    display: inline;
     margin-bottom: 0ch;
     line-height: 20px;
     color: var(--gray-000);
+    &::before {
+      display:inline;
+    }
+    &::after {
+      display:inline;
+    }
   }
 }
 
@@ -85,6 +98,7 @@ dt.required:after,
   margin-left: 0.25ch;
   color: var(--enrollment-status-red);
   font-weight: 600;
+  display: inline;
 }
 
 input:not([type='submit']),
@@ -307,6 +321,10 @@ input[type='date']:invalid::-webkit-datetime-edit {
   margin-left: 0.25ch;
   color: var(--enrollment-status-red);
   font-weight: 600;
+  &::after {
+    content:"";
+    display:block;
+  }
 }
 
 #broker_agency_form.bs4-active {
