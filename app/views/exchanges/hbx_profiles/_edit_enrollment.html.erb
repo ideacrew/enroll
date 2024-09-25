@@ -42,7 +42,6 @@
             $('#person_dob').keyup(function(){
               clearTimeout(typingTimer);
               if ($('#person_dob').val()) {
-                console.log($('#person_dob').val());
                 typingTimer = setTimeout(submitDate, 600);
               }
             });
