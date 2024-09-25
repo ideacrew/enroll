@@ -7,7 +7,7 @@
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "components/notifier/app/controllers/notifier/notice_kinds_controller.rb",
-      "line": 65,
+      "line": 66,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(\"#{Rails.root}/tmp/#{Notifier::NoticeKind.find(params[:id]).notice_recipient.hbx_id}_#{Notifier::NoticeKind.find(params[:id]).title.titleize.gsub(/\\s+/, \"_\")}.pdf\", :type => \"application/pdf\", :disposition => \"inline\")",
       "render_path": null,
@@ -609,6 +609,27 @@
     {
       "warning_type": "Usage of html_safe",
       "warning_code": 2,
+      "fingerprint": "4ec65ea81133df63035a07d0101d198ed0ec4f95b6a0f9c4bde0b7852b416924",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "lib/html_scrubber_util.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").add(\"style\"), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.merge([\"style\", \"data-toggle\", \"data-slide-to\", \"data-target\", \"data-dismiss\"])).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "HtmlScrubberUtil",
+        "method": "sanitize_html"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
       "fingerprint": "4f539a24c7eb1efd381be0097aead4b9a473552799baf4fb59562ed1193ca6b0",
       "check_name": "HtmlSafeUsage",
       "message": "Html_safe used",
@@ -621,7 +642,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "new_benefit_application",
-          "line": 67,
+          "line": 72,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/new_benefit_application",
@@ -837,7 +858,7 @@
       "check_name": "MassAssignment",
       "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
       "file": "app/controllers/application_controller.rb",
-      "line": 114,
+      "line": 145,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.permit!",
       "render_path": null,
@@ -1097,7 +1118,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 513,
+          "line": 573,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -2151,7 +2172,7 @@
       "warning_code": 121,
       "fingerprint": "edf687f759ec9765bd5db185dbc615c80af77d6e7e19386fc42934e7a80307af",
       "check_name": "EOLRuby",
-      "message": "Support for Ruby 2.6.3 ended on 2022-03-31",
+      "message": "Support for Ruby 3.0.6 ended on 2024-03-31",
       "file": ".ruby-version",
       "line": 1,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
@@ -2163,7 +2184,7 @@
       "cwe_id": [
         1104
       ],
-      "note": "Planned to be delt with by ruby upgrade."
+      "note": "Planned to be dealt with by ruby upgrade."
     },
     {
       "warning_type": "File Access",
@@ -2252,6 +2273,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-02-27 15:36:31 -0700",
-  "brakeman_version": "5.4.1"
+  "updated": "2024-09-25 16:04:14 +0000",
+  "brakeman_version": "6.1.2"
 }
