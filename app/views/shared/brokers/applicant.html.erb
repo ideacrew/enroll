@@ -1,6 +1,6 @@
 <%= form_for @broker_applicant, url: {action: "update"} do |f| %>
 <div class="content-bottom">
-  <div class="row">
+  <div class="<%= 'row' unless @bs4 %>">
     <div class="col-xs-12">
       <% if @broker_applicant.errors.any? %>
         <div class="alert alert-error">
@@ -14,16 +14,18 @@
           </ul>
         </div>
       <% end %>
+      <% unless @bs4 %>
       <div class="row">
           <a class="remove return_to_broker_applicants" href="#">
             <i aria-hidden="true" class="far fa-times-circle"></i>
             Cancel
           </a>
       </div>
+      <% end %>
       <% broker_or_staff_role = @broker_applicant.broker_role.nil? ? @broker_applicant.broker_agency_staff_roles[0] : @broker_applicant.broker_role %>
       <%= render partial: "shared/brokers/broker_fields", :locals => {f: f, broker_or_staff_role: broker_or_staff_role} %>
       <br/>
-       <div class="row top-row no-border">
+       <div class="<%= 'row top-row no-border' unless @bs4 %>">
         <div class="col-xs-12 text-center broker_approve_deny_btn">
           <%= pundit_span HbxProfile, :approve_broker? %>
             <% if @broker_agency_profile.present? %>

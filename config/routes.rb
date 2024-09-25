@@ -80,8 +80,6 @@ Rails.application.routes.draw do
   namespace :exchanges do
 
     resources :bulk_notices, format: false
-
-    resources :inboxes, only: [:show, :destroy]
     resources :announcements, format: false, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
     end
@@ -198,7 +196,6 @@ Rails.application.routes.draw do
         post :transmit_group_xml
         get :transmit_group_xml
         get :home
-        get :inbox
       end
 
       # resources :hbx_staff_roles, shallow: true do

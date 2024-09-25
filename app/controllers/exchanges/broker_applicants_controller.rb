@@ -2,11 +2,12 @@
 
 class Exchanges::BrokerApplicantsController < ApplicationController
   include Exchanges::BrokerApplicantsHelper
-  layout 'single_column'
+  layout :resolve_layout
 
   before_action :check_hbx_staff_role
   before_action :find_broker_applicant, only: [:edit, :update]
   before_action :set_cache_headers, only: [:index, :edit]
+  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
 
   def index
     @people = Person.broker_role_having_agency
@@ -24,7 +25,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { render "shared/brokers/applicants.html.slim" }
+      format.html { render "shared/brokers/applicants" }
       format.js
     end
   end
@@ -73,9 +74,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
       create_and_approve_staff_role_and_approve_agency(broker_role)
 
-      if broker_role.agency_pending?
-        send_secure_message_to_broker_agency(broker_role) if broker_role.broker_agency_profile
-      end
+      send_secure_message_to_broker_agency(broker_role) if broker_role.agency_pending? && broker_role.broker_agency_profile
       flash[:notice] = "Broker applicant approved successfully."
     end
 
@@ -136,5 +135,13 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
   def check_hbx_staff_role
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
+  end
+
+  def resolve_layout
+    EnrollRegistry.feature_enabled?(:bs4_admin_flow) ? "progress" : "single_column"
   end
 end

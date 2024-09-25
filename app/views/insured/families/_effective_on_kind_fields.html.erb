@@ -12,7 +12,9 @@
       <%= select_tag 'effective_on_kind', options_for_select(generate_options_for_effective_on_kinds(@qle, @qle_event_date)), include_blank: "#{l10n('.select_effective_date').to_s.upcase} *" %>
     </div>
     <script type="text/javascript">
-      $('select').selectric();
+      if (!disableSelectric) {
+        $('select').selectric();
+      }
     </script>
   <% end %>
 <% else %>

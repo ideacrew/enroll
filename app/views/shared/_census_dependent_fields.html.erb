@@ -83,6 +83,8 @@
 
 <script>
   $(function() {
-    $('select').selectric();
+    if (!disableSelectric) {
+      $('select').selectric();
+    }
   });
 </script>

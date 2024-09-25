@@ -517,33 +517,39 @@ ul.plain {
       margin-left: -1px;
       line-height: 1.25;
       background-color: var(--grey-000);
-      border-color: var(--grey-020);
+      border: 1px solid var(--grey-020);
 
       a {
         color: var(--primary-color);
         font-weight: 600;
         text-decoration: none;
-        padding: $spacer / 2 $spacer;
       }
 
-      &.active:hover a {
+      &.active:hover {
         background-color: var(--primary-color-darker);
       }
 
-      &:hover:not(.active):not(.disabled) a {
+      &:hover:not(.active):not(.disabled) {
         background-color: var(--grey-020);
       }
     }
 
-    &.active.paginate_button a {
+    &.active.paginate_button {
       background-color: var(--primary-color);
       border-color: var(--primary-color);
-      color: var(--grey-000);
+      a { color: var(--grey-000)}
     }
 
-    .next {
+    &.paginate_button.previous {
+      border-top-left-radius: 0.25rem;
+      border-bottom-left-radius: 0.25rem;
+      border-color: var(--grey-030);
+    }
+
+    &.paginate_button.next {
       border-top-right-radius: 0.25rem;
       border-bottom-right-radius: 0.25rem;
+      border-color: var(--grey-030);
     }
   }
 }
