@@ -1,8 +1,0 @@
-if (<%= @bs4 %>) {
-  document.getElementById('aptcData').innerHTML = ''
-  document.getElementById('aptcUpdate').innerHTML = '<%= j render partial: 'update_aptc_csr' %>';
-} else {
-  //set_tab_content("update successful.");
-  $('#aptcData').hide();
-  $('#aptcUpdate').html('<%= j render partial: 'update_aptc_csr'%>');
-}

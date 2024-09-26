@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <%= render partial: 'financial_assistance/shared/faa_progress_options', locals: {step: 6} %>
 
-  <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
+  <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get}, class: "needs-validation" do |f| %>
     <div>
       <p class="alert alert-error hide"></p>
 
