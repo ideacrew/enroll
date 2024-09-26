@@ -4,7 +4,7 @@
 class EmployeeEnrollmentSubmitted
 
   def self.print_btn
-    '#btnPrint'
+    '.btn-print'
   end
 
   def self.continue_btn

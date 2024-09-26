@@ -1,23 +1,50 @@
-<% unless demographic[0] == "ADDRESSES" %>
-  <div class="form-bottom-border">
-    <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-      <%= content_tag(:div, class: "col-md-11 form-heading") do %>
-        <%= label(nil, demographic[0], class: "col-md-6") %>
-        <%= content_tag(:div, demographic[1].nil? ? "N/A" : demographic[1] == true ? "Yes" : demographic[1] == false ? "No" : demographic[1], class: "col-md-6") %>
+<% if @bs4 %>
+  <% unless demographic[0] == "ADDRESSES" %>
+    <div class="d-flex justify-content-between align-items-center">
+      <% description = demographic[1] %>
+      <% if description.nil? %>
+        <% description = l10n('faa.not_applicable_abbreviation') %>
+      <% else %>
+        <% description = human_boolean(description) if [true, false].include?(description) %>
       <% end %>
+      <dt class="col-<%= description.to_s.length > 12 ? "3" : "8" %> px-0"><%= label(nil, demographic[0]) %></dt>
+      <dd class="text-right"><%= description %></dd>
     </div>
-  </div>
+  <% else %>
+    <% demographic[1].each do |k, v| %>
+      <section>
+        <h3><%= l10n(k) %> </h3>
+        <% v.each do |field| %>
+          <div class="d-flex justify-content-between align-items-center">
+            <dt class="col-<%= description.to_s.length > 12 ? "3" : "8" %> px-0"><%= field[0] %></dt>
+            <dd class="text-right"><%= field[1] %></dd>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+  <% end %>
 <% else %>
-  <% demographic[1].each do |k, v| %>
+  <% unless demographic[0] == "ADDRESSES" %>
     <div class="form-bottom-border">
       <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-        <%= content_tag(:div, class: "col-md-11 form-heading", style: "font-weight: 1000;") do %>
-          <%= label(nil, k, class: "col-md-6 ") %>
+        <%= content_tag(:div, class: "col-md-11 form-heading") do %>
+          <%= label(nil, demographic[0], class: "col-md-6") %>
+          <%= content_tag(:div, demographic[1].nil? ? "N/A" : demographic[1] == true ? "Yes" : demographic[1] == false ? "No" : demographic[1], class: "col-md-6") %>
         <% end %>
       </div>
     </div>
-    <div class="no-buffer" style="border: 1px solid #ddd;">
-      <%= render partial: "financial_assistance/applications/form_fields", collection: v, as: :form_field %>
-    </div>
+  <% else %>
+    <% demographic[1].each do |k, v| %>
+      <div class="form-bottom-border">
+        <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+          <%= content_tag(:div, class: "col-md-11 form-heading", style: "font-weight: 1000;") do %>
+            <%= label(nil, k, class: "col-md-6 ") %>
+          <% end %>
+        </div>
+      </div>
+      <div class="no-buffer" style="border: 1px solid #ddd;">
+        <%= render partial: "financial_assistance/applications/form_fields", collection: v, as: :form_field %>
+      </div>
+    <% end %>
   <% end %>
 <% end %>
