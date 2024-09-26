@@ -197,7 +197,8 @@ module Forms
             current_address.update(address.except("_destroy"))
             person.save! # to trigger address change events
           else
-            person.addresses.create(address.except("_destroy").permit!)
+            filtered_address = address.except("_destroy")
+            person.addresses.create(filtered_address.permit!)
           end
         end
       end
