@@ -233,9 +233,8 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
         end
 
         context "if address_1 is blank or city is not blank" do
-          let(:addresses) { {"0" => {"kind" => "home", "address_1" => "", "city" => "not blank"}} }
-          let(:address) {{"kind" => "home", "address_1" => "", "city" => "not blank"}}
-
+          let(:addresses) { ActionController::Parameters.new({ "0" => {"kind" => "home", "address_1" => "", "city" => "not blank", "_destroy" => "false"}}) }
+          let(:address) {{"kind" => "home", "address_1" => "", "city" => "not blank", "_destroy" => "false"}}
           before :each do
             allow(person).to receive(:home_address).and_return addr3
             allow(person).to receive(:has_mailing_address?).and_return false
@@ -259,6 +258,7 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
             allow(person).to receive(:addresses).and_return addresses1
 
             expect(addresses1).to receive(:create).and_return true
+
             employee_dependent.assign_person_address(person)
           end
         end
