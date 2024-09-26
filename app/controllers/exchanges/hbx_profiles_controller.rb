@@ -16,9 +16,10 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :set_cache_headers, only: [:show, :family_index_dt, :user_account_index, :identity_verification, :broker_agency_index, :outstanding_verification_dt, :configuration, :inbox]
   before_action :redirect_if_general_agency_is_disabled, only: [:general_agency_index]
   before_action :redirect_if_employer_datatable_is_disabled, only: [:employer_datatable]
+  before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
-  layout 'single_column'
+  layout :resolve_layout
 
   # SHOP Feature
   def oe_extendable_applications
@@ -118,7 +119,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         ::BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.set_binder_paid(params[:ids])
         flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
         render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
-      rescue => e
+      rescue StandardError
         render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
       end
     end
@@ -164,7 +165,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def disable_ssn_requirement
     authorize HbxProfile, :disable_ssn_requirement?
 
-    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:_id.in => params[:ids])
 
     @benfit_sponsorships.each do |benfit_sponsorship|
       # logic for both Bulk Action drop down and action column drop down under data table
@@ -174,12 +175,10 @@ class Exchanges::HbxProfilesController < ApplicationController
         else
           benfit_sponsorship.update_attributes(is_no_ssn_enabled: false, ssn_enabled_on: TimeKeeper.datetime_of_record)
         end
+      elsif !benfit_sponsorship.is_no_ssn_enabled
+        benfit_sponsorship.update_attributes(is_no_ssn_enabled: true, ssn_disabled_on: TimeKeeper.datetime_of_record)
       else
-        if !benfit_sponsorship.is_no_ssn_enabled
-          benfit_sponsorship.update_attributes(is_no_ssn_enabled: true, ssn_disabled_on: TimeKeeper.datetime_of_record)
-        else
-          benfit_sponsorship.update_attributes(is_no_ssn_enabled: false, ssn_enabled_on: TimeKeeper.datetime_of_record)
-        end
+        benfit_sponsorship.update_attributes(is_no_ssn_enabled: false, ssn_enabled_on: TimeKeeper.datetime_of_record)
       end
     end
     redirect_to exchanges_hbx_profiles_root_path, :flash => { :success => "SSN/TIN requirement has been successfully updated for the roster of selected employer" }
@@ -189,7 +188,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def generate_invoice
     authorize HbxProfile, :generate_invoice?
 
-    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => params[:ids])
+    @benfit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:_id.in => params[:ids])
     @organizations = @benfit_sponsorships.map(&:organization)
     @employer_profiles = @organizations.flat_map(&:employer_profile)
     @employer_profiles.each do |employer_profile|
@@ -199,9 +198,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     flash["notice"] = "Successfully submitted the selected employer(s) for invoice generation."
     #redirect_to exchanges_hbx_profiles_root_path
 
-     respond_to do |format|
-       format.js
-     end
+    respond_to do |format|
+      format.js
+    end
   end
 
   # SHOP Feature
@@ -212,8 +211,8 @@ class Exchanges::HbxProfilesController < ApplicationController
     @benefit_application = @benefit_sponsorship.benefit_applications.draft_state.last
 
     respond_to do |format|
-     format.js
-   end
+      format.js
+    end
   end
 
   # SHOP Feature
@@ -225,9 +224,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     if @benefit_application.present?
       @service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(@benefit_application)
-      if @service.may_force_submit_application? || params[:publish_with_warnings] == 'true'
-        @service.force_submit_application
-      end
+      @service.force_submit_application if @service.may_force_submit_application? || params[:publish_with_warnings] == 'true'
     end
 
     respond_to do |format|
@@ -288,11 +285,11 @@ class Exchanges::HbxProfilesController < ApplicationController
     @staff = Person.where(:$or => [{csr_role: {:$exists => true}}, {assister_role: {:$exists => true}}])
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
-    if @q.nil?
-      @staff = page_no.present? ? @staff.where(last_name: /^#{Regexp.escape(page_no)}/i) : []
-    else
-      @staff = @staff.where(last_name: @q)
-    end
+    @staff = if @q.nil?
+               page_no.present? ? @staff.where(last_name: /^#{Regexp.escape(page_no)}/i) : []
+             else
+               @staff.where(last_name: @q)
+             end
     respond_to do |format|
       format.html { render '/exchanges/hbx_profiles/staff.html.erb' }
     end
@@ -302,14 +299,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :assister_index?
 
     @q = params.permit(:q)[:q]
-    @staff = Person.where(assister_role: {:$exists =>true})
+    @staff = Person.where(assister_role: {:$exists => true})
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
-    if @q.nil?
-      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
-    else
-      @staff = @staff.where(last_name: @q)
-    end
+    @staff = if @q.nil?
+               @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
+             else
+               @staff.where(last_name: @q)
+             end
 
     respond_to :js
   end
@@ -329,19 +326,17 @@ class Exchanges::HbxProfilesController < ApplicationController
         agent = match.first
         role = cac_flag ? 'Certified Applicant Counselor' : 'Customer Service Representative'
       end
+    elsif params[:broker].present?
+      agent = Person.find(params[:broker])
+      broker_role_id = agent.broker_role.id
+      consumer = Person.find(params[:person])
+      family = consumer.primary_family
+      authorize family, :hire_broker_agency?
+      family.hire_broker_agency(broker_role_id)
+      role = l10n("broker")
     else
-      if params[:broker].present?
-        agent = Person.find(params[:broker])
-        broker_role_id = agent.broker_role.id
-        consumer = Person.find(params[:person])
-        family = consumer.primary_family
-        authorize family, :hire_broker_agency?
-        family.hire_broker_agency(broker_role_id)
-        role = l10n("broker")
-      else
-        agent = Person.find(params[:assister])
-        role = 'In-Person Assister'
-      end
+      agent = Person.find(params[:assister])
+      role = 'In-Person Assister'
     end
     if role
       status_text = 'Message sent to ' + role + ' ' + agent.full_name + ' <br>'
@@ -367,13 +362,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     @q = params.permit(:q)[:q]
     page_string = params.permit(:families_page)[:families_page]
     page_no = page_string.blank? ? nil : page_string.to_i
-    unless @q.present?
-      @families = Family.page page_no
-      @total = Family.count
-    else
+    if @q.present?
       total_families = Person.search(@q).map(&:families).flatten.uniq
       @total = total_families.count
       @families = Kaminari.paginate_array(total_families).page page_no
+    else
+      @families = Family.page page_no
+      @total = Family.count
     end
     respond_to do |format|
       format.html { render "insured/families/index" }
@@ -457,10 +452,10 @@ class Exchanges::HbxProfilesController < ApplicationController
       @employer_actions = true
       @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
       @organization = if params.key?(:employer_actions_id)
-        BenefitSponsors::Organizations::Profile.find(@element_to_replace_id.split("_").last).organization
-      else
-        BenefitSponsors::Organizations::Organization.find(@element_to_replace_id.split("_").last)
-      end
+                        BenefitSponsors::Organizations::Profile.find(@element_to_replace_id.split("_").last).organization
+                      else
+                        BenefitSponsors::Organizations::Organization.find(@element_to_replace_id.split("_").last)
+                      end
     end
 
     respond_to :js
@@ -571,7 +566,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @row = params[:family_actions_id]
     @element_to_replace_id = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_and_expired_enrollments
-    @coverage_ended_enrollments = @person.primary_family.hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending", "coverage_expired"])
+    @coverage_ended_enrollments = @person.primary_family.hbx_enrollments.where(:aasm_state.in => ["coverage_terminated", "coverage_termination_pending", "coverage_expired"])
     @dup_enr_ids = fetch_duplicate_enrollment_ids(@coverage_ended_enrollments).map(&:to_s)
 
     respond_to :js
@@ -653,9 +648,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
         @element_to_replace_id = params[:family_actions_id]
         if reinstated_enrollment.present?
-          if params['comments'].present?
-            reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
-          end
+          reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id) if params['comments'].present?
           respond_to do |format|
             format.js
           end
@@ -795,21 +788,13 @@ class Exchanges::HbxProfilesController < ApplicationController
     @unread_messages = @profile.inbox.unread_messages.try(:count) || 0
   end
 
-  def inbox
-    authorize HbxProfile, :inbox?
-
-    respond_to do |format|
-      format.html { render "exchanges/hbx_profiles/inbox_messages.html.slim" }
-    end
-  end
-
   def set_date
     authorize HbxProfile, :modify_admin_tabs?
     forms_time_keeper = Forms::TimeKeeper.new(timekeeper_params.to_h)
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
       flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-    rescue Exception=>e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       flash[:error] = "Failed to set date of record, " + e.message
     end
     redirect_to exchanges_hbx_profiles_root_path
@@ -822,15 +807,15 @@ class Exchanges::HbxProfilesController < ApplicationController
     @q = params.permit(:q)[:q]
     page_string = params.permit(:families_page)[:families_page]
     page_no = page_string.blank? ? nil : page_string.to_i
-    unless @q.present?
-      @families = Family.all_active_assistance_receiving_for_current_year.page page_no
-      @total = Family.all_active_assistance_receiving_for_current_year.count
-    else
+    if @q.present?
       person_ids = Person.search(@q).map(&:_id)
 
       total_families = Family.all_active_assistance_receiving_for_current_year.in("family_members.person_id" => person_ids).entries
       @total = total_families.count
       @families = Kaminari.paginate_array(total_families).page page_no
+    else
+      @families = Family.all_active_assistance_receiving_for_current_year.page page_no
+      @total = Family.all_active_assistance_receiving_for_current_year.count
     end
     respond_to do |format|
       #format.html { render "insured/families/aptc_csr_listing" }
@@ -849,7 +834,6 @@ class Exchanges::HbxProfilesController < ApplicationController
       flash[:error] = "Failed to update setting, " + e.message
     end
     redirect_to exchanges_hbx_profiles_root_path
-
   end
 
   def ivl_dry_run_dashboard
@@ -950,9 +934,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     enrs_mapping_by_year_and_market = group_enrollments_by_year_and_market(enrollments)
     return [] if enrs_mapping_by_year_and_market.blank?
 
-    enrs_mapping_by_year_and_market.inject([]) do |duplicate_ids, (market_year, enrollments)|
-      next duplicate_ids unless enrollments.count > 1
-      dups = get_duplicate_enrs(enrollments)
+    enrs_mapping_by_year_and_market.inject([]) do |duplicate_ids, (_market_year, enrllmnts)|
+      next duplicate_ids unless enrllmnts.count > 1
+      dups = get_duplicate_enrs(enrllmnts)
       next duplicate_ids if dups.empty?
       effective_date = dups.map(&:effective_on).max
       dups.each do |enr|
@@ -1108,15 +1092,11 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def check_hbx_staff_role
-    unless current_user.has_hbx_staff_role?
-      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
   end
 
   def check_csr_or_hbx_staff
-    unless current_user.has_hbx_staff_role? || (current_user.person.csr_role && !current_user.person.csr_role.cac)
-      redirect_to root_path, :flash => { :error => "You must be an HBX staff member or a CSR" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an HBX staff member or a CSR" } unless current_user.has_hbx_staff_role? || (current_user.person.csr_role && !current_user.person.csr_role.cac)
   end
 
   def authorize_for_instance
@@ -1130,5 +1110,13 @@ class Exchanges::HbxProfilesController < ApplicationController
   def find_benefit_sponsorship
     @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id] || params[:id])
     raise "Unable to find benefit sponsorship" if @benefit_sponsorship.blank?
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
+  end
+
+  def resolve_layout
+    EnrollRegistry.feature_enabled?(:bs4_admin_flow) ? "progress" : "single_column"
   end
 end

@@ -3,7 +3,7 @@
     placeholder: "#{l10n("social_security").to_s.upcase}",
     class: "required mask-ssn input_txt",
     pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
-    oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+    oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
     oninput: "this.setCustomValidity('')",
     value: params[:new_ssn].present? ? params[:new_ssn] : @person.ssn,
     required: params[:new_ssn].present? ? true : false,
@@ -19,7 +19,7 @@
       class: "hidden mask-ssn ssn-input-#{presenter.person_id}",
       target: 'person.ssn',
       pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
-      oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+      oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
       oninput: "this.setCustomValidity('')",
       value: nil,
       data: { :"admin-can-enable" => true }

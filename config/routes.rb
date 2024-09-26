@@ -40,9 +40,6 @@ Rails.application.routes.draw do
 
   match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
   match "hbx_admin/registry" => "hbx_admin#registry", as: :registry, via: :get
-  match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
-  match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
-  match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
   get "qna_bot", to: 'welcome#qna_bot'
   post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
@@ -80,8 +77,6 @@ Rails.application.routes.draw do
   namespace :exchanges do
 
     resources :bulk_notices, format: false
-
-    resources :inboxes, only: [:show, :destroy]
     resources :announcements, format: false, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
     end
@@ -106,7 +101,7 @@ Rails.application.routes.draw do
         collection do
           get 'sep_types_dt'
           get 'sorting_sep_types'
-          patch 'sort'
+          patch 'update_list'
           get 'sep_type_to_publish'
           get 'sep_type_to_expire'
           post 'publish_sep_type'
@@ -198,7 +193,6 @@ Rails.application.routes.draw do
         post :transmit_group_xml
         get :transmit_group_xml
         get :home
-        get :inbox
       end
 
       # resources :hbx_staff_roles, shallow: true do

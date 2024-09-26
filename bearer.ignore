@@ -538,5 +538,41 @@
     "comment": "This is flagged as 'Leakage of sensitive data in dynamic file generation [CWE-313]' but this is a script that will only be used internally and is supposed to write this data to a csv",
     "false_positive": true,
     "ignored_at": "2024-07-09T18:03:30Z"
+  },
+  "218f24cab2d393b88605c63b725bfadf_2": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this just text from a translation file.",
+    "false_positive": true,
+    "ignored_at": "2024-09-19T19:12:30Z"
+  },
+  "218f24cab2d393b88605c63b725bfadf_3": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this just text from a translation file.",
+    "false_positive": true,
+    "ignored_at": "2024-09-19T19:12:28Z"
+  },
+  "d5f5bf4a6b1ec5af16b2f7cbe2056219_2": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this just text from a translation file.",
+    "false_positive": true,
+    "ignored_at": "2024-09-19T19:12:33Z"
+  },
+  "d5f5bf4a6b1ec5af16b2f7cbe2056219_3": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this just text from a translation file.",
+    "false_positive": true,
+    "ignored_at": "2024-09-19T19:12:36Z"
+  },
+  "a261fe84031c542c9d50b0d4fe1a9c0f_2": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this just text from a translation file.",
+    "false_positive": true,
+    "ignored_at": "2024-09-19T19:12:39Z"
+  },
+  "a261fe84031c542c9d50b0d4fe1a9c0f_3": {
+    "author": "Tristan",
+    "comment": "This is flagged as 'Usage of hard-coded secret [CWE-798]' but this just text from a translation file.",
+    "false_positive": true,
+    "ignored_at": "2024-09-19T19:13:42Z"
   }
 }

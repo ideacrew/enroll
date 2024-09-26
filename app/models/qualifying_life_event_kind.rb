@@ -100,6 +100,7 @@ class QualifyingLifeEventKind
   field :date_options_available, type: Mongoid::Boolean
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
+  field :is_common, type: Mongoid::Boolean, default: false
   field :aasm_state, type: Symbol, default: :draft
 
   field :is_active, type: Boolean, default: false
@@ -117,7 +118,7 @@ class QualifyingLifeEventKind
   field :created_by, type: BSON::ObjectId
 
   index({action_kind: 1})
-  index({market_kind: 1, ordinal_position: 1 })
+  index({market_kind: 1, ordinal_position: 1, is_common: 1 })
   index({start_on: 1, end_on: 1})
 
   # validates :effective_on_kinds,
@@ -129,7 +130,7 @@ class QualifyingLifeEventKind
   validates :market_kind,
             presence: true,
             allow_blank: false,
-            allow_nil:   false,
+            allow_nil: false,
             inclusion: {in: MARKET_KINDS}
 
   # before_create :activate_household_sep
@@ -145,13 +146,17 @@ class QualifyingLifeEventKind
   scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
   scope :non_draft, ->{ where(:aasm_state.nin => [:draft]) }
-  scope :by_date, ->(date = TimeKeeper.date_of_record){ where(
-    :"$or" => [
-      {:start_on.lte => date, :end_on.gte => date},
-      {:start_on.lte => date, :end_on => {:$eq => nil}},
-      {:start_on => {:$eq => nil}, :end_on => {:$eq => nil}}
-    ]
-  )}
+  scope :common, -> { where.not(is_common: false) } # consider nil values as common to support existing data
+  scope :rare, -> { where(is_common: false) }
+  scope :by_date, lambda { |date = TimeKeeper.date_of_record|
+                    where(
+                      :"$or" => [
+                        {:start_on.lte => date, :end_on.gte => date},
+                        {:start_on.lte => date, :end_on => {:$eq => nil}},
+                        {:start_on => {:$eq => nil}, :end_on => {:$eq => nil}}
+                      ]
+                    )
+                  }
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -163,26 +168,24 @@ class QualifyingLifeEventKind
   # If coverage ends on date other than last day of month and plan selected before the month in which coverage ends:
   #   effective date is consumer chooses between 1st of the month when coverage ends (allowing overlap - but no APTC for overlapping month)
   #   or the first of the month following the month when coverage ends
-  def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, consumer_coverage_effective_on = nil)
+  def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, _consumer_coverage_effective_on = nil)
     coverage_end_last_day_of_month = Date.new(coverage_end_on.year, coverage_end_on.month, coverage_end_on.end_of_month.day)
     if coverage_end_on == coverage_end_last_day_of_month
       if TimeKeeper.date_of_record <= coverage_end_on
-        coverage_effective_on = coverage_end_last_day_of_month + 1.day
+        coverage_end_last_day_of_month + 1.day
       else
-        coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
+        TimeKeeper.date_of_record.end_of_month + 1.day
+      end
+    elsif TimeKeeper.date_of_record <= (coverage_end_last_day_of_month - 1.month).end_of_month
+      if selected_effective_on.blank?
+        [coverage_end_on.beginning_of_month, coverage_end_last_day_of_month + 1.day]
+      else
+        selected_effective_on
       end
     else
-      if TimeKeeper.date_of_record <= (coverage_end_last_day_of_month - 1.month).end_of_month
-        coverage_effective_on = if selected_effective_on.blank?
-                                  [coverage_end_on.beginning_of_month, coverage_end_last_day_of_month + 1.day]
-                                else
-                                  selected_effective_on
-                                end
-      else
-        coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
-      end
+      TimeKeeper.date_of_record.end_of_month + 1.day
 
-      #FIXME what's this consumer_coverage_effective_on for, this is no rules for EmployeeGainingMedicare to allowd consumer to choose a particular timing.
+      #FIXME: what's this consumer_coverage_effective_on for, this is no rules for EmployeeGainingMedicare to allowd consumer to choose a particular timing.
       #if (consumer_coverage_effective_on >= coverage_end_on.first_of_month) &&
       #  (consumer_coverage_effective_on <= (coverage_end_on.first_of_month + 1.month))
       #  coverage_effective_on = consumer_coverage_effective_on
@@ -190,7 +193,6 @@ class QualifyingLifeEventKind
       #  # raise invalid effective date error
       #end
     end
-    coverage_effective_on
   end
 
   # Business rules for MoveToState
@@ -202,7 +204,7 @@ class QualifyingLifeEventKind
   def is_dependent_loss_of_coverage?
     #["Losing Employer-Subsidized Insurance because employee is going on Medicare", "My employer did not pay my premiums on time"].include? title
     #lost_access_to_mec
-    %w(employee_gaining_medicare employer_sponsored_coverage_termination).include? reason
+    %w[employee_gaining_medicare employer_sponsored_coverage_termination].include? reason
   end
 
   def is_moved_to_dc?
@@ -228,7 +230,7 @@ class QualifyingLifeEventKind
 
   def family_structure_changed?
     #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
-    %w(birth adoption marriage divorce domestic_partnership).include? reason
+    %w[birth adoption marriage divorce domestic_partnership].include? reason
   end
 
   def is_loss_of_other_coverage?
@@ -273,43 +275,43 @@ class QualifyingLifeEventKind
     end
 
     def shop_market_events
-      by_market_kind('shop').and(:is_visible.ne => false).active.to_a
+      by_market_kind('shop').and(:is_visible.ne => false).active
     end
 
     def shop_market_events_admin
-      by_market_kind('shop').active.to_a
+      by_market_kind('shop').active
     end
 
     def shop_market_non_self_attested_events
-      by_market_kind('shop').and(:is_visible.ne => true).active.to_a
+      by_market_kind('shop').and(:is_visible.ne => true).active
     end
 
     def fehb_market_events
-      by_market_kind('fehb').and(:is_visible.ne => false).active.to_a
+      by_market_kind('fehb').and(:is_visible.ne => false).active
     end
 
     def fehb_market_events_admin
-      by_market_kind('fehb').active.to_a
+      by_market_kind('fehb').active
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kind('fehb').and(:is_visible.ne => true).active.to_a
+      by_market_kind('fehb').and(:is_visible.ne => true).active
     end
 
     def individual_market_events
-      by_market_kind('individual').and(:is_visible.ne => false).active.to_a
+      by_market_kind('individual').and(:is_visible.ne => false).active
     end
 
     def individual_market_events_admin
-      by_market_kind('individual').active.to_a
+      by_market_kind('individual').active
     end
 
     def individual_market_non_self_attested_events
-      by_market_kind('individual').and(:is_visible.ne => true).active.to_a
+      by_market_kind('individual').and(:is_visible.ne => true).active
     end
 
     def individual_market_events_without_transition_member_action
-      by_market_kind('individual').active.to_a.reject {|qle| qle.action_kind == "transition_member"}
+      by_market_kind('individual').active.reject {|qle| qle.action_kind == "transition_member"}
     end
 
     def qualifying_life_events_for(role, hbx_staff = false)
@@ -330,7 +332,7 @@ class QualifyingLifeEventKind
   def date_hint
     start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
-      "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
+    "(must fall between #{start_date.strftime('%B %d')} and #{end_date.strftime('%B %d')})"
   end
 
   def active?
@@ -379,8 +381,6 @@ class QualifyingLifeEventKind
   def qle_date_guards
     errors.add(:start_on, "start_on cannot be nil when end_on date present") if end_on.present? && start_on.blank?
 
-    if start_on.present? && end_on.present?
-      errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
-    end
+    errors.add(:end_on, "end_on cannot preceed start_on date") if start_on.present? && end_on.present? && (self.end_on < self.start_on)
   end
 end

@@ -391,7 +391,7 @@ module FinancialAssistance
     end
 
     def set_default_tobacco_use
-      self.is_tobacco_user = "U" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
+      self.is_tobacco_user = "unknown" if EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage)
     end
 
     def accept(visitor)
@@ -798,8 +798,7 @@ module FinancialAssistance
     end
 
     def tobacco_user
-      default_tobacco_use = EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "U" : "unknown"
-      person.is_tobacco_user || default_tobacco_use
+      EnrollRegistry.feature_enabled?(:sensor_tobacco_carrier_usage) ? "unknown" : (person.is_tobacco_user || "unknown")
     end
 
     def eligibility_determination=(eg)
@@ -1321,6 +1320,15 @@ module FinancialAssistance
         elsif evidence.pending?
           set_evidence_unverified(evidence)
         end
+      end
+    end
+
+    def move_outstanding_to_nrr_status
+      EVIDENCES.each do |evidence_type|
+        evidence = self.send(evidence_type)
+        next if evidence.blank? || evidence.aasm_state != 'outstanding'
+
+        set_evidence_to_negative_response(evidence)
       end
     end
 

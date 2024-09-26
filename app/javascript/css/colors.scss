@@ -125,9 +125,9 @@
   --button-tertiary-hover-color: #50662e;
   --button-tertiary-active-color: #3c4c23;
 
-  --button-error-color: var(--status-red);
-  --button-error-hover-color: var(--status-red-hover);
-  --button-error-active-color: var(--status-red-active);
+  --button-error-color: #a21e1f;
+  --button-error-hover-color: #85191a;
+  --button-error-active-color: #671314;
 
   --badge-current-bg: hsla(206, 30%, 82%, 1);
   --badge-current-border: hsla(206, 33%, 66%, 1);
@@ -136,6 +136,7 @@
 
   --tab-active-border: #A2B289;
   --nav-dropdown-drop-shadow: hsla(0, 0%, 0%, 0.13);
+  --subnav-bg: #EBEEF0;
 }
 
 [data-theme='dc'] {

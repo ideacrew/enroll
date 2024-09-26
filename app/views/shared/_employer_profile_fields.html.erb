@@ -30,7 +30,9 @@
 
 <script>
   $(function(){
-    Freebies.selectric();
+    if (!disableSelectric) {
+      Freebies.selectric();
+    }
     $(".chosen-select").chosen({width: "100%"});
   });
 </script>

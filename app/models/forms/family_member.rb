@@ -194,10 +194,10 @@ module Forms
             next
           end
           if current_address.present?
-            current_address.update(address.permit!)
+            current_address.update(address)
             person.save! # to trigger address change events
           else
-            person.addresses.create(address.permit!)
+            person.addresses.create(address)
           end
         end
       end

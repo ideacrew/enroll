@@ -6,10 +6,8 @@
       <div class="col px-0">
         <div id='qle-date-chose'>
           <div class="mb-2" onkeydown="handleButtonKeyDown(event, 'qle_submit')">
-            <label class="weight-n">
-              <p class='qle-label'><%= l10n("insured.qle_detail.event_date") %></p>
-              <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
-            </label>
+            <label for="qle_date" class='weight-n required'><span class="qle-label"><%= l10n("insured.qle_detail.event_date") %></span></label>
+            <%= date_field_tag "qle_date", nil, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
           </div>
           <div class="mt-4 <%= pundit_class Family,:updateable? %>">
             <%= render partial: 'shared/progress_navigation_buttons', locals: {button_type: "button", button_id: "qle_submit", disable_link: true} %>
@@ -25,8 +23,8 @@
             <%= hidden_field_tag 'bs4', true %>
             <div class="alert alert-success d-flex align-items-center justify-content-start" role="alert">
               <div class="success-icon icon align-self-start">&nbsp;</div>
-              <div class="col px-0 py-1">
-                <p class="mb-1"><%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %></p>
+              <div class="col px-0">
+                <%= l10n("insured.qle_detail.eligible_to_enroll_limited_time") %>
               </div>
             </div>
             <div class="effective_on_kinds"></div>

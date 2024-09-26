@@ -7,11 +7,11 @@ module Exchanges
     include ::DataTablesAdapter #TODO: check
     include ::Pundit
 
-  # layout 'single_column'
-    layout 'bootstrap_4'
+    layout :resolve_layout
+
     before_action :set_seed, only: %i[edit]
     before_action :csv_format_valid?, only: %i[create]
-    before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
+    before_action :enable_bs4_layout if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
 
     before_action :redirect_if_prod, :check_hbx_staff_role
     def new
@@ -130,6 +130,10 @@ module Exchanges
 
     def enable_bs4_layout
       @bs4 = true
+    end
+
+    def resolve_layout
+      EnrollRegistry.feature_enabled?(:bs4_admin_flow) ? "progress" : "bootstrap_4"
     end
   end
 end

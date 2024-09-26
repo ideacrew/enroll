@@ -1,13 +1,14 @@
 require 'rails_helper'
 
 describe "exchanges/announcements/index.html.erb" do
-  let(:person) { FactoryBot.create(:person)}
-  let(:user) { FactoryBot.create(:user, :person => person)}
+  let!(:user) { FactoryBot.create(:user, :with_hbx_staff_role) }
   before :each do
-    stub_template "exchanges/hbx_profiles/shared/_primary_nav.html.erb"  => 'nav_bar'
+    stub_template "ui-components/v1/navs/primary_nav" => 'nav_bar'
     sign_in user
     assign(:announcements, Announcement.current)
-    allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", modify_admin_tabs?: true))
+    allow(view).to receive(:policy_helper).and_return(double("ConsumerRole", updateable?: true, access_new_consumer_application_sub_tab?: true, access_outstanding_verification_sub_tab?: true, access_identity_verification_sub_tab?: true,
+                                                                             begin_resident_enrollment?: true, can_access_user_account_tab?: true, view_admin_tabs?: true, view_the_configuration_tab?: true, can_send_secure_message?: true,
+                                                                             can_manage_qles?: true, modify_admin_tabs?: true))
     render template: "exchanges/announcements/index.html.erb"
   end
 

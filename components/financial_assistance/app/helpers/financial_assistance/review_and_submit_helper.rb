@@ -386,6 +386,7 @@ module FinancialAssistance
       hash[:esi_covered] = benefit.esi_covered
       hash[:esi_employee_minimum] = format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency)
       hash[:affordable_question] = human_boolean(benefit.health_plan_meets_mvs_and_affordable) if display_minimum_value_standard_question?(benefit.insurance_kind)
+      hash
     end
 
     private

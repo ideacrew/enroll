@@ -478,8 +478,6 @@ module ApplicationHelper
       employers_inbox_path(provider, message_id: message.id)
     when "BrokerAgencyProfile"
       benefit_sponsors.inboxes_message_path(provider, message_id: message.id)
-    when "HbxProfile"
-      exchanges_inbox_path(provider, message_id: message.id)
     when "GeneralAgencyProfile"
       general_agencies_inbox_path(provider, message_id: message.id)
     end
@@ -494,8 +492,6 @@ module ApplicationHelper
     case provider.model_name.name
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
-    when "HbxProfile"
-      inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
       benefit_sponsors.inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
     when "Person"
@@ -764,7 +760,7 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    if plan.instance_of?(Plan) || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
+    if plan.instance_of?(::Plan) || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
       return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == 'health'
 
       (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""

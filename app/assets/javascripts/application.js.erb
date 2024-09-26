@@ -32,7 +32,6 @@
 //= require bowser.min
 //= require consumer_role
 //= require plan_year_selection
-//= require aptc
 //= require announcement
 //= require bootstrap-slider
 //= require bootstrap-hooks
@@ -46,12 +45,18 @@
 //= require bootstrap-treeview
 //= require_tree .
 
+var bs4 = document.documentElement.dataset.bs4;
 var disableSelectric = false;
 
 $(document).on('page:load turbolinks:load', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
   indicateRequiredFields();
+  Responsive.setSizeListeners();
+  if (controllerName() === 'families' && actionName() === 'verification'){
+    $('.verification-update-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
+    $('.return-for-def-reason .selectric').removeEventListener('turbolinks:load', Freebies.selectric())
+  }
 });
 
 function indicateRequiredFields() {
@@ -60,6 +65,16 @@ function indicateRequiredFields() {
       $(this).append('<span class="sr-only sr-required-indicator">*</span>');
     }
   });
+}
+
+function controllerName() {
+  const body = document.body;
+  return body.dataset.controller;
+}
+
+function actionName() {
+  const body = document.body;
+  return body.dataset.action;
 }
 
 function applyJQDatePickerSetup(ele) {
@@ -157,12 +172,14 @@ function applyJQDatePickerSetup(ele) {
 }
 
 function applyJQDatePickers() {
-  $(".jq-datepicker").each(function(idx, ele) {
-    applyJQDatePickerSetup(ele);
-    if ($(this).attr("readonly") != undefined){
-      $(ele).datepicker('disable');
-    }
-  });
+  if (!bs4) {
+    $(".jq-datepicker").each(function(idx, ele) {
+      applyJQDatePickerSetup(ele);
+      if ($(this).attr("readonly") != undefined){
+        $(ele).datepicker('disable');
+      }
+    });
+  }
 }
 
 function applyMultiLanguageSelect() {
@@ -964,7 +981,7 @@ document.addEventListener('click', function(event) {
         (next && next.id && next.id.includes('_1_kind') && next.value == 'mailing')) {
         element.value = true;
       } else {
-        // NOTE: this second condition may not be necessary, 
+        // NOTE: this second condition may not be necessary,
         // both family_member and applicant dependent controllers
         // handle removing a dependent home address if the 'same_as_primary' param is true
         let homeAddressId = element.id.replace('_1__', '_0__');

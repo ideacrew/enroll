@@ -63,3 +63,18 @@ function handleGlossaryKeydown(event, glossaryId) {
     $("#" + glossaryId).popover('hide');
   }
 }
+
+window.addEventListener('keydown', function(event) {
+  if (event.keyIdentifier == 'U+000A' || event.keyIdentifier == 'Enter' || event.key === 'Enter') {
+    if (event.target.nodeName == 'INPUT' && event.target.type !== 'text' && event.target.type !== 'textarea') {
+      var form = event.target.closest('form');
+      if (form.checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+        form.classList.add('was-validated');
+      } else {
+        form.classList.remove('was-validated');
+      }
+    }
+  }
+}, true);

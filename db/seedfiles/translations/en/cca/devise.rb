@@ -1,5 +1,11 @@
 # Devise Translations
 DEVISE_TRANSLATIONS = {
+  "en.devise.shared.sign_in.heading" => "Sign In",
+  "en.devise.shared.sign_in.username" => "Username",
+  "en.devise.shared.sign_in.blank_username" => "Please enter your username.",
+  "en.devise.shared.sign_in.password" => "Password",
+  "en.devise.shared.sign_in.blank_password" => "Please enter your password.",
+  "en.devise.shared.sign_in.remember_me" => "Remember Me",
   "en.devise.passwords.new.forgot_your_password" => "Forgot your password?",
   "en.devise.passwords.new.send_me_reset_password_instructions" => "Send me reset password instructions",
   "en.devise.passwords.admin.send_reset_password_instructions" => "Send Reset Password Instructions",
@@ -11,7 +17,7 @@ DEVISE_TRANSLATIONS = {
   "en.devise.shared.links.create_account" => "Create account",
   "en.devise.shared.links.did_not_receive_confirmation_instructions" => "Didn't receive confirmation instructions",
   "en.devise.shared.links.sign_in_with_provider" => "Sign in with %{provider}",
-  "en.devise.registrations.new.optional" => "optional",
+  "en.devise.new.optional" => "(Optional)",
   "en.devise.registrations.new.password_confirmation" => "Password confirmation",
   "en.devise.registrations.characters_minimum" => "characters minimum",
   "en.devise.errors.password_match" => "Your password confirmation didn’t match. Try again.",
