@@ -1,6 +1,7 @@
 <% if @bs4 %>
   <section>
     <h3><%= income_coverage[0].to_s.titleize %></h3>
+    <hr class="my-1">
     <% income_coverage[1].each do |k, v| %>
       <% if k == "jobs" %>
         <% v.values.each do |job_data| %>
