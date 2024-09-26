@@ -258,7 +258,6 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
             allow(person).to receive(:addresses).and_return addresses1
 
             expect(addresses1).to receive(:create).and_return true
-
             employee_dependent.assign_person_address(person)
           end
         end
