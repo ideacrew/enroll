@@ -151,6 +151,7 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
       let(:family) {double(primary_family_member: double(person: primary))}
       let(:family_member) {double(person: person, family: family)}
       let(:employee_dependent) { Forms::FamilyMember.new }
+      let(:new_dependent) { Forms::FamilyMember.new }
 
       context "if same with primary" do
         before :each do
@@ -189,8 +190,12 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
       end
 
       context "if not same with primary" do
+
+        let(:person_1) {FactoryBot.create(:person)}
+  
         before :each do
           allow(employee_dependent).to receive(:same_with_primary).and_return 'false'
+          allow(new_dependent).to receive(:same_with_primary).and_return 'false'
         end
 
         context "if address_1 is blank and city is blank" do
@@ -209,6 +214,21 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
           it "return true" do
             allow(addr3).to receive(:destroy).and_return nil
             expect(employee_dependent.assign_person_address(person)).to eq true
+          end
+
+          context 'when creating addresses' do
+
+            let(:home_address) { { "kind" => 'home', "address_1" => "new-home-address", "city" => "home-city", "county" => "Hampden", "state" => "DC", "zip" => "01001", "_destroy" => "false" } }
+            let(:addresses) { ActionController::Parameters.new({ "0" => home_address}) }
+
+            before do
+              person_1.addresses.destroy
+              allow(new_dependent).to receive(:addresses).and_return(addresses.permit!)
+            end
+            it "should successfully create an address" do
+              new_dependent.assign_person_address(person_1)
+              expect(person_1.reload.home_address.address_1).to eq('new-home-address')
+            end
           end
         end
 
@@ -245,8 +265,8 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
 
         context "when dependent has mailing and home address" do
           let(:person) {FactoryBot.create(:person, :with_mailing_address)}
-          let(:home_address) { { "kind" => 'home', "address_1" => "new-home-address", "city" => "home-city", "county" => "Hampden", "state" => "DC", "zip" => "01001" } }
-          let(:mailing_address) { { "kind" => 'mailing', "address_1" => "new-mailing-address", "city" => "mailing-city", "county" => "Hampden", "state" => "DC", "zip" => "01001" } }
+          let(:home_address) { { "kind" => 'home', "address_1" => "new-home-address", "city" => "home-city", "county" => "Hampden", "state" => "DC", "zip" => "01001", "_destroy" => "false" } }
+          let(:mailing_address) { { "kind" => 'mailing', "address_1" => "new-mailing-address", "city" => "mailing-city", "county" => "Hampden", "state" => "DC", "zip" => "01001", "_destroy" => "false" } }
           let(:addresses) { ActionController::Parameters.new({ "0" => home_address, "1" => mailing_address }) }
 
           before :each do
