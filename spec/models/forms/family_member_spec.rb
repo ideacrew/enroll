@@ -192,7 +192,7 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
       context "if not same with primary" do
 
         let(:person_1) {FactoryBot.create(:person)}
-  
+
         before :each do
           allow(employee_dependent).to receive(:same_with_primary).and_return 'false'
           allow(new_dependent).to receive(:same_with_primary).and_return 'false'
