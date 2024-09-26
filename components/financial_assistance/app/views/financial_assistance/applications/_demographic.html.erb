@@ -1,12 +1,12 @@
 <% if @bs4 %>
   <% unless demographic[0] == "ADDRESSES" %>
+    <% description = demographic[1] %>
+    <% if description.nil? %>
+      <% description = l10n('faa.not_applicable_abbreviation') %>
+    <% else %>
+      <% description = human_boolean(description) if [true, false].include?(description) %>
+    <% end %>
     <div class="d-flex justify-content-between align-items-center">
-      <% description = demographic[1] %>
-      <% if description.nil? %>
-        <% description = l10n('faa.not_applicable_abbreviation') %>
-      <% else %>
-        <% description = human_boolean(description) if [true, false].include?(description) %>
-      <% end %>
       <dt class="col-<%= description.to_s.length > 12 ? "3" : "8" %> px-0"><%= label(nil, demographic[0]) %></dt>
       <dd class="text-right"><%= description %></dd>
     </div>
