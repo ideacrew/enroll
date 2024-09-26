@@ -129,14 +129,6 @@
                 <% end %>
               </li>
             <% end %>
-            <% if EnrollRegistry.feature_enabled?(:inbox_tab) %>
-              <li class="pl-1 <%= pundit_class HbxProfile, :view_admin_tabs? %>" role="presentation">
-                <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), remote: false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", role: "tab") do %>
-                  Inbox
-                  <span class="badge ml-half"><%= @unread_messages %></span>
-                <% end %>
-              </li>
-            <% end %>
           <% end %>
         </ul>
       </div>
@@ -278,14 +270,6 @@
                 <% end %>
               </ul>
             </li>
-            <% if EnrollRegistry.feature_enabled?(:inbox_tab) %>
-              <li class="pl-1 <%= pundit_class HbxProfile, :view_admin_tabs? %>" role="presentation">
-                <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), remote: false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", role: "tab") do %>
-                  Inbox
-                  <span class="badge ml-half"><%= @unread_messages %></span>
-                <% end %>
-              </li>
-            <% end %>
             <% if EnrollRegistry.feature_enabled?(:notices_tab) %>
               <li class="pl-1" role="presentation <%= pundit_class HbxProfile, :view_admin_tabs? %>">
                 <%= link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab") do %>
