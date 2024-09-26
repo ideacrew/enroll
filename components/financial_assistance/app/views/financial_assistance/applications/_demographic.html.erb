@@ -16,7 +16,7 @@
         <h3><%= l10n(k) %> </h3>
         <% v.each do |field| %>
           <div class="d-flex justify-content-between align-items-center">
-            <dt class="col-<%= description.to_s.length > 12 ? "3" : "8" %> px-0"><%= field[0] %></dt>
+            <dt class="col-3 px-0"><%= field[0].titleize %></dt>
             <dd class="text-right"><%= field[1] %></dd>
           </div>
         <% end %>

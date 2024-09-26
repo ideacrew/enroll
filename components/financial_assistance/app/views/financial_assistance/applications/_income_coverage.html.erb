@@ -2,34 +2,38 @@
   <section>
     <h3><%= income_coverage[0].to_s.titleize %></h3>
     <hr class="my-1">
-    <% income_coverage[1].each do |k, v| %>
-      <% if k == "jobs" %>
-        <% v.values.each do |job_data| %>
-          <% job_data.each do |job_data_key, job_data_value| %>
-            <dl class="d-flex justify-content-between align-items-center">
-              <dt class="col-<%= job_data_value.to_s.length > 12 ? "3" : "8" %> px-0"><%= job_data_key %></dt>
-              <dd class="text-right"><%= job_data_value %></dd>
+    <dl>
+      <% income_coverage[1].each do |k, v| %>
+        <% if k == "jobs" %>
+          <% v.values.each do |job_data| %>
+            <dl>
+              <% job_data.each do |job_data_key, job_data_value| %>
+                <div class="d-flex justify-content-between align-items-center">
+                  <dt class="col-<%= job_data_value.to_s.length > 12 ? "3" : "8" %> px-0"><%= job_data_key %></dt>
+                  <dd class="text-right"><%= job_data_value %></dd>
+                </div>
+              <% end %>
             </dl>
           <% end %>
-        <% end %>
-      <% else %>
-        <dl class="d-flex justify-content-between align-items-center">
-          <% description = v %>
-          <% if description.nil? %>
-            <% description = l10n('faa.not_applicable_abbreviation') %>
-          <% else %>
-            <% description = human_boolean(description) if [true, false].include?(description) %>
+        <% else %>
+          <div class="d-flex justify-content-between align-items-center">
+            <% description = v %>
+            <% if description.nil? %>
+              <% description = l10n('faa.not_applicable_abbreviation') %>
+            <% else %>
+              <% description = human_boolean(description) if [true, false].include?(description) %>
+            <% end %>
+            <dt class="col-<%= description.to_s.length > 12 ? "3" : "8" %> px-0"><%= k %></dt>
+            <dd class="text-right"><%= description %></dd>
+          </div>
+          <% if income_coverage[0] == "HEALTH COVERAGE" && k.include?("enrolled") && k == applicant_currently_enrolled && applicant.has_enrolled_health_coverage  %>
+              <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
+          <% elsif income_coverage[0]== "HEALTH COVERAGE" && k == applicant_eligibly_enrolled && applicant.has_eligible_health_coverage %>
+              <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_eligible', applicant: applicant} %>
           <% end %>
-          <dt class="col-<%= description.to_s.length > 12 ? "3" : "8" %> px-0"><%= k %></dt>
-          <dd class="text-right"><%= description %></dd>
-        </dl>
-        <% if income_coverage[0] == "HEALTH COVERAGE" && k.include?("enrolled") && k == applicant_currently_enrolled && applicant.has_enrolled_health_coverage  %>
-            <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_enrolled', applicant: applicant} %>
-        <% elsif income_coverage[0]== "HEALTH COVERAGE" && k == applicant_eligibly_enrolled && applicant.has_eligible_health_coverage %>
-            <%= render partial: 'financial_assistance/applications/review_benefits', locals: {kind: 'is_eligible', applicant: applicant} %>
         <% end %>
       <% end %>
-    <% end %>
+    </dl>
   </section>
 <% else %>
   <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
