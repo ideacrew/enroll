@@ -407,7 +407,7 @@ module ApplicationHelper
   end
 
   def show_table_notice(notice)
-    sanitize_html(render(plain: notice)) if notice.present? && notice == flash[:notice]
+    sanitize_html(render(plain: notice)) if notice.present? && notice != flash[:notice]
   end
 
   def dd_value(val)
