@@ -3,8 +3,13 @@
     <nav id="admin-nav" class="<%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' %>">
       <div class="container px-0">
         <ul id="myTab" class="list-unstyled list-inline m-0 p-0" role="tablist">
+          <li class="pl-0" role="presentation">
+            <a>
+              <%= h(link_to(l10n('layout.header.home'), main_app.exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" )) %>
+            </a>
+          </li>
           <% if individual_market_is_enabled? %>
-            <li class="nav-item" role="presentation">
+            <li class="dropdown pl-1" role="presentation">
               <button class="dropdown-toggle unstyled" data-toggle="dropdown" id="families_dropdown">Families</button>
               <ul class="dropdown-menu" aria-labelledby="families_dropdown">
                 <li>
@@ -145,15 +150,15 @@
     <nav id="uic-primary-nav" class="<%= 'pre_prod_nav_color' if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' %>">
       <div class="container">
         <ul id="myTab" class="list-unstyled list-inline" role="tablist">
-          <li class="nav-item pl-0" role="presentation">
+          <li class="pl-0" role="presentation">
             <a>
-              <%= h(link_to(main_app.exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" )) do %>
+              <%= h(link_to(main_app.exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab") do %>
                 <i class="fas fa-home fa-lg" aria-hidden="true"></i>
-              <% end %>
+              <% end) %>
             </a>
           </li>
           <% if individual_market_is_enabled? %>
-            <li class="nav-item" role="presentation">
+            <li class="dropdown pl-1" role="presentation">
               <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="families_dropdown">Families <i class="fas fa-caret-down"></i></a>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                 <li>
