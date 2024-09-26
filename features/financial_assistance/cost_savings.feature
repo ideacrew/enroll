@@ -52,7 +52,7 @@ Feature: Cost Savings
   Scenario: FAA Feature Is Enabled - Consumer will see message if oe_application_warning_display feature is enabled
     Given the oe application warning display feature is enabled
     Given current hbx is not under open enrollment
-    Given it is before open enrollment
+    Given current date is between renewals generation date and open enrollment start on
     Given consumer visits home page
     And the Cost Savings link is visible
     When the consumer clicks the Cost Savings link
@@ -63,7 +63,7 @@ Feature: Cost Savings
     Given the oe application warning display feature is enabled
     Given the filtered_application_list feature is enabled
     Given current hbx is not under open enrollment
-    Given it is before open enrollment
+    Given current date is between renewals generation date and open enrollment start on
     Given consumer visits home page
     And the Cost Savings link is visible
     When the consumer clicks the Cost Savings link
@@ -73,7 +73,7 @@ Feature: Cost Savings
   Scenario: Consumer will not see message if after open enrollment
     Given the oe application warning display feature is enabled
     Given current hbx is not under open enrollment
-    Given it is after open enrollment
+    Given current date is outside renewals generation date and open enrollment start on
     Given consumer visits home page
     And the Cost Savings link is visible
     When the consumer clicks the Cost Savings link
