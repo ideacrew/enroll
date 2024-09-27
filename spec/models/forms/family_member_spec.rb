@@ -256,7 +256,6 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
 
             addresses1 = double(new: {})
             allow(person).to receive(:addresses).and_return addresses1
-            allow(person).to receive(:save).and_return true
             expect(addresses1).to receive(:create).and_return true
             employee_dependent.assign_person_address(person)
           end
