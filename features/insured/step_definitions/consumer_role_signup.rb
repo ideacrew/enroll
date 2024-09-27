@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^user signup$/) do
   visit "/users/sign_up"
   fill_in "user_oim_id", with: user_sign_up[:oim_id]
