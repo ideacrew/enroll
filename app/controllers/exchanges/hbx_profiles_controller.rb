@@ -576,7 +576,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :update_enrollment_terminated_on_date?
 
     begin
-      params[:new_termination_date] = parse_date(params[:new_termination_date]).strftime("%m/%d/%Y")
+      params[:new_termination_date] = parse_date(params[:new_termination_date])&.strftime("%m/%d/%Y")
       @row = params[:family_actions_id]
       @element_to_replace_id = params[:family_actions_id]
       result = Operations::HbxEnrollments::EndDateChange.new.call(params: params)
@@ -755,7 +755,7 @@ class Exchanges::HbxProfilesController < ApplicationController
       th_group_info = params.require(:tax_household_group).permit(
         :person_id, :family_actions_id, :effective_date, tax_households: {}
       ).to_h
-      th_group_info[:effective_date] = parse_date(th_group_info[:effective_date]).strftime("%m/%d/%Y")
+      th_group_info[:effective_date] = parse_date(th_group_info[:effective_date])&.strftime("%m/%d/%Y")
       result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call(
         {
           family: family,
