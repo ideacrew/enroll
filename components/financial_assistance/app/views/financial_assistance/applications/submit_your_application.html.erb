@@ -90,7 +90,7 @@
       <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
       <div class="col-md-4 px-0">
         <label for="first_name_thank_you" class="required"><%= l10n("first_name") %></label>
-        <%= text_field_tag "first_name_thank_you", nil, placeholder: l10n("first_name"), required: true, class: "thank_you_field w-100", id: "first_name_thank_you" %>
+        <%= text_field_tag "first_name_thank_you", nil, placeholder: l10n("first_name"), required: true, class: "thank_you_field w-100", id: "first_name_thank_you", pattern: match_char_pattern(person.first_name) %>
       </div>
       <div class="col-md-4 px-3">
         <label for="middle_name_thank_you"><%= l10n("middle_name") %></label>
@@ -98,7 +98,7 @@
       </div>
       <div class="col-md-4 px-0">
         <label for="last_name_thank_you" class="required"><%= l10n("last_name") %></label>
-        <%= text_field_tag "last_name_thank_you", nil, placeholder: l10n("last_name"), required: true, class: "thank_you_field w-100", id: "last_name_thank_you" %>
+        <%= text_field_tag "last_name_thank_you", nil, placeholder: l10n("last_name"), required: true, class: "thank_you_field w-100", id: "last_name_thank_you", pattern: match_char_pattern(person.last_name) %>
       </div>
     </fieldset>
     <div class="mt-4">
