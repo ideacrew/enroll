@@ -75,12 +75,6 @@ legend,
 
 label:not(:has(input[type='checkbox'])):not(:has(input[type='radio'])), legend, .label, .legend {
   display: block;
-  &::before {
-    content:none;
-  }
-  &::after {
-    content:none;
-  }
 }
 
 .d-flex label:has(input[type='radio']) + label:has(input[type='radio']) {
