@@ -406,6 +406,10 @@ module ApplicationHelper
     item.respond_to?(:keys) && item[:is_announcement]
   end
 
+  def show_table_notice(notice)
+    sanitize_html(render(plain: notice)) if notice.present? && notice != flash[:notice]
+  end
+
   def dd_value(val)
     val.blank? ? "&nbsp;" : val
   end

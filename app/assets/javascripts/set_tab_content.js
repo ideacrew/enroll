@@ -1,6 +1,7 @@
 function set_tab_content(partial) {
   $('.flash').remove();
   $('#inbox > #tabContent').html(partial);
+  $('#inbox').attr('aria-labelledby', 'inbox-tab')
 }
 
 function set_active_ontab(tab_id) {

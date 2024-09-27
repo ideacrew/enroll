@@ -350,7 +350,7 @@ export default class extends Controller {
     let username = this.usernameFieldTarget.value;
     // if email field is blank or username field is blank, allow user to keyboard navigate through to sign in link or live chat widget
     if (email != '' || username != '') {
-      if (!this.isEmail(email)) {
+      if (email !== '' && !this.isEmail(email)) {
         Swal.fire({
           title: 'Invalid Email Entered xxx',
           type: 'error',
