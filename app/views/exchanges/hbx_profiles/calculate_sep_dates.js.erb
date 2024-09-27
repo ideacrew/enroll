@@ -1,4 +1,20 @@
-$('.sep_dates_filter').show();
+function hideElement(element) {
+  <% if @bs4 %>
+    element.addClass('hidden');
+  <% else %>
+    element.hide();
+  <% end %>
+}
+
+function showElement(element) {
+  <% if @bs4 %>
+    element.removeClass('hidden');
+  <% else %>
+    element.show();
+  <% end %>
+}
+
+showElement($('.sep_dates_filter'));
 <% if @bs4 %>
   $('.start_btn input').val("<%= @start_on.strftime('%Y-%m-%d') %>");
   $('.end_btn input').val("<%= @end_on.strftime('%Y-%m-%d') %>");
@@ -10,15 +26,15 @@ $('.sep_dates_filter').show();
 <% end %>
 
 $('.kind input').val("<%= @eff_kind %>")
-"<%= @date_options %>" == "true" ? $('.optional_date').show() : $('.optional_date').hide();
+"<%= @date_options %>" == "true" ? showElement($('.optional_date')) : hideElement($('.optional_date'));
 if ("<%= prior_py_sep?(@family, @effective_on, @market_kind) %>" == "true") {
   $("#coverage_renewal_flag").prop('disabled',false);
-  $('.coverage-renewal-flag').show()
+  showElement($('.coverage-renewal-flag'))
 } else {
   $("#coverage_renewal_flag").prop('disabled',true);
-  $('.coverage-renewal-flag').hide();
+  hideElement($('.coverage-renewal-flag'));
 }
-"<%= prior_py_sep?(@family, @effective_on, @market_kind) %>" == "true"  ? $('.coverage-renewal-flag').show() : $('.coverage-renewal-flag').hide();
+"<%= prior_py_sep?(@family, @effective_on, @market_kind) %>" == "true"  ? showElement($('.coverage-renewal-flag')) : hideElement($('.coverage-renewal-flag'));
 $('#prior_py_sep').val("<%= (::EnrollRegistry.feature_enabled?(:prior_plan_year_ivl_sep) || ::EnrollRegistry.feature_enabled?(:prior_plan_year_shop_sep)) &&
                              prior_py_sep?(@family, @effective_on, @market_kind)  %>")
 $("#calculated_effective_date").val("<%= @effective_on.to_s %>")

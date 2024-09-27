@@ -257,6 +257,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.total' => "total",
   :'en.shop' => "Shop",
   :'en.individual' => "Individual",
+  :'en.ivl' => "IVL",
   :'en.none' => "None",
   :'en.insured.issuer_placeholder' => "Issuer placeholder",
   :'en.insured.benefit_type_placeholder' => "Benefit type placeholder",

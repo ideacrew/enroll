@@ -10,7 +10,7 @@
     <%= form_for @person, remote: true, url: update_dob_ssn_path, method: "post", class: "form" do |f|%>
       <%= f.hidden_field :person_id, value: @person.id %>
       <% if @bs4 %>
-        <h3 class="title">Edit DOB / SSN</h3>
+        <h3 class="title"><%= l10n('hbx_profiles.edit_dob_ssn.header') %></h3>
         <div class="mb-3">
           <div>
             <%= f.label :dob, l10n('new_dob'), class: "weight-n align-self-start d-block" %>
