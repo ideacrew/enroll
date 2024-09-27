@@ -197,7 +197,7 @@ module Forms
             current_address.update(address.except("_destroy"))
             person.save! # to trigger address change events
           else
-            person.addresses.create(address.except("_destroy").permit(:address_1, :address_2, :city, :state, :zip, :kind, :county))
+            person.addresses << Address.new(address.except("_destroy").permit(:address_1, :address_2, :city, :state, :zip, :kind, :county))
             person.save # to trigger address change events
           end
         end
