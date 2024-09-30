@@ -406,6 +406,10 @@ module ApplicationHelper
     item.respond_to?(:keys) && item[:is_announcement]
   end
 
+  def show_table_notice(notice)
+    sanitize_html(render(plain: notice)) if notice.present? && notice != flash[:notice]
+  end
+
   def dd_value(val)
     val.blank? ? "&nbsp;" : val
   end
@@ -1134,5 +1138,10 @@ module ApplicationHelper
 
   def imm_docs_requried_class
     FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required"
+  end
+
+  # HTML patterns for validation are case sensative. In order to make them case insensative, we need to convert them to case insensative patterns.
+  def match_char_pattern(string)
+    string.chars.map{  |char| "[#{char.upcase}#{char.downcase}]" }.join
   end
 end
