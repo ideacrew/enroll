@@ -58,7 +58,7 @@ class Announcement
       AUDIENCE_KINDS
     end
 
-    def get_announcements_by_portal(portal_path = "", person = nil)
+    def get_announcements_by_portal(portal_path = "", person = nil) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
       announcements = []
 
       if portal_path.include?("employers/employer_profiles")

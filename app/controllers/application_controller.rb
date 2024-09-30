@@ -184,10 +184,10 @@ class ApplicationController < ActionController::Base
   end
 
   def extract_locale_from_accept_language_header
-    request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first if request.env['HTTP_ACCEPT_LANGUAGE']
+    request.env['HTTP_ACCEPT_LANGUAGE']&.scan(/^[a-z]{2}/)&.first
   end
 
-  def update_url
+  def update_url # rubocop:disable Metrics/CyclomaticComplexity
     return if current_user&.person&.agent?
     if ((controller_name == "employer_profiles" && action_name == "show") ||
        (controller_name == "families" && action_name == "home") ||
@@ -237,7 +237,7 @@ class ApplicationController < ActionController::Base
         redirect_to main_app.new_user_registration_path
       end
     end
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     message = {}
     message[:message] = "Application Exception - #{e.message}"
     message[:session_person_id] = session[:person_id] if session[:person_id]
@@ -288,10 +288,9 @@ class ApplicationController < ActionController::Base
   def authenticate_user_from_token!
     user_token = params[:user_token].presence
     user = user_token && User.find_by_authentication_token(user_token.to_s)
-    if user
-      sign_in user, store: false
-      flash[:notice] = "Signed in Successfully."
-    end
+    return unless user
+    sign_in user, store: false
+    flash[:notice] = "Signed in Successfully."
   end
 
   def cur_page_no(alph = "a")
@@ -329,7 +328,7 @@ class ApplicationController < ActionController::Base
     # TODO: We need to be mindful of this in situations where the person_id is being erroneously set
     # to the current hbx_admin
     # FOLLOWUP: This method does sometimes set the admin to @person which affects the views related to /insured/family_members
-  def set_current_person(required: true)
+  def set_current_person(required: true) # rubocop:disable Naming/AccessorMethodName
     @person = if current_user.try(:person).try(:agent?) && session[:person_id].present?
                 Person.find(session[:person_id])
               else
@@ -370,13 +369,9 @@ class ApplicationController < ActionController::Base
     /consumer/.match(current_user.last_portal_visited) || (session[:last_market_visited] == 'individual' && !/employee/.match(current_user.try(:last_portal_visited)))
   end
 
-  def save_bookmark(role, bookmark_url)
+  def save_bookmark(role, bookmark_url) # rubocop:disable Metrics/CyclomaticComplexity
     if hbx_staff_and_consumer_role(role)
-      if @person.present? && @person.consumer_role.identity_verified?
-        @person.consumer_role.update_attribute(:bookmark_url, bookmark_url)
-      elsif prior_ridp_bookmark_urls(bookmark_url)
-        @person.consumer_role.update_attribute(:bookmark_url, bookmark_url)
-      end
+      @person.consumer_role.update_attribute(:bookmark_url, bookmark_url) if (@person.present? && @person.consumer_role.identity_verified?) || prior_ridp_bookmark_urls(bookmark_url)
     elsif role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
       role.bookmark_url = bookmark_url
       role.try(:save!)
@@ -397,7 +392,7 @@ class ApplicationController < ActionController::Base
     # Used for certain RIDP cases when we need to track Admins and the Consumers bookmark separatelty.
     # There are cases based on the completeness of Verification types as to where the Consumer vs Admin lands on logging in.
 
-  def set_admin_bookmark_url(url = nil)
+  def set_admin_bookmark_url(url = nil) # rubocop:disable Naming/AccessorMethodName
     set_current_person
     bookmark_url = url || request.original_url
     role = current_user.has_hbx_staff_role?
@@ -413,18 +408,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def set_bookmark_url(url = nil)
+  def set_bookmark_url(url = nil) # rubocop:disable Naming/AccessorMethodName
     set_current_person
     bookmark_url = url || request.original_url
-    if /employee/.match(bookmark_url)
+    case bookmark_url
+    when /employee/
       role = @person.try(:employee_roles).try(:last)
-    elsif /consumer/.match(bookmark_url)
+    when /consumer/
       role = @person.try(:consumer_role)
     end
     save_bookmark role, bookmark_url
   end
 
-  def set_employee_bookmark_url(url = nil)
+  def set_employee_bookmark_url(url = nil) # rubocop:disable Naming/AccessorMethodName
     set_current_person
     role = @person.try(:employee_roles).try(:last)
     bookmark_url = url || request.original_url
@@ -432,7 +428,7 @@ class ApplicationController < ActionController::Base
     session[:last_market_visited] = 'shop'
   end
 
-  def set_consumer_bookmark_url(url = nil)
+  def set_consumer_bookmark_url(url = nil) # rubocop:disable Naming/AccessorMethodName
     set_current_person
     role = @person.try(:consumer_role)
     bookmark_url = url || request.original_url
@@ -440,7 +436,7 @@ class ApplicationController < ActionController::Base
     session[:last_market_visited] = 'individual'
   end
 
-  def set_resident_bookmark_url(url = nil)
+  def set_resident_bookmark_url(url = nil) # rubocop:disable Naming/AccessorMethodName
     set_current_person
     role = @person.try(:resident_role)
     bookmark_url = url || request.original_url
@@ -481,7 +477,7 @@ class ApplicationController < ActionController::Base
     dismiss_announcements = begin
       JSON.parse(session[:dismiss_announcements] || "[]")
     rescue StandardError
-      []
+      "[]"
     end
     announcements -= dismiss_announcements
     flash.now[:warning] = announcements.map do |announcement|
