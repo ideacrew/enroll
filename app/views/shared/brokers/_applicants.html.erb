@@ -35,7 +35,7 @@
   <div class="row">
     <div class="col-md-10">
       <%= render 'shared/alph_paginate', url: url, full_index_url: index_url, alphs: @page_alphabets, remote: true, status: @status, bs4: @bs4 %>
-      (Click on any letter above to see all applicants whose last name starts with that letter.)
+      <%= l10n("admin.alph_pagination_helper") %>
     </div>
     <div class="col-md-2 text-right">
       <h4><%= "#{@broker_applicants.count} #{l10n('admin.out_of')} #{@people.count}" %></h4>
