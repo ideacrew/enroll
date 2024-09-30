@@ -367,7 +367,7 @@ module ApplicationHelper
   def render_flash(use_bs4: false)
     rendered = []
     flash.each do |type, messages|
-      next if messages.blank? || (messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string"))
+      next if invalid_flash_messages?(messages)
 
       if messages.respond_to?(:each)
         messages.each do |m|
@@ -387,6 +387,15 @@ module ApplicationHelper
     else
       render(:partial => 'layouts/flash', :locals => {:type => type, :message => msg})
     end
+  end
+
+  def invalid_flash_messages?(messages)
+    return true if messages.blank?
+    return true if messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string")
+
+    # catch-all for boolean-type messages
+    return true unless messages.is_a?(String) || messages.is_a?(Array)
+    false
   end
 
   def get_flash_type(type)
