@@ -222,7 +222,7 @@ module SepAll
       @message_for_partial = @bs4 ? l10n('hbx_profiles.add_sep.result.success', name: @name) : "SEP Added for #{@name}"
     else
       errors = special_enrollment_period.errors.full_messages.join(", ")
-      @message_for_partial = @bs4 ? l10n('hbx_profiles.add_sep.result.failure', errors: errors) : "SEP not saved. (Error: \"#{errors}\")"
+      @message_for_partial = @bs4 ? l10n('hbx_profiles.add_sep.result.failure', errors: errors) : "SEP not saved. (Error: #{errors})"
     end
   end
 

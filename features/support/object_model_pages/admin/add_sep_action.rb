@@ -28,19 +28,19 @@ class AddSepAction
   end
 
   def self.select_sep_reason_dropdown
-    '.admin_selected_sep_reason .selectric span.label'
+    '.admin_selected_sep_reason select'
   end
 
   def self.select_sep_reason
-    '.admin_selected_sep_reason .selectric-items .selectric-scroll li'
+    '.admin_selected_sep_reason select option'
   end
 
   def self.select_sep_options_dropdown
-    '.admin_effective_on_kind_options .selectric span.label'
+    '.admin_effective_on_kind_options select'
   end
 
   def self.select_sep_option_kind
-    '.admin_effective_on_kind_options .selectric-items .selectric-scroll li'
+    '.admin_effective_on_kind_options select option'
   end
 
   def self.sep_end_on

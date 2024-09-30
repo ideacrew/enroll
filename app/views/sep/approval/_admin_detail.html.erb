@@ -59,15 +59,15 @@
       <div class='d-flex p-2 justify-content-between sep_dates_filter'>
         <div class="col-auto pl-0 start_btn start_end_date start_input">
           <label for="start_on" class="d-block required"><%= l10n('hbx_profiles.sep_start_date') %></label>
-          <%= date_field_tag :start_on, nil, value: date_field_value, min: date_field_value, max: date_field_value, required: true, disabled: true %>
+          <%= date_field_tag :start_on, nil, value: date_field_value, required: true, disabled: true %>
         </div>
         <div class="col-auto end_btn start_end_date end_input">
           <label for="end_on"class="d-block required"><%= l10n('hbx_profiles.sep_end_date') %></label>
-          <%= date_field_tag :end_on, nil, value: date_field_value(60.days.from_now), min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
+          <%= date_field_tag :end_on, nil, value: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
         <div class='col-auto pr-0 init_effective_date'>
           <label for="next_poss_effective_date" class="d-block required"><%= l10n('hbx_profiles.sep_next_possible_start_date') %></label>
-          <%= date_field_tag :next_poss_effective_date, nil, value: date_field_value, min: date_field_value, max: date_field_value(60.days.from_now), required: true, disabled: true %>
+          <%= date_field_tag :next_poss_effective_date, nil, value: date_field_value, required: true, disabled: true %>
         </div>
       </div>
       <div class='d-flex p-2 justify-content-between optional_date'>
