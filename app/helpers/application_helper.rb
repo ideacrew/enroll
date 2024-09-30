@@ -1139,4 +1139,9 @@ module ApplicationHelper
   def imm_docs_requried_class
     FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required"
   end
+
+  # HTML patterns for validation are case sensative. In order to make them case insensative, we need to convert them to case insensative patterns.
+  def match_char_pattern(string)
+    string.chars.map{  |char| "[#{char.upcase}#{char.downcase}]" }.join
+  end
 end
