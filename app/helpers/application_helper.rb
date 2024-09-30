@@ -1140,6 +1140,11 @@ module ApplicationHelper
     FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required"
   end
 
+  # HTML patterns for validation are case sensative. In order to make them case insensative, we need to convert them to case insensative patterns.
+  def match_char_pattern(string)
+    string.chars.map{  |char| "[#{char.upcase}#{char.downcase}]" }.join
+  end
+
   def date_field_value(date = nil)
     date = Date.current if date.nil? || date.to_s == "0"
     date.strftime("%Y-%m-%d")

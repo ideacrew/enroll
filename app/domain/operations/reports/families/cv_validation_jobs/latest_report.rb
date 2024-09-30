@@ -52,7 +52,7 @@ module Operations
           # @option params [Integer] :jobs_per_iteration The number of jobs to process per iteration.
           # @return [Dry::Monads::Result::Success<Integer>, Dry::Monads::Result::Failure<String>]
           def validate(params)
-            if params[:jobs_per_iteration].to_i < 0
+            if params[:jobs_per_iteration].to_i <= 0
               failure_msg = "Invalid jobs_per_iteration: #{params[:jobs_per_iteration]}. Please pass jobs_per_iteration as a positive integer."
               @logger.error failure_msg
               Failure(failure_msg)
