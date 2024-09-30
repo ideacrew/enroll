@@ -1,54 +1,52 @@
 <% if @bs4 %>
   <div id="broker_applicants_list">
     <div id="broker_applicants_roster">
-      <h1>Applicants</h1>
+      <h1><%= l10n("admin.applicants") %></h1>
       <div class="form-inline my-3">
-        <div class="" role="group" aria-label="">
-          <div class="btn-group" data-toggle="buttons" name="broker_applicants_tabs">
-            <% if @broker_agency_profile %>
-            <label class="btn btn-default active">
-              <input type="radio" name="options" autocomplete="off" value="broker_agency_pending" checked> Applicant
+        <fieldset class="mb-4" id="applicantsFilters">
+          <% if @broker_agency_profile %>
+          <label class="active">
+            <input type="radio" name="options" autocomplete="off" value="broker_agency_pending" checked><%= l10n("admin.applicant") %>
+          </label>
+          <label>
+            <input type="radio" name="options" autocomplete="off" value="active"><%= l10n("admin.accepted") %>
+          </label>
+          <label>
+            <input type="radio" name="options" autocomplete="off" value="broker_agency_declined"><%= l10n("admin.declined") %>
+          </label>
+          <label>
+            <input type="radio" name="options" autocomplete="off" value="broker_agency_terminated"><%= l10n("admin.terminated") %>
+          </label>
+          <label>
+            <input type="radio" name="options" autocomplete="off" value="all"><%= l10n("all") %>
+          </label>
+          <% else %>
+            <label class="active">
+              <input type="radio" name="options" autocomplete="off" value="applicant" checked><%= l10n("admin.applicant") %>
             </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="active"> Accepted
+            <label>
+              <input type="radio" name="options" autocomplete="off" value="certified"><%= l10n("admin.certified") %>
             </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="broker_agency_declined"> Declined
+            <label>
+              <input type="radio" name="options" autocomplete="off" value="pending"><%= l10n("admin.pending") %>
             </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="broker_agency_terminated"> Terminated
+            <label>
+              <input type="radio" name="options" autocomplete="off" value="decertified"><%= l10n("admin.decertified") %>
             </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="all"> All
+            <label>
+              <input type="radio" name="options" autocomplete="off" value="denied"><%= l10n("admin.denied") %>
             </label>
-            <% else %>
-            <label class="btn btn-default active">
-              <input type="radio" name="options" autocomplete="off" value="applicant" checked> Applicant
+            <label>
+              <input type="radio" name="options" autocomplete="off" value="extended"><%= l10n("admin.extended") %>
             </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="certified"> Certified
+            <label>
+              <input type="radio" name="options" autocomplete="off" value="imported"><%= l10n("admin.imported") %>
             </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="pending"> Pending
+            <label>
+              <input type="radio" name="options" autocomplete="off" value="all"><%= l10n("all") %>
             </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="decertified"> Decertified
-            </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="denied"> Denied
-            </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="extended"> Extended
-            </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="imported"> Imported
-            </label>
-            <label class="btn btn-default">
-              <input type="radio" name="options" autocomplete="off" value="all"> All
-            </label>
-            <% end %>
-          </div>
-        </div>
+          <% end %>
+        </fieldset>
       </div>
     </div>
 

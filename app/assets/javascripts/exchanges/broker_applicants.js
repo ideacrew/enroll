@@ -17,4 +17,19 @@ function enableBrokerApplicantFilters() {
       });
     });
   });
+
+  const filterInputs = document.querySelectorAll('#applicantsFilters input');
+  const bs4 =  document.documentElement.dataset.bs4;
+
+  filterInputs.forEach(input => {
+    input.addEventListener('change', function(){
+      var filter = $(this).val();
+      $.ajax({
+        url: url,
+        type: "GET",
+        data : { 'status': filter, 'bs4': bs4 }
+      });
+    });
+  });
+
 }
