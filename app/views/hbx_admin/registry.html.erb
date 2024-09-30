@@ -1,3 +1,36 @@
+<% if @bs4 %>
+<div id="registry">
+	<h1><%= l10n("admin.rr.heading") %></h1>
+	<p><%= l10n("hbx_profiles.last_updated_at") %>: <%= EnrollRegistry.configurations[:created_at] %></p>
+  <p><%= l10n("admin.rr.note") %></p>
+	<% EnrollRegistry.features.group_by{|f| EnrollRegistry[f].namespace}.each do |namespace, features| %>
+		<section class="card p-0">
+    <div class="card-header p-2">
+      <h2 class="secondary-text"><%= namespace %></h2>
+    </div>
+    <div class="card-body p-2">
+      <% features.sort().each_with_index do |f, index|%>
+      <% feature = EnrollRegistry[f] %>
+      <div class="d-flex align-items-center <%= 'mt-3' if index != 0 %>">
+        <div class="<%= feature.enabled? ? "success" : "error" %>-icon icon beta" alt="<%= feature.enabled? ? "success" : "error" %>">&nbsp;</div>
+        <h3 class="mb-0"><span class="registry-feature"><%= f %></h3>
+      </div>
+      <dl class="parent mb-0">
+        <% if feature.item && feature.item != f %>
+          <dt><%= l10n("admin.rr.item") %>:</dt>
+          <dd><%= feature.item.to_s %></dd>
+        <% end %>
+        <% feature.settings.each do |s| %>
+          <dt><%= s.key %>:</dt>
+          <dd><%= s.item %></dd>
+        <% end %>
+      </dl>
+      <% end %>
+    </div>
+		</section>
+	<% end %>
+</div>
+<% else %>
 <div class="container" id="registry">
 	<h1>EnrollRegistry Settings</h1>
 	Updated At: <%= EnrollRegistry.configurations[:created_at] %>
@@ -16,3 +49,4 @@
 		</div>
 	<% end %>
 </div>
+<% end %>
