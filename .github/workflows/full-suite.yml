@@ -173,13 +173,13 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec
       - name: copy coverage report
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           root=`pwd -P`
           cd $root/components/${{ matrix.engine-name }}
           cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.engine-name }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage.engines-${{ matrix.engine-name }}_${{ strategy.job-total }}
@@ -251,12 +251,12 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: 'components/financial_assistance/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/fa-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage.fa-${{ matrix.group }}_${{ strategy.job-total }}
           path: ${{ github.workspace }}/coverage/fa-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
@@ -347,12 +347,12 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cd components/benefit_sponsors
           cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage.bs-${{ matrix.group }}_${{ strategy.job-total }}
@@ -450,12 +450,12 @@ jobs:
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/financial_assistance,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/rspec-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage.rspec-${{ matrix.group }}_${{ strategy.job-total }}
           path: ${{ github.workspace }}/coverage/rspec-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
@@ -577,12 +577,12 @@ jobs:
           WD_CHROME_PATH: ${{ github.workspace }}/chrome-linux64/chrome
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
-        #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+        uses: actions/upload-artifact@v3
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
           name: code-coverage.cukes-${{ matrix.group }}_${{ strategy.job-total }}
           path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
@@ -600,7 +600,7 @@ jobs:
         if: needs[env.CHECK].result != 'success'
         run: exit 1
   code-coverage-summary:
-    #if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
+    if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
@@ -630,14 +630,14 @@ jobs:
           path: coveragereport/*
       - name: Write to Job Summary
         run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
-#      - name: copy coverage badge
-#        run: |
-#          mkdir coverage-save
-#          cp coveragereport/badge_linecoverage.svg coverage-save/
-#      - name: Publish coverage badge to coverage-badge branch
-#        uses: JamesIves/github-pages-deploy-action@v4
-#        with:
-#          branch: coverage-artifacts
-#          folder: coverage-save/
+      - name: copy coverage badge
+        run: |
+          mkdir coverage-save
+          cp coveragereport/badge_linecoverage.svg coverage-save/
+      - name: Publish coverage badge to coverage-badge branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: coverage-artifacts
+          folder: coverage-save/
 
 
