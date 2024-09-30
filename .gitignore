@@ -133,3 +133,4 @@ ci/rspec/**/*.json
 
 # For update county
 !update_county.csv
+.irb_history
