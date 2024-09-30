@@ -76,7 +76,9 @@
 </div>
 <div class="row">
 <div class="col-md-6">
-  <%= render 'shared/alph_paginate', url: url, full_index_url: index_url, alphs: @page_alphabets, remote: true, status: @status %>
+  <% if params[:page].present? || (@people.count != @broker_applicants.count) %>
+    <%= render 'shared/alph_paginate', url: url, full_index_url: index_url, alphs: @page_alphabets, remote: true, status: @status %>
+  <% end %>
 </div>
 
 <div class="col-md-6 text-right">
