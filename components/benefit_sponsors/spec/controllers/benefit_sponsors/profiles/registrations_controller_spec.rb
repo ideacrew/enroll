@@ -139,7 +139,6 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       # This spec should ultimately be refactored to remove any reference to a client in it
       # allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
       # allow(setting).to receive(:setting).with(:site_key).and_return(double(item: :dc))
-      allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
     end
 
     shared_examples_for "initialize registration form" do |action, params, profile_type|
