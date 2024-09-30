@@ -62,7 +62,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -72,7 +72,7 @@ jobs:
           node-version: '14'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
@@ -128,13 +128,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
       - name: Restore project gems
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -147,7 +147,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
@@ -169,7 +169,7 @@ jobs:
     needs: [rspec-report, rspec-engines-report]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Download all artifacts into the provided directory
       - uses: actions/download-artifact@v3

@@ -92,7 +92,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Add git HEAD info to docker image
         run: |
@@ -106,7 +106,7 @@ jobs:
           version: v0.9.1
 
       - name: Cache Docker layers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           # Key is named differently to avoid collision
@@ -172,7 +172,7 @@ jobs:
             CLIENT=${{ matrix.client }}
 
       - name: Setup sysdig cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: cache
           key: ${{ runner.os }}-cache-${{ hashFiles('**/sysdig-cli-scanner', '**/latest_version.txt', '**/db/main.db.meta.json', '**/scanner-cache/inlineScannerCache.db') }}

@@ -9,7 +9,7 @@ jobs:
   cucumber:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v2
         with:
@@ -25,7 +25,7 @@ jobs:
         with:
           mongoDBVersion: '3.6'
       - name: Restore project gems
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -38,7 +38,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v12-${{ hashFiles('yarn.lock') }}

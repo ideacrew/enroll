@@ -18,7 +18,7 @@ jobs:
         client-name: ['dc', 'me']
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
@@ -36,7 +36,7 @@ jobs:
         with:
           mongoDBVersion: '3.6'
       - name: Restore project gems
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -52,7 +52,7 @@ jobs:
           bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
@@ -80,7 +80,7 @@ jobs:
           ]
         client-name: ['dc', 'me']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
@@ -98,7 +98,7 @@ jobs:
         with:
           mongoDBVersion: '3.6'
       - name: restore Project Gems
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
@@ -118,7 +118,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
@@ -147,7 +147,7 @@ jobs:
         group: [1, 2]
         client-name: ['dc', 'me']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
@@ -165,7 +165,7 @@ jobs:
         with:
           mongoDBVersion: '3.6'
       - name: Restore Project Gems
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
@@ -183,7 +183,7 @@ jobs:
           gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
@@ -211,7 +211,7 @@ jobs:
         group: [1, 2, 3, 4, 5, 6]
         client-name: ['dc', 'me']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
@@ -229,7 +229,7 @@ jobs:
         with:
           mongoDBVersion: '3.6'
       - name: Restore project gems
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -246,7 +246,7 @@ jobs:
           bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
@@ -266,7 +266,7 @@ jobs:
         group: [1, 2, 3, 4, 5]
         client-name: ['dc', 'me']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
@@ -284,7 +284,7 @@ jobs:
         with:
           mongoDBVersion: '3.6'
       - name: Restore project gems
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -301,7 +301,7 @@ jobs:
           bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}

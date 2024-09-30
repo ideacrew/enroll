@@ -17,7 +17,7 @@ jobs:
   view_linter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -29,7 +29,7 @@ jobs:
   brakeman:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -57,7 +57,7 @@ jobs:
           - transport_profiles
           - ui_helpers
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -120,7 +120,7 @@ jobs:
             'transport_profiles'
           ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
@@ -128,7 +128,7 @@ jobs:
         with:
           node-version: '14'
       - name: restore Project Gems
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
@@ -147,7 +147,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -223,7 +223,7 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -235,7 +235,7 @@ jobs:
         run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -299,7 +299,7 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
@@ -307,7 +307,7 @@ jobs:
         with:
           node-version: '14'
       - name: Restore Project Gems
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
@@ -324,7 +324,7 @@ jobs:
           gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -421,7 +421,7 @@ jobs:
             23,
           ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -433,7 +433,7 @@ jobs:
         run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -544,7 +544,7 @@ jobs:
             44,
           ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -556,7 +556,7 @@ jobs:
         run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -603,7 +603,7 @@ jobs:
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download code coverage artifact
         uses: actions/download-artifact@v3
         with:
