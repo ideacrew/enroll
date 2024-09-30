@@ -1,9 +1,9 @@
 <%= render "ui-components/v1/navs/primary_nav" %>
 <% if @bs4 %>
-  <h1>Configuration</h1>
-  <%= link_to 'Announcements', exchanges_announcements_path, {class: 'btn btn-default my-3'} %>
+  <h1><%= l10n("admin.config.header") %></h1>
+  <%= link_to l10n("admin.announcements"), exchanges_announcements_path, {class: 'btn btn-default my-3'} %>
   <% if aca_security_questions %>
-    <%= link_to 'Security Questions', exchanges_security_questions_path, {class: 'btn btn-default my-3'} %>
+    <%= link_to l10n("admin.security_questions"), exchanges_security_questions_path, {class: 'btn btn-default my-3'} %>
   <% end %>
   <section class="card w-100 my-3">
     <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f| %>
@@ -11,16 +11,16 @@
       <span><%= l10n("admin_actions.time_travel.info") %></span>
       <div class="d-flex my-3 justify-content-start <%= pundit_class HbxProfile, :modify_admin_tabs? %>">
         <div class="mr-4 ml-0 col-sm col-md-6 col-lg-3 p-0">
-          <%= label_tag :current_date, "Current Date" %>
+          <%= label_tag :current_date, l10n("admin.config.current_date") %>
           <%= date_field_tag :current_date, @time_keeper.date_of_record.strftime('%Y-%m-%d'), {disabled: true, class: "w-100"} %>
         </div>
         <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-          <%= f.label :date_of_record, "New Date" %>
+          <%= f.label :date_of_record, l10n("admin.config.new_date") %>
           <%= f.date_field :date_of_record, {placeholder: "MM/DD/YYYY", class: "w-100"} %>
         </div>
       </div>
       <button type="submit" class="btn btn-primary" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>
-        Set Date
+        <%= l10n("admin.config.set_date") %>
       </button>
     <% end %>
   </section>
@@ -31,16 +31,16 @@
         <span><%= l10n("admin_actions.time_jump.info") %></span>
         <div class="d-flex my-3 justify-content-start <%= pundit_class HbxProfile, :modify_admin_tabs? %>">
           <div class="mr-4 ml-0 col-sm col-md-6 col-lg-3 p-0">
-            <%= label_tag :tj_current_date, "Current Date" %>
+            <%= label_tag :tj_current_date, l10n("admin.config.current_date") %>
             <%= date_field_tag :tj_current_date, @time_keeper.date_of_record.strftime('%Y-%m-%d'), {disabled: true, class: "w-100"} %>
           </div>
           <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-            <%= f.label :date_of_record, "New Date", for: "set_date_date_of_record" %>
+            <%= f.label :date_of_record, l10n("admin.config.new_date"), for: "set_date_date_of_record" %>
             <%= f.date_field :date_of_record, {placeholder: "MM/DD/YYYY", class: "w-100", id: "set_date_date_of_record"} %>
           </div>
         </div>
         <button type="button" class="btn btn-primary" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %> data-toggle="modal" data-target="#setDateModal" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>
-          Set Date
+          <%= l10n("admin.config.set_date") %>
         </button>
         <!-- Modal Popup -->
         <div class="modal" id="setDateModal" tabindex="-1" role="dialog" aria-labelledby="setDateModalLabel" aria-hidden="true">
@@ -73,16 +73,16 @@
         <div class="d-flex my-3 justify-content-start <%= pundit_class HbxProfile, :modify_admin_tabs? %>">
           <div class="mr-4 ml-0 col-sm col-md-6 col-lg-3 p-0">
             <%= f.hidden_field :name %>
-            <%= label_tag :current_day, "Current Day" %>
+            <%= label_tag :current_day, l10n("admin.config.current_day") %>
             <%= number_field_tag :current_day, Setting.individual_market_monthly_enrollment_due_on, {placeholder: "00", disabled: true, class: "w-100"} %>
           </div>
           <div class="mr-auto col-sm col-md-6 col-lg-3 p-0">
-            <%= f.label :value, "New Date", class: "required" %>
+            <%= f.label :value, l10n("admin.config.new_day"), class: "required" %>
             <%= f.number_field :value, {required: true, min: 1, max: 31, step: 1} %>
           </div>
         </div>
         <button type="submit" class="btn btn-primary">
-          Set Day
+          <%= l10n("admin.config.set_day") %>
         </button>
       <% end %>
     </section>
