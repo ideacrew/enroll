@@ -1,6 +1,6 @@
 ---
 title: "Resource Registry"
-date: 2021-02-09:12:25-05:00
+date: 2021-02-09T12:12:25-05:00
 draft: false
 ---
 
