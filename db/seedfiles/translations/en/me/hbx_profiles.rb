@@ -59,4 +59,5 @@ HBX_PROFILES_TRANSLATIONS = {
   'en.admin.comments' => 'Comments',
   'en.admin.no_applicants_found' => 'No Applicants found.',
   'en.admin.out_of' => 'out of',
+  'en.admin.alph_pagination_helper' => '(Click on any letter above to see all applicants whose last name starts with that letter.)'
 }
