@@ -18,7 +18,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - uses: actions/setup-node@v4
         with:
-          node-version: '10'
+          node-version: '14'
       - uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: '3.6'

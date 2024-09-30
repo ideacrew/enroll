@@ -24,7 +24,7 @@ jobs:
           rubygems: 3.3.26
       - uses: actions/setup-node@v4
         with:
-          node-version: '10'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -86,7 +86,7 @@ jobs:
           rubygems: 3.3.26
       - uses: actions/setup-node@v4
         with:
-          node-version: '10'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -153,7 +153,7 @@ jobs:
           rubygems: 3.3.26
       - uses: actions/setup-node@v4
         with:
-          node-version: '10'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -217,7 +217,7 @@ jobs:
           rubygems: 3.3.26
       - uses: actions/setup-node@v4
         with:
-          node-version: '10'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
@@ -272,7 +272,7 @@ jobs:
           rubygems: 3.3.26
       - uses: actions/setup-node@v4
         with:
-          node-version: '10'
+          node-version: '14'
       - uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'

@@ -13,7 +13,7 @@ jobs:
       - uses: nelonoel/branch-name@v1.0.1
       - uses: actions/setup-node@v4
         with:
-          node-version: '12'
+          node-version: '14'
       - name: Install global packages
         run: |
           yarn install
