@@ -19,7 +19,7 @@ jobs:
         run: |
           bundler-audit --output=bundler_audit.txt
       - name: upload bundler-audit failure report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: Security Reports
