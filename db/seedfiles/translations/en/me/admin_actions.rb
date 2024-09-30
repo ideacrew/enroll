@@ -1,5 +1,11 @@
 # Translations for Admin actions.
 ADMIN_ACTIONS_TRANSLATIONS = {
+  'en.admin.rr.heading' => 'Resource Registry Settings',
+  'en.admin.rr.note' => 'Note: The following features are enabled in the Resource Registry for web pods some configs may vary for other pods.',
+  'en.admin.rr.item' => 'Item',
+  'en.admin.applicants' => "Applicants",
+  'en.admin.applicant' => "Applicant",
+  'en.admin.accepted' => "Accepted",
   'en.admin.config.header' => 'Configuration',
   'en.admin.announcements' => 'Announcements',
   'en.admin.security_questions' => 'Security Questions',
