@@ -30,6 +30,10 @@ module BenefitSponsors
 
     describe "GET new" do
 
+      before do
+        get :new, params: { profile_type: "general_agency_staff" }
+      end
+
       it "should render new template" do
         expect(response).to render_template("new")
       end
