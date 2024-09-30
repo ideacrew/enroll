@@ -22,7 +22,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
@@ -84,7 +84,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
@@ -151,7 +151,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
@@ -215,7 +215,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2
@@ -270,7 +270,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: '10'
       - uses: getong/rabbitmq-action@v1.2

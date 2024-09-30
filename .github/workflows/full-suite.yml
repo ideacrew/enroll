@@ -124,7 +124,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: restore Project Gems
@@ -228,7 +228,7 @@ jobs:
         with:
           bundler-cache: true
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Install Test Boosters gem
@@ -303,7 +303,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Restore Project Gems
@@ -426,7 +426,7 @@ jobs:
         with:
           bundler-cache: true
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Install Test Boosters gem
@@ -549,7 +549,7 @@ jobs:
         with:
           bundler-cache: true
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Install Test boosters gem
