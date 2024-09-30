@@ -360,7 +360,8 @@ class Insured::FamilyMembersController < ApplicationController
     elsif @dependent.addresses.is_a? ActionController::Parameters
       addresses = []
       @dependent.addresses.each do |_k, address|
-        addresses << Address.new(address.permit!)
+
+        addresses << Address.new(address.except("_destroy").permit!)
       end
       @dependent.addresses = addresses
     end
