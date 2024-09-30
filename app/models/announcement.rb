@@ -7,7 +7,7 @@ class Announcement
   AUDIENCE_KINDS = [].tap do |a|
     a << 'Employer' if is_shop_or_fehb_market_enabled?
     a << 'Employee' if is_shop_or_fehb_market_enabled?
-    a << 'GA' if general_agency_enabled?
+    a << 'GA' if is_general_agency_enabled?
     a << ['IVL', 'Broker']
   end.flatten
 
