@@ -1,7 +1,7 @@
 <% if @bs4 %>
   <%= render partial: 'financial_assistance/shared/faa_progress_options', locals: {step: 6} %>
 
-  <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
+  <%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get}, class: "needs-validation" do |f| %>
     <div>
       <p class="alert alert-error hide"></p>
 
@@ -24,14 +24,14 @@
           </div>
         </fieldset>
 
-          <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
+        <% no_ssn_dropdown = FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) %>
         <fieldset class="mb-4 row-form-wrapper">
           <legend>
             <label class="weight-n <%= 'required' if no_ssn_dropdown %>" for="no_ssn_reason"><%= applicant_prompt('why_no_ssn') %></label>
           </legend>
           <div class="col px-0" data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>">
             <% if no_ssn_dropdown %>
-              <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true) %>
+              <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true, required: no_ssn_dropdown) %>
             <% else %>
               <%= f.text_field :non_ssn_apply_reason, id: "no_ssn_reason", placeholder: l10n('faa.other_ques.ssn_reason') %>
             <% end %>
@@ -43,8 +43,8 @@
         <fieldset>
           <legend class="weight-n required"><%= applicant_prompt('is_pregnant') %></legend>
           <div class="focus d-inline-flex">
-            <label class="weight-n"><%= f.radio_button :is_pregnant, true, id: "is_pregnant_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_pregnant, false, id: "is_pregnant_no" %> <%= l10n('no') %></label>
+            <label class="weight-n"><%= f.radio_button :is_pregnant, true, id: "is_pregnant_yes", required: true %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_pregnant, false, id: "is_pregnant_no", required: true %> <%= l10n('no') %></label>
           </div>
         </fieldset>
         <div>
@@ -87,16 +87,16 @@
         <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n required"><%= applicant_prompt("is_enrolled_on_medicaid") %></legend>
           <div class="focus d-inline-flex">
-            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
+            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, true, id: "medicaid_pregnancy_yes", required: true %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, false, id: "medicaid_pregnancy_no", required: true %> <%= l10n('no') %></label>
           </div>
         </fieldset>
 
         <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n required"><%= applicant_prompt("foster_care_at18") %></legend>
           <div class="focus d-inline-flex">
-            <label class="weight-n"><%= f.radio_button :is_former_foster_care, true, id: "is_former_foster_care_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_former_foster_care, false, id: "is_former_foster_care_no" %> <%= l10n('no') %></label>
+            <label class="weight-n"><%= f.radio_button :is_former_foster_care, true, id: "is_former_foster_care_yes", required: true %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_former_foster_care, false, id: "is_former_foster_care_no", required: true %> <%= l10n('no') %></label>
           </div>
         </fieldset>
 
@@ -126,8 +126,8 @@
           <fieldset class="mb-4 row-form-wrapper">
             <legend class="weight-n required"><%= applicant_prompt("is_student") %></legend>
             <div class="focus d-inline-flex">
-              <label class="weight-n"><%= f.radio_button :is_student, true, id: "is_student_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :is_student, false, id: "is_student_no" %> <%= l10n('no') %></label>
+              <label class="weight-n"><%= f.radio_button :is_student, true, id: "is_student_yes", required: true %> <%= l10n('yes') %></label>
+              <label class="weight-n"><%= f.radio_button :is_student, false, id: "is_student_no", required: true %> <%= l10n('no') %></label>
             </div>
           </fieldset>
 
@@ -160,8 +160,8 @@
           <fieldset>
             <legend class="weight-n <%= 'required' if is_question_required %>"><%= applicant_prompt("is_blind") %></legend>
             <div class="focus d-inline-flex">
-              <label class="weight-n"><%= f.radio_button :is_self_attested_blind, true, id: "is_self_attested_blind_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :is_self_attested_blind, false, id: "is_self_attested_blind_no" %> <%= l10n('no') %></label>
+              <label class="weight-n"><%= f.radio_button :is_self_attested_blind, true, id: "is_self_attested_blind_yes", required: is_question_required %> <%= l10n('yes') %></label>
+              <label class="weight-n"><%= f.radio_button :is_self_attested_blind, false, id: "is_self_attested_blind_no", required: is_question_required %> <%= l10n('no') %></label>
             </div>
           </fieldset>
           <div>
@@ -174,8 +174,8 @@
           <fieldset>
             <legend class="weight-n <%= 'required' if is_question_required %>"><%= applicant_prompt("daily_living_help") %></legend>
             <div class="focus d-inline-flex">
-              <label class="weight-n"><%= f.radio_button :has_daily_living_help, true, id: "has_daily_living_help_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :has_daily_living_help, false, id: "has_daily_living_help_no" %> <%= l10n('no') %></label>
+              <label class="weight-n"><%= f.radio_button :has_daily_living_help, true, id: "has_daily_living_help_yes", required: is_question_required %> <%= l10n('yes') %></label>
+              <label class="weight-n"><%= f.radio_button :has_daily_living_help, false, id: "has_daily_living_help_no", required: is_question_required %> <%= l10n('no') %></label>
             </div>
           </fieldset>
           <div>
@@ -188,8 +188,8 @@
           <fieldset>
             <legend class="weight-n <%= 'required' if is_question_required %>"><%= applicant_prompt("help_paying_bills") %></legend>
             <div class="focus d-inline-flex">
-              <label class="weight-n"><%= f.radio_button :need_help_paying_bills, true, id: "need_help_paying_bills_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :need_help_paying_bills, false, id: "need_help_paying_bills_no" %> <%= l10n('no') %></label>
+              <label class="weight-n"><%= f.radio_button :need_help_paying_bills, true, id: "need_help_paying_bills_yes", required: is_question_required %> <%= l10n('yes') %></label>
+              <label class="weight-n"><%= f.radio_button :need_help_paying_bills, false, id: "need_help_paying_bills_no", required: is_question_required %> <%= l10n('no') %></label>
             </div>
           </fieldset>
           <div>
@@ -202,8 +202,8 @@
           <fieldset>
             <legend class="weight-n <%= 'required' if is_question_required %>"><%= applicant_prompt("disability_question") %></legend>
             <div class="focus d-inline-flex">
-              <label class="weight-n"><%= f.radio_button :is_physically_disabled, true, id: "radio_physically_disabled_yes" %> <%= l10n('yes') %></label>
-              <label class="weight-n"><%= f.radio_button :is_physically_disabled, false, id: "radio_physically_disabled_no" %> <%= l10n('no') %></label>
+              <label class="weight-n"><%= f.radio_button :is_physically_disabled, true, id: "radio_physically_disabled_yes", required: is_question_required %> <%= l10n('yes') %></label>
+              <label class="weight-n"><%= f.radio_button :is_physically_disabled, false, id: "radio_physically_disabled_no", required: is_question_required %> <%= l10n('no') %></label>
             </div>
           </fieldset>
           <div>
@@ -217,8 +217,8 @@
             <fieldset>
               <legend class="weight-n required"><%= applicant_prompt("primary_caretaker_question_text") %></legend>
               <div class="focus d-inline-flex">
-                <label class="weight-n"><%= f.radio_button :is_primary_caregiver, true, id: "is_primary_caregiver_yes" %> <%= l10n('yes') %></label>
-                <label class="weight-n"><%= f.radio_button :is_primary_caregiver, false, id: "is_primary_caregiver_no" %> <%= l10n('no') %></label>
+                <label class="weight-n"><%= f.radio_button :is_primary_caregiver, true, id: "is_primary_caregiver_yes", required: true %> <%= l10n('yes') %></label>
+                <label class="weight-n"><%= f.radio_button :is_primary_caregiver, false, id: "is_primary_caregiver_no", required: true %> <%= l10n('no') %></label>
               </div>
             </fieldset>
             <div>

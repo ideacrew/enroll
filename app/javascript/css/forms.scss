@@ -73,6 +73,18 @@ legend,
   }
 }
 
+label:not(:has(input[type='checkbox'])):not(:has(input[type='radio'])), legend, .label, .legend {
+  display: block;
+}
+
+.d-flex label:has(input[type='radio']) + label:has(input[type='radio']) {
+  margin-left: 1rem;
+}
+
+.d-flex .d-block label:has(input[type='radio']) + label:has(input[type='radio']) {
+  margin-left: 0;
+}
+
 button,
 .btn {
   label {
@@ -239,7 +251,7 @@ fieldset {
   align-items: center;
 }
 
-fieldset label:not(:last-child) {
+fieldset label:has(input[type='text']):not(:last-child) {
   margin-right: $spacer;
 }
 
@@ -392,4 +404,18 @@ input[type='date']:invalid::-webkit-datetime-edit {
 
 #update_tax_credit_section input[type="number"] {
   width: 100px;
+}
+
+.was-validated {
+  input:invalid, select:invalid, textarea:invalid {
+    border-color: var(--error-color);
+    padding-right: calc(1.5em + 0.75rem) !important;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23A21E1F'/%3E%3Cline x1='8.46451' y1='8.46448' x2='15.5356' y2='15.5355' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='15.5356' y1='8.46451' x2='8.46458' y2='15.5356' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  input[type='checkbox']:invalid,
+  input[type='radio']:invalid {
+    outline: 2px solid var(--error-color);
+  }
 }

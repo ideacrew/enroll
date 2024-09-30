@@ -21,7 +21,7 @@ end
 #
 # @return [void]
 row_limit_per_file = ENV['row_limit_per_file']
-if row_limit_per_file.to_i < 0
+if row_limit_per_file.to_i <= 0
   puts 'Please pass row_limit_per_file as a positive integer. EXITING.'
   exit
 end

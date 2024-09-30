@@ -1,8 +1,16 @@
 # Translations for Admin actions.
 ADMIN_ACTIONS_TRANSLATIONS = {
+  'en.admin.config.header' => 'Configuration',
+  'en.admin.announcements' => 'Announcements',
+  'en.admin.security_questions' => 'Security Questions',
+  'en.admin.config.current_date' => 'Current Date',
+  'en.admin.config.current_day' => 'Current Day',
+  'en.admin.config.new_day' => 'New Day',
+  'en.admin.config.new_date' => 'New Date',
+  'en.admin.config.set_date' => 'Set Date',
+  'en.admin.config.set_day' => 'Set Day',
   'en.admin_actions.bulk_upload.new.description_text' => 'Use this tool to send the same message or notice to a specific set of users. Copy and paste the FEINs or HBX IDs for the users who should get the message in their secure inbox. Remember, each FEIN or HBX ID must be separated by a comma.',
   'en.admin_actions.bulk_upload.new.description_sub_text' => 'The message and any attachments will be the same for everyone on the recipient list – they cannot be personalized. You can attach files in PDF, JPEG, or PNG formats.',
-  'en.admin_actions.edit_aptc_csr' => 'Edit APTC / CSR',
   'en.admin_actions.drop_enrollment_members' => 'Disenroll Member(s)',
   'en.admin_actions.drop_member_description' => 'This tool allows Admins to disenroll members from an active Individual Market enrollment. The tool will only be available for families where more than one member exists in the family and there is at least one active individual market health or dental enrollment.',
   'en.admin_actions.enrollment_hbx_id' => 'Enrollment HBX ID',
