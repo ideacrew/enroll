@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nelonoel/branch-name@v1.0.1
       - uses: actions/setup-node@v4
         with:
           node-version: '14'
@@ -37,7 +36,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.IC_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.IC_AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: hugo/public
-          DEST_DIR: ${{ env.BRANCH_NAME }}
+          DEST_DIR: ${{ github.ref_name }}
       - name: Invalidate CloudFront
         uses: chetan/invalidate-cloudfront-action@v2
         env:
