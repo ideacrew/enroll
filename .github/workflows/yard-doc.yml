@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'hugo_doc_fix_10_1'
+      - 'trunk'
 
 jobs:
   docs_deployment:
