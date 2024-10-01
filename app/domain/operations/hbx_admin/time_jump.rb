@@ -19,7 +19,6 @@ module Operations
       def validate(params)
         new_date = Date.parse(params[:new_date])
 
-        binding.irb
         if new_date >= Date.today
           Success(new_date)
         else
