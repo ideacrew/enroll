@@ -116,6 +116,8 @@ class UsersController < ApplicationController
     authorize HbxProfile, :login_history?
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
 
+    @bs4 = true if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+
     respond_to do |format|
       format.js { render 'login_history' }
     end

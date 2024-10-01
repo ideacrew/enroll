@@ -12,6 +12,7 @@ module Effective
       scopes = (params[:scopes].presence || params[:custom_attributes].presence || {})
 
       @datatable = find_datatable(params[:id]).try(:new, attributes.merge(scopes).to_hash)
+      @bs4 = params[:bs4] == 'true'
       @datatable.view = view_context if !@datatable.nil?
 
       EffectiveDatatables.authorized?(@datatable, self, :index, @datatable.try(:collection_class) || @datatable.try(:class))
