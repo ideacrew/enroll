@@ -1,4 +1,22 @@
 <% remote = remote.blank? ? false : remote %>
+<% if bs4 == true || @bs4 %>
+<ul class='pagination'>
+  <%- if defined?(full_index_url) && full_index_url.present? %>
+    <li class="page-item <%= 'active' if params[:page].nil? %>">
+      <%= link_to(full_index_url, remote: true, class: "page-link #{'active' unless params[:page].present?}") do %>
+       <%= l10n("all") %>
+      <% end %>
+    </li>
+  <% end %>
+  <% current_page = current_page(params[:page], alphs) %>
+  <% alphs.each do |alph| %>
+    <% alph_url = url + "?page=#{alph}" %>
+    <% alph_url += "&status=#{status}" if defined?(status) && status %>
+    <% alph_url += "&employee_search=#{ERB::Util.url_encode(params[:employee_search])}" if params[:employee_search].present? %>
+    <li class="page-item <%= 'active' if alph == params[:page] %>"><%= link_to alph, (alph_url), remote: remote, class:"page-link" %></li>
+  <% end %>
+</ul>
+<% else %>
 <ul class='pagination'>
   <%- if defined?(full_index_url) && full_index_url.present? %>
     <li class="<%= 'active' if params[:page].nil? %>">
@@ -14,3 +32,4 @@
     <li class="<%= 'active' if alph == params[:page] %>"><%= link_to alph, (alph_url), remote: remote %></li>
   <% end %>
 </ul>
+<% end %>
