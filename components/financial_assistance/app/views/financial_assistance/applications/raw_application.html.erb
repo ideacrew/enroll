@@ -26,31 +26,31 @@
                 </tr>
               </thead>
               <tbody>
-              <% @applicants.each do |applicant| %>
-                <% income_and_deductions_for(applicant).each do |embedded_document| %>
-                  <tr>
-                    <td> <%= applicant.full_name %> </td>
-                    <% if embedded_document.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
-                      <td> <%= l10n("faa.#{embedded_document.class.name.demodulize.downcase}.#{embedded_document.kind}.#{embedded_document.ssi_type}") %> </td>
-                    <%else%>
-                      <td> <%= l10n("faa.#{embedded_document.class.name.demodulize.downcase}.#{embedded_document.kind}") %> </td>
-                    <%end%>
-                    <td> <%= embedded_document.frequency_kind.humanize %> </td>
-                    <td>
-                      <b>
-                        <% if embedded_document.is_a? FinancialAssistance::Deduction %>
-                            (<%= number_to_currency(embedded_document.amount.to_s) %>)
-                        <% else %>
-                            <%= number_to_currency(embedded_document.amount.to_s) %>
-                        <% end %>
-                      </b>
-                    </td>
-                    <td>
-                      <%= start_to_end_dates(embedded_document) %>
-                    </td>
-                  </tr>
+                <% @applicants.each do |applicant| %>
+                  <% income_and_deductions_for(applicant).each do |embedded_document| %>
+                    <tr>
+                      <td> <%= applicant.full_name %> </td>
+                      <% if embedded_document.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
+                        <td> <%= l10n("faa.#{embedded_document.class.name.demodulize.downcase}.#{embedded_document.kind}.#{embedded_document.ssi_type}") %> </td>
+                      <%else%>
+                        <td> <%= l10n("faa.#{embedded_document.class.name.demodulize.downcase}.#{embedded_document.kind}") %> </td>
+                      <%end%>
+                      <td> <%= embedded_document.frequency_kind.humanize %> </td>
+                      <td>
+                        <b>
+                          <% if embedded_document.is_a? FinancialAssistance::Deduction %>
+                              (<%= number_to_currency(embedded_document.amount.to_s) %>)
+                          <% else %>
+                              <%= number_to_currency(embedded_document.amount.to_s) %>
+                          <% end %>
+                        </b>
+                      </td>
+                      <td>
+                        <%= start_to_end_dates(embedded_document) %>
+                      </td>
+                    </tr>
+                  <% end %>
                 <% end %>
-              <% end %>
               </tbody>
             </table>
 
