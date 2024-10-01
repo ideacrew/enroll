@@ -35,7 +35,16 @@
                   <% end %>
                 </b>
               </td>
-              <td><%= start_to_end_dates(embedded_document) %></td>
+              <td class="d-flex justify-content-between">
+                  <%= start_to_end_dates(embedded_document) %>
+                  <% if helper.can_edit %>
+                    <span>
+                      <%= h(link_to(income_and_deductions_edit(@application, applicant, embedded_document), id: 'edit-income-and-deductions-pencil') do %>
+                        <%= l10n("edit") %>
+                      <% end) %>
+                    </span>
+                  <% end %>
+              </td>
             </tr>
           <% end %>
           <% if FinancialAssistanceRegistry[:net_annual_income_display].enabled? && applicant.net_annual_income.present? %>

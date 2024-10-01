@@ -186,6 +186,8 @@ module FinancialAssistance
 
       # Class which manages the summary hash for the consumer review pages containing limited raw application data and supporting editable sections.
       class ConsumerSummaryService < SummaryService
+        attr_reader :can_edit
+
         def initialize(cfl_service, application, applicants, can_edit)
           @can_edit = can_edit
           @applicant_displayable_helpers = applicants.map { |applicant| ApplicantDisplayableHelper.new(cfl_service, applicant.id) }
