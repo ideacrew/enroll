@@ -1,9 +1,19 @@
+var bs4 = document.documentElement.dataset.bs4 == "true"
+
 document.addEventListener('DOMContentLoaded', function() {
-  const submitButton = document.getElementById('submit');
+  let submitButton;
+  let dateInput;
+
+  if (bs4) {
+    submitButton = document.getElementById('time-jump-submit');
+    dateInput = document.getElementById('set_date_date_of_record');
+  } else {
+    submitButton = document.getElementById('submit');
+    dateInput = document.getElementById('hop_to_date_date_of_record');
+  }
 
   if (submitButton) {
     submitButton.addEventListener('click', function() {
-      const dateInput = document.getElementById('hop_to_date_date_of_record');
       const dateValue = dateInput ? dateInput.value : '';
 
       // Validate the date value
