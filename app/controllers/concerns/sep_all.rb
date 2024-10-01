@@ -23,7 +23,7 @@ module SepAll
 
     special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: @eff_kind)
     special_enrollment_period.qualifying_life_event_kind = qle
-    special_enrollment_period.qle_on = Date.strptime(params[:eventDate], "%m/%d/%Y")
+    special_enrollment_period.qle_on = parse_date(params[:eventDate])
     @start_on = special_enrollment_period.start_on
     @end_on = special_enrollment_period.end_on
     @effective_on = special_enrollment_period.effective_on
@@ -35,10 +35,10 @@ module SepAll
   def check_renewal_flag
     @family = Family.find(params[:person]) if params[:person].present?
     qle = QualifyingLifeEventKind.find(params[:id]) if params[:id].present?
-    effective_date = Date.strptime(params[:effective_date], "%m/%d/%Y") if params[:effective_date].present?
-    date_option_1 = Date.strptime(params[:date_option1], "%m/%d/%Y") if params[:date_option1].present?
-    date_option_2 = Date.strptime(params[:date_option2], "%m/%d/%Y") if params[:date_option2].present?
-    date_option_3 = Date.strptime(params[:date_option3], "%m/%d/%Y") if params[:date_option3].present?
+    effective_date = parse_date(params[:effective_date]) if params[:effective_date].present?
+    date_option_1 = parse_date(params[:date_option1]) if params[:date_option1].present?
+    date_option_2 = parse_date(params[:date_option2]) if params[:date_option2].present?
+    date_option_3 = parse_date(params[:date_option3]) if params[:date_option3].present?
 
     status = []
     [effective_date, date_option_1, date_option_2, date_option_3].each do |date|
@@ -201,27 +201,28 @@ module SepAll
     @name = sep_params[:firstName] + " " + sep_params[:lastName]
     special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: sep_params[:effective_on_kind].downcase)
     special_enrollment_period.qualifying_life_event_kind = qle
-    special_enrollment_period.qle_on = Date.strptime(sep_params[:event_date], "%m/%d/%Y") if sep_params[:event_date].present?
-    special_enrollment_period.start_on = Date.strptime(sep_params[:start_on], "%m/%d/%Y") if sep_params[:start_on].present?
-    special_enrollment_period.end_on = Date.strptime(sep_params[:end_on], "%m/%d/%Y") if sep_params[:end_on].present?
+    special_enrollment_period.qle_on = parse_date(sep_params[:event_date]) if sep_params[:event_date].present?
+    special_enrollment_period.start_on = parse_date(sep_params[:start_on]) if sep_params[:start_on].present?
+    special_enrollment_period.end_on = parse_date(sep_params[:end_on]) if sep_params[:end_on].present?
     special_enrollment_period.selected_effective_on = sep_params[:effective_on_date] if sep_params[:effective_on_date].present?
     # special_enrollment_period.admin_comment = params.permit(:admin_comment)[:admin_comment] if sep_params[:admin_comment].present?
     special_enrollment_period.comments << Comment.new(content: sep_params[:admin_comment], user: current_user.email) if sep_params[:admin_comment].present?
     special_enrollment_period.csl_num = sep_params[:csl_num] if sep_params[:csl_num].present?
-    special_enrollment_period.next_poss_effective_date = Date.strptime(sep_params[:next_poss_effective_date], "%m/%d/%Y") if sep_params[:next_poss_effective_date].present?
+    special_enrollment_period.next_poss_effective_date = parse_date(sep_params[:next_poss_effective_date]) if sep_params[:next_poss_effective_date].present?
     date_arr = Array.new
-    date_arr.push(Date.strptime(sep_params[:option1_date], "%m/%d/%Y").to_s) if sep_params[:option1_date].present?
-    date_arr.push(Date.strptime(sep_params[:option2_date], "%m/%d/%Y").to_s) if sep_params[:option2_date].present?
-    date_arr.push(Date.strptime(sep_params[:option3_date], "%m/%d/%Y").to_s) if sep_params[:option3_date].present?
+    date_arr.push(parse_date(sep_params[:option1_date]).to_s) if sep_params[:option1_date].present?
+    date_arr.push(parse_date(sep_params[:option2_date]).to_s) if sep_params[:option2_date].present?
+    date_arr.push(parse_date(sep_params[:option3_date]).to_s) if sep_params[:option3_date].present?
     special_enrollment_period.optional_effective_on = date_arr if date_arr.length > 0
     special_enrollment_period.market_kind = qle.market_kind == "individual" ? "ivl" : qle.market_kind
     special_enrollment_period.admin_flag = true
     special_enrollment_period.coverage_renewal_flag = sep_params[:coverage_renewal_flag].to_s == "true"
     
     if special_enrollment_period.save
-      @message_for_partial = "SEP Added for #{@name}"
+      @message_for_partial = @bs4 ? l10n('hbx_profiles.add_sep.result.success', name: @name) : "SEP Added for #{@name}"
     else
-      @message_for_partial = "SEP not saved. (Error: " + special_enrollment_period.errors.full_messages.join(", ") + ")"
+      errors = special_enrollment_period.errors.full_messages.join(", ")
+      @message_for_partial = @bs4 ? l10n('hbx_profiles.add_sep.result.failure', errors: errors) : "SEP not saved. (Error: #{errors})"
     end
   end
 
@@ -247,5 +248,11 @@ module SepAll
       end
     end
    returnData == 'yes' ? init_arr : init_arr.length;
+  end
+
+  def parse_date(string)
+    return nil if string.blank?
+    date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+    Date.strptime(string, date_format)
   end
 end

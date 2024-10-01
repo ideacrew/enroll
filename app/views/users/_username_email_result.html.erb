@@ -1,42 +1,78 @@
-<div class="container">
-  <%if @matches != true %>
-    <h4 class="title text-center">User Account Updated Successfully</h4>
-    <table class="table table-border">
-      <thead></thead>
-      <tbody>
-      <tr>
-        <td>
-          <h5><b>Name:</b> <%= @user.person.try(:full_name) %></h5>
-        </td>
-        <td>
-          <h5><b>HBX ID:</b> <%= @user.person.try(:hbx_id) %></h5>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <h5><b>Username:</b> <%= @user.oim_id %></h5>
-        </td>
-        <td>
-          <h5><b>User_Email:</b> <%= @user.email %></h5>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    </div>
-  <%else%>
-    <h3 class="title text-center">User Account Update Failed</h3>
-    <% if @username_taken.present? %>
-      <h4>The username matches with the following user:</h4>
-      First Name :<b><%= @username_taken.person.first_name %></b> <br />
-      Last Name:  <b><%= @username_taken.person.last_name %></b>  <br />
-      HBX ID:     <b><%= @username_taken.person.hbx_id %></b>     <br />
+<% if @bs4 %>
+  <div>
+    <% if @matches != true %>
+      <h3 class="title text-center"><%= l10n('hbx_profiles.user_accounts.actions.edit.result.success') %></h3>
+      
+      <table class="table table-border">
+        <thead></thead>
+        <tbody>
+          <tr>
+            <td><%= l10n('name') %>: <b><%= @user.person.try(:full_name) %></b></td>
+            <td><%= l10n('hbx_id') %>: <b><%= @user.person.try(:hbx_id)%></b></td>
+          </tr>
+          <tr>
+            <td><%= l10n('username') %>: <b><%= @user.oim_id  %></b></td>
+            <td><%= l10n('email') %>: <b><%= @person.email %></b></td>
+          </tr>
+        </tbody>
+      </table>
+    <% else %>
+      <h3><%= l10n('hbx_profiles.user_accounts.actions.edit.result.failure') %></h3>
+      <% if @username_taken.present? %>
+        <h4><%= l10n('hbx_profiles.user_accounts.actions.edit.result.failure.username_subheader') %></h4>
+        <div><%= l10n('first_name') %>: <b><%= @ssn_match.first_name %></b></div>
+        <div><%= l10n('last_name') %>: <b><%= @ssn_match.last_name %></b></div>
+        <div><%= l10n('hbx_id') %>: <b><%= @ssn_match.hbx_id %></b></div>
+      <% end %>
+      <% if @email_taken.present? %>
+        <h4><%= l10n('hbx_profiles.user_accounts.actions.edit.result.failure.email_subheader') %></h4>
+        <div><%= l10n('first_name') %>: <b><%= @ssn_match.first_name %></b></div>
+        <div><%= l10n('last_name') %>: <b><%= @ssn_match.last_name %></b></div>
+        <div><%= l10n('hbx_id') %>: <b><%= @ssn_match.hbx_id %></b></div>
+      <% end %>
+      <h4><%= l10n('hbx_profiles.actions.failure.resolve') %></h4>
     <% end %>
-    <% if @email_taken.present? %>
-      <h4>The email matches with the following user:</h4>
-      First Name :<b><%= @email_taken.person.first_name %></b> <br />
-      Last Name:  <b><%= @email_taken.person.last_name %></b>  <br />
-      HBX ID:     <b><%= @email_taken.person.hbx_id %></b>     <br />
-    <% end %>
-    <h5>Please resolve the match issue.</h5>
-  <%end%>
   </div>
+<% else %>
+  <div class="container">
+    <%if @matches != true %>
+      <h4 class="title text-center">User Account Updated Successfully</h4>
+      <table class="table table-border">
+        <thead></thead>
+        <tbody>
+        <tr>
+          <td>
+            <h5><b>Name:</b> <%= @user.person.try(:full_name) %></h5>
+          </td>
+          <td>
+            <h5><b>HBX ID:</b> <%= @user.person.try(:hbx_id) %></h5>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <h5><b>Username:</b> <%= @user.oim_id %></h5>
+          </td>
+          <td>
+            <h5><b>User_Email:</b> <%= @user.email %></h5>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    <%else%>
+      <h3 class="title text-center">User Account Update Failed</h3>
+      <% if @username_taken.present? %>
+        <h4>The username matches with the following user:</h4>
+        First Name :<b><%= @username_taken.person.first_name %></b> <br />
+        Last Name:  <b><%= @username_taken.person.last_name %></b>  <br />
+        HBX ID:     <b><%= @username_taken.person.hbx_id %></b>     <br />
+      <% end %>
+      <% if @email_taken.present? %>
+        <h4>The email matches with the following user:</h4>
+        First Name :<b><%= @email_taken.person.first_name %></b> <br />
+        Last Name:  <b><%= @email_taken.person.last_name %></b>  <br />
+        HBX ID:     <b><%= @email_taken.person.hbx_id %></b>     <br />
+      <% end %>
+      <h5>Please resolve the match issue.</h5>
+    <%end%>
+  </div>
+<% end %>
