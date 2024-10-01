@@ -10,6 +10,7 @@ module FinancialAssistance
       include L10nHelper
 
       APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_application.yml.erb"
+      COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
 
       def initialize(application, applicants, cfl_service)
         @application = application
@@ -72,8 +73,30 @@ module FinancialAssistance
       # @return [Hash] The hash holding all of the application summary data for the applicant.
       def load_applicant_map(applicant)
         # load the map from the config
-        file = File.read(SummaryService::APPLICANT_CONFIGURATION)
-        YAML.safe_load(ERB.new(file).result(binding)).deep_symbolize_keys
+        application_file = File.read(SummaryService::APPLICANT_CONFIGURATION)
+        application_map = YAML.safe_load(ERB.new(application_file).result(binding)).deep_symbolize_keys
+
+        # load the coverage data into the map from the coverage config
+        load_coverages_map(applicant, application_map, :is_enrolled)
+        load_coverages_map(applicant, application_map, :is_eligible)
+
+        application_map
+      end
+
+      # @method load_coverages_map(applicant, application_map, kind)
+      # Helper method for `load_applicant_map`.
+      # Loads the coverage data from the coverage config into the application map for the given applicant.
+      # Used for the `is_enrolled` and `is_eligible` coverage rows *only* when the row value is true.
+      #
+      # @param [FinancialAssistance::Applicant] applicant The applicant for whom the coverage data is being loaded.
+      # @param [Hash] applicant The application map to load the coverage data into.
+      # @param [Symbol] kind The kind of coverage data to load.
+      def load_coverages_map(applicant, application_map, kind)
+        return unless application_map[:health_coverage][:rows][kind][:value]
+
+        coverage_file = File.read(SummaryService::COVERAGE_CONFIGURATION)
+        coverage_map = YAML.safe_load(ERB.new(coverage_file).result(binding)).map { |kind_array| kind_array.map(&:deep_symbolize_keys) }
+        application_map[:health_coverage][:rows][kind][:coverages] = coverage_map
       end
 
       # @method section_hash(section_data)
@@ -156,7 +179,7 @@ module FinancialAssistance
           filter_rows(map, :personal_info, PERSONAL_INFO_ROWS)
           map[:personal_info][:rows].merge!(map[:demographics][:rows])
           map.delete(:demographics)
-          filter_rows(map, :health_coverage, [:enrolled_in_health_coverage, :has_eligible_health_coverage]) if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
+          filter_rows(map, :health_coverage, [:is_enrolled, :is_eligible]) if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
           map
         end
       end
@@ -220,7 +243,7 @@ module FinancialAssistance
         end
 
         def coverage_section(map, applicant)
-          rows = [:enrolled_in_health_coverage, :has_eligible_health_coverage]
+          rows = [:is_enrolled, :is_eligible]
           rows += [:indian_health_service_eligible, :indian_health_service_through_referral] if EnrollRegistry[:indian_health_service_question].feature.is_enabled && applicant.indian_tribe_member
           if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
             rows += [:not_eligible_for_medicaid_cubcare, :medicaid_cubcare_due_on, :eligibility_change_due_to_medicaid_cubcare, :household_income_change, :medicaid_last_day]

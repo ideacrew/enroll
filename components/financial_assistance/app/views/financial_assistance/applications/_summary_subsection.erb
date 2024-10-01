@@ -29,7 +29,7 @@
       <% subsection[:rows].each do |row| %>
         <% if row.is_a?(Array) %> <%# nested section %>
           <% for nested_section in row %>
-            <%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: nested_section, is_nested: true} %>
+            <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: nested_section, is_nested: true} %>
           <% end %>
         <% else %> <%# single row %>
           <div class="d-flex justify-content-between align-items-center">

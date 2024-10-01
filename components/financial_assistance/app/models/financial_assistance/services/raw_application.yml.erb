@@ -4,7 +4,7 @@
 # 3. Admin FAA Full Application Review (accessible from the Home > Applications > Application dropdown)
 #
 # The configuration ties together both the translation keys and field values used on the key-value pair rows in the review pages.
-# `ApplicationHelper::SummaryHelper` drives the parsing of this file, view mapping, and conditional row/section display for the above pages.
+# `FinancialAssistance::Services::SummaryService` drives the parsing of this file, view mapping, and conditional row/section display for the above pages.
 # Shared conditional row/section display logic is managed in this config; conditional display logic which varies on page context is managed in the helper.
 
 personal_info:
@@ -210,85 +210,12 @@ health_coverage:
     title: <%= l10n('health_coverage') %>
     edit_link: <%= application_applicant_benefits_path(@application, applicant) %>
     rows:
-        <% benefit_coverage_sections = ['is_enrolled', 'is_eligible'].map { |kind| [kind, applicant.benefits.has_valid_insurance_kind.where(kind: kind).group_by(&:insurance_kind)] }.to_h %>
-        enrolled_in_health_coverage:
+        is_enrolled:
             key: <%= l10n(applicant_currently_enrolled_short_key) %>
             value: <%= applicant.has_enrolled_health_coverage %>
-            <% if applicant.has_enrolled_health_coverage %>
-            <% kind = 'is_enrolled' %>
-            coverages:
-                <% benefit_coverage_sections[kind].each do |insurance_kind, benefits| %>
-                -
-                    <% benefits.each do |benefit| %>
-                    -   type: <%= l10n(benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-                        period: <%= start_to_end_dates(benefit) %>
-                        <% if display_esi_fields?(benefit.insurance_kind, kind) %>
-                        esi_benefit_data:
-                            employer_name:
-                                key: <%= l10n('faa.benefits.employer_name') %>
-                                value: <%= benefit.employer_name %>
-                            <% unless FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
-                            employer_address_line_1:
-                                key: <%= l10n('faa.benefits.employer_address_line_1') %>
-                                value: <%= benefit.employer_address.address_1 %>
-                            <% if benefit.employer_address.address_2.present? %>
-                            employer_address_line_2:
-                                key: <%= l10n('faa.benefits.employer_address_line_2') %>
-                                value: <%= benefit.employer_address.address_2 %>
-                            <% end %>
-                            city:
-                                key: <%= l10n('faa.benefits.city') %>
-                                value: <%= benefit.employer_address.city %>
-                            state:
-                                key: <%= l10n('faa.benefits.state') %>
-                                value: <%= benefit.employer_address.state %>
-                            zip:
-                                key: <%= l10n('faa.benefits.zip') %>
-                                value: <%= benefit.employer_address.zip %>
-                            <% end %>
-                        <% end %>
-                    <% end %>
-                <% end %>
-            <% end %>
-        has_eligible_health_coverage:
+        is_eligible:
             key: <%= l10n(applicant_eligibly_enrolled_short_key) %>
             value: <%= applicant.has_eligible_health_coverage %>
-            <% if applicant.has_eligible_health_coverage %>
-            <% kind = 'is_eligible' %>
-            coverages:
-                <% benefit_coverage_sections[kind].each do |insurance_kind, benefits| %>
-                -
-                    <% benefits.each do |benefit| %>
-                    -   type: <%= l10n(benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-                        period: <%= start_to_end_dates(benefit) %>
-                        <% if display_esi_fields?(benefit.insurance_kind, kind) %>
-                        esi_benefit_data:
-                            employer_name:
-                                key: <%= l10n('faa.benefits.employer_name') %>
-                                value: <%= benefit.employer_name %>
-                            <% unless FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
-                            employer_address_line_1:
-                                key: <%= l10n('faa.benefits.employer_address_line_1') %>
-                                value: <%= benefit.employer_address.address_1 %>
-                            <% if benefit.employer_address.address_2.present? %>
-                            employer_address_line_2:
-                                key: <%= l10n('faa.benefits.employer_address_line_2') %>
-                                value: <%= benefit.employer_address.address_2 %>
-                            <% end %>
-                            city:
-                                key: <%= l10n('faa.benefits.city') %>
-                                value: <%= benefit.employer_address.city %>
-                            state:
-                                key: <%= l10n('faa.benefits.state') %>
-                                value: <%= benefit.employer_address.state %>
-                            zip:
-                                key: <%= l10n('faa.benefits.zip') %>
-                                value: <%= benefit.employer_address.zip %>
-                            <% end %>
-                        <% end %>
-                    <% end %>
-                <% end %>
-            <% end %>
         indian_health_service_eligible:
             key: <%= l10n('faa.indian_health_service_eligible') %>
             value: <%= applicant.health_service_eligible %>
