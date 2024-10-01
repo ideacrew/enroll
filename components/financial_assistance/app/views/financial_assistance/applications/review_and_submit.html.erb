@@ -101,6 +101,16 @@
         <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.relationships_summary} %>
       </section>
     <% end %>
+    
+    <%# Household & Preferences summary %>
+    <% if @application.applicants.count > 1 && helper.relationships_summary.present? %>
+      <section>
+        <h2 class="mb-4"><%= l10n("faa.review.your_household")%></h2>
+        <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.relationships_summary} %>
+      </section>
+    <% end %>
+    <section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.preferences_summary} %></section>
+    <section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.household_summary} %></section>
 
     <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: go_to_step_application_path(@application, 1), disable_link: @application.incomplete_applicants? } %>
   </div>

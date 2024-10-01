@@ -67,7 +67,7 @@
     <% end %>
 
     <%# Applicants summary %>
-    <% helper = ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(@cfl_service, @application, @applicants, true)  %>
+    <% helper = ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(@cfl_service, @application, @applicants, false)  %>
     <% helper.applicant_summaries.each do |summary| %>
       <section>
         <h2 class="mb-4"><%= summary[:applicant_name] %></h2>
@@ -76,6 +76,16 @@
         <% end %>
       </section>
     <% end %>
+
+    <%# Household & Preferences summary %>
+    <% if @application.applicants.count > 1 && helper.relationships_summary.present? %>
+      <section>
+        <h2 class="mb-4"><%= l10n("faa.review.your_household")%></h2>
+        <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.relationships_summary} %>
+      </section>
+    <% end %>
+    <section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.preferences_summary} %></section>
+    <section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.household_summary} %></section>
 
     <%= h(link_to l10n("faa.applications.detail.back"), applications_path, class: "btn btn-primary mt-2") %>
   </div>

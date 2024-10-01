@@ -1,398 +1,69 @@
-# This file enforces the structure of the review pages in FAA:
-# 1. Consumer FAA Review & Submit (following the Application flow)
-# 2. Consumer FAA Review (accessible from the Home > Applications > Application dropdown)
-# 3. Admin FAA Full Application Review (accessible from the Home > Applications > Application dropdown)
-#
-# The configuration ties together both the translation keys and field values used on the key-value pair rows in the review pages.
-# `ApplicationHelper::SummaryHelper` drives the parsing of this file, view mapping, and conditional row/section display for the above pages.
-# Shared conditional row/section display logic is managed in this config; conditional display logic which varies on page context is managed in the helper.
-
-personal_info:
-    title: <%= l10n('personal_information') %>
-    rows:
-        dob:
-            key: <%= l10n('dob') %>
-            value: <%= applicant.dob %>
-        age: 
-            key: <%= l10n('age') %>
-            value: <%= applicant.age_of_the_applicant %>
-        gender:
-            key: <%= l10n('gender') %>
-            value: <%= applicant.gender.humanize %>
-        relationship:
-            key: <%= l10n('relationship') %>
-            value: <%= applicant.is_primary_applicant? ? l10n('self') : applicant.relationships.find_by(relative_id: @application.primary_applicant.id).kind.humanize %>
-        coverage:
-            key: <%= l10n('faa.review.personal.needs_coverage') %>
-            value: <%= applicant.is_applying_coverage %>
-        status:
-            key: <%= l10n('status') %>
-            value: <%= applicant.citizen_status.present? ? applicant.format_citizen : nil %>
-        is_incarcerated:
-            key: <%= l10n('faa.review.personal.incarcerated') %>
-            value: <%= applicant.is_incarcerated %>
-
-demographics:
-    rows:
-        us_citizen:
-            key: <%= l10n('insured.us_citizen') %>
-            value: <%= applicant.us_citizen %>
-        naturalized_citizen:
-            key: <%= l10n('insured.consumer_roles.naturalized_question') %>
-            value: <%= applicant.naturalized_citizen %>
-        eligible:
-            key: <%= l10n('faa.question.eligible_immigration_status') %>
-            value: <%= applicant.eligible_immigration_status %>
-        document_type:
-            key: <%= l10n('faa.review.personal.document_type') %>
-            value: <%= immigration_field_value(applicant, :vlp_subject) %>
-        citizenship_number:
-            key: <%= l10n('faa.review.personal.citizenship_number') %>
-            value: <%= immigration_field_value(applicant, :citizenship_number) %>
-        alien_number:
-            key: <%= l10n('insured.consumer_roles.docs_shared.alien_number') %>
-            value: <%= immigration_field_value(applicant, :alien_number) %>
-        i94_number:
-            key: <%= l10n('insured.consumer_roles.docs_shared.i94_number') %>
-            value: <%= immigration_field_value(applicant, :i94_number) %>
-        visa_number:
-            key: <%= l10n('insured.consumer_roles.docs_shared.visa_number') %>
-            value: <%= immigration_field_value(applicant, :visa_number) %>
-        passport_number:
-            key: <%= l10n('insured.passport_number') %>
-            value: <%= immigration_field_value(applicant, :passport_number) %>
-        sevis_id:
-            key: <%= l10n('insured.consumer_roles.docs_shared.sevis_id') %>
-            value: <%= immigration_field_value(applicant, :sevis_id) %>
-        naturalization_number:
-            key: <%= l10n('insured.consumer_roles.docs_shared.naturalization_number') %>
-            value: <%= immigration_field_value(applicant, :naturalization_number) %>
-        receipt_number:
-            key: <%= l10n('faa.review.personal.receipt_number') %>
-            value: <%= immigration_field_value(applicant, :receipt_number) %>
-        card_number:
-            key: <%= l10n('insured.consumer_roles.docs_shared.card_number') %>
-            value: <%= immigration_field_value(applicant, :card_number) %>
-        country_of_citizenship:
-            key: <%= l10n('insured.consumer_roles.docs_shared.country_of_citizenship') %>
-            value: <%= immigration_field_value(applicant, :country_of_citizenship) %>
-        vlp_description:
-            key: <%= l10n('insured.consumer_roles.docs_shared.document_description') %>
-            value: <%= immigration_field_value(applicant, :vlp_description) %>
-        expiration_date:
-            key: <%= l10n('faa.review.personal.expiration_date') %>
-            value: <%= immigration_field_value(applicant, :expiration_date) %>
-        issuing_country:
-            key: <%= l10n('faa.review.personal.issuing_country') %>
-            value: <%= immigration_field_value(applicant, :issuing_country) %>
-        american_indian_or_alaska_native_tribe:
-            key: <%= l10n('faa.review.personal.ai_an_member') %>
-            value: <%= applicant.indian_tribe_member %>
-         <% if FinancialAssistanceRegistry.feature_enabled?(:tribes_information_raw_review) %>
-        tribe_state:
-            key: <%= l10n('faa.review.personal.tribal_state') %>
-            value: <%= applicant.tribal_state %>
-        tribe_name:
-            key: <%= l10n('faa.review.personal.tribal_name') %>
-            value: <%= applicant.tribal_name %>
-        tribe_codes:
-            key: <%= l10n('faa.review.personal.tribe_codes') %>
-            value: <%= applicant.tribe_codes %>
+- demographics:
+    Are you a US Citizen or US National?: <%= applicant.us_citizen %>
+    Are you a naturalized citizen?: <%= applicant.naturalized_citizen %>
+    Do you have eligible immigration status?: <%= applicant.eligible_immigration_status%>
+    Document_type: <%=  check_citizen_immigration_status?(applicant) ? applicant.vlp_subject : 'N/A' %>
+    citizenship_number: <%= check_citizen_immigration_status?(applicant) ? applicant.citizenship_number : "N/A"%>
+    alien_number: <%= check_citizen_immigration_status?(applicant) ? applicant.alien_number : "N/A"%>
+    i94_number: <%= check_citizen_immigration_status?(applicant) ? applicant.i94_number : "N/A"%>
+    visa_number: <%= check_citizen_immigration_status?(applicant) ? applicant.visa_number : "N/A"%>
+    passport_number: <%= check_citizen_immigration_status?(applicant) ? applicant.passport_number : "N/A"%>
+    sevis_id: <%= check_citizen_immigration_status?(applicant) ? applicant.sevis_id : "N/A"%>
+    naturalization_number: <%= check_citizen_immigration_status?(applicant) ? applicant.naturalization_number : "N/A"%>
+    receipt_number: <%= check_citizen_immigration_status?(applicant) ? applicant.receipt_number : "N/A"%>
+    card_number: <%= check_citizen_immigration_status?(applicant) ? applicant.card_number : "N/A"%>
+    country_of_citizenship: <%= check_citizen_immigration_status?(applicant) ? applicant.country_of_citizenship: "N/A"%>
+    vlp_description: <%= check_citizen_immigration_status?(applicant) ? applicant.vlp_description : "N/A"%>
+    expiration_date: <%= check_citizen_immigration_status?(applicant) ? applicant.expiration_date : "N/A"%>
+    issuing_country: <%= check_citizen_immigration_status?(applicant) ? applicant.issuing_country : "N/A"%>
+    Are you a member of an American Indian or Alaska Native Tribe?: <%= applicant.indian_tribe_member%>
+    <% if FinancialAssistanceRegistry.feature_enabled?(:tribes_information_raw_review) %>
+    Tribe State: <%= applicant.tribal_state %>
+    Tribe Name: <%= applicant.tribal_name %>
+    Tribe Codes: <%= applicant.tribe_codes %>
+    <% end %>
+    Are you currently incarcerated?: <%= applicant.is_incarcerated%>
+    What is your race/ethnicity? (OPTIONAL - check all that apply): <%= applicant.ethnicity %>
+    ADDRESSES:
+- financial_assistance_info:
+    TAX INFO:
+        Will this Person file taxes for <%= @application.assistance_year %>?: <%= applicant.is_required_to_file_taxes %>
+        Will this person be claimed as a tax dependent for <%= @application.assistance_year %>?: <%= applicant.is_claimed_as_tax_dependent %>
+        Will this person be filing jointly?: <%= applicant.is_joint_tax_filing %>
+        This person will be claimed as a dependent by: <%= applicant.claimed_as_tax_dependent_by ? @applicants.find(applicant.claimed_as_tax_dependent_by).full_name : nil %>
+    INCOME:
+    INCOME ADJUSTMENTS:
+      <% assistance_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!.to_s %>
+      <%= sanitize(l10n('faa.deductions.income_adjustments', subject: l10n('faa.this_person'), assistance_year: assistance_year)) %>*: <%= applicant.has_deductions %>
+    HEALTH COVERAGE:
+        Is this person currently enrolled in health coverage?: <%= applicant.has_enrolled_health_coverage %>
+        Does this person currently have access to other health coverage, including through another person?: <%=applicant.has_eligible_health_coverage %>
+    OTHER QUESTIONS:
+        Has this person applied for an SSN?:  <%= applicant.is_ssn_applied %>
+        Why doesn't this person have an SSN?:  <%=applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason_readable.to_s : 'N/A' %>
+        Is this person pregnant?:  <%= applicant.is_pregnant %>
+        Pregnancy due date?:  <%=applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A' %>
+        How many children is this person expecting?:  <%=applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A' %>
+        <% if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) %>
+        <%= l10n("faa.other_ques.pregnant_last_year", subject: l10n("faa.this_person")) %>: <%= applicant.is_post_partum_period %>
+        <% else %>
+        <%= l10n("faa.other_ques.pregnant_last_60d", subject: l10n("faa.this_person")) %>: <%= applicant.is_post_partum_period %>
         <% end %>
-        is_incarcerated:
-            key: <%= l10n('insured.incarcerated') %>
-            value: <%= applicant.is_incarcerated %>
-        race_ethnicity:
-            key: <%= l10n('race_or_ethnicity') %>
-            value: <%= applicant.ethnicity %>
-        <% addresses = applicant.addresses %>
-        <% if addresses.present? %>
-        addresses:
-            <% addresses.each do |address| %>
-            -   title: "<%= address.kind.titleize %> <%= l10n('address') %>"
-                rows:
-                    line_1:
-                        key: <%= l10n('address_line_1') %>
-                        value: <%= address&.address_1 %>
-                    line_2:
-                        key: <%= l10n('address_line_2') %>
-                        value: <%= address&.address_2 %>
-                    city:
-                        key: <%= l10n('city') %>
-                        value: <%= address&.city %>
-                    zip:
-                        key: <%= l10n('zip') %>
-                        value: <%= address&.zip %>
-                    state:
-                        key: <%= l10n('state') %>
-                        value: <%= address&.state %>
-                    county:
-                        key: <%= l10n('county') %>
-                        value: <%= address&.county %>
-            <% end %>
-        <% end %>
-tax_info:
-    title: <%= l10n('faa.review.tax_info') %>
-    edit_link: <%= go_to_step_application_applicant_path(@application, applicant, 1) %>
-    rows:
-        will_file_taxes:
-            key: <%= l10n('faa.tax_info.question1', year: @application.assistance_year) %>
-            value: <%= applicant.is_required_to_file_taxes %>
-        claimed_as_tax_dependent:
-            key: <%= l10n('faa.tax_info.question4', year: @application.assistance_year) %>
-            value: <%= applicant.is_claimed_as_tax_dependent %>
-        filing_jointly:
-            key: <%= l10n('faa.tax_info.question2', year: @application.assistance_year) %>
-            value: <%= applicant.is_joint_tax_filing %>
-        claimed_by:
-            key: <%= l10n('faa.tax_info.claimed_by') %>
-            value: <%= applicant.claimed_as_tax_dependent_by ? @applicants.find(applicant.claimed_as_tax_dependent_by.to_s).full_name : nil %>
-income:
-    title: <%= l10n('faa.evidence_type_income') %>
-    edit_link: <%= application_applicant_incomes_path(@application, applicant) %>
-    rows:
-        <% assistance_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!.to_s %>
-        has_job_income:
-            key: <%= l10n('faa.incomes.from_employer', assistance_year: assistance_year) %>
-            value: <%= applicant.has_job_income %>
-        <% jobs = applicant.incomes.jobs %>
-        <% if jobs.present? %>
-        jobs:
-            <% jobs.each do |job| %>
-            -   title: <%= job.employer_name %>
-                has_address: <%= job.employer_address.present? %>
-                rows:
-                    line_1:
-                        key: <%= l10n('employer_address_line_1') %>
-                        value: <%= job&.employer_address&.address_1 %>
-                    line_2:
-                        key: <%= l10n('employer_address_line_2') %>
-                        value: <%= job&.employer_address&.address_2 %>
-                    city:
-                        key: <%= l10n('city') %>
-                        value: <%= job&.employer_address&.city %>
-                    zip:
-                        key: <%= l10n('zip') %>
-                        value: <%= job&.employer_address&.state %>
-                    state:
-                        key: <%= l10n('state') %>
-                        value: <%= job&.employer_address&.zip %>
-                    phone:
-                        key: <%= l10n('faa.incomes.employer_phone') %>
-                        value: <%= format_phone job.employer_phone&.full_phone_number %>
-            <% end %>
-        <% end %>
-        self_employment:
-            key: <%= l10n('faa.incomes.from_self_employment', assistance_year: assistance_year) %>
-            value: <%= applicant.has_self_employment_income %>
-        other_sources:
-            key: <%= l10n('faa.other_incomes.other_sources', assistance_year: assistance_year) %>
-            value: <%= applicant.has_other_income %>
-        <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
-        unemployment:
-            key: <%= l10n('faa.other_incomes.unemployment', assistance_year: assistance_year) %>
-            value: <%= applicant.has_unemployment_income %>
-        <% end %>
-        <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) %>
-        ai_an_income:
-            key: <%= l10n('faa.other_incomes.alaska_native') %>
-            value: <%= applicant.has_american_indian_alaskan_native_income %>
-        <% end %>
-
-income_adjustments:
-    title: <%= l10n('faa.review.income_adjustments') %>
-    edit_link: <%= application_applicant_deductions_path(@application, applicant) %>
-    rows:
-        income_adjustments:
-            key: <%= l10n('faa.deductions.income_adjustments', subject: l10n('faa.this_person'), assistance_year: @application.assistance_year) %>
-            value: <%= applicant.has_deductions %>
-health_coverage:
-    title: <%= l10n('health_coverage') %>
-    edit_link: <%= application_applicant_benefits_path(@application, applicant) %>
-    rows:
-        <% benefit_coverage_sections = ['is_enrolled', 'is_eligible'].map { |kind| [kind, applicant.benefits.has_valid_insurance_kind.where(kind: kind).group_by(&:insurance_kind)] }.to_h %>
-        enrolled_in_health_coverage:
-            key: <%= l10n(applicant_currently_enrolled_short_key) %>
-            value: <%= applicant.has_enrolled_health_coverage %>
-            <% if applicant.has_enrolled_health_coverage %>
-            <% kind = 'is_enrolled' %>
-            coverages:
-                <% benefit_coverage_sections[kind].each do |insurance_kind, benefits| %>
-                -
-                    <% benefits.each do |benefit| %>
-                    -   type: <%= l10n(benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-                        period: <%= start_to_end_dates(benefit) %>
-                        <% if display_esi_fields?(benefit.insurance_kind, kind) %>
-                        esi_benefit_data:
-                            employer_name:
-                                key: <%= l10n('faa.benefits.employer_name') %>
-                                value: <%= benefit.employer_name %>
-                            <% unless FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
-                            employer_address_line_1:
-                                key: <%= l10n('faa.benefits.employer_address_line_1') %>
-                                value: <%= benefit.employer_address.address_1 %>
-                            <% if benefit.employer_address.address_2.present? %>
-                            employer_address_line_2:
-                                key: <%= l10n('faa.benefits.employer_address_line_2') %>
-                                value: <%= benefit.employer_address.address_2 %>
-                            <% end %>
-                            city:
-                                key: <%= l10n('faa.benefits.city') %>
-                                value: <%= benefit.employer_address.city %>
-                            state:
-                                key: <%= l10n('faa.benefits.state') %>
-                                value: <%= benefit.employer_address.state %>
-                            zip:
-                                key: <%= l10n('faa.benefits.zip') %>
-                                value: <%= benefit.employer_address.zip %>
-                            <% end %>
-                        <% end %>
-                    <% end %>
-                <% end %>
-            <% end %>
-        has_eligible_health_coverage:
-            key: <%= l10n(applicant_eligibly_enrolled_short_key) %>
-            value: <%= applicant.has_eligible_health_coverage %>
-            <% if applicant.has_eligible_health_coverage %>
-            <% kind = 'is_eligible' %>
-            coverages:
-                <% benefit_coverage_sections[kind].each do |insurance_kind, benefits| %>
-                -
-                    <% benefits.each do |benefit| %>
-                    -   type: <%= l10n(benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-                        period: <%= start_to_end_dates(benefit) %>
-                        <% if display_esi_fields?(benefit.insurance_kind, kind) %>
-                        esi_benefit_data:
-                            employer_name:
-                                key: <%= l10n('faa.benefits.employer_name') %>
-                                value: <%= benefit.employer_name %>
-                            <% unless FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
-                            employer_address_line_1:
-                                key: <%= l10n('faa.benefits.employer_address_line_1') %>
-                                value: <%= benefit.employer_address.address_1 %>
-                            <% if benefit.employer_address.address_2.present? %>
-                            employer_address_line_2:
-                                key: <%= l10n('faa.benefits.employer_address_line_2') %>
-                                value: <%= benefit.employer_address.address_2 %>
-                            <% end %>
-                            city:
-                                key: <%= l10n('faa.benefits.city') %>
-                                value: <%= benefit.employer_address.city %>
-                            state:
-                                key: <%= l10n('faa.benefits.state') %>
-                                value: <%= benefit.employer_address.state %>
-                            zip:
-                                key: <%= l10n('faa.benefits.zip') %>
-                                value: <%= benefit.employer_address.zip %>
-                            <% end %>
-                        <% end %>
-                    <% end %>
-                <% end %>
-            <% end %>
-        indian_health_service_eligible:
-            key: <%= l10n('faa.indian_health_service_eligible') %>
-            value: <%= applicant.health_service_eligible %>
-        indian_health_service_through_referral:
-            key: <%= l10n('faa.indian_health_service') %>
-            value: <%= applicant.health_service_through_referral %>
-        not_eligible_for_medicaid_cubcare:
-            key: <%= l10n('faa.medicaid_not_eligible') %>
-            value: <%= applicant.has_eligible_medicaid_cubcare %>
-        medicaid_cubcare_due_on:
-            key: <%= l10n('faa.medicaid_cubcare_end_date') %>
-            value: <%= applicant.medicaid_cubcare_due_on.to_s.present? ? applicant.medicaid_cubcare_due_on.to_s : 'N/A' %>
-        eligibility_change_due_to_medicaid_cubcare:
-            key: <%= l10n('faa.change_eligibility_status') %>
-            value: <%= applicant.has_eligibility_changed %>
-        household_income_change:
-            key: <%= l10n('faa.household_income_changed') %>
-            value: <%= applicant.has_household_income_changed %>
-        medicaid_last_day:
-            key: <%= l10n('faa.person_medicaid_last_day') %>
-            value: <%= applicant.person_coverage_end_on.to_s.present? ? applicant.person_coverage_end_on.to_s : 'N/A' %>
-        medicaid_chip_ineligible:
-            key: <%= l10n('faa.medicaid_chip_ineligible', year: @application.assistance_year - 5) %>
-            value: <%= applicant.medicaid_chip_ineligible %>
-        immigration_status_changed:
-            key: <%= l10n('faa.immigration_status_changed') %>
-            value: <%= applicant.immigration_status_changed %>
-        <% if applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
-        dependent_coverage_end:
-            key: <%= l10n('faa.has_dependent_with_coverage') %>
-            value: <%= applicant.has_dependent_with_coverage %>
-        dependent_coverage_end_date:
-            key: <%= l10n('faa.dependent_job_end_on') %>
-            value: <%= applicant.dependent_job_end_on.to_s.present? ? applicant.dependent_job_end_on.to_s : 'N/A' %>
-        <% end %>
-other_questions:
-    title: <%= l10n('faa.review.other_questions') %>
-    edit_link: <%= other_questions_application_applicant_path(@application, applicant) %>
-    rows:
-        ssn_applied:
-            key: <%= other_questions_prompt('ssn_apply') %>
-            value: <%= applicant.is_ssn_applied %>
-        non_ssn_reason:
-            key: <%= other_questions_prompt('ssn_reason') %>
-            value: <%= applicant.non_ssn_apply_reason.to_s.present? ? applicant.non_ssn_apply_reason_readable.to_s : 'N/A' %>
-        is_pregnant:
-            key: <%= other_questions_prompt('is_pregnant') %>
-            value: <%= applicant.is_pregnant %>
-        pregnancy_due_date:
-            key: <%= other_questions_prompt('pregnancy_due_date') %>
-            value: <%= applicant.pregnancy_due_on.to_s.present? ? applicant.pregnancy_due_on.to_s : 'N/A' %>
-        children_expected_count:
-            key: <%= other_questions_prompt('children_expected') %>
-            value: <%= applicant.children_expected_count.present? ? applicant.children_expected_count : 'N/A' %>
-        post_partum_period:
-            key: <%= other_questions_prompt(FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? 'pregnant_last_year' : 'pregnant_last_60d') %>
-            value: <%= applicant.is_post_partum_period %>
-        pregnancy_end_on:
-            key: "<%= l10n('faa.other_ques.pregnancy_end') %>"
-            value: <%= applicant.pregnancy_end_on.to_s.present? ? applicant.pregnancy_end_on.to_s : 'N/A' %>
-        is_enrolled_on_medicaid:
-            key: <%= other_questions_prompt('is_enrolled_on_medicaid') %>
-            value: <%= applicant.is_enrolled_on_medicaid %>
-        former_foster_care:
-            key: <%= other_questions_prompt('foster_care_at18') %>
-            value: <%= applicant.is_former_foster_care %>
-        foster_care_us_state:
-            key: <%= other_questions_prompt('foster_care_state') %>
-            value: <%= applicant.foster_care_us_state.present? ? applicant.foster_care_us_state : 'N/A' %>
-        age_left_foster_care:
-            key: <%= other_questions_prompt('foster_care_age_left') %>
-            value: <%= applicant.age_left_foster_care.present? ? applicant.age_left_foster_care : 'N/A' %>
-        medicaid_during_foster_care:
-            key: <%= other_questions_prompt('foster_care_medicaid') %>
-            value: <%= applicant.had_medicaid_during_foster_care %>
-        is_student:
-            key: <%= other_questions_prompt('is_student') %>
-            value: <%= applicant.is_student %>
-        student_kind:
-            key: <%= l10n('faa.other_ques.student_type') %>
-            value: <%= applicant.student_kind.present? ? applicant.student_kind : 'N/A' %>
-        student_status_end_on:
-            key: <%= l10n('faa.other_ques.student_status_end') %>
-            value: <%= applicant.student_status_end_on.present? ? applicant.student_status_end_on : 'N/A' %>
-        student_school_kind:
-            key: <%= l10n('faa.other_ques.student_school_type') %>
-            value: <%= applicant.student_school_kind %>
-        is_blind:
-            key: <%= other_questions_prompt('is_blind') %>
-            value: <%= applicant.is_self_attested_blind %>
-        has_daily_living_help:
-            key: <%= other_questions_prompt('daily_living_help') %>
-            value: <%= applicant.has_daily_living_help %>
-        need_help_paying_bills:
-            key: <%= other_questions_prompt('help_paying_bills') %>
-            value: <%= applicant.need_help_paying_bills %>
-        is_physically_disabled:
-            key: <%= other_questions_prompt('disability_question') %>
-            value: <%= applicant.is_physically_disabled %>
+        Pregnancy end on date:  <%=applicant.pregnancy_end_on.to_s.present? ? applicant.pregnancy_end_on.to_s : 'N/A' %>
+        Was this person on Medicaid during pregnancy?:  <%= applicant.is_enrolled_on_medicaid %>
+        Was this person in foster care at age 18 or older?:  <%= applicant.is_former_foster_care %>
+        Where was this person in foster care?:  <%=applicant.foster_care_us_state.present? ? applicant.foster_care_us_state : 'N/A' %>
+        How old was this person when they left foster care?:  <%=applicant.age_left_foster_care.present? ? applicant.age_left_foster_care : 'N/A' %>
+        Was this person enrolled in Medicaid when they left foster care?:  <%= applicant.had_medicaid_during_foster_care %>
+        Is this person a student?:  <%= applicant.is_student %>
+        What is the type of student?:  <%=applicant.student_kind.present? ? applicant.student_kind : 'N/A' %>
+        Student status end on date?:  <%=applicant.student_status_end_on.present? ? applicant.student_status_end_on : 'N/A' %>
+        What type of school do you go to?:  <%= applicant.student_school_kind %>
+        Is this person blind?:  <%= applicant.is_self_attested_blind %>
+        Does this person need help with daily life activities, such as dressing or bathing?:  <%= applicant.has_daily_living_help %>
+        Does this person need help paying for any medical bills from the last 3 months?:  <%= applicant.need_help_paying_bills %>
+        Does this person have a disability?:  <%= applicant.is_physically_disabled %>
         <% if applicant.age_of_the_applicant >= 19 && applicant.is_applying_coverage %>
-        primary_caregiver:
-            key: <%= other_questions_prompt('primary_caretaker_question_text') %>
-            value: <%= applicant.is_primary_caregiver %>
-        primary_caregiver_for:
-            key: <%= other_questions_prompt('primary_caretaker_for_text') %>
-            value: <%= applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact %>
+        Is this person the main person taking care of any children age 18 or younger?: <%= applicant.is_primary_caregiver %>
+        Which member(s) of the household is this person the caretaker for?: <%=  applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact %>
         <% end %>
