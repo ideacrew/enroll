@@ -16,7 +16,7 @@ ResourceRegistry uses a Feature to group related system functions and settings. 
 
 - item [Any] 'value' of the Feature's key/value pair. May be a static value, proc, class instance and may include an options hash
 
-n- amespace [Array] an ordered list that supports optional taxonomy for relationships between Features
+- namespace [Array] an ordered list that supports optional taxonomy for relationships between Features
 
 - is_enabled [Boolean] indicator whether the Feature is accessible in the current configuration
 
