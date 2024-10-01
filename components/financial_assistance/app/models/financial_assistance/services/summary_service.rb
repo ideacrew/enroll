@@ -9,13 +9,16 @@ module FinancialAssistance
       include ActionView::Helpers::NumberHelper
       include L10nHelper
 
+      attr_reader :can_edit
+
       APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_application.yml.erb"
       COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
 
-      def initialize(cfl_service, application, applicants)
+      def initialize(cfl_service, application, applicants, can_edit: false)
         @application = application
         @application_displayable_helper = ApplicationDisplayableHelper.new(cfl_service, @application.id)
         @applicants = applicants
+        @can_edit = can_edit
       end
 
       # @method applicant_summaries
@@ -186,12 +189,10 @@ module FinancialAssistance
 
       # Class which manages the summary hash for the consumer review pages containing limited raw application data and supporting editable sections.
       class ConsumerSummaryService < SummaryService
-        attr_reader :can_edit
 
         def initialize(cfl_service, application, applicants, can_edit)
-          @can_edit = can_edit
           @applicant_displayable_helpers = applicants.map { |applicant| ApplicantDisplayableHelper.new(cfl_service, applicant.id) }
-          super(cfl_service, application, applicants)
+          super
         end
 
         private
