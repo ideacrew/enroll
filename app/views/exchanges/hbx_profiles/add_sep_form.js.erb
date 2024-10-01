@@ -18,36 +18,60 @@ else {
 if (!disableSelectric) {
   $('select').selectric();
 }
-$('.sep_link').hide();
-$('.admin_effective_on_kind_options').hide();
-$('.init_event_date').hide();
-$('.sep_dates_filter').hide();
-$('.optional_date').hide();
-$('.coverage-renewal-flag').hide();
+
+function hideElement(element) {
+  <% if @bs4 %>
+    element.addClass('hidden');
+  <% else %>
+    element.hide();
+  <% end %>
+}
+
+function showElement(element) {
+  <% if @bs4 %>
+    element.removeClass('hidden');
+  <% else %>
+    element.show();
+  <% end %>
+}
+
+hideElement($('.sep_link'));
+hideElement($('.admin_effective_on_kind_options'));
+hideElement($('.init_event_date'));
+hideElement($('.sep_dates_filter'));
+hideElement($('.optional_date'));
+hideElement($('.coverage-renewal-flag'));
 var ivlTable, shopTable, ivl_shop_Table, selectedTable, idTable;
 var self_attested;
 var arrEffectiveDate;
 var idVal;
 var personID;
 
-if("<%= @market %>" == 'both')
-  $('.radio_option').show();
+if ("<%= @market %>" == 'both')
+  showElement($('.radio_option'));
 else
-  $('.radio_option').hide();
+  hideElement($('.radio_option'));
 
 $(document).on('change','.admin_selected_sep_reason select',function(){
   if($(this).val() == '') {
-    $('.init_event_date').hide();
-    $('.admin_effective_on_kind_options').hide();
-    $('.sep_dates_filter').hide();
+    hideElement($('.init_event_date'));
+    hideElement($('.admin_effective_on_kind_options'));
+    hideElement($('.sep_dates_filter'));
     $('.csl_num_options input:text').val("");
   }
   else{
-    var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
-    var getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
-    self_attested = getObj.data('is-self-attested');
-    arrEffectiveDate = getObj.data('effective-on-kinds');
-    idVal = getObj.data('id');
+    <% if @bs4 %>
+      idVal = $(this).val();
+      const selected = $(this).find('option:selected');
+      self_attested = $(selected).data('is-self-attested');
+      arrEffectiveDate = $(selected).data('effective-on-kinds');
+    <% else %>
+      var selectedVal = $('.admin_selected_sep_reason .selectric-scroll .selected').text();
+      var getObj = $('.admin_selected_sep_reason .selectric-hide-select select option:contains(' + selectedVal + ')');
+      self_attested = getObj.data('is-self-attested');
+      arrEffectiveDate = getObj.data('effective-on-kinds');
+      idVal = getObj.data('id');  
+    <% end %>
 
     $.ajax({
       type: "GET",
@@ -65,10 +89,10 @@ $(document).on('change','#option1_date, #option2_date, #option3_date', function(
       success: function (response) {
         if (response["renewalFlagStatus"]) {
           $("#coverage_renewal_flag").prop('disabled',false);
-          $('.coverage-renewal-flag').show();
+          showElement($('.coverage-renewal-flag'));
         } else {
           $("#coverage_renewal_flag").prop('disabled',true);
-          $(  '.coverage-renewal-flag').hide();
+          hideElement($('.coverage-renewal-flag'));
         }
       }
     });
@@ -78,14 +102,19 @@ $(document).on('change','#option1_date, #option2_date, #option3_date', function(
 $(document).on('change','.admin_effective_on_kind_options select', function(){
   if($(this).val() == ''){
     $('.init_effective_date input').val("");
-    $('.sep_dates_filter').hide();
-    $('.optional_date').hide();
-    $('.coverage-renewal-flag').hide();
+    hideElement($('.sep_dates_filter'));
+    hideElement($('.optional_date'));
+    hideElement($('.coverage-renewal-flag'));
   }
   else{
-    $('.init_effective_date .label-floatlabel').removeClass('dn-1');
-    $('.init_effective_date .label-floatlabel').addClass('dn-1');
-    $('.start_end_date').show();
+    <% if @bs4 %>
+      $('.sep_dates_filter').removeClass('hidden');
+      $('.init_effective_date').removeClass('hidden');
+    <% else %>
+      $('.init_effective_date .label-floatlabel').removeClass('dn-1');
+      $('.init_effective_date .label-floatlabel').addClass('dn-1');
+    <% end %>
+    showElement($('.start_end_date'));
 
     $.ajax({
       type: "GET",
@@ -102,35 +131,40 @@ $(document).on('change','.radio_option input', function(){
   else
     $('.admin_selected_sep_reason .selectric-hide-select select').html("<%= escape_javascript options_for_select([['SEP REASON', '']]) + options_for_select(@qle_ivl.map{ |c| [c.title, c.id, data:{title: c.title, id: c.id.to_s, effective_on_kinds: c.effective_on_kinds, label: c.event_kind_label, post_event_sep_in_days: c.post_event_sep_in_days, pre_event_sep_in_days: c.pre_event_sep_in_days, date_hint: c.date_hint, is_self_attested: c.is_self_attested, date_options_available: c.date_options_available, current_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')}]  }) %>").selectric("refresh");
 
-  $('.admin_effective_on_kind_options').hide();
-  $('.init_event_date').hide();
-  $('.sep_dates_filter').hide();
+  hideElement($('.admin_effective_on_kind_options'));
+  hideElement($('.init_event_date'));
+  hideElement($('.sep_dates_filter'));
   $('.init_effective_date input').val('');
   $('.csl_num_options input').val('');
-  $('.optional_date').hide();
-  $('.coverage-renewal-flag').hide();
+  hideElement($('.optional_date'));
+  hideElement($('.coverage-renewal-flag'));
 });
 
 $(document).on('change','.init_event_date input', function(){
   if($(this).val() == ''){
-   $('.admin_effective_on_kind_options').hide();
+    hideElement($('.admin_effective_on_kind_options'));
   }
   else{
-    $('.admin_effective_on_kind_options').show();
+    showElement($('.admin_effective_on_kind_options'));
     $('.admin_effective_on_kind_options #effective_on_date').val("");
     $('.init_effective_date input').val("");
     //$('.start_end_date').show();
   }
     $('.end_date input').val("");
     $('init_effective_date input').val("");
-    $('.init_event_date .label-floatlabel').removeClass("dn-1");
-    $('.init_event_date .label-floatlabel').addClass("dn-1");
-    $('.sep_dates_filter').hide();
+
+    <% if @bs4 %>
+      showElement($('.init_event_date'));
+    <% else %>
+      $('.init_event_date .label-floatlabel').removeClass("dn-1");
+      $('.init_event_date .label-floatlabel').addClass("dn-1");
+    <% end %>
+    hideElement($('.sep_dates_filter'));
     if (!disableSelectric) {
       $('.admin_effective_on_kind_options #effective_on_date').selectric("refresh");
     }
-    $('.optional_date').hide();
-    $('.coverage-renewal-flag').hide();
+    hideElement($('.optional_date'));
+    hideElement($('.coverage-renewal-flag'));
 });
 
 $('#tab_datatables a[data-toggle="tab"]').on("mousedown", function(){

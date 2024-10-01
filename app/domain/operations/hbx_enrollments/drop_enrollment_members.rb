@@ -29,7 +29,7 @@ module Operations
         return Failure('Not an ivl enrollment.') unless base_enrollment.is_ivl_by_kind? # Added per the request, also need further development if to be used for shop
         return Failure('Member(s) have not been selected for termination.') if params[:options].select{|string| string.include?("terminate_member")}.empty?
         return Failure('Termination date has not been selected.') if params[:options].select{|string| string.include?("termination_date")}.empty?
-        @termination_date = Date.strptime(params[:options]["termination_date_#{params[:hbx_enrollment].id}"], "%m/%d/%Y")
+        @termination_date = parse_date(params[:options]["termination_date_#{params[:hbx_enrollment].id}"])
         @future_effective = termination_date > base_enrollment.effective_on
         @new_effective_date = future_effective ? termination_date + 1.day : base_enrollment.effective_on
         return Failure('Termination date must be in current calendar year.') unless future_effective || (new_effective_date.year == termination_date.year)
@@ -37,6 +37,12 @@ module Operations
         return Failure('Unable to disenroll member(s) because of retroactive date selection.') if termination_date < TimeKeeper.date_of_record && EnrollRegistry[:drop_retro_scenario].disabled?
 
         Success(params)
+      end
+
+      def parse_date(string)
+        return nil if string.blank?
+        date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+        Date.strptime(string, date_format)
       end
 
       def drop_enrollment_members(params)

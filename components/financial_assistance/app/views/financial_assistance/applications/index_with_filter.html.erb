@@ -64,7 +64,7 @@
                   <%= submission.present? ? submission : l10n('faa.not_applicable_abbreviation') %>
                 </td>
                 <td>
-                  <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: application_dropdowns(application), pull_left: true, dropdown_class: "dropdown-menu-right"} %>
+                  <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: application_dropdowns(application)} %>
                 </td>
               </tr>
             <% end %>
