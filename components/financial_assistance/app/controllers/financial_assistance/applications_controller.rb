@@ -417,6 +417,8 @@ module FinancialAssistance
         params.keys.include?('cur') ? "financial_assistance_nav" : "financial_assistance"
       when "wait_for_eligibility_response"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "bs4_financial_assistance" : "financial_assistance"
+      when "transfer_history"
+        EnrollRegistry.feature_enabled?(:bs4_admin_flow) ? "financial_assistance_progress" : "financial_assistance"
       else
         "financial_assistance"
       end
