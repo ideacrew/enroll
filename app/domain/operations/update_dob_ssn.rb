@@ -30,7 +30,8 @@ module Operations
     end
 
     def update_person(person, params, current_user, ssn_require)
-      person.dob = Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date
+      dob_param = params.dig(:jq_datepicker_ignore_person, :dob).present? ? params[:jq_datepicker_ignore_person][:dob] : params[:person][:dob]
+      person.dob = Date.strptime(dob_param, dob_param.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y")
       if params[:person][:ssn].blank?
         if ssn_require
           dont_update_ssn = true

@@ -16,12 +16,21 @@ RSpec.describe Operations::Reports::Families::CvValidationJobs::LatestReport do
       end
     end
 
-    context 'when the jobs_per_iteration is invalid' do
+    context 'when the jobs_per_iteration is negative' do
       let(:jobs_per_iteration) { -1 }
 
       it 'returns a failure result' do
         expect(result).to be_failure
-        expect(result.failure).to eq('Invalid jobs_per_iteration: -1. Please pass jobs_per_iteration as a positive integer.')
+        expect(result.failure).to eq("Invalid jobs_per_iteration: #{jobs_per_iteration}. Please pass jobs_per_iteration as a positive integer.")
+      end
+    end
+
+    context 'when the jobs_per_iteration is zero' do
+      let(:jobs_per_iteration) { 0 }
+
+      it 'returns a failure result' do
+        expect(result).to be_failure
+        expect(result.failure).to eq("Invalid jobs_per_iteration: #{jobs_per_iteration}. Please pass jobs_per_iteration as a positive integer.")
       end
     end
 

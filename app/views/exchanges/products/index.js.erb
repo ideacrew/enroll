@@ -120,10 +120,10 @@ function buildDropDownMenu(sData) {
               Actions
               <span class='caret'></span>
             </button>
-            <ul class="dropdown-menu">
-              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Upload</a></li>
-              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Delete</a></li>
-              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}'>Download</a></li>
+            <ul class="dropdown-menu <%= "actions-dropdown" if @bs4 %>">
+              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}' class=<%= "dropdown-item" if @bs4 %>>Upload</a></li>
+              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}' class=<%= "dropdown-item" if @bs4 %>>Delete</a></li>
+              <li><a href="javascript:void(0)" onclick="toAction(this)" data-product-id-id='${product_id}' class=<%= "dropdown-item" if @bs4 %>>Download</a></li>
             </ul>
           </div>`
 }
