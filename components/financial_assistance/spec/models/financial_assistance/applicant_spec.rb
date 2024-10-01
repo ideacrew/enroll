@@ -243,14 +243,14 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   describe '#tribe_codes' do
     context "when tribe codes is set to nil" do
       it "should return an empty array" do
-        applicant.update_attributes(tribe_codes: nil)
+        applicant.set(tribe_codes: nil)
         expect(applicant.reload.tribe_codes).to eq []
       end
     end
 
     context "when tribe codes is set to array of strings" do
       it "should return value set in DB" do
-        applicant.update_attributes(tribe_codes: [""])
+        applicant.set(tribe_codes: [""])
         expect(applicant.reload.tribe_codes).to eq [""]
       end
     end
@@ -259,14 +259,14 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   describe '#ethnicity' do
     context "when ethnicity is set to nil" do
       it "should return an empty array" do
-        applicant.update_attributes(ethnicity: nil)
+        applicant.set(ethnicity: nil)
         expect(applicant.reload.ethnicity).to eq []
       end
     end
 
     context "when ethnicity is set to array of strings" do
       it "should return value set in DB" do
-        applicant.update_attributes(ethnicity: ["", ""])
+        applicant.set(ethnicity: ["", ""])
         expect(applicant.reload.ethnicity).to eq ["", ""]
       end
     end
