@@ -35,10 +35,6 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
     let(:staff_class)                     { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
 
     describe "GET new" do
-      before do
-        allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
-      end
-
       context 'for a broker in the agency' do
         before do
           sign_in user
@@ -548,8 +544,6 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
         context "GET new" do
           before do
-            allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
-
             get :new, params: { profile_id: bap_id }, format: :js, xhr: true
           end
 
@@ -663,7 +657,6 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
         context "GET new" do
           before do
-            allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
             get :new, params: { profile_id: bap_id }, format: :js, xhr: true
           end
 

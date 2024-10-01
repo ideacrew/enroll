@@ -16,7 +16,6 @@ module BenefitSponsors
           authorize @broker_agency_profile if request.format.js?
 
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
-          set_ie_flash_by_announcement
 
           respond_to do |format|
             # the js template is for the first scenario metioned above^

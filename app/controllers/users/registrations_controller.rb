@@ -8,7 +8,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
   before_action :enable_bs4_layout, only: [:create, :new] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :enable_updated_layout, only: [:create, :new]
   before_action :configure_sign_up_params, only: [:create]
-  before_action :set_ie_flash_by_announcement, only: [:new]
 
   # used with respond_with in the create action
   respond_to :html
