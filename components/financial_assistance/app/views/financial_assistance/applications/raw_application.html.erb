@@ -75,7 +75,6 @@
           </div>
         <% end %>
 
-
         <%# Applicants summary %>
         <% helper = ::FinancialAssistance::Services::SummaryService::AdminSummaryService.new(@application, @applicants, @cfl_service) %>
         <% helper.applicant_summaries().each do |summary| %>
