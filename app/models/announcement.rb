@@ -7,7 +7,8 @@ class Announcement
   AUDIENCE_KINDS = [].tap do |a|
     a << 'Employer' if is_shop_or_fehb_market_enabled?
     a << 'Employee' if is_shop_or_fehb_market_enabled?
-    a << ['IVL', 'Broker', 'GA', 'Web_Page']
+    a << 'GA' if is_general_agency_enabled?
+    a << ['IVL', 'Broker']
   end.flatten
 
   field :content, type: String
@@ -57,30 +58,25 @@ class Announcement
       AUDIENCE_KINDS
     end
 
-    def get_announcements_by_portal(portal_path="", person=nil)
+    def get_announcements_by_portal(portal_path = "", person = nil) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
       announcements = []
 
-      case
-      when portal_path.include?("employers/employer_profiles")
+      if portal_path.include?("employers/employer_profiles")
         announcements.concat(Announcement.current_msg_for_employer)
-      when portal_path.include?("families/home")
+      elsif portal_path.include?("families/home")
         announcements.concat(Announcement.current_msg_for_employee) if person && person.has_active_employee_role?
         announcements.concat(Announcement.current_msg_for_ivl) if person && person.is_consumer_role_active?
-      when portal_path.include?("employee")
+      elsif portal_path.include?("employee")
         announcements.concat(Announcement.current_msg_for_employee) if person && person.has_active_employee_role?
-      when portal_path.include?("consumer")
+      elsif portal_path.include?("consumer")
         announcements.concat(Announcement.current_msg_for_ivl) if person && person.is_consumer_role_active?
-      when portal_path.include?("broker_agencies")
+      elsif portal_path.include?("broker_agencies")
         announcements.concat(Announcement.current_msg_for_broker)
-      when portal_path.include?("general_agencies")
+      elsif portal_path.include?("general_agencies")
         announcements.concat(Announcement.current_msg_for_ga)
       end
 
       announcements.uniq
-    end
-
-    def announcements_for_web
-      Announcement.current_msg_for_web_page
     end
   end
 end
