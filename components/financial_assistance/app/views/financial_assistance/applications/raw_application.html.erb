@@ -77,7 +77,7 @@
 
         <%# Applicants summary %>
         <% helper = ::FinancialAssistance::Services::SummaryService::AdminSummaryService.new(@application, @applicants, @cfl_service) %>
-        <% helper.applicant_summaries().each do |summary| %>
+        <% helper.applicant_summaries.each do |summary| %>
           <section>
             <h2 class="mb-4"><%= summary[:applicant_name] %></h2>
             <% summary[:sections].each do |section| %>
