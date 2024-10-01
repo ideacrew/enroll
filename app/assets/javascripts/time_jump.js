@@ -1,12 +1,16 @@
 var bs4 = document.documentElement.dataset.bs4 == "true"
 
-document.addEventListener('DOMContentLoaded', function() {
-  let submitButton;
-  let dateInput;
+window.addEventListener('DOMContentLoaded', function() {
+
+  const selectedDateElement = document.getElementById('selectedDate');
+  if (selectedDateElement) {
+    selectedDateElement.textContent = 'tomorrow';
+  }
 
   if (bs4) {
     submitButton = document.getElementById('time-jump-submit');
     dateInput = document.getElementById('set_date_date_of_record');
+    console.log("pls works");
   } else {
     submitButton = document.getElementById('submit');
     dateInput = document.getElementById('hop_to_date_date_of_record');
@@ -14,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (submitButton) {
     submitButton.addEventListener('click', function() {
+      console.log('bs4', bs4);
+      console.log("pls works");
       const dateValue = dateInput ? dateInput.value : '';
 
       // Validate the date value
@@ -29,12 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
       const day = ('0' + date.getDate()).slice(-2); // Add leading zero
       const formattedDate = `${year}-${month}-${day}`;
 
-      const selectedDateElement = document.getElementById('selectedDate');
       const hiddenDateField = document.getElementById('hiddenDateField');
 
-      if (selectedDateElement) {
-        selectedDateElement.textContent = formattedDate;
-      }
+      // if (selectedDateElement) {
+      //   selectedDateElement.textContent = formattedDate;
+      // }
 
       if (hiddenDateField) {
         hiddenDateField.value = formattedDate;
