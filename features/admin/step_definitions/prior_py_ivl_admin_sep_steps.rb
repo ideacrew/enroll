@@ -31,7 +31,7 @@ When(/^a SEP is added with a prior year effective date$/) do
   scroll_to :center
   element = find(AddSepAction.admin_comment)
   scroll_to(element, align: :bottom)
-  find(AddSepAction.select_sep_reason_dropdown, wait: 5).click
+  find(AddSepAction.select_sep_reason_dropdown).click
   find(AddSepAction.select_sep_reason, text: AddSepAction.sep_reason_text).click
   fill_in AddSepAction.sep_event_date, :with => TimeKeeper.date_of_record.beginning_of_year - 1.year
   find(AddSepAction.sep_title).click
