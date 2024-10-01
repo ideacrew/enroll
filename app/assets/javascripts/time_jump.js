@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (submitButton) {
     submitButton.addEventListener('click', function() {
-      const dateInput = bs4 ? document.getElementById('set_date_date_of_record') : document.getElementById('hop_to_date_date_of_record');
+      let dateInput = bs4 ? document.getElementById('set_date_date_of_record') : document.getElementById('hop_to_date_date_of_record');
       let dateValue = dateInput ? dateInput.value : '';
 
       // Validate the date value
@@ -15,20 +15,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (!bs4) {
         // Parse the date value
-        const date = new Date(dateValue);
-        const year = date.getFullYear();
-        const month = ('0' + (date.getMonth() + 1)).slice(-2); // Add leading zero
-        const day = ('0' + date.getDate()).slice(-2); // Add leading zero
+        let date = new Date(dateValue);
+        let year = date.getFullYear();
+        let month = ('0' + (date.getMonth() + 1)).slice(-2); // Add leading zero
+        let day = ('0' + date.getDate()).slice(-2); // Add leading zero
         dateValue = `${year}-${month}-${day}`;
 
-        const hiddenDateField = document.getElementById('hiddenDateField');
+        let hiddenDateField = document.getElementById('hiddenDateField');
 
         if (hiddenDateField) {
           hiddenDateField.value = dateValue;
         }
       }
 
-      const selectedDateElement = document.getElementById('selectedDate');
+      let selectedDateElement = document.getElementById('selectedDate');
 
       if (selectedDateElement) {
         selectedDateElement.textContent = dateValue;
