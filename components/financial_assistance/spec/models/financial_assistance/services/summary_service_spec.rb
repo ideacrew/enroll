@@ -14,7 +14,7 @@ describe ::FinancialAssistance::Services::SummaryService do
                                   is_primary_applicant: true)
   end
   let(:cfl_service) { ::FinancialAssistance::Services::ConditionalFieldsLookupService.new }
-  subject { ::FinancialAssistance::Services::SummaryService::AdminSummaryService.new(application, application.active_applicants, cfl_service) }
+  subject { ::FinancialAssistance::Services::SummaryService::AdminSummaryService.new(cfl_service, application, application.active_applicants) }
   describe 'applicant_summaries' do
     context "when benefits are present" do
       let!(:benefit) do
