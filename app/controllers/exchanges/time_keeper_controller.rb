@@ -7,6 +7,7 @@ module Exchanges
 
     def hop_to_date
       authorize HbxProfile, :hop_to_date?
+      binding.irb
 
       result = Operations::HbxAdmin::TimeJump.new.call({new_date: permit_params.to_h["date_of_record"]})
 
