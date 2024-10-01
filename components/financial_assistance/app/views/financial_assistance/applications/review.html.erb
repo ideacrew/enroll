@@ -72,7 +72,7 @@
       <section>
         <h2 class="mb-4"><%= summary[:applicant_name] %></h2>
         <% summary[:sections].each do |section| %>
-          <%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: section} %>
+          <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: section} %>
         <% end %>
       </section>
     <% end %>
