@@ -8,44 +8,89 @@
       jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[1]).prop('checked', false);
     }
   });
+
+  $('#cancel-btn').on('click', function() {
+    $('tr.child-row:visible').remove();
+  });
 </script>
 
-<td colspan="90%">
-  <%if @hbxs.present?%>
-    <%= form_tag update_cancel_enrollment_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
-      <h3 class='title'>Cancel Enrollment</h3>
-      <br />
-      <table  class="table table-striped">
-        <tr>
-          <th>HBX ID</th>
-          <th>Plan</th>
-          <th>Effective Date</th>
-          <th>Cancellation Date</th>
-          <th>Cancel Enrollment ?</th>
-          <th>Transmit to Carrier ?</th>
-        </tr>
-        <% @hbxs.each do |hbx| %>
-        <tr>
-          <td><%= hbx.hbx_id %></td>
-          <td><%= hbx.product.title %></td>
-          <td><%= hbx.effective_on %></td>
-          <td><%= hbx.effective_on %></td>
-          <td><%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id %></td>
-          <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%></td>
-        </tr>
-        <% end %>
-        <tr><td colspan = "6"><br /></td></tr>
-        <tr>
-          <td colspan = "6">
-            <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
-            <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
-            <%= hidden_field_tag :family_id, params[:family] %>
-            <%= submit_tag "Submit", class: 'btn btn-primary' %>
-          </td>
-        </tr>
-      </table>
-    <% end %>
-  <%else%>
-    <h4 class='title'>No Enrollments to cancel</h3>
-  <%end%>
-</td>
+<% if @bs4 %>
+  <td colspan="90%">
+    <%if @hbxs.present?%>
+      <%= form_tag update_cancel_enrollment_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
+        <h3><%= l10n('hbx_profiles.cancel.header') %></h3>
+        <table  class="table table-striped">
+          <tr>
+            <th><%= l10n('insured.families.hbx_id') %></th>
+            <th><%= l10n('plan') %></th>
+            <th><%= l10n('hbx_profiles.effective_date') %></th>
+            <th><%= l10n('hbx_profiles.cancel.cancellation_date') %></th>
+            <th><%= l10n('hbx_profiles.cancel.cancel_enrollment') %></th>
+            <th><%= l10n('hbx_profiles.edi') %></th>
+          </tr>
+          <% @hbxs.each do |hbx| %>
+          <tr>
+            <td><%= hbx.hbx_id %></td>
+            <td><%= hbx.product.title %></td>
+            <td><%= hbx.effective_on %></td>
+            <td><%= hbx.effective_on %></td>
+            <td><%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id %></td>
+            <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%></td>
+          </tr>
+          <% end %>
+          <tr><td colspan = "6"><br /></td></tr>
+          <tr>
+            <td colspan = "6">
+              <span id='cancel-btn' class="btn btn-default"><%= l10n('cancel') %></span>&nbsp;&nbsp;&nbsp;
+              <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
+              <%= hidden_field_tag :family_id, params[:family] %>
+              <%= submit_tag l10n('submit'), class: 'btn btn-primary' %>
+            </td>
+          </tr>
+        </table>
+      <% end %>
+    <%else%>
+      <h3><%= l10n('hbx_profiles.cancel.empty') %> </h3>
+    <%end%>
+  </td>
+<% else %>
+  <td colspan="90%">
+    <%if @hbxs.present?%>
+      <%= form_tag update_cancel_enrollment_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
+        <h3 class='title'>Cancel Enrollment</h3>
+        <br />
+        <table  class="table table-striped">
+          <tr>
+            <th>HBX ID</th>
+            <th>Plan</th>
+            <th>Effective Date</th>
+            <th>Cancellation Date</th>
+            <th>Cancel Enrollment ?</th>
+            <th>Transmit to Carrier ?</th>
+          </tr>
+          <% @hbxs.each do |hbx| %>
+          <tr>
+            <td><%= hbx.hbx_id %></td>
+            <td><%= hbx.product.title %></td>
+            <td><%= hbx.effective_on %></td>
+            <td><%= hbx.effective_on %></td>
+            <td><%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id %></td>
+            <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%></td>
+          </tr>
+          <% end %>
+          <tr><td colspan = "6"><br /></td></tr>
+          <tr>
+            <td colspan = "6">
+              <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+              <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
+              <%= hidden_field_tag :family_id, params[:family] %>
+              <%= submit_tag "Submit", class: 'btn btn-primary' %>
+            </td>
+          </tr>
+        </table>
+      <% end %>
+    <%else%>
+      <h4 class='title'>No Enrollments to cancel</h3>
+    <%end%>
+  </td>
+<% end %>

@@ -576,6 +576,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     authorize HbxProfile, :update_enrollment_terminated_on_date?
 
     begin
+      params[:new_termination_date] = parse_date(params[:new_termination_date])&.strftime("%m/%d/%Y")
       @row = params[:family_actions_id]
       @element_to_replace_id = params[:family_actions_id]
       result = Operations::HbxEnrollments::EndDateChange.new.call(params: params)
@@ -677,9 +678,10 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
-    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, params[:new_dob])
+    new_dob = parse_date(params[:new_dob])
+    @premium_implications = Person.dob_change_implication_on_active_enrollments(@person, new_dob)
     respond_to do |format|
-      format.js { render "edit_enrollment", person: @person, :new_ssn => params[:new_ssn], :new_dob => params[:new_dob],  :family_actions_id => params[:family_actions_id]}
+      format.js { render "edit_enrollment", person: @person, :new_ssn => params[:new_ssn], :new_dob => new_dob, :family_actions_id => params[:family_actions_id]}
     end
   end
 
@@ -750,12 +752,14 @@ class Exchanges::HbxProfilesController < ApplicationController
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       @element_to_replace_id = params[:tax_household_group][:family_actions_id]
       family = Person.find(params[:tax_household_group][:person_id]).primary_family
+      th_group_info = params.require(:tax_household_group).permit(
+        :person_id, :family_actions_id, :effective_date, tax_households: {}
+      ).to_h
+      th_group_info[:effective_date] = parse_date(th_group_info[:effective_date])&.strftime("%m/%d/%Y")
       result = ::Operations::TaxHouseholdGroups::CreateEligibility.new.call(
         {
           family: family,
-          th_group_info: params.require(:tax_household_group).permit(
-            :person_id, :family_actions_id, :effective_date, tax_households: {}
-          ).to_h
+          th_group_info: th_group_info
         }
       )
 

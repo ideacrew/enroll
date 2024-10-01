@@ -1153,4 +1153,9 @@ module ApplicationHelper
   def match_char_pattern(string)
     string.chars.map{  |char| "[#{char.upcase}#{char.downcase}]" }.join
   end
+
+  def date_field_value(date = nil)
+    date = Date.current if date.nil? || date.to_s == "0"
+    date.strftime("%Y-%m-%d")
+  end
 end
