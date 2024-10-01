@@ -69,9 +69,5 @@ class Announcement
 
       announcements.uniq
     end
-
-    def announcements_for_web
-      Announcement.current_msg_for_web_page
-    end
   end
 end
