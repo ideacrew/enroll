@@ -61,6 +61,7 @@ table {
   caption {
     text-align: left;
     margin: 1em 0;
+    color: var(--text-secondary);
   }
 }
 
@@ -224,8 +225,4 @@ table {
   .row {
     margin: 0
   }
-}
-
-table caption {
-  color: var(--text-secondary);
 }
