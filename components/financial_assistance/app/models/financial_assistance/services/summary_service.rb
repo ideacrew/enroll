@@ -12,7 +12,7 @@ module FinancialAssistance
       APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_application.yml.erb"
       COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
 
-      def initialize(application, applicants, cfl_service)
+      def initialize(cfl_service, application, applicants)
         @application = application
         @application_displayable_helper = ApplicationDisplayableHelper.new(cfl_service, @application.id)
         @applicants = applicants
@@ -189,7 +189,7 @@ module FinancialAssistance
         def initialize(cfl_service, application, applicants, can_edit)
           @can_edit = can_edit
           @applicant_displayable_helpers = applicants.map { |applicant| ApplicantDisplayableHelper.new(cfl_service, applicant.id) }
-          super(application, applicants)
+          super(cfl_service, application, applicants)
         end
 
         private
