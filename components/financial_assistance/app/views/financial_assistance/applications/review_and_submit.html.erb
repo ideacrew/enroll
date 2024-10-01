@@ -81,27 +81,26 @@
     <% end %>
 
     <%# Applicants summary %>
-    <% @applicants.each do |applicant| %>
+    <% helper = ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(@cfl_service, @application, @applicants, true) %>
+    <% helper.applicant_summaries().each do |summary| %>
       <section>
-        <h2 class="mb-4"><%= capitalize_full_name(applicant.full_name) %></h2>
-        <% applicant_summary_hashes(applicant, true).each do |subsection| %>
-          <%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: subsection, applicant: applicant} %>
+        <h2 class="mb-4"><%= summary[:applicant_name] %></h2>
+        <% summary[:sections].each do |section| %>
+          <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: section} %>
         <% end %>
       </section>
     <% end %>
 
     <%# Household & Preferences summary %>
-    <% if @application.applicants.count > 1 && !family_relationships_hash.nil? %>
+    <% if @application.applicants.count > 1 && helper.relationships_summary.present? %>
       <section>
         <div class="mb-4">
           <h2><%= l10n("faa.review.your_household")%></h2>
         </div>
 
-        <%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: family_relationships_hash} %>
+        <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.relationships_summary} %>
       </section>
     <% end %>
-    <section><%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: preferences_hash} %></section>
-    <section><%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: household_hash} %></section>
 
     <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: go_to_step_application_path(@application, 1), disable_link: @application.incomplete_applicants? } %>
   </div>

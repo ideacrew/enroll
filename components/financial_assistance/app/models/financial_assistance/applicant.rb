@@ -1516,6 +1516,10 @@ module FinancialAssistance
       home_address || mailing_address
     end
 
+    def has_citizen_immigration_status?
+      naturalized_citizen.present? || eligible_immigration_status.present?
+    end
+
     private
 
     def fetch_evidence_params(evidence)

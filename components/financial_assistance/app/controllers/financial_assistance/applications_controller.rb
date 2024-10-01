@@ -242,22 +242,7 @@ module FinancialAssistance
       else
         @applicants = @application.active_applicants
         @all_relationships = @application.relationships
-        @demographic_hash = {}
-        @income_coverage_hash = {}
         build_applicants_name_by_hbx_id_hash
-
-        @applicants.each do |applicant|
-          file = if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
-                   File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
-                 else
-                   File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application_hra.yml.erb")
-                 end
-          application_hash = YAML.safe_load(ERB.new(file).result(binding))
-          @demographic_hash[applicant.id] = application_hash[0]["demographics"]
-          application_hash[0]["demographics"]["ADDRESSES"] = generate_address_hash(applicant)
-          application_hash[1]["financial_assistance_info"]["INCOME"] = generate_income_hash(applicant)
-          @income_coverage_hash[applicant.id] = application_hash[1]["financial_assistance_info"]
-        end
       end
 
       respond_to :html
@@ -527,50 +512,6 @@ module FinancialAssistance
 
     def check_citizen_immigration_status?(applicant)
       applicant.naturalized_citizen.present? || applicant.eligible_immigration_status.present?
-    end
-
-    def generate_income_hash(applicant)
-      assistance_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!.to_s
-      income_hash = {
-        "#{l10n('faa.incomes.from_employer', assistance_year: assistance_year)}*" => human_boolean(applicant.has_job_income),
-        "jobs" => generate_employment_hash(applicant.incomes.jobs),
-        l10n('faa.incomes.from_self_employment',
-             assistance_year: assistance_year) => human_boolean(applicant.has_self_employment_income),
-        l10n('faa.other_incomes.other_sources', assistance_year: assistance_year) => human_boolean(applicant.has_other_income)
-      }
-      income_hash.merge!(l10n('faa.other_incomes.unemployment', assistance_year: assistance_year) => human_boolean(applicant.has_unemployment_income)) if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
-      income_hash
-    end
-
-    def generate_employment_hash(jobs)
-      job_hash = {}
-      jobs.each do |job|
-        job_hash[job.id] = {
-          "Employer Name" => job.employer_name,
-          "EMPLOYER ADDRESSS LINE 1" => job&.employer_address&.address_1,
-          "EMPLOYER ADDRESSS LINE 2" => job&.employer_address&.address_2,
-          "CITY" => job&.employer_address&.city,
-          "STATE" => job&.employer_address&.state,
-          "ZIP" => job&.employer_address&.zip,
-          "EMPLOYER PHONE " => job.employer_phone&.full_phone_number
-        }
-      end
-      job_hash
-    end
-
-    def generate_address_hash(applicant)
-      addresses_hash = {}
-      applicant.addresses.each do |address|
-        addresses_hash["#{address.kind}_address"] = {
-          "ADDRESS LINE 1" => address&.address_1,
-          "ADDRESS LINE 2" => address&.address_2,
-          "CITY" => address&.city,
-          "ZIP" => address&.zip,
-          "STATE" => address&.state,
-          "COUNTY" => address&.county
-        }
-      end
-      addresses_hash
     end
 
     def human_boolean(value)

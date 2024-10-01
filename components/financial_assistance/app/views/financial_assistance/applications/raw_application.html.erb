@@ -75,86 +75,27 @@
           </div>
         <% end %>
 
-        <% @applicants.each do |applicant| %>
-          <div class="col-md-12 p-0">
 
-            <h2><%= applicant.full_name %></h2>
-            <table class="table">
-              <tr>
-                <thead>
-                <tr>
-                  <th><%= l10n("dob") %></th>
-                  <th><%= l10n("gender") %></th>
-                  <th><%= l10n("relationship") %></th>
-                  <th><%= l10n("faa.review.personal.needs_coverage") %></th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr>
-                  <td><%= applicant.dob %></td>
-                  <td><%= applicant.gender.humanize %></td>
-                  <td><%= applicant.is_primary_applicant? ? 'Self' : applicant.relationships.find_by(relative_id: @application.primary_applicant.id).kind.humanize %></td>
-                  <td><%= human_boolean applicant.is_applying_coverage %></td>
-                </tr>
-                </tbody>
-              </tr>
-            </table>
-            <dl>
-              <%= render partial: "financial_assistance/applications/demographic", collection: @demographic_hash[applicant.id], as: :demographic %>
-            </dl>
-            <dl>
-              <%= render partial: "financial_assistance/applications/income_coverage", collection: @income_coverage_hash[applicant.id], as: :income_coverage, locals: {applicant: applicant} %>
-            </dl>
-          </div>
-          <br>
+        <%# Applicants summary %>
+        <% helper = ::FinancialAssistance::Services::SummaryService::AdminSummaryService.new(@application, @applicants, @cfl_service) %>
+        <% helper.applicant_summaries().each do |summary| %>
+          <section>
+            <h2 class="mb-4"><%= summary[:applicant_name] %></h2>
+            <% summary[:sections].each do |section| %>
+              <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: section} %>
+            <% end %>
+          </section>
         <% end %>
 
         <%# Household & Preferences summary %>
-        <div class="col-md-12 p-0">
-          <% if @application.applicants.count > 1 && !family_relationships_hash.nil? %>
-            <section>
-              <div class="mb-4">
-                <h2><%= l10n("faa.review.your_household")%></h2>
-              </div>
-
-              <%= render partial: 'financial_assistance/applications/review_and_submit_subsection', locals: {subsection: family_relationships_hash} %>
-            </section>
-          <% end %>
-
-          <!-- Your Preferences -->
-          <% unless ![@application.is_requesting_voter_registration_application_in_mail, @application.years_to_renew].include?(nil) %>
-            <h2><%= l10n('insured.preferences.heading') %></h2>
-            <% if @cfl_service.displayable_field?('application', @application.id, :years_to_renew) %>
-              <dl>
-                <div class="d-flex justify-content-between align-items-center">
-                  <dt class="col-8 px-0"><%= l10n("faa.review.preferences.eligibility_renewal") %></dt>
-                  <dd class="text-right"><%= @application.years_to_renew %></dd>
-                </div>
-              </dl>
-            <% end %>
-          <% end %>
-
-          <!-- More about your Household -->
-          <% if @cfl_service.displayable_field?('application', @application.id, :parent_living_out_of_home_terms) %>
-            <h2><%= l10n('faa.review.more_about_your_household') %></h2>
-            <dl>
-              <div class="d-flex justify-content-between align-items-center">
-                <dt class="col-8 px-0"><%= l10n("faa.review.more_about_your_household.parent_living_outside") %></dt>
-                <dd class="text-right"><%= human_boolean(@application.parent_living_out_of_home_terms) %></dd>
-              </div>
-              <% if FinancialAssistanceRegistry.feature_enabled?(:full_medicaid_determination_step) %>
-                <div class="d-flex justify-content-between align-items-center">
-                  <dt class="col-8 px-0"><%= state_abbreviation_text(l10n("faa.medicaid_question")) %></dt>
-                  <dd class="text-right"><%= human_boolean(@application.full_medicaid_determination) %></dd>
-                </div>
-              <% end %>
-              <% if FinancialAssistanceRegistry.feature_enabled?(:display_medicaid_question) %>
-                <dt><%= l10n("faa.medicaid_question") %></dt>
-              <% end %>
-            </dl>
-          <% end %>
-        </div>
+        <% if @application.applicants.count > 1 && helper.relationships_summary.present? %>
+          <section>
+            <h2 class="mb-4"><%= l10n("faa.review.your_household")%></h2>
+            <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.relationships_summary} %>
+          </section>
+        <% end %>
+        <section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.preferences_summary} %></section>
+        <section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.household_summary} %></section>
       </div>
       <div class="d-flex justify-content-between">
         <span><%= link_to l10n('faa.results.view_my_applications'), applications_path, class: "btn btn-primary" %></span>
