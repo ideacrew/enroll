@@ -367,7 +367,7 @@ module ApplicationHelper
   def render_flash(use_bs4: false)
     rendered = []
     flash.each do |type, messages|
-      next if messages.blank? || (messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string"))
+      next if invalid_flash_messages?(messages)
 
       if messages.respond_to?(:each)
         messages.each do |m|
@@ -389,6 +389,15 @@ module ApplicationHelper
     end
   end
 
+  def invalid_flash_messages?(messages)
+    return true if messages.blank?
+    return true if messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string")
+
+    # catch-all for boolean-type messages
+    return true unless messages.is_a?(String) || messages.is_a?(Array)
+    false
+  end
+
   def get_flash_type(type)
     case type
     when "notice"
@@ -404,6 +413,10 @@ module ApplicationHelper
 
   def is_announcement?(item)
     item.respond_to?(:keys) && item[:is_announcement]
+  end
+
+  def show_table_notice(notice)
+    sanitize_html(render(plain: notice)) if notice.present? && notice != flash[:notice]
   end
 
   def dd_value(val)
@@ -1134,5 +1147,10 @@ module ApplicationHelper
 
   def imm_docs_requried_class
     FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) ? "" : "required"
+  end
+
+  # HTML patterns for validation are case sensative. In order to make them case insensative, we need to convert them to case insensative patterns.
+  def match_char_pattern(string)
+    string.chars.map{  |char| "[#{char.upcase}#{char.downcase}]" }.join
   end
 end
