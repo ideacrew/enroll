@@ -26,7 +26,7 @@
       <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: go_to_step_application_path(@application, 1), disable_link: @application.incomplete_applicants? } %>
     </div>
 
-    <%= render partial: "summary", locals: {helper: ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(@cfl_service, @application, @applicants, true)} %>
+    <%= render partial: "summary", locals: {helper: ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(@cfl_service, @application, @applicants, can_edit: true)} %>
 
     <%= render partial: "shared/progress_navigation_buttons", locals: { next_link: go_to_step_application_path(@application, 1), disable_link: @application.incomplete_applicants? } %>
   </div>

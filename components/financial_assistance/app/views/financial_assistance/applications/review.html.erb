@@ -19,7 +19,7 @@
       <dd><%= @application.hbx_id %></dd>
     </dl>
 
-    <%= render partial: "summary", locals: {helper: ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(@cfl_service, @application, @applicants, false)} %>
+    <%= render partial: "summary", locals: {helper: ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(@cfl_service, @application, @applicants, can_edit: false)} %>
 
     <%= h(link_to l10n("faa.applications.detail.back"), applications_path, class: "btn btn-primary mt-2") %>
   </div>
