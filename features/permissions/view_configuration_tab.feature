@@ -33,5 +33,13 @@ Feature: As a Super Admin I will be the only user
     And the user goes to the Config Page
     Then the user will see the Time Tavel option
 
+  Scenario: HBX Staff with Super Admin subroles and a time travel ability enabled should have the option to time travel
+    Given notices feature is enabled
+    Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
+    And the user with a HBX staff role with Super Admin subrole updates permisssions to time travel
+    And the user is on the Main Page
+    And the user goes to the Config Page
+    Then the user will clicks on Announcements page
+    the user should see on Create Announcement Button
 
 
