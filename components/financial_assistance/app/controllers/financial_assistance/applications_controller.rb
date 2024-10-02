@@ -21,7 +21,7 @@ module FinancialAssistance
     require 'securerandom'
 
     before_action :check_eligibility, only: [:copy]
-    before_action :init_cfl_service, only: [:review_and_submit, :review, :raw_application]
+    before_action :set_summary_helpers, only: [:review_and_submit, :review, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
     # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
@@ -204,7 +204,6 @@ module FinancialAssistance
       set_admin_bookmark_url
       @all_relationships = @application.relationships
       @application.calculate_total_net_income_for_applicants
-      @applicants = @application.active_applicants if @application.present?
       build_applicants_name_by_hbx_id_hash
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
       @has_outstanding_local_mec_evidence = has_outstanding_local_mec_evidence?(@application) if EnrollRegistry.feature_enabled?(:mec_check)
@@ -224,7 +223,6 @@ module FinancialAssistance
       return redirect_to applications_path if @application.blank?
 
       authorize @application, :review?
-      @applicants = @application.active_applicants
       build_applicants_name_by_hbx_id_hash
 
       respond_to :html
@@ -240,7 +238,6 @@ module FinancialAssistance
       if @application.nil? || @application.is_draft?
         redirect_to applications_path
       else
-        @applicants = @application.active_applicants
         @all_relationships = @application.relationships
         @demographic_hash = {}
         @income_coverage_hash = {}
@@ -490,8 +487,12 @@ module FinancialAssistance
       return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if medicaid_gateway_determination_is_enabled?
     end
 
-    def init_cfl_service
+    def set_summary_helpers
       @cfl_service = ::FinancialAssistance::Services::ConditionalFieldsLookupService.new
+      @applicants = @application&.active_applicants
+      return unless @bs4
+
+      @summary_helper = ::FinancialAssistance::Services::SummaryService.instance_for_action(action_name, @cfl_service, @application, @applicants)
     end
 
     def check_eligibility

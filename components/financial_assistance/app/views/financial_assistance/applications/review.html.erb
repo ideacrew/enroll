@@ -18,8 +18,7 @@
       <dt class="mr-4"><%= l10n('faa.applications.detail.id') %></dt>
       <dd><%= @application.hbx_id %></dd>
     </dl>
-
-    <%= render partial: "summary", locals: {helper: ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(@cfl_service, @application, @applicants, can_edit: false)} %>
+    <%= render partial: "summary" %>
 
     <%= h(link_to l10n("faa.applications.detail.back"), applications_path, class: "btn btn-primary mt-2") %>
   </div>

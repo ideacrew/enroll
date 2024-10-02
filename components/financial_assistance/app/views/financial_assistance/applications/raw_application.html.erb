@@ -5,14 +5,17 @@
         <span><%= link_to l10n('faa.results.view_my_applications'), applications_path, class: "btn btn-primary" %></span>
         <button class="btn btn-print"><%= l10n('print') %></button>
       </div>
+
       <h1><%= l10n('faa.review.review_and_submit') %></h1>
+      
       <div id="printArea">
         <dl class="d-flex">
           <dt class="mr-4"><%= l10n('faa.applications.detail.id') %></dt>
           <dd><%= @application.hbx_id %></dd>
         </dl>
-        <%= render partial: "summary", locals: {helper: ::FinancialAssistance::Services::SummaryService::AdminSummaryService.new(@cfl_service, @application, @applicants)} %>
+        <%= render partial: "summary" %>
       </div>
+
       <div class="d-flex justify-content-between">
         <span><%= link_to l10n('faa.results.view_my_applications'), applications_path, class: "btn btn-primary" %></span>
         <button class="btn btn-print"><%= l10n('print') %></button>

@@ -37,7 +37,7 @@
               </td>
               <td class="d-flex justify-content-between">
                   <%= start_to_end_dates(embedded_document) %>
-                  <% if helper.can_edit %>
+                  <% if @summary_helper.can_edit %>
                     <span>
                       <%= h(link_to(income_and_deductions_edit(@application, applicant, embedded_document), id: 'edit-income-and-deductions-pencil') do %>
                         <%= l10n("edit") %>
@@ -64,7 +64,7 @@
 <% end %>
 
 <%# Applicants summary %>
-<% helper.applicant_summaries.each do |summary| %>
+<% @summary_helper.applicant_summaries.each do |summary| %>
   <section>
     <h2 class="mb-4"><%= summary[:applicant_name] %></h2>
     <% summary[:sections].each do |section| %>
@@ -77,8 +77,8 @@
 <% if @application.applicants.count > 1 && helper.relationships_summary.present? %>
   <section>
     <h2 class="mb-4"><%= l10n("faa.review.your_household")%></h2>
-    <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.relationships_summary} %>
+    <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: @summary_helper.relationships_summary} %>
   </section>
 <% end %>
-<section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.preferences_summary} %></section>
-<section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: helper.household_summary} %></section>
+<section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: @summary_helper.preferences_summary} %></section>
+<section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: @summary_helper.household_summary} %></section>

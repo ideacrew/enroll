@@ -11,8 +11,14 @@ module FinancialAssistance
 
       attr_reader :can_edit
 
-      APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_application.yml.erb"
-      COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
+      def self.instance_for_action(action_name, cfl_service, application, applicants)
+        case action_name
+        when "raw_application"
+          ::FinancialAssistance::Services::SummaryService::AdminSummaryService.new(cfl_service, application, applicants)
+        else
+          ::FinancialAssistance::Services::SummaryService::ConsumerSummaryService.new(cfl_service, application, applicants, can_edit: action_name == 'review_and_submit')
+        end
+      end
 
       def initialize(cfl_service, application, applicants, can_edit: false)
         @application = application
@@ -68,6 +74,9 @@ module FinancialAssistance
 
       private
 
+      APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_application.yml.erb"
+      COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
+
       # @method load_applicant_map(applicant)
       # Translates the applicant summary config data into a symbolized hash.
       #
@@ -79,7 +88,7 @@ module FinancialAssistance
         application_file = File.read(SummaryService::APPLICANT_CONFIGURATION)
         application_map = YAML.safe_load(ERB.new(application_file).result(binding)).deep_symbolize_keys
 
-        # load the coverage data into the map from the coverage config
+        # load the coverage data into the base map from the coverage config
         load_coverages_map(applicant, application_map, :is_enrolled)
         load_coverages_map(applicant, application_map, :is_eligible)
 
@@ -88,7 +97,7 @@ module FinancialAssistance
 
       # @method load_coverages_map(applicant, application_map, kind)
       # Helper method for `load_applicant_map`.
-      # Loads the coverage data from the coverage config into the application map for the given applicant.
+      # Loads the coverage data from the coverage config into the base application map for the given applicant.
       # Used for the `is_enrolled` and `is_eligible` coverage rows *only* when the row value is true.
       #
       # @param [FinancialAssistance::Applicant] applicant The applicant for whom the coverage data is being loaded.
