@@ -46,7 +46,7 @@
         <div class="d-flex col justify-content-around">
           <div class='flex-column init_event_date justify-content-center'>
             <label for="event_date" class="d-block required"><%= l10n('hbx_profiles.sep_event_date') %></label>
-            <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: 110.years.ago, max: 110.years.from_now, required: true, class: "qle-date-picker", class: "qle-date-picker" %>
+            <%= date_field_tag :event_date, nil, placeholder: "MM/DD/YYYY", min: date_field_value(110.years.ago), max: date_field_value(110.years.from_now), required: true, class: "qle-date-picker" %>
           </div>
           <div class='flex-column csl_num_options justify-content-center'>
             <label for="csl_num" class="d-block"><%= l10n('hbx_profiles.csl_number') %></label>
@@ -65,7 +65,7 @@
         </div>
         <div class="col-auto end_btn start_end_date end_input">
           <label for="end_on"class="d-block required"><%= l10n('hbx_profiles.sep_end_date') %></label>
-          <%= date_field_tag :end_on, nil, value: 60.days.from_now, required: true, disabled: true %>
+          <%= date_field_tag :end_on, nil, value: date_field_value(60.days.from_now), required: true, disabled: true %>
         </div>
         <div class='col-auto pr-0 init_effective_date'>
           <label for="next_poss_effective_date" class="d-block required"><%= l10n('hbx_profiles.sep_next_possible_start_date') %></label>
