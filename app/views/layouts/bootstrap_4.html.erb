@@ -25,7 +25,7 @@
       <%= action_cable_meta_tag %>
       <%= csrf_meta_tags %>
 
-      <meta property="csp-nonce" content="<%= content_security_policy_nonce %>"/>
+      <meta name="csp-nonce" content="<%= content_security_policy_nonce %>"/>
 
       <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
         <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
