@@ -13,8 +13,8 @@ module Effective
           #row.legal_name
           #(link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home')) + raw("<br>") + truncate(row.id.to_s, length: 8, omission: '' )
           #link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile)
-                                                                   link_to h(row.legal_name), benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(row.broker_agency_profile)
-                                                                 }, :sortable => false, :filter => false, :width => '40%'
+                                                                           link_to h(row.legal_name), benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(row.broker_agency_profile)
+                                                                         }, :sortable => false, :filter => false, :width => '40%'
 
         table_column :dba, :label => l10n('dba_caps'), :proc => proc { |row|
           h(row.dba)
@@ -45,11 +45,12 @@ module Effective
       end
 
       def nested_filter_definition
-        filters = {
+        return nil if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+        {
           broker_agencies:
-           [
-             {scope: 'all', label: 'All'}
-           ],
+            [
+              {scope: 'all', label: 'All'}
+            ],
           top_scope: :broker_agencies
         }
       end
