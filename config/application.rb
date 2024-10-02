@@ -96,5 +96,7 @@ module Enroll
       config.acapi.add_amqp_worker("TransportProfiles::Subscribers::TransportArtifactSubscriber")
       config.acapi.add_async_subscription("Notifier::NotificationSubscriber")
     end
+
+    config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
   end
 end
