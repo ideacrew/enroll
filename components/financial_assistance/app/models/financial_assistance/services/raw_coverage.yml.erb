@@ -1,7 +1,7 @@
 # This file is used to DRY up the two coverage subtables in the raw_application ("financial_assistance/services/raw_application.yml.erb") health_coverage row mapping. 
-# See `FinancialAssistance::Services::SummaryService.load_coverages_map` for more information.
+# See `FinancialAssistance::Services::SummaryService.ApplicantSection.load_coverages_map` for more information.
 
-<% applicant.benefits.has_valid_insurance_kind.where(kind: kind).group_by(&:insurance_kind).each do |insurance_kind, benefits| %>
+<% @applicant.benefits.has_valid_insurance_kind.where(kind: kind).group_by(&:insurance_kind).each do |insurance_kind, benefits| %>
 -
     <% benefits.each do |benefit| %>
     -   type: <%= l10n(benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>

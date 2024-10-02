@@ -37,7 +37,7 @@
               </td>
               <td class="d-flex justify-content-between">
                   <%= start_to_end_dates(embedded_document) %>
-                  <% if @summary_helper.can_edit %>
+                  <% if @summary_helper.can_edit_incomes %>
                     <span>
                       <%= h(link_to(income_and_deductions_edit(@application, applicant, embedded_document), id: 'edit-income-and-deductions-pencil') do %>
                         <%= l10n("edit") %>

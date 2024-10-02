@@ -14,7 +14,7 @@ describe ::FinancialAssistance::Services::SummaryService do
                                   is_primary_applicant: true)
   end
   let(:cfl_service) { ::FinancialAssistance::Services::ConditionalFieldsLookupService.new }
-  subject { ::FinancialAssistance::Services::SummaryService::AdminSummaryService.new(cfl_service, application, application.active_applicants) }
+  subject { ::FinancialAssistance::Services::SummaryService.new(false, false, cfl_service, application, application.active_applicants) }
   describe 'applicant_summaries' do
     context "when benefits are present" do
       let!(:benefit) do
@@ -28,7 +28,7 @@ describe ::FinancialAssistance::Services::SummaryService do
       end
 
       it "should return esi hash" do
-        esi_benefit_hash = subject.applicant_summaries.first[:sections][4][:rows][1][:coverages].first.first[:esi_benefit_data]
+        esi_benefit_hash = subject.sections.first[:subsections][4][:rows][1][:coverages].first.first[:esi_benefit_data]
         expect(esi_benefit_hash[:employer_name][:value]).to eq "Test Employer"
         expect(esi_benefit_hash[:employer_address_line_1][:value]).to eq "address_1"
         expect(esi_benefit_hash[:city][:value]).to eq "Dummy City"
