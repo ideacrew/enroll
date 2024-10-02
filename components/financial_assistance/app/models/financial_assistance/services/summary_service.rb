@@ -304,6 +304,8 @@ module FinancialAssistance
         [*@applicant_summaries.map(&:to_h), relationships_summary, preferences_summary, household_summary].compact
       end
 
+      private
+
       # @method relationships_summary
       #
       # @return [Hash] The hash for the relationships summary section for the application.
