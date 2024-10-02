@@ -36,7 +36,7 @@ module FinancialAssistance
       end
 
       # Base class for the applicant summary section. Manages the loading of the raw application data and the mapping of the data into a view-ready hash.
-      class ApplicantSection < Section
+      class ApplicantSummary < Section
         include L10nHelper
         include FinancialAssistance::ApplicationHelper
         include FinancialAssistance::Engine.routes.url_helpers
@@ -60,7 +60,7 @@ module FinancialAssistance
         # @return [Hash] The hash holding all of the application summary data for the applicant.
         def load_applicant_map
           # load the map from the config
-          application_file = File.read(ApplicantSection::APPLICANT_CONFIGURATION)
+          application_file = File.read(ApplicantSummary::APPLICANT_CONFIGURATION)
           application_map = YAML.safe_load(ERB.new(application_file).result(binding)).deep_symbolize_keys
 
           # load the coverage data into the base map from the coverage config
@@ -80,7 +80,7 @@ module FinancialAssistance
         def load_coverages_map(application_map, kind)
           return unless application_map[:health_coverage][:rows][kind][:value]
 
-          coverage_file = File.read(ApplicantSection::COVERAGE_CONFIGURATION)
+          coverage_file = File.read(ApplicantSummary::COVERAGE_CONFIGURATION)
           coverage_map = YAML.safe_load(ERB.new(coverage_file).result(binding)).map { |kind_array| kind_array.map(&:deep_symbolize_keys) }
           application_map[:health_coverage][:rows][kind][:coverages] = coverage_map
         end
@@ -147,7 +147,7 @@ module FinancialAssistance
       end
 
       # Manages the applicant summary section for the Admin page context, containing nearly all raw application data.
-      class AdminApplicantSection < ApplicantSection
+      class AdminApplicantSummary < ApplicantSummary
         private
 
         PERSONAL_INFO_ROWS = [:dob, :gender, :relationship, :coverage].freeze
@@ -174,7 +174,7 @@ module FinancialAssistance
       end
 
       # Manages the applicant summary section for the Consumer page context, containing only displayable raw application data and allowing for editing.
-      class ConsumerApplicantSection < ApplicantSection
+      class ConsumerApplicantSummary < ApplicantSummary
 
         def initialize(cfl_service, application, applicant, can_edit:)
           @helper = ApplicantDisplayableHelper.new(cfl_service, applicant.id)
@@ -288,9 +288,9 @@ module FinancialAssistance
         @applicants = applicants
         @applicant_summaries = applicants.map do |applicant|
           if is_concise
-            ::FinancialAssistance::Services::SummaryService::ConsumerApplicantSection.new(cfl_service, application, applicant, can_edit: can_edit)
+            ::FinancialAssistance::Services::SummaryService::ConsumerApplicantSummary.new(cfl_service, application, applicant, can_edit: can_edit)
           else
-            ::FinancialAssistance::Services::SummaryService::AdminApplicantSection.new(application, applicant)
+            ::FinancialAssistance::Services::SummaryService::AdminApplicantSummary.new(application, applicant)
           end
         end
         @can_edit_incomes = can_edit
