@@ -27,6 +27,16 @@ module FinancialAssistance
         @can_edit = can_edit
       end
 
+      # @method sections
+      # Loads and returns the applicant summaries, relationships summary, preferences summary, and household summary sections for the application.
+      #
+      # @return [Array] The sections for the summary.
+      def sections
+        [*applicant_summaries, relationships_summary, preferences_summary, household_summary].compact
+      end
+
+      private
+
       # @method applicant_summaries
       # Loads the applicant summary section hashes for all applicants in the application.
       #
@@ -34,7 +44,7 @@ module FinancialAssistance
       def applicant_summaries
         @applicants.map do |applicant|
           applicant_map = load_applicant_map(applicant)
-          {applicant_name: applicant.full_name, sections: applicant_map.values.map(&method(:applicant_section_hash))}
+          section_hash(section_title: applicant.full_name, subsections: applicant_map.values.map(&method(:applicant_subsection_hash)))
         end
       end
 
@@ -42,7 +52,7 @@ module FinancialAssistance
       #
       # @return [Hash] The hash for the relationships summary section for the application.
       def relationships_summary
-        return unless @application.relationships.present?
+        return unless @application.applicants.count > 1 && @application.relationships.present?
 
         fr_hash = @application.relationships.map do |relationship|
           if member_name_by_id(relationship.applicant_id).present?
@@ -51,7 +61,13 @@ module FinancialAssistance
           end
         end
 
-        section_hash(title: l10n('faa.nav.family_relationships'), edit_link: application_relationships_path(@application), rows: fr_hash) unless fr_hash.empty?
+        return if fr_hash.empty?
+        section_hash(section_title: l10n('faa.review.your_household'),
+                     subsections: [
+                      subsection_hash(title: l10n('faa.nav.family_relationships'), 
+                                      edit_link: application_relationships_path(@application), 
+                                      rows: fr_hash.compact)
+                                  ])
       end
 
       # @method preferences_summary
@@ -60,7 +76,9 @@ module FinancialAssistance
       def preferences_summary
         return unless @application.years_to_renew.present? && @application_displayable_helper.displayable?(:years_to_renew)
 
-        section_hash(title: l10n('faa.review.preferences'), edit_link: nil, rows: [{key: l10n('faa.review.preferences.eligibility_renewal'), value: @application.years_to_renew}])
+        subsection_hash(title: l10n('faa.review.preferences'),
+                        edit_link: nil,
+                        rows: [{key: l10n('faa.review.preferences.eligibility_renewal'), value: @application.years_to_renew}])
       end
 
       # @method household_summary
@@ -69,10 +87,10 @@ module FinancialAssistance
       def household_summary
         return unless @application_displayable_helper.displayable?(:parent_living_out_of_home_terms)
 
-        section_hash(title: l10n('faa.review.more_about_your_household'), edit_link: nil, rows: [{key: l10n('faa.review.more_about_your_household.parent_living_outside'), value: human_boolean(@application.parent_living_out_of_home_terms)}])
+        subsection_hash(title: l10n('faa.review.more_about_your_household'), 
+                        edit_link: nil,
+                        rows: [{key: l10n('faa.review.more_about_your_household.parent_living_outside'), value: human_boolean(@application.parent_living_out_of_home_terms)}])
       end
-
-      private
 
       APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_application.yml.erb"
       COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
@@ -123,13 +141,13 @@ module FinancialAssistance
       # @param [Hash] section_data The section hash from the config.
       #
       # @return [Hash] The view-ready section hash.
-      def applicant_section_hash(section_data)
-        section_hash(
+      def applicant_subsection_hash(section_data)
+        subsection_hash(
           title: section_data[:title],
           edit_link: (section_data[:edit_link] if @can_edit),
           rows: section_data[:rows].map do |row_key, row_data|
             if [:addresses, :jobs].include?(row_key) # address and job rows include nested rows
-              row_data.map { |nested_section| applicant_section_hash(nested_section) }
+              row_data.map { |nested_section| applicant_subsection_hash(nested_section) }
             else
               row_data[:value] = human_value(row_data[:value])
               row_data
@@ -138,7 +156,11 @@ module FinancialAssistance
         )
       end
 
-      def section_hash(title:, edit_link:, rows:)
+      def section_hash(section_title:, subsections:)
+        {section_title: section_title, subsections: subsections}
+      end
+
+      def subsection_hash(title:, edit_link:, rows:)
         {title: title, edit_link: edit_link, rows: rows}
       end
 

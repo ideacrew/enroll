@@ -63,22 +63,15 @@
   </section>
 <% end %>
 
-<%# Applicants summary %>
-<% @summary_helper.applicant_summaries.each do |summary| %>
+<%# Summary sections: Applicant summaries, Family Relationships, My Preferences, and My Household %>
+<% @summary_helper.sections.each do |section| %>
   <section>
-    <h2 class="mb-4"><%= summary[:applicant_name] %></h2>
-    <% summary[:sections].each do |section| %>
-      <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: section} %>
+    <% subsections = section[:subsections] || [section] %> <%# handle standalone subsections like My Preferences and My Household %>
+    <% if section[:section_title].present? %>
+      <h2 class="mb-4"><%= section[:section_title] %></h2>
+    <% end %>
+    <% subsections.each do |subsection| %>
+      <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: subsection} %>
     <% end %>
   </section>
 <% end %>
-
-<%# Household & Preferences summary %>
-<% if @application.applicants.count > 1 && helper.relationships_summary.present? %>
-  <section>
-    <h2 class="mb-4"><%= l10n("faa.review.your_household")%></h2>
-    <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: @summary_helper.relationships_summary} %>
-  </section>
-<% end %>
-<section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: @summary_helper.preferences_summary} %></section>
-<section><%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: @summary_helper.household_summary} %></section>
