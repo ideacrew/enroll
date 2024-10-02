@@ -12,7 +12,7 @@ module FinancialAssistance
 
       # Wrapper for a section of the summary page holding title and subsections
       class Section
-        def initialize(section_title, subsections)
+        def initialize(section_title:, subsections:)
           @section_title = section_title
           @subsections = subsections
         end
@@ -46,7 +46,7 @@ module FinancialAssistance
           @applicant = applicant
           @application = application
           @can_edit = can_edit
-          super(capitalize_full_name(applicant.full_name), @subsections = load_applicant_map.values.map(&method(:applicant_subsection_hash)))
+          super(section_title: capitalize_full_name(applicant.full_name), subsections: load_applicant_map.values.map(&method(:applicant_subsection_hash)))
         end
 
         private
@@ -320,9 +320,9 @@ module FinancialAssistance
         return if fr_hash.empty?
         Section.new(section_title: l10n('faa.review.your_household'),
                     subsections: [
-                      Subsection.new(title: l10n('faa.nav.family_relationships'), 
-                                     edit_link: application_relationships_path(@application), 
-                                     rows: fr_hash.compact)
+                      Subsection.new(title: l10n('faa.nav.family_relationships'),
+                                     edit_link: application_relationships_path(@application),
+                                     rows: fr_hash.compact).to_h
                                   ]).to_h
       end
 
