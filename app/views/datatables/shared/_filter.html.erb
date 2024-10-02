@@ -2,8 +2,7 @@
 <% if level == 1 %>
    <% ancestors=[] %>
    <% data_scope = filters[:top_scope] %>
-
-   <div class='custom_filter'>
+   <div class="custom_filter <%= 'hidden' if @bs4 && data_scope == :broker_agencies %>">
 <% end %>
 
 <% filter_group = ancestors.join('-')%>
