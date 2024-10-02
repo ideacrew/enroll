@@ -44,7 +44,7 @@ module FinancialAssistance
       def applicant_summaries
         @applicants.map do |applicant|
           applicant_map = load_applicant_map(applicant)
-          section_hash(section_title: applicant.full_name, subsections: applicant_map.values.map(&method(:applicant_subsection_hash)))
+          section_hash(section_title: capitalize_full_name(applicant.full_name), subsections: applicant_map.values.map(&method(:applicant_subsection_hash)))
         end
       end
 
