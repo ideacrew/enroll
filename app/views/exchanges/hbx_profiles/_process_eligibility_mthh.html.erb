@@ -12,13 +12,13 @@
     </div>
 
     <div>
-      <p><<%= l10n('hbx_profiles.new_eligibility.tax_group.family_contributions') %></p>
+      <p><%= l10n('hbx_profiles.new_eligibility.tax_group.family_contributions') %></p>
 
       <% @tax_household_group_data.values.each_with_index do |members, i| %>
       <div class="bottom-pd">
         <%= f.hidden_field "tax_households[#{i}][members]", value: members.to_json  %>
         <div class="mb-4">
-          <strong><%= l10n('hbx_profiles.new_eligibility.tax_group.group', index: i) %></strong>
+          <strong><%= l10n('hbx_profiles.new_eligibility.tax_group.group', index: i + 1) %></strong>
         </div>
         <div>
           <strong><%= l10n('members') %></strong>
