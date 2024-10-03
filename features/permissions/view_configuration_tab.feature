@@ -2,6 +2,8 @@ Feature: As a Super Admin I will be the only user
   that is able to see & access the Config tab
 
   Background: Setup site, employer, and benefit application
+    Given bs4_admin_flow feature is disable
+    Given the FAA feature configuration is enabled
     Given a CCA site exists with a benefit market
     And there is an employer ABC Widgets
     Given benefit market catalog exists for ABC Widgets initial employer with health benefits
@@ -39,6 +41,7 @@ Feature: As a Super Admin I will be the only user
     And the user with a HBX staff role with Super Admin subrole updates permisssions to time travel
     And the user is on the Main Page
     And the user goes to the Config Page
+    And the user should see Announcements button
     Then the user will clicks on Announcements page
 
 

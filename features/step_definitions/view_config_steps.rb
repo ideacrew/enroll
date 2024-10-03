@@ -34,6 +34,10 @@ Then(/^the user will see the Time Tavel option$/) do
   expect(page).to have_button('Set Current Date', disabled: false)
 end
 
+When(/^the user should see Announcements button/) do
+  expect(page).to have_button('Announcements')
+end
+
 When(/^the user clicks on Announcements page/) do
   find('.btn', text: 'Announcements').click
 end
