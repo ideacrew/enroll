@@ -19,7 +19,7 @@ module FinancialAssistance
       # @param [Array] applicants The applicants to create the SummaryService for.
       # return [SummaryService] The new SummaryService instance.
       def self.instance_for_action(action_name, cfl_service, application, applicants)
-        self.new(action_name != "raw_application", action_name == "review_and_submit", cfl_service, application, applicants)
+        new(action_name != "raw_application", action_name == "review_and_submit", cfl_service, application, applicants)
       end
 
       def initialize(is_concise, can_edit, cfl_service, application, applicants)
@@ -237,8 +237,6 @@ module FinancialAssistance
         # @return [Hash] The view-ready section hash.
         def applicant_subsection_hash(section_data)
           hash = super
-          return hash unless @can_edit
-
           hash[:edit_link] = section_data[:edit_link] if @can_edit
           hash
         end
