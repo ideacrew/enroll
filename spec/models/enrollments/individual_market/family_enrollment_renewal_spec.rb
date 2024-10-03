@@ -344,10 +344,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           subject.enrollment.product.update_attributes(hios_base_id: "33653ME0560001", hios_id: "33653ME0560001-01")
         end
 
-        it "should fetch cross walk product for renewal" do
+        it "should fetch cross walk product for renewal for year 2025" do
           subject.enrollment&.consumer_role&.rating_address&.update_attributes(county: "Hancock")
           renewal = subject.renew
-          expect(renewal.product.hios_id).to eq cross_product.hios_id
+          if subject.renewal_coverage_start.year == 2025
+            expect(renewal.product.hios_id).to eq cross_product.hios_id
+          else
+            expect(renewal.product.hios_id).to eq renewal_product.hios_id
+          end
         end
 
         it "should fetch renewal product for renewal" do
