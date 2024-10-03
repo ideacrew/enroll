@@ -39,19 +39,19 @@
         <% if benefit.insurance_kind == 'employer_sponsored_insurance' %>
         esi_employee_waiting_period:
             key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_waiting_period') %>
-            value: <%= benefit.is_esi_waiting_period %>
+            value: "<%= human_value benefit.is_esi_waiting_period %>"
         esi_employer_minimum_standard:
             key: <%= l10n('faa.review.income.review_benefits_table.esi.employer_minimum_standard') %>
-            value: <%= benefit.is_esi_mec_met %>
+            value: "<%= human_value benefit.is_esi_mec_met %>"
         esi_covered:
             key: <%= l10n('faa.review.income.review_benefits_table.esi.covered') %>
-            value: <%= benefit.esi_covered %>
+            value: <%= human_value benefit.esi_covered.titleize %>
         esi_employee_minimum:
             key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_minimum') %>
             value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
         affordable_question:
-            key: <%= l10n('health_plan_meets_mvs_and_affordable_question') %>
-            value: <%= benefit.health_plan_meets_mvs_and_affordable if display_minimum_value_standard_question?(benefit.insurance_kind) %>
+            key: <%= l10n('health_plan_meets_mvs_and_affordable_question_short') %>
+            value: "<%= human_value benefit.health_plan_meets_mvs_and_affordable if display_minimum_value_standard_question?(benefit.insurance_kind) %>"
         <% end %>
         <% if benefit.insurance_kind == 'health_reimbursement_arrangement' %>
         type_of_hra:

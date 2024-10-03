@@ -26,13 +26,7 @@ module FinancialAssistance
         @application = application
         @application_displayable_helper = ApplicationDisplayableHelper.new(cfl_service, @application.id)
         @applicants = applicants
-        @applicant_summaries = applicants.map do |applicant|
-          if is_concise
-            ::FinancialAssistance::Services::SummaryService::ConsumerApplicantSummary.new(cfl_service, application, applicant, can_edit: can_edit)
-          else
-            ::FinancialAssistance::Services::SummaryService::AdminApplicantSummary.new(application, applicant)
-          end
-        end
+        @applicant_summaries = applicants.map { |applicant| is_concise ? ConsumerApplicantSummary.new(cfl_service, application, applicant, can_edit: can_edit) : AdminApplicantSummary.new(application, applicant) }
         @can_edit_incomes = can_edit
       end
 
@@ -123,7 +117,14 @@ module FinancialAssistance
         # @return [Hash] The view-ready section hash.
         def applicant_subsection_hash(section_data)
           section_data[:rows] = section_data[:rows].values
-          section_data[:rows].map { |row| row.is_a?(Array) ? row.map(&method(:applicant_subsection_hash)) : row }
+          section_data[:rows].map do |row|
+            if row.is_a?(Array)
+              row.map(&method(:applicant_subsection_hash))
+            else
+              row[:value] = human_value(row[:value])
+              row
+            end
+          end
           subsection_hash(title: section_data[:title], rows: section_data[:rows])
         end
 
