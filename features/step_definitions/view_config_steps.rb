@@ -35,14 +35,14 @@ Then(/^the user will see the Time Tavel option$/) do
 end
 
 When(/^the user should see Announcements button/) do
-  expect(page).to have_button('Announcements')
+  expect(page).to have_css('.interaction-click-control-announcements')
 end
 
 When(/^the user clicks on Announcements page/) do
-  find('.btn', text: 'Announcements').click
+  find('.interaction-click-control-announcements').click
 end
 
-Then(/^the user should see on Create Announcement Button/) do
-  expect(page).to have_content('Create Announcement')
+Then(/^the user should see Current Announcements text/) do
+  expect(page).to have_content('Current Announcements')
 end
 

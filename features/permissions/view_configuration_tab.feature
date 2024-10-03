@@ -42,6 +42,7 @@ Feature: As a Super Admin I will be the only user
     And the user is on the Main Page
     And the user goes to the Config Page
     And the user should see Announcements button
-    Then the user will clicks on Announcements page
+    And the user will clicks on Announcements page
+    And the user should see Current Announcements text
 
 
