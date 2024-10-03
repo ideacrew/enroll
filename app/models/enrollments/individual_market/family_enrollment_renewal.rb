@@ -69,43 +69,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     end
   end
 
-  def fetch_cross_walk_product_hios_base_id(county, current_hios_base_id)
-    counties = %w[
-      Aroostook
-      Hancock
-      Penobscot
-      Piscataquis
-      Somerset
-      Washington
-    ]
-
-    return if counties.exclude?(county)
-    { '33653ME0560001' => '33653ME0560006', '33653ME0560005' => '33653ME0560003' }[current_hios_base_id]
-  end
-
-  def fetch_cross_product
-    renewal_year = renewal_coverage_start.year
-    default_renewal_product = enrollment.product.renewal_product
-    raise "#{renewal_coverage_start.year} default_renewal_product missing on HIOS id #{@enrollment.product.hios_id}" if default_renewal_product.blank?
-
-    # This is a temporary fix for 2025 renewal enrollments as the current Data Model does not support cross walk products by county.
-    return default_renewal_product unless renewal_year == 2025
-
-    cross_walk_product_hios_base_id = fetch_cross_walk_product_hios_base_id(
-      enrollment&.consumer_role&.rating_address&.county&.capitalize,
-      enrollment.product.hios_base_id
-    )
-    return default_renewal_product if cross_walk_product_hios_base_id.blank?
-
-    cross_walk_product = ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_year).where(
-      { hios_id: "#{cross_walk_product_hios_base_id}-01" }
-    ).first
-
-    raise "#{renewal_coverage_start.year} cross_walk_product missing on HIOS id #{@enrollment.product.hios_id}" if cross_walk_product.blank?
-
-    cross_walk_product
-  end
-
   def set_csr_value
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
@@ -212,20 +175,52 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   #  - max APTC
   def renewal_eligiblity_determination; end
 
+  def fetch_cross_walk_product_hios_base_id(county, current_hios_base_id)
+    counties = %w[
+      Aroostook
+      Hancock
+      Penobscot
+      Piscataquis
+      Somerset
+      Washington
+    ]
+
+    return if counties.exclude?(county)
+    { '33653ME0560001' => '33653ME0560006', '33653ME0560005' => '33653ME0560003' }[current_hios_base_id]
+  end
+
+  def fetch_cross_product
+    renewal_year = renewal_coverage_start.year
+    default_renewal_product = enrollment.product.renewal_product
+
+    # This is a temporary fix for 2025 renewal enrollments as the current Data Model does not support cross walk products by county.
+    return default_renewal_product unless renewal_year == 2025
+
+    cross_walk_product_hios_base_id = fetch_cross_walk_product_hios_base_id(
+      enrollment&.consumer_role&.rating_address&.county&.capitalize,
+      enrollment.product.hios_base_id
+    )
+    return default_renewal_product if cross_walk_product_hios_base_id.blank?
+
+    ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_year).where(
+      { hios_id: "#{cross_walk_product_hios_base_id}-01" }
+    ).first
+  end
+
   # Cat product ageoff
   # Eligibility determination CSR change
   def renewal_product
     if @enrollment.coverage_kind == 'dental'
-      renewal_product = @cross_walk_product.id
+      renewal_product = @cross_walk_product&.id
     elsif has_catastrophic_product? && is_cat_product_ineligible?
       renewal_product = fetch_cat_age_off_product(@enrollment.product)
       raise "#{renewal_coverage_start.year} Catastrophic age off product missing on HIOS id #{@enrollment.product.hios_id}" if renewal_product.blank?
     else
       renewal_product = if @enrollment.product.csr_variant_id == '01' || has_catastrophic_product?
-                          @cross_walk_product.id
+                          @cross_walk_product&.id
                         else
                           ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_coverage_start.year).where(
-                            {:hios_id => "#{@cross_walk_product.hios_base_id}-01"}
+                            {:hios_id => "#{@cross_walk_product&.hios_base_id}-01"}
                           ).first.id
                         end
     end
