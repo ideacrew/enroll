@@ -78,10 +78,9 @@ module FinancialAssistance
         include FinancialAssistance::Engine.routes.url_helpers
         include ActionView::Helpers::NumberHelper
 
-        def initialize(application, applicant, can_edit: false)
+        def initialize(application, applicant)
           @applicant = applicant
           @application = application
-          @can_edit = can_edit
           super(section_title: capitalize_full_name(applicant.full_name), subsections: load_applicant_map.values.map(&method(:applicant_subsection_hash)))
         end
 
@@ -126,7 +125,7 @@ module FinancialAssistance
           application_map[:health_coverage][:rows][kind][:coverages] = coverage_map
         end
 
-        # @method section_hash(section_data)
+        # @method applicant_subsection_hash(section_data)
         # Maps the raw section hash into a view-ready hash of the form:
         # { title: <section_title>,
         #   edit_link: <section_edit_link>,
@@ -148,8 +147,7 @@ module FinancialAssistance
                 row_data[:value] = human_value(row_data[:value])
                 row_data
               end
-            end,
-            edit_link: (section_data[:edit_link] if @can_edit)
+            end
           ).to_h
         end
 
@@ -195,7 +193,7 @@ module FinancialAssistance
 
         # @method filter_sections(map)
         # Modifies the applicant_map for the Admin page context.
-        # Removes the ai_an_income row from the Income section and the HRA rows if enrolled.
+        # Removes the ai_an_income row from the Income section and the HRA rows if enrolled. Also filter the Personal Info rows and combines them with the Demographics rows.
         #
         # @param [Hash] map The applicant_map to be modified.
         #
@@ -215,12 +213,35 @@ module FinancialAssistance
 
         def initialize(cfl_service, application, applicant, can_edit:)
           @helper = ApplicantDisplayableHelper.new(cfl_service, applicant.id)
-          super(application, applicant, can_edit: can_edit)
+          @can_edit = can_edit
+          super(application, applicant)
         end
 
         private
 
         PERSONAL_INFO_ROWS = [:age, :gender, :relationship, :status, :is_incarcerated, :coverage].freeze
+
+        # @method applicant_subsection_hash(section_data)
+        # Maps the raw section hash for the consumer into a view-ready hash of the form:
+        # { title: <section_title>,
+        #   edit_link: <section_edit_link>,
+        #   rows: [{
+        #     key: <row_label>, value: <row_value>, <... special row data ...>
+        #   }]
+        # }
+        #
+        # Overrides the base class method to optionally include the edit link.
+        #
+        # @param [Hash] section_data The section hash from the config.
+        #
+        # @return [Hash] The view-ready section hash.
+        def applicant_subsection_hash(section_data)
+          hash = super
+          return hash unless @can_edit
+
+          hash[:edit_link] = section_data[:edit_link] if @can_edit
+          hash
+        end
 
         # @method filter_sections(map)
         # Modifies the applicant_map for the Consumer page context.
