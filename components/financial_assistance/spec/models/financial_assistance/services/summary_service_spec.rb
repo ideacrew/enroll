@@ -28,7 +28,7 @@ describe ::FinancialAssistance::Services::SummaryService do
       end
 
       it "should return esi hash" do
-        esi_benefit_hash = subject.sections.first[:subsections][4][:rows][1][:coverages].first.first[:esi_benefit_data]
+        esi_benefit_hash = subject.sections.first[:subsections][4][:rows][1][:coverages].first.first
         expect(esi_benefit_hash[:employer_name][:value]).to eq "Test Employer"
         expect(esi_benefit_hash[:employer_address_line_1][:value]).to eq "address_1"
         expect(esi_benefit_hash[:city][:value]).to eq "Dummy City"
