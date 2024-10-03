@@ -34,3 +34,15 @@ Then(/^the user will see the Time Tavel option$/) do
   expect(page).to have_button('Set Current Date', disabled: false)
 end
 
+And(/^the user should see Announcements button/) do
+  expect(page).to have_css('.interaction-click-control-announcements')
+end
+
+And(/^the user will clicks on Announcements page/) do
+  find('.interaction-click-control-announcements').click
+end
+
+And(/^the user should see Current Announcements text/) do
+  expect(page).to have_content('Current Announcements')
+end
+
