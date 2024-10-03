@@ -51,7 +51,7 @@
             value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
         affordable_question:
             key: <%= l10n('health_plan_meets_mvs_and_affordable_question') %>
-            value: <%= human_boolean(benefit.health_plan_meets_mvs_and_affordable) if display_minimum_value_standard_question?(benefit.insurance_kind) %>
+            value: <%= benefit.health_plan_meets_mvs_and_affordable if display_minimum_value_standard_question?(benefit.insurance_kind) %>
         <% end %>
         <% if benefit.insurance_kind == 'health_reimbursement_arrangement' %>
         type_of_hra:

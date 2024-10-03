@@ -41,47 +41,36 @@ module FinancialAssistance
       #
       # @return [Array] The sections for the summary.
       def sections
-        [*@applicant_summaries.map(&:to_h), relationships_summary, preferences_summary, household_summary].compact
+        [*@applicant_summaries.map(&:hash), relationships_summary, preferences_summary, household_summary].compact
       end
 
       private
 
-      # Wrapper for a section of the summary page holding title and subsections
-      class Section
-        def initialize(section_title:, subsections:)
-          @section_title = section_title
-          @subsections = subsections
+      # Shared helpers for the generating summary sections.
+      module SectionHelper
+        def section_hash(title:, subsections:)
+          {section_title: title, subsections: subsections}
         end
 
-        def to_h
-          {section_title: @section_title, subsections: @subsections.map(&:to_h)}
-        end
-      end
-
-      # Wrapper for a subsection of a section in the summary page holding title, rows, and an optional edit_link
-      class Subsection
-        def initialize(title:, rows:, edit_link: nil)
-          @title = title
-          @rows = rows
-          @edit_link = edit_link
-        end
-
-        def to_h
-          {title: @title, edit_link: @edit_link, rows: @rows}
+        def subsection_hash(title:, rows:, edit_link: nil)
+          {title: title, rows: rows, edit_link: edit_link}
         end
       end
 
       # Base class for the applicant summary section. Manages the loading of the raw application data and the mapping of the data into a view-ready hash.
-      class ApplicantSummary < Section
+      class ApplicantSummary
         include L10nHelper
         include FinancialAssistance::ApplicationHelper
         include FinancialAssistance::Engine.routes.url_helpers
         include ActionView::Helpers::NumberHelper
+        include SectionHelper
+
+        attr_reader :hash
 
         def initialize(application, applicant)
           @applicant = applicant
           @application = application
-          super(section_title: capitalize_full_name(applicant.full_name), subsections: load_applicant_map.values.map(&method(:applicant_subsection_hash)))
+          @hash = section_hash(title: capitalize_full_name(applicant.full_name), subsections: load_applicant_map.values.map(&method(:applicant_subsection_hash)))
         end
 
         private
@@ -126,29 +115,16 @@ module FinancialAssistance
         end
 
         # @method applicant_subsection_hash(section_data)
-        # Maps the raw section hash into a view-ready hash of the form:
-        # { title: <section_title>,
-        #   edit_link: <section_edit_link>,
-        #   rows: [{
-        #     key: <row_label>, value: <row_value>, <... special row data ...>
-        #   }]
-        # }
+        # Maps the raw section hash into a view-ready hash of the form by reducing each section to a hash of {title: <section_title>, rows: <section_rows>}.
+        # Also handles nested subsections by recursively calling itself on each necessary row.
         #
         # @param [Hash] section_data The section hash from the config.
         #
         # @return [Hash] The view-ready section hash.
         def applicant_subsection_hash(section_data)
-          Subsection.new(
-            title: section_data[:title],
-            rows: section_data[:rows].map do |row_key, row_data|
-              if [:addresses, :jobs].include?(row_key) # address and job rows include nested rows
-                row_data.map { |nested_section| applicant_subsection_hash(nested_section) }
-              else
-                row_data[:value] = human_value(row_data[:value])
-                row_data
-              end
-            end
-          ).to_h
+          section_data[:rows] = section_data[:rows].values
+          section_data[:rows].map { |row| row.is_a?(Array) ? row.map(&method(:applicant_subsection_hash)) : row }
+          subsection_hash(title: section_data[:title], rows: section_data[:rows])
         end
 
         # @method filter_rows(base_map, section_key, rows)
@@ -237,8 +213,7 @@ module FinancialAssistance
         # @return [Hash] The view-ready section hash.
         def applicant_subsection_hash(section_data)
           hash = super
-          hash[:edit_link] = section_data[:edit_link] if @can_edit
-          hash
+          subsection_hash(title: hash[:title], rows: hash[:rows], edit_link: (section_data[:edit_link] if @can_edit))
         end
 
         # @method filter_sections(map)
@@ -322,6 +297,8 @@ module FinancialAssistance
         end
       end
 
+      include SectionHelper
+
       # @method relationships_summary
       #
       # @return [Hash] The hash for the relationships summary section for the application.
@@ -336,12 +313,12 @@ module FinancialAssistance
         end
 
         return if fr_hash.empty?
-        Section.new(section_title: l10n('faa.review.your_household'),
-                    subsections: [
-                      Subsection.new(title: l10n('faa.nav.family_relationships'),
-                                     edit_link: application_relationships_path(@application),
-                                     rows: fr_hash.compact).to_h
-                                  ]).to_h
+        section_hash(title: l10n('faa.review.your_household'),
+                     subsections: [subsection_hash(
+                       title: l10n('faa.nav.family_relationships'),
+                       edit_link: application_relationships_path(@application),
+                       rows: fr_hash.compact
+                     )])
       end
 
       # @method preferences_summary
@@ -350,9 +327,7 @@ module FinancialAssistance
       def preferences_summary
         return unless @application.years_to_renew.present? && @application_displayable_helper.displayable?(:years_to_renew)
 
-        Subsection.new(title: l10n('faa.review.preferences'),
-                       edit_link: nil,
-                       rows: [{key: l10n('faa.review.preferences.eligibility_renewal'), value: @application.years_to_renew}]).to_h
+        subsection_hash(title: l10n('faa.review.preferences'), rows: [{key: l10n('faa.review.preferences.eligibility_renewal'), value: @application.years_to_renew}])
       end
 
       # @method household_summary
@@ -361,9 +336,7 @@ module FinancialAssistance
       def household_summary
         return unless @application_displayable_helper.displayable?(:parent_living_out_of_home_terms)
 
-        Subsection.new(title: l10n('faa.review.more_about_your_household'), 
-                       edit_link: nil,
-                       rows: [{key: l10n('faa.review.more_about_your_household.parent_living_outside'), value: human_boolean(@application.parent_living_out_of_home_terms)}]).to_h
+        subsection_hash(title: l10n('faa.review.more_about_your_household'), rows: [{key: l10n('faa.review.more_about_your_household.parent_living_outside'), value: human_boolean(@application.parent_living_out_of_home_terms)}])
       end
 
       # displayable field helpers
