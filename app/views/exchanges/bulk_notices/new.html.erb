@@ -37,6 +37,11 @@
           </tr>
           </tbody>
         </table>
+
+        <div class="d-flex">
+          <%= link_to_with_noopener_noreferrer('Back', exchanges_bulk_notices_path, class: 'btn btn-secondary col-auto') %>
+          <%= f.submit "Preview", class: 'btn-primary d-flex ml-2 col-auto', onclick: "onSubmit();" %>
+        </div>
     <% end %>
   <% else %>
     <h4>New Message</h4>
