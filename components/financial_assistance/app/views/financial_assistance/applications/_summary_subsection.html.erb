@@ -46,14 +46,17 @@
               </thead>
               <tbody>
               <% coverage_set.each do |benefit| %>
-                <tr>
-                  <td class="col-6"><b><%= benefit[:type] %></b></td>
-                  <td class="col-6"><%= benefit[:period] %></td>
-                </tr>
-                <% benefit[:esi_benefit_data]&.values&.compact&.each do |label, value| %>
+                <% benefit.values.each_with_index do |row, index| %>
                   <tr>
-                    <td class="col-6"><%= label %></td>
-                    <td class="col-6"><%= value %></td>
+                    <td class="col-6">
+                      <% key = row[:key] %>
+                      <% if index == 0 %>
+                        <b><%= key %></b>
+                      <% else %>
+                        <%= sanitize key %>
+                      <% end %>
+                    </td>
+                    <td class="col-6"><%= row[:value] %></td>
                   </tr>
                 <% end %>
               <% end %>

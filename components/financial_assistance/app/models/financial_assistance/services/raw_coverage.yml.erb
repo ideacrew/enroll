@@ -4,63 +4,63 @@
 <% @applicant.benefits.has_valid_insurance_kind.where(kind: kind).group_by(&:insurance_kind).each do |insurance_kind, benefits| %>
 -
     <% benefits.each do |benefit| %>
-    -   type: <%= l10n(benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
-        period: "<%= start_to_end_dates(benefit) %>"
+    -   description:
+            key: <%= l10n(benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+            value: "<%= start_to_end_dates(benefit) %>"
         <% if display_esi_fields?(benefit.insurance_kind, kind.to_s) %>
-        esi_benefit_data:
-            employer_name:
-                key: <%= l10n('employer_name') %>
-                value: <%= benefit.employer_name %>
-            <% unless FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
-            employer_address_line_1:
-                key: <%= l10n('employer_address_line_1') %>
-                value: <%= benefit.employer_address.address_1 %>
-            <% if benefit.employer_address.address_2.present? %>
-            employer_address_line_2:
-                key: <%= l10n('employer_address_line_1') %>
-                value: <%= benefit.employer_address.address_2 %>
-            <% end %>
-            city:
-                key: <%= l10n('city') %>
-                value: <%= benefit.employer_address.city %>
-            state:
-                key: <%= l10n('state') %>
-                value: <%= benefit.employer_address.state %>
-            zip:
-                key: <%= l10n('zip') %>
-                value: <%= benefit.employer_address.zip %>
-            <% end %>
-            phone:
-                key: <%= l10n('faa.incomes.employer_phone') %>
-                value: <%= format_phone(benefit&.employer_phone&.full_phone_number) %>
-            esi_employer_ein:
-                key: <%= l10n('esi_employer_ein').titleize %>
-                value: <%= benefit.employer_id %>
-            <% if benefit.insurance_kind == 'employer_sponsored_insurance' %>
-            esi_employee_waiting_period:
-                key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_waiting_period') %>
-                value: <%= benefit.is_esi_waiting_period %>
-            esi_employer_minimum_standard:
-                key: <%= l10n('faa.review.income.review_benefits_table.esi.employer_minimum_standard') %>
-                value: <%= benefit.is_esi_mec_met %>
-            esi_covered:
-                key: <%= l10n('faa.review.income.review_benefits_table.esi.covered') %>
-                value: <%= benefit.esi_covered %>
-            esi_employee_minimum:
-                key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_minimum') %>
-                value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
-            affordable_question:
-                key: <%= l10n('health_plan_meets_mvs_and_affordable_question') %>
-                value: <%= human_boolean(benefit.health_plan_meets_mvs_and_affordable) if display_minimum_value_standard_question?(benefit.insurance_kind) %>
-            <% end %>
-            <% if benefit.insurance_kind == 'health_reimbursement_arrangement' %>
-            type_of_hra:
-                key: <%= l10n('faa.question.type_of_hra') %>
-                value: <%= benefit.hra_type %>
-            max_employer_reimbursement:
-                key: <%= l10n('faa.question.max_employer_reimbursement') %>
-                value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
-            <% end %>
+        employer_name:
+            key: <%= l10n('employer_name') %>
+            value: <%= benefit.employer_name %>
+        <% unless FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
+        employer_address_line_1:
+            key: <%= l10n('employer_address_line_1') %>
+            value: <%= benefit.employer_address.address_1 %>
+        <% if benefit.employer_address.address_2.present? %>
+        employer_address_line_2:
+            key: <%= l10n('employer_address_line_1') %>
+            value: <%= benefit.employer_address.address_2 %>
+        <% end %>
+        city:
+            key: <%= l10n('city') %>
+            value: <%= benefit.employer_address.city %>
+        state:
+            key: <%= l10n('state') %>
+            value: <%= benefit.employer_address.state %>
+        zip:
+            key: <%= l10n('zip') %>
+            value: <%= benefit.employer_address.zip %>
+        <% end %>
+        phone:
+            key: <%= l10n('faa.incomes.employer_phone') %>
+            value: <%= format_phone(benefit&.employer_phone&.full_phone_number) %>
+        esi_employer_ein:
+            key: <%= l10n('esi_employer_ein').titleize %>
+            value: <%= benefit.employer_id %>
+        <% if benefit.insurance_kind == 'employer_sponsored_insurance' %>
+        esi_employee_waiting_period:
+            key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_waiting_period') %>
+            value: <%= benefit.is_esi_waiting_period %>
+        esi_employer_minimum_standard:
+            key: <%= l10n('faa.review.income.review_benefits_table.esi.employer_minimum_standard') %>
+            value: <%= benefit.is_esi_mec_met %>
+        esi_covered:
+            key: <%= l10n('faa.review.income.review_benefits_table.esi.covered') %>
+            value: <%= benefit.esi_covered %>
+        esi_employee_minimum:
+            key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_minimum') %>
+            value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
+        affordable_question:
+            key: <%= l10n('health_plan_meets_mvs_and_affordable_question') %>
+            value: <%= human_boolean(benefit.health_plan_meets_mvs_and_affordable) if display_minimum_value_standard_question?(benefit.insurance_kind) %>
+        <% end %>
+        <% if benefit.insurance_kind == 'health_reimbursement_arrangement' %>
+        type_of_hra:
+            key: <%= l10n('faa.question.type_of_hra') %>
+            value: <%= benefit.hra_type %>
+        max_employer_reimbursement:
+            key: <%= l10n('faa.question.max_employer_reimbursement') %>
+            value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
+        <% end %>
         <% end %>
     <% end %>
 <% end %>
