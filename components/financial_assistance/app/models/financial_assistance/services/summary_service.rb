@@ -3,6 +3,10 @@
 module FinancialAssistance
   module Services
     # Manages the data of the summary sections for a review page. Constructs the applicants, relationships, preferences, and household summary sections.
+    #   The applicant data is managed by `Summary::ApplicantSummary::ApplicantSummary`, which loads from the configuration files containing the raw sections of key-value pairs.
+    #   The subclasses `AdminApplicantSummary` & `ConsumerApplicantSummary` drive the differences between the Admin and Consumer page contexts.
+    #
+    #   The application data is managed by `Summary::ApplicationSummary`, loads the top-level Application data directly.
     class SummaryService
 
       attr_reader :can_edit_incomes
@@ -35,132 +39,124 @@ module FinancialAssistance
         [*@applicant_summaries.map(&:hash), @application_summary.relationships_summary, @application_summary.preferences_summary, @application_summary.household_summary].compact
       end
 
-      # Summary helpers
-      module Summary
-        # Base class for a summary section. Provides an interface for section and subsection hashes, as well as including shared dependent modules.
-        class Summary
-          include L10nHelper
-          include FinancialAssistance::ApplicationHelper
-          include FinancialAssistance::Engine.routes.url_helpers
-          include ActionView::Helpers::NumberHelper
+      # Base class for a summary section. Provides an interface for section and subsection hashes, as well as including shared dependent modules.
+      class Summary
+        include L10nHelper
+        include FinancialAssistance::ApplicationHelper
+        include FinancialAssistance::Engine.routes.url_helpers
+        include ActionView::Helpers::NumberHelper
 
-          def section_hash(title:, subsections:)
-            {section_title: title, subsections: subsections}
-          end
-
-          def subsection_hash(title:, rows:, edit_link: nil)
-            {title: title, rows: rows, edit_link: edit_link}
-          end
+        def section_hash(title:, subsections:)
+          {section_title: title, subsections: subsections}
         end
 
-        # Applicant summary section
-        module ApplicantSummary
+        def subsection_hash(title:, rows:, edit_link: nil)
+          {title: title, rows: rows, edit_link: edit_link}
+        end
 
-          # Base class for the applicant summary section. Manages the loading of the raw application data and the mapping of the data into a view-ready hash.
-          class ApplicantSummary < Summary
+        # Base class for the applicant summary section. Manages the loading of the raw application data and the mapping of the data into a view-ready hash.
+        class ApplicantSummary < Summary
 
-            attr_reader :hash
+          attr_reader :hash
 
-            def initialize(application, applicant)
-              super()
-              @applicant = applicant
-              @application = application
-              @hash = section_hash(title: capitalize_full_name(applicant.full_name), subsections: load_applicant_map.values.map(&method(:applicant_subsection_hash)))
-            end
+          def initialize(application, applicant)
+            super()
+            @applicant = applicant
+            @application = application
+            @hash = section_hash(title: capitalize_full_name(applicant.full_name), subsections: load_applicant_map.values.map(&method(:applicant_subsection_hash)))
+          end
 
-            private
+          private
 
-            APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_applicant.yml.erb"
-            COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
+          APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_applicant.yml.erb"
+          COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
 
-            # @method load_applicant_map
-            # Translates the applicant summary config data into a symbolized hash.
-            #
-            # @return [Hash] The hash holding all of the application summary data for the applicant.
-            def load_applicant_map
-              # load the map from the config
-              application_file = File.read(ApplicantSummary::APPLICANT_CONFIGURATION)
-              application_map = YAML.safe_load(ERB.new(application_file).result(binding)).deep_symbolize_keys
+          # @method load_applicant_map
+          # Translates the applicant summary config data into a symbolized hash.
+          #
+          # @return [Hash] The hash holding all of the application summary data for the applicant.
+          def load_applicant_map
+            application_file = File.read(ApplicantSummary::APPLICANT_CONFIGURATION)
+            application_map = YAML.safe_load(ERB.new(application_file).result(binding)).deep_symbolize_keys
 
-              # load the coverage data into the base map from the coverage config
-              load_coverages_map(application_map, :is_enrolled)
-              load_coverages_map(application_map, :is_eligible)
+            # load the coverage data into the base map from the coverage config
+            load_coverages_map(application_map, :is_enrolled)
+            load_coverages_map(application_map, :is_eligible)
 
-              filter_sections(application_map)
+            filter_sections(application_map)
 
-              application_map
-            end
+            application_map
+          end
 
-            # @method load_coverages_map(application_map, kind)
-            # Helper method for `load_applicant_map`.
-            # Loads the coverage data from the coverage config into the base application map for the given applicant.
-            # Used for the `is_enrolled` and `is_eligible` coverage rows *only* when the row value is true.
-            #
-            # @param [Hash] applicant The application map to load the coverage data into.
-            # @param [Symbol] kind The kind of coverage data to load.
-            def load_coverages_map(application_map, kind)
-              return unless application_map[:health_coverage][:rows][kind][:value]
+          # @method load_coverages_map(application_map, kind)
+          # Helper method for `load_applicant_map`.
+          # Loads the coverage data from the coverage config into the base application map for the given applicant.
+          # Used for the `is_enrolled` and `is_eligible` coverage rows *only* when the row value is true.
+          #
+          # @param [Hash] applicant The application map to load the coverage data into.
+          # @param [Symbol] kind The kind of coverage data to load.
+          def load_coverages_map(application_map, kind)
+            return unless application_map[:health_coverage][:rows][kind][:value]
 
-              coverage_file = File.read(ApplicantSummary::COVERAGE_CONFIGURATION)
-              coverage_map = YAML.safe_load(ERB.new(coverage_file).result(binding)).map { |kind_array| kind_array.map(&:deep_symbolize_keys) }
-              application_map[:health_coverage][:rows][kind][:coverages] = coverage_map
-            end
+            coverage_file = File.read(ApplicantSummary::COVERAGE_CONFIGURATION)
+            coverage_map = YAML.safe_load(ERB.new(coverage_file).result(binding)).map { |kind_array| kind_array.map(&:deep_symbolize_keys) }
+            application_map[:health_coverage][:rows][kind][:coverages] = coverage_map
+          end
 
-            # @method applicant_subsection_hash(section_data)
-            # Maps the raw section hash into a view-ready hash of the form by reducing each section to a hash of {title: <section_title>, rows: <section_rows>}.
-            # Also handles nested subsections by recursively calling itself on each necessary row.
-            #
-            # @param [Hash] section_data The section hash from the config.
-            #
-            # @return [Hash] The view-ready section hash.
-            def applicant_subsection_hash(section_data)
-              section_data[:rows] = section_data[:rows].values
-              section_data[:rows].map do |row|
-                if row.is_a?(Array)
-                  row.map(&method(:applicant_subsection_hash))
-                else
-                  row[:value] = human_value(row[:value])
-                  row
-                end
-              end
-              subsection_hash(title: section_data[:title], rows: section_data[:rows])
-            end
-
-            # stub method child classes can override to conditionlly render rows
-            def filter_sections(map) end
-
-            # @method filter_rows(base_map, section_key, rows)
-            # Filters the rows of a section from the base map based on the provided list of row keys.
-            #
-            # @param [Hash] base_map The entire summary hash from the config.
-            # @param [Symbol] section_key The key of the section to filter rows for.
-            # @param [Array] rows The row keys to keep in the section.
-            #
-            # @return [Hash] The modified section hash containing only the specified rows.
-            def filter_rows(base_map, section_key, rows)
-              base_map[section_key][:rows].slice!(*rows)
-            end
-
-            # value helpers
-
-            def human_value(value)
-              case value
-              when true
-                l10n('yes')
-              when false
-                l10n('no')
+          # @method applicant_subsection_hash(section_data)
+          # Maps the raw section hash into a view-ready hash of the form by reducing each section to a hash of {title: <section_title>, rows: <section_rows>}.
+          # Also handles nested subsections by recursively calling itself on each necessary row.
+          #
+          # @param [Hash] section_data The section hash from the config.
+          #
+          # @return [Hash] The view-ready section hash.
+          def applicant_subsection_hash(section_data)
+            section_data[:rows] = section_data[:rows].values
+            section_data[:rows].map do |row|
+              if row.is_a?(Array)
+                row.map(&method(:applicant_subsection_hash))
               else
-                value || l10n('faa.not_applicable_abbreviation')
+                row[:value] = human_value(row[:value])
+                row
               end
             end
+            subsection_hash(title: section_data[:title], rows: section_data[:rows])
+          end
 
-            def immigration_field_value(field)
-              @applicant.has_citizen_immigration_status? ? @applicant.send(field) : l10n('faa.not_applicable_abbreviation')
-            end
+          # stub method child classes can override to conditionlly render rows
+          def filter_sections(map) end
 
-            def applicants_name_by_hbx_id_hash
-              @application.active_applicants.each_with_object({}) { |applicant, hash| hash[applicant.person_hbx_id] = applicant.full_name }
+          # @method filter_rows(base_map, section_key, rows)
+          # Filters the rows of a section from the base map based on the provided list of row keys.
+          #
+          # @param [Hash] base_map The entire summary hash from the config.
+          # @param [Symbol] section_key The key of the section to filter rows for.
+          # @param [Array] rows The row keys to keep in the section.
+          #
+          # @return [Hash] The modified section hash containing only the specified rows.
+          def filter_rows(base_map, section_key, rows)
+            base_map[section_key][:rows].slice!(*rows)
+          end
+
+          # value helpers
+
+          def human_value(value)
+            case value
+            when true
+              l10n('yes')
+            when false
+              l10n('no')
+            else
+              value || l10n('faa.not_applicable_abbreviation')
             end
+          end
+
+          def immigration_field_value(field)
+            @applicant.has_citizen_immigration_status? ? @applicant.send(field) : l10n('faa.not_applicable_abbreviation')
+          end
+
+          def applicants_name_by_hbx_id_hash
+            @application.active_applicants.each_with_object({}) { |applicant, hash| hash[applicant.person_hbx_id] = applicant.full_name }
           end
 
           # Manages the applicant summary section for the Admin page context, containing nearly all raw application data.
@@ -323,10 +319,10 @@ module FinancialAssistance
 
             return if fr_hash.empty?
             section_hash(title: l10n('faa.review.your_household'),
-                        subsections: [subsection_hash(
-                          title: l10n('faa.nav.family_relationships'),
-                          edit_link: application_relationships_path(@application),
-                          rows: fr_hash.compact
+                         subsections: [subsection_hash(
+                           title: l10n('faa.nav.family_relationships'),
+                           edit_link: application_relationships_path(@application),
+                           rows: fr_hash.compact
                         )])
           end
 
