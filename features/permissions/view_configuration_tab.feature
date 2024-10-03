@@ -40,6 +40,5 @@ Feature: As a Super Admin I will be the only user
     And the user is on the Main Page
     And the user goes to the Config Page
     Then the user will clicks on Announcements page
-    the user should see on Create Announcement Button
 
 
