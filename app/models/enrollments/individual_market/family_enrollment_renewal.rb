@@ -57,10 +57,10 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def fetch_product_id(renewal_enrollment)
     # TODO: Fetch proper csr product as the family might be eligible for a
     # different csr value than that of given externally.
-    return renewal_product if has_catastrophic_product?
-
     # Sets the cross walk product
     @cross_walk_product = fetch_cross_product
+
+    return renewal_product if has_catastrophic_product?
 
     if can_renew_assisted_product?(renewal_enrollment)
       assisted_renewal_product
@@ -86,18 +86,24 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def fetch_cross_product
     renewal_year = renewal_coverage_start.year
     default_renewal_product = enrollment.product.renewal_product
+    raise "#{renewal_coverage_start.year} default_renewal_product missing on HIOS id #{@enrollment.product.hios_id}" if default_renewal_product.blank?
+
     # This is a temporary fix for 2025 renewal enrollments as the current Data Model does not support cross walk products by county.
     return default_renewal_product unless renewal_year == 2025
 
     cross_walk_product_hios_base_id = fetch_cross_walk_product_hios_base_id(
-      enrollment.consumer_role.rating_address.county.capitalize,
+      enrollment&.consumer_role&.rating_address&.county&.capitalize,
       enrollment.product.hios_base_id
     )
     return default_renewal_product if cross_walk_product_hios_base_id.blank?
 
-    ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_year).where(
+    cross_walk_product = ::BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(renewal_year).where(
       { hios_id: "#{cross_walk_product_hios_base_id}-01" }
     ).first
+
+    raise "#{renewal_coverage_start.year} cross_walk_product missing on HIOS id #{@enrollment.product.hios_id}" if cross_walk_product.blank?
+
+    cross_walk_product
   end
 
   def set_csr_value
