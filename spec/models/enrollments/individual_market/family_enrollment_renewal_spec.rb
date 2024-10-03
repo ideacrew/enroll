@@ -328,6 +328,34 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
 
+      context "fetch cross walk product for renewal" do
+        let!(:cross_product) do
+          prod =
+            FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile,
+                              benefit_market_kind: :aca_individual, kind: :health, service_area: renewal_service_area, csr_variant_id: '01',
+                              metal_level_kind: 'silver', hios_id: "33653ME0560006-01", hios_base_id: "33653ME0560006",
+                              application_period: renewal_application_period)
+          prod.premium_tables = [renewal_premium_table]
+          prod.save
+          prod
+        end
+
+        before do
+          subject.enrollment.product.update_attributes(hios_base_id: "33653ME0560001", hios_id: "33653ME0560001-01")
+        end
+
+        it "should fetch cross walk product for renewal" do
+          subject.enrollment&.consumer_role&.rating_address&.update_attributes(county: "Hancock")
+          renewal = subject.renew
+          expect(renewal.product.hios_id).to eq cross_product.hios_id
+        end
+
+        it "should fetch renewal product for renewal" do
+          renewal = subject.renew
+          expect(renewal.product.hios_id).to eq renewal_product.hios_id
+        end
+      end
+
       context "renew coverall product" do
         subject do
           enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
