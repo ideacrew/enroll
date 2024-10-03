@@ -39,7 +39,7 @@
             <%= f.date_field :date_of_record, {placeholder: "MM/DD/YYYY", class: "w-100", id: "set_date_date_of_record"} %>
           </div>
         </div>
-        <button type="button" class="btn btn-primary" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %> data-toggle="modal" data-target="#setDateModal" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>
+        <button type="button" id='submit' class="btn btn-primary" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %> data-toggle="modal" data-target="#setDateModal" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>
           <%= l10n("admin.config.set_date") %>
         </button>
         <!-- Modal Popup -->
@@ -57,7 +57,6 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary outline" data-dismiss="modal"><%= l10n("admin_actions.time_jump.cancel") %></button>
-                <%= f.hidden_field :date_of_record, id: 'hiddenDateField' %>
                 <%= f.submit l10n("admin_actions.time_jump.confirm"), class: 'btn btn-primary', id: 'confirmSetDate' %>
               </div>
             </div>
@@ -112,7 +111,7 @@
                   <%= datepicker_control f, :date_of_record, { class: "form-control", placeholder: "DATE OF RECORD", :'data-date-min' => "0d", required: true, id: "set_date_date_of_record" } %>
                 </td>
                 <td class="col-md-4">
-                  <button type="button" id='submit' class="btn btn-primary" data-toggle="modal" data-target="#setDateModal" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>
+                  <button type="submit" class="btn btn-primary pull-right" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>
                     Set Current Date
                   </button>
                 </td>
