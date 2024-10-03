@@ -112,10 +112,10 @@ demographics:
             -   title: "<%= address.kind.titleize %> <%= l10n('address') %>"
                 rows:
                     line_1:
-                        key: <%= l10n('address_line_1') %>
+                        key: <%= l10n('address_line_1').titleize %>
                         value: <%= address&.address_1 %>
                     line_2:
-                        key: <%= l10n('address_line_2') %>
+                        key: <%= l10n('address_line_2').titleize %>
                         value: <%= address&.address_2 %>
                     city:
                         key: <%= l10n('city') %>

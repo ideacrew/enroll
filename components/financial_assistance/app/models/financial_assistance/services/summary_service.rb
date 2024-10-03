@@ -2,13 +2,49 @@
 
 module FinancialAssistance
   module Services
-    # Manages the data of the sections for a summary page. Constructs the applicants summary, relationships summary, preferences summary, and household summary sections.
+    # Manages the data of the summary sections for a review page. Constructs the applicants, relationships, preferences, and household summary sections.
     class SummaryService
       include FinancialAssistance::Engine.routes.url_helpers
       include FinancialAssistance::ApplicationHelper
       include L10nHelper
 
       attr_reader :can_edit_incomes
+
+      # @method instance_for_action(action_name, cfl_service, application, applicants)
+      # Creates a new instance of the SummaryService based on the given action name.
+      #
+      # @param [String] action_name The name of the action to create the SummaryService for.
+      # @param [ConditionalFieldsLookupService] cfl_service The ConditionalFieldsLookupService instance.
+      # @param [Application] application The application to create the SummaryService for.
+      # @param [Array] applicants The applicants to create the SummaryService for.
+      # return [SummaryService] The new SummaryService instance.
+      def self.instance_for_action(action_name, cfl_service, application, applicants)
+        self.new(action_name != "raw_application", action_name == "review_and_submit", cfl_service, application, applicants)
+      end
+
+      def initialize(is_concise, can_edit, cfl_service, application, applicants)
+        @application = application
+        @application_displayable_helper = ApplicationDisplayableHelper.new(cfl_service, @application.id)
+        @applicants = applicants
+        @applicant_summaries = applicants.map do |applicant|
+          if is_concise
+            ::FinancialAssistance::Services::SummaryService::ConsumerApplicantSummary.new(cfl_service, application, applicant, can_edit: can_edit)
+          else
+            ::FinancialAssistance::Services::SummaryService::AdminApplicantSummary.new(application, applicant)
+          end
+        end
+        @can_edit_incomes = can_edit
+      end
+
+      # @method sections
+      # Loads and returns the applicant summaries, relationships summary, preferences summary, and household summary sections for the application.
+      #
+      # @return [Array] The sections for the summary.
+      def sections
+        [*@applicant_summaries.map(&:to_h), relationships_summary, preferences_summary, household_summary].compact
+      end
+
+      private
 
       # Wrapper for a section of the summary page holding title and subsections
       class Section
@@ -67,8 +103,13 @@ module FinancialAssistance
           load_coverages_map(application_map, :is_enrolled)
           load_coverages_map(application_map, :is_eligible)
 
+          filter_sections(application_map)
+
           application_map
         end
+
+        # stub method child classes can override to conditionlly render rows
+        def filter_sections(map) end
 
         # @method load_coverages_map(application_map, kind)
         # Helper method for `load_applicant_map`.
@@ -152,10 +193,6 @@ module FinancialAssistance
 
         PERSONAL_INFO_ROWS = [:dob, :gender, :relationship, :coverage].freeze
 
-        def load_applicant_map
-          filter_sections(super)
-        end
-
         # @method filter_sections(map)
         # Modifies the applicant_map for the Admin page context.
         # Removes the ai_an_income row from the Income section and the HRA rows if enrolled.
@@ -184,10 +221,6 @@ module FinancialAssistance
         private
 
         PERSONAL_INFO_ROWS = [:age, :gender, :relationship, :status, :is_incarcerated, :coverage].freeze
-
-        def load_applicant_map
-          filter_sections(super)
-        end
 
         # @method filter_sections(map)
         # Modifies the applicant_map for the Consumer page context.
@@ -269,42 +302,6 @@ module FinancialAssistance
           rows
         end
       end
-
-      # @method instance_for_action(action_name, cfl_service, application, applicants)
-      # Creates a new instance of the SummaryService based on the given action name.
-      #
-      # @param [String] action_name The name of the action to create the SummaryService for.
-      # @param [ConditionalFieldsLookupService] cfl_service The ConditionalFieldsLookupService instance.
-      # @param [Application] application The application to create the SummaryService for.
-      # @param [Array] applicants The applicants to create the SummaryService for.
-      # return [SummaryService] The new SummaryService instance.
-      def self.instance_for_action(action_name, cfl_service, application, applicants)
-        self.new(action_name != "raw_application", action_name == "review_and_submit", cfl_service, application, applicants)
-      end
-
-      def initialize(is_concise, can_edit, cfl_service, application, applicants)
-        @application = application
-        @application_displayable_helper = ApplicationDisplayableHelper.new(cfl_service, @application.id)
-        @applicants = applicants
-        @applicant_summaries = applicants.map do |applicant|
-          if is_concise
-            ::FinancialAssistance::Services::SummaryService::ConsumerApplicantSummary.new(cfl_service, application, applicant, can_edit: can_edit)
-          else
-            ::FinancialAssistance::Services::SummaryService::AdminApplicantSummary.new(application, applicant)
-          end
-        end
-        @can_edit_incomes = can_edit
-      end
-
-      # @method sections
-      # Loads and returns the applicant summaries, relationships summary, preferences summary, and household summary sections for the application.
-      #
-      # @return [Array] The sections for the summary.
-      def sections
-        [*@applicant_summaries.map(&:to_h), relationships_summary, preferences_summary, household_summary].compact
-      end
-
-      private
 
       # @method relationships_summary
       #
