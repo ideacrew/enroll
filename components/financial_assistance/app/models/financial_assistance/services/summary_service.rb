@@ -3,7 +3,7 @@
 module FinancialAssistance
   module Services
     # Manages the data of the summary sections for a review page. Constructs the applicants, relationships, preferences, and household summary sections.
-    #   The applicant data is managed by `Summary::ApplicantSummary::ApplicantSummary`, which loads from the configuration files containing the raw sections of key-value pairs.
+    #   The applicant data is managed by `Summary::ApplicantSummary`, which loads from the configuration files containing the raw sections of key-value pairs.
     #   The subclasses `AdminApplicantSummary` & `ConsumerApplicantSummary` drive the differences between the Admin and Consumer page contexts.
     #
     #   The application data is managed by `Summary::ApplicationSummary`, loads the top-level Application data directly.
