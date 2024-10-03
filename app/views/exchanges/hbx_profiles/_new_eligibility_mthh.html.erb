@@ -30,9 +30,9 @@
             <%= hidden_field_tag "person[family_members][#{member_id}][member_name]", member_name %>
             
             <tr>
-              <td><h5><%= member_name %></h5></td>
-              <td><h5><%= person.dob %> </h5></td>
-              <td><h5><%= person.hbx_id %></h5></td>
+              <td><%= member_name %></td>
+              <td><%= person.dob %></td>
+              <td><%= person.hbx_id %></td>
               <td><%= mthh_active_eligibility?(current_eligible_member_ids, member_id) %></td>
               <td><%= select_tag "person[family_members][#{member_id}][pdc_type]", options_for_select(TaxHouseholdMember::PDC_TYPES, @tax_household_group_data&.dig(member_id, 'pdc_type')), class: 'form-control required', required: true %></td>
               <td class="select_person_csr">
