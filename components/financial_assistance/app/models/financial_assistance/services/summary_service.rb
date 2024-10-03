@@ -90,9 +90,6 @@ module FinancialAssistance
           application_map
         end
 
-        # stub method child classes can override to conditionlly render rows
-        def filter_sections(map) end
-
         # @method load_coverages_map(application_map, kind)
         # Helper method for `load_applicant_map`.
         # Loads the coverage data from the coverage config into the base application map for the given applicant.
@@ -128,6 +125,9 @@ module FinancialAssistance
           subsection_hash(title: section_data[:title], rows: section_data[:rows])
         end
 
+        # stub method child classes can override to conditionlly render rows
+        def filter_sections(map) end
+
         # @method filter_rows(base_map, section_key, rows)
         # Filters the rows of a section from the base map based on the provided list of row keys.
         #
@@ -140,6 +140,8 @@ module FinancialAssistance
           base_map[section_key][:rows].slice!(*rows)
         end
 
+        # value helpers
+
         def human_value(value)
           case value
           when true
@@ -150,8 +152,6 @@ module FinancialAssistance
             value || l10n('faa.not_applicable_abbreviation')
           end
         end
-
-        # value helpers
 
         def immigration_field_value(field)
           @applicant.has_citizen_immigration_status? ? @applicant.send(field) : l10n('faa.not_applicable_abbreviation')
