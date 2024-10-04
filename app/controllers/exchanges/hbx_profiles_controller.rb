@@ -414,6 +414,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     end
   end
 
+  def registry
+    authorize EnrollRegistry, :show?
+  end
+
   def hide_form
     authorize HbxProfile, :hide_form?
 
