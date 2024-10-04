@@ -400,7 +400,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @datatable = Effective::Datatables::UserAccountDatatable.new
     respond_to do |format|
-      format.html { render '/exchanges/hbx_profiles/user_account_index_datatable' }
+      format.html { render '/exchanges/hbx_profiles/user_account_index_datatable.html.slim' }
     end
   end
 
@@ -603,7 +603,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new
 
     respond_to do |format|
-      format.html { render 'exchanges/hbx_profiles/broker_agency_index_datatable' }
+      format.html { render 'exchanges/hbx_profiles/broker_agency_index_datatable.html.slim' }
     end
   end
 
