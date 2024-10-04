@@ -37,15 +37,13 @@ module FinancialAssistance
         [*@applicant_summaries.map(&:hash), @application_summary.relationships_summary, @application_summary.preferences_summary, @application_summary.household_summary].compact
       end
 
-      private       
-      
       # @method concise_action?(action_name)
       # Static helper for initialization which determines if the action uses the concise/consumer summary flavor.
       #
       # @param [String] action_name The name of the action to check.
-      # 
+      #
       # @return [Boolean] True if the action is concise, false otherwise.
-      def self.concise_action?(action_name)
+      private_class_method def self.concise_action?(action_name)
         action_name != "raw_application"
       end
 
@@ -55,9 +53,11 @@ module FinancialAssistance
       # @param [String] action_name The name of the action to check.
       #
       # @return [Boolean] True if the action is editable, false otherwise.
-      def self.editable_action?(action_name)
+      private_class_method def self.editable_action?(action_name)
         action_name == "review_and_submit"
       end
+
+      private
 
       # @method create_applicant_summaries(is_concise, can_edit, cfl_service, application, applicants)
       # Helper method for initialization of the service that creates the applicant summaries based on the given context.
@@ -76,7 +76,6 @@ module FinancialAssistance
         end
 
         module ApplicantSummary
-          
           # Factory class for creating the appropriate applicant summary section based on the context.
           class ApplicantSummaryFactory
             def self.create(is_concise, can_edit, cfl_service, application, applicant)
@@ -99,7 +98,7 @@ module FinancialAssistance
               @config = config
             end
 
-            def load_config           
+            def load_config
               config = File.read(@config)
               deep_symbolize_keys(YAML.safe_load(ERB.new(config).result(binding)))
             end
@@ -151,7 +150,7 @@ module FinancialAssistance
               def immigration_field_value(field)
                 @applicant.has_citizen_immigration_status? ? @applicant.send(field) : l10n('faa.not_applicable_abbreviation')
               end
-  
+
               # Constructs a hash of hbx_ids to full names for the application's active applicants
               def applicants_name_by_hbx_id_hash
                 @application.active_applicants.each_with_object({}) { |applicant, hash| hash[applicant.person_hbx_id] = applicant.full_name }
@@ -176,7 +175,7 @@ module FinancialAssistance
                 has_kind = hash[:health_coverage][:rows][kind][:value]
                 hash[:health_coverage][:rows][kind][:value] = human_value(has_kind)
                 return unless has_kind
-  
+
                 coverage_map = ApplicantCoverageConfigLoader.new(@applicant, kind).load_config
                 hash[:health_coverage][:rows][kind][:coverages] = coverage_map
               end
@@ -222,7 +221,7 @@ module FinancialAssistance
             def filter_subsections(map)
               filter_rows(map, :personal_info, self.class::PERSONAL_INFO_ROWS)
             end
-            
+
             # @method filter_rows(base_map, section_key, rows)
             # Filters the rows of a section from the base map based on the provided list of row keys.
             #
@@ -390,7 +389,7 @@ module FinancialAssistance
           include L10nHelper
           include FinancialAssistance::ApplicationHelper
           include FinancialAssistance::Engine.routes.url_helpers
-          
+
           def initialize(application, cfl_service)
             super()
             @application = application
