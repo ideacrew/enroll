@@ -19,8 +19,8 @@
         <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n required"><%= applicant_prompt('ssn_apply') %></legend>
           <div class="focus d-inline-flex">
-            <label class="weight-n"><%= f.radio_button :is_ssn_applied, true, id: "is_ssn_applied_yes" %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_ssn_applied, false, id: "is_ssn_applied_no" %> <%= l10n('no') %></label>
+            <label class="weight-n"><%= f.radio_button :is_ssn_applied, true, id: "is_ssn_applied_yes", required: true %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_ssn_applied, false, id: "is_ssn_applied_no", required: true %> <%= l10n('no') %></label>
           </div>
         </fieldset>
 
@@ -31,7 +31,7 @@
           </legend>
           <div class="col px-0" data-cuke="<%= no_ssn_dropdown ? 'no-ssn-dropdown' : '' %>">
             <% if no_ssn_dropdown %>
-              <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true, required: no_ssn_dropdown) %>
+              <%= f.select(:non_ssn_apply_reason, options_for_select(FinancialAssistance::Applicant::NO_SSN_REASONS, selected: @applicant.non_ssn_apply_reason), {:include_blank =>  l10n('faa.other_ques.ssn_reason')}, :id => 'no_ssn_reason', class: "col-4", prompt: true, required: true) %>
             <% else %>
               <%= f.text_field :non_ssn_apply_reason, id: "no_ssn_reason", placeholder: l10n('faa.other_ques.ssn_reason') %>
             <% end %>
@@ -87,8 +87,8 @@
         <fieldset class="mb-4 row-form-wrapper">
           <legend class="weight-n required"><%= applicant_prompt("is_enrolled_on_medicaid") %></legend>
           <div class="focus d-inline-flex">
-            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, true, id: "medicaid_pregnancy_yes", required: true %> <%= l10n('yes') %></label>
-            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, false, id: "medicaid_pregnancy_no", required: true %> <%= l10n('no') %></label>
+            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, true, id: "medicaid_pregnancy_yes" %> <%= l10n('yes') %></label>
+            <label class="weight-n"><%= f.radio_button :is_enrolled_on_medicaid, false, id: "medicaid_pregnancy_no" %> <%= l10n('no') %></label>
           </div>
         </fieldset>
 

@@ -4139,6 +4139,7 @@
       order:   [],
       start:   displayStart,
       length:  displayLength,
+      bs4: document.documentElement.dataset.bs4 == "true",
       search:  {
         value: preSearch.sSearch,
         regex: preSearch.bRegex

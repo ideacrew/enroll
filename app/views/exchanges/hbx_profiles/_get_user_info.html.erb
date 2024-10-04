@@ -1,33 +1,73 @@
-<div id="get-info-table" class = "table-responsive table-override">
-  <h4> UserName/eMail view </h4>
-  <% user = @person.user %>
-  <table class = "table table-striped table-bordered" style="table-layout: fixed;">
-    <thead>
-      <tr>
-        <th> Username </th>
-        <th> eMail </th>
-        <th> Last Sign In </th>
-        <th> Person Created Date </th>
-        <th> e-Case ID </th>
-        <th> Person Roles </th>
-      </tr>
-    </thead>
+<% if @bs4 %>
+  <div id="get-info-table" class = "table-responsive table-override">
+    <h3><%= l10n('hbx_profiles.user_info.header') %></h4>
+    <% user = @person.user %>
+    <table class = "table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th><%= l10n('devise.shared.sign_in.username') %></th>
+          <th><%= l10n('hbx_profiles.user_info.email') %></th>
+          <th><%= l10n('hbx_profiles.user_info.last_sign_in') %></th>
+          <th><%= l10n('hbx_profiles.user_info.person_created_date') %></th>
+          <th><%= l10n('hbx_profiles.user_info.ecase_id') %></th>
+          <th><%= l10n('hbx_profiles.user_info.person_roles') %></th>
+        </tr>
+      </thead>
 
-    <tbody>
-      <% person_roles = get_person_roles(@person) %>
-      <tr>
-        <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
-        <td> <%= user.present? ? user.email : "Nil" %> </td>
-        <% if user.present? %>
-          <td> <%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
-        <% else %>
-          <td> Nil </td>
-        <% end %>
-        <td> <%= @person.created_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= @person.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
-        <td style="word-wrap:break-word;"> <%= @person.primary_family.e_case_id || "Nil" %> </td>
-        <td> <%= person_roles.join(", ") %> </td>
-      </tr>
-    </tbody>
-  </table>
-  <h6 align="right"> Requested by @<%= @current_user.person.full_name %> </h6>
-</div>
+      <tbody>
+        <% person_roles = get_person_roles(@person) %>
+        <tr>
+          <td><%= user.present? ? user.oim_id : l10n('hbx_profiles.user_info.nil') %></td>
+          <td><%= user.present? ? user.email : l10n('hbx_profiles.user_info.nil') %></td>
+          <% if user.present? %>
+            <% current_sign_in_at = user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)") %>
+            <td><%= current_sign_in_at.to_date %> <strong>(<%= current_sign_in_at.strftime("%I:%M%p") %>)</strong></td>
+          <% else %>
+            <td><%= l10n('hbx_profiles.user_info.nil') %></td>
+          <% end %>
+          <td>
+            <% created_at = @person.created_at.in_time_zone("Eastern Time (US & Canada)") %>
+            <%= created_at.to_date %> <strong>(<%= created_at.strftime("%I:%M%p") %>)</strong>
+          </td>
+          <td style="word-wrap:break-word;"><%= @person.primary_family.e_case_id || l10n('hbx_profiles.user_info.nil') %></td>
+          <td><%= person_roles.join(", ") %></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="font-weight-bold text-right"><%= l10n('hbx_profiles.user_info.requested_by', name: @current_user.person.full_name) %></p>
+  </div>
+<% else %>
+  <div id="get-info-table" class = "table-responsive table-override">
+    <h4> UserName/eMail view </h4>
+    <% user = @person.user %>
+    <table class = "table table-striped table-bordered" style="table-layout: fixed;">
+      <thead>
+        <tr>
+          <th> Username </th>
+          <th> eMail </th>
+          <th> Last Sign In </th>
+          <th> Person Created Date </th>
+          <th> e-Case ID </th>
+          <th> Person Roles </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% person_roles = get_person_roles(@person) %>
+        <tr>
+          <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
+          <td> <%= user.present? ? user.email : "Nil" %> </td>
+          <% if user.present? %>
+            <td> <%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+          <% else %>
+            <td> Nil </td>
+          <% end %>
+          <td> <%= @person.created_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= @person.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+          <td style="word-wrap:break-word;"> <%= @person.primary_family.e_case_id || "Nil" %> </td>
+          <td> <%= person_roles.join(", ") %> </td>
+        </tr>
+      </tbody>
+    </table>
+    <h6 align="right"> Requested by @<%= @current_user.person.full_name %> </h6>
+  </div>
+<% end %>
