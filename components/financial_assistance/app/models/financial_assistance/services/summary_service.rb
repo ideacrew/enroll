@@ -69,11 +69,6 @@ module FinancialAssistance
 
       # Base class for a summary section. Provides an interface for section and subsection hashes.
       class Summary
-        include L10nHelper
-        include FinancialAssistance::ApplicationHelper
-        include FinancialAssistance::Engine.routes.url_helpers
-        include ActionView::Helpers::NumberHelper
-
         def section_hash(title:, subsections:)
           {section_title: title, subsections: subsections}
         end
@@ -95,6 +90,7 @@ module FinancialAssistance
             end
           end
 
+          # Base class for the config loader. Manages the loading of the raw configuration data and the mapping of the data into a view-ready hash.
           class ConfigLoader
             include L10nHelper
             include FinancialAssistance::ApplicationHelper
@@ -112,11 +108,15 @@ module FinancialAssistance
 
             private
 
+            # @method deep_symbolize_keys(data)
+            # Recursively converts the keys of a hash into symbols.
             def deep_symbolize_keys(data)
               return data.map(&method(:deep_symbolize_keys)) if data.is_a?(Array)
               data.deep_symbolize_keys
             end
 
+            # @method human_value(value)
+            # Converts a boolean value into a human-readable string.
             def human_value(value)
               case value
               when true
@@ -128,6 +128,7 @@ module FinancialAssistance
               end
             end
 
+            # Config loader for the applicant base hash
             class ApplicantConfigLoader < ConfigLoader
               def initialize(applicant, application)
                 super(config: APPLICANT_CONFIGURATION)
@@ -135,25 +136,30 @@ module FinancialAssistance
                 @application = application
               end
 
+              # @method load_config
+              # Loads the raw applicant hash from the config and constructs coverage subtables from the `ApplicantCoverageConfigLoader`.
               def load_config
-                base_config = super
-                load_coverages_map(base_config, :is_enrolled)
-                load_coverages_map(base_config, :is_eligible)
-                base_config
+                base_hash = super
+                load_coverages_map(base_hash, :is_enrolled)
+                load_coverages_map(base_hash, :is_eligible)
+                base_hash
               end
 
               private
 
               APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_applicant.yml.erb"
 
+              # Display the value of the immigration field based on the applicant's citizenship status
               def immigration_field_value(field)
                 @applicant.has_citizen_immigration_status? ? @applicant.send(field) : l10n('faa.not_applicable_abbreviation')
               end
   
+              # Constructs a hash of hbx_ids to full names for the application's active applicants
               def applicants_name_by_hbx_id_hash
                 @application.active_applicants.each_with_object({}) { |applicant, hash| hash[applicant.person_hbx_id] = applicant.full_name }
               end
 
+              # Config loader for the applicant coverage subtables within the base hash
               class ApplicantCoverageConfigLoader < ConfigLoader
                 def initialize(applicant, kind)
                   super(config: COVERAGE_CONFIGURATION)
@@ -165,13 +171,16 @@ module FinancialAssistance
                 COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
               end
 
-              def load_coverages_map(map, kind)
-                has_kind = map[:health_coverage][:rows][kind][:value]
-                map[:health_coverage][:rows][kind][:value] = human_value(has_kind)
+              # @method load_coverages_map(hash, kind)
+              # Loads the coverage subtables for the specified kind only when the applicant has the kind.
+              # After reading the kind, it formats it into a human-readable string and constructs the coverage subtables if needed.
+              def load_coverages_map(hash, kind)
+                has_kind = hash[:health_coverage][:rows][kind][:value]
+                hash[:health_coverage][:rows][kind][:value] = human_value(has_kind)
                 return unless has_kind
   
                 coverage_map = ApplicantCoverageConfigLoader.new(@applicant, kind).load_config
-                map[:health_coverage][:rows][kind][:coverages] = coverage_map
+                hash[:health_coverage][:rows][kind][:coverages] = coverage_map
               end
             end
           end
@@ -367,6 +376,10 @@ module FinancialAssistance
 
         # Manages the application summary sections for the review page context, containing the relationships, preferences, and household summaries.
         class ApplicationSummary < Summary
+          include L10nHelper
+          include FinancialAssistance::ApplicationHelper
+          include FinancialAssistance::Engine.routes.url_helpers
+          
           def initialize(application, cfl_service)
             super()
             @application = application
