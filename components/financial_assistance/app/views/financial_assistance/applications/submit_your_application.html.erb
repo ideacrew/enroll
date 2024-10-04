@@ -60,7 +60,7 @@
     </div>
 
     <div class="my-4">
-      <p><%= l10n('submission_terms_question') %></p>
+      <p class="required"><%= l10n('submission_terms_question') %></p>
       <%= f.label :submission_terms do %>
         <%= f.check_box :submission_terms, {checked: false, required: true}, "yes", "no" %>
         <span class="weight-n"><%= l10n('faa.i_agree') %></span>
