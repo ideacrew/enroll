@@ -67,7 +67,7 @@ module FinancialAssistance
         end
       end
 
-      # Base class for a summary section. Provides an interface for section and subsection hashes, as well as including shared dependent modules.
+      # Base class for a summary section. Provides an interface for section and subsection hashes.
       class Summary
         include L10nHelper
         include FinancialAssistance::ApplicationHelper
@@ -95,55 +95,109 @@ module FinancialAssistance
             end
           end
 
+          class ConfigLoader
+            include L10nHelper
+            include FinancialAssistance::ApplicationHelper
+            include FinancialAssistance::Engine.routes.url_helpers
+            include ActionView::Helpers::NumberHelper
+
+            def initialize(config:)
+              @config = config
+            end
+
+            def load_config           
+              config = File.read(@config)
+              deep_symbolize_keys(YAML.safe_load(ERB.new(config).result(binding)))
+            end
+
+            private
+
+            def deep_symbolize_keys(data)
+              return data.map(&method(:deep_symbolize_keys)) if data.is_a?(Array)
+              data.deep_symbolize_keys
+            end
+
+            def human_value(value)
+              case value
+              when true
+                l10n('yes')
+              when false
+                l10n('no')
+              else
+                value || l10n('faa.not_applicable_abbreviation')
+              end
+            end
+
+            class ApplicantConfigLoader < ConfigLoader
+              def initialize(applicant, application)
+                super(config: APPLICANT_CONFIGURATION)
+                @applicant = applicant
+                @application = application
+              end
+
+              def load_config
+                base_config = super
+                load_coverages_map(base_config, :is_enrolled)
+                load_coverages_map(base_config, :is_eligible)
+                base_config
+              end
+
+              private
+
+              APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_applicant.yml.erb"
+
+              def immigration_field_value(field)
+                @applicant.has_citizen_immigration_status? ? @applicant.send(field) : l10n('faa.not_applicable_abbreviation')
+              end
+  
+              def applicants_name_by_hbx_id_hash
+                @application.active_applicants.each_with_object({}) { |applicant, hash| hash[applicant.person_hbx_id] = applicant.full_name }
+              end
+
+              class ApplicantCoverageConfigLoader < ConfigLoader
+                def initialize(applicant, kind)
+                  super(config: COVERAGE_CONFIGURATION)
+                  @benefits = applicant.benefits.has_valid_insurance_kind.where(kind: kind)
+                end
+
+                private
+
+                COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
+              end
+
+              def load_coverages_map(map, kind)
+                has_kind = map[:health_coverage][:rows][kind][:value]
+                map[:health_coverage][:rows][kind][:value] = human_value(has_kind)
+                return unless has_kind
+  
+                coverage_map = ApplicantCoverageConfigLoader.new(@applicant, kind).load_config
+                map[:health_coverage][:rows][kind][:coverages] = coverage_map
+              end
+            end
+          end
+
           # Base class for the applicant summary section. Manages the loading of the raw application data and the mapping of the data into a view-ready hash.
           class ApplicantSummary < Summary
+            include FinancialAssistance::ApplicationHelper
 
             attr_reader :hash
 
             def initialize(application, applicant)
               super()
-              @applicant = applicant
               @application = application
-              @hash = section_hash(title: capitalize_full_name(applicant.full_name), subsections: load_applicant_map.values.map(&method(:applicant_subsection_hash)))
+              @applicant = applicant
+              @hash = section_hash(title: capitalize_full_name(applicant.full_name), subsections: load_summary.values.map(&method(:applicant_subsection_hash)))
             end
 
             private
-
-            APPLICANT_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_applicant.yml.erb"
-            COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
-
-            # @method load_applicant_map
-            # Translates the applicant summary config data into a symbolized hash.
+            
+            # @method load_summary
+            # Loads the raw summary hash from the config and filters the sections based on the context.
             #
-            # @return [Hash] The hash holding all of the application summary data for the applicant.
-            def load_applicant_map
-              application_file = File.read(ApplicantSummary::APPLICANT_CONFIGURATION)
-              application_map = YAML.safe_load(ERB.new(application_file).result(binding)).deep_symbolize_keys
-
-              # load the coverage data into the base map from the coverage config
-              load_coverages_map(application_map, :is_enrolled)
-              load_coverages_map(application_map, :is_eligible)
-
-              filter_sections(application_map)
-
-              application_map
-            end
-
-            # @method load_coverages_map(application_map, kind)
-            # Helper method for `load_applicant_map`.
-            # Loads the coverage data from the coverage config into the base application map for the given applicant.
-            # Used for the `is_enrolled` and `is_eligible` coverage rows *only* when the row value is true.
-            #
-            # @param [Hash] applicant The application map to load the coverage data into.
-            # @param [Symbol] kind The kind of coverage data to load.
-            def load_coverages_map(application_map, kind)
-              has_kind = application_map[:health_coverage][:rows][kind][:value]
-              application_map[:health_coverage][:rows][kind][:value] = human_value(has_kind)
-              return unless has_kind
-
-              coverage_file = File.read(ApplicantSummary::COVERAGE_CONFIGURATION)
-              coverage_map = YAML.safe_load(ERB.new(coverage_file).result(binding)).map { |kind_array| kind_array.map(&:deep_symbolize_keys) }
-              application_map[:health_coverage][:rows][kind][:coverages] = coverage_map
+            # @return [Hash] The view-ready summary hash.
+            def load_summary()
+              applicant_hash = ConfigLoader::ApplicantConfigLoader.new(@applicant, @application).load_config
+              filter_sections(applicant_hash)
             end
 
             # @method applicant_subsection_hash(section_data)
@@ -171,27 +225,6 @@ module FinancialAssistance
             # @return [Hash] The modified section hash containing only the specified rows.
             def filter_rows(base_map, section_key, rows)
               base_map[section_key][:rows].slice!(*rows)
-            end
-
-            # value helpers
-
-            def human_value(value)
-              case value
-              when true
-                l10n('yes')
-              when false
-                l10n('no')
-              else
-                value || l10n('faa.not_applicable_abbreviation')
-              end
-            end
-
-            def immigration_field_value(field)
-              @applicant.has_citizen_immigration_status? ? @applicant.send(field) : l10n('faa.not_applicable_abbreviation')
-            end
-
-            def applicants_name_by_hbx_id_hash
-              @application.active_applicants.each_with_object({}) { |applicant, hash| hash[applicant.person_hbx_id] = applicant.full_name }
             end
 
             # Manages the applicant summary section for the Admin page context, containing nearly all raw application data.
