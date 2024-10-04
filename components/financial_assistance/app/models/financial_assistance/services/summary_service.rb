@@ -6,7 +6,7 @@ module FinancialAssistance
     # The applicant data is managed by `Summary::ApplicantSummary`, which loads from the configuration files containing the raw sections of key-value pairs.
     # The subclasses `AdminApplicantSummary` & `ConsumerApplicantSummary` drive the differences between the Admin and Consumer page contexts.
     #
-    # The application data is managed by `Summary::ApplicationSummary`, loads the top-level Application data directly.
+    # The application data is managed by `Summary::ApplicationSummary`, which loads the top-level Application data directly.
     class SummaryService
 
       attr_reader :can_edit_incomes
