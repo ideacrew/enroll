@@ -36,13 +36,13 @@ demographics:
     rows:
         us_citizen:
             key: <%= l10n('insured.us_citizen') %>
-            value: <%= @applicant.us_citizen %>
+            value: "<%= human_boolean(@applicant.us_citizen) %>"
         naturalized_citizen:
             key: <%= l10n('insured.consumer_roles.naturalized_question') %>
-            value: <%= @applicant.naturalized_citizen %>
+            value: "<%= human_boolean(@applicant.naturalized_citizen) %>"
         eligible:
             key: <%= l10n('faa.question.eligible_immigration_status') %>
-            value: <%= @applicant.eligible_immigration_status %>
+            value: "<%= human_boolean(@applicant.eligible_immigration_status) %>"
         document_type:
             key: <%= l10n('faa.review.personal.document_type') %>
             value: <%= immigration_field_value(:vlp_subject) %>

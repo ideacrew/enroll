@@ -193,35 +193,29 @@ module FinancialAssistance
               super()
               @application = application
               @applicant = applicant
-              @hash = section_hash(title: capitalize_full_name(applicant.full_name), subsections: load_summary.values.map(&method(:applicant_subsection_hash)))
+              @hash = section_hash(title: capitalize_full_name(applicant.full_name), subsections: applicant_subsections)
             end
 
             private
-            
+
+            # @method applicant_subsections
+            # Loads and converts the summary hash into a view-ready array of subsections, removing all outer section/row keys.
+            def applicant_subsections
+              load_summary.values.map(&method(:applicant_subsection_hash))
+            end
+
             # @method load_summary
             # Loads the raw summary hash from the config and filters the sections based on the context.
             #
             # @return [Hash] The view-ready summary hash.
-            def load_summary()
+            def load_summary
               applicant_hash = ConfigLoader::ApplicantConfigLoader.new(@applicant, @application).load_config
-              filter_sections(applicant_hash)
+              filter_subsections(applicant_hash)
             end
 
-            # @method applicant_subsection_hash(section_data)
-            # Maps the raw subsection hash into a view-ready hash by removing the outer row_keys and recursively handling nested subsections.
-            #
-            # @param [Hash] section_data The section hash from the config.
-            #
-            # @return [Hash] The view-ready section hash.
-            def applicant_subsection_hash(section_data)
-              section_data[:rows] = section_data[:rows].values
-              section_data[:rows].map { |row| row.is_a?(Array) ? row.map(&method(:applicant_subsection_hash)) : row }
-              subsection_hash(title: section_data[:title], rows: section_data[:rows])
-            end
-
-            # stub method child classes can override to conditionlly render rows
-            def filter_sections(map) end
-
+            # stub method child classes can override to conditionlly render rows in the subsections
+            def filter_subsections(map) end
+            
             # @method filter_rows(base_map, section_key, rows)
             # Filters the rows of a section from the base map based on the provided list of row keys.
             #
@@ -234,20 +228,32 @@ module FinancialAssistance
               base_map[section_key][:rows].slice!(*rows)
             end
 
+            # @method applicant_subsection_hash(section_data)
+            # Maps the raw subsection hash into a view-ready hash by removing the outer row keys and recursively handling nested subsections.
+            #
+            # @param [Hash] section_data The section hash from the config.
+            #
+            # @return [Hash] The view-ready section hash.
+            def applicant_subsection_hash(section_data)
+              section_data[:rows] = section_data[:rows].values
+              section_data[:rows].map { |row| row.is_a?(Array) ? row.map(&method(:applicant_subsection_hash)) : row }
+              subsection_hash(title: section_data[:title], rows: section_data[:rows])
+            end
+
             # Manages the applicant summary section for the Admin page context, containing nearly all raw application data.
             class AdminApplicantSummary < ApplicantSummary
               private
 
               PERSONAL_INFO_ROWS = [:dob, :gender, :relationship, :coverage].freeze
 
-              # @method filter_sections(map)
+              # @method filter_subsections(map)
               # Modifies the applicant_map for the Admin page context.
               # Removes the ai_an_income row from the Income section and the HRA rows if enrolled. Also filter the Personal Info rows and combines them with the Demographics rows.
               #
               # @param [Hash] map The applicant_map to be modified.
               #
               # @return [Hash] The modified applicant_map.
-              def filter_sections(map)
+              def filter_subsections(map)
                 map[:income][:rows].delete(:ai_an_income)
                 filter_rows(map, :personal_info, PERSONAL_INFO_ROWS)
                 map[:personal_info][:rows].merge!(map[:demographics][:rows])
@@ -289,14 +295,14 @@ module FinancialAssistance
                 subsection_hash(title: hash[:title], rows: hash[:rows], edit_link: (section_data[:edit_link] if @can_edit))
               end
 
-              # @method filter_sections(map)
+              # @method filter_subsections(map)
               # Modifies the applicant_map for the Consumer page context.
               # Removes the demographics section entirely, and filters the Income, Tax Info, Health Coverage, and Other Questions sections based on the applicant's displayable fields.
               #
               # @param [Hash] map The applicant_map to be modified.
               #
               # @return [Hash] The modified applicant_map.
-              def filter_sections(map)
+              def filter_subsections(map)
                 map.delete(:demographics)
                 filter_rows(map, :personal_info, PERSONAL_INFO_ROWS)
                 income_section(map)
