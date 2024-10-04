@@ -60,7 +60,7 @@ module FinancialAssistance
       end
 
       # @method create_applicant_summaries(is_concise, can_edit, cfl_service, application, applicants)
-      # Creates the applicant summaries based on the given context.
+      # Helper method for initialization of the service that creates the applicant summaries based on the given context.
       def create_applicant_summaries(is_concise, can_edit, cfl_service, application, applicants)
         applicants.map do |applicant|
           Summary::ApplicantSummary::ApplicantSummaryFactory.create(is_concise, can_edit, cfl_service, application, applicant)
@@ -137,7 +137,9 @@ module FinancialAssistance
             # @param [Hash] applicant The application map to load the coverage data into.
             # @param [Symbol] kind The kind of coverage data to load.
             def load_coverages_map(application_map, kind)
-              return unless application_map[:health_coverage][:rows][kind][:value]
+              has_kind = application_map[:health_coverage][:rows][kind][:value]
+              application_map[:health_coverage][:rows][kind][:value] = human_value(has_kind)
+              return unless has_kind
 
               coverage_file = File.read(ApplicantSummary::COVERAGE_CONFIGURATION)
               coverage_map = YAML.safe_load(ERB.new(coverage_file).result(binding)).map { |kind_array| kind_array.map(&:deep_symbolize_keys) }
@@ -145,22 +147,14 @@ module FinancialAssistance
             end
 
             # @method applicant_subsection_hash(section_data)
-            # Maps the raw section hash into a view-ready hash of the form by reducing each section to a hash of {title: <section_title>, rows: <section_rows>}.
-            # Also handles nested subsections by recursively calling itself on each necessary row.
+            # Maps the raw subsection hash into a view-ready hash by removing the outer row_keys and recursively handling nested subsections.
             #
             # @param [Hash] section_data The section hash from the config.
             #
             # @return [Hash] The view-ready section hash.
             def applicant_subsection_hash(section_data)
               section_data[:rows] = section_data[:rows].values
-              section_data[:rows].map do |row|
-                if row.is_a?(Array)
-                  row.map(&method(:applicant_subsection_hash))
-                else
-                  row[:value] = human_value(row[:value])
-                  row
-                end
-              end
+              section_data[:rows].map { |row| row.is_a?(Array) ? row.map(&method(:applicant_subsection_hash)) : row }
               subsection_hash(title: section_data[:title], rows: section_data[:rows])
             end
 
