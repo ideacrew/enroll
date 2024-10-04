@@ -1056,7 +1056,8 @@ module ApplicationHelper
   end
 
   def forgot_password_recaptcha_enabled?
-    EnrollRegistry.feature_enabled?(:forgot_password_recaptcha)
+    false
+    # EnrollRegistry.feature_enabled?(:forgot_password_recaptcha)
   end
 
   def plan_childcare_subsidy_eligible(plan)

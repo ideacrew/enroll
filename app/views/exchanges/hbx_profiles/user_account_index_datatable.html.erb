@@ -1,0 +1,10 @@
+<%= render "ui-components/v1/navs/primary_nav" %>
+<div class="container">
+  <h1 class="<%= @bs4 ? '' : heading-text %>">Account Updates</h1>
+
+  <%= raw render_datatable(@datatable) %>
+</div>
+
+<script>
+  initializeDataTables();
+</script>

@@ -8,12 +8,8 @@ describe UserPolicy do
     let(:target_user) { instance_double(User, :person => nil) }
     subject { UserPolicy.new(user, target_user) }
 
-    it "is not lockable" do
-      expect(subject.lockable?).to be_falsey 
-    end
-
     it "can not reset the password" do
-      expect(subject.reset_password?).to be_falsey 
+      expect(subject.reset_password?).to be_falsey
     end
   end
 
@@ -26,12 +22,8 @@ describe UserPolicy do
     let(:target_user) { instance_double(User) }
     subject { UserPolicy.new(user, target_user) }
 
-    it "is not lockable" do
-      expect(subject.lockable?).to be_falsey 
-    end
-
     it "can not reset the password" do
-      expect(subject.reset_password?).to be_falsey 
+      expect(subject.reset_password?).to be_falsey
     end
   end
 
@@ -47,12 +39,8 @@ describe UserPolicy do
     let(:target_user) { instance_double(User) }
     subject { UserPolicy.new(user, target_user) }
 
-    it "is not lockable" do
-      expect(subject.lockable?).to be_falsey 
-    end
-
     it "can not reset the password" do
-      expect(subject.reset_password?).to be_falsey 
+      expect(subject.reset_password?).to be_falsey
     end
   end
 
@@ -60,7 +48,6 @@ describe UserPolicy do
     - a current user with a person
     - who has an hbx_staff_role
     - has a permission
-    - the permission can not lock unlock
     - the permission can not reset password
   " do
 
@@ -68,7 +55,6 @@ describe UserPolicy do
       instance_double(
         Permission,
         {
-          :can_lock_unlock => false,
           :can_reset_password => false
         }
       )
@@ -81,12 +67,8 @@ describe UserPolicy do
     let(:target_user) { instance_double(User) }
     subject { UserPolicy.new(user, target_user) }
 
-    it "is not lockable" do
-      expect(subject.lockable?).to be_falsey 
-    end
-
     it "can not reset the password" do
-      expect(subject.reset_password?).to be_falsey 
+      expect(subject.reset_password?).to be_falsey
     end
   end
 
@@ -94,7 +76,6 @@ describe UserPolicy do
     - a current user with a person
     - who has an hbx_staff_role
     - has a permission
-    - the permission can lock unlock
     - the permission can reset password
   " do
 
@@ -102,7 +83,6 @@ describe UserPolicy do
       instance_double(
         Permission,
         {
-          :can_lock_unlock => true,
           :can_reset_password => true
         }
       )
@@ -114,10 +94,6 @@ describe UserPolicy do
     let(:user) { instance_double(User, :person => current_user_person) }
     let(:target_user) { instance_double(User) }
     subject { UserPolicy.new(user, target_user) }
-
-    it "is not lockable" do
-      expect(subject.lockable?).to be_truthy
-    end
 
     it "can not reset the password" do
       expect(subject.reset_password?).to be_truthy
