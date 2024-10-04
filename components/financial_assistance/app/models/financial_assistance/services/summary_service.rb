@@ -163,8 +163,6 @@ module FinancialAssistance
                   @benefits = applicant.benefits.has_valid_insurance_kind.where(kind: kind)
                 end
 
-                private
-
                 COVERAGE_CONFIGURATION = "./components/financial_assistance/app/models/financial_assistance/services/raw_coverage.yml.erb"
               end
 
