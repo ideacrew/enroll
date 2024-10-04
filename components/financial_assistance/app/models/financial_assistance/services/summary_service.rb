@@ -62,9 +62,7 @@ module FinancialAssistance
       # @method create_applicant_summaries(is_concise, can_edit, cfl_service, application, applicants)
       # Helper method for initialization of the service that creates the applicant summaries based on the given context.
       def create_applicant_summaries(is_concise, can_edit, cfl_service, application, applicants)
-        applicants.map do |applicant|
-          Summary::ApplicantSummary::ApplicantSummaryFactory.create(is_concise, can_edit, cfl_service, application, applicant)
-        end
+        applicants.map { |applicant| Summary::ApplicantSummary::ApplicantSummaryFactory.create(is_concise, can_edit, cfl_service, application, applicant) }
       end
 
       # Base class for a summary section. Provides an interface for section and subsection hashes.
