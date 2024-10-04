@@ -114,7 +114,7 @@ module FinancialAssistance
             end
 
             # @method human_value(value)
-            # Converts a boolean value into a human-readable string.
+            # Converts a value into a human-readable string. Booleans become humanized, nils become 'N/A', and other values are returned as-is.
             def human_value(value)
               case value
               when true
