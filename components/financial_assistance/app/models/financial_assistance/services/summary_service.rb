@@ -213,8 +213,15 @@ module FinancialAssistance
               filter_subsections(applicant_hash)
             end
 
-            # stub method child classes can override to conditionlly render rows in the subsections
-            def filter_subsections(map) end
+            # @method filter_subsections(map)
+            # Modifies the applicant_map by filtering out the specified rows from the Personal Info section.
+            #
+            # @param [Hash] map The applicant_map to be modified.
+            #
+            # @return [Hash] The modified applicant_map.
+            def filter_subsections(map)
+              filter_rows(map, :personal_info, self.class::PERSONAL_INFO_ROWS)
+            end
             
             # @method filter_rows(base_map, section_key, rows)
             # Filters the rows of a section from the base map based on the provided list of row keys.
@@ -254,8 +261,8 @@ module FinancialAssistance
               #
               # @return [Hash] The modified applicant_map.
               def filter_subsections(map)
+                super
                 map[:income][:rows].delete(:ai_an_income)
-                filter_rows(map, :personal_info, PERSONAL_INFO_ROWS)
                 map[:personal_info][:rows].merge!(map[:demographics][:rows])
                 map.delete(:demographics)
                 filter_rows(map, :health_coverage, [:is_enrolled, :is_eligible]) if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
@@ -303,8 +310,8 @@ module FinancialAssistance
               #
               # @return [Hash] The modified applicant_map.
               def filter_subsections(map)
+                super
                 map.delete(:demographics)
-                filter_rows(map, :personal_info, PERSONAL_INFO_ROWS)
                 income_section(map)
                 tax_info_section(map)
                 coverage_section(map)

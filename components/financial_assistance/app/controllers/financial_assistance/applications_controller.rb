@@ -400,10 +400,11 @@ module FinancialAssistance
 
     def enable_bs4_layout
       case action_name
-      when "application_year_selection", "application_checklist", "edit", "eligibility_results", "review_and_submit", "review", "transfer_history", "submit_your_application", "wait_for_eligibility_response", "preferences", "application_publish_error", "eligibility_response_error", "index", "index_with_filter":
+      when "application_year_selection", "application_checklist", "edit", "eligibility_results", "review_and_submit", "review", "transfer_history", "submit_your_application", "wait_for_eligibility_response", "preferences", "application_publish_error", "eligibility_response_error", "index", "index_with_filter"
         @bs4 = true if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
       when "raw_application"
         @bs4 = true if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+      end
     end
 
     def resolve_layout
