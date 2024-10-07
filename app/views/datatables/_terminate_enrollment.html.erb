@@ -27,12 +27,21 @@ $( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
       <br />
       <table  class="table table-striped">
         <tr>
-          <th>HBX ID</th>
-          <th>Plan</th>
-          <th>Effective Date</th>
-          <th>Termination Date</th>
-          <th>Terminate Enrollment ?</th>
-          <th>Transmit to Carrier ?</th>
+          <% if @bs4 %>
+            <th><%= l10n('insured.families.hbx_id') %></th>
+            <th><%= l10n('plan') %></th>
+            <th><%= l10n('hbx_profiles.effective_date') %></th>
+            <th><%= l10n('termination_date') %></th>
+            <th><%= l10n('terminate_enrollment') %></th>
+            <th><%= l10n('hbx_profiles.edi') %></th>
+          <% else %>
+            <th>HBX ID</th>
+            <th>Plan</th>
+            <th>Effective Date</th>
+            <th>Termination Date</th>
+            <th>Terminate Enrollment ?</th>
+            <th>Transmit to Carrier ?</th>
+          <% end %>
         </tr>
         <% @hbxs.each do |hbx| %>
         <tr>
@@ -53,7 +62,7 @@ $( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
             <% if @bs4 %>
               <label class="d-block weight-n">
                 <%= check_box_tag "terminate_hbx_#{hbx.id}", hbx.id %>
-                <%= l10n('Terminate') %>
+                <%= l10n('terminate') %>
               </label>
             <% else %>
               <%= check_box_tag "terminate_hbx_#{hbx.id}", hbx.id %>
@@ -63,7 +72,7 @@ $( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
             <% if @bs4 %>
               <label class="d-block weight-n">
                 <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%>
-                <%= l10n('Transmit') %>
+                <%= l10n('transmit') %>
               </label>
             <% else %>
               <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%>

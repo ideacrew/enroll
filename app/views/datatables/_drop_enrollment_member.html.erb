@@ -61,7 +61,7 @@
                 <% if @bs4 %>
                   <label class="d-block weight-n">
                     <%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox' %>
-                    <%= l10n('Terminate') %>
+                    <%= l10n('terminate') %>
                   </label>
                 <% else %>
                   <%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox' %>
