@@ -134,9 +134,11 @@ module FinancialAssistance
 
             def applicant_qnc_code(applicant)
               return true if use_defaults_for_qnc_and_five_year_bar_data?
-              return applicant.qualified_non_citizen if applicant.qualified_non_citizen.present?
 
-              applicant.eligible_immigration_status ? true : false
+              return applicant.qualified_non_citizen unless applicant.qualified_non_citizen.nil?
+
+              # Return true if eligible_immigration_status is truthy, otherwise false
+              applicant.eligible_immigration_status.present?
             end
 
             def applicant_five_year_bar_met(applicant)

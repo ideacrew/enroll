@@ -35,7 +35,7 @@ table {
       font-weight: 400;
       padding: 0.75rem;
 
-      &:first-of-type {
+      &:first-of-type:not(.standard) {
         font-size: 16px;
         line-height: 20px;
         font-weight: 400;
