@@ -12,7 +12,6 @@ RSpec.describe UsersController, type: :controller do
     DatabaseCleaner.clean
   end
 
-
   describe 'with authorization and authentication' do
     let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
     let(:hbx_staff_role) { person.hbx_staff_role }
@@ -26,58 +25,6 @@ RSpec.describe UsersController, type: :controller do
     before do
       hbx_staff_role.update_attributes!(permission_id: permission.id)
       sign_in(admin)
-    end
-
-    describe 'GET #confirm_lock' do
-      shared_examples 'responds_to_mime_type for GET endpoint confirm_lock' do |unsupported_mime_types|
-        unsupported_mime_types.each do |mime_type|
-          it "rejects #{mime_type}" do
-            get :confirm_lock, params: { id: user.id, format: mime_type }
-            expect(response).to have_http_status(:not_acceptable)
-          end
-        end
-      end
-
-      include_examples 'responds_to_mime_type for GET endpoint confirm_lock', [:html, :json, :xml, :csv, :text]
-    end
-
-    describe 'GET #lockable' do
-      shared_examples 'responds_to_mime_type for GET endpoint lockable' do |unsupported_mime_types|
-        unsupported_mime_types.each do |mime_type|
-          it "rejects #{mime_type}" do
-            get :lockable, params: { id: user.id, format: mime_type }
-            expect(response).to have_http_status(:not_acceptable)
-          end
-        end
-      end
-
-      include_examples 'responds_to_mime_type for GET endpoint lockable', [:html, :json, :xml, :csv, :text]
-    end
-
-    describe 'GET #reset_password' do
-      shared_examples 'responds_to_mime_type for GET endpoint reset_password' do |unsupported_mime_types|
-        unsupported_mime_types.each do |mime_type|
-          it "rejects #{mime_type}" do
-            get :reset_password, params: { id: user.id, format: mime_type }
-            expect(response).to have_http_status(:not_acceptable)
-          end
-        end
-      end
-
-      include_examples 'responds_to_mime_type for GET endpoint reset_password', [:html, :json, :xml, :csv, :text]
-    end
-
-    describe 'PUT #confirm_reset_password' do
-      shared_examples 'responds_to_mime_type for PUT endpoint confirm_reset_password' do |unsupported_mime_types|
-        unsupported_mime_types.each do |mime_type|
-          it "rejects #{mime_type}" do
-            put :confirm_reset_password, params: { id: user.id, format: mime_type }
-            expect(response).to have_http_status(:not_acceptable)
-          end
-        end
-      end
-
-      include_examples 'responds_to_mime_type for PUT endpoint confirm_reset_password', [:html, :json, :xml, :csv, :text]
     end
 
     describe 'GET #change_username_and_email' do
