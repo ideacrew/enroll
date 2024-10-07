@@ -23,7 +23,7 @@
               <%= render partial: 'shared/person/ssn/admin_ssn_field', locals: { f: f, presenter: organize_ssn_params(f.object) } %>
             </div>
             <% else %>
-              <%= f.label :ssn, l10n('new_ssn'), class: "align-self-start d-block" %>
+              <%= f.label :ssn, l10n('new_ssn'), class: "weight-n align-self-start d-block" %>
               <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
                 <%= f.text_field :ssn, placeholder: "000-00-0000", class: "col-2 mask-ssn",
                   pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')", oninput: "this.setCustomValidity('')",
