@@ -34,7 +34,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     it "renders broker_agency_index" do
       get :broker_agency_index, xhr: true
       expect(response).to have_http_status(:success)
-      expect(response).to render_template("exchanges/hbx_profiles/broker_agency_index_datatable.html.slim", "layouts/single_column")
+      expect(response).to render_template("exchanges/hbx_profiles/broker_agency_index_datatable.html.erb", "layouts/single_column")
     end
 
     xit "renders issuer_index" do
