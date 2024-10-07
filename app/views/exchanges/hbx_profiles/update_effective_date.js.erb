@@ -42,48 +42,71 @@ else{
 
 function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, eligibilty_start_date, eligibilty_end_date, cdate) {
   var target = $('.qle-date-picker');
-  <% if @bs4 %>
-    $(target).val('');
-    return
-  <% end %>
-  
-  if("<%= @qle.is_self_attested %>" == 'false'){
-    dateMin = '-110y';
-    dateMax = '+110y';
-  }
+  if("<%= @qle.is_self_attested %>" == 'false') {
+    <% if @bs4 %>
+      dateMin = '<%= date_field_value(110.years.ago) %>';
+      dateMax = '<%= date_field_value(110.years.from_now) %>';
+    <% else %>
+      dateMin = '-110y';
+      dateMax = '+110y';
+    <% end %>
+  } 
   else{
-    var splitdate = cdate.split('/');
-    var cur_date = new Date(splitdate[2], splitdate[0]-1, splitdate[1]);
-    var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
-    var post_days = (idays - post_event_sep_in_days);
-    var pre_days = (idays + pre_event_sep_in_days);
-    if (post_days >= 0){
-      dateMin = '+' + post_days + 'd';
-    }else{
-      dateMin = post_days + 'd';
-    }
-    if (pre_days >= 0){
-      dateMax = '+' + pre_days + 'd';
-    }else{
-      dateMax = pre_days + 'd';
-    }
+    <% if @bs4 %>
+      var preDate = new Date();
+      preDate.setTime(preDate.getTime() + pre_event_sep_in_days * 24 * 60 * 60 * 1000)
+      var postDate = new Date();
+      postDate.setTime(postDate.getTime() - post_event_sep_in_days * 24 * 60 * 60 * 1000)
+
+      dateMin = postDate.toISOString().split('T')[0]
+      dateMax = preDate.toISOString().split('T')[0]
+    <% else %>
+      var splitdate = cdate.split('/');
+      var cur_date = new Date(splitdate[2], splitdate[0]-1, splitdate[1]);
+      var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
+      var post_days = (idays - post_event_sep_in_days);
+      var pre_days = (idays + pre_event_sep_in_days);
+      if (post_days >= 0){
+        dateMin = '+' + post_days + 'd';
+      }else{
+        dateMin = post_days + 'd';
+      }
+      if (pre_days >= 0){
+        dateMax = '+' + pre_days + 'd';
+      }else{
+        dateMax = pre_days + 'd';
+      }
+    <% end %>
+
     if ("<%= @qle.coverage_start_on.present? && @qle.coverage_start_on.present? %>" == 'true'){
-      dateMin = eligibilty_start_date
-      dateMax = eligibilty_end_date
+      <% if @bs4 %>
+        dateMin = '<%= date_field_value(@qle.coverage_start_on) %>';
+        dateMax = '<%= date_field_value(@qle.coverage_end_on) %>';
+      <% else %>
+        dateMin = eligibilty_start_date
+        dateMax = eligibilty_end_date
+      <% end %>
     }
   }
+
   $(target).val('');
-  $(target).datepicker('destroy');
-  $(target).datepicker({
-    changeMonth: true,
-    changeYear: true,
-    dateFormat: 'mm/dd/yy',
-    defaultDate: cdate,
-    minDate: dateMin,
-    maxDate: dateMax});
-  $('input.floatlabel').floatlabel({
-      slideInput: false
-  });
+  
+  <% if @bs4 %>
+    target.attr('max', dateMax);
+    target.attr('min', dateMin);
+  <% else %>
+    $(target).datepicker('destroy');
+    $(target).datepicker({
+      changeMonth: true,
+      changeYear: true,
+      dateFormat: 'mm/dd/yy',
+      defaultDate: cdate,
+      minDate: dateMin,
+      maxDate: dateMax});
+    $('input.floatlabel').floatlabel({
+        slideInput: false
+    });
+  <% end %>
 };
 
 function getDate(){
