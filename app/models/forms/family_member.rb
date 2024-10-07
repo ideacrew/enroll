@@ -181,7 +181,8 @@ module Forms
         mailing_address = person.has_mailing_address? ? person.mailing_address : nil
 
         addresses.each do |key, address|
-          current_address = case address["kind"]
+          sanitized_address = sanitize_address(address)
+          current_address = case sanitized_address["kind"]
                             when "home"
                               home_address
                             when "mailing"
@@ -189,21 +190,29 @@ module Forms
                             else
                               next
                             end
-          if address["address_1"].blank? && address["city"].blank?
+          if sanitized_address["address_1"].blank? && sanitized_address["city"].blank?
             current_address.destroy if current_address.present?
             next
           end
           if current_address.present?
-            current_address.update(address.except("_destroy"))
+            current_address.update(sanitized_address)
             person.save! # to trigger address change events
           else
-            person.addresses.create(address.except("_destroy").permit(:address_1, :address_2, :city, :state, :zip, :kind, :county))
+            person.addresses.create(sanitized_address)
           end
         end
       end
       true
     rescue => e
       false
+    end
+
+    def sanitize_address(address)
+      if address.class == ActionController::Parameters
+        address.except("_destroy").permit(:address_1, :address_2, :city, :state, :zip, :kind, :county)
+      else
+        address.except("_destroy")
+      end
     end
 
     def extract_consumer_role_params
