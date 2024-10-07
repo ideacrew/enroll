@@ -2,6 +2,8 @@ Feature: As a Super Admin I will be the only user
   that is able to see & access the Config tab
 
   Background: Setup site, employer, and benefit application
+    Given bs4_admin_flow feature is disable
+    Given the FAA feature configuration is enabled
     Given a CCA site exists with a benefit market
     And there is an employer ABC Widgets
     Given benefit market catalog exists for ABC Widgets initial employer with health benefits
@@ -33,5 +35,14 @@ Feature: As a Super Admin I will be the only user
     And the user goes to the Config Page
     Then the user will see the Time Tavel option
 
+  Scenario: HBX Staff with Super Admin subroles and a time travel ability enabled should have the option to time travel
+    Given notices feature is enabled
+    Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
+    And the user with a HBX staff role with Super Admin subrole updates permisssions to time travel
+    And the user is on the Main Page
+    And the user goes to the Config Page
+    And the user should see Announcements button
+    And the user will clicks on Announcements page
+    And the user should see Current Announcements text
 
 

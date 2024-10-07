@@ -37,7 +37,7 @@ module Forms
         if key.to_s[/terminate_hbx_.*/]
           hbx = HbxEnrollment.find(params[key.to_s])
           begin
-            termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
+            termination_date = parse_date(params["termination_date_#{value}"])
             # IVL enrollments go automatically to coverage_terminated
             if termination_date >= ::TimeKeeper.date_of_record && hbx.is_shop?
               hbx.schedule_coverage_termination!(termination_date) if hbx.may_schedule_coverage_termination?
@@ -137,6 +137,12 @@ module Forms
           "is_trading_partner_publishable" => transmit_flag
         }
       )
+    end
+
+    def parse_date(string)
+      return nil if string.blank?
+      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
+      Date.strptime(string, date_format)
     end
   end
 end

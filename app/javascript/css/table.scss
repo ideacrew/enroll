@@ -13,7 +13,9 @@ table {
       font-size: 16px;
       line-height: 24px;
       font-weight: 600;
-
+      &.w-100px {
+        width: 100px;
+      }
       &.w-256px {
         width: 256px;
       }
@@ -59,6 +61,7 @@ table {
   caption {
     text-align: left;
     margin: 1em 0;
+    color: var(--text-secondary);
   }
 }
 
