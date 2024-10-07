@@ -208,7 +208,7 @@ module Forms
     end
 
     def sanitize_address(address)
-      if address.class == ActionController::Parameters
+      if address.instance_of?(ActionController::Parameters)
         address.except("_destroy").permit(:address_1, :address_2, :city, :state, :zip, :kind, :county)
       else
         address.except("_destroy")
