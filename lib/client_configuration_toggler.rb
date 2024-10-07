@@ -7,15 +7,18 @@ class ClientConfigurationToggler < MongoidMigrationTask
   end
 
   def target_config_folder
-    "#{Rails.root}/config/client_config/#{@target_client_state_abbreviation}"
+    "#{Rails.root}/config/client_config/dc"
+    # "#{Rails.root}/config/client_config/#{@target_client_state_abbreviation}"
   end
 
   def old_config_folder
-    "#{Rails.root}/config/client_config/#{@old_configured_state_abbreviation}"
+    "#{Rails.root}/config/client_config/me"
+    # "#{Rails.root}/config/client_config/#{@old_configured_state_abbreviation}"
   end
 
   def old_configured_state_abbreviation
-    EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase
+    'me'
+    # EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase
   end
 
   def target_client_state_abbreviation
@@ -26,6 +29,7 @@ class ClientConfigurationToggler < MongoidMigrationTask
     incorrect_state_abbreviation_format_message = "Incorrect state abbreviation length. Set abbreviation to two letters like 'me' or 'dc'"
     raise(incorrect_state_abbreviation_format_message) if ENV['CLIENT'].length > 2
     ENV['CLIENT'].downcase
+    'dc'
   end
 
   def copy_target_configuration_to_system_folder
