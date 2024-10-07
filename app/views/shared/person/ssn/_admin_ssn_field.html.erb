@@ -13,25 +13,33 @@
   <div data-controller='person' id='#admin-ssn-input-field'>
     <%= javascript_pack_tag 'effective_table_add_ons' %>
 
-    <%= f.label l10n('new_ssn'), class: "weight-n d-block" %>
-    <div class="d-flex">
-      <%= f.text_field :ssn,
-        disabled: true,
-        class: "hidden mask-ssn ssn-input-#{presenter.person_id}",
-        target: 'person.ssn',
-        pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
-        oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
-        oninput: "this.setCustomValidity('')",
-        value: nil,
-        data: { :"admin-can-enable" => true }
-      %>
-      <input
-        type="text"
-        placeholder="<%= presenter.obscured_ssn %>"
-        class="mask-ssn <%= "ssn-facade-#{presenter.person_id}" %>"
-        readonly='true'
-      >
-      <%= render partial: 'shared/person/ssn/show_hide_ssn_buttons', locals: { presenter: presenter } %>
-    </div>
+    <label class="hidden weight-n ssn-input">
+      <%= l10n('new_ssn') %>
+      <div class="d-flex">
+        <%= f.text_field :ssn,
+          disabled: true,
+          class: "mask-ssn hidden ssn-input-#{presenter.person_id}",
+          target: 'person.ssn',
+          pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
+          oninvalid: "this.setCustomValidity('#{l10n('insured.consumer_roles.invalid_ssn_error')}')",
+          oninput: "this.setCustomValidity('')",
+          value: nil,
+          data: { :"admin-can-enable" => true }
+        %>
+        <%= render partial: 'shared/person/ssn/show_hide_ssn_buttons', locals: { presenter: presenter } %>
+      </div>
+    </label>
+    <label class="weight-n ssn-facade">
+      <%= l10n('new_ssn') %>
+      <div class="d-flex">
+        <input
+          type="text"
+          placeholder="<%= presenter.obscured_ssn %>"
+          class="mask-ssn <%= "ssn-facade-#{presenter.person_id}" %>"
+          readonly='true'
+        >
+        <%= render partial: 'shared/person/ssn/show_hide_ssn_buttons', locals: { presenter: presenter } %>
+      </div>
+    </label>
   </div>
 <% end %>

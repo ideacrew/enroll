@@ -63,7 +63,9 @@ export default class extends Controller {
     const personId = target.getAttribute('data-id');
   
     document.querySelector(`.ssn-input-${personId}`).classList.add('hidden');
+    $(`.ssn-input-${personId}`).parents('label').addClass('hidden');
     document.querySelector(`.ssn-facade-${personId}`).classList.remove('hidden');
+    $(`.ssn-facade-${personId}`).parents('label').removeClass('hidden');
     document.querySelector(`.ssn-eye-on-${personId}`).classList.add('hidden');
     document.querySelector(`.ssn-eye-off-${personId}`).classList.remove('hidden');
   
@@ -77,7 +79,9 @@ export default class extends Controller {
   
   showSsnInput(personId) {
     document.querySelector(`.ssn-input-${personId}`).classList.remove('hidden');
+    $(`.ssn-input-${personId}`).parents('label').removeClass('hidden');
     document.querySelector(`.ssn-facade-${personId}`).classList.add('hidden');
+    $(`.ssn-facade-${personId}`).parents('label').addClass('hidden');
     document.querySelector(`.ssn-eye-on-${personId}`).classList.remove('hidden');
     document.querySelector(`.ssn-eye-off-${personId}`).classList.add('hidden');
   
