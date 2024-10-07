@@ -16,57 +16,46 @@ describe ::FinancialAssistance::Services::SummaryService do
   let(:cfl_service) { ::FinancialAssistance::Services::ConditionalFieldsLookupService.new }
 
   describe('.instance_for_action') do
+    RSpec.shared_examples 'a SummaryService instance' do |applicant_summary_class, can_edit|
+      it "should return instance of SummaryService with applicant_summaries of type #{applicant_summary_class}" do
+        applicant_summaries = subject.instance_variable_get(:@applicant_summaries)
+        expect(applicant_summaries).to all(be_a(applicant_summary_class))
+      end
+    
+      it "should return instance of SummaryService that is #{can_edit ? 'editable' : 'not editable'}" do
+        expect(subject.can_edit_incomes).to eq(can_edit)
+
+        applicant_summaries = subject.instance_variable_get(:@applicant_summaries)
+        applicant_summaries.each do |summary|
+          edit_links = summary.hash[:subsections].pluck(:edit_link).compact
+          if can_edit
+            expect(edit_links).not_to be_empty
+          else
+            expect(edit_links).to be_empty
+          end
+        end
+      end
+    end
+
     context 'when action is raw_application' do
       let(:action_name) { 'raw_application' }
       subject { described_class.instance_for_action(action_name, cfl_service, application, application.active_applicants) }
 
-      it 'should return instance of SummaryService with applicant_summaries of type AdminApplicantSummary' do
-        expect(subject.instance_variable_get(:@applicant_summaries).first).to be_a(FinancialAssistance::Services::SummaryService::Summary::ApplicantSummary::ApplicantSummary::AdminApplicantSummary)
-      end
+      it_behaves_like 'a SummaryService instance', FinancialAssistance::Services::SummaryService::Summary::ApplicantSummary::ApplicantSummary::AdminApplicantSummary, false
+    end
 
-      it 'should return instance of SummaryService that is not editable' do
-        expect(subject.can_edit_incomes).to be_falsey
+    context 'when action is review' do
+      let(:action_name) { 'review' }
+      subject { described_class.instance_for_action(action_name, cfl_service, application, application.active_applicants) }
 
-        applicant_summary = subject.instance_variable_get(:@applicant_summaries).first
-        edit_links = applicant_summary.hash[:subsections].pluck(:edit_link).compact
-        expect(edit_links.length).to be_empty
-      end
+      it_behaves_like 'a SummaryService instance', FinancialAssistance::Services::SummaryService::Summary::ApplicantSummary::ApplicantSummary::ConsumerApplicantSummary, false
     end
 
     context 'when action is review_and_submit' do
       let(:action_name) { 'review_and_submit' }
       subject { described_class.instance_for_action(action_name, cfl_service, application, application.active_applicants) }
 
-      it 'should return instance of SummaryService with applicant_summaries of type ConsumerApplicantSummary' do
-        expect(subject.instance_variable_get(:@applicant_summaries).first).to be_a(FinancialAssistance::Services::SummaryService::Summary::ApplicantSummary::ApplicantSummary::ConsumerApplicantSummary)
-      end
-
-      it 'should return instance of SummaryService that is editable' do
-        expect(subject.can_edit_incomes).to be_truthy
-
-        applicant_summary = subject.instance_variable_get(:@applicant_summaries).first
-        edit_links = applicant_summary.hash[:subsections].pluck(:edit_link).compact
-        binding.irb
-        expect(edit_links.length).to be > 0
-      end
-    end
-
-
-    context 'when action is review' do
-      let(:action_name) { 'review' }
-      subject { described_class.instance_for_action(action_name, cfl_service, application, application.active_applicants) }
-
-      it 'should return instance of SummaryService with applicant_summaries of type ConsumerApplicantSummary' do
-        expect(subject.instance_variable_get(:@applicant_summaries).first).to be_a(FinancialAssistance::Services::SummaryService::Summary::ApplicantSummary::ApplicantSummary::ConsumerApplicantSummary)
-      end
-
-      it 'should return instance of SummaryService that is not editable' do
-        expect(subject.can_edit_incomes).to be_falsey
-
-        applicant_summary = subject.instance_variable_get(:@applicant_summaries).first
-        edit_links = applicant_summary.hash[:subsections].pluck(:edit_link).compact
-        expect(edit_links.length).to be_empty
-      end
+      it_behaves_like 'a SummaryService instance', FinancialAssistance::Services::SummaryService::Summary::ApplicantSummary::ApplicantSummary::ConsumerApplicantSummary, true
     end
   end
 
