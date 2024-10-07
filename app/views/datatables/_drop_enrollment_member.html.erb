@@ -20,11 +20,14 @@
         <p class='title'><b><%= l10n('admin_actions.enrollment_hbx_id') %>:</b> <%= hbx.hbx_id %></p>
         <p class='title'><b><%= l10n('plan') %>:</b> <%= hbx.product.title %></p>
         <p>
-          <%= l10n('termination_date') %>: 
           <% if @bs4 %>
           <%= set_default_termination_date_value(hbx).class %>
-            <%= date_field_tag "termination_date_#{hbx.id}", nil, value: set_default_termination_date_value(hbx).strftime("%Y-%m-%d"), id: "termination-date-picker_#{hbx.id}", min: set_date_min_to_beginning_of_year(hbx, 1), max: set_date_max_to_plan_end_of_year(hbx), 'data-cuke': 'drop_termination_date' %>
+            <label class="d-block weight-n">
+              <div><%= l10n("termination_date") %></div>
+              <%= date_field_tag "termination_date_#{hbx.id}", nil, value: set_default_termination_date_value(hbx).strftime("%Y-%m-%d"), id: "termination-date-picker_#{hbx.id}", min: set_date_min_to_beginning_of_year(hbx, 1), max: set_date_max_to_plan_end_of_year(hbx), 'data-cuke': 'drop_termination_date' %>
+            </label>
           <% else %>
+            <%= l10n('termination_date') %>: 
             <%= text_field_tag "termination_date_#{hbx.id}", nil, value: set_default_termination_date_value(hbx), id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  set_date_min_to_beginning_of_year(hbx, 1), "data-date-max" =>  set_date_max_to_plan_end_of_year(hbx), 'data-cuke': 'drop_termination_date' %>
           <% end %>
         </p> 
@@ -54,7 +57,16 @@
               <td><%= person.dob %></td>
               <td><%= member.hbx_id %></td>
               <td><%= hbx.effective_on %></td>
-              <td><%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox' %></td>
+              <td>
+                <% if @bs4 %>
+                  <label class="d-block weight-n">
+                    <%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox' %>
+                    <%= l10n('Terminate') %>
+                  </label>
+                <% else %>
+                  <%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox' %>
+                <% end %>
+              </td>
             </tr>
           <% end %>
           <tr>
