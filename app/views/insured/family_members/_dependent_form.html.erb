@@ -151,10 +151,8 @@
               <% end %>
             <% end %>
 
-            <%= f.button(id: 'confirm-member', class: "btn btn-primary hidden", onclick: "$('#btn-continue').removeClass('disabled');") %>
-            <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'confirm-dependent')", id='confirm-dependent' class="btn btn-primary">
-              <%= is_editing ? l10n("save_changes") : l10n("confirm_new_member") %>
-            </span>
+            <% button_label =  is_editing ? l10n("save_changes") : l10n("confirm_new_member") %>
+            <%= button_tag button_label, type: 'submit', id: 'confirm-member', class: 'btn btn-primary interaction-click-control-update-family-member', onclick: "$('#btn-continue').removeClass('disabled');" %>
           </div>
         </div>
 
