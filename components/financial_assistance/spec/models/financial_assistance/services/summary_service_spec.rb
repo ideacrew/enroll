@@ -16,12 +16,12 @@ describe ::FinancialAssistance::Services::SummaryService do
   let(:cfl_service) { ::FinancialAssistance::Services::ConditionalFieldsLookupService.new }
 
   describe('.instance_for_action') do
-    RSpec.shared_examples 'a SummaryService instance' do |applicant_summary_class, can_edit|
+    shared_examples 'a SummaryService instance' do |applicant_summary_class, can_edit|
       it "should return instance of SummaryService with applicant_summaries of type #{applicant_summary_class}" do
         applicant_summaries = subject.instance_variable_get(:@applicant_summaries)
         expect(applicant_summaries).to all(be_a(applicant_summary_class))
       end
-    
+
       it "should return instance of SummaryService that is #{can_edit ? 'editable' : 'not editable'}" do
         expect(subject.can_edit_incomes).to eq(can_edit)
 
@@ -63,6 +63,14 @@ describe ::FinancialAssistance::Services::SummaryService do
     describe('when is_concise is false') do
       subject { ::FinancialAssistance::Services::SummaryService.new(is_concise: false, can_edit: false, cfl_service: cfl_service, application: application, applicants: application.active_applicants).sections.first }
 
+      describe('personal info section') do
+        let(:section) { subject[:subsections][0][:rows] }
+
+        it "should return the full list of personal info rows" do
+          expect(section.length).to eq(27)
+        end
+      end
+
       describe('health coverage section') do
         let(:section) { subject[:subsections][4][:rows] }
 
@@ -94,6 +102,31 @@ describe ::FinancialAssistance::Services::SummaryService do
           it "should not return esi hash" do
             expect(section[0][:coverages]).to be_nil
             expect(section[1][:coverages]).to be_nil
+          end
+        end
+        
+        describe "enrollment" do
+          shared_context "enrollment setup" do |currently_enrolled, currently_enrolled_with_hra|
+            before do
+              allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(currently_enrolled)
+              allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(currently_enrolled_with_hra)
+            end
+          end
+        
+          context "when enrolled with hra" do
+            include_context "enrollment setup", false, true
+
+            it "should return hra rows" do
+              expect(section.length).to eq(11)
+            end
+          end
+        
+          context "when enrolled" do
+            include_context "enrollment setup", true, false
+
+            it "should not return hra rows" do
+              expect(section.length).to eq(2)
+            end
           end
         end
       end
