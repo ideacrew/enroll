@@ -60,10 +60,18 @@ describe ::FinancialAssistance::Services::SummaryService do
   end
 
   describe '#sections' do
-    describe('when is_concise is false') do
+    shared_examples "base sections" do
+      it "includes personal info, tax info, income, income adjustments, health coverage, and other questions subsections" do
+        expect(subject[:subsections].pluck(:title)).to contain_exactly("Personal Information", "Tax Information", "Income", "Income Adjustments", "Health Coverage", "Other Questions")
+      end
+    end
+
+    context "when initialized is_concise as false" do
       subject { ::FinancialAssistance::Services::SummaryService.new(is_concise: false, can_edit: false, cfl_service: cfl_service, application: application, applicants: application.active_applicants).sections.first }
 
-      describe('personal info section') do
+      it_behaves_like "base sections"
+
+      describe('personal info subsection') do
         let(:section) { subject[:subsections][0][:rows] }
 
         it "should return the full list of personal info rows" do
@@ -71,7 +79,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         end
       end
 
-      describe('health coverage section') do
+      describe('health coverage subsection') do
         let(:section) { subject[:subsections][4][:rows] }
 
         context "when benefits are present" do
