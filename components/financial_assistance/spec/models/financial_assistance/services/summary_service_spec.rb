@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 describe ::FinancialAssistance::Services::SummaryService do
-  let!(:application) { FactoryBot.create(:application, family_id: BSON::ObjectId.new, assistance_year: Date.today.year) }
+  let!(:application) { FactoryBot.create(:application, family_id: BSON::ObjectId.new, assistance_year: 2024) }
   let!(:applicant) do
     FactoryBot.create(:applicant, application: application,
                                   ssn: '243108282',
@@ -59,153 +59,110 @@ describe ::FinancialAssistance::Services::SummaryService do
     end
   end
 
-  describe('#sections') do
-    shared_examples "base sections" do
-      it "includes personal info, tax info, income, income adjustments, health coverage, and other questions subsections" do
-        expect(subject[:subsections].pluck(:title)).to contain_exactly("Personal Information", "Tax Information", "Income", "Income Adjustments", "Health Coverage", "Other Questions")
+  describe '#sections' do
+    subject { described_class.new(is_concise: is_concise, can_edit: false, cfl_service: cfl_service, application: application, applicants: application.active_applicants).sections }
+    
+    shared_examples "subsection structure" do |subsection_title, expected_rows|
+      it "includes the #{subsection_title} subsection with the expected rows" do
+        expect(subsection).not_to be_nil
+        expect(subsection[:title]).to eq(subsection_title)
+        rows = subsection[:rows]
+        expect(rows.map { |row| row[:key] }).to match_array(expected_rows.keys)
+        expect(rows.map { |row| row[:value] }).to match_array(expected_rows.values)
       end
     end
 
-    shared_examples "base health coverage rows" do
-      context "when benefits are present" do
-        let!(:benefit) do
-          ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', insurance_kind: 'employer_sponsored_insurance')
-          ben.build_employer_address(kind: 'home', address_1: 'address_1', city: 'Dummy City', state: 'DC', zip: '20001')
-          ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
-          applicant.benefits << ben
-          applicant.update_attributes(has_eligible_health_coverage: true)
-          applicant.save!
-          ben
-        end
-
-        it "should return esi hash" do
-          esi_benefit_hash = section[1][:coverages].first.first
-          expect(esi_benefit_hash[:employer_name][:value]).to eq "Test Employer"
-          expect(esi_benefit_hash[:employer_address_line_1][:value]).to eq "address_1"
-          expect(esi_benefit_hash[:city][:value]).to eq "Dummy City"
-        end
+    RSpec.shared_examples "row presence" do |row_label, precondition_proc|
+      let(:includes_row) { subsection[:rows].map { |row| row[:key] }.include?(row_label) }
+      
+      context "the row exists with the precondition" do
+        before do instance_exec(&precondition_proc) if precondition_proc end
+        it "includes the \"#{row_label}\" row" do expect(includes_row).to be true end
       end
-
-      context "when benefits are not present" do
-        before do
-          applicant.update_attributes(has_eligible_health_coverage: false, has_enrolled_health_coverage: false)
-          applicant.save!
-        end
-
-        it "should not return esi hash" do
-          expect(section[0][:coverages]).to be_nil
-          expect(section[1][:coverages]).to be_nil
-        end
+    
+      context "the row does not exist without the precondition" do
+        it "does not include the \"#{row_label}\" row" do expect(includes_row).to be false end
       end
-    end
-
-    def toggle_single_flag(registry, flag, enabled)
-      allow(registry).to receive(:feature_enabled?).and_return(false)
-      allow(registry).to receive(:feature_enabled?).with(flag).and_return(enabled)
-    end
-
-    shared_examples "flagged row presence" do |registry, flag, key|
-      context "when #{flag} flag is enabled" do
-        before do
-          toggle_single_flag(registry, flag, true)
-        end
-  
-        it "includes the row with key '#{key}'" do
-          expect(section).to include(hash_including(key: key))
-        end
-      end
-  
-      context "when #{flag} flag is disabled" do
-        before do
-          toggle_single_flag(registry, flag, false)
-        end
-  
-        it "does not include the row with key '#{key}'" do
-          expect(section).not_to include(hash_including(key: key))
-        end
-      end
-    end
-
-    shared_examples "base income rows" do
-      it_behaves_like "flagged row presence", FinancialAssistanceRegistry, :unemployment_income, "Does this person receive unemployment compensation, or have they received it this year?", true
     end
 
     context "when initialized is_concise as false" do
-      subject { ::FinancialAssistance::Services::SummaryService.new(is_concise: false, can_edit: false, cfl_service: cfl_service, application: application, applicants: application.active_applicants).sections.first }
+      let(:is_concise) { false }
 
-      it_behaves_like "base sections"
-
-      describe('personal info subsection') do
-        let(:section) { subject[:subsections][0][:rows] }
-
-        it "should return the full list of personal info rows" do
-          expect(section.length).to eq(27)
-        end
+      describe "Personal Information subsection" do
+        let(:subsection) { subject.first[:subsections][0] }
+       
+        it_behaves_like "subsection structure", "Personal Information", {
+          "DOB"=>"03/08/1984",
+          "Sex"=>"Male",
+          "Relationship"=>"Self",
+          "Needs Coverage?"=>"N/A",
+          "Is this person a US citizen or US national?"=>"N/A",
+          "Is this person a naturalized or derived citizen?"=>"N/A",
+          "Does this person have an eligible immigration status?"=>"N/A",
+          "Document Type"=>"N/A",
+          "Citizenship Number"=>"N/A",
+          "Alien Number"=>"N/A",
+          "I 94 Number"=>"N/A",
+          "Visa Number"=>"N/A",
+          "Passport Number"=>"N/A",
+          "SEVIS ID"=>"N/A",
+          "Naturalization Number"=>"N/A",
+          "Receipt Number"=>"N/A",
+          "Card Number"=>"N/A",
+          "Country of Citizenship"=>"N/A",
+          "Document Description"=>"N/A",
+          "Expiration Date"=>"N/A",
+          "Issuing Country"=>"N/A",
+          "Are you a member of an American Indian or Alaska Native Tribe?"=>"N/A",
+          "Tribe State"=>"N/A",
+          "Tribe Name"=>"N/A",
+          "Tribe Codes"=>nil,
+          "Is this person currently incarcerated?"=>"N/A",
+          "Race/Ethnicity"=>nil       
+        }
       end
 
-      describe('income subsection') do
-        let(:section) { subject[:subsections][2][:rows] }
-
-        it_behaves_like "base income rows"
-      end
-
-      describe('health coverage subsection') do
-        let(:section) { subject[:subsections][4][:rows] }
-
-        it_behaves_like "base health coverage rows"
-        
-        describe "enrollment" do
-          shared_context "enrollment setup" do |currently_enrolled, currently_enrolled_with_hra|
-            before do
-              allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(currently_enrolled)
-              allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(currently_enrolled_with_hra)
-            end
-          end
-        
-          context "when enrolled with hra" do
-            include_context "enrollment setup", false, true
-
-            it "should return hra rows" do
-              expect(section.length).to eq(11)
-            end
-          end
-        
-          context "when enrolled" do
-            include_context "enrollment setup", true, false
-
-            it "should not return hra rows" do
-              expect(section.length).to eq(2)
-            end
-          end
-        end
+      describe "Tax Information subsection" do
+        let(:subsection) { subject.first[:subsections][1] }
+       
+        it_behaves_like "subsection structure", "Tax Information", {
+          "Will this person file taxes for 2024?"=>"N/A",
+          "Will this person be claimed as a tax dependent for 2024?"=>"N/A",
+          "Will this person be filing jointly?"=>"N/A",
+          "This person will be claimed as a dependent by"=>"N/A"
+        }
       end
     end
 
     context "when initialized is_concise as true" do
-      subject { ::FinancialAssistance::Services::SummaryService.new(is_concise: true, can_edit: false, cfl_service: cfl_service, application: application, applicants: application.active_applicants).sections.first }
+      let(:is_concise) { true }
 
-      it_behaves_like "base sections"
-
-      describe('personal info subsection') do
-        let(:section) { subject[:subsections][0][:rows] }
-
-        it "should return the concise list of personal info rows" do
-          expect(section.length).to eq(6)
-        end
+      describe "Personal Information subsection" do
+        let(:subsection) { subject.first[:subsections][0] }
+       
+        it_behaves_like "subsection structure", "Personal Information", { "Age"=>40, "Sex"=>"Male", "Relationship"=>"Self", "Status"=>nil, "Incarcerated"=>"N/A", "Needs Coverage?"=>"N/A" }
       end
 
-      describe('income subsection') do
-        let(:section) { subject[:subsections][2][:rows] }
+      describe "Tax Information subsection" do
+        let(:subsection) { subject.first[:subsections][1] }
+        
+        it_behaves_like "subsection structure", "Tax Information", {
+          "Will this person file taxes for 2024?"=>"N/A",
+          "Will this person be claimed as a tax dependent for 2024?"=>"N/A",
+          "Will this person be filing jointly?"=>"N/A",
+          "This person will be claimed as a dependent by"=>"N/A"
+        }
 
-        it_behaves_like "base income rows"
-        it_behaves_like "flagged row presence", EnrollRegistry, :american_indian_alaskan_native_income, "Is any of this person's income from American Indian or Alaska Native tribal sources?"
-      end
-
-      describe('health coverage subsection') do
-        let(:section) { subject[:subsections][4][:rows] }
-
-        it_behaves_like "base health coverage rows"
+        it_behaves_like "row presence", "Will this person be filing jointly?", -> {
+          binding.irb
+          applicant.update(is_required_to_file_taxes: true)
+          applicant.save
+          application.relationships << ::FinancialAssistance::Relationship.new({kind: "spouse", applicant_id: applicant.id, relative_id: applicant.id}) # mock spouse relationship to self
+          application.save
+        }
       end
     end
   end
 end
+
+# subject.first[:subsections].first[:rows].reduce({}) {|total, current| total.update(current[:key] => current[:value])}

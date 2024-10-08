@@ -91,10 +91,10 @@ demographics:
         <% if FinancialAssistanceRegistry.feature_enabled?(:tribes_information_raw_review) %>
         tribe_state:
             key: <%= l10n('faa.review.personal.tribal_state') %>
-            value: <%= @applicant.tribal_state %>
+            value: <%= human_value(@applicant.tribal_state) %>
         tribe_name:
             key: <%= l10n('faa.review.personal.tribal_name') %>
-            value: <%= @applicant.tribal_name %>
+            value: <%= human_value(@applicant.tribal_name) %>
         tribe_codes:
             key: <%= l10n('faa.review.personal.tribe_codes') %>
             value: <%= @applicant.tribe_codes %>
