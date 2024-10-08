@@ -960,6 +960,15 @@ document.addEventListener('click', function(event) {
     const addButton = document.getElementById('add_mailing_address');
     addButton.classList.remove('d-none');
     document.querySelectorAll(".mailing-div").forEach(el => {
+      // Clear text input fields
+      el.querySelectorAll("input[type='text']").forEach(input => {
+        input.value = '';
+      });
+
+      // Clear select fields
+      el.querySelectorAll("select").forEach(select => {
+        select.value = '';
+      });
       el.classList.add('d-none');
       el.classList.remove('d-block');
     });
