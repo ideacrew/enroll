@@ -240,6 +240,39 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  describe '#tribe_codes' do
+    context "when tribe codes is set to nil" do
+      it "should return an empty array" do
+        applicant.set(tribe_codes: nil)
+        expect(applicant.reload.tribe_codes).to eq []
+      end
+    end
+
+    context "when tribe codes is set to array of strings" do
+      it "should return value set in DB" do
+        applicant.set(tribe_codes: [""])
+        expect(applicant.reload.tribe_codes).to eq [""]
+      end
+    end
+  end
+
+  describe '#ethnicity' do
+    context "when ethnicity is set to nil" do
+      it "should return an empty array" do
+        applicant.set(ethnicity: nil)
+        expect(applicant.reload.ethnicity).to eq []
+      end
+    end
+
+    context "when ethnicity is set to array of strings" do
+      it "should return value set in DB" do
+        applicant.set(ethnicity: ["", ""])
+        expect(applicant.reload.ethnicity).to eq ["", ""]
+      end
+    end
+  end
+
+
   context 'current_month_incomes with income that started in March & End Dated in August' do
     let!(:create_job_income12) do
       inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',

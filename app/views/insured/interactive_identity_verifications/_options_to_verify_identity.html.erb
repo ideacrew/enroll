@@ -1,13 +1,13 @@
 <p><%= l10n("insured.interactive_identity_verifications.failed_validation.options_header") %></p>
 <ul>
   <li>
-    <b><%= l10n("insured.interactive_identity_verifications.failed_validation.upload_docs") %>:</b> <%= l10n("insured.interactive_identity_verifications.failed_validation.upload_doc_details", site_key: site_key.upcase) %>
+    <b><%= l10n("insured.interactive_identity_verifications.failed_validation.upload_docs") %>:</b> <%= l10n("insured.interactive_identity_verifications.failed_validation.upload_doc_details", site_key: site_key.upcase, site_short_name: site_short_name) %>
   </li>
   <li>
-    <b><%= l10n("insured.consumer_roles.upload_ridp_documents.in_person") %>:</b> <%= l10n("insured.consumer_roles.upload_ridp_documents.in_person_details", site_key: site_key.upcase, phone: health_benefit_exchange_authority_phone_number) %>
+    <b><%= l10n("insured.consumer_roles.upload_ridp_documents.in_person") %>:</b> <%= l10n("insured.consumer_roles.upload_ridp_documents.in_person_details", site_key: site_key.upcase, phone: health_benefit_exchange_authority_phone_number, site_short_name: site_short_name) %>
   </li>
   <li>
-    <b><%= l10n("insured.consumer_roles.upload_ridp_documents.paper_application") %>:</b> <%= l10n("insured.consumer_roles.upload_ridp_documents.paper_application_details", site_key: site_key.upcase) %>
+    <b><%= l10n("insured.consumer_roles.upload_ridp_documents.paper_application") %>:</b> <%= l10n("insured.consumer_roles.upload_ridp_documents.paper_application_details", site_key: site_key.upcase, site_short_name: site_short_name) %>
   </li>
 </ul>
 <p>

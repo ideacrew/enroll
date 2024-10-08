@@ -458,7 +458,7 @@ module FinancialAssistance
                 tribal_id: family_member.person.tribal_id,
                 tribal_name: family_member.person.tribal_name,
                 tribal_state: family_member.person.tribal_state,
-                tribe_codes: family_member.person.tribe_codes,
+                tribe_codes: family_member.person.tribe_codes || [],
                 transfer_referral_reason: applicant_hash['transfer_referral_reason']
               }
             end
@@ -504,7 +504,7 @@ module FinancialAssistance
               tribal_id: person_hash['person_demographics']['tribal_id'],
               tribal_name: person_hash['person_demographics']['tribal_name'],
               tribal_state: person_hash['person_demographics']['tribal_state'],
-              tribe_codes: person_hash['person_demographics']['tribe_codes'],
+              tribe_codes: person_hash['person_demographics']['tribe_codes'] || [],
               language_code: person_hash['person_demographics']['language_code'],
               is_tobacco_user: person_hash['person_health']['is_tobacco_user'],
               is_physically_disabled: person_hash['person_health']['is_physically_disabled'],
