@@ -91,6 +91,7 @@ button,
     margin-bottom: 0ch;
     line-height: 20px;
     color: var(--gray-000);
+    @extend .d-inline;
     &::before {
       display:inline;
     }
@@ -173,6 +174,7 @@ input.fake-disabled-input:not([type='submit']):disabled,
 
 input[type='checkbox'],
 input[type='radio'] {
+  flex-shrink: 0;
   &:active,
   &:focus {
     outline: 1px solid var(--grey-150);
