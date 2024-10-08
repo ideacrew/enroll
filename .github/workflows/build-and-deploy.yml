@@ -170,6 +170,22 @@ jobs:
           build-args: |
             HOSTNAME=172.17.0.1
             CLIENT=${{ matrix.client }}
+            COMMIT_SHA=${{ github.sha }}
+
+      - name: extract SBOM
+        env:
+          CONTAINER_NAME: sbom-${{ github.run_id }}-${{ github.run_number }}-${{ matrix.client }}
+        run: |
+          docker container create --name ${CONTAINER_NAME} ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryGhcr, needs.prep.outputs.taggedImage, matrix.client) }}
+          docker container cp ${CONTAINER_NAME}:/enroll/sbom/sbom.json ./sbom.json
+          docker container rm -f ${CONTAINER_NAME}
+          zip -er -P ${{ secrets.SBOM_PASSWORD }} sbom.zip sbom.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: SBOM ${{ matrix.client }}
+          path: sbom.zip
 
       - name: Setup sysdig cache
         uses: actions/cache@v3

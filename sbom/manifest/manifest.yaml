@@ -1,0 +1,22 @@
+items:
+  - type: rubygems
+    gemfile_location: ../../Gemfile
+    lockfile_location: ../../Gemfile.lock
+  - type: npm
+    directory: ../../
+  - type: custom_sbom
+    sbom_file: ./enroll_custom_asset_sbom.json
+  - type: dpkg_db
+    db_path: ./dpkg
+  - type: ruby_default_gems
+    ruby_version: 3.0.6
+enrichers:
+  - type: grype
+  - type: osv_scanner
+  - type: oval_xml
+    xml_file: ./oval-definitions-bullseye.xml
+  - type: nvd_db_update
+    nvd_db: ./nvd_db
+  - type: nvd_impact
+    nvd_db: ./nvd_db
+  - type: oval_certainty_evaluator 
