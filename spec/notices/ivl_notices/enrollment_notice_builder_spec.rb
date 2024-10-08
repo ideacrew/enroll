@@ -263,7 +263,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     end
 
     it "should render documents section when the family has an invalid e_case_id and outstanding people are present" do
-      family.update_attributes!(:e_case_id => "curam_landing_for10000")
+      family.set(:e_case_id => "curam_landing_for10000")
       @eligibility_notice.append_hbe
       @eligibility_notice.build
       expect(@eligibility_notice).to receive :attach_required_documents
@@ -271,7 +271,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     end
 
     it "should render documents section when the family is unassisted and outstanding people are present" do
-      family.update_attributes!(:e_case_id => nil)
+      family.set(:e_case_id => nil)
       @eligibility_notice.append_hbe
       @eligibility_notice.build
       expect(@eligibility_notice).to receive :attach_required_documents

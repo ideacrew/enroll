@@ -23,7 +23,7 @@ RSpec.describe 'ModelEvents::EmployeeOpenEnrollmentReminder', :dbclean => :after
 
   before :each do
     census_employee.update_attributes(employee_role_id: employee_role.id)
-    census_employee.update_attributes!(created_at: current_effective_date.prev_year)
+    census_employee.set(created_at: current_effective_date.prev_year)
     TimeKeeper.set_date_of_record_unprotected!(date_mock_object)
   end
 

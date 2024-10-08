@@ -148,8 +148,8 @@ module BenefitSponsors
       let(:user) { FactoryBot.create(:user, :person => person)}
 
       before :each do
-        primary_office_location_address.update_attributes!(kind: 'primary')
-        broker_agency_profile.update_attributes!(ach_account_number: "1234567890", ach_routing_number: "011000015")
+        primary_office_location_address.set(kind: 'primary')
+        broker_agency_profile.set(ach_account_number: "1234567890", ach_routing_number: "011000015")
       end
 
       context "profile_type = benefit_sponsor" do

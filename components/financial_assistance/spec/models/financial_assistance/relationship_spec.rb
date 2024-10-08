@@ -115,7 +115,7 @@ RSpec.describe FinancialAssistance::Relationship, type: :model, dbclean: :after_
 
     context 'application is not in draft' do
       before do
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
         application.update_or_build_relationship(applicant1, applicant2, 'spouse')
       end
 

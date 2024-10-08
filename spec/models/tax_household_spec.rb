@@ -134,7 +134,7 @@ RSpec.describe TaxHousehold, type: :model do
     end
 
     before do
-      tax_household.tax_household_members.first.update_attributes!(applicant_id: family.family_members[0].id)
+      tax_household.tax_household_members.first.set(applicant_id: family.family_members[0].id)
     end
 
     context 'when all csr percent is csr_100 for tax household members' do
@@ -251,7 +251,7 @@ RSpec.describe TaxHousehold, type: :model do
     end
 
     before :each do
-      hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.set(slcsp_id: product.id)
       ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
     end
 
@@ -303,7 +303,7 @@ RSpec.describe TaxHousehold, type: :model do
       end
 
       before do
-        hbx_enrollment_aptc.update_attributes!(effective_on: TimeKeeper.date_of_record.beginning_of_year, applied_aptc_amount: 150.00)
+        hbx_enrollment_aptc.set(effective_on: TimeKeeper.date_of_record.beginning_of_year, applied_aptc_amount: 150.00)
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 8, 1))
         allow(EnrollRegistry[:calculate_monthly_aggregate].feature).to receive(:is_enabled).and_return(true)
         @result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment_aptc, TimeKeeper.date_of_record)
@@ -411,10 +411,10 @@ RSpec.describe TaxHousehold, type: :model do
       let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)}
 
       before do
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: product.id)
-        person.update_attributes!(dob: TimeKeeper.date_of_record - 38.years)
-        person.primary_family.family_members[1].person.update_attributes!(dob: TimeKeeper.date_of_record - 28.years)
-        person.primary_family.family_members[2].person.update_attributes!(dob: TimeKeeper.date_of_record - 18.years)
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.set(slcsp_id: product.id)
+        person.set(dob: TimeKeeper.date_of_record - 38.years)
+        person.primary_family.family_members[1].person.set(dob: TimeKeeper.date_of_record - 28.years)
+        person.primary_family.family_members[2].person.set(dob: TimeKeeper.date_of_record - 18.years)
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       end
 

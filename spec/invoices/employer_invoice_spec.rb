@@ -30,7 +30,7 @@ RSpec.describe EmployerInvoice, dbclean: :after_each do
         end
 
         it "should not trigger notice for employer with renewal plan year" do
-          conversion_employer_organization.employer_profile.published_plan_year.update_attributes!(:aasm_state => "renewing_draft")
+          conversion_employer_organization.employer_profile.published_plan_year.set(:aasm_state => "renewing_draft")
           expect_any_instance_of(Observers::NoticeObserver).not_to receive(:deliver)
           subject.send_first_invoice_available_notice
         end

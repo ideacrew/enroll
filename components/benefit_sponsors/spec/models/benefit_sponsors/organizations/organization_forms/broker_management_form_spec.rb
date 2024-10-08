@@ -52,7 +52,7 @@ module BenefitSponsors
     end
 
     before :each do
-      broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
+      broker_agency_profile1.set(primary_broker_role_id: broker_role1.id)
       broker_agency_profile1.approve!
     end
 
@@ -80,7 +80,7 @@ module BenefitSponsors
 
     describe 'save/persist!' do
       before :each do
-        broker_agency_profile1.update_attributes!(default_general_agency_profile_id: general_agency_profile.id)
+        broker_agency_profile1.set(default_general_agency_profile_id: general_agency_profile.id)
         broker_management_form_create.save
         organization.reload
       end

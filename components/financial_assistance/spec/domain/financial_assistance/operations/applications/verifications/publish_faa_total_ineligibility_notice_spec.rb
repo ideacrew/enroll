@@ -133,7 +133,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::P
 
     context 'missing eligibility results' do
       before do
-        application.update_attributes!(eligibility_response_payload: nil)
+        application.set(eligibility_response_payload: nil)
         @result = subject.construct_payload(application)
       end
 

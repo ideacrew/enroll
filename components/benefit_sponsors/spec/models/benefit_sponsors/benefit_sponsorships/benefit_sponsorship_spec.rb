@@ -11,7 +11,7 @@ module BenefitSponsors
     let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
     let!(:next_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year + 1) }
     let!(:next_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year + 1) }
-  
+
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)  { site.benefit_markets.first }
 
@@ -492,7 +492,7 @@ module BenefitSponsors
       end
       context "when an employer has imported benefit application" do
         it "should return imported benefit application" do
-          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          benefit_sponsorship.set(source_kind: :conversion)
           expect(benefit_sponsorship.submitted_benefit_application).to eq imported_benefit_application
         end
       end
@@ -506,7 +506,7 @@ module BenefitSponsors
           )
         end
         it "should return active benefit application" do
-          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          benefit_sponsorship.set(source_kind: :conversion)
           expect(benefit_sponsorship.submitted_benefit_application).to eq active_benefit_application
         end
       end
@@ -525,7 +525,7 @@ module BenefitSponsors
         end
 
         it "should return active imported benefit application" do
-          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          benefit_sponsorship.set(source_kind: :conversion)
           expect(benefit_sponsorship.active_imported_benefit_application).to eq active_imported_benefit_application
         end
       end
@@ -544,7 +544,7 @@ module BenefitSponsors
         end
 
         it "should return nil" do
-          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          benefit_sponsorship.set(source_kind: :conversion)
           expect(benefit_sponsorship.active_imported_benefit_application).to eq nil
         end
       end
@@ -564,7 +564,7 @@ module BenefitSponsors
         end
 
         it "should return draft benefit application" do
-          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          benefit_sponsorship.set(source_kind: :conversion)
           expect(benefit_sponsorship.dt_display_benefit_application).to eq draft_benefit_application
         end
       end
@@ -592,7 +592,7 @@ module BenefitSponsors
           )
         end
         it "should return renewing draft benefit application" do
-          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          benefit_sponsorship.set(source_kind: :conversion)
           expect(benefit_sponsorship.dt_display_benefit_application).to eq renewing_benefit_application
         end
       end
@@ -607,7 +607,7 @@ module BenefitSponsors
         end
 
         it "should return active benefit application" do
-          benefit_sponsorship.update_attributes!(source_kind: :conversion)
+          benefit_sponsorship.set(source_kind: :conversion)
           expect(benefit_sponsorship.dt_display_benefit_application).to eq active_benefit_application
         end
       end
@@ -688,7 +688,7 @@ module BenefitSponsors
       end
 
       context '.may_end_open_enrollment?' do
-        context 'applications that are under enrollment_open state' do 
+        context 'applications that are under enrollment_open state' do
           let(:initial_application_state) { :enrollment_open }
           let(:renewal_application_state) { :enrollment_open }
 
@@ -698,7 +698,7 @@ module BenefitSponsors
           end
         end
 
-        context 'applications that are under enrollment_extended state' do 
+        context 'applications that are under enrollment_extended state' do
           let(:initial_application_state) { :enrollment_extended }
           let(:renewal_application_state) { :enrollment_extended }
 
@@ -781,7 +781,7 @@ module BenefitSponsors
           )
         end
 
-        it "should fetch only valid initial applications" do 
+        it "should fetch only valid initial applications" do
           applications = subject.may_transmit_initial_enrollment?(april_effective_date)
 
           expect((applications & april_sponsors).sort).to eq april_sponsors.sort
@@ -912,7 +912,7 @@ module BenefitSponsors
 
       end
 
-      context '.may_transition_as_initial_ineligible?' do 
+      context '.may_transition_as_initial_ineligible?' do
         let(:initial_application_state) { :enrollment_closed }
         let(:renewal_application_state) { :enrollment_closed }
         let(:april_enrollment_elgible_sponsor) { april_sponsors[0] }
@@ -1019,7 +1019,7 @@ module BenefitSponsors
 
       let(:april_application) { april_sponsor.benefit_applications.detect{|app| app.start_on == april_effective_date} }
 
- 
+
       context '.oe_extendable_benefit_applications' do
 
         let(:current_date)  { Date.new(this_year, 4, 10) }
@@ -1044,13 +1044,13 @@ module BenefitSponsors
 
             it "should not return application for enrollment extension" do
               expect(april_sponsor.oe_extendable_benefit_applications).to be_empty
-            end 
+            end
           end
 
           context "approved" do
             let(:aasm_state) { :approved }
 
-            it "should not return application for enrollment extension" do 
+            it "should not return application for enrollment extension" do
               expect(april_sponsor.oe_extendable_benefit_applications).to be_empty
             end
           end
@@ -1058,7 +1058,7 @@ module BenefitSponsors
           context "enrollment_extended" do
             let(:aasm_state) { :enrollment_extended }
 
-            it "should return only already extended application" do 
+            it "should return only already extended application" do
               expect(april_sponsor.oe_extendable_benefit_applications).to be_present
               expect(april_sponsor.oe_extendable_benefit_applications).to eq [april_application]
             end
@@ -1075,7 +1075,7 @@ module BenefitSponsors
           context "draft" do
             let(:aasm_state) { :draft }
 
-            it "should return application for enrollment extension" do 
+            it "should return application for enrollment extension" do
               expect(april_sponsor.oe_extendable_benefit_applications).to be_present
               expect(april_sponsor.oe_extendable_benefit_applications).to eq [new_application]
             end
@@ -1100,7 +1100,7 @@ module BenefitSponsors
             expect(april_sponsor.oe_extendable_benefit_applications).to be_present
             expect(april_sponsor.oe_extendable_benefit_applications).to eq [new_application]
           end
-        end 
+        end
       end
 
       context '.oe_extended_applications' do
@@ -1417,7 +1417,7 @@ module BenefitSponsors
         let!(:initial_application) do
           application = FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: aasm_state_initial, effective_period: effective_period, benefit_sponsorship: active_benefit_sponsorship)
           terminated_period = aasm_state_renewal.nil? && ['terminated', 'termination_pending'].include?(aasm_state_initial) ? effective_period.min..termination_date : effective_period
-          application.update_attributes!(effective_period: terminated_period)
+          application.set(effective_period: terminated_period)
         end
         let!(:offcycle_application) do
           return unless aasm_state_off_cycle.present?
@@ -1429,7 +1429,7 @@ module BenefitSponsors
 
           terminated_period = ['terminated', 'termination_pending'].include?(aasm_state_renewal) ? renewal_effective_period.min..termination_date : renewal_effective_period
           application = FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: aasm_state_renewal, effective_period: terminated_period, benefit_sponsorship: active_benefit_sponsorship)
-          application.update_attributes!(effective_period: terminated_period)
+          application.set(effective_period: terminated_period)
         end
         it "when #{aasm_state_initial} #{aasm_state_renewal} application(s) are present" do
           expect(active_benefit_sponsorship.off_cycle_benefit_application == offcycle_application).to eq expectation if aasm_state_off_cycle.present?
@@ -1507,7 +1507,7 @@ module BenefitSponsors
 
       it 'should return future_active_reinstated_benefit_application' do
         period = benefit_application.effective_period.min + 1.year..(benefit_application.effective_period.max + 1.year)
-        benefit_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+        benefit_application.set(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
         expect(benefit_sponsorship.future_active_reinstated_benefit_application).to eq benefit_application
       end
 

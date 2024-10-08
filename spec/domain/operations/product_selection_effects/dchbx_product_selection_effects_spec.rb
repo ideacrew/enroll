@@ -524,7 +524,7 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
 
     context 'new enrollment in renewal plan year' do
       before do
-        enrollment.update_attributes!(effective_on: enrollment.effective_on + 1.year)
+        enrollment.set(effective_on: enrollment.effective_on + 1.year)
         product_selection = Entities::ProductSelection.new({:enrollment => enrollment, :product => enrollment.product, :family => family})
         @result = subject.call(product_selection)
       end
@@ -744,7 +744,7 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
 
     context 'new enrollment in current plan year' do
       before do
-        predecessor_enrollment.update_attributes!(effective_on: predecessor_enrollment.effective_on + 1.year)
+        predecessor_enrollment.set(effective_on: predecessor_enrollment.effective_on + 1.year)
         product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
         @result = subject.call(product_selection)
       end

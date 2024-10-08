@@ -247,7 +247,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
           let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role, effective_on: TimeKeeper.date_of_record, aasm_state: :coverage_selected) }
 
           it "should update the end_on date to terminated date only if CE is termed/pending" do
-            census_employee.update_attributes!(aasm_state: 'employee_termination_pending', coverage_terminated_on: TimeKeeper.date_of_record + 2.days)
+            census_employee.set(aasm_state: 'employee_termination_pending', coverage_terminated_on: TimeKeeper.date_of_record + 2.days)
             hbx_enrollment.benefit_group_assignment = benefit_group_assignment
             benefit_group_assignment.hbx_enrollment = hbx_enrollment
             hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, TimeKeeper.date_of_record + 2.days)
@@ -372,7 +372,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee, hbx_enrollment: hbx_enrollment)}
     let!(:employee_role) do
       ee = FactoryBot.create(:employee_role, person: family.primary_person, employer_profile: employer_profile, census_employee: census_employee)
-      census_employee.update_attributes!(employee_role_id: ee.id)
+      census_employee.set(employee_role_id: ee.id)
       ee
     end
 
@@ -437,7 +437,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       it "should not update end_on date for inactive BGA" do
-        census_employee.benefit_group_assignments.first.update_attributes!(end_on: nil)
+        census_employee.benefit_group_assignments.first.set(end_on: nil)
         allow(census_employee.benefit_group_assignments.first).to receive(:is_active?).and_return(false)
         census_employee.benefit_group_assignments.first.make_active
         census_employee.benefit_group_assignments.first.reload

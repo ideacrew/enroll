@@ -79,7 +79,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
     end
 
     it "should not change the ee_role_id of hbx_enrollment if the EE Role id matches with the correct one" do
-      organization.employer_profile.benefit_applications.second.update_attributes!(predecessor_id: nil)
+      organization.employer_profile.benefit_applications.second.set(predecessor_id: nil)
       ClimateControl.modify old_benefit_package_id: organization.employer_profile.benefit_applications.first.benefit_packages.first.id,
                             renewing_benefit_package_id: organization.employer_profile.benefit_applications.second.benefit_packages.first.id do
         subject.migrate

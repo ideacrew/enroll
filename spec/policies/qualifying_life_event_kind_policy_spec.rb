@@ -19,42 +19,42 @@ describe QualifyingLifeEventKindPolicy, dbclean: :after_each do
     subject                       { QualifyingLifeEventKindPolicy.new(user, nil) }
 
     it 'should return true for hbx_tier3 role' do
-      person.hbx_staff_role.update_attributes!(permission_id: hbx_tier3_permission.id)
+      person.hbx_staff_role.set(permission_id: hbx_tier3_permission.id)
       expect(subject.can_manage_qles?).to eq true
     end
 
     it 'should return true for super admin role' do
-      person.hbx_staff_role.update_attributes!(permission_id: super_admin_permission.id)
+      person.hbx_staff_role.set(permission_id: super_admin_permission.id)
       expect(subject.can_manage_qles?).to eq true
     end
 
     it 'should return true for developer role' do
-      person.hbx_staff_role.update_attributes!(permission_id: developer_permission.id)
+      person.hbx_staff_role.set(permission_id: developer_permission.id)
       expect(subject.can_manage_qles?).to eq false
     end
 
     it 'should return true for hbx_csr_tier1 role' do
-      person.hbx_staff_role.update_attributes!(permission_id: hbx_csr_tier1_permission.id)
+      person.hbx_staff_role.set(permission_id: hbx_csr_tier1_permission.id)
       expect(subject.can_manage_qles?).to eq false
     end
 
     it 'should return true for hbx_csr_tier2 role' do
-      person.hbx_staff_role.update_attributes!(permission_id: hbx_csr_tier2_permission.id)
+      person.hbx_staff_role.set(permission_id: hbx_csr_tier2_permission.id)
       expect(subject.can_manage_qles?).to eq false
     end
 
     it 'should return true for hbx_csr_supervisor role' do
-      person.hbx_staff_role.update_attributes!(permission_id: hbx_csr_supervisor_permission.id)
+      person.hbx_staff_role.set(permission_id: hbx_csr_supervisor_permission.id)
       expect(subject.can_manage_qles?).to eq false
     end
 
     it 'should return true for hbx_read_only role' do
-      person.hbx_staff_role.update_attributes!(permission_id: hbx_read_only_permission.id)
+      person.hbx_staff_role.set(permission_id: hbx_read_only_permission.id)
       expect(subject.can_manage_qles?).to eq false
     end
 
     it 'should return true for hbx_staff role' do
-      person.hbx_staff_role.update_attributes!(permission_id: hbx_staff_permission.id)
+      person.hbx_staff_role.set(permission_id: hbx_staff_permission.id)
       expect(subject.can_manage_qles?).to eq false
     end
   end

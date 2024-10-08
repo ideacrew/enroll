@@ -68,7 +68,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household) }
 
       it "should return yes" do
-        tax_household.update_attributes!(effective_ending_on: nil)
+        tax_household.set(effective_ending_on: nil)
         expect(helper.active_eligibility?(family)).to eq 'Yes'
       end
 

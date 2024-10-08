@@ -47,8 +47,8 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
       BenefitMarkets::Locations::ServiceArea.update_all(covered_states: ['ME'])
 
       rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
-      enrollment.update_attributes!(rating_area_id: rating_area.id)
-      enrollment2.update_attributes!(rating_area_id: rating_area.id)
+      enrollment.set(rating_area_id: rating_area.id)
+      enrollment2.set(rating_area_id: rating_area.id)
       person.home_address.update_attributes(zip: "04771", county: "Aroostook", state: "ME")
       modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
       @params = {
@@ -80,8 +80,8 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
       BenefitMarkets::Locations::ServiceArea.all.update_all(covered_states: ['ME'])
 
       rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
-      enrollment.update_attributes!(rating_area_id: rating_area.id)
-      enrollment2.update_attributes!(rating_area_id: rating_area.id)
+      enrollment.set(rating_area_id: rating_area.id)
+      enrollment2.set(rating_area_id: rating_area.id)
       person.home_address.update_attributes(zip: "01001", county: "test", state: "AZ")
       modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
       @params = {
@@ -114,8 +114,8 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
       BenefitMarkets::Locations::ServiceArea.all.update_all(covered_states: ['ME'])
 
       rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
-      enrollment.update_attributes!(rating_area_id: rating_area.id)
-      enrollment2.update_attributes!(rating_area_id: rating_area.id)
+      enrollment.set(rating_area_id: rating_area.id)
+      enrollment2.set(rating_area_id: rating_area.id)
       person.mailing_address.update_attributes(zip: "01001", county: "test", state: "AZ", kind: "mailing")
       modified_address = person.mailing_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
       @params = {
@@ -153,8 +153,8 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
         BenefitMarkets::Locations::RatingArea.where(:exchange_provided_code.nin => ["R-ME004"]).first.update_attributes(covered_states: nil, active_year: start_date.year, county_zip_ids: [county_zip.id], exchange_provided_code: "R-ME001")
         BenefitMarkets::Locations::ServiceArea.update_all(covered_states: ['ME'])
         rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
-        enrollment.update_attributes!(rating_area_id: rating_area.id)
-        enrollment2.update_attributes!(rating_area_id: rating_area.id)
+        enrollment.set(rating_area_id: rating_area.id)
+        enrollment2.set(rating_area_id: rating_area.id)
         person.home_address.update_attributes(zip: "04771", county: "Aroostook", state: "ME")
         modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
         @params = {
@@ -191,9 +191,9 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
         BenefitMarkets::Locations::ServiceArea.update_all(covered_states: ['ME'])
 
         rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
-        enrollment.update_attributes!(rating_area_id: rating_area.id)
-        enrollment2.update_attributes!(rating_area_id: rating_area.id)
-        enrollment_3.update_attributes!(rating_area_id: rating_area.id)
+        enrollment.set(rating_area_id: rating_area.id)
+        enrollment2.set(rating_area_id: rating_area.id)
+        enrollment_3.set(rating_area_id: rating_area.id)
         person.home_address.update_attributes(zip: "04771", county: "Aroostook", state: "ME")
         modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
         @params = {

@@ -18,7 +18,7 @@ describe InvalidateHbxEnrollmentWithBrokenCurrentPremium do
 
     context "void enrollment" do
       before :each do
-        hbx_enrollment.update_attributes!(:aasm_state => "inactive")
+        hbx_enrollment.set(:aasm_state => "inactive")
         hbx_enrollment.stub(:total_premium).and_raise(StandardError.new("error"))
       end
 
@@ -33,7 +33,7 @@ describe InvalidateHbxEnrollmentWithBrokenCurrentPremium do
 
     context "active enrollment" do
       before :each do
-        hbx_enrollment.update_attributes!(:aasm_state => "coverage_selected")
+        hbx_enrollment.set(:aasm_state => "coverage_selected")
         hbx_enrollment.stub(:total_premium).and_raise(StandardError.new("error"))
       end
 

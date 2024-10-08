@@ -38,7 +38,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
 
     it "should return true when consumer's birthday is less than or equal to the effective date" do
-      dependent_1.update_attributes!(dob: new_effective_on)
+      dependent_1.set(dob: new_effective_on)
       expect(rule.valid_birthdate?).to eql(true)
     end
   end

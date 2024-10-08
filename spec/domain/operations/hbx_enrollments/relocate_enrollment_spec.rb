@@ -44,7 +44,7 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
       BenefitMarkets::Locations::RatingArea.where(:exchange_provided_code.nin => ["R-ME004"]).first.update_attributes(covered_states: nil, active_year: start_date.year, county_zip_ids: [county_zip.id], exchange_provided_code: "R-ME001")
       BenefitMarkets::Locations::ServiceArea.update_all(covered_states: ['ME'])
       @rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
-      enrollment.update_attributes!(rating_area_id: @rating_area.id)
+      enrollment.set(rating_area_id: @rating_area.id)
       person.home_address.update_attributes(zip: county_zip2.zip, county: county_zip2.county_name, state: county_zip2.state)
 
       @params = {
@@ -87,7 +87,7 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
       BenefitMarkets::Locations::RatingArea.where(:exchange_provided_code.nin => ["R-ME004"]).first.update_attributes(covered_states: nil, active_year: start_date.year, county_zip_ids: [county_zip.id], exchange_provided_code: "R-ME001")
       BenefitMarkets::Locations::ServiceArea.update_all(covered_states: ['ME'])
       @rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
-      enrollment.update_attributes!(rating_area_id: @rating_area.id)
+      enrollment.set(rating_area_id: @rating_area.id)
       person.home_address.update_attributes(zip: county_zip2.zip, county: county_zip2.county_name, state: "DC")
 
       @params = {

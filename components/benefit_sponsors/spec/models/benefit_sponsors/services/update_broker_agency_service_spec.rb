@@ -41,7 +41,7 @@ module BenefitSponsors
 
       before :each do
         old_broker_agency_profile.update_attributes(primary_broker_role: person1.broker_role)
-        person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: old_broker_agency_profile.id)
+        person.broker_role.set(benefit_sponsors_broker_agency_profile_id: old_broker_agency_profile.id)
       end
 
       let(:formed_params) { {

@@ -842,7 +842,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
           allow(sep).to receive(:is_eligible?).and_return true
           allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return false
-          sep.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days, end_on: TimeKeeper.date_of_record + 10.days) unless sep.is_active?
+          sep.set(start_on: TimeKeeper.date_of_record - 10.days, end_on: TimeKeeper.date_of_record + 10.days) unless sep.is_active?
         end
 
         it "should return true if active benefit group offers dental" do
@@ -862,7 +862,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           allow(active_bg).to receive(:is_offering_dental?).and_return true
           allow(sep).to receive(:is_eligible?).and_return true
           allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return true
-          sep.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days, end_on: TimeKeeper.date_of_record + 10.days) unless sep.is_active?
+          sep.set(start_on: TimeKeeper.date_of_record - 10.days, end_on: TimeKeeper.date_of_record + 10.days) unless sep.is_active?
         end
 
         it "should return true if renewal benefit group offers dental" do

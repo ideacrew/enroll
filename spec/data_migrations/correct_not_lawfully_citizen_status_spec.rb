@@ -21,9 +21,9 @@ describe CorrectNotLawfullyCitizenStatus, dbclean: :after_each do
   }
   shared_examples_for 'correct_not_lawfully_citizen_status' do |old_state, new_state, result|
     before do
-      person.consumer_role.lawful_presence_determination.update_attributes!( citizen_status: old_state)
-      person2.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: new_state)
-      person3.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: new_state)
+      person.consumer_role.lawful_presence_determination.set( citizen_status: old_state)
+      person2.consumer_role.lawful_presence_determination.set(citizen_status: new_state)
+      person3.consumer_role.lawful_presence_determination.set(citizen_status: new_state)
       person.verification_types << verification_type
       allow(subject).to receive(:get_families).and_return([family])
       allow(subject).to receive(:get_enrollments).and_return([enrollment])

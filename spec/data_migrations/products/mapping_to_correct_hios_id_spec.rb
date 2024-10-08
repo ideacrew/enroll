@@ -3,12 +3,12 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "products", "mapping_to_correct_hios_id")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
-  
+
 describe MappingToCorrectHiosId, dbclean: :after_each do
 
   let(:given_task_name) { "mapping_to_correct_hios_id" }
   subject { MappingToCorrectHiosId.new(given_task_name, double(:current_scope => nil)) }
-  
+
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -55,7 +55,7 @@ describe MappingToCorrectHiosId, dbclean: :after_each do
     around do |example|
       current_benefit_market_catalog
       ClimateControl.modify feins: abc_organization.fein, hios_id: product2.hios_id do
-        census_employee.update_attributes!(employee_role_id: employee_role.id)
+        census_employee.set(employee_role_id: employee_role.id)
         example.run
       end
     end

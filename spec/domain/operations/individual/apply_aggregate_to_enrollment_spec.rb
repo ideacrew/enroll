@@ -137,7 +137,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
   before(:each) do
     allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
-    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: plan.id)
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.set(slcsp_id: plan.id)
   end
 
   context 'return failure with no active tax household' do
@@ -256,12 +256,12 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
       system_date = rand(Date.new(current_year, 11, 1)..Date.new(current_year, 12, 1))
       allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
       allow(family).to receive(:active_household).and_return(household)
-      tax_household.update_attributes!(effective_starting_on: Date.today.next_year.beginning_of_year)
-      hbx_with_aptc_1.update_attributes!(effective_on: Date.new(hbx_with_aptc_1.effective_on.next_year.year, 3, 1))
+      tax_household.set(effective_starting_on: Date.today.next_year.beginning_of_year)
+      hbx_with_aptc_1.set(effective_on: Date.new(hbx_with_aptc_1.effective_on.next_year.year, 3, 1))
       new_app_period = Date.today.next_year.beginning_of_year..Date.today.next_year.end_of_year
       ::BenefitMarkets::Products::Product.each do |product|
-        product.update_attributes!(application_period: new_app_period)
-        product.premium_tables.each { |p_table| p_table.update_attributes!(effective_period: new_app_period) }
+        product.set(application_period: new_app_period)
+        product.premium_tables.each { |p_table| p_table.set(effective_period: new_app_period) }
       end
       ::BenefitMarkets::Locations::RatingArea.update_all(active_year: current_year.next)
       ::BenefitMarkets::Locations::ServiceArea.update_all(active_year: current_year.next)

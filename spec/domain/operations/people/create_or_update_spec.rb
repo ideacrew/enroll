@@ -63,7 +63,7 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
       context 'nil hbx id' do
         before do
           person_params.merge!({person_hbx_id: nil})
-          nil_person.update_attributes!(first_name: "Nil Test")
+          nil_person.set(first_name: "Nil Test")
           Person.where(first_name: "Nil Test").update_all(hbx_id: nil)
           @result = subject.call(params: person_params)
         end

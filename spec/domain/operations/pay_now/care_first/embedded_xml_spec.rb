@@ -9,7 +9,7 @@ RSpec.describe Operations::PayNow::CareFirst::EmbeddedXml do
   include_context "3 dental products with different rating_methods, different child_only_offerings and 3 health products"
   let(:enr_product) do
     product = BenefitMarkets::Products::DentalProducts::DentalProduct.by_year(TimeKeeper.date_of_record.year).detect(&:family_based_rating?)
-    product.update_attributes!(dental_level: nil)
+    product.set(dental_level: nil)
     product
   end
 

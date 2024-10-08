@@ -45,7 +45,7 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
         ba = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(abc_organization.employer_profile).first.benefit_applications.first
         sb = ba.benefit_packages.first.sponsored_benefits.first
         bp = ba.benefit_packages.first
-        enrollment.update_attributes!(sponsored_benefit_id: sb.id, sponsored_benefit_package_id: bp.id, benefit_sponsorship_id: ba.benefit_sponsorship.id)
+        enrollment.set(sponsored_benefit_id: sb.id, sponsored_benefit_package_id: bp.id, benefit_sponsorship_id: ba.benefit_sponsorship.id)
         ba.update_attributes(aasm_state:"binder_paid",effective_period:predecessor_application.effective_period)
       end
 
@@ -55,7 +55,7 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
       end
     end
 
-    it '.find_simulated_renewal_enrollments' do 
+    it '.find_simulated_renewal_enrollments' do
       ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_profile(abc_organization.employer_profile).first.benefit_applications.first.update_attributes(aasm_state:"binder_paid",effective_period:predecessor_application.effective_period)
       query =  ::Queries::NamedEnrollmentQueries.find_simulated_renewal_enrollments(current_benefit_package.sponsored_benefits, predecessor_application.effective_period.min, as_of_time = ::TimeKeeper.date_of_record)
       expect(query.map{|er|er}).to include (enrollment.hbx_id)
@@ -74,9 +74,9 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
     let!(:person) {FactoryBot.create(:person, first_name: ce.first_name, last_name: ce.last_name, ssn:ce.ssn)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person:person)}
     let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
-    let!(:initial_enrollment) { 
-      hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                          household: family.active_household, 
+    let!(:initial_enrollment) {
+      hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          household: family.active_household,
                           aasm_state: "coverage_enrolled",
                           family: family,
                           rating_area_id: predecessor_application.recorded_rating_area_id,
@@ -85,15 +85,15 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
                           benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
                           employee_role_id: employee_role.id,
                           submitted_at:Date.new(2018,6,21)
-                          ) 
+                          )
       hbx_enrollment.benefit_sponsorship = benefit_sponsorship
       hbx_enrollment.save!
       hbx_enrollment
     }
 
-    let!(:renewal_enrollment) { 
-      hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                          household: family.active_household, 
+    let!(:renewal_enrollment) {
+      hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          household: family.active_household,
                           family: family,
                           aasm_state: "coverage_selected",
                           rating_area_id: renewal_application.recorded_rating_area_id,
@@ -101,7 +101,7 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
                           sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
                           benefit_sponsorship_id: renewal_application.benefit_sponsorship.id,
                           employee_role_id: employee_role.id
-                          ) 
+                          )
       hbx_enrollment.benefit_sponsorship = benefit_sponsorship
       hbx_enrollment.save!
       hbx_enrollment
@@ -113,7 +113,7 @@ describe Queries::NamedEnrollmentQueries, "Enrollment Queries", dbclean: :after_
       ce.update_attributes(:employee_role_id => employee_role.id )
     end
 
-    it '.renewal_gate_lifted_enrollments' do 
+    it '.renewal_gate_lifted_enrollments' do
       value = subject.renewal_gate_lifted_enrollments(organization, effective_on, as_of_time = ::TimeKeeper.date_of_record)
       expect(value.map{|er|er}).to include (renewal_enrollment.hbx_id)
     end

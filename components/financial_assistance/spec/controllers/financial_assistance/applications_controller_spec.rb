@@ -400,7 +400,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context "submit step with a valid but incomplete application" do
       before do
-        application.update_attributes!(aasm_state: 'draft')
+        application.set(aasm_state: 'draft')
         allow(application).to receive(:complete?).and_return(false)
         allow(application).to receive(:save).and_return(true)
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
@@ -419,7 +419,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       let(:operation) { double new: double(call: double(failure: failure, success?: false)) }
 
       before do
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
         allow(application).to receive(:complete?).and_return(true)
         allow(application).to receive(:may_submit?).and_return(true)
         allow(application).to receive(:submit!).and_return(true)
@@ -470,7 +470,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
       let!(:create_home_address) do
         [application, application2].each do |applin|
-          applin.applicants.first.update_attributes!(is_primary_applicant: true)
+          applin.applicants.first.set(is_primary_applicant: true)
           address_attributes = {
             kind: 'home',
             address_1: '3 Awesome Street',
@@ -541,7 +541,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
       it "should successfully publish application and redirects to wait_for_eligibility" do
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
         application.reload
         allow(application).to receive(:complete?).and_return(true)
         allow(application).to receive(:may_submit?).and_return(true)
@@ -1026,7 +1026,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context 'where application received eligibility determination' do
       before do
-        application.update_attributes!(determination_http_status_code: 200, aasm_state: 'determined')
+        application.set(determination_http_status_code: 200, aasm_state: 'determined')
         get :eligibility_response_error, params: { id: application.id }
       end
 
@@ -1123,7 +1123,7 @@ def setup_faa_data
   FinancialAssistance::Application.all.each do |faa|
     faa.applicants.each do |appl|
       params = {gender: 'female', dob: Date.today - 30.years}
-      appl.update_attributes!(params)
+      appl.set(params)
     end
   end
 end

@@ -222,7 +222,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
     context 'when terminated benefit_application reinstated' do
       before do
-        initial_application.update_attributes!(:aasm_state => :terminated, effective_period: effective_period)
+        initial_application.set(:aasm_state => :terminated, effective_period: effective_period)
         abc_profile.benefit_applications << [reinstated_application]
         abc_profile.save!
       end
@@ -245,7 +245,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
     context 'when termination_pending benefit_application reinstated' do
       before do
-        initial_application.update_attributes!(:aasm_state => :termination_pending, effective_period: effective_period)
+        initial_application.set(:aasm_state => :termination_pending, effective_period: effective_period)
         abc_profile.benefit_applications << [reinstated_application]
         abc_profile.save!
       end
@@ -268,7 +268,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
     context 'when retroactive_cancel benefit_application reinstated' do
       before do
-        initial_application.update_attributes!(:aasm_state => :retroactive_cancel, effective_period: effective_period)
+        initial_application.set(:aasm_state => :retroactive_cancel, effective_period: effective_period)
         abc_profile.benefit_applications << [reinstated_application]
         abc_profile.save!
       end
@@ -458,7 +458,7 @@ describe EventsHelper, "selecting plan years to be exported", dbclean: :after_ea
 
     context 'when terminated benefit_application reinstated' do
       before do
-        initial_application.update_attributes!(:aasm_state => :terminated, effective_period: effective_period)
+        initial_application.set(:aasm_state => :terminated, effective_period: effective_period)
         abc_profile.benefit_applications << [reinstated_application]
         abc_profile.save!
       end
@@ -479,7 +479,7 @@ describe EventsHelper, "selecting plan years to be exported", dbclean: :after_ea
 
     context 'when termination_pending benefit_application reinstated' do
       before do
-        initial_application.update_attributes!(:aasm_state => :termination_pending, effective_period: effective_period)
+        initial_application.set(:aasm_state => :termination_pending, effective_period: effective_period)
         abc_profile.benefit_applications << [reinstated_application]
         abc_profile.save!
       end
@@ -500,7 +500,7 @@ describe EventsHelper, "selecting plan years to be exported", dbclean: :after_ea
 
     context 'when retroactive_cancel benefit_application reinstated' do
       before do
-        initial_application.update_attributes!(:aasm_state => :retroactive_cancel, effective_period: effective_period)
+        initial_application.set(:aasm_state => :retroactive_cancel, effective_period: effective_period)
         abc_profile.benefit_applications << [reinstated_application]
         abc_profile.save!
       end

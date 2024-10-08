@@ -99,7 +99,7 @@ describe Factories::EnrollmentFactory, :dbclean => :after_each do
         before do
           allow(existing_person).to receive("primary_family").and_return(family)
           allow(existing_person).to receive(:families).and_return([family])
-          dependent2.update_attributes!(is_active: false)
+          dependent2.set(is_active: false)
           Factories::EnrollmentFactory.build_employee_role(existing_person, nil, employer_profile,census_employee, hired_on)
         end
 
@@ -777,11 +777,11 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     let(:family) { consumer_role.person.primary_family }
     before :each do
       allow(EnrollRegistry[:alive_status].feature).to receive(:is_enabled).and_return(true)
-      family.update_attributes!(:e_case_id => parser.integrated_case_id)
+      family.set(:e_case_id => parser.integrated_case_id)
     end
 
     it "should not crash on updating the e_case_id" do
-      expect {person.primary_family.update_attributes!(:e_case_id => "some e case id whatever")}.not_to raise_error
+      expect {person.primary_family.set(:e_case_id => "some e case id whatever")}.not_to raise_error
     end
 
     it "should is_applying_coverage should be false" do

@@ -272,7 +272,7 @@ describe "match a person in db" do
         before do
           allow(db_person).to receive(:broker_role).and_return(broker_role)
           db_person.broker_agency_staff_roles.create(aasm_state: :active, benefit_sponsors_broker_agency_profile_id: benefit_sponsor.broker_agency_profile.id)
-          db_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: benefit_sponsor.broker_agency_profile.id)
+          db_person.broker_role.set(benefit_sponsors_broker_agency_profile_id: benefit_sponsor.broker_agency_profile.id)
           db_person.save!
         end
 

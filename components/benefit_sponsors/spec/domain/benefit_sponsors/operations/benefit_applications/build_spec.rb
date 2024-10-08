@@ -44,7 +44,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Build, dbclean:
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 15))
       initial_application.benefit_packages.each do |bp|
         bp.sponsored_benefits.each do |spon_benefit|
-          spon_benefit.update_attributes!(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
+          spon_benefit.set(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
           create_pd(spon_benefit)
           update_contribution_levels(spon_benefit) if initial_application.employer_profile.is_a_fehb_profile?
         end
@@ -101,6 +101,6 @@ end
 
 def update_contribution_levels(spon_benefit)
   spon_benefit.sponsor_contribution.contribution_levels.each do |cl|
-    cl.update_attributes!({contribution_cap: 0.5, flat_contribution_amount: 100.00})
+    cl.set({contribution_cap: 0.5, flat_contribution_amount: 100.00})
   end
 end

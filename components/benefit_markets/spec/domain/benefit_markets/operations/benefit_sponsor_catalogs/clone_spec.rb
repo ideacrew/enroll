@@ -57,7 +57,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone, dbclea
   end
   let(:product_package) do
     pp = FactoryBot.build(:benefit_markets_products_product_package, contribution_model: contribution_model, assigned_contribution_model: contribution_model, contribution_models: [contribution_model])
-    pp.products.each {|product| product.update_attributes!(issuer_profile_id: BSON::ObjectId.new)}
+    pp.products.each {|product| product.set(issuer_profile_id: BSON::ObjectId.new)}
     pp
   end
   let!(:benefit_sponsor_catalog) do

@@ -75,7 +75,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         end
 
         it "should extend open enrollment from enrollment open" do
-          ineligible_benefit_application.update_attributes!(aasm_state: "enrollment_open")
+          ineligible_benefit_application.set(aasm_state: "enrollment_open")
           expect(ineligible_benefit_application.aasm_state).to eq :enrollment_open
           subject.migrate
           ineligible_benefit_application.reload
@@ -85,7 +85,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         end
 
         it "should not extend open enrollment from draft" do
-          ineligible_benefit_application.update_attributes!(aasm_state: "draft")
+          ineligible_benefit_application.set(aasm_state: "draft")
           expect(ineligible_benefit_application.aasm_state).to eq :draft
           expect { subject.migrate }.to raise_error("Unable to find benefit application!!")
         end
@@ -102,8 +102,8 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         end
 
         it "should update the benefit application" do
-          predecessor_application.update_attributes!(aasm_state: "enrollment_ineligible", benefit_packages: [])
-          # benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_ineligible")
+          predecessor_application.set(aasm_state: "enrollment_ineligible", benefit_packages: [])
+          # benefit_sponsorship.set(aasm_state: "initial_enrollment_ineligible")
           expect(predecessor_application.aasm_state).to eq :enrollment_ineligible
           # expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_ineligible
           subject.migrate
@@ -133,8 +133,8 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         end
 
         it "should update the benefit application" do
-          predecessor_application.update_attributes!(aasm_state: :enrollment_ineligible, benefit_packages: [])
-          # benefit_sponsorship.update_attributes!(aasm_state: "initial_enrollment_ineligible")
+          predecessor_application.set(aasm_state: :enrollment_ineligible, benefit_packages: [])
+          # benefit_sponsorship.set(aasm_state: "initial_enrollment_ineligible")
           expect(predecessor_application.aasm_state).to eq :enrollment_ineligible
           # expect(benefit_sponsorship.aasm_state).to eq :initial_enrollment_ineligible
           subject.migrate
@@ -153,7 +153,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:termination_reason) { 'Company went out of business/bankrupt' }
 
       before do
-        renewal_application.update_attributes!(aasm_state: "active", benefit_packages: [])
+        renewal_application.set(aasm_state: "active", benefit_packages: [])
         subject.migrate
         renewal_application.reload
       end
@@ -261,7 +261,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       end
 
       it "should update the initial benefit application and transition the benefit sponsorship" do
-        predecessor_application.update_attributes!(aasm_state: "draft")
+        predecessor_application.set(aasm_state: "draft")
         expect(predecessor_application.effective_period.min.to_date).to eq effective_date
         subject.migrate
         predecessor_application.reload
@@ -294,8 +294,8 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       end
 
       it "should update the benefit application and transition the benefit sponsorship" do
-        predecessor_application.update_attributes!(aasm_state: "draft")
-        predecessor_application.update_attributes!(fte_count: 3)
+        predecessor_application.set(aasm_state: "draft")
+        predecessor_application.set(fte_count: 3)
         expect(predecessor_application.effective_period.min.to_date).to eq effective_date
         subject.migrate
         predecessor_application.reload
@@ -332,7 +332,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       end
 
       it "should update the renewing benefit application and transition the benefit sponsorship" do
-        renewal_application.update_attributes!(aasm_state: "draft")
+        renewal_application.set(aasm_state: "draft")
         expect(renewal_application.effective_period.min.to_date).to eq effective_date
         subject.migrate
         renewal_application.reload
@@ -346,7 +346,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       end
 
       it "should not update the renewing benefit application" do
-        renewal_application.update_attributes!(aasm_state: "active")
+        renewal_application.set(aasm_state: "active")
         expect { subject.migrate }.to raise_error(RuntimeError)
         expect { subject.migrate }.to raise_error("No benefit application found.")
       end
@@ -372,7 +372,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:model_instance) { renewal_application }
 
       before do
-        renewal_application.update_attributes!(aasm_state: "active", benefit_packages: [])
+        renewal_application.set(aasm_state: "active", benefit_packages: [])
       end
 
       context "should trigger termination notice to employer and employees" do

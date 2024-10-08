@@ -469,7 +469,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
               hbx_enrollment.product_id = product_01.id
               hbx_enrollment.save!
               family.family_members.map(&:person).each do |per|
-                per.update_attributes!(indian_tribe_member: true)
+                per.set(indian_tribe_member: true)
               end
               allow(EnrollRegistry[:native_american_csr].feature).to receive(:is_enabled).and_return(true)
             end

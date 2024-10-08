@@ -51,7 +51,7 @@ RSpec.describe FinancialAssistance::Operations::Applicants::Destroy, dbclean: :a
 
     context 'application is not draft' do
       let(:input_params) do
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
         applicant2
       end
 

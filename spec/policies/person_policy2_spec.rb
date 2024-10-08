@@ -63,11 +63,11 @@ RSpec.describe PersonPolicy, type: :policy do
       let(:broker_agency_id) { broker_agency_profile.id }
 
       before do
-        broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+        broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
         broker_person.create_broker_agency_staff_role(
           benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
         )
-        broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id, market_kind: :both)
+        broker_agency_profile.set(primary_broker_role_id: broker_role.id, market_kind: :both)
         broker_role.approve!
         broker_staff
       end

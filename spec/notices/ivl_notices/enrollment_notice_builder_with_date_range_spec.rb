@@ -10,7 +10,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
     FactoryBot.create(
       :hbx_enrollment,
       family: family,
-      created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), 
+      created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
       household: family.households.first,
       kind: "individual",
       is_any_enrollment_member_outstanding: true,
@@ -197,7 +197,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
     end
 
     it "should render documents section when the family has an invalid e_case_id and outstanding people are present" do
-      family.update_attributes!(:e_case_id => "curam_landing_for10000")
+      family.set(:e_case_id => "curam_landing_for10000")
       @eligibility_notice.append_hbe
       @eligibility_notice.build
       expect(@eligibility_notice).to receive :attach_required_documents
@@ -205,7 +205,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilderWithDateRange, dbclean: :after
     end
 
     it "should render documents section when the family is unassisted and outstanding people are present" do
-      family.update_attributes!(:e_case_id => nil)
+      family.set(:e_case_id => nil)
       @eligibility_notice.append_hbe
       @eligibility_notice.build
       expect(@eligibility_notice).to receive :attach_required_documents

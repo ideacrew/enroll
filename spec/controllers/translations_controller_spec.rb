@@ -31,7 +31,7 @@ RSpec.describe TranslationsController, :type => :controller do
 
         context "as a non super admin user" do
           before do
-            super_admin_permission.update_attributes!(name: "non_super_admin")
+            super_admin_permission.set(name: "non_super_admin")
           end
           it "should not be authorized" do
             get :new
@@ -69,7 +69,7 @@ RSpec.describe TranslationsController, :type => :controller do
 
       context "as a non super admin user" do
         before do
-          super_admin_permission.update_attributes!(name: "non_super_admin")
+          super_admin_permission.set(name: "non_super_admin")
         end
         it "should not be authorized" do
           post :create, params: {translation: {key: "en.translation", value: "This is the translation."}}
@@ -89,7 +89,7 @@ RSpec.describe TranslationsController, :type => :controller do
 
         context "as a non super admin user" do
           before do
-            super_admin_permission.update_attributes!(name: "non_super_admin")
+            super_admin_permission.set(name: "non_super_admin")
           end
           it "should not be authorized" do
             get :edit, params: {id: test_translation.id}
@@ -126,7 +126,7 @@ RSpec.describe TranslationsController, :type => :controller do
 
       context "as a non super admin user" do
         before do
-          super_admin_permission.update_attributes!(name: "non_super_admin")
+          super_admin_permission.set(name: "non_super_admin")
         end
         it "should not be authorized" do
           put :update, params: {id: test_translation.id, translation: {key: "en.translation", value: "This is the translation."}}
@@ -146,7 +146,7 @@ RSpec.describe TranslationsController, :type => :controller do
 
         context "as a non super admin user" do
           before do
-            super_admin_permission.update_attributes!(name: "non_super_admin")
+            super_admin_permission.set(name: "non_super_admin")
           end
           it "should not be authorized" do
             get :show, params: {id: test_translation.id}
@@ -184,7 +184,7 @@ RSpec.describe TranslationsController, :type => :controller do
 
         context "as a non super admin user" do
           before do
-            super_admin_permission.update_attributes!(name: "non_super_admin")
+            super_admin_permission.set(name: "non_super_admin")
           end
           it "should not be authorized" do
             get :index

@@ -142,7 +142,7 @@ module BenefitSponsors
       it 'terminate pending benefit application should be terminated when the end on is reached' do
         april_sponsors.each do |sponsor|
           sponsor.benefit_applications.each do |ba|
-            ba.update_attributes!(effective_period: ba_start_on..current_date.prev_day, terminated_on: current_date.prev_month)
+            ba.set(effective_period: ba_start_on..current_date.prev_day, terminated_on: current_date.prev_month)
           end
           benefit_application = sponsor.benefit_applications.termination_pending.first
           service = subject.new(benefit_sponsorship: sponsor, new_date: benefit_application.effective_period.max.next_day)
@@ -155,7 +155,7 @@ module BenefitSponsors
       end
     end
 
-    describe '.end_open_enrollment' do 
+    describe '.end_open_enrollment' do
       let(:sponsorship_state)               { :applicant }
       let(:business_policy) { double(success_results: [], fail_results: []) }
 
@@ -165,10 +165,10 @@ module BenefitSponsors
         allow_any_instance_of(::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive(:business_policy).and_return(business_policy)
       end
 
-      context  'For initial employers for whom open enrollment extended' do 
+      context  'For initial employers for whom open enrollment extended' do
         let(:initial_application_state)       { :enrollment_extended }
 
-        it "should close their open enrollment" do 
+        it "should close their open enrollment" do
           (april_sponsors).each do |sponsor|
             benefit_application = sponsor.benefit_applications.first
 
@@ -187,10 +187,10 @@ module BenefitSponsors
         end
       end
 
-      context  'For renewal employers for whom open enrollment extended' do 
+      context  'For renewal employers for whom open enrollment extended' do
         let(:renewal_application_state)       { :enrollment_extended }
 
-        it "should close their open enrollment" do 
+        it "should close their open enrollment" do
           (april_renewal_sponsors).each do |sponsor|
             benefit_application = sponsor.benefit_applications.first
 
@@ -246,7 +246,7 @@ module BenefitSponsors
       end
       let!(:new_renewal_app_product)  { FactoryBot.create(:benefit_markets_products_health_products_health_product)}
       let!(:update_benefit_application) do
-        renewal_application.update_attributes!(aasm_state: :enrollment_eligible)
+        renewal_application.set(aasm_state: :enrollment_eligible)
         active_application.benefit_packages.first.health_sponsored_benefit.update_attributes(reference_product_id: active_application_product.id, product_package_kind: :single_product)
         renewal_application.benefit_packages.first.health_sponsored_benefit.update_attributes(product_package_kind: :single_product)
         product = renewal_application.benefit_packages.first.health_sponsored_benefit.reference_product

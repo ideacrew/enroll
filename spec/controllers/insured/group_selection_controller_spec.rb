@@ -429,9 +429,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
         before do
           allow(person_1).to receive(:primary_family).and_return(family_1)
-          person_2.update_attributes!(is_incarcerated: nil)
-          person_2.consumer_role.update_attributes!(is_applying_coverage: false)
-          person_1.update_attributes!(is_incarcerated: false)
+          person_2.set(is_incarcerated: nil)
+          person_2.consumer_role.set(is_applying_coverage: false)
+          person_1.set(is_incarcerated: false)
           family = person_1.primary_family
           expect(family.family_members.count).to eq(1)
           FactoryBot.create(:family_member, family: family, person: person_2)
@@ -540,11 +540,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 679.8)
         @product.save!
 
-        hbx_enrollment_member1.family_member.person.update_attributes!(dob: (@enrollment.effective_on - 61.years))
-        hbx_enrollment_member2.family_member.person.update_attributes!(dob: (@enrollment.effective_on - 59.years))
+        hbx_enrollment_member1.family_member.person.set(dob: (@enrollment.effective_on - 61.years))
+        hbx_enrollment_member2.family_member.person.set(dob: (@enrollment.effective_on - 59.years))
         @enrollment.update_attributes(product: @product, consumer_role_id: person.consumer_role.id)
         @enrollment.save!
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: @product.id)}
         area = EnrollRegistry[:rating_area].settings(:areas).item.first
         allow(Person).to receive(:find).and_return(person)
         @user = FactoryBot.create(:user, person: person)
@@ -702,7 +702,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(ivl_hbx_enrollment).to receive(:coverage_kind).and_return 'health'
         allow(person).to receive(:is_consumer_role_active?).and_return true
         allow(person).to receive(:consumer_role).and_return(consumer_role)
-        ivl_hbx_enrollment.update_attributes!(kind: 'individual')
+        ivl_hbx_enrollment.set(kind: 'individual')
         allow(ivl_hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(true)
       end
 
@@ -1180,7 +1180,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     context 'for termination_date_options' do
       before :each do
         @shop_sep = person.primary_family.latest_shop_sep
-        @shop_sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['exact_date'])
+        @shop_sep.qualifying_life_event_kind.set(termination_on_kinds: ['exact_date'])
         sign_in user
         get :terminate_selection, params: { person_id: person.id }
       end

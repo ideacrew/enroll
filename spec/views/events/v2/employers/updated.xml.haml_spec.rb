@@ -141,12 +141,12 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :around_each do
             :benefit_sponsors_benefit_packages_benefit_package,
             benefit_application: benefit_application,
             product_package: product_package,
-            dental_sponsored_benefit: true, 
+            dental_sponsored_benefit: true,
             dental_product_package: dental_product_package
           )
         end
         let!(:dental_sponsored_benefit) { benefit_package.dental_sponsored_benefit }
-        let!(:update_dental_product) { dental_sponsored_benefit.reference_product.update_attributes!(issuer_profile_id:issuer_profile.id) }  
+        let!(:update_dental_product) { dental_sponsored_benefit.reference_product.set(issuer_profile_id:issuer_profile.id) }
         let(:dental_sponsor_contribution) do
           FactoryBot.build(
             :benefit_sponsors_sponsored_benefits_sponsor_contribution,
@@ -154,7 +154,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :around_each do
             sponsored_benefit: dental_sponsored_benefit
           )
         end
-        
+
         before do
           allow(sponsor_contribution).to receive(:contribution_model).and_return(product_package.contribution_model)
           allow(dental_sponsored_benefit).to receive(:sponsor_contribution).and_return(dental_sponsor_contribution)

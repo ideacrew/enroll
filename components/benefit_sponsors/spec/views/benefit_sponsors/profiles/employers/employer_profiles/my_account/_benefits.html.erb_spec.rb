@@ -69,7 +69,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
 
     context "initials" do
       it "should display add plan year button when draft application is present" do
-        benefit_application.update_attributes!(aasm_state: :draft)
+        benefit_application.set(aasm_state: :draft)
         render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits'
         expect(rendered).to have_selector("a", text: "Add Plan Year")
       end

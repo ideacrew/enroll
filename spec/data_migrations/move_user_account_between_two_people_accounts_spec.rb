@@ -8,7 +8,7 @@ describe MoveUserAccountBetweenTwoPeopleAccounts, dbclean: :after_each do
   def with_modified_env(options, &block)
     ClimateControl.modify(options, &block)
   end
-  
+
   describe 'given a task name' do
     it 'has the given task name' do
       expect(subject.name).to eql given_task_name
@@ -22,7 +22,7 @@ describe MoveUserAccountBetweenTwoPeopleAccounts, dbclean: :after_each do
     let(:user_env_support) {{hbx_id_1: person1.hbx_id, hbx_id_2:person2.hbx_id}}
 
     it 'should move user from person1 to person2' do
-      with_modified_env user_env_support do 
+      with_modified_env user_env_support do
         expect(person1.user).not_to eq nil
         expect(person2.user).to eq nil
         subject.migrate
@@ -42,8 +42,8 @@ describe MoveUserAccountBetweenTwoPeopleAccounts, dbclean: :after_each do
 
     it 'should not move user from person1 to person2' do
       with_modified_env user_env_support do
-        person1.update_attributes!(hbx_id:nil)
-        expect(person1.user_id).to eq user.id 
+        person1.set(hbx_id:nil)
+        expect(person1.user_id).to eq user.id
         expect(person2.user).to eq nil
         subject.migrate
         expect(person1.reload.user).not_to eq nil
@@ -58,7 +58,7 @@ describe MoveUserAccountBetweenTwoPeopleAccounts, dbclean: :after_each do
     let(:user_env_support) {{hbx_id_1: person1.hbx_id, hbx_id_2:person2.hbx_id}}
 
     it 'should not move user from person1 to person2' do
-      with_modified_env user_env_support do 
+      with_modified_env user_env_support do
         subject.migrate
         person1.reload
         person2.reload

@@ -26,9 +26,9 @@ describe EligibilityDeterminationDeterminedOnMigration, dbclean: :after_each do
     let(:determined_at_initial_value) { DateTime.new(2015,2,3,4,5,6) }
 
     before :each do
-      eligibility_determination.update_attributes!(determined_at: determined_at_initial_value)
+      eligibility_determination.set(determined_at: determined_at_initial_value)
     end
-    
+
     it "should create a CSV with eligibility determination fields" do
       expect(eligibility_determination.determined_at).to_not eq(eligibility_determination.determined_on)
       expect(eligibility_determination.determined_at).to eq(determined_at_initial_value)

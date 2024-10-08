@@ -228,7 +228,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         end
 
         before do
-          application.update_attributes!(mocked_params)
+          application.set(mocked_params)
           @duplicate_application = subject.call(application_id: application.id).success
         end
 
@@ -282,7 +282,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         let(:mocked_params) { { predecessor_id: predecessor_application.id } }
 
         before do
-          application.update_attributes!(mocked_params)
+          application.set(mocked_params)
           @duplicate_application = subject.call(application_id: application.id).success
         end
 
@@ -315,7 +315,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         end
 
         before do
-          applicant.update_attributes!(mocked_params)
+          applicant.set(mocked_params)
           @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
 
@@ -380,7 +380,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         let(:mocked_params) { { net_annual_income: 10_012.00 } }
 
         before do
-          applicant.update_attributes!(mocked_params)
+          applicant.set(mocked_params)
           @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
 
@@ -397,7 +397,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         let(:mocked_params) { { claimed_as_tax_dependent_by: BSON::ObjectId.new } }
 
         before do
-          applicant.update_attributes!(mocked_params)
+          applicant.set(mocked_params)
           @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
 
@@ -410,7 +410,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         let(:mocked_params) { { five_year_bar_applies: true, five_year_bar_met: true } }
 
         before do
-          person1.consumer_role.update_attributes!(mocked_params)
+          person1.consumer_role.set(mocked_params)
           person1.consumer_role.lawful_presence_determination.update!(qualified_non_citizenship_result: 'Y')
           @duplicate_applicant = subject.call(application_id: application.id).success.applicants.first
         end
@@ -434,8 +434,8 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
     let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
 
     before do
-      application.update_attributes!(family_id: family11.id)
-      applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
+      application.set(family_id: family11.id)
+      applicant.set(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
       @new_application = subject.call(application_id: application.id).success
     end
 
@@ -458,9 +458,9 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
     let!(:family11) { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
 
     before do
-      application.update_attributes!(family_id: family11.id)
-      applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
-      applicant2.update_attributes!(is_active: false)
+      application.set(family_id: family11.id)
+      applicant.set(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
+      applicant2.set(is_active: false)
       @new_application = subject.call(application_id: application.id).success
     end
 
@@ -500,7 +500,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       end
 
       before do
-        applicant.update_attributes!(person_hbx_id: '10001', first_name: 'Test', last_name: 'Last', dob: TimeKeeper.date_of_record - 40.years)
+        applicant.set(person_hbx_id: '10001', first_name: 'Test', last_name: 'Last', dob: TimeKeeper.date_of_record - 40.years)
         @applicant_result = subject.send(:fetch_matching_applicant, new_application, applicant)
       end
 
@@ -530,8 +530,8 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
       end
 
       before do
-        application.update_attributes!(family_id: family11.id)
-        applicant.update_attributes!(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
+        application.set(family_id: family11.id)
+        applicant.set(person_hbx_id: person11.hbx_id, family_member_id: family11.primary_applicant.id)
         applicant2.destroy!
         @new_application = subject.call(application_id: application.id).success
       end
@@ -626,7 +626,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
     context 'aasm_state of application' do
       context "application is one of ['income_verification_extension_required', 'applicants_update_required'] states" do
         before do
-          application_11.update_attributes!(aasm_state: ['income_verification_extension_required', 'applicants_update_required'].sample)
+          application_11.set(aasm_state: ['income_verification_extension_required', 'applicants_update_required'].sample)
           @result = subject.call(application_id: application_11.id)
         end
 
@@ -641,7 +641,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         let(:invalid_state) { ['draft', 'renewal_draft', 'mitc_magi_medicaid_eligibility_request_errored', 'haven_magi_medicaid_eligibility_request_errored'].sample }
 
         before do
-          application_11.update_attributes!(aasm_state: invalid_state)
+          application_11.set(aasm_state: invalid_state)
           @result = subject.call(application_id: application_11.id)
         end
 
@@ -680,7 +680,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
     context 'is_living_in_state' do
       before :each do
         [application_11].each do |applin|
-          applin.applicants.first.update_attributes!(is_primary_applicant: true)
+          applin.applicants.first.set(is_primary_applicant: true)
           address_attributes = {
             kind: 'home',
             address_1: '3 Awesome Street',
@@ -995,7 +995,7 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
         p.addresses.delete_all
       end
       [application2].each do |applin|
-        applin.applicants.first.update_attributes!(is_primary_applicant: true)
+        applin.applicants.first.set(is_primary_applicant: true)
         address_attributes = {
           kind: 'home',
           address_1: '3 Awesome Street',

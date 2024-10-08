@@ -49,7 +49,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyTypeOfHousehold do
     context 'valid input' do
       let(:person1) do
         per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - family_member1_age.years)
-        per.rating_address.update_attributes!(county: 'York', zip: '04001', state: 'ME')
+        per.rating_address.set(county: 'York', zip: '04001', state: 'ME')
         per
       end
       let(:person2) do
@@ -60,7 +60,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyTypeOfHousehold do
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
       let(:family_member1) do
         fm = family.primary_applicant
-        fm.update_attributes!(is_active: false)
+        fm.set(is_active: false)
         fm
       end
       let(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2, is_active: false) }

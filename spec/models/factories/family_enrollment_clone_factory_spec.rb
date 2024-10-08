@@ -35,7 +35,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
     employee_role.person.update_attributes(dob: ce.dob, ssn: ce.ssn)
     employee_role.update_attributes(census_employee: ce)
     person = employee_role.person
-    ce.update_attributes!({employee_role: employee_role})
+    ce.set({employee_role: employee_role})
     family_rec = Family.find_or_build_from_employee_role(employee_role)
     hbx_enrollment_mem = FactoryBot.build(:hbx_enrollment_member, eligibility_date:Time.now,applicant_id:person.primary_family.family_members.first.id,coverage_start_on:ce.active_benefit_group_assignment.benefit_package.start_on)
     family_rec.save!

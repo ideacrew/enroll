@@ -22,9 +22,9 @@ describe UpdateBenefitGroupId, dbclean: :after_each do
     let!(:person) {FactoryBot.create(:person, first_name: ce.first_name, last_name: ce.last_name, ssn:ce.ssn)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person:person)}
     let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
-    let!(:initial_enrollment) { 
-      hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                          household: family.active_household, 
+    let!(:initial_enrollment) {
+      hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          household: family.active_household,
                           aasm_state: "coverage_enrolled",
                           family: family,
                           effective_on: effective_on,
@@ -35,7 +35,7 @@ describe UpdateBenefitGroupId, dbclean: :after_each do
                           benefit_package_id: initial_application.benefit_packages.first.id,
                           employee_role_id: employee_role.id,
                           submitted_at: Date.new(2018,6,21)
-                          ) 
+                          )
       hbx_enrollment.benefit_sponsorship = benefit_sponsorship
       hbx_enrollment.save!
       hbx_enrollment
@@ -48,7 +48,7 @@ describe UpdateBenefitGroupId, dbclean: :after_each do
       ce.update_attributes(:employee_role_id => employee_role.id )
     end
     it "should update benefit group id" do
-      initial_enrollment.update_attributes!(benefit_package_id: nil)
+      initial_enrollment.set(benefit_package_id: nil)
       expect(initial_enrollment.benefit_group_id).to eq(nil)
       subject.migrate
       initial_enrollment.reload

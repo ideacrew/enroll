@@ -24,7 +24,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
     let(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, :aasm_state => "eligible", benefit_group_assignments: [benefit_group_assignment]) }
 
 
-    before(:each) do 
+    before(:each) do
       plan_year.employer_profile.update_attributes(profile_source: "conversion")
     end
     it "should change the plan year effective on date" do
@@ -52,7 +52,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
       ref_plan_active_year: "#{plan.active_year}",
       action_on_enrollments: "",
       plan_year_state: "" do
-      employer_profile.update_attributes!(profile_source:'conversion')
+      employer_profile.set(profile_source:'conversion')
       subject.migrate
       plan_year.reload
       expect(plan_year.benefit_groups.first.reference_plan.hios_id).to eq plan.hios_id
@@ -67,7 +67,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         ref_plan_active_year: "#{plan.active_year}",
         action_on_enrollments: "",
         plan_year_state: "" do
-        employer_profile.update_attributes!(profile_source:'conversion')
+        employer_profile.set(profile_source:'conversion')
         subject.migrate
         plan_year.reload
         expect(plan_year.aasm_state).to eq "draft"
@@ -83,7 +83,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
               action_on_enrollments: "",
               REDIS_URL: "redis://what",
               REDIS_NAMESPACE_QUIET: "what",
-              REDIS_NAMESPACE_DEPRECATIONS: "what", 
+              REDIS_NAMESPACE_DEPRECATIONS: "what",
               plan_year_state: "force_publish" do
           allow_any_instance_of(CensusEmployee).to receive(:has_benefit_group_assignment?).and_return(true)
           allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return [plan]
@@ -98,7 +98,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
     end
 
     it "should revert the renewal py if received args as revert renewal" do
-      plan_year.update_attributes!(aasm_state: "renewing_enrolling")
+      plan_year.set(aasm_state: "renewing_enrolling")
         ClimateControl.modify fein: plan_year.employer_profile.parent.fein,
           aasm_state: plan_year.aasm_state,
           py_new_start_on: "#{plan_year.start_on - 1.month}",
@@ -107,9 +107,9 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
           action_on_enrollments: "",
           REDIS_URL: "redis://what",
           REDIS_NAMESPACE_QUIET: "what",
-          REDIS_NAMESPACE_DEPRECATIONS: "what", 
+          REDIS_NAMESPACE_DEPRECATIONS: "what",
           plan_year_state: "revert_renewal" do
-            plan_year.employer_profile.update_attributes!(profile_source: "conversion")
+            plan_year.employer_profile.set(profile_source: "conversion")
             enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id, aasm_state: "auto_renewing")
             subject.migrate
             enrollment.reload
@@ -118,7 +118,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
             expect(plan_year.aasm_state).to eq "renewing_draft"
       end
     end
-    
+
 
     it "should cancel the enrollments under inital py if received args as revert application" do
       plan_year.update_attributes(aasm_state: "active")
@@ -131,7 +131,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what", 
+        REDIS_NAMESPACE_DEPRECATIONS: "what",
         plan_year_state: "revert_application" do
         subject.migrate
         enrollment.reload
@@ -140,8 +140,8 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         expect(plan_year.aasm_state).to eq "draft"
       end
     end
-    
-    
+
+
     it "should set the enrollment effective on date as py start on date if enrollment has an effective date prior to py" do
       enrollment.update_attributes(benefit_group_id: benefit_group.id, effective_on: plan_year.start_on - 3.months)
       ClimateControl.modify fein: plan_year.employer_profile.parent.fein,
@@ -152,7 +152,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
       action_on_enrollments: "",
       REDIS_URL: "redis://what",
       REDIS_NAMESPACE_QUIET: "what",
-      REDIS_NAMESPACE_DEPRECATIONS: "what", 
+      REDIS_NAMESPACE_DEPRECATIONS: "what",
       plan_year_state: "revert_application" do
         subject.migrate
         enrollment.reload
@@ -171,7 +171,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what", 
+        REDIS_NAMESPACE_DEPRECATIONS: "what",
         plan_year_state: "revert_application" do
         subject.migrate
         enrollment.reload
@@ -189,7 +189,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "py_start_on",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what", 
+        REDIS_NAMESPACE_DEPRECATIONS: "what",
         plan_year_state: "revert_application" do
         subject.migrate
         enrollment.reload
@@ -208,7 +208,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "py_start_on",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what", 
+        REDIS_NAMESPACE_DEPRECATIONS: "what",
         plan_year_state: "revert_application" do
       end
       expect(subject.migrate).to eq nil
@@ -224,7 +224,7 @@ describe ChangePlanYearEffectiveDate, dbclean: :after_each do
         action_on_enrollments: "py_start_on",
         REDIS_URL: "redis://what",
         REDIS_NAMESPACE_QUIET: "what",
-        REDIS_NAMESPACE_DEPRECATIONS: "what", 
+        REDIS_NAMESPACE_DEPRECATIONS: "what",
         plan_year_state: "revert_application" do
       expect(subject.migrate).to eq nil
       end

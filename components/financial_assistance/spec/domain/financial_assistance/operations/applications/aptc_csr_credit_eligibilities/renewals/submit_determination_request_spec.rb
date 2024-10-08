@@ -101,7 +101,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'enabled' do
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(true)
-          applicant.update_attributes!(tribal_name: "tribe name", tribal_state: "ME")
+          applicant.set(tribal_name: "tribe name", tribal_state: "ME")
           @result = subject.call({application_id: application.id})
         end
 
@@ -117,7 +117,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'disabled' do
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
-          applicant.update_attributes!(tribal_id: "4848477")
+          applicant.set(tribal_id: "4848477")
           @result = subject.call({application_id: application.id})
         end
 
@@ -145,7 +145,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
     context 'invalid application aasm_state' do
       before do
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
         @result = subject.call({application_id: application.id})
       end
 

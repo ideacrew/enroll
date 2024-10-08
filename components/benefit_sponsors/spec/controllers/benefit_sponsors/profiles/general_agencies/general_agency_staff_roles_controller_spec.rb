@@ -132,7 +132,7 @@ module BenefitSponsors
     # describe "GET search_general_agency" do
 
     #   before do
-    #     general_agency_staff_role.update_attributes!(is_primary: true)
+    #     general_agency_staff_role.set(is_primary: true)
     #     general_agency_profile1.approve!
     #     organization.reload
     #     get :search_general_agency, params: params, format: :js, xhr: true

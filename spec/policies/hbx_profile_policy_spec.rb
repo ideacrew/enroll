@@ -273,7 +273,7 @@ describe HbxProfilePolicy do
         let(:bad_permission) { FactoryBot.create(:permission, kind.to_sym) }
 
         it 'should return false' do
-          person.hbx_staff_role.update_attributes!(permission_id: bad_permission.id)
+          person.hbx_staff_role.set(permission_id: bad_permission.id)
           expect(subject.can_create_benefit_application?).to eq false
         end
       end
@@ -284,7 +284,7 @@ describe HbxProfilePolicy do
         let(:good_permission) { FactoryBot.create(:permission, kind.to_sym) }
 
         it 'should return true' do
-          person.hbx_staff_role.update_attributes!(permission_id: good_permission.id)
+          person.hbx_staff_role.set(permission_id: good_permission.id)
           expect(subject.can_create_benefit_application?).to eq true
           expect(subject.can_submit_time_travel_request?).to eq false
         end
@@ -302,7 +302,7 @@ describe HbxProfilePolicy do
           let(:good_permission) { FactoryBot.create(:permission, kind.to_sym) }
 
           it 'should return true' do
-            person.hbx_staff_role.update_attributes!(permission_id: good_permission.id)
+            person.hbx_staff_role.set(permission_id: good_permission.id)
             expect(subject.can_create_benefit_application?).to eq true
             expect(subject.can_submit_time_travel_request?).to eq false
             expect(subject.view_the_configuration_tab?).to eq true

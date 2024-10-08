@@ -143,7 +143,7 @@ describe FixOrganization, dbclean: :after_each do
     context "when employer has an attestation is in denied state and document in rejected state" do
 
       before do
-        employer_profile.employer_attestation.update_attributes!(aasm_state: 'denied')
+        employer_profile.employer_attestation.set(aasm_state: 'denied')
         employer_profile.employer_attestation.employer_attestation_documents.create(title: "test", aasm_state:'rejected')
         employer_profile.save
       end

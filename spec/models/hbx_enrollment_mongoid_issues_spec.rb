@@ -28,7 +28,7 @@ describe Family, "with 2 policies", :dbclean => :around_each do
 
     before :each do
       @pol_1_effective_date = @hbx_enrollment_1.effective_on
-      @hbx_enrollment_2.update_attributes!(:effective_on => new_effective_on_date)
+      @hbx_enrollment_2.set(:effective_on => new_effective_on_date)
       family.reload
       hh = family.active_household
       @first_enrollment = hh.hbx_enrollments.detect { |he| he.id == @id_for_1 }
@@ -50,7 +50,7 @@ describe Family, "with 2 policies", :dbclean => :around_each do
 
     before :each do
       @pol_1_effective_date = @hbx_enrollment_1.hbx_enrollment_members.first.coverage_start_on
-      @hbx_enrollment_2.hbx_enrollment_members.first.update_attributes!(:coverage_start_on => new_effective_on_date)
+      @hbx_enrollment_2.hbx_enrollment_members.first.set(:coverage_start_on => new_effective_on_date)
       family.reload
       hh = family.active_household
       @first_enrollment = hh.hbx_enrollments.detect { |he| he.id == @id_for_1 }

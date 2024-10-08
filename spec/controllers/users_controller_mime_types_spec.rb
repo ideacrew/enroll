@@ -24,7 +24,7 @@ RSpec.describe UsersController, type: :controller do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: user_person) }
 
     before do
-      hbx_staff_role.update_attributes!(permission_id: permission.id)
+      hbx_staff_role.set(permission_id: permission.id)
       sign_in(admin)
     end
 

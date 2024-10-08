@@ -101,14 +101,14 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
   context 'for successfully renewal' do
     before do
       BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-      hbx_profile.benefit_sponsorship.benefit_coverage_periods.last.update_attributes!(slcsp_id: renewal_product.id)
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.last.set(slcsp_id: renewal_product.id)
     end
 
     context 'assisted cases' do
       context 'renewal enrollment with assigned aptc' do
         before :each do
-          tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
-          tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
+          tax_household.set(effective_starting_on: next_year_date.beginning_of_year)
+          tax_household.tax_household_members.first.set(applicant_id: family_member.id)
         end
 
         context 'ehb premium is less than the selected aptc' do
@@ -136,7 +136,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
         context 'ehb premium is greater than the selected aptc' do
           before do
             enrollment.hbx_enrollment_members.first.person.update_attributes(is_tobacco_user: "NA")
-            eligibilty_determination.update_attributes!(max_aptc: 100.00)
+            eligibilty_determination.set(max_aptc: 100.00)
             @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
           end
 
@@ -165,8 +165,8 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
         context 'current enrollment has some aptc applied' do
           before do
             enrollment.hbx_enrollment_members.first.person.update_attributes(is_tobacco_user: "NA")
-            enrollment.update_attributes!(elected_aptc_pct: 0.5, applied_aptc_amount: 50.0)
-            eligibilty_determination.update_attributes!(max_aptc: 100.00)
+            enrollment.set(elected_aptc_pct: 0.5, applied_aptc_amount: 50.0)
+            eligibilty_determination.set(max_aptc: 100.00)
             @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
           end
 
@@ -193,9 +193,9 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
         context 'current enrollment is Coverall kind' do
           before do
-            enrollment.update_attributes!(kind: 'coverall')
-            enrollment.update_attributes!(elected_aptc_pct: 0.5, applied_aptc_amount: 50.0)
-            eligibilty_determination.update_attributes!(max_aptc: 100.00)
+            enrollment.set(kind: 'coverall')
+            enrollment.set(elected_aptc_pct: 0.5, applied_aptc_amount: 50.0)
+            eligibilty_determination.set(max_aptc: 100.00)
             @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
           end
 
@@ -222,8 +222,8 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
         before do
           BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
           enrollment.hbx_enrollment_members.first.person.update_attributes(is_tobacco_user: "NA")
-          tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
-          tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
+          tax_household.set(effective_starting_on: next_year_date.beginning_of_year)
+          tax_household.tax_household_members.first.set(applicant_id: family_member.id)
           tax_household.tax_household_members.update_all(csr_eligibility_kind: "csr_87")
           @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
         end
@@ -259,8 +259,8 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
         before do
           BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-          tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
-          tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
+          tax_household.set(effective_starting_on: next_year_date.beginning_of_year)
+          tax_household.tax_household_members.first.set(applicant_id: family_member.id)
           tax_household.tax_household_members.update_all(csr_eligibility_kind: "csr_limited")
           @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
         end
@@ -295,9 +295,9 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
     context 'enrollment product is catastrophic' do
       before do
-        tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
-        tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
-        product.update_attributes!(metal_level_kind: 'catastrophic')
+        tax_household.set(effective_starting_on: next_year_date.beginning_of_year)
+        tax_household.tax_household_members.first.set(applicant_id: family_member.id)
+        product.set(metal_level_kind: 'catastrophic')
         @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
       end
 
@@ -339,14 +339,14 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       let(:dental_benefit_package) do
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
           bcp.benefit_packages.each do |bp|
-            bp.update_attributes!(benefit_categories: ['dental'], title: "individual_dental_benefits_#{effective_on.year}")
+            bp.set(benefit_categories: ['dental'], title: "individual_dental_benefits_#{effective_on.year}")
           end
         end
       end
 
       before :each do
         enrollment.expire_coverage!
-        enrollment.update_attributes!(coverage_kind: 'dental',
+        enrollment.set(coverage_kind: 'dental',
                                       elected_aptc_pct: 0.7,
                                       applied_aptc_amount: 100.00,
                                       product_id: product.id)
@@ -371,7 +371,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
   context 'enrollment renewal failure' do
     before do
-      enrollment.hbx_enrollment_members.each { |mbr| mbr.person.update_attributes!(is_incarcerated: true) }
+      enrollment.hbx_enrollment_members.each { |mbr| mbr.person.set(is_incarcerated: true) }
       subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
     end
 
@@ -399,7 +399,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
     context 'shop enrollment object' do
       before :each do
-        enrollment.update_attributes!(kind: 'employer_sponsored')
+        enrollment.set(kind: 'employer_sponsored')
         @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
       end
 
@@ -444,7 +444,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
 
     context 'with non active enrollment by aasm state' do
       before :each do
-        enrollment.update_attributes!(aasm_state: 'shopping')
+        enrollment.set(aasm_state: 'shopping')
         @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
       end
 

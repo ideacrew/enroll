@@ -267,9 +267,9 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
         before do
           enrollment_2.benefit_sponsorship = benefit_sponsorship
           enrollment_2.save!
-          product.premium_tables.first.update_attributes!(rating_area: ::BenefitMarkets::Locations::RatingArea.where('active_year' => TimeKeeper.date_of_record.year).first)
+          product.premium_tables.first.set(rating_area: ::BenefitMarkets::Locations::RatingArea.where('active_year' => TimeKeeper.date_of_record.year).first)
           BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-          enrollment_2.update_attributes!(product: product, consumer_role: person.consumer_role)
+          enrollment_2.set(product: product, consumer_role: person.consumer_role)
 
           family.family_members.each do |member|
             FactoryBot.create(:tax_household_member, tax_household: tax_household, applicant_id: member.id)
@@ -315,9 +315,9 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
             before do
               dob = hbx_enrollment_member1.person.dob
               birth_month = (TimeKeeper.date_of_record - 3.months).month
-              hbx_enrollment_member1.person.update_attributes!(dob: Date.new(dob.year, birth_month, dob.day))
-              hbx_enrollment_member2.person.update_attributes!(dob: Date.new(dob.year, birth_month, dob.day + 1))
-              enrollment_2.update_attributes!(effective_on: TimeKeeper.date_of_record - 6.months)
+              hbx_enrollment_member1.person.set(dob: Date.new(dob.year, birth_month, dob.day))
+              hbx_enrollment_member2.person.set(dob: Date.new(dob.year, birth_month, dob.day + 1))
+              enrollment_2.set(effective_on: TimeKeeper.date_of_record - 6.months)
               subject.call({hbx_enrollment: enrollment_2, options: {"termination_date_#{enrollment_2.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
                                                                     "terminate_member_#{hbx_enrollment_member3.id}" => enrollment_2.subscriber.id.to_s,
                                                                     "admin_permission" => true}})

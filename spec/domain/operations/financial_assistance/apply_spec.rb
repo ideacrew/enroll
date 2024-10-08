@@ -12,7 +12,7 @@ RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :a
   end
   let!(:family) do
     fmly = FactoryBot.create(:family, :with_primary_family_member, person: person)
-    fmly.update_attributes!(renewal_consent_through_year: fmly.application_applicable_year + 2)
+    fmly.set(renewal_consent_through_year: fmly.application_applicable_year + 2)
     fmly
   end
   let!(:family_member) { FactoryBot.create(:family_member, family: family, person: person2) }
@@ -20,7 +20,7 @@ RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :a
 
   before :each do
     HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
-      bcp.update_attributes!(slcsp_id: product.id)
+      bcp.set(slcsp_id: product.id)
     end
   end
 

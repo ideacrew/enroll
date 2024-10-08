@@ -1742,14 +1742,14 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       context "person has a consumer role" do
         context "person has chosen to receive electronic communication" do
           it "sends the email" do
-            consumer_role2.update_attributes!(contact_method: "Paper and Electronic communications")
+            consumer_role2.set(contact_method: "Paper and Electronic communications")
             expect(@controller.send(:notice_upload_email)).to be_a_kind_of(Mail::Message)
           end
         end
 
         context "person has chosen not to receive electronic communication" do
           it "should not sent the email" do
-            consumer_role2.update_attributes!(contact_method: "Only Paper communication")
+            consumer_role2.set(contact_method: "Only Paper communication")
             expect(@controller.send(:notice_upload_email)).to be nil
           end
         end
@@ -1766,14 +1766,14 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         context "person has chosen to receive electronic communication" do
           it "sends the email" do
-            employee_role2.update_attributes!(contact_method: "Paper and Electronic communications")
+            employee_role2.set(contact_method: "Paper and Electronic communications")
             expect(@controller.send(:notice_upload_email)).to be_a_kind_of(Mail::Message)
           end
         end
 
         context "person has chosen not to receive electronic communication" do
           it "should not sent the email" do
-            employee_role2.update_attributes!(contact_method: "Only Paper communication")
+            employee_role2.set(contact_method: "Only Paper communication")
             expect(@controller.send(:notice_upload_email)).to be nil
           end
         end

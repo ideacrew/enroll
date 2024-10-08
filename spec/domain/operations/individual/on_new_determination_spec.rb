@@ -99,7 +99,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
       premium_table.update_attributes(effective_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
       @product.save!
       enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "coverage_selected")
-      hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: @product.id)}
       ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       cr1 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
       family.family_members[1].person.consumer_role = cr1

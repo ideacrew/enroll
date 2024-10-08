@@ -45,7 +45,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   describe "New" do
     before do
       allow(person).to receive("primary_family").and_return(family)
-      person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
+      person.consumer_role.set(:aasm_state => "verification_outstanding")
       @consumer_role = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
     end
     context "valid params" do
@@ -67,7 +67,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
 
   describe "Build" do
     before do
-      person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
+      person.consumer_role.set(:aasm_state => "verification_outstanding")
       allow(person).to receive("primary_family").and_return(family)
       @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
       @reminder_notice.build
@@ -108,7 +108,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
 
   describe "#append_notice_subject" do
     before do
-      person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
+      person.consumer_role.set(:aasm_state => "verification_outstanding")
       allow(person).to receive("primary_family").and_return(family)
       @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
       @reminder_notice.build
@@ -120,7 +120,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
 
   describe "#generate_pdf_notice" do
     before do
-      person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
+      person.consumer_role.set(:aasm_state => "verification_outstanding")
       allow(person).to receive("primary_family").and_return(family)
       @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
     end
@@ -146,7 +146,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
   describe "append_unverified_individuals" do
 
     before :each do
-      person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
+      person.consumer_role.set(:aasm_state => "verification_outstanding")
       allow(person).to receive("primary_family").and_return(family)
       @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
     end
@@ -170,7 +170,7 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
 
     context "citizenship" do
       it "should have citizenship pdf template" do
-        person.consumer_role.update_attributes!(citizen_status: "us_citizen")
+        person.consumer_role.set(citizen_status: "us_citizen")
         @reminder_notice.build
         expect(@reminder_notice.notice.dhs_unverified.present?).to be_truthy
       end

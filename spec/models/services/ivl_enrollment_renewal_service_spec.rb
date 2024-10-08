@@ -49,7 +49,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
                    else
                      active_csr_87_product.id
                    end
-        bcp.update_attributes!(slcsp_id: slcsp_id)
+        bcp.set(slcsp_id: slcsp_id)
       end
       hbx_profile.reload
 
@@ -82,7 +82,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
       end
 
       it "should return available_aptc" do
-        eligibility_determination1.update_attributes!(max_aptc: 15.00)
+        eligibility_determination1.set(max_aptc: 15.00)
         renewal_enrollment = subject.assign(aptc_values)
         expect(renewal_enrollment.applied_aptc_amount.to_f).to eq(eligibility_determination1.max_aptc.to_f)
       end
@@ -108,7 +108,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
       end
 
       before do
-        eligibility_determination1.update_attributes!(max_aptc: 30.00)
+        eligibility_determination1.set(max_aptc: 30.00)
         @renewal_enrollment = subject.assign(aptc_values)
       end
 

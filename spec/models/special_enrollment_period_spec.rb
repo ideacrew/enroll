@@ -812,7 +812,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       context 'qle_on is middle of month' do
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 15.days }
 
-        it 'should set effective date as beginning of current month' do 
+        it 'should set effective date as beginning of current month' do
           expect(sep.effective_on).to eq qle_on.beginning_of_month
         end
       end
@@ -820,7 +820,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       context 'qle_on is beginning of momth' do
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
 
-        it 'should set effective date as beginning of current month' do 
+        it 'should set effective date as beginning of current month' do
           expect(sep.effective_on).to eq qle_on.beginning_of_month
         end
       end
@@ -832,7 +832,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       context 'qle_on is middle of month' do
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month + 15.days }
 
-        it 'should set effective date as beginning of next month' do 
+        it 'should set effective date as beginning of next month' do
           expect(sep.effective_on).to eq qle_on.end_of_month + 1.day
         end
       end
@@ -840,7 +840,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       context 'qle_on is beginning of momth' do
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
 
-        it 'should set effective date as beginning of next month' do 
+        it 'should set effective date as beginning of next month' do
           expect(sep.effective_on).to eq qle_on.end_of_month + 1.day
         end
       end
@@ -1500,7 +1500,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         let(:qle_on) { TimeKeeper.date_of_record.beginning_of_month }
         let(:submitted_at) { TimeKeeper.date_of_record }
         before do
-          new_sep.update_attributes!(qle_on: qle_on)
+          new_sep.set(qle_on: qle_on)
         end
 
         it 'sets effective date as the beginning of next month after the submitted date' do
@@ -1512,7 +1512,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         let(:qle_on) { TimeKeeper.date_of_record + 1.month }
         let(:submitted_at) { TimeKeeper.date_of_record}
         before do
-          new_sep.update_attributes!(qle_on: qle_on)
+          new_sep.set(qle_on: qle_on)
         end
 
         it 'sets effective date as the beginning of next month after the submitted date' do
@@ -1623,7 +1623,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
       let!(:sep10) do
         sep = FactoryBot.create(:special_enrollment_period, family: family10)
-        sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+        sep.qualifying_life_event_kind.set(termination_on_kinds: ['end_of_event_month', 'exact_date'])
         sep
       end
 
@@ -1658,7 +1658,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
       let!(:sep) do
         sep = FactoryBot.create(:special_enrollment_period, family: family)
-        sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date', 'date_before_event','end_of_last_month_of_reporting','end_of_reporting_month', 'end_of_month_before_last'])
+        sep.qualifying_life_event_kind.set(termination_on_kinds: ['end_of_event_month', 'exact_date', 'date_before_event','end_of_last_month_of_reporting','end_of_reporting_month', 'end_of_month_before_last'])
         sep
       end
 
@@ -1674,7 +1674,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     let!(:qle_on) { TimeKeeper.date_of_record - 10.days }
     let!(:sep10) do
       sep = FactoryBot.create(:special_enrollment_period, qle_on: qle_on, family: family10)
-      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep.qualifying_life_event_kind.set(termination_on_kinds: ['end_of_event_month', 'exact_date'])
       sep
     end
 

@@ -44,7 +44,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 15))
       initial_application.benefit_packages.each do |bp|
         bp.sponsored_benefits.each do |spon_benefit|
-          spon_benefit.update_attributes!(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
+          spon_benefit.set(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
           create_pd(spon_benefit)
           update_contribution_levels(spon_benefit) if initial_application.employer_profile.is_a_fehb_profile?
         end
@@ -54,7 +54,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
     context 'clone terminated benefit application' do
       before do
         initial_application.terminate_enrollment!
-        initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
+        initial_application.set(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
         @new_ba = subject.call({benefit_application: initial_application, effective_period: initial_application.effective_period}).success
         @new_sponsored_benefit = @new_ba.benefit_packages.first.sponsored_benefits.first
       end
@@ -115,7 +115,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
     context 'clone termination_pending benefit application' do
       before do
         initial_application.schedule_enrollment_termination!
-        initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record + 1.month).end_of_month)
+        initial_application.set(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record + 1.month).end_of_month)
         @new_ba = subject.call({benefit_application: initial_application, effective_period: initial_application.effective_period}).success
       end
 
@@ -197,6 +197,6 @@ end
 
 def update_contribution_levels(spon_benefit)
   spon_benefit.sponsor_contribution.contribution_levels.each do |cl|
-    cl.update_attributes!({contribution_cap: 0.5, flat_contribution_amount: 100.00})
+    cl.set({contribution_cap: 0.5, flat_contribution_amount: 100.00})
   end
 end

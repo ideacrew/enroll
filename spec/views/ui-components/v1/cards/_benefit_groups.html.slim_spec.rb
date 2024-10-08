@@ -44,7 +44,7 @@ RSpec.describe "_benefit_groups.html.slim", :type => :view, dbclean: :after_each
     end
 
     it "should display 'yes' if the plan is a standard plan" do
-      benefit_group.reference_plan.update_attributes!(is_standard_plan: true)
+      benefit_group.reference_plan.set(is_standard_plan: true)
       render :partial => "ui-components/v1/cards/benefit_groups.html.slim", :locals => {:bg => benefit_group}
       expect(rendered).to have_content(l10n('standard_plan'))
       expect(rendered).to have_content(l10n('yes'))

@@ -546,7 +546,7 @@ describe Family, dbclean: :around_each do
     let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
     let!(:sep10) do
       sep = FactoryBot.create(:special_enrollment_period, family: family10)
-      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep.qualifying_life_event_kind.set(termination_on_kinds: ['end_of_event_month', 'exact_date'])
       sep
     end
     let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
@@ -569,13 +569,13 @@ describe Family, dbclean: :around_each do
     let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family10) }
     let!(:sep10) do
       sep = FactoryBot.create(:special_enrollment_period, family: family10)
-      sep.qualifying_life_event_kind.update_attributes!(market_kind: 'shop', termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep.qualifying_life_event_kind.set(market_kind: 'shop', termination_on_kinds: ['end_of_event_month', 'exact_date'])
       sep
     end
 
     let!(:fehb_sep) do
       sep = FactoryBot.create(:special_enrollment_period, family: family10)
-      sep.qualifying_life_event_kind.update_attributes!(market_kind: 'fehb', termination_on_kinds: ['end_of_reporting_month', 'end_of_month_before_last'])
+      sep.qualifying_life_event_kind.set(market_kind: 'fehb', termination_on_kinds: ['end_of_reporting_month', 'end_of_month_before_last'])
       sep
     end
 
@@ -1221,8 +1221,8 @@ describe "#outstanding_verification_datatable scope", dbclean: :after_each do
 
 
   it "should include families with only enrolled and enrolling outstanding enrollments" do
-    ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
-    ivl_person_2.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+    ivl_person.consumer_role.set(aasm_state: "verification_outstanding")
+    ivl_person_2.consumer_role.set(aasm_state: "verification_outstanding")
     ivl_enrollment.save!
     ivl_enrollment_2.save!
     expect(Family.outstanding_verification_datatable.size).to be(1)
@@ -1472,12 +1472,12 @@ describe "has_valid_e_case_id" do
   end
 
   it "returns true as it has a valid e_case_id" do
-    family1000.update_attributes!(e_case_id: "curam_landing_for5a0208eesjdb2c000096")
+    family1000.set(e_case_id: "curam_landing_for5a0208eesjdb2c000096")
     expect(family1000.has_valid_e_case_id?).to be_falsey
   end
 
   it "returns false as it don't have a valid e_case_id" do
-    family1000.update_attributes!(e_case_id: "urn:openhbx:hbx:dc0:resources:v1:curam:integrated_case#999999")
+    family1000.set(e_case_id: "urn:openhbx:hbx:dc0:resources:v1:curam:integrated_case#999999")
     expect(family1000.has_valid_e_case_id?).to be_truthy
   end
 end

@@ -216,7 +216,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
 
       it 'should return -01' do
         family.reload
-        ivl_tax_household.update_attributes!(effective_ending_on: TimeKeeper.date_of_record.end_of_year)
+        ivl_tax_household.set(effective_ending_on: TimeKeeper.date_of_record.end_of_year)
         expect(subject.csr_value).to eq '-01'
       end
     end

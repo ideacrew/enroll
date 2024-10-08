@@ -37,9 +37,9 @@ module BenefitSponsors
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
       user_with_hbx_staff_role.person.hbx_staff_role.save!
       benefit_sponsorship.save!
-      broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id, market_kind: 'shop')
+      broker_agency_profile1.set(primary_broker_role_id: broker_role1.id, market_kind: 'shop')
       broker_agency_profile1.approve!
-      broker_agency_profile2.update_attributes!(primary_broker_role_id: broker_role2.id, market_kind: 'shop')
+      broker_agency_profile2.set(primary_broker_role_id: broker_role2.id, market_kind: 'shop')
       broker_agency_profile2.approve!
       organization.reload
     end

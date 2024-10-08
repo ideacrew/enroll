@@ -55,7 +55,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   let(:event) { Success(double) }
   let(:obj)  { FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication.new }
   let(:create_home_address) do
-    application.applicants.first.update_attributes!(is_primary_applicant: true)
+    application.applicants.first.set(is_primary_applicant: true)
     add = ::FinancialAssistance::Locations::Address.new({
                                                           kind: 'home',
                                                           address_1: '3 Awesome Street',
@@ -99,7 +99,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
     context 'submit_renewal_draft' do
       before do
-        application.update_attributes!(aasm_state: 'renewal_draft')
+        application.set(aasm_state: 'renewal_draft')
         params = { payload: { application_hbx_id: application.hbx_id }, event_name: 'submit_renewal_draft' }
         @result = subject.call(params)
       end

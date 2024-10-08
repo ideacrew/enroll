@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month}
-  
+
   let!(:person) { create :person }
   let(:user)    { FactoryBot.create(:user, :person => person)}
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
@@ -17,7 +17,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   let!(:broker_agency_profile) { broker_agency_organization1.broker_agency_profile}
   let!(:model_instance) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
   let!(:broker_role1) { broker_agency_profile.primary_broker_role }
-  
+
   before do
     broker_agency_profile.update_attributes(primary_broker_role_id: broker_role1.id)
   end
@@ -49,7 +49,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
           expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
-        
+
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.broker_hired_confirmation_to_employer"
           expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}EmployerProfile"
@@ -62,7 +62,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   end
 
   describe "NoticeBuilder" do
-     
+
     context "when broker_hired_notice_to_broker is triggered" do
       let(:data_elements) {
         [
@@ -130,7 +130,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       it "should return broker agency name " do
         expect(merge_model.broker_agency_name).to eq broker_agency_profile.legal_name
       end
-    end 
+    end
 
 
     context "when broker_agency_hired_confirmation is triggered" do
@@ -164,7 +164,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       before do
         allow(subject).to receive(:resource).and_return(broker_agency_profile)
         allow(subject).to receive(:payload).and_return(payload)
-        broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role1.id)
+        broker_agency_profile.set(primary_broker_role_id: broker_role1.id)
         person.employer_staff_roles.create! benefit_sponsor_employer_profile_id: employer_profile.id
       end
 
@@ -205,8 +205,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       it "should return broker agency name " do
         expect(merge_model.broker_agency_name).to eq broker_agency_profile.legal_name
       end
-    end 
-    
+    end
+
     context "when broker_agency_hired_confirmation is triggered" do
       let(:data_elements) {
         [

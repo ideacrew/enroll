@@ -126,7 +126,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         context 'when coverage terminated' do
           before do
             allow_any_instance_of(BenefitSponsors::ModelEvents::HbxEnrollment).to receive(:notify_on_save).and_return(nil)
-            employee_role.update_attributes!(census_employee_id: census_employee.id)
+            employee_role.set(census_employee_id: census_employee.id)
             health_enrollment.terminate_coverage!
             allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
           end
@@ -139,7 +139,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         context 'when coverage termination pending' do
           before do
             allow_any_instance_of(BenefitSponsors::ModelEvents::HbxEnrollment).to receive(:notify_on_save).and_return(nil)
-            employee_role.update_attributes!(census_employee_id: census_employee.id)
+            employee_role.set(census_employee_id: census_employee.id)
             health_enrollment.schedule_coverage_termination!
             allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([health_enrollment])
           end
@@ -148,7 +148,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
             expect(helper.enrollment_state(census_employee)).to eq "Coverage Termination Pending (Health)"
           end
         end
-        
+
         context 'when coverage waived' do
           before do
             health_enrollment.update_attributes(:aasm_state => :inactive)
@@ -284,7 +284,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         assign(:census_employee, census_employee)
         assign(:employer_profile, abc_profile)
         period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
-        initial_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+        initial_application.set(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
         benefit_group_assignment.update_attributes(start_on: initial_application.effective_period.min)
       end
 
@@ -304,7 +304,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
       context 'if reinstated py is not present' do
         it 'should return nil if reinstated PY is not present' do
           census_employee.benefit_group_assignments = []
-          initial_application.update_attributes!(reinstated_id: nil)
+          initial_application.set(reinstated_id: nil)
           expect(helper.current_option_for_reinstated_benefit_package).to eq nil
         end
       end
@@ -561,26 +561,26 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         let(:cancel_end_on) { TimeKeeper.date_of_record.end_of_month }
 
         it 'For terminated benefit_application' do
-          initial_application.update_attributes!(aasm_state: :terminated)
+          initial_application.set(aasm_state: :terminated)
           expect(initial_application.aasm_state).to eq :terminated
           expect(display_reinstate_ba).to eq true
         end
 
         it 'For termiantion_pending benefit_application' do
-          initial_application.update_attributes!(aasm_state: :termination_pending)
+          initial_application.set(aasm_state: :termination_pending)
           expect(initial_application.aasm_state).to eq :termination_pending
           expect(display_reinstate_ba).to eq true
         end
 
         it 'For retroactive cancel benefit_application' do
-          initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
-          initial_application.update_attributes!(aasm_state: :retroactive_canceled)
+          initial_application.set(effective_period: start_on..cancel_end_on)
+          initial_application.set(aasm_state: :retroactive_canceled)
           expect(initial_application.aasm_state).to eq :retroactive_canceled
           expect(display_reinstate_ba).to eq true
         end
 
         it 'For canceled benefit_application' do
-          initial_application.update_attributes!(effective_period: TimeKeeper.date_of_record.next_month.beginning_of_month..TimeKeeper.date_of_record.end_of_month.next_year, aasm_state: :enrollment_eligible)
+          initial_application.set(effective_period: TimeKeeper.date_of_record.next_month.beginning_of_month..TimeKeeper.date_of_record.end_of_month.next_year, aasm_state: :enrollment_eligible)
           initial_application.cancel!
           initial_application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
           expect(initial_application.aasm_state).to eq :canceled
@@ -594,26 +594,26 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         let(:cancel_end_on)  { TimeKeeper.date_of_record.prev_month.end_of_month }
 
         it 'For terminated benefit_application' do
-          initial_application.update_attributes!(aasm_state: :terminated)
+          initial_application.set(aasm_state: :terminated)
           expect(initial_application.aasm_state).to eq :terminated
           expect(display_reinstate_ba).to eq false
         end
 
         it 'For termiantion_pending benefit_application' do
-          initial_application.update_attributes!(aasm_state: :termination_pending)
+          initial_application.set(aasm_state: :termination_pending)
           expect(initial_application.aasm_state).to eq :termination_pending
           expect(display_reinstate_ba).to eq false
         end
 
         it 'For retroactive cancel benefit_application' do
-          initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
-          initial_application.update_attributes!(aasm_state: :retroactive_canceled)
+          initial_application.set(effective_period: start_on..cancel_end_on)
+          initial_application.set(aasm_state: :retroactive_canceled)
           expect(initial_application.aasm_state).to eq :retroactive_canceled
           expect(display_reinstate_ba).to eq false
         end
 
         it 'For canceled benefit_application' do
-          initial_application.update_attributes!(effective_period: TimeKeeper.date_of_record.next_month.beginning_of_month..TimeKeeper.date_of_record.end_of_month.next_year, aasm_state: :enrollment_eligible)
+          initial_application.set(effective_period: TimeKeeper.date_of_record.next_month.beginning_of_month..TimeKeeper.date_of_record.end_of_month.next_year, aasm_state: :enrollment_eligible)
           initial_application.cancel!
           initial_application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
           expect(initial_application.aasm_state).to eq :canceled
@@ -629,7 +629,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           let(:end_on) { TimeKeeper.date_of_record.next_month.end_of_month }
 
           it 'should return true' do
-            initial_application.update_attributes!(aasm_state: :terminated)
+            initial_application.set(aasm_state: :terminated)
             expect(initial_application.aasm_state).to eq :terminated
             expect(validate_ba_reinstate_period).to eq true
           end
@@ -640,7 +640,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           let(:end_on) { TimeKeeper.date_of_record.end_of_month }
 
           it 'For terminated benefit_application' do
-            initial_application.update_attributes!(aasm_state: :terminated)
+            initial_application.set(aasm_state: :terminated)
             expect(initial_application.aasm_state).to eq :terminated
             expect(validate_ba_reinstate_period).to eq false
           end

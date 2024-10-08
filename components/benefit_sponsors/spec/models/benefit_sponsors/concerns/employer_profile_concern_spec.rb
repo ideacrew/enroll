@@ -27,7 +27,7 @@ module BenefitSponsors
         end
 
         it "should return nil and given billing date if given date covers canceled benefit_application effective period " do
-          application.update_attributes!(aasm_state: :canceled)
+          application.set(aasm_state: :canceled)
           date = application.start_on
           expect(profile.billing_benefit_application(date)).to eq [nil, date]
         end
@@ -55,7 +55,7 @@ module BenefitSponsors
           end
 
           it "should return renewal canceled application effective date & renewal start on date" do
-            renewal_application.update_attributes!(aasm_state: :canceled)
+            renewal_application.set(aasm_state: :canceled)
             expect(profile.billing_benefit_application).to eq [nil, nil]
           end
         end
@@ -66,7 +66,7 @@ module BenefitSponsors
       include_context 'set up broker agency profile for BQT, by using configuration settings'
 
       let(:employer_profile) {plan_design_organization_with_assigned_ga.employer_profile}
-      let!(:update_plan_design) {plan_design_organization_with_assigned_ga.update_attributes!(has_active_broker_relationship: true)}
+      let!(:update_plan_design) {plan_design_organization_with_assigned_ga.set(has_active_broker_relationship: true)}
       let(:ga_legal_name) {plan_design_organization_with_assigned_ga.general_agency_profile.legal_name.to_s}
       let(:site)            { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -166,7 +166,7 @@ module BenefitSponsors
 
       it 'should return future_active_reinstated_benefit_application' do
         period = benefit_application.effective_period.min + 1.year..(benefit_application.effective_period.max + 1.year)
-        benefit_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+        benefit_application.set(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
         expect(abc_profile.future_active_reinstated_benefit_application).to eq benefit_application
       end
 

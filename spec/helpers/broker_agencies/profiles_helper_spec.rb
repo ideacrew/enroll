@@ -39,7 +39,7 @@ RSpec.describe BrokerAgencies::ProfilesHelper, dbclean: :after_each, :type => :h
 
     context "with broker role" do
       before do
-        broker_agency_profile1.update_attributes!(primary_broker_role: broker_role)
+        broker_agency_profile1.set(primary_broker_role: broker_role)
       end
 
       it 'should return false if staff has primary broker role' do

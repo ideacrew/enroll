@@ -26,7 +26,7 @@ RSpec.describe Operations::Subscribers::ProcessRequests::DetermineSlcsp, type: :
       let!(:application) { FactoryBot.create(:financial_assistance_application, hbx_id: '200000126', aasm_state: "submitted", family_id: family.id, effective_date: TimeKeeper.date_of_record) }
       let!(:ed) do
         eli_d = FactoryBot.create(:financial_assistance_eligibility_determination, application: application)
-        eli_d.update_attributes!(hbx_assigned_id: '12345')
+        eli_d.set(hbx_assigned_id: '12345')
         eli_d
       end
       let!(:applicant) do
@@ -75,8 +75,8 @@ RSpec.describe Operations::Subscribers::ProcessRequests::DetermineSlcsp, type: :
       let(:benchmark_product) { ::Operations::BenchmarkProducts::Initialize.new.call(benchmark_product_hash).success }
 
       before do
-        health_product.issuer_profile.update_attributes!(abbrev: 'BCBS')
-        person.update_attributes!(hbx_id: '95')
+        health_product.issuer_profile.set(abbrev: 'BCBS')
+        person.set(hbx_id: '95')
         allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
           double('IdentifySlcspWithPediatricDentalCosts', call: Success(benchmark_product))
         )

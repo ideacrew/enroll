@@ -37,7 +37,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::AddEligib
       let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family.xml')) }
 
       before do
-        ed.update_attributes!(hbx_assigned_id: '205828')
+        ed.set(hbx_assigned_id: '205828')
         application.update_response_attributes(message)
         @result = subject.call(application: application)
         @ed = ed
@@ -86,7 +86,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::AddEligib
       let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family_without_ed.xml')) }
 
       before do
-        ed.update_attributes!(hbx_assigned_id: '205828')
+        ed.set(hbx_assigned_id: '205828')
         application.update_response_attributes(message)
         @result = subject.call(application: application)
         @ed = ed
@@ -148,7 +148,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::AddEligib
       let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family_with_ed_and_member_not_eligible.xml')) }
 
       before do
-        ed.update_attributes!(hbx_assigned_id: '205828')
+        ed.set(hbx_assigned_id: '205828')
         application.update_response_attributes(message)
         @result = subject.call(application: application)
       end
@@ -171,7 +171,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Haven::AddEligib
       let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family_without_ed_and_member_eligible.xml')) }
 
       before do
-        ed.update_attributes!(hbx_assigned_id: '205828')
+        ed.set(hbx_assigned_id: '205828')
         application.update_response_attributes(message)
         @result = subject.call(application: application)
       end

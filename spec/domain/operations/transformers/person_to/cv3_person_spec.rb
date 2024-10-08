@@ -45,7 +45,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     let!(:vlp_document) {person.consumer_role.vlp_documents.first}
 
     subject do
-      person.consumer_role.update_attributes!(active_vlp_document_id: vlp_document.id)
+      person.consumer_role.set(active_vlp_document_id: vlp_document.id)
       person.consumer_role.vlp_documents.create!(subject: "I-551 (Permanent Resident Card)")
       ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
     end
@@ -63,7 +63,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     let!(:vlp_document) {person.consumer_role.vlp_documents.first}
 
     subject do
-      person.consumer_role.update_attributes!(active_vlp_document_id: nil)
+      person.consumer_role.set(active_vlp_document_id: nil)
       ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
     end
 
@@ -89,7 +89,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     let(:person) { FactoryBot.create(:person, consumer_role: consumer_role) }
 
     before do
-      person.consumer_role.update_attributes!(active_vlp_document_id: vlp_document.id)
+      person.consumer_role.set(active_vlp_document_id: vlp_document.id)
       person.consumer_role.vlp_documents.create!(subject: "I-551 (Permanent Resident Card)")
       person_payload = ::Operations::Transformers::PersonTo::Cv3Person.new.call(person).success
       person_contract = AcaEntities::Contracts::People::PersonContract.new.call(person_payload)

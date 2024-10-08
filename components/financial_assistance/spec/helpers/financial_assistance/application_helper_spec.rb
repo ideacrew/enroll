@@ -240,7 +240,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
   context 'csr_73_87_or_94_eligible_applicants' do
     before do
-      applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: [73, 87, 94].sample })
+      applicant.set({ is_ia_eligible: true, csr_percent_as_integer: [73, 87, 94].sample })
       applicant.reload
       @result = helper.csr_73_87_or_94_eligible_applicants?(application.id)
     end
@@ -252,7 +252,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
   context 'csr_100_eligible_applicants' do
     before do
-      applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: 100 })
+      applicant.set({ is_ia_eligible: true, csr_percent_as_integer: 100 })
       applicant.reload
       @result = helper.csr_100_eligible_applicants?(application.id)
     end
@@ -265,7 +265,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
   context 'csr_limited_eligible_applicants' do
     context 'aqhp' do
       before do
-        applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: -1 })
+        applicant.set({ is_ia_eligible: true, csr_percent_as_integer: -1 })
         applicant.reload
         @result = helper.csr_limited_eligible_applicants?(application.id)
       end
@@ -277,7 +277,7 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
 
     context 'uqhp' do
       before do
-        applicant.update_attributes!({ indian_tribe_member: true })
+        applicant.set({ indian_tribe_member: true })
         applicant.reload
         @result = helper.csr_limited_eligible_applicants?(application.id)
       end

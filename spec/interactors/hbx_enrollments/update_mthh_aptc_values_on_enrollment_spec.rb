@@ -123,7 +123,7 @@ RSpec.describe ::HbxEnrollments::UpdateMthhAptcValuesOnEnrollment, :dbclean => :
     )
     effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
     enrollment.update_attributes(effective_on: Date.new(effective_on.year, 1, 1), aasm_state: "coverage_selected")
-    hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: product.id)}
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: product.id)}
     allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(product, effective_on, person.age_on(Date.today), "R-#{site_key}001", 'N').and_return(679.8)
     cr1 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
     family.family_members[1].person.consumer_role = cr1

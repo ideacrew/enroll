@@ -39,7 +39,7 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules
     context 'person without SSN' do
       let(:person) do
         per = FactoryBot.create(:person, :with_consumer_role)
-        per.update_attributes!(encrypted_ssn: nil)
+        per.set(encrypted_ssn: nil)
         per
       end
 

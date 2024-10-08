@@ -18,7 +18,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
 
   let!(:ed) do
     eli_d = FactoryBot.create(:financial_assistance_eligibility_determination, application: application)
-    eli_d.update_attributes!(hbx_assigned_id: '12345')
+    eli_d.set(hbx_assigned_id: '12345')
     eli_d
   end
 

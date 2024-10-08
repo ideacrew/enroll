@@ -24,7 +24,7 @@ RSpec.describe ::Operations::Transformers::Cv3ApplicationTo::IdentifySlcspReques
       let(:mm_application) { ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success }
 
       before do
-        person.update_attributes!(hbx_id: '95')
+        person.set(hbx_id: '95')
       end
 
       it 'should return success result' do
@@ -34,4 +34,3 @@ RSpec.describe ::Operations::Transformers::Cv3ApplicationTo::IdentifySlcspReques
     end
   end
 end
-

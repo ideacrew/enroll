@@ -598,7 +598,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:indian_alaskan_tribe_codes].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
-        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
+        person.set(tribal_state: "ME", tribe_codes: ["", "PE"])
         person.save!
         allow(EnrollRegistry[:enable_call_hub_for_ai_an].feature).to receive(:is_enabled).and_return(true)
 

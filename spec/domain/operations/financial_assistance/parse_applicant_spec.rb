@@ -6,7 +6,7 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
     per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
     addi_attrs = { active_vlp_document_id: per.consumer_role.vlp_documents.first.id,
                    is_applying_coverage: true, five_year_bar_applies: true, five_year_bar_met: true }
-    per.consumer_role.update_attributes!(addi_attrs)
+    per.consumer_role.set(addi_attrs)
     per.consumer_role.lawful_presence_determination.update!(qualified_non_citizenship_result: 'Y')
     per
   end
@@ -25,7 +25,7 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
 
   before :each do
     bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-    bcp.update_attributes!(slcsp_id: product.id)
+    bcp.set(slcsp_id: product.id)
   end
 
   it 'should be a container-ready operation' do

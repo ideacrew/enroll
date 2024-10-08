@@ -63,7 +63,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     context 'when enrollment reinstated', dbclean: :around_each do
       before do
         period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
-        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
         initial_application.terminate_enrollment!
         effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
         cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
@@ -170,7 +170,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
       context 'for a waived enrollment' do
         before do
-          enrollment.update_attributes!(effective_on: @cloned_package.start_on, aasm_state: 'shopping', terminate_reason: 'retroactive_canceled')
+          enrollment.set(effective_on: @cloned_package.start_on, aasm_state: 'shopping', terminate_reason: 'retroactive_canceled')
           enrollment.waive_coverage!
           enrollment.cancel_coverage!
           @result = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
@@ -185,7 +185,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     context 'reinstating terminated enrollment, employee terminated in past', dbclean: :after_each do
       before do
         period = initial_application.effective_period.min..(TimeKeeper.date_of_record - 2.months).end_of_month
-        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
         initial_application.terminate_enrollment!
         census_employee.terminate_employment(TimeKeeper.date_of_record.last_month.end_of_month)
 
@@ -247,7 +247,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     context 'when benefit group assignment not found', dbclean: :after_each do
       before do
         period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
-        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
         initial_application.terminate_enrollment!
         effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
         cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
@@ -270,7 +270,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     context 'overlapping enrollment exists' do
       before do
         period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
-        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
         initial_application.terminate_enrollment!
         effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
         cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
@@ -302,7 +302,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     context 'when benefit package optional params missing' do
       before do
         period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
-        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
         initial_application.terminate_enrollment!
         effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
         cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
@@ -419,7 +419,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     context 'monthly ageoff termination' do
       before do
         period = (initial_application.effective_period.min..initial_application.start_on.next_month.end_of_month)
-        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
         initial_application.terminate_enrollment!
         effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
         cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
@@ -557,7 +557,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     context 'yearly ageoff termination' do
       before do
         period = (initial_application.effective_period.min..initial_application.start_on.end_of_year)
-        initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+        initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
         initial_application.terminate_enrollment!
         effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
         cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success

@@ -89,7 +89,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
       before :each do
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
-        initial_application.update_attributes!(:aasm_state => :enrollment_open)
+        initial_application.set(:aasm_state => :enrollment_open)
         put :cancel, params: { employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id, end_on: initial_application.start_on.next_month }
       end
 
@@ -137,7 +137,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
         allow(EnrollRegistry[:benefit_application_reinstate].feature).to receive(:is_enabled).and_return(true)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
-        initial_application.update_attributes!(:aasm_state => :retroactive_canceled)
+        initial_application.set(:aasm_state => :retroactive_canceled)
         put :reinstate, params: { employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id}
       end
 
@@ -158,7 +158,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
       before :each do
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: false))
         sign_in(user)
-        initial_application.update_attributes!(:aasm_state => :retroactive_canceled)
+        initial_application.set(:aasm_state => :retroactive_canceled)
         put :reinstate, params: { employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id}
       end
 
@@ -180,7 +180,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
         allow(EnrollRegistry[:benefit_application_reinstate].feature).to receive(:is_enabled).and_return(true)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
-        initial_application.update_attributes!(:aasm_state => :enrollment_eligible)
+        initial_application.set(:aasm_state => :enrollment_eligible)
         put :reinstate, params: { employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id}
       end
 
@@ -202,7 +202,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
         allow(EnrollRegistry[:benefit_application_reinstate].feature).to receive(:is_enabled).and_return(false)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
-        initial_application.update_attributes!(:aasm_state => :enrollment_eligible)
+        initial_application.set(:aasm_state => :enrollment_eligible)
         put :reinstate, params: { employer_application_id: initial_application.id, employer_id: benefit_sponsorship.id}
       end
 

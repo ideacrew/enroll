@@ -144,7 +144,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     end
 
     it "should have rx formulary url coverage_kind = health" do
-      plan.update_attributes!(nationwide: true)
+      plan.set(nationwide: true)
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to match(/#{plan.rx_formulary_url}/)
     end
@@ -169,7 +169,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     if offers_nationwide_plans?
       it "should have provider directory url if nationwide = true" do
-        plan.update_attributes!(nationwide: true)
+        plan.set(nationwide: true)
         render "shared/comparison", :qhps => mock_qhps
         expect(rendered).to match(/#{plan.provider_directory_url}/)
       end

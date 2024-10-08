@@ -53,7 +53,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
       context "for new model employer profile match", dbclean: :after_each do
 
         before(:each) do
-          abc_organization.update_attributes!(hbx_id: employer_profile.hbx_id)
+          abc_organization.set(hbx_id: employer_profile.hbx_id)
         end
 
         it "should redirect" do
@@ -168,4 +168,3 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
     end
   end
 end
-

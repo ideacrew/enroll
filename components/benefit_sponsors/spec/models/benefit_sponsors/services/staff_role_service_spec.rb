@@ -301,7 +301,7 @@ module BenefitSponsors
         end
         # flaky test
         xit "should return result if broker profile is approved" do
-          broker_agency_profile.update_attributes!(aasm_state: "is_approved")
+          broker_agency_profile.set(aasm_state: "is_approved")
           expect(subject.broker_agency_search!(staff_role_form)).to eq [broker_agency_profile]
         end
       end
@@ -322,7 +322,7 @@ module BenefitSponsors
                                                                                is_broker_registration_page: "true")
         end
         it "should return blank search" do
-          broker_agency_profile.primary_broker_role.update_attributes!(aasm_state: "decertified")
+          broker_agency_profile.primary_broker_role.set(aasm_state: "decertified")
           expect(subject.broker_agency_search!(staff_role_form)).to eq []
         end
       end
@@ -342,7 +342,7 @@ module BenefitSponsors
         end
         # flaky test
         xit "should return result if general agency profile is approved" do
-          general_agency_profile.update_attributes!(aasm_state: "is_approved")
+          general_agency_profile.set(aasm_state: "is_approved")
           expect(subject.general_agency_search!(staff_role_form)).to eq [general_agency_profile]
         end
       end

@@ -110,7 +110,7 @@ module BenefitSponsors
     let(:partner_contribution_unit) { contribution_model.contribution_units.where(order: 2).first }
     let(:child_contribution_unit) { contribution_model.contribution_units.where(order: 3).first }
     before do
-      issuer_profile.organization.update_attributes!(site_id: site.id)
+      issuer_profile.organization.set(site_id: site.id)
     end
 
     describe "GET new" do
@@ -207,7 +207,7 @@ module BenefitSponsors
     describe "GET edit" do
 
       before do
-        benefit_package.sponsored_benefits.first.reference_product.update_attributes!(:issuer_profile_id => issuer_profile.id)
+        benefit_package.sponsored_benefits.first.reference_product.set(:issuer_profile_id => issuer_profile.id)
         benefit_package.reload
       end
 

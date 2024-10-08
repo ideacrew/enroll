@@ -27,7 +27,7 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
   describe 'amount' do
     context 'presence of amount' do
       before do
-        income.update_attributes!(amount: nil)
+        income.set(amount: nil)
       end
 
       context 'presence of amount on step_1' do
@@ -99,7 +99,7 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
   context 'hours_worked_per_week' do
     context 'end_on is before TimeKeeper.date_of_record' do
       before do
-        income.update_attributes!({ start_on: TimeKeeper.date_of_record.prev_year,
+        income.set({ start_on: TimeKeeper.date_of_record.prev_year,
                                     end_on: (TimeKeeper.date_of_record - 2.days)})
       end
 
@@ -113,7 +113,7 @@ RSpec.describe FinancialAssistance::Income, type: :model, dbclean: :after_each d
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_zero_income_amount_validation).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ssi_income_types).and_return(true)
-      income.update_attributes!(kind: "social_security_benefit")
+      income.set(kind: "social_security_benefit")
     end
 
     context 'with no ssi type set' do

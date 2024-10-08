@@ -75,7 +75,7 @@ module BenefitSponsors
 
       context "for broker agency profile" do
         before do
-          broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_organization.broker_agency_profile.id)
+          broker_person.broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_organization.broker_agency_profile.id)
           @broker_inbox = broker_person.build_inbox
           @broker_inbox.save!
           welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
@@ -180,11 +180,11 @@ module BenefitSponsors
         let(:permission) { FactoryBot.create(:permission, :super_admin) }
 
         before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
           broker_person.create_broker_agency_staff_role(
             benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
           )
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id, market_kind: market_kind)
+          broker_agency_profile.set(primary_broker_role_id: broker_role.id, market_kind: market_kind)
           broker_role.approve!
           broker_staff
           sign_in broker_staff_user

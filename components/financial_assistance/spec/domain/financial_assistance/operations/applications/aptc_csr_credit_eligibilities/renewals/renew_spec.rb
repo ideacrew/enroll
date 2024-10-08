@@ -68,7 +68,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
     context 'determined application with no years to renew' do
       before do
-        application.update_attributes!({ aasm_state: 'determined', years_to_renew: [0, nil].sample })
+        application.set({ aasm_state: 'determined', years_to_renew: [0, nil].sample })
         application.reload
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         @renewal_draft_app = @result.success
@@ -96,7 +96,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(true)
           allow(FinancialAssistanceRegistry[:full_medicaid_determination_step].setting(:annual_eligibility_redetermination)).to receive(:item).and_return(true)
 
-          application.update_attributes!({ aasm_state: 'determined', years_to_renew: 1 })
+          application.set({ aasm_state: 'determined', years_to_renew: 1 })
           application.reload
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
           @renewal_draft_app = @result.success
@@ -112,7 +112,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(false)
           allow(FinancialAssistanceRegistry[:full_medicaid_determination_step].setting(:annual_eligibility_redetermination)).to receive(:item).and_return(false)
 
-          application.update_attributes!({ aasm_state: 'determined', years_to_renew: 1 })
+          application.set({ aasm_state: 'determined', years_to_renew: 1 })
           application.reload
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
           @renewal_draft_app = @result.success
@@ -129,7 +129,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(true)
         allow(FinancialAssistanceRegistry[:full_medicaid_determination_step].setting(:annual_eligibility_redetermination)).to receive(:item).and_return(false)
 
-        application.update_attributes!({ aasm_state: 'determined', years_to_renew: 1 })
+        application.set({ aasm_state: 'determined', years_to_renew: 1 })
         application.reload
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         @renewal_draft_app = @result.success
@@ -210,7 +210,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
     context 'renewal_base_year' do
       before do
         years_to_renew = 4
-        application.update_attributes!({ aasm_state: 'determined', years_to_renew: years_to_renew, renewal_base_year: TimeKeeper.date_of_record.year + years_to_renew, is_renewal_authorized: false })
+        application.set({ aasm_state: 'determined', years_to_renew: years_to_renew, renewal_base_year: TimeKeeper.date_of_record.year + years_to_renew, is_renewal_authorized: false })
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         @renewal_draft_app = @result.success
       end
@@ -229,7 +229,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
     context 'submitted application' do
       before do
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
         application.reload
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
       end
@@ -347,7 +347,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
       context 'Claiming applicants missing' do
         before do
-          application_11.applicants.last.update_attributes!(claimed_as_tax_dependent_by: nil)
+          application_11.applicants.last.set(claimed_as_tax_dependent_by: nil)
           @result = subject.call({ family_id: application_11.family_id, renewal_year: application_11.assistance_year.next })
         end
 
@@ -443,7 +443,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
         let(:validated_params) { { family_id: application.family_id, renewal_year: application.assistance_year.next } }
         before do
-          application.update_attributes!(aasm_state: app_state)
+          application.set(aasm_state: app_state)
           @result = subject.call(validated_params)
         end
 
@@ -531,7 +531,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'application has all ineligible applicants and skip_eligibility_redetermination flag is set to true' do
         before do
           application.applicants.each do |appl|
-            appl.update_attributes!(is_totally_ineligible: true)
+            appl.set(is_totally_ineligible: true)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
           @input_params = { family_id: application.family_id, renewal_year: application.assistance_year.next }
@@ -550,7 +550,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'application has all not applyling coverage applicants and skip_eligibility_redetermination flag is set to true' do
         before do
           application.applicants.each do |appl|
-            appl.update_attributes!(is_applying_coverage: false)
+            appl.set(is_applying_coverage: false)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
           @input_params = { family_id: application.family_id, renewal_year: application.assistance_year.next }
@@ -569,7 +569,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'application has all medicaid chip applicants and skip_eligibility_redetermination flag is set to true' do
         before do
           application.applicants.each do |appl|
-            appl.update_attributes!(is_medicaid_chip_eligible: true)
+            appl.set(is_medicaid_chip_eligible: true)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
           @input_params = { family_id: application.family_id, renewal_year: application.assistance_year.next }
@@ -587,8 +587,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
       context 'application has one medicaid chip and uqhp eligible applicant and skip_eligibility_redetermination flag is set to true' do
         before do
-          application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
-          application.applicants[1].update_attributes!(is_without_assistance: true)
+          application.applicants[0].set(is_medicaid_chip_eligible: true)
+          application.applicants[1].set(is_without_assistance: true)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         end
@@ -600,8 +600,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
       context 'application has one medicaid chip and one insurance assistance eligible applicant and skip_eligibility_redetermination flag is set to true' do
         before do
-          application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
-          application.applicants[1].update_attributes!(is_ia_eligible: true)
+          application.applicants[0].set(is_medicaid_chip_eligible: true)
+          application.applicants[1].set(is_ia_eligible: true)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         end
@@ -625,7 +625,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'application has all ineligible applicants and skip_eligibility_redetermination flag is set to false' do
         before do
           application.applicants.each do |appl|
-            appl.update_attributes!(is_totally_ineligible: true)
+            appl.set(is_totally_ineligible: true)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
@@ -648,7 +648,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'application has all not applying coverage applicants and skip_eligibility_redetermination flag is set to false' do
         before do
           application.applicants.each do |appl|
-            appl.update_attributes!(is_applying_coverage: false)
+            appl.set(is_applying_coverage: false)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
@@ -662,7 +662,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'application has all medicaid chip applicants and skip_eligibility_redetermination flag is set to false' do
         before do
           application.applicants.each do |appl|
-            appl.update_attributes!(is_medicaid_chip_eligible: true)
+            appl.set(is_medicaid_chip_eligible: true)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
@@ -675,8 +675,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
       context 'application has one medicaid chip and uqhp eligible applicant and skip_eligibility_redetermination flag is set to false' do
         before do
-          application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
-          application.applicants[1].update_attributes!(is_without_assistance: true)
+          application.applicants[0].set(is_medicaid_chip_eligible: true)
+          application.applicants[1].set(is_without_assistance: true)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
           @renewal_draft_app = @result.success
@@ -689,8 +689,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
       context 'application has one medicaid chip and one insurance assistance eligible applicant and skip_eligibility_redetermination flag is set to false' do
         before do
-          application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
-          application.applicants[1].update_attributes!(is_ia_eligible: true)
+          application.applicants[0].set(is_medicaid_chip_eligible: true)
+          application.applicants[1].set(is_ia_eligible: true)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         end

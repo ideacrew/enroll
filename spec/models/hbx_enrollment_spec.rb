@@ -568,7 +568,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
   let(:family) { person.primary_family }
   let!(:census_employee) do
     ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
-    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    ce.set(employee_role_id: person.employee_roles.first.id)
     person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
     ce
   end

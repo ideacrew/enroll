@@ -126,7 +126,7 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
         # end
 
         # it "should not trigger notice to employer if plan year doesn't start in 2018" do
-        #   renewing_employer.plan_years.first.update_attributes!(start_on: start_on, end_on: end_on)
+        #   renewing_employer.plan_years.first.set(start_on: start_on, end_on: end_on)
         #   expect(renewal_factory).not_to receive(:trigger_notice)
         #   renewal_factory.renew
         # end

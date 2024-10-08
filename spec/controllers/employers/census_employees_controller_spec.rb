@@ -237,7 +237,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     context 'employer can remove census employee ssn when census employee is added at the time of ssn/tin disabled' do
       it "should able to update census employee without ssn" do
         expect(census_employee.ssn.present?).to eq true
-        census_employee.update_attributes!(:no_ssn_allowed => 'true')
+        census_employee.set(:no_ssn_allowed => 'true')
         post :update, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: census_employee_delete_ssn}
         census_employee.reload
         expect(census_employee.ssn.present?).to eq false
