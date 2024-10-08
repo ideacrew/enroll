@@ -75,13 +75,17 @@
         <%= hidden_field_tag 'person_id', person.id  %>
         <%= hidden_field_tag 'verification_type', type.id %>
         <%= hidden_field_tag 'admin_action', 'extend' %>
-
-        <div class="col-md-3">
-          <%= link_to "Cancel", verification_insured_families_path, class: "btn btn-default v-type-confirm-button" %>
-        </div>
-        <div class="col-md-3">
+        <% if @bs4 %>
+          <%= link_to "Cancel", verification_insured_families_path, class: "btn btn-error outline v-type-confirm-button" %>
           <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
-        </div>
+        <% else %>
+          <div class="col-md-3">
+            <%= link_to "Cancel", verification_insured_families_path, class: "btn btn-default v-type-confirm-button" %>
+          </div>
+          <div class="col-md-3">
+            <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+          </div>
+        <% end %>
     <%end%>
   </div>
 </div>
