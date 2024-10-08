@@ -25,8 +25,8 @@
             <th><%= l10n('plan') %></th>
             <th><%= l10n('hbx_profiles.effective_date') %></th>
             <th><%= l10n('hbx_profiles.cancel.cancellation_date') %></th>
-            <th><%= l10n('hbx_profiles.cancel.cancel_enrollment') %></th>
-            <th><%= l10n('hbx_profiles.edi') %></th>
+            <th id="cancel_header"><%= l10n('hbx_profiles.cancel.cancel_enrollment') %></th>
+            <th id="transmit_header"><%= l10n('hbx_profiles.edi') %></th>
           </tr>
           <% @hbxs.each do |hbx| %>
           <tr>
@@ -34,18 +34,8 @@
             <td><%= hbx.product.title %></td>
             <td><%= hbx.effective_on %></td>
             <td><%= hbx.effective_on %></td>
-            <td>
-              <label class="d-block weight-n">
-                <%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id %>
-                <%= l10n('cancel') %>
-              </label>
-            </td>
-            <td>
-              <label class="d-block weight-n">
-                <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false, disabled: true %>
-                <%= l10n('transmit') %>
-              </label>
-            </td>
+            <td><%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id, false, 'aria-labelledby': "cancel_header" %></td>
+            <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false, disabled: true, aria: { labelledby: "transmit_header" } %></td>
           </tr>
           <% end %>
           <tr><td colspan = "6"><br /></td></tr>
