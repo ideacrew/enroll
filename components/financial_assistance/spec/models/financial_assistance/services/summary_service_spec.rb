@@ -128,7 +128,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         }
     end
 
-    context "subsections" do
+    context "applicant subsections" do
       let(:subsection) { subject.first[:subsections][subsection_index] }
 
       context "when initialized with is_concise as false" do
@@ -260,10 +260,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Income subsection" do
           let(:subsection_index) { 2 }
 
-          before do
-            applicant.update_attributes(has_job_income: true, has_self_employment_income: false)
-            applicant.save
-          end
+          before do applicant.update_attributes!(has_job_income: true, has_self_employment_income: false) end
 
           it_behaves_like "subsection structure", "Income", {
             "Does this person have income from an employer"=>"Yes",
@@ -281,10 +278,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Income and Adjustments subsection" do
           let(:subsection_index) { 3 }
 
-          before do
-            applicant.update_attributes(has_deductions: true)
-            applicant.save
-          end
+          before do applicant.update_attributes!(has_deductions: true) end
 
           it_behaves_like "subsection structure", "Income Adjustments", {"Does this person have adjustments to income?"=>"Yes"}
         end
@@ -359,6 +353,34 @@ describe ::FinancialAssistance::Services::SummaryService do
             desc: "the applicant is applying for coverage, has no SSN, has not applied for an SSN, and has given a reason",
             proc: -> { 
               applicant.update_attributes!(is_applying_coverage: true, no_ssn: '1', is_ssn_applied: false, non_ssn_apply_reason: "applicant reason")
+            }
+          }
+
+          it_behaves_like "conditional rows", ["Pregnancy due date?", "How many children is this person expecting?"], {
+            desc: "the applicant is pregnant", 
+            proc: -> { 
+              applicant.update_attributes!(is_pregnant: true)
+            }
+          }
+
+          it_behaves_like "conditional rows", "Was this person pregnant in the last year?", {
+            desc: "the applicant is not pregnant",
+            proc: -> { 
+              applicant.update_attributes!(is_pregnant: false)
+            }
+          }
+
+          it_behaves_like "conditional rows", "Pregnancy end date:", {
+            desc: "the applicant is not pregnant but was recently pregnant and is in post partum",
+            proc: -> { 
+              applicant.update_attributes!(is_pregnant: false, is_post_partum_period: true, pregnancy_end_on: 30.days.ago)
+            }
+          }
+
+          it_behaves_like "conditional rows", "Was this person enrolled in Medicaid during the pregnancy?", {
+            desc: "the applicant is enrolled on medicaid",
+            proc: -> { 
+              applicant.update_attributes!(is_enrolled_on_medicaid: true)
             }
           }
 
