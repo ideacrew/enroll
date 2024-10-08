@@ -5,68 +5,8 @@
 # @see ApplicationController
 class UsersController < ApplicationController
 
-  # Sets the user before each action, except for :confirm_lock and :unsupported_browser.
-  before_action :set_user, except: [:confirm_lock, :unsupported_browser]
-
-  # Confirms the lock action for a user.
-  #
-  # @return [void]
-  # @response_to JS
-  def confirm_lock
-    authorize HbxProfile, :confirm_lock?
-    @user_id  = params[:user_action_id]
-
-    respond_to do |format|
-      format.js { render 'confirm_lock' }
-    end
-  end
-
-  # Locks a user.
-  #
-  # @return [void]
-  # @response_to JS
-  def lockable
-    authorize HbxProfile, :lockable?
-    @user.lock!
-    flash[:notice] = "User #{user.email} is successfully #{user.lockable_notice}."
-
-    respond_to do |format|
-      format.js { render 'lockable' }
-    end
-  end
-
-  # Resets a user's password.
-  #
-  # @return [void]
-  # @response_to JS
-  def reset_password
-    authorize HbxProfile, :reset_password?
-
-    respond_to do |format|
-      format.js { render 'reset_password' }
-    end
-  end
-
-  # Confirms the reset password action for a user.
-  #
-  # @return [void]
-  # @response_to JS
-  def confirm_reset_password
-    authorize HbxProfile, :confirm_reset_password?
-    @error = nil
-    validate_email if params[:user].present?
-
-    respond_to do |format|
-      format.js do
-        if @error.nil?
-          User.send_reset_password_instructions(email: @user.email)
-          redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "Reset password instruction sent to user email."
-        else
-          render 'reset_password'
-        end
-      end
-    end
-  end
+  # Sets the user before each action, except for :unsupported_browser.
+  before_action :set_user, except: [:unsupported_browser]
 
   # Changes a user's username and email.
   #
