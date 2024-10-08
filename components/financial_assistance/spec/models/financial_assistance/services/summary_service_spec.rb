@@ -73,7 +73,6 @@ describe ::FinancialAssistance::Services::SummaryService do
     # enforce general structure of a given subsection
     shared_examples "subsection structure" do |subsection_title, expected_rows|
       it "includes the #{subsection_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
-        binding.irb
         expect(subsection).not_to be_nil
         expect(subsection[:title]).to eq(subsection_title)
         rows = subsection[:rows]
@@ -98,7 +97,7 @@ describe ::FinancialAssistance::Services::SummaryService do
       end
     end
 
-    context "when initialized is_concise as false" do
+    context "when initialized with is_concise as false" do
       let(:is_concise) { false }
 
       describe "Personal Information subsection" do
@@ -147,7 +146,7 @@ describe ::FinancialAssistance::Services::SummaryService do
       end
     end
 
-    context "when initialized is_concise as true" do
+    context "when initialized with is_concise as true" do
       let(:is_concise) { true }
 
       describe "Personal Information subsection" do
@@ -176,7 +175,7 @@ describe ::FinancialAssistance::Services::SummaryService do
           }
         }
 
-        it_behaves_like "conditional row", "Will this person be claimed as a tax dependent for #{assistance_year}?", {
+        it_behaves_like "conditional row", "This person will be claimed as a dependent by", {
           desc: "applicant is claimed as tax dependent", 
           proc: -> {
             applicant.update(is_claimed_as_tax_dependent: true)
@@ -205,8 +204,17 @@ describe ::FinancialAssistance::Services::SummaryService do
           proc: -> { toggle_single_flag(EnrollRegistry, :american_indian_alaskan_native_income, true) }
         }
       end
+
+      describe "Income and Adjustments subsection" do
+        let(:subsection) { subject.first[:subsections][3] }
+
+        before do
+          applicant.update_attributes(has_deductions: true)
+          applicant.save
+        end
+
+        it_behaves_like "subsection structure", "Income Adjustments", {"Does this person have adjustments to income?"=>"Yes"}
+      end
     end
   end
 end
-
-# subject.first[:subsections].first[:rows].reduce({}) {|total, current| total.update(current[:key] => current[:value])}
