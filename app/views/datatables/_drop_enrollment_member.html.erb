@@ -23,7 +23,7 @@
           <% if @bs4 %>
             <label class="d-block weight-n">
               <%= l10n("termination_date") %>
-              <%= date_field_tag "termination_date_#{hbx.id}", nil, value: set_default_termination_date_value(hbx).strftime("%Y-%m-%d"), id: "termination-date-picker_#{hbx.id}", min: set_date_min_to_beginning_of_year(hbx, 1), max: set_date_max_to_plan_end_of_year(hbx), 'data-cuke': 'drop_termination_date', class: 'd-block' %>
+              <%= date_field_tag "termination_date_#{hbx.id}", nil, value: date_field_value(set_default_termination_date_value(hbx)), id: "termination-date-picker_#{hbx.id}", min: date_field_value(set_date_min_to_beginning_of_year(hbx, 1)), max: date_field_value(set_date_max_to_plan_end_of_year(hbx)), 'data-cuke': 'drop_termination_date', class: 'd-block' %>
             </label>
           <% else %>
             <%= l10n('termination_date') %>: 
