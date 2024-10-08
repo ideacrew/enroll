@@ -92,7 +92,7 @@
               </tr>
               <% @enrollments.each_with_index do |hbx, index| %>
                   <tr>
-                    <td>
+                    <td class="px-0">
                       <label class="weight-n">
                         <%= radio_button_tag("enrollment_id", hbx.id, (index.zero? ? true : false), id:"terminate_hbx_#{hbx.id}") %>
                         <%= hbx.hbx_id  %>
