@@ -100,7 +100,10 @@ module FinancialAssistance
 
             def load_config
               config = File.read(@config)
-              deep_symbolize_keys(YAML.safe_load(ERB.new(config).result(binding)))
+              parsed = YAML.safe_load(ERB.new(config).result(binding))
+              return if parsed.nil?
+
+              deep_symbolize_keys(parsed)
             end
 
             private
@@ -175,7 +178,7 @@ module FinancialAssistance
                 return unless has_kind
 
                 coverage_map = ApplicantCoverageConfigLoader.new(@applicant, kind).load_config
-                hash[:health_coverage][:rows][kind][:coverages] = coverage_map
+                hash[:health_coverage][:rows][kind][:coverages] = coverage_map if coverage_map.present?
               end
             end
           end
@@ -342,11 +345,11 @@ module FinancialAssistance
 
               def coverage_section(map)
                 rows = [:is_enrolled, :is_eligible]
-                rows += [:indian_health_service_eligible, :indian_health_service_through_referral] if EnrollRegistry[:indian_health_service_question].feature.is_enabled && @applicant.indian_tribe_member
+                rows += [:indian_health_service_eligible, :indian_health_service_through_referral] if EnrollRegistry.feature_enabled?(:indian_health_service_question) && @applicant.indian_tribe_member
                 if FinancialAssistanceRegistry.feature_enabled?(:has_medicare_cubcare_eligible)
                   rows += [:not_eligible_for_medicaid_cubcare, :medicaid_cubcare_due_on, :eligibility_change_due_to_medicaid_cubcare, :household_income_change, :medicaid_last_day]
                 end
-                rows += [:medicaid_chip_ineligible, :immigration_status_changed] if FinancialAssistanceRegistry[:medicaid_chip_driver_questions].enabled? && @applicant.eligible_immigration_status
+                rows += [:medicaid_chip_ineligible, :immigration_status_changed] if FinancialAssistanceRegistry.feature_enabled?(:medicaid_chip_driver_questions) && @applicant.eligible_immigration_status
                 rows += [:dependent_coverage_end, :dependent_coverage_end_date]
                 filter_rows(map, :health_coverage, rows)
               end
