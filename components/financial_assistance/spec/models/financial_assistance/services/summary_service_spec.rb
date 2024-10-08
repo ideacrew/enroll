@@ -103,7 +103,7 @@ describe ::FinancialAssistance::Services::SummaryService do
     end
 
     # base examples between summary variants
-    shared_examples "base health coverage subsection" do
+    shared_examples "base Health Coverage subsection" do
       before do
         applicant.update_attributes(has_enrolled_health_coverage: true, has_eligible_health_coverage: false)
         applicant.save
@@ -177,6 +177,45 @@ describe ::FinancialAssistance::Services::SummaryService do
             "Will this person be filing jointly?"=>"N/A",
             "This person will be claimed as a dependent by"=>"N/A"
           }
+        end
+
+        describe "Other Questions subsection" do
+          let(:subsection_index) { 5 }
+          
+          it_behaves_like "subsection structure", "Other Questions", {
+            "Has this person applied for an SSN?"=>"N/A",
+            "No SSN Reason"=>"N/A",
+            "Is this person pregnant?"=>"N/A",
+            "Pregnancy due date?"=>"N/A",
+            "How many children is this person expecting?"=>0,
+            "Was this person pregnant in the last year?"=>"N/A",
+            "Pregnancy end date:"=>"N/A",
+            "Was this person enrolled in Medicaid during the pregnancy?"=>"N/A",
+            "Was this person in foster care at age 18 or older?"=>"N/A",
+            "Where was this person in foster care?"=>"N/A",
+            "How old was this person when they left foster care?"=>0,
+            "Was this person enrolled in Medicaid when they left foster care?"=>"N/A",
+            "Is this person a full-time student?"=>"No",
+            "Student Type"=>"N/A",
+            "Student Status End On"=>"N/A",
+            "Student School Kind"=>nil,
+            "Is this person blind?"=>"N/A",
+            "Does this person need help with daily life activities, such as dressing or bathing?"=>"N/A",
+            "Does this person need help paying for any medical bills from the last 3 months?"=>"N/A",
+            "Does this person have a disability?"=>"Yes"
+          }
+
+          it_behaves_like "conditional rows", 
+            [
+              "Is this person the main person taking care of any children age 18 or younger?",
+              "Which member(s) of the household is this person the caretaker for? (choose all that apply)"
+            ],
+            {
+              desc: "the applicant is greater than 19 years old and is applying for coverage", 
+              proc: -> { 
+                applicant.update_attributes(dob: 20.years.ago, is_applying_coverage: true)
+              }
+            }
         end
       end
 
@@ -253,7 +292,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Health Coverage subsection" do
           let(:subsection_index) { 4 }
 
-          it_behaves_like "base health coverage subsection"
+          it_behaves_like "base Health Coverage subsection"
 
           it_behaves_like "conditional rows", 
             [
@@ -293,6 +332,72 @@ describe ::FinancialAssistance::Services::SummaryService do
                 applicant.eligible_immigration_status = true
               }
             }
+        end
+
+        describe "Other Questions subsection" do
+          let(:subsection_index) { 5 }
+          
+          before do applicant.update_attributes!(is_student: false, is_physically_disabled: true) end
+    
+          it_behaves_like "subsection structure", "Other Questions", {
+            "Is this person pregnant?"=>"N/A",
+            "Is this person a full-time student?"=>"No",
+            "Is this person blind?"=>"N/A",
+            "Does this person need help with daily life activities, such as dressing or bathing?"=>"N/A",
+            "Does this person need help paying for any medical bills from the last 3 months?"=>"N/A",
+            "Does this person have a disability?"=>"Yes"
+          }
+
+          it_behaves_like "conditional rows", "Has this person applied for an SSN?", {
+            desc: "the applicant is applying for coverage, has no SSN, and has indicated an SSN application reason", 
+            proc: -> { 
+              applicant.update_attributes!(is_applying_coverage: true, no_ssn: '1', is_ssn_applied: false)
+            }
+          }
+
+          it_behaves_like "conditional rows", "No SSN Reason", {
+            desc: "the applicant is applying for coverage, has no SSN, has not applied for an SSN, and has given a reason",
+            proc: -> { 
+              applicant.update_attributes!(is_applying_coverage: true, no_ssn: '1', is_ssn_applied: false, non_ssn_apply_reason: "applicant reason")
+            }
+          }
+
+          it_behaves_like "conditional rows", "Was this person in foster care at age 18 or older?", {
+            desc: "the applicant age is within the applicable foster care range",
+            proc: -> { 
+              applicant.update_attributes!(dob: 21.years.ago)
+            }
+          }
+
+          it_behaves_like "conditional rows", ["Where was this person in foster care?", "How old was this person when they left foster care?", "Was this person enrolled in Medicaid when they left foster care?"], {
+            desc: "the applicant age is within the applicable foster care range and had former foster care",
+            proc: -> { 
+              applicant.update_attributes!(dob: 21.years.ago, is_former_foster_care: true)
+            }
+          }
+
+          it_behaves_like "conditional rows", ["What is the type of student?", "Student status end on date?", "What type of school do you go to?"], {
+            desc: "the applicant age is a student",
+            proc: -> { 
+              applicant.update_attributes!(is_student: true)
+            }
+          }
+
+          it_behaves_like "conditional rows", "Is this person the main person taking care of any children age 18 or younger?", {
+            desc: "the primary_caregiver_other_question flag is enabled and the applicant is greater than 19 years old and is applying for coverage", 
+            proc: -> { 
+              toggle_flag(:primary_caregiver_other_question)
+              applicant.update_attributes!(dob: 20.years.ago, is_applying_coverage: true)
+            }
+          }
+
+          it_behaves_like "conditional rows", "Which member(s) of the household is this person the caretaker for? (choose all that apply)", {
+            desc: "the primary_caregiver_relationship_other_question flag is enabled and the applicant is greater than 19 years old and is applying for coverage", 
+            proc: -> { 
+              toggle_flag(:primary_caregiver_relationship_other_question)
+              applicant.update_attributes!(dob: 20.years.ago, is_applying_coverage: true)
+            }
+          }
         end
       end
     end

@@ -91,10 +91,10 @@ demographics:
         <% if FinancialAssistanceRegistry.feature_enabled?(:tribes_information_raw_review) %>
         tribe_state:
             key: <%= l10n('faa.review.personal.tribal_state') %>
-            value: <%= human_value(@applicant.tribal_state) %>
+            value: "<%= human_value(@applicant.tribal_state) %>"
         tribe_name:
             key: <%= l10n('faa.review.personal.tribal_name') %>
-            value: <%= human_value(@applicant.tribal_name) %>
+            value: "<%= human_value(@applicant.tribal_name) %>"
         tribe_codes:
             key: <%= l10n('faa.review.personal.tribe_codes') %>
             value: <%= @applicant.tribe_codes %>
@@ -299,13 +299,13 @@ other_questions:
             key: <%= other_questions_prompt('is_student') %>
             value: "<%= human_boolean(@applicant.is_student) %>"
         student_kind:
-            key: <%= l10n('student_type') %>
+            key: <%= l10n('faa.other_ques.student_type') %>
             value: <%= human_value(@applicant.student_kind) %>
         student_status_end_on:
-            key: <%= l10n('student_status_end_on') %>
+            key: <%= l10n('faa.other_ques.student_status_end') %>
             value: <%= human_value(@applicant.student_status_end_on) %>
         student_school_kind:
-            key: <%= l10n('student_school_kind') %>
+            key: <%= l10n('faa.other_ques.student_school_type') %>
             value: <%= @applicant.student_school_kind %>
         is_blind:
             key: <%= other_questions_prompt('is_blind') %>

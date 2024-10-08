@@ -362,7 +362,7 @@ module FinancialAssistance
                 end
                 rows += pregnancy_question_rows
                 rows.append(:former_foster_care) if @helper.displayable?(:is_former_foster_care)
-                rows += [:foster_care_state, :age_left_foster_care, :medicaid_during_foster_care] if @helper.displayable?(:foster_care_us_state)
+                rows += [:foster_care_us_state, :age_left_foster_care, :medicaid_during_foster_care] if @helper.displayable?(:foster_care_us_state)
                 rows.append(:is_student)
                 rows += [:student_kind, :student_status_end_on, :student_school_kind] if @helper.displayable?(:student_kind)
                 rows += [:is_blind, :has_daily_living_help, :need_help_paying_bills, :is_physically_disabled]
