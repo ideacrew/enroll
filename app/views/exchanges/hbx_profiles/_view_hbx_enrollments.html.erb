@@ -12,7 +12,7 @@
                 <th><%= l10n('hbx_profiles.effective_date') %></th>
                 <th><%= l10n('termination_date') %></th>
                 <th><%= l10n('hbx_profiles.reinstate.effective_date') %></th>
-                <th><%= l10n('hbx_profiles.reinstate.transmit_carrier') %></th>
+                <th id="transmit_header"><%= l10n('hbx_profiles.reinstate.transmit_carrier') %></th>
                 <th><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> <%= l10n('id') %></th>
               </tr>
               </thead>
@@ -30,12 +30,7 @@
                     <td><%= enrollment.effective_on %></td>
                     <td><%= enrollment.fetch_term_or_expiration_date %></td>
                     <td id="reinstate"><%= enrollment.fetch_term_or_expiration_date.next_day %></td>
-                    <td>
-                      <label class="weight-n">
-                        <input type="checkbox" name="edi_required" value="checked" checked />
-                        <%= l10n("hbx_profiles.reinstate.transmit") %>
-                      </label>
-                    </td>
+                    <td><input type="checkbox" name="edi_required" value="checked" checked aria-labelledby="transmit_header" /></td>
                     <td id="hbx_id"><%= enrollment.hbx_id %></td>
                     <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
                     <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
