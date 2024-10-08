@@ -22,10 +22,10 @@
               <% login_history.each do |login| %>
                 <li>
                   <div class='row'>
-                    <div class='col-3'><%= login.sign_in_outcome || "Successful" %> login on:</div>
+                    <div class='col-3'><%= l10n('devise.login_history.admin.login_status', status: h(login.sign_in_outcome || l10n('devise.login_history.admin.login_success'))) %></div>
                     <div class='col-3 p-0'><%= TimeKeeper.local_time(login.created_at).strftime('%D %r') %></div>
-                    <div class='col-1 pl-0'>from:</div>
-                    <div class='col-5'><%= login.ip_address || "IP NOT FOUND" %></div>
+                    <div class='col-1 pl-0'><%= l10n('devise.login_history.admin.login_from') %></div>
+                    <div class='col-5'><%= login.ip_address || l10n('devise.login_history.admin.ip_not_found') %></div>
                   </div>  
                 </li>
               <% end %>
