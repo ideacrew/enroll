@@ -14,7 +14,6 @@
                 <th><%= l10n('hbx_profiles.reinstate.effective_date') %></th>
                 <th><%= l10n('hbx_profiles.reinstate.transmit_carrier') %></th>
                 <th><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> <%= l10n('id') %></th>
-                <th><%= l10n('insured.families.hbx_id') %></th>
               </tr>
               </thead>
 
@@ -27,13 +26,6 @@
                       </label>
                     </td>
                     <td><%= enrollment.kind.camelcase %></td>
-                    <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
-                    <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
-                    <td id="term_reason_eligible_for_reinstate" class="hidden"><%= enrollment.term_reason_eligible_for_reinstate? %></td>
-                    <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
-                    <td id="cobra_employee" class="hidden"><%= enrollment.is_shop? && enrollment.employee_role.is_cobra_status? %></td>
-                    <td id="cobra_enrollment" class="hidden"><%= enrollment.is_shop? && enrollment.is_cobra_status? %></td>
-                    <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_term_or_expired_exists_for_reinstated_date? %></td>
                     <td><%= enrollment.effective_on.year %></td>
                     <td><%= enrollment.effective_on %></td>
                     <td><%= enrollment.fetch_term_or_expiration_date %></td>
@@ -45,6 +37,13 @@
                       </label>
                     </td>
                     <td id="hbx_id"><%= enrollment.hbx_id %></td>
+                    <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
+                    <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
+                    <td id="term_reason_eligible_for_reinstate" class="hidden"><%= enrollment.term_reason_eligible_for_reinstate? %></td>
+                    <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
+                    <td id="cobra_employee" class="hidden"><%= enrollment.is_shop? && enrollment.employee_role.is_cobra_status? %></td>
+                    <td id="cobra_enrollment" class="hidden"><%= enrollment.is_shop? && enrollment.is_cobra_status? %></td>
+                    <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_term_or_expired_exists_for_reinstated_date? %></td>
                   </tr>
               <%end%>
             </table>
