@@ -38,7 +38,7 @@
             <th><%= l10n('dob') %></th>
             <th><%= l10n('hbx_id') %></th>
             <th><%= l10n('effective_date') %></th>
-            <th><%= l10n('admin_actions.drop_member') %>?</th>
+            <th id="terminate_header"><%= l10n('admin_actions.drop_member') %>?</th>
           </tr>
           <% hbx.hbx_enrollment_members.each do |member| %>
             <% person = member.family_member.person%>
@@ -58,10 +58,7 @@
               <td><%= hbx.effective_on %></td>
               <td>
                 <% if @bs4 %>
-                  <label class="d-block weight-n">
-                    <%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox' %>
-                    <%= l10n('terminate') %>
-                  </label>
+                  <%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox', aria: { labelledby: "terminate_header" } %>
                 <% else %>
                   <%= check_box_tag "terminate_member_#{member.id}", member.id, false, 'data-cuke': 'drop_member_select_checkbox' %>
                 <% end %>
