@@ -19,17 +19,15 @@
           <p><%= l10n("insured.consumer_roles.upload_ridp_documents.document_info") %></p>
           <div>
             <%= form_tag insured_ridp_documents_upload_path, multipart: true do %>
-              <fieldset>
+              <fieldset class="d-block">
                 <legend><%= l10n("insured.consumer_roles.upload_ridp_documents.document_type") %></legend>
-                <span class="focus">
                   <% element_name = "ridp_subject" %>
                   <% ridp_modal_options.each_with_index do |(option, input_value), index| %>
-                    <div class="d-inline-flex flex-row-reverse align-items-center mb-2">
-                      <label class="weight-n mb-0" for=<%= "#{element_name}_#{option}" %>><%= l10n("insured.consumer_roles.upload_ridp_documents.#{option}") %></label>
-                      <div class="col-auto px-0"><%= radio_button_tag element_name, option, index == 0, value: input_value %></div>
-                    </div>
+                    <label class="weight-n d-flex align-items-center mb-2" for=<%= "#{element_name}_#{option}" %>>
+                      <%= radio_button_tag element_name, option, index == 0, value: input_value %>
+                      <div class="mr-2"><%= l10n("insured.consumer_roles.upload_ridp_documents.#{option}") %></div>
+                    </label>
                   <% end %>
-                </span>
               </fieldset>
               <div class="d-flex align-items-center mt-4 float-right">
                 <button type="button" class="btn outline mr-2" data-dismiss="modal"> <%= l10n("insured.consumer_roles.upload_ridp_documents.cancel") %> </button>
