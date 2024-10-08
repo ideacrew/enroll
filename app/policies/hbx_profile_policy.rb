@@ -267,22 +267,6 @@ class HbxProfilePolicy < ApplicationPolicy
     staff_modify_admin_tabs?
   end
 
-  def confirm_lock?
-    staff_can_lock_unlock?
-  end
-
-  def lockable?
-    staff_can_lock_unlock?
-  end
-
-  def reset_password?
-    staff_can_reset_password?
-  end
-
-  def confirm_reset_password?
-    staff_can_reset_password?
-  end
-
   def change_username_and_email?
     staff_can_change_username_and_email?
   end
