@@ -12,7 +12,9 @@
               <a class="close-icon icon icon-sm pr-1" data-dismiss="modal" alt="<%= l10n("close") %>" href="#">&nbsp;<span class="sr-only"><%= l10n("close") %></span></a>
             </div>
           </div>
-          <p class='mb-0'><%= l10n('devise.login_history.admin.subtitle', number_of_logins: h(@user_login_history.size), email: h(@user.email || @user.oim_id)) %></p>
+          <% if @user_login_history.size >= 1 %>
+            <p class='mb-0'><%= l10n('devise.login_history.admin.subtitle', number_of_logins: h(@user_login_history.size), email: h(@user.email || @user.oim_id)) %></p>
+          <% end %>
         </div>
         <div class="modal-body">
           <div class='container'>
