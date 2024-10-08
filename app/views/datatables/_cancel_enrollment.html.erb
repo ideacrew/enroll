@@ -16,7 +16,7 @@
 
 <% if @bs4 %>
   <td colspan="90%">
-    <%if @hbxs.present?%>
+    <% if @hbxs.present? %>
       <%= form_tag update_cancel_enrollment_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
         <h3><%= l10n('hbx_profiles.cancel.header') %></h3>
         <table  class="table table-striped">
@@ -36,13 +36,13 @@
             <td><%= hbx.effective_on %></td>
             <td>
               <label class="d-block weight-n">
-                <%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id, class: "pr-2" %>
+                <%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id %>
                 <%= l10n('cancel') %>
               </label>
             </td>
             <td>
               <label class="d-block weight-n">
-                <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true, class: "pr-2" %>
+                <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false, disabled: true %>
                 <%= l10n('transmit') %>
               </label>
             </td>
