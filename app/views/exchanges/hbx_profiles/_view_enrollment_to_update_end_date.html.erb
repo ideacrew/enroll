@@ -86,9 +86,9 @@
                 <th><%= l10n('insured.families.hbx_id') %></th>
                 <th><%= l10n('plan') %></th>
                 <th><%= l10n('hbx_profiles.effective_date') %></th>
-                <th><%= l10n('end_date') %></th>
+                <th id="end_date_header"><%= l10n('end_date') %></th>
                 <th><%= l10n('hbx_profiles.enrollment_end_date.new_end_date') %></th>
-                <th><%= l10n('hbx_profiles.edi') %></th>
+                <th id="transmit_header"><%= l10n('hbx_profiles.edi') %></th>
               </tr>
               <% @enrollments.each_with_index do |hbx, index| %>
                   <tr>
@@ -104,19 +104,9 @@
                     <td><%= term_or_expire_date %></td>
                     <td>
                       <% max_date = hbx.prior_plan_year_coverage? || hbx.active_plan_year_coverage? ? (hbx.is_shop? ? hbx.sponsored_benefit_package.end_on : hbx.effective_on.end_of_year) : hbx.terminated_on %> 
-                      <label>
-                        <span class="text-nowrap pr-2"><%= l10n("end_date") %></span>
-                        <%= date_field_tag :new_termination_date, nil, disabled: true, value: date_field_value(term_or_expire_date), id: "termination-date-picker_#{hbx.id}", min: date_field_value(hbx.effective_on), max: date_field_value(max_date) %>
-                      </label>
+                      <%= date_field_tag :new_termination_date, nil, disabled: true, value: date_field_value(term_or_expire_date), id: "termination-date-picker_#{hbx.id}", min: date_field_value(hbx.effective_on), max: date_field_value(max_date), 'aria-labelledby': "end_date_header" %>
                     </td>
-                    <td>
-                      <div class="d-flex flex-column">
-                        <label class="align-self-start">
-                          <%= check_box_tag "edi_required", hbx.id, false,  disabled: true%>
-                          <%= l10n("hbx_profiles.reinstate.transmit") %>
-                        </label>
-                      </div>
-                    </td>
+                    <td><%= check_box_tag "edi_required", hbx.id, false, disabled: true, 'aria-labelledby': "transmit_header" %></td>
                   </tr>
               <% end %>
               <tr><td colspan = "7"><br /></td></tr>
