@@ -105,6 +105,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_info.requested_by" => "Requested by @%{name}",
 	"en.hbx_profiles.user_info.nil" => "Nil",
 	# User Accounts Tab Actions
+	"en.hbx_profiles.user_accounts.table.title" => "Account Updates",
 	"en.hbx_profiles.user_accounts.actions.edit.header" => "Edit User Credentials",
 	"en.hbx_profiles.user_accounts.actions.edit.username" => "New Username",
 	"en.hbx_profiles.user_accounts.actions.edit.email" => "New Email",
