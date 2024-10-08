@@ -103,29 +103,43 @@ describe ::FinancialAssistance::Services::SummaryService do
     end
 
     # base examples between summary variants
+    shared_examples "base Income subsection" do
+      before do applicant.update_attributes!(has_job_income: true, has_self_employment_income: false) end
+
+      it_behaves_like "subsection structure", "Income", {
+        "Does this person have income from an employer"=>"Yes",
+        "Does this person have self-employment income?"=>"No",
+        "Does this person have income from other sources?"=>"N/A",
+        "Does this person receive unemployment compensation, or have they received it this year?"=>"N/A"
+      }
+    end
+
     shared_examples "base Health Coverage subsection" do
-      before do
-        applicant.update_attributes(has_enrolled_health_coverage: true, has_eligible_health_coverage: false)
-        applicant.save
-      end
+      before do applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false) end
 
       it_behaves_like "subsection structure", "Health Coverage", {
         "Is this person currently enrolled in health coverage?"=>"Yes",
         "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?"=>"No"
       }
 
-      it_behaves_like "conditional rows",
-        [
-          "Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?",
-          "What was the last day this person had coverage through the job?"
-        ],
-        {
-          desc: "has_dependent_with_coverage flag is enabled and the applicant is less than 19 years old", 
-          proc: -> { 
-            toggle_flag(:has_dependent_with_coverage) 
-            applicant.update_attributes(dob: 18.years.ago)
-          }
-        }
+      context "when the applicant has eligible health coverage" do
+        before do
+          ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', insurance_kind: 'employer_sponsored_insurance')
+          ben.build_employer_address(kind: 'home', address_1: 'address_1', city: 'Dummy City', state: 'DC', zip: '20001')
+          ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
+          applicant.benefits << ben
+          applicant.update_attributes(has_eligible_health_coverage: true)
+          applicant.save!
+          ben
+        end
+
+        it "should return esi hash" do
+          esi_benefit_hash = subsection[:rows][1][:coverages].first.first
+          expect(esi_benefit_hash[:employer_name][:value]).to eq "Test Employer"
+          expect(esi_benefit_hash[:employer_address_line_1][:value]).to eq "address_1"
+          expect(esi_benefit_hash[:city][:value]).to eq "Dummy City"
+        end
+      end
     end
 
     context "applicant subsections" do
@@ -179,6 +193,20 @@ describe ::FinancialAssistance::Services::SummaryService do
           }
         end
 
+        describe "Income subsection" do
+          let(:subsection_index) { 2 }
+
+          it_behaves_like "base Income subsection"
+        end
+
+        describe "Income and Adjustments subsection" do
+          let(:subsection_index) { 3 }
+
+          before do applicant.update_attributes!(has_deductions: true) end
+
+          it_behaves_like "subsection structure", "Income Adjustments", {"Does this person have adjustments to income?"=>"Yes"}
+        end
+
         describe "Other Questions subsection" do
           let(:subsection_index) { 5 }
           
@@ -195,14 +223,14 @@ describe ::FinancialAssistance::Services::SummaryService do
             "Where was this person in foster care?"=>"N/A",
             "How old was this person when they left foster care?"=>0,
             "Was this person enrolled in Medicaid when they left foster care?"=>"N/A",
-            "Is this person a full-time student?"=>"No",
-            "Student Type"=>"N/A",
-            "Student Status End On"=>"N/A",
-            "Student School Kind"=>nil,
+            "Is this person a full-time student?"=>"N/A",
+            "What is the type of student?"=>"N/A",
+            "Student status end on date?"=>"N/A",
+            "What type of school do you go to?"=>nil,
             "Is this person blind?"=>"N/A",
             "Does this person need help with daily life activities, such as dressing or bathing?"=>"N/A",
             "Does this person need help paying for any medical bills from the last 3 months?"=>"N/A",
-            "Does this person have a disability?"=>"Yes"
+            "Does this person have a disability?"=>"N/A"
           }
 
           it_behaves_like "conditional rows", 
@@ -216,6 +244,33 @@ describe ::FinancialAssistance::Services::SummaryService do
                 applicant.update_attributes(dob: 20.years.ago, is_applying_coverage: true)
               }
             }
+        end
+
+        describe "Health Coverage subsection" do
+          let(:subsection_index) { 4 }
+
+          context "when the applicant has no hra health coverage" do it_behaves_like "base Health Coverage subsection" end
+
+          context "when the applicant has hra health coverage" do
+            before do
+              allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
+              allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(true)
+            end
+
+            it_behaves_like "subsection structure", "Health Coverage", {
+              "Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?"=>"N/A",
+              "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?"=>"N/A",
+              "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?"=>"N/A",
+              "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?"=>"N/A",
+              "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days?"=>"N/A",
+              "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)?"=>"N/A",
+              "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?"=>"N/A",
+              "Has this person's household income or household size changed since they were told their coverage was ending?"=>"N/A",
+              "What is the last day of this person’s MaineCare (Medicaid) or Cub Care (CHIP) coverage?"=>"N/A",
+              "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since 2019"=>"N/A",
+              "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)"=>"N/A"
+            }
+          end
         end
       end
 
@@ -234,15 +289,12 @@ describe ::FinancialAssistance::Services::SummaryService do
           it_behaves_like "subsection structure", "Tax Information", {
             "Will this person file taxes for #{assistance_year}?"=>"N/A",
             "Will this person be claimed as a tax dependent for #{assistance_year}?"=>"N/A",
-            "Will this person be filing jointly?"=>"N/A",
-            "This person will be claimed as a dependent by"=>"N/A"
           }
 
           it_behaves_like "conditional rows", "Will this person be filing jointly?", {
             desc: "applicant is required to file taxes and has a spouse", 
             proc: -> {
-              applicant.update(is_required_to_file_taxes: true)
-              applicant.save
+              applicant.update!(is_required_to_file_taxes: true)
               application.relationships << ::FinancialAssistance::Relationship.new({kind: "spouse", applicant_id: applicant.id, relative_id: applicant.id}) # mock spouse relationship to self
               application.save
             }
@@ -250,24 +302,14 @@ describe ::FinancialAssistance::Services::SummaryService do
 
           it_behaves_like "conditional rows", "This person will be claimed as a dependent by", {
             desc: "applicant is claimed as tax dependent", 
-            proc: -> {
-              applicant.update(is_claimed_as_tax_dependent: true)
-              applicant.save
-            }
+            proc: -> { applicant.update!(is_claimed_as_tax_dependent: true) }
           }
         end
 
         describe "Income subsection" do
           let(:subsection_index) { 2 }
 
-          before do applicant.update_attributes!(has_job_income: true, has_self_employment_income: false) end
-
-          it_behaves_like "subsection structure", "Income", {
-            "Does this person have income from an employer"=>"Yes",
-            "Does this person have self-employment income?"=>"No",
-            "Does this person have income from other sources?"=>"N/A",
-            "Does this person receive unemployment compensation, or have they received it this year?"=>"N/A"
-          }
+          it_behaves_like "base Income subsection"
 
           it_behaves_like "conditional rows", "Is any of this person's income from American Indian or Alaska Native tribal sources?", {
             desc: "american_indian_alaskan_native_income flag is enabled", 
@@ -324,6 +366,19 @@ describe ::FinancialAssistance::Services::SummaryService do
               proc: -> { 
                 toggle_flag(:medicaid_chip_driver_questions) 
                 applicant.eligible_immigration_status = true
+              }
+            }
+
+          it_behaves_like "conditional rows",
+            [
+              "Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?",
+              "What was the last day this person had coverage through the job?"
+            ],
+            {
+              desc: "has_dependent_with_coverage flag is enabled and the applicant is less than 19 years old", 
+              proc: -> { 
+                toggle_flag(:has_dependent_with_coverage) 
+                applicant.update_attributes(dob: 18.years.ago)
               }
             }
         end
