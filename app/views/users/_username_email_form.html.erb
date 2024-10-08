@@ -7,14 +7,13 @@
     </div>
   <%end%>
 
-  <h3><%= l10n('hbx_profiles.user_accounts.actions.edit.header') %></h3>
+  <h2 class='mb-4'><%= l10n('hbx_profiles.user_accounts.actions.edit.header') %></h2>
   <div id="credentials-matches" class="hidden">
     <h4 class="text-center"><%= l10n('hbx_profiles.user_accounts.actions.edit.result.failure') %></h4>
     <div id="credentials-error-message"></div>
     <h5><%= l10n('hbx_profiles.actions.failure.resolve') %></h5>
   </div>
-  <br/>
-  <%= form_tag(confirm_change_username_and_email_user_path, method: :put, id: "changeUsernameEmailForm", class:"form-horizontal", remote: true) do %>
+  <%= form_tag(confirm_change_username_and_email_user_path, method: :put, id: "change-username-email-form", class: "form-horizontal needs-validation s508", remote: true) do %>
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
     <% if @user.oim_id.present? %>
       <%= hidden_field_tag :current_oim_id, @user.oim_id %>
@@ -24,20 +23,9 @@
     <% end %>
     <div class="field-error-block alert-danger hidden">
     </div>
-    <div>
-      <div class="col-sm-5">
-        <label for="inputNewUsername"><%= l10n('hbx_profiles.user_accounts.actions.edit.username') %></label>
-        <%= text_field_tag :new_oim_id, user.oim_id, {class:"form-control", id:'inputNewUsername'} %>
-      </div>
-      <div class="col-sm-5">
-        <label for="inputNewEmail" ><%= l10n('hbx_profiles.user_accounts.actions.edit.email') %></label>
-        <%= text_field_tag :new_email, user.email, {class:"form-control", id:'inputNewEmail'} %>
-        <%= hidden_field :family_actions_id, :value => "family_actions_#{@user.id.to_s}" %>
-        <span class="help-block email-block hidden"></span>
-      </div>
+    <div class='row mb-4'>
+      <%= render partial: './ui-components/bs4/v1/forms/admin/edit_username_email', locals: { user:  @user } %>
     </div>
-    <br />
-    <br />
     <div>
       <div class="col-sm-1">
         <%= button_tag "Reset", class:'btn btn-info', id: 'resetUsernameEmailFields' %>
