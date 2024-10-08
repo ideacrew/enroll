@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 describe ::FinancialAssistance::Services::SummaryService do
-  let!(:application) { FactoryBot.create(:application, family_id: BSON::ObjectId.new, assistance_year: 2024) }
+  assistance_year = TimeKeeper.date_of_record.year
+  let!(:application) { FactoryBot.create(:application, family_id: BSON::ObjectId.new, assistance_year: assistance_year) }
   let!(:applicant) do
     FactoryBot.create(:applicant, application: application,
                                   ssn: '243108282',
@@ -15,7 +16,7 @@ describe ::FinancialAssistance::Services::SummaryService do
   end
   let(:cfl_service) { ::FinancialAssistance::Services::ConditionalFieldsLookupService.new }
 
-  describe('.instance_for_action') do
+  describe '.instance_for_action' do
     shared_examples 'a SummaryService instance' do |applicant_summary_class, can_edit|
       it "should return instance of SummaryService with applicant_summaries of type #{applicant_summary_class}" do
         applicant_summaries = subject.instance_variable_get(:@applicant_summaries)
@@ -62,8 +63,17 @@ describe ::FinancialAssistance::Services::SummaryService do
   describe '#sections' do
     subject { described_class.new(is_concise: is_concise, can_edit: false, cfl_service: cfl_service, application: application, applicants: application.active_applicants).sections }
     
+    # helper method to toggle a single flag in the registry
+    def toggle_single_flag(registry, flag, enabled)
+      allow(registry).to receive(:feature_enabled?).and_return(false)
+      allow(registry).to receive(:feature_enabled?).with(flag).and_return(enabled)
+    end
+
+    # helper examples
+    # enforce general structure of a given subsection
     shared_examples "subsection structure" do |subsection_title, expected_rows|
-      it "includes the #{subsection_title} subsection with the expected rows" do
+      it "includes the #{subsection_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
+        binding.irb
         expect(subsection).not_to be_nil
         expect(subsection[:title]).to eq(subsection_title)
         rows = subsection[:rows]
@@ -72,16 +82,19 @@ describe ::FinancialAssistance::Services::SummaryService do
       end
     end
 
-    RSpec.shared_examples "row presence" do |row_label, precondition_proc|
+    # enforce the presence and absence of a row based on a precondition
+    shared_examples "conditional row" do |row_label, precondition_args|
+      precondition_desc = precondition_args[:desc]
+      precondition_proc = precondition_args[:proc]
       let(:includes_row) { subsection[:rows].map { |row| row[:key] }.include?(row_label) }
       
-      context "the row exists with the precondition" do
-        before do instance_exec(&precondition_proc) if precondition_proc end
-        it "includes the \"#{row_label}\" row" do expect(includes_row).to be true end
+      context "when the precondition that <#{precondition_desc}> holds" do
+        before do instance_exec(&precondition_proc) if precondition_proc end # setup the precondition
+        it "includes the \"#{row_label}\" row" do expect(includes_row).to be true end # enforce the presence of the row
       end
     
-      context "the row does not exist without the precondition" do
-        it "does not include the \"#{row_label}\" row" do expect(includes_row).to be false end
+      context "when the precondition that <#{precondition_desc}> does not hold" do
+        it "does not include the \"#{row_label}\" row" do expect(includes_row).to be false end # enforce the absence of the row without the precondtion
       end
     end
 
@@ -126,8 +139,8 @@ describe ::FinancialAssistance::Services::SummaryService do
         let(:subsection) { subject.first[:subsections][1] }
        
         it_behaves_like "subsection structure", "Tax Information", {
-          "Will this person file taxes for 2024?"=>"N/A",
-          "Will this person be claimed as a tax dependent for 2024?"=>"N/A",
+          "Will this person file taxes for #{assistance_year}?"=>"N/A",
+          "Will this person be claimed as a tax dependent for #{assistance_year}?"=>"N/A",
           "Will this person be filing jointly?"=>"N/A",
           "This person will be claimed as a dependent by"=>"N/A"
         }
@@ -147,18 +160,49 @@ describe ::FinancialAssistance::Services::SummaryService do
         let(:subsection) { subject.first[:subsections][1] }
         
         it_behaves_like "subsection structure", "Tax Information", {
-          "Will this person file taxes for 2024?"=>"N/A",
-          "Will this person be claimed as a tax dependent for 2024?"=>"N/A",
+          "Will this person file taxes for #{assistance_year}?"=>"N/A",
+          "Will this person be claimed as a tax dependent for #{assistance_year}?"=>"N/A",
           "Will this person be filing jointly?"=>"N/A",
           "This person will be claimed as a dependent by"=>"N/A"
         }
 
-        it_behaves_like "row presence", "Will this person be filing jointly?", -> {
-          binding.irb
-          applicant.update(is_required_to_file_taxes: true)
+        it_behaves_like "conditional row", "Will this person be filing jointly?", {
+          desc: "applicant is required to file taxes and has a spouse", 
+          proc: -> {
+            applicant.update(is_required_to_file_taxes: true)
+            applicant.save
+            application.relationships << ::FinancialAssistance::Relationship.new({kind: "spouse", applicant_id: applicant.id, relative_id: applicant.id}) # mock spouse relationship to self
+            application.save
+          }
+        }
+
+        it_behaves_like "conditional row", "Will this person be claimed as a tax dependent for #{assistance_year}?", {
+          desc: "applicant is claimed as tax dependent", 
+          proc: -> {
+            applicant.update(is_claimed_as_tax_dependent: true)
+            applicant.save
+          }
+        }
+      end
+
+      describe "Income subsection" do
+        let(:subsection) { subject.first[:subsections][2] }
+
+        before do
+          applicant.update_attributes(has_job_income: true, has_self_employment_income: false)
           applicant.save
-          application.relationships << ::FinancialAssistance::Relationship.new({kind: "spouse", applicant_id: applicant.id, relative_id: applicant.id}) # mock spouse relationship to self
-          application.save
+        end
+
+        it_behaves_like "subsection structure", "Income", {
+          "Does this person have income from an employer"=>"Yes",
+          "Does this person have self-employment income?"=>"No",
+          "Does this person have income from other sources?"=>"N/A",
+          "Does this person receive unemployment compensation, or have they received it this year?"=>"N/A"
+        }
+
+        it_behaves_like "conditional row", "Is any of this person's income from American Indian or Alaska Native tribal sources?", {
+          desc: "american_indian_alaskan_native_income flag is enabled", 
+          proc: -> { toggle_single_flag(EnrollRegistry, :american_indian_alaskan_native_income, true) }
         }
       end
     end
