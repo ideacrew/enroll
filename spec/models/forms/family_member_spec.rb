@@ -280,6 +280,86 @@ RSpec.describe Forms::FamilyMember, dbclean: :after_each, type: :form do
             end
           end
         end
+
+        context "when address fields are ActionController::Parameters" do
+          let(:addresses) { ActionController::Parameters.new({ "0" => home_address, "1" => mailing_address }) }
+
+          before :each do
+            allow(employee_dependent).to receive(:addresses).and_return(addresses.permit!)
+            allow(addresses).to receive(:values).and_return [mailing_address]
+          end
+          context "when dependent has mailing and home address" do
+            let(:person) do
+              p = FactoryBot.create(:person)
+              p.addresses.last.update(kind: 'mailing')
+              p
+            end
+            let(:home_address) { { "kind" => 'home', "address_1" => "new-home-address", "city" => "home-city", "county" => "Hampden", "state" => "DC", "zip" => "01001", "_destroy" => "false" } }
+            let(:mailing_address) { { "kind" => 'mailing', "address_1" => "", "city" => "", "county" => "", "state" => "", "zip" => "", "_destroy" => "true" } }
+
+            it "should delete mailing address" do
+              employee_dependent.assign_person_address(person)
+              expect(person.reload.home_address.address_1).to eq('new-home-address')
+              expect(person.reload.addresses.where(kind: "mailing")).to be_empty
+            end
+          end
+
+          context "when dependent has home address" do
+            let(:person) do
+              p = FactoryBot.create(:person)
+              p.addresses.last.delete
+              p
+            end
+            let(:home_address) { person.addresses.first.attributes.slice("kind", "address_1", "city",  "county", "state", "zip", "_destroy") }
+            let(:mailing_address) { { "kind" => 'mailing', "address_1" => "new-mailing-address", "city" => "mailing-city", "county" => "Hampden", "state" => "DC", "zip" => "01001", "_destroy" => "false" } }
+
+            it "should add mailing address" do
+              employee_dependent.assign_person_address(person)
+              expect(person.reload.home_address.address_1).to eq home_address["address_1"]
+              expect(person.reload.addresses.where(kind: "mailing")).not_to be_empty
+            end
+          end
+        end
+
+        context "when address fields are hash parameters" do
+          let(:addresses) { { "0" => home_address, "1" => mailing_address } }
+
+          before :each do
+            employee_dependent.instance_variable_set(:@addresses, addresses)
+          end
+
+          context "when dependent has mailing and home address" do
+            let(:person) do
+              p = FactoryBot.create(:person)
+              p.addresses.last.update(kind: 'mailing')
+              p
+            end
+            let(:home_address) { { "kind" => 'home', "address_1" => "new-home-address", "city" => "home-city", "county" => "Hampden", "state" => "DC", "zip" => "01001", "_destroy" => "false" } }
+            let(:mailing_address) { { "kind" => 'mailing', "address_1" => "", "city" => "", "county" => "", "state" => "", "zip" => "", "_destroy" => "true" } }
+
+            it "should delete mailing address" do
+              employee_dependent.assign_person_address(person)
+              expect(person.reload.home_address.address_1).to eq('new-home-address')
+              expect(person.reload.addresses.where(kind: "mailing")).to be_empty
+            end
+          end
+
+          context "when dependent has home address" do
+            let(:person) do
+              p = FactoryBot.create(:person)
+              p.addresses.last.delete
+              p
+            end
+            let(:home_address) { person.addresses.first.attributes.slice("kind", "address_1", "city",  "county", "state", "zip", "_destroy") }
+            let(:mailing_address) { { "kind" => 'mailing', "address_1" => "new-mailing-address", "city" => "mailing-city", "county" => "Hampden", "state" => "DC", "zip" => "01001", "_destroy" => "false" } }
+
+            it "should add mailing address" do
+              employee_dependent.assign_person_address(person)
+              expect(person.reload.home_address.address_1).to eq home_address["address_1"]
+              expect(person.reload.addresses.where(kind: "mailing")).not_to be_empty
+            end
+          end
+        end
       end
     end
   end
