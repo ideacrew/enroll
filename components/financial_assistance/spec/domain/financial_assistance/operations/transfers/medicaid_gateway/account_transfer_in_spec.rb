@@ -386,14 +386,20 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         document
       end
 
-      it "should default the person/applicant indian_tribe_member to false" do
+      before do
         allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
         record = serializer.parse(document.root.canonicalize, :single => true)
         @transformed = transformer.transform(record.to_hash(identifier: true))
         @result = subject.call(@transformed)
-        person = Person.all.where(first_name: "Junior").first
-        expect(person.indian_tribe_member).to eq false
-        expect(person.tribe_codes).to eq nil
+        @person = Person.all.where(first_name: "Junior").first
+      end
+
+      it "should default the person/applicant indian_tribe_member to false" do
+        expect(@person.indian_tribe_member).to eq false
+      end
+
+      it "should set tribe_codes to empty array" do
+        expect(@person.tribe_codes).to eq []
       end
     end
 
