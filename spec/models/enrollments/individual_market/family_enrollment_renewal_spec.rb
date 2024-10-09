@@ -1302,6 +1302,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           family_assisted.active_household.reload
           update_age_off_excluded(family_assisted, false)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+          subject.instance_variable_set(:@cross_walk_product, renewal_product)
         end
 
         it "should append APTC values" do
