@@ -211,7 +211,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # Eligibility determination CSR change
   def renewal_product
     if @enrollment.coverage_kind == 'dental'
-      renewal_product = @cross_walk_product&.id
+      renewal_product = (@cross_walk_product || @enrollment.product.renewal_product)&.id
     elsif has_catastrophic_product? && is_cat_product_ineligible?
       renewal_product = fetch_cat_age_off_product(@enrollment.product)
       raise "#{renewal_coverage_start.year} Catastrophic age off product missing on HIOS id #{@enrollment.product.hios_id}" if renewal_product.blank?
