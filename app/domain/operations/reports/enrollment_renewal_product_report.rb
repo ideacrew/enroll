@@ -6,6 +6,7 @@ require 'dry/monads/do'
 module Operations
   module Reports
     # Generates a report for enrollments and renewal with product details
+    # Operations::Reports::EnrollmentRenewalProductReport.new.call({current_year: 2024})
     class EnrollmentRenewalProductReport
       include Dry::Monads[:result, :do]
 
