@@ -47,7 +47,9 @@
               </td>
             </tr>
           <% end %>
-          <% if FinancialAssistanceRegistry[:net_annual_income_display].enabled? && applicant.net_annual_income.present? %>
+        <% end %>
+        <% if FinancialAssistanceRegistry[:net_annual_income_display].enabled? %>
+          <% @applicants.select { |applicant| applicant.net_annual_income.present? }.each do |applicant| %>
             <tr>
               <td colspan="3">
                 <b><%= l10n("faa.review.income.table.annual_income", applicant_name: applicant.first_name, assistance_year: @application.assistance_year) %></b>
