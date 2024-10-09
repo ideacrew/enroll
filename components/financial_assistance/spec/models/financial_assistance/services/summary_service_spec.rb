@@ -205,8 +205,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         # Health Coverage subsection structure with nested coverage subsection
         context "when the applicant has eligible health coverage" do
           before do
-            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_return(false)
-            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:employer_sponsored_insurance).and_return(true)
+            toggle_flag(:employer_sponsored_insurance)
 
             allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
             allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
