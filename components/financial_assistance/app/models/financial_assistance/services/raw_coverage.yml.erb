@@ -10,7 +10,7 @@
         <% if display_esi_fields?(benefit.insurance_kind, benefit.kind) %>
         employer_name:
             key: <%= l10n('employer_name') %>
-            value: <%= benefit.employer_name %>
+            value: "<%= benefit.employer_name %>"
         <% unless FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
         employer_address_line_1:
             key: <%= l10n('employer_address_line_1') %>
