@@ -444,14 +444,6 @@ class ApplicationPolicy # rubocop:disable Metrics/ClassLength
     permission&.can_update_ssn
   end
 
-  def staff_can_lock_unlock?
-    permission&.can_lock_unlock
-  end
-
-  def staff_can_reset_password?
-    permission&.can_reset_password
-  end
-
   def staff_can_change_username_and_email?
     permission&.can_change_username_and_email
   end
