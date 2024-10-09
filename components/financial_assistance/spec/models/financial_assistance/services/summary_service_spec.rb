@@ -121,6 +121,7 @@ describe ::FinancialAssistance::Services::SummaryService do
       # enforce general structure of a given subsection
       shared_examples "subsection structure" do |expected_title:, expected_rows:|
         it "includes the #{expected_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
+          binding.irb
           expect(subsection).not_to be_nil
           expect(subsection[:title]).to eq(expected_title)
           rows = subsection[:rows]
@@ -261,7 +262,7 @@ describe ::FinancialAssistance::Services::SummaryService do
             "Receipt Number" => "N/A",
             "Card Number" => "N/A",
             "Country of Citizenship" => "N/A",
-            "Document Description" => "N/A",
+            "Vlp Description" => "N/A",
             "Expiration Date" => "N/A",
             "Issuing Country" => "N/A",
             "Are you a member of an American Indian or Alaska Native Tribe?" => "N/A",
