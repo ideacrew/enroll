@@ -1,13 +1,14 @@
-<% if @bs4 %>  
+<% if @bs4 %>
   <%if @errors && @errors.any? %>
-    <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <div class='alert alert-error'>
+      <a class='close-icon icon icon-sm float-right' data-dismiss='alert'>x</a>
       <% @errors.each do |err| %>
         <li><%= err[0].to_s == "oim_id" ? l10n("username") : l10n("email") %> <%= err[1][0] %></li>
       <%end%>
     </div>
   <%end%>
 
-  <h2 class='mb-4'><%= l10n('hbx_profiles.user_accounts.actions.edit.header') %></h2>
+  <h2 class='mb-3'><%= l10n('hbx_profiles.user_accounts.actions.edit.header') %></h2>
   <div id="credentials-matches" class="hidden">
     <h4 class="text-center"><%= l10n('hbx_profiles.user_accounts.actions.edit.result.failure') %></h4>
     <div id="credentials-error-message"></div>
@@ -23,16 +24,10 @@
     <% end %>
     <div class="field-error-block alert-danger hidden">
     </div>
-    <div class='row mb-4'>
-      <%= render partial: './ui-components/bs4/v1/forms/admin/edit_username_email', locals: { user:  @user } %>
-    </div>
-    <div>
-      <div class="col-sm-1">
-        <%= button_tag "Reset", class:'btn btn-info', id: 'resetUsernameEmailFields' %>
-      </div>
-      <div class="col-sm-1">
-        <%= submit_tag "Submit", class:'btn btn-primary', data: {confirm: l10n('confirm')} %>
-      </div>
+    <%= render partial: 'ui-components/bs4/v1/forms/admin/username_email_fields' %>
+    <div class="row mb-2">
+      <%= button_tag "Cancel", class:'btn btn-info outline mr-2', id: 'resetUsernameEmailFields' %>
+      <%= submit_tag "Save Changes", class:'btn btn-primary', data: { confirm: l10n('confirm') } %>
     </div>
   <% end %>
 <% else %>

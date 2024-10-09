@@ -94,18 +94,22 @@ class UsersController < ApplicationController
     if @email_taken.present? || @username_taken.present?
       @matches = true
     else
+      @error_params = { email: @user.email, oim_id: @user.oim_id }
       @user.oim_id = params[:new_oim_id] if params[:new_oim_id] != params[:current_oim_id]
       @user.email = params[:new_email] if params[:new_email] && (params[:new_email] != params[:current_email])
       begin
         @user.modifier = current_user
         @user.save!
-      rescue => e
+      rescue StandardError => e
         @errors = @user.errors.messages
       end
     end
     respond_to do |format|
-      format.js { render "change_username_and_email"} if @errors
-      format.js { render "username_email_result"}
+      if @errors
+        format.js { render "change_username_and_email"}
+      else
+        format.js { render "username_email_result"}
+      end
     end
   end
 
@@ -135,10 +139,26 @@ class UsersController < ApplicationController
 
   private
 
-  helper_method :user
+  helper_method :user, :min_username_length, :max_username_length
 
   def enable_bs4_layout
     @bs4 = true
+  end
+
+  # Helper method to display maximum character length for username.
+  #
+  # @return Integer
+  # @note Authentication and Authorization are not required
+  def max_username_length
+    User::MAX_USERNAME_LENGTH
+  end
+
+  # Helper method to display minimum character length for username.
+  #
+  # @return Integer
+  # @note Authentication and Authorization are not required
+  def min_username_length
+    User::MIN_USERNAME_LENGTH
   end
 
   def email_update_params
@@ -146,11 +166,11 @@ class UsersController < ApplicationController
   end
 
   def validate_email
-     @error = if params[:user][:email].blank?
+    @error = if params[:user][:email].blank?
                'Please enter a valid email'
              elsif params[:user].present? && !@user.update_attributes(email_update_params)
-                @user.errors.full_messages.join.gsub('(optional) ', '')
-              end
+               @user.errors.full_messages.join.gsub('(optional) ', '')
+             end
   end
 
   # Returns the user.
