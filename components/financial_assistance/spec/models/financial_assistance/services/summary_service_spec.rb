@@ -9,7 +9,7 @@ describe ::FinancialAssistance::Services::SummaryService do
 
   def create_applicant(first_name, ssn, is_primary_applicant: false, relationship_kind: 'child')
     applicant = FactoryBot.create(
-      :applicant, 
+      :applicant,
       application: application,
       ssn: ssn,
       dob: Date.new(1984, 3, 8),
@@ -214,21 +214,19 @@ describe ::FinancialAssistance::Services::SummaryService do
               value: "Yes",
               coverages: [
                 [
-                  {
-                    "Coverage through your job (also known as employer-sponsored health insurance)" => " - Present",
-                    "Employer Name" => "Test Employer",
-                    "Employer Address Line 1" => "300 Circle Dr.",
-                    "City" => "Dummy City",
-                    "State" => "DC",
-                    "ZIP" => "20001",
-                    "Phone Number" => "(123) 456-7890",
-                    "Employer Identification No. (Ein)" => nil,
-                    "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
-                    "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
-                    "Who can be covered?" => "N/A",
-                    "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil,
-                    "Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?" => "N/A"
-                  }
+                  {"Coverage through your job (also known as employer-sponsored health insurance)" => " - Present",
+                   "Employer Name" => "Test Employer",
+                   "Employer Address Line 1" => "300 Circle Dr.",
+                   "City" => "Dummy City",
+                   "State" => "DC",
+                   "ZIP" => 20_001,
+                   "Phone Number" => "(123) 456-7890",
+                   "Employer Identification No. (Ein)" => nil,
+                   "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
+                   "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
+                   "Who can be covered?" => "N/A",
+                   "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil,
+                   "Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?" => "N/A"}
                 ]
               ]
             }
