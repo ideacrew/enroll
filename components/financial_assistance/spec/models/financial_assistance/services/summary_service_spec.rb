@@ -5,16 +5,29 @@ require 'rails_helper'
 describe ::FinancialAssistance::Services::SummaryService do
   assistance_year = TimeKeeper.date_of_record.year
   let!(:application) { FactoryBot.create(:application, family_id: BSON::ObjectId.new, assistance_year: assistance_year) }
-  let!(:applicant) do
-    FactoryBot.create(:applicant, application: application,
-                                  ssn: '243108282',
-                                  dob: Date.new(1984, 3, 8),
-                                  gender: "Male",
-                                  first_name: 'Domtest34',
-                                  last_name: 'Test',
-                                  is_primary_applicant: true)
-  end
   let(:cfl_service) { ::FinancialAssistance::Services::ConditionalFieldsLookupService.new }
+
+  def create_applicant(first_name, ssn, is_primary_applicant: false, relationship_kind: 'child')
+    applicant = FactoryBot.create(
+      :applicant, 
+      application: application,
+      ssn: ssn,
+      dob: Date.new(1984, 3, 8),
+      gender: "Male",
+      first_name: first_name,
+      last_name: 'Test',
+      is_primary_applicant: is_primary_applicant
+    )
+
+    unless is_primary_applicant
+      application.relationships << ::FinancialAssistance::Relationship.new({kind: relationship_kind, applicant_id: applicant.id, relative_id: application.primary_applicant.id})
+      application.relationships << ::FinancialAssistance::Relationship.new({kind: relationship_kind, applicant_id: application.primary_applicant.id, relative_id: applicant.id}) if relationship_kind == 'spouse'
+      application.save!
+    end
+
+    applicant
+  end
+  let!(:applicant) { create_applicant('Domtest34', '243108282', is_primary_applicant: true) }
 
   describe '.instance_for_action' do
     shared_examples 'a SummaryService instance' do |applicant_summary_class, can_edit|
@@ -69,128 +82,159 @@ describe ::FinancialAssistance::Services::SummaryService do
       allow(registry).to receive(:feature_enabled?).with(flag).and_return(true)
     end
 
-    # helper examples
+    # enforce section structure
+    describe "applicant sections" do
+      let(:is_concise) { false }
 
-    # enforce general structure of a given subsection
-    shared_examples "subsection structure" do |expected_title:, expected_rows:|
-      it "includes the #{expected_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
-        expect(subsection).not_to be_nil
-        expect(subsection[:title]).to eq(expected_title)
-        rows = subsection[:rows]
-        expected_rows.each do |key, expected_value|
-          row = rows.find { |r| r[:key] == key }
-          expect(row).not_to be_nil # confirm row with key label exists
+      context("when there is only one applicant") do
+        it("it only has one section") do
+          expect(subject.length).to eq(1)
+        end
 
-          # confirm expected values, including nested values (Health Coverage/Coverage nested subsection case)
-          if expected_value.is_a?(Hash)
-            expected_value.each do |nested_key, nested_value|
-              if nested_key == :coverages
-                nested_value.each_with_index do |coverage_group, group_index|
-                  coverage_group.each_with_index do |expected_coverage, index|
-                    coverage = row[:coverages][group_index][index].values.reduce({}) {|coverage_hash, coverage_row| coverage_hash.update(coverage_row[:key] => coverage_row[:value])}
-                    expect(coverage).to eq(expected_coverage)
+        it("it has the correct Applicant summary section title") do
+          expect(subject.first[:section_title]).to eq("Domtest34 Test")
+        end
+      end
+
+      context("when there are three applicants") do
+        before do
+          create_applicant('Domtest35', '243108283')
+          create_applicant('Domtest36', '243108284')
+        end
+
+        it("it has four sections") do
+          expect(subject.length).to eq(4) # 4 sections: 3 Applicant summary section and 1 Family Relationships summary section
+        end
+
+        it("it has the correct Applicant summary section titles") do
+          expect(subject[...3].map { |s| s[:section_title] }).to eq(["Domtest34 Test", "Domtest35 Test", "Domtest36 Test"])
+        end
+      end
+    end
+
+    # enforce applicant subsection structure
+    describe "applicant subsections" do
+      let(:subsection) { subject.first[:subsections][subsection_index] }
+
+      # helper examples
+
+      # enforce general structure of a given subsection
+      shared_examples "subsection structure" do |expected_title:, expected_rows:|
+        it "includes the #{expected_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
+          expect(subsection).not_to be_nil
+          expect(subsection[:title]).to eq(expected_title)
+          rows = subsection[:rows]
+          expected_rows.each do |key, expected_value|
+            row = rows.find { |r| r[:key] == key }
+            expect(row).not_to be_nil # confirm row with key label exists
+
+            # confirm expected values, including nested values (Health Coverage/Coverage nested subsection case)
+            if expected_value.is_a?(Hash)
+              expected_value.each do |nested_key, nested_value|
+                if nested_key == :coverages
+                  nested_value.each_with_index do |coverage_group, group_index|
+                    coverage_group.each_with_index do |expected_coverage, index|
+                      coverage = row[:coverages][group_index][index].values.reduce({}) {|coverage_hash, coverage_row| coverage_hash.update(coverage_row[:key] => coverage_row[:value])}
+                      expect(coverage).to eq(expected_coverage)
+                    end
                   end
+                else
+                  expect(row[nested_key]).to eq(nested_value)
                 end
-              else
-                expect(row[nested_key]).to eq(nested_value)
               end
+            else
+              expect(row[:value]).to eq(expected_value)
             end
-          else
-            expect(row[:value]).to eq(expected_value)
           end
         end
       end
-    end
 
-    # enforce the presence and absence of row(s) based on a precondition
-    shared_examples "conditional rows" do |expected_row_labels:, precondition:|
-      precondition_desc = precondition[:desc]
-      precondition_proc = precondition[:proc]
-      expected_row_labels = [expected_row_labels] unless expected_row_labels.is_a?(Array)
+      # enforce the presence and absence of row(s) based on a precondition
+      shared_examples "conditional rows" do |expected_row_labels:, precondition:|
+        precondition_desc = precondition[:desc]
+        precondition_proc = precondition[:proc]
+        expected_row_labels = [expected_row_labels] unless expected_row_labels.is_a?(Array)
 
-      expected_row_labels.each_with_index do |row_label, index|
-        includes_row = "includes_#{index}".to_sym
-        let(includes_row) { subsection[:rows].map { |row| row[:key] }.include?(row_label) }
+        expected_row_labels.each_with_index do |row_label, index|
+          includes_row = "includes_#{index}".to_sym
+          let(includes_row) { subsection[:rows].map { |row| row[:key] }.include?(row_label) }
 
-        context "when the precondition that <#{precondition_desc}> holds" do
-          before { instance_exec(&precondition_proc) if precondition_proc }
-          it "includes the \"#{row_label}\" row" do expect(send(includes_row)).to be true end
-        end
+          context "when the precondition that <#{precondition_desc}> holds" do
+            before { instance_exec(&precondition_proc) if precondition_proc }
+            it "includes the \"#{row_label}\" row" do expect(send(includes_row)).to be true end
+          end
 
-        context "when the precondition that <#{precondition_desc}> does not hold" do
-          it "does not include the \"#{row_label}\" row" do expect(send(includes_row)).to be false end
+          context "when the precondition that <#{precondition_desc}> does not hold" do
+            it "does not include the \"#{row_label}\" row" do expect(send(includes_row)).to be false end
+          end
         end
       end
-    end
 
-    # base examples between summary variants
+      # base examples between summary variants
 
-    shared_examples "base Income subsection" do
-      before { applicant.update_attributes!(has_job_income: true, has_self_employment_income: false) }
+      shared_examples "base Income subsection" do
+        before { applicant.update_attributes!(has_job_income: true, has_self_employment_income: false) }
 
-      it_behaves_like "subsection structure", expected_title: "Income", expected_rows: {
-        "Does this person have income from an employer (wages, tips, bonuses, etc.) in #{assistance_year}?" => "Yes",
-        "Does this person expect to receive self-employment income in #{assistance_year}?" => "No",
-        "Does this person expect to have income from other sources in #{assistance_year}?" => "N/A",
-        "Did this person receive Unemployment Income at any point in #{assistance_year}?" => "N/A"
-      }
-    end
-
-    shared_examples "base Income and Adjustments subsection" do
-      before { applicant.update_attributes!(has_deductions: true) }
-
-      it_behaves_like "subsection structure", expected_title: "Income Adjustments", expected_rows: {"Does this person expect to have income adjustments in #{assistance_year}?" => "Yes"}
-    end
-
-    shared_examples "base Health Coverage subsection" do
-      before { applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false) }
-
-      # default Health Coverage
-      it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
-        "Is this person currently enrolled in health coverage?" => "Yes",
-        "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => "No"
-      }
-
-      # Health Coverage subsection structure with nested coverage subsection
-      context "when the applicant has eligible health coverage" do
-        before do
-          ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', insurance_kind: 'employer_sponsored_insurance')
-          ben.build_employer_address(kind: 'home', address_1: '300 Circle Dr.', city: 'Dummy City', state: 'DC', zip: '20001')
-          ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
-          applicant.benefits << ben
-          applicant.update_attributes!(has_eligible_health_coverage: true)
-        end
-
-        it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
-          "Is this person currently enrolled in health coverage?" => "Yes",
-          "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => {
-            value: "Yes",
-            coverages: [
-              [
-                {
-                  "Coverage through your job (also known as employer-sponsored health insurance)" => " - Present",
-                  "Employer Name" => "Test Employer",
-                  "Employer Address Line 1" => "300 Circle Dr.",
-                  "City" => "Dummy City",
-                  "State" => "DC",
-                  "ZIP" => 20_001,
-                  "Phone Number" => "(123) 456-7890",
-                  "Employer Identification No. (Ein)" => nil,
-                  "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
-                  "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
-                  "Who can be covered?" => "N/A",
-                  "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil,
-                  "Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?" => "N/A"
-                }
-              ]
-            ]
-          }
+        it_behaves_like "subsection structure", expected_title: "Income", expected_rows: {
+          "Does this person have income from an employer (wages, tips, bonuses, etc.) in #{assistance_year}?" => "Yes",
+          "Does this person expect to receive self-employment income in #{assistance_year}?" => "No",
+          "Does this person expect to have income from other sources in #{assistance_year}?" => "N/A",
+          "Did this person receive Unemployment Income at any point in #{assistance_year}?" => "N/A"
         }
       end
-    end
 
-    context "applicant subsections" do
-      let(:subsection) { subject.first[:subsections][subsection_index] }
+      shared_examples "base Income and Adjustments subsection" do
+        before { applicant.update_attributes!(has_deductions: true) }
+
+        it_behaves_like "subsection structure", expected_title: "Income Adjustments", expected_rows: {"Does this person expect to have income adjustments in #{assistance_year}?" => "Yes"}
+      end
+
+      shared_examples "base Health Coverage subsection" do
+        before { applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false) }
+
+        # default Health Coverage
+        it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
+          "Is this person currently enrolled in health coverage?" => "Yes",
+          "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => "No"
+        }
+
+        # Health Coverage subsection structure with nested coverage subsection
+        context "when the applicant has eligible health coverage" do
+          before do
+            ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', insurance_kind: 'employer_sponsored_insurance')
+            ben.build_employer_address(kind: 'home', address_1: '300 Circle Dr.', city: 'Dummy City', state: 'DC', zip: '20001')
+            ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
+            applicant.benefits << ben
+            applicant.update_attributes!(has_eligible_health_coverage: true)
+          end
+
+          it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
+            "Is this person currently enrolled in health coverage?" => "Yes",
+            "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => {
+              value: "Yes",
+              coverages: [
+                [
+                  {
+                    "Coverage through your job (also known as employer-sponsored health insurance)" => " - Present",
+                    "Employer Name" => "Test Employer",
+                    "Employer Address Line 1" => "300 Circle Dr.",
+                    "City" => "Dummy City",
+                    "State" => "DC",
+                    "ZIP" => 20_001,
+                    "Phone Number" => "(123) 456-7890",
+                    "Employer Identification No. (Ein)" => nil,
+                    "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
+                    "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
+                    "Who can be covered?" => "N/A",
+                    "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil,
+                    "Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?" => "N/A"
+                  }
+                ]
+              ]
+            }
+          }
+        end
+      end
 
       context "when initialized with is_concise as false" do
         let(:is_concise) { false }
@@ -267,7 +311,7 @@ describe ::FinancialAssistance::Services::SummaryService do
                             "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?",
                             "Has this person's household income or household size changed since they were told their coverage was ending?",
                             "What's the last day of this person’s Medicaid or CHIP coverage?",
-                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since 2019?",
+                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since 2019",
                             "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)"
                           ],
                           precondition: {
@@ -338,8 +382,7 @@ describe ::FinancialAssistance::Services::SummaryService do
             desc: "applicant is required to file taxes and has a spouse",
             proc: lambda {
               applicant.update!(is_required_to_file_taxes: true)
-              application.relationships << ::FinancialAssistance::Relationship.new({kind: "spouse", applicant_id: applicant.id, relative_id: applicant.id}) # mock spouse relationship to self
-              application.save
+              create_applicant('Spouse', '243108285', relationship_kind: 'spouse')
             }
           }
 
