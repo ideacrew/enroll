@@ -77,9 +77,9 @@ describe ::FinancialAssistance::Services::SummaryService do
     subject { described_class.new(is_concise: is_concise, can_edit: false, cfl_service: cfl_service, application: application, applicants: application.active_applicants).sections }
 
     # helper method to toggle a single flag in the registry
-    def toggle_flag(flag, registry = FinancialAssistanceRegistry)
+    def toggle_flag(flag, registry = FinancialAssistanceRegistry, is_enabled: true)
       allow(registry).to receive(:feature_enabled?).and_return(false)
-      allow(registry).to receive(:feature_enabled?).with(flag).and_return(true)
+      allow(registry).to receive(:feature_enabled?).with(flag).and_return(true) if is_enabled
     end
 
     # enforce section structure
@@ -205,6 +205,9 @@ describe ::FinancialAssistance::Services::SummaryService do
         # Health Coverage subsection structure with nested coverage subsection
         context "when the applicant has eligible health coverage" do
           before do
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_return(false)
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:employer_sponsored_insurance).and_return(true)
+
             allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
             allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
 
@@ -222,7 +225,7 @@ describe ::FinancialAssistance::Services::SummaryService do
               value: "Yes",
               coverages: [
                 [
-                  {"Coverage through your job (also known as employer-sponsored health insurance)" => " - Present",
+                  {"Coverage through a job (or another person's job, like a spouse or parent)" => " - Present",
                    "Employer Name" => "Test Employer",
                    "Employer Address Line 1" => "300 Circle Dr.",
                    "City" => "Dummy City",
@@ -233,8 +236,7 @@ describe ::FinancialAssistance::Services::SummaryService do
                    "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
                    "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
                    "Who can be covered?" => "N/A",
-                   "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil,
-                   "Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?" => "N/A"}
+                   "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil}
                 ]
               ]
             }

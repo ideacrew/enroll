@@ -49,9 +49,11 @@
         esi_employee_minimum:
             key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_minimum') %>
             value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
+        <% if display_minimum_value_standard_question?(benefit.insurance_kind) %>
         affordable_question:
             key: <%= l10n('health_plan_meets_mvs_and_affordable_question_short') %>
-            value: "<%= human_value benefit.health_plan_meets_mvs_and_affordable if display_minimum_value_standard_question?(benefit.insurance_kind) %>"
+            value: "<%= human_value benefit.health_plan_meets_mvs_and_affordable %>"
+        <% end %>
         <% end %>
         <% if benefit.insurance_kind == 'health_reimbursement_arrangement' %>
         type_of_hra:
