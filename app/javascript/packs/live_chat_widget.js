@@ -18,3 +18,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+  CXBus.configure({debug:false, pluginsPath:'https://apps.usw2.pure.cloud/widgets/9.0/plugins/'});
+  CXBus.loadPlugin('widgets-core');
+});
