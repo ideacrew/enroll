@@ -9,8 +9,6 @@ FactoryBot.define do
     approve_ga { true }
     modify_admin_tabs { true }
     view_admin_tabs { true }
-    can_lock_unlock { false }
-    can_reset_password { false }
 
     trait :hbx_staff do
       can_complete_resident_application { true }

@@ -11,8 +11,6 @@ FactoryBot.define do
     approve_ga { true }
     modify_admin_tabs { true }
     view_admin_tabs  { true }
-    can_lock_unlock { false }
-    can_reset_password { false }
     can_add_pdc { false }
     can_transition_family_members { true }
     can_view_sep_history {true}
@@ -215,13 +213,11 @@ FactoryBot.define do
       can_complete_resident_application { true }
       can_add_sep { true }
       can_add_pdc { true }
-      can_lock_unlock { true }
       can_view_username_and_email { true }
       can_transition_family_members { true }
       can_access_user_account_tab { true }
       view_login_history { true }
       can_change_username_and_email { true }
-      can_reset_password { true }
       can_extend_open_enrollment { true }
       can_modify_plan_year { true }
       can_create_benefit_application { true }
