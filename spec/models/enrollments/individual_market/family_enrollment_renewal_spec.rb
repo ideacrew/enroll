@@ -358,6 +358,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           renewal = subject.renew
           expect(renewal.product.hios_id).to eq renewal_product.hios_id
         end
+
+        it "should fetch renewal product for renewal for dental" do
+          subject.enrollment.update_attributes(coverage_kind: "dental")
+          renewal = subject.renew
+          expect(renewal.product.hios_id).to eq renewal_product.hios_id
+        end
       end
 
       context "renew coverall product" do
