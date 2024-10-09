@@ -52,7 +52,7 @@ class MeDefinePermissions < MigrationTask
                           can_view_application_types: true, view_personal_info_page: true, can_access_new_consumer_application_sub_tab: true, can_modify_plan_year: false,
                           can_change_fein: false, can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false,
                           can_view_sep_history: true, can_reinstate_enrollment: false, can_cancel_enrollment: true, can_terminate_enrollment: true,
-                          change_enrollment_end_date: false, can_drop_enrollment_members: false, can_call_hub: true, can_edit_broker_agency_profile: true)
+                          change_enrollment_end_date: false, can_drop_enrollment_members: true, can_call_hub: true, can_edit_broker_agency_profile: true)
   end
 
   def initial_hbx
