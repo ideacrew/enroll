@@ -190,7 +190,11 @@ describe ::FinancialAssistance::Services::SummaryService do
       end
 
       shared_examples "base Health Coverage subsection" do
-        before { applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false) }
+        before do
+          allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
+          allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
+          applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false)
+        end
 
         # default Health Coverage
         it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
@@ -201,15 +205,19 @@ describe ::FinancialAssistance::Services::SummaryService do
         # Health Coverage subsection structure with nested coverage subsection
         context "when the applicant has eligible health coverage" do
           before do
+            allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
+            allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
+
             ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', insurance_kind: 'employer_sponsored_insurance')
             ben.build_employer_address(kind: 'home', address_1: '300 Circle Dr.', city: 'Dummy City', state: 'DC', zip: '20001')
             ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
             applicant.benefits << ben
-            applicant.update_attributes!(has_eligible_health_coverage: true)
+            applicant.update_attributes(has_enrolled_health_coverage: false, has_eligible_health_coverage: true)
+            applicant.save!
           end
 
           it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
-            "Is this person currently enrolled in health coverage?" => "Yes",
+            "Is this person currently enrolled in health coverage?" => "No",
             "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => {
               value: "Yes",
               coverages: [
