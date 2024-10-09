@@ -271,12 +271,11 @@ describe ::FinancialAssistance::Services::SummaryService do
             "Expiration Date" => "N/A",
             "Issuing Country" => "N/A",
             "Are you a member of an American Indian or Alaska Native Tribe?" => "N/A",
-            "Tribe State" => "N/A",
-            "Tribe Name" => "N/A",
-            "Tribe Codes" => nil,
             "Is this person currently incarcerated?" => "N/A",
             "Race/Ethnicity" => nil
           }
+
+          it_behaves_like "conditional rows", expected_row_labels: ["Tribe State", "Tribe Name", "Tribe Codes"], precondition: { desc: "tribes_information_raw_review flag is enabled", proc: -> { toggle_flag(:tribes_information_raw_review) } }
         end
 
         describe "Tax Information subsection" do
