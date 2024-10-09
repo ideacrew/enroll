@@ -121,7 +121,6 @@ describe ::FinancialAssistance::Services::SummaryService do
       # enforce general structure of a given subsection
       shared_examples "subsection structure" do |expected_title:, expected_rows:|
         it "includes the #{expected_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
-          binding.irb
           expect(subsection).not_to be_nil
           expect(subsection[:title]).to eq(expected_title)
           rows = subsection[:rows]
@@ -327,6 +326,8 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Other Questions subsection" do
           let(:subsection_index) { 5 }
 
+          before { toggle_flag(:post_partum_period_one_year) }
+
           it_behaves_like "subsection structure", expected_title: "Other Questions", expected_rows: {
             "Has this person applied for an SSN?" => "N/A",
             "No SSN Reason" => "N/A",
@@ -471,7 +472,10 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Other Questions subsection" do
           let(:subsection_index) { 5 }
 
-          before { applicant.update_attributes!(is_student: false, is_physically_disabled: true) }
+          before do
+            toggle_flag(:post_partum_period_one_year)
+            applicant.update_attributes!(is_student: false, is_physically_disabled: true)
+          end
 
           it_behaves_like "subsection structure", expected_title: "Other Questions", expected_rows: {
             "Is this person pregnant?" => "N/A",
