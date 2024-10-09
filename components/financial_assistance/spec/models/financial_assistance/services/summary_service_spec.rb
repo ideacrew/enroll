@@ -220,7 +220,7 @@ describe ::FinancialAssistance::Services::SummaryService do
                     "Employer Address Line 1" => "300 Circle Dr.",
                     "City" => "Dummy City",
                     "State" => "DC",
-                    "ZIP" => 20_001,
+                    "ZIP" => "20001",
                     "Phone Number" => "(123) 456-7890",
                     "Employer Identification No. (Ein)" => nil,
                     "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
