@@ -70,14 +70,35 @@ describe ::FinancialAssistance::Services::SummaryService do
     end
 
     # helper examples
+
     # enforce general structure of a given subsection
     shared_examples "subsection structure" do |subsection_title, expected_rows|
       it "includes the #{subsection_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
         expect(subsection).not_to be_nil
         expect(subsection[:title]).to eq(subsection_title)
         rows = subsection[:rows]
-        expect(rows.map { |row| row[:key] }).to match_array(expected_rows.keys)
-        expect(rows.map { |row| row[:value] }).to match_array(expected_rows.values)
+        expected_rows.each do |key, expected_value|
+          row = rows.find { |r| r[:key] == key }
+          expect(row).not_to be_nil # confirm row with key label exists
+
+          # confirm expected values, including nested values (Health Coverage/Coverage nested subsection case)
+          if expected_value.is_a?(Hash)
+            expected_value.each do |nested_key, nested_value|
+              if nested_key == :coverages
+                nested_value.each_with_index do |coverage_group, group_index|
+                  coverage_group.each_with_index do |expected_coverage, index|
+                    coverage = row[:coverages][group_index][index].values.reduce({}) {|coverage_hash, coverage_row| coverage_hash.update(coverage_row[:key] => coverage_row[:value])}
+                    expect(coverage).to eq(expected_coverage)
+                  end
+                end
+              else
+                expect(row[nested_key]).to eq(nested_value)
+              end
+            end
+          else
+            expect(row[:value]).to eq(expected_value)
+          end
+        end
       end
     end
 
@@ -103,6 +124,7 @@ describe ::FinancialAssistance::Services::SummaryService do
     end
 
     # base examples between summary variants
+
     shared_examples "base Income subsection" do
       before { applicant.update_attributes!(has_job_income: true, has_self_employment_income: false) }
 
@@ -117,28 +139,47 @@ describe ::FinancialAssistance::Services::SummaryService do
     shared_examples "base Health Coverage subsection" do
       before { applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false) }
 
+      # default Health Coverage subsection structure
       it_behaves_like "subsection structure", "Health Coverage", {
         "Is this person currently enrolled in health coverage?" => "Yes",
         "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => "No"
       }
 
+      # Health Coverage subsection structure with nested coverage subsection
       context "when the applicant has eligible health coverage" do
         before do
           ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', insurance_kind: 'employer_sponsored_insurance')
-          ben.build_employer_address(kind: 'home', address_1: 'address_1', city: 'Dummy City', state: 'DC', zip: '20001')
+          ben.build_employer_address(kind: 'home', address_1: '300 Circle Dr.', city: 'Dummy City', state: 'DC', zip: '20001')
           ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
           applicant.benefits << ben
-          applicant.update_attributes(has_eligible_health_coverage: true)
-          applicant.save!
-          ben
+          applicant.update_attributes!(has_eligible_health_coverage: true)
         end
 
-        it "should return esi hash" do
-          esi_benefit_hash = subsection[:rows][1][:coverages].first.first
-          expect(esi_benefit_hash[:employer_name][:value]).to eq "Test Employer"
-          expect(esi_benefit_hash[:employer_address_line_1][:value]).to eq "address_1"
-          expect(esi_benefit_hash[:city][:value]).to eq "Dummy City"
-        end
+        it_behaves_like "subsection structure", "Health Coverage", {
+          "Is this person currently enrolled in health coverage?" => "Yes",
+          "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => {
+            value: "Yes",
+            coverages: [
+              [
+                {
+                  "Coverage through your job (also known as employer-sponsored health insurance)"=>" - Present",
+                  "Employer Name"=>"Test Employer",
+                  "Employer Address Line 1"=>"300 Circle Dr.",
+                  "City"=>"Dummy City",
+                  "State"=>"DC",
+                  "ZIP"=>20001,
+                  "Phone Number"=>"(123) 456-7890",
+                  "Employer Identification No. (Ein)"=>nil,
+                  "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
+                  "Does this employer offer a health plan that meets the minimum value standard?"=>"N/A",
+                  "Who can be covered?"=>"N/A",
+                  "How much would the employee only pay for the lowest cost minimum value standard plan?"=>nil,
+                  "Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?"=>"N/A"
+                }
+              ]
+            ]
+          }
+        }
       end
     end
 
@@ -249,7 +290,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Health Coverage subsection" do
           let(:subsection_index) { 4 }
 
-          context "when the applicant has no hra health coverage" do it_behaves_like "base Health Coverage subsection" end
+          it_behaves_like "base Health Coverage subsection"
 
           it_behaves_like "conditional rows", [
             "Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?",
