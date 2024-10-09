@@ -13,6 +13,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def renew
+    @cross_walk_product = fetch_cross_product
     set_csr_value if enrollment.is_health_enrollment?
     renewal_enrollment = clone_enrollment
     populate_aptc_hash(renewal_enrollment) if renewal_enrollment.is_health_enrollment?
@@ -58,8 +59,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     # TODO: Fetch proper csr product as the family might be eligible for a
     # different csr value than that of given externally.
     # Sets the cross walk product
-    @cross_walk_product = fetch_cross_product
-
     return renewal_product if has_catastrophic_product?
 
     if can_renew_assisted_product?(renewal_enrollment)
@@ -211,7 +210,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # Eligibility determination CSR change
   def renewal_product
     if @enrollment.coverage_kind == 'dental'
-      renewal_product = (@cross_walk_product || @enrollment.product.renewal_product)&.id
+      renewal_product = @cross_walk_product&.id
     elsif has_catastrophic_product? && is_cat_product_ineligible?
       renewal_product = fetch_cat_age_off_product(@enrollment.product)
       raise "#{renewal_coverage_start.year} Catastrophic age off product missing on HIOS id #{@enrollment.product.hios_id}" if renewal_product.blank?
