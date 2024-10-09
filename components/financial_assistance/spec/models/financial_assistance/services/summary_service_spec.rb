@@ -129,17 +129,23 @@ describe ::FinancialAssistance::Services::SummaryService do
       before { applicant.update_attributes!(has_job_income: true, has_self_employment_income: false) }
 
       it_behaves_like "subsection structure", expected_title: "Income", expected_rows: {
-        "Does this person have income from an employer" => "Yes",
-        "Does this person have self-employment income?" => "No",
-        "Does this person have income from other sources?" => "N/A",
-        "Does this person receive unemployment compensation, or have they received it this year?" => "N/A"
+        "Does this person have income from an employer (wages, tips, bonuses, etc.) in #{assistance_year}?" => "Yes",
+        "Does this person expect to receive self-employment income in #{assistance_year}?" => "No",
+        "Does this person expect to have income from other sources in #{assistance_year}?" => "N/A",
+        "Did this person receive Unemployment Income at any point in #{assistance_year}?" => "N/A"
       }
+    end
+
+    shared_examples "base Income and Adjustments subsection" do
+      before { applicant.update_attributes!(has_deductions: true) }
+
+      it_behaves_like "subsection structure", expected_title: "Income Adjustments", expected_rows: {"Does this person expect to have income adjustments in #{assistance_year}?" => "Yes"}
     end
 
     shared_examples "base Health Coverage subsection" do
       before { applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false) }
 
-      # default Health Coverage 
+      # default Health Coverage
       it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
         "Is this person currently enrolled in health coverage?" => "Yes",
         "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => "No"
@@ -194,12 +200,12 @@ describe ::FinancialAssistance::Services::SummaryService do
 
           it_behaves_like "subsection structure", expected_title: "Personal Information", expected_rows: {
             "DOB" => "03/08/1984",
-            "Sex" => "Male",
+            "Gender" => "Male",
             "Relationship" => "Self",
             "Needs Coverage?" => "N/A",
             "Is this person a US citizen or US national?" => "N/A",
-            "Is this person a naturalized or derived citizen?" => "N/A",
-            "Does this person have an eligible immigration status?" => "N/A",
+            "Is this person a naturalized citizen?" => "N/A",
+            "Do you have eligible immigration status? *" => "N/A",
             "Document Type" => "N/A",
             "Citizenship Number" => "N/A",
             "Alien Number" => "N/A",
@@ -243,9 +249,34 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Income and Adjustments subsection" do
           let(:subsection_index) { 3 }
 
-          before { applicant.update_attributes!(has_deductions: true) }
+          it_behaves_like "base Income and Adjustments subsection"
+        end
 
-          it_behaves_like "subsection structure", expected_title: "Income Adjustments", expected_rows: {"Does this person have adjustments to income?" => "Yes"}
+        describe "Health Coverage subsection" do
+          let(:subsection_index) { 4 }
+
+          it_behaves_like "base Health Coverage subsection"
+
+          it_behaves_like "conditional rows",
+                          expected_row_labels: [
+                            "Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?",
+                            "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
+                            "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
+                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days?",
+                            "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)?",
+                            "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?",
+                            "Has this person's household income or household size changed since they were told their coverage was ending?",
+                            "What's the last day of this person’s Medicaid or CHIP coverage?",
+                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since 2019?",
+                            "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)"
+                          ],
+                          precondition: {
+                            desc: "the applicant has hra health coverage",
+                            proc: lambda {
+                                    allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
+                                    allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(true)
+                                  }
+                          }
         end
 
         describe "Other Questions subsection" do
@@ -284,33 +315,6 @@ describe ::FinancialAssistance::Services::SummaryService do
                             proc: -> { applicant.update_attributes(dob: 20.years.ago, is_applying_coverage: true) }
                           }
         end
-
-        describe "Health Coverage subsection" do
-          let(:subsection_index) { 4 }
-
-          it_behaves_like "base Health Coverage subsection"
-
-          it_behaves_like "conditional rows",
-                          expected_row_labels: [
-                            "Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?",
-                            "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
-                            "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
-                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days?",
-                            "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)?",
-                            "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?",
-                            "Has this person's household income or household size changed since they were told their coverage was ending?",
-                            "What is the last day of this person’s MaineCare (Medicaid) or Cub Care (CHIP) coverage?",
-                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since 2019",
-                            "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)"
-                          ],
-                          precondition: {
-                            desc: "the applicant has hra health coverage",
-                            proc: lambda {
-                                    allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
-                                    allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(true)
-                                  }
-                          }
-        end
       end
 
       context "when initialized with is_concise as true" do
@@ -319,7 +323,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Personal Information subsection" do
           let(:subsection_index) { 0 }
 
-          it_behaves_like "subsection structure", expected_title: "Personal Information", expected_rows: { "Age" => 40, "Sex" => "Male", "Relationship" => "Self", "Status" => nil, "Incarcerated" => "N/A", "Needs Coverage?" => "N/A" }
+          it_behaves_like "subsection structure", expected_title: "Personal Information", expected_rows: { "Age" => 40, "Gender" => "Male", "Relationship" => "Self", "Status" => nil, "Incarcerated" => "N/A", "Needs Coverage?" => "N/A" }
         end
 
         describe "Tax Information subsection" do
@@ -359,9 +363,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Income and Adjustments subsection" do
           let(:subsection_index) { 3 }
 
-          before { applicant.update_attributes!(has_deductions: true) }
-
-          it_behaves_like "subsection structure", expected_title: "Income Adjustments", expected_rows: {"Does this person have adjustments to income?" => "Yes"}
+          it_behaves_like "base Income and Adjustments subsection"
         end
 
         describe "Health Coverage subsection" do
@@ -388,7 +390,7 @@ describe ::FinancialAssistance::Services::SummaryService do
                                             "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)?",
                                             "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?",
                                             "Has this person's household income or household size changed since they were told their coverage was ending?",
-                                            "What is the last day of this person’s MaineCare (Medicaid) or Cub Care (CHIP) coverage?"
+                                            "What's the last day of this person’s Medicaid or CHIP coverage?"
                                           ],
                           precondition: {
                             desc: "has_medicare_cubcare_eligible flag is enabled",
