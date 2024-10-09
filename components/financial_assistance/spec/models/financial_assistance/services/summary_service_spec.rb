@@ -64,7 +64,7 @@ describe ::FinancialAssistance::Services::SummaryService do
     subject { described_class.new(is_concise: is_concise, can_edit: false, cfl_service: cfl_service, application: application, applicants: application.active_applicants).sections }
 
     # helper method to toggle a single flag in the registry
-    def toggle_flag(registry = FinancialAssistanceRegistry, flag)
+    def toggle_flag(flag, registry = FinancialAssistanceRegistry)
       allow(registry).to receive(:feature_enabled?).and_return(false)
       allow(registry).to receive(:feature_enabled?).with(flag).and_return(true)
     end
@@ -72,10 +72,10 @@ describe ::FinancialAssistance::Services::SummaryService do
     # helper examples
 
     # enforce general structure of a given subsection
-    shared_examples "subsection structure" do |subsection_title, expected_rows|
-      it "includes the #{subsection_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
+    shared_examples "subsection structure" do |expected_title:, expected_rows:|
+      it "includes the #{expected_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
         expect(subsection).not_to be_nil
-        expect(subsection[:title]).to eq(subsection_title)
+        expect(subsection[:title]).to eq(expected_title)
         rows = subsection[:rows]
         expected_rows.each do |key, expected_value|
           row = rows.find { |r| r[:key] == key }
@@ -103,12 +103,12 @@ describe ::FinancialAssistance::Services::SummaryService do
     end
 
     # enforce the presence and absence of row(s) based on a precondition
-    shared_examples "conditional rows" do |row_labels, precondition_args|
-      precondition_desc = precondition_args[:desc]
-      precondition_proc = precondition_args[:proc]
-      row_labels = [row_labels] unless row_labels.is_a?(Array)
+    shared_examples "conditional rows" do |expected_row_labels:, precondition:|
+      precondition_desc = precondition[:desc]
+      precondition_proc = precondition[:proc]
+      expected_row_labels = [expected_row_labels] unless expected_row_labels.is_a?(Array)
 
-      row_labels.each_with_index do |row_label, index|
+      expected_row_labels.each_with_index do |row_label, index|
         includes_row = "includes_#{index}".to_sym
         let(includes_row) { subsection[:rows].map { |row| row[:key] }.include?(row_label) }
 
@@ -128,7 +128,7 @@ describe ::FinancialAssistance::Services::SummaryService do
     shared_examples "base Income subsection" do
       before { applicant.update_attributes!(has_job_income: true, has_self_employment_income: false) }
 
-      it_behaves_like "subsection structure", "Income", {
+      it_behaves_like "subsection structure", expected_title: "Income", expected_rows: {
         "Does this person have income from an employer" => "Yes",
         "Does this person have self-employment income?" => "No",
         "Does this person have income from other sources?" => "N/A",
@@ -139,8 +139,8 @@ describe ::FinancialAssistance::Services::SummaryService do
     shared_examples "base Health Coverage subsection" do
       before { applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false) }
 
-      # default Health Coverage subsection structure
-      it_behaves_like "subsection structure", "Health Coverage", {
+      # default Health Coverage 
+      it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
         "Is this person currently enrolled in health coverage?" => "Yes",
         "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => "No"
       }
@@ -155,26 +155,26 @@ describe ::FinancialAssistance::Services::SummaryService do
           applicant.update_attributes!(has_eligible_health_coverage: true)
         end
 
-        it_behaves_like "subsection structure", "Health Coverage", {
+        it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
           "Is this person currently enrolled in health coverage?" => "Yes",
           "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => {
             value: "Yes",
             coverages: [
               [
                 {
-                  "Coverage through your job (also known as employer-sponsored health insurance)"=>" - Present",
-                  "Employer Name"=>"Test Employer",
-                  "Employer Address Line 1"=>"300 Circle Dr.",
-                  "City"=>"Dummy City",
-                  "State"=>"DC",
-                  "ZIP"=>20001,
-                  "Phone Number"=>"(123) 456-7890",
-                  "Employer Identification No. (Ein)"=>nil,
+                  "Coverage through your job (also known as employer-sponsored health insurance)" => " - Present",
+                  "Employer Name" => "Test Employer",
+                  "Employer Address Line 1" => "300 Circle Dr.",
+                  "City" => "Dummy City",
+                  "State" => "DC",
+                  "ZIP" => 20_001,
+                  "Phone Number" => "(123) 456-7890",
+                  "Employer Identification No. (Ein)" => nil,
                   "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
-                  "Does this employer offer a health plan that meets the minimum value standard?"=>"N/A",
-                  "Who can be covered?"=>"N/A",
-                  "How much would the employee only pay for the lowest cost minimum value standard plan?"=>nil,
-                  "Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?"=>"N/A"
+                  "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
+                  "Who can be covered?" => "N/A",
+                  "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil,
+                  "Does this employer offer a health plan that meets the minimum value standard and is considered affordable for the employee and family?" => "N/A"
                 }
               ]
             ]
@@ -192,7 +192,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Personal Information subsection" do
           let(:subsection_index) { 0 }
 
-          it_behaves_like "subsection structure", "Personal Information", {
+          it_behaves_like "subsection structure", expected_title: "Personal Information", expected_rows: {
             "DOB" => "03/08/1984",
             "Sex" => "Male",
             "Relationship" => "Self",
@@ -226,7 +226,7 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Tax Information subsection" do
           let(:subsection_index) { 1 }
 
-          it_behaves_like "subsection structure", "Tax Information", {
+          it_behaves_like "subsection structure", expected_title: "Tax Information", expected_rows: {
             "Will this person file taxes for #{assistance_year}?" => "N/A",
             "Will this person be claimed as a tax dependent for #{assistance_year}?" => "N/A",
             "Will this person be filing jointly?" => "N/A",
@@ -245,13 +245,13 @@ describe ::FinancialAssistance::Services::SummaryService do
 
           before { applicant.update_attributes!(has_deductions: true) }
 
-          it_behaves_like "subsection structure", "Income Adjustments", {"Does this person have adjustments to income?" => "Yes"}
+          it_behaves_like "subsection structure", expected_title: "Income Adjustments", expected_rows: {"Does this person have adjustments to income?" => "Yes"}
         end
 
         describe "Other Questions subsection" do
           let(:subsection_index) { 5 }
 
-          it_behaves_like "subsection structure", "Other Questions", {
+          it_behaves_like "subsection structure", expected_title: "Other Questions", expected_rows: {
             "Has this person applied for an SSN?" => "N/A",
             "No SSN Reason" => "N/A",
             "Is this person pregnant?" => "N/A",
@@ -275,15 +275,13 @@ describe ::FinancialAssistance::Services::SummaryService do
           }
 
           it_behaves_like "conditional rows",
-                          [
+                          expected_row_labels: [
                             "Is this person the main person taking care of any children age 18 or younger?",
                             "Which member(s) of the household is this person the caretaker for? (choose all that apply)"
                           ],
-                          {
+                          precondition: {
                             desc: "the applicant is greater than 19 years old and is applying for coverage",
-                            proc: lambda {
-                              applicant.update_attributes(dob: 20.years.ago, is_applying_coverage: true)
-                            }
+                            proc: -> { applicant.update_attributes(dob: 20.years.ago, is_applying_coverage: true) }
                           }
         end
 
@@ -292,24 +290,25 @@ describe ::FinancialAssistance::Services::SummaryService do
 
           it_behaves_like "base Health Coverage subsection"
 
-          it_behaves_like "conditional rows", [
-            "Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?",
-            "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
-            "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
-            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days?",
-            "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)?",
-            "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?",
-            "Has this person's household income or household size changed since they were told their coverage was ending?",
-            "What is the last day of this person’s MaineCare (Medicaid) or Cub Care (CHIP) coverage?",
-            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since 2019",
-            "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)"
-          ],
-                          {
+          it_behaves_like "conditional rows",
+                          expected_row_labels: [
+                            "Is this person currently enrolled in health coverage or getting help paying for health coverage through a Health Reimbursement Arrangement?",
+                            "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
+                            "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?",
+                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days?",
+                            "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)?",
+                            "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?",
+                            "Has this person's household income or household size changed since they were told their coverage was ending?",
+                            "What is the last day of this person’s MaineCare (Medicaid) or Cub Care (CHIP) coverage?",
+                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since 2019",
+                            "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)"
+                          ],
+                          precondition: {
                             desc: "the applicant has hra health coverage",
                             proc: lambda {
-                              allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
-                              allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(true)
-                            }
+                                    allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(false)
+                                    allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled_with_hra)).to receive(:item).and_return(true)
+                                  }
                           }
         end
       end
@@ -320,18 +319,18 @@ describe ::FinancialAssistance::Services::SummaryService do
         describe "Personal Information subsection" do
           let(:subsection_index) { 0 }
 
-          it_behaves_like "subsection structure", "Personal Information", { "Age" => 40, "Sex" => "Male", "Relationship" => "Self", "Status" => nil, "Incarcerated" => "N/A", "Needs Coverage?" => "N/A" }
+          it_behaves_like "subsection structure", expected_title: "Personal Information", expected_rows: { "Age" => 40, "Sex" => "Male", "Relationship" => "Self", "Status" => nil, "Incarcerated" => "N/A", "Needs Coverage?" => "N/A" }
         end
 
         describe "Tax Information subsection" do
           let(:subsection_index) { 1 }
 
-          it_behaves_like "subsection structure", "Tax Information", {
+          it_behaves_like "subsection structure", expected_title: "Tax Information", expected_rows: {
             "Will this person file taxes for #{assistance_year}?" => "N/A",
             "Will this person be claimed as a tax dependent for #{assistance_year}?" => "N/A"
           }
 
-          it_behaves_like "conditional rows", "Will this person be filing jointly?", {
+          it_behaves_like "conditional rows", expected_row_labels: "Will this person be filing jointly?", precondition: {
             desc: "applicant is required to file taxes and has a spouse",
             proc: lambda {
               applicant.update!(is_required_to_file_taxes: true)
@@ -340,7 +339,7 @@ describe ::FinancialAssistance::Services::SummaryService do
             }
           }
 
-          it_behaves_like "conditional rows", "This person will be claimed as a dependent by", {
+          it_behaves_like "conditional rows", expected_row_labels: "This person will be claimed as a dependent by", precondition: {
             desc: "applicant is claimed as tax dependent",
             proc: -> { applicant.update!(is_claimed_as_tax_dependent: true) }
           }
@@ -351,9 +350,9 @@ describe ::FinancialAssistance::Services::SummaryService do
 
           it_behaves_like "base Income subsection"
 
-          it_behaves_like "conditional rows", "Is any of this person's income from American Indian or Alaska Native tribal sources?", {
+          it_behaves_like "conditional rows", expected_row_labels: "Is any of this person's income from American Indian or Alaska Native tribal sources?", precondition: {
             desc: "american_indian_alaskan_native_income flag is enabled",
-            proc: -> { toggle_flag(EnrollRegistry, :american_indian_alaskan_native_income) }
+            proc: -> { toggle_flag(:american_indian_alaskan_native_income, EnrollRegistry) }
           }
         end
 
@@ -362,7 +361,7 @@ describe ::FinancialAssistance::Services::SummaryService do
 
           before { applicant.update_attributes!(has_deductions: true) }
 
-          it_behaves_like "subsection structure", "Income Adjustments", {"Does this person have adjustments to income?" => "Yes"}
+          it_behaves_like "subsection structure", expected_title: "Income Adjustments", expected_rows: {"Does this person have adjustments to income?" => "Yes"}
         end
 
         describe "Health Coverage subsection" do
@@ -371,55 +370,55 @@ describe ::FinancialAssistance::Services::SummaryService do
           it_behaves_like "base Health Coverage subsection"
 
           it_behaves_like "conditional rows",
-                          [
+                          expected_row_labels: [
                             "Is this person eligible to get health services from the Indian Health Service, a tribal health program, or an urban Indian health program or through referral from one of these programs?",
                             "Has this person ever gotten a health service from the Indian Health Service, a tribal health program, or urban Indian health program or through a referral from one of these programs?"
                           ],
-                          {
+                          precondition: {
                             desc: "indian_health_service_question flag is enabled and the applicant is an Indian tribe member",
                             proc: lambda {
-                              toggle_flag(EnrollRegistry, :indian_health_service_question)
+                              toggle_flag(:indian_health_service_question, EnrollRegistry)
                               applicant.update_attributes(indian_tribe_member: true)
                             }
                           }
 
           it_behaves_like "conditional rows",
-                          [
-                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days?",
-                            "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)?",
-                            "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?",
-                            "Has this person's household income or household size changed since they were told their coverage was ending?",
-                            "What is the last day of this person’s MaineCare (Medicaid) or Cub Care (CHIP) coverage?"
-                          ],
-                          {
+                          expected_row_labels: [
+                                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) within the last 90 days?",
+                                            "When was this person denied MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program)?",
+                                            "Did this person have MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) that will end soon or that recently ended because of a change in eligibility?",
+                                            "Has this person's household income or household size changed since they were told their coverage was ending?",
+                                            "What is the last day of this person’s MaineCare (Medicaid) or Cub Care (CHIP) coverage?"
+                                          ],
+                          precondition: {
                             desc: "has_medicare_cubcare_eligible flag is enabled",
                             proc: -> { toggle_flag(:has_medicare_cubcare_eligible) }
                           }
 
           it_behaves_like "conditional rows",
-                          [
-                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since #{assistance_year - 5}",
-                            "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)"
-                          ],
-                          {
+                          expected_row_labels: [
+                                            "Was this person found not eligible for MaineCare (Medicaid) or Cub Care (Children's Health Insurance Program) based on their immigration status since #{assistance_year - 5}",
+                                            "Has this person’s immigration status changed since they were not found eligible for MaineCare (Medicaid) or Cub Care (Children’s Health Insurance Program)"
+                                          ],
+                          precondition: {
                             desc: "medicaid_chip_driver_questions flag is enabled and the applicant has an eligible immigration status",
                             proc: lambda {
-                              toggle_flag(:medicaid_chip_driver_questions)
-                              applicant.eligible_immigration_status = true
-                            }
+                                    toggle_flag(:medicaid_chip_driver_questions)
+                                    applicant.eligible_immigration_status = true
+                                  }
                           }
 
           it_behaves_like "conditional rows",
-                          [
-                            "Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?",
-                            "What was the last day this person had coverage through the job?"
-                          ],
-                          {
+                          expected_row_labels: [
+                                            "Did this person have coverage through a job (for example, a parent’s job) that ended in the last 3 months?",
+                                            "What was the last day this person had coverage through the job?"
+                                          ],
+                          precondition: {
                             desc: "has_dependent_with_coverage flag is enabled and the applicant is less than 19 years old",
                             proc: lambda {
-                              toggle_flag(:has_dependent_with_coverage)
-                              applicant.update_attributes(dob: 18.years.ago)
-                            }
+                                    toggle_flag(:has_dependent_with_coverage)
+                                    applicant.update_attributes(dob: 18.years.ago)
+                                  }
                           }
         end
 
@@ -428,7 +427,7 @@ describe ::FinancialAssistance::Services::SummaryService do
 
           before { applicant.update_attributes!(is_student: false, is_physically_disabled: true) }
 
-          it_behaves_like "subsection structure", "Other Questions", {
+          it_behaves_like "subsection structure", expected_title: "Other Questions", expected_rows: {
             "Is this person pregnant?" => "N/A",
             "Is this person a full-time student?" => "No",
             "Is this person blind?" => "N/A",
@@ -437,70 +436,52 @@ describe ::FinancialAssistance::Services::SummaryService do
             "Does this person have a disability?" => "Yes"
           }
 
-          it_behaves_like "conditional rows", "Has this person applied for an SSN?", {
+          it_behaves_like "conditional rows", expected_row_labels: "Has this person applied for an SSN?", precondition: {
             desc: "the applicant is applying for coverage, has no SSN, and has indicated an SSN application reason",
-            proc: lambda {
-              applicant.update_attributes!(is_applying_coverage: true, no_ssn: '1', is_ssn_applied: false)
-            }
+            proc: -> { applicant.update_attributes!(is_applying_coverage: true, no_ssn: '1', is_ssn_applied: false) }
           }
 
-          it_behaves_like "conditional rows", "No SSN Reason", {
+          it_behaves_like "conditional rows", expected_row_labels: "No SSN Reason", precondition: {
             desc: "the applicant is applying for coverage, has no SSN, has not applied for an SSN, and has given a reason",
-            proc: lambda {
-              applicant.update_attributes!(is_applying_coverage: true, no_ssn: '1', is_ssn_applied: false, non_ssn_apply_reason: "applicant reason")
-            }
+            proc: -> { applicant.update_attributes!(is_applying_coverage: true, no_ssn: '1', is_ssn_applied: false, non_ssn_apply_reason: "applicant reason") }
           }
 
-          it_behaves_like "conditional rows", ["Pregnancy due date?", "How many children is this person expecting?"], {
+          it_behaves_like "conditional rows", expected_row_labels: ["Pregnancy due date?", "How many children is this person expecting?"], precondition: {
             desc: "the applicant is pregnant",
-            proc: lambda {
-              applicant.update_attributes!(is_pregnant: true)
-            }
+            proc: -> { applicant.update_attributes!(is_pregnant: true) }
           }
 
-          it_behaves_like "conditional rows", "Was this person pregnant in the last year?", {
+          it_behaves_like "conditional rows", expected_row_labels: "Was this person pregnant in the last year?", precondition: {
             desc: "the applicant is not pregnant",
-            proc: lambda {
-              applicant.update_attributes!(is_pregnant: false)
-            }
+            proc: -> { applicant.update_attributes!(is_pregnant: false) }
           }
 
-          it_behaves_like "conditional rows", "Pregnancy end date:", {
+          it_behaves_like "conditional rows", expected_row_labels: "Pregnancy end date:", precondition: {
             desc: "the applicant is not pregnant but was recently pregnant and is in post partum",
-            proc: lambda {
-              applicant.update_attributes!(is_pregnant: false, is_post_partum_period: true, pregnancy_end_on: 30.days.ago)
-            }
+            proc: -> { applicant.update_attributes!(is_pregnant: false, is_post_partum_period: true, pregnancy_end_on: 30.days.ago) }
           }
 
-          it_behaves_like "conditional rows", "Was this person enrolled in Medicaid during the pregnancy?", {
+          it_behaves_like "conditional rows", expected_row_labels: "Was this person enrolled in Medicaid during the pregnancy?", precondition: {
             desc: "the applicant is enrolled on medicaid",
-            proc: lambda {
-              applicant.update_attributes!(is_enrolled_on_medicaid: true)
-            }
+            proc: -> { applicant.update_attributes!(is_enrolled_on_medicaid: true) }
           }
 
-          it_behaves_like "conditional rows", "Was this person in foster care at age 18 or older?", {
+          it_behaves_like "conditional rows", expected_row_labels: "Was this person in foster care at age 18 or older?", precondition: {
             desc: "the applicant age is within the applicable foster care range",
-            proc: lambda {
-              applicant.update_attributes!(dob: 21.years.ago)
-            }
+            proc: -> { applicant.update_attributes!(dob: 21.years.ago) }
           }
 
-          it_behaves_like "conditional rows", ["Where was this person in foster care?", "How old was this person when they left foster care?", "Was this person enrolled in Medicaid when they left foster care?"], {
+          it_behaves_like "conditional rows", expected_row_labels: ["Where was this person in foster care?", "How old was this person when they left foster care?", "Was this person enrolled in Medicaid when they left foster care?"], precondition: {
             desc: "the applicant age is within the applicable foster care range and had former foster care",
-            proc: lambda {
-              applicant.update_attributes!(dob: 21.years.ago, is_former_foster_care: true)
-            }
+            proc: -> { applicant.update_attributes!(dob: 21.years.ago, is_former_foster_care: true) }
           }
 
-          it_behaves_like "conditional rows", ["What is the type of student?", "Student status end on date?", "What type of school do you go to?"], {
+          it_behaves_like "conditional rows", expected_row_labels: ["What is the type of student?", "Student status end on date?", "What type of school do you go to?"], precondition: {
             desc: "the applicant age is a student",
-            proc: lambda {
-              applicant.update_attributes!(is_student: true)
-            }
+            proc: -> { applicant.update_attributes!(is_student: true) }
           }
 
-          it_behaves_like "conditional rows", "Is this person the main person taking care of any children age 18 or younger?", {
+          it_behaves_like "conditional rows", expected_row_labels: "Is this person the main person taking care of any children age 18 or younger?", precondition: {
             desc: "the primary_caregiver_other_question flag is enabled and the applicant is greater than 19 years old and is applying for coverage",
             proc: lambda {
               toggle_flag(:primary_caregiver_other_question)
@@ -508,7 +489,7 @@ describe ::FinancialAssistance::Services::SummaryService do
             }
           }
 
-          it_behaves_like "conditional rows", "Which member(s) of the household is this person the caretaker for? (choose all that apply)", {
+          it_behaves_like "conditional rows", expected_row_labels: "Which member(s) of the household is this person the caretaker for? (choose all that apply)", precondition: {
             desc: "the primary_caregiver_relationship_other_question flag is enabled and the applicant is greater than 19 years old and is applying for coverage",
             proc: lambda {
               toggle_flag(:primary_caregiver_relationship_other_question)
