@@ -45,8 +45,14 @@ Then(/^I should only see user with employee role$/) do
   expect(page).to have_content("Unlocked")
 end
 
+# NOTE: After the GHAs are updated to use environment-specific translations when running,
+# this step should be changed to a single `expect(page).to have_content("Permission Level")` line
+# and have the other checks removed. For the time being, we are checking for a few of the
+# other columns that are displayed elsewhere on the Account Updates table.
 Then(/^I should see subrole field on datatable$/) do
-  expect(page).to have_content("Permission Level")
+  expect(page).to have_content("DOB")
+  expect(page).to have_content("HBX ID")
+  expect(page).to have_content("Status")
 end
 
 When(/^I click All button$/) do
