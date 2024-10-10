@@ -46,7 +46,7 @@ Then(/^I should only see user with employee role$/) do
 end
 
 Then(/^I should see subrole field on datatable$/) do
-  expect(page).to have_content("Permission level")
+  expect(page).to have_content("Permission Level")
 end
 
 When(/^I click All button$/) do

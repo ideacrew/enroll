@@ -1,5 +1,5 @@
 <div class='row mb-3'>
-  <div class="col-md-6 px-1">
+  <div class="col-md-6 pl-0">
     <%= label_tag 'inputNewUsername', l10n('hbx_profiles.user_accounts.actions.edit.username'), class: 'required' %>
     <%= text_field_tag :new_oim_id, @user.oim_id,
       id: 'inputNewUsername',
@@ -11,7 +11,7 @@
     %>
   </div>
 
-  <div class="col-md-6 col-sm-6 px-1">
+  <div class="col-md-6 col-sm-6 pr-0">
     <%= label_tag "inputNewEmail", l10n('hbx_profiles.user_accounts.actions.edit.email'), class: 'required' %>
     <%= text_field_tag :new_email, @user.email,
       class:"form-control w-100",
