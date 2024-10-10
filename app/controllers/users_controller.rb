@@ -39,7 +39,7 @@ class UsersController < ApplicationController
       begin
         @user.modifier = current_user
         @user.save!
-      rescue StandardError => e
+      rescue StandardError
         @errors = @user.errors.messages
       end
     end
