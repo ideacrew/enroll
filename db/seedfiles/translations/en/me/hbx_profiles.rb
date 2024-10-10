@@ -83,7 +83,6 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.cancel.result.empty" => "No enrollments selected for cancellation",
 	"en.hbx_profiles.reinstate.id" => "ID",
 	"en.hbx_profiles.reinstate.transmit_carrier" => "Transmit Carrier EDI?",
-	"en.hbx_profiles.reinstate.transmit" => "Transmit",
 	"en.hbx_profiles.reinstate.effective_date" => "Reinstate Effective Date",
 	"en.hbx_profiles.reinstate.plans" => "Medical/Dental Plans",
 	"en.hbx_profiles.reinstate.modal.header" => " You are about to reinstate the following enrollment on behalf of %{name}",
