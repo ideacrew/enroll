@@ -124,7 +124,6 @@ describe ::FinancialAssistance::Services::SummaryService do
           expect(subsection).not_to be_nil
           expect(subsection[:title]).to eq(expected_title) unless expected_title.include?("nested") # nested subsections do not have titles
           rows = subsection[:rows]
-          binding.irb if expected_title == "Health Coverage nested Coverages subsection"
           # reduce sut from descriptive hash to a hash of key-value pairs for easy comparison
           expect(rows.reduce({}) {|stripped_rows, row| stripped_rows.update(row[:key] => row[:value])}).to eq(expected_rows)
         end
