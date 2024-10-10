@@ -656,6 +656,13 @@ Then(/^\w+ should be able to see the new enrollment tile styling$/) do
   expect(page).to_not have_css('.hbx-enrollment-panel')
 end
 
+Then(/^\w+ should see the dental plan below the health plan$/) do
+  expect(find_all(".plan-year")[0].text.downcase).to include('health')
+  expect(find_all(".plan-year")[0].text.downcase).not_to include('dental')
+  expect(find_all(".plan-year")[1].text.downcase).to include('dental')
+  expect(find_all(".plan-year")[1].text.downcase).not_to include('health')
+end
+
 When(/^\w+ should be able to see Actions dropdown$/) do
   page.all(EmployeeHomepage.actions_dropdown).count > 0
 end
