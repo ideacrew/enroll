@@ -13,6 +13,9 @@
             <%= l10n('devise.passwords.new.please_enter_email') %>
           </div>
           <br>
+          <% if forgot_password_recaptcha_enabled? %>
+            <%= recaptcha_tags %>
+          <% end %>
         </div>
         <div class="form-group">
           <%= f.submit l10n(".send_me_reset_password_instructions"), class: 'btn btn-primary mb-3' %>
