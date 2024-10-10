@@ -122,30 +122,11 @@ describe ::FinancialAssistance::Services::SummaryService do
       shared_examples "subsection structure" do |expected_title:, expected_rows:|
         it "includes the #{expected_title} subsection with the expected rows" do # enforce presence of section, expected title, and expected rows
           expect(subsection).not_to be_nil
-          expect(subsection[:title]).to eq(expected_title)
+          expect(subsection[:title]).to eq(expected_title) unless expected_title.include?("nested") # nested subsections do not have titles
           rows = subsection[:rows]
-          expected_rows.each do |key, expected_value|
-            row = rows.find { |r| r[:key] == key }
-            expect(row).not_to be_nil # confirm row with key label exists
-
-            # confirm expected values, including nested values (Health Coverage/Coverage nested subsection case)
-            if expected_value.is_a?(Hash)
-              expected_value.each do |nested_key, nested_value|
-                if nested_key == :coverages
-                  nested_value.each_with_index do |coverage_group, group_index|
-                    coverage_group.each_with_index do |expected_coverage, index|
-                      coverage = row[:coverages][group_index][index].values.reduce({}) {|coverage_hash, coverage_row| coverage_hash.update(coverage_row[:key] => coverage_row[:value])}
-                      expect(coverage).to eq(expected_coverage)
-                    end
-                  end
-                else
-                  expect(row[nested_key]).to eq(nested_value)
-                end
-              end
-            else
-              expect(row[:value]).to eq(expected_value)
-            end
-          end
+          binding.irb if expected_title == "Health Coverage nested Coverages subsection"
+          # reduce sut from descriptive hash to a hash of key-value pairs for easy comparison
+          expect(rows.reduce({}) {|stripped_rows, row| stripped_rows.update(row[:key] => row[:value])}).to eq(expected_rows)
         end
       end
 
@@ -190,56 +171,80 @@ describe ::FinancialAssistance::Services::SummaryService do
       end
 
       shared_examples "base Health Coverage subsection" do
-        before do
-          allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
-          allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
-          applicant.update_attributes!(has_enrolled_health_coverage: true, has_eligible_health_coverage: false)
-        end
+        let!(:eligble_label) { "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" }
+        let!(:enrolled_label) { "Is this person currently enrolled in health coverage?" }
 
-        # default Health Coverage
-        it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
-          "Is this person currently enrolled in health coverage?" => "Yes",
-          "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => "No"
-        }
-
-        # Health Coverage subsection structure with nested coverage subsection
-        context "when the applicant has eligible health coverage" do
+        shared_examples "coverage type" do |kind, expected_coverage_subsection_rows:|
           before do
-            toggle_flag(:employer_sponsored_insurance)
-
             allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
             allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
-
-            ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', insurance_kind: 'employer_sponsored_insurance')
-            ben.build_employer_address(kind: 'home', address_1: '300 Circle Dr.', city: 'Dummy City', state: 'DC', zip: '20001')
-            ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
-            applicant.benefits << ben
-            applicant.update_attributes(has_enrolled_health_coverage: false, has_eligible_health_coverage: true)
-            applicant.save!
+            applicant.update_attributes!(has_enrolled_health_coverage: kind == :is_enrolled, has_eligible_health_coverage: kind == :is_eligible)
           end
 
+          # enforce base rows
           it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
-            "Is this person currently enrolled in health coverage?" => "No",
-            "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => {
-              value: "Yes",
-              coverages: [
-                [
-                  {"Coverage through a job (or another person's job, like a spouse or parent)" => " - Present",
-                   "Employer Name" => "Test Employer",
-                   "Employer Address Line 1" => "300 Circle Dr.",
-                   "City" => "Dummy City",
-                   "State" => "DC",
-                   "ZIP" => 20_001,
-                   "Phone Number" => "(123) 456-7890",
-                   "Employer Identification No. (Ein)" => nil,
-                   "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
-                   "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
-                   "Who can be covered?" => "N/A",
-                   "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil}
-                ]
-              ]
-            }
+            "Is this person currently enrolled in health coverage?" => kind == :is_enrolled ? "Yes" : "No",
+            "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" => kind == :is_eligible ? "Yes" : "No"
           }
+
+          # enforce nested coverage subsection structure
+          describe "Health Coverage nested Coverages subsection" do
+            # intercept lazily loaded subsection reference used in `subsection structure` and override it with the nested coverage subsection under test
+            def override_subsection_reference(row_label)
+              coverage_nested_subsection = subsection[:rows].find { |row| row[:key] == row_label }[:coverages].first.first
+              allow(self).to receive(:subsection).and_return({rows: coverage_nested_subsection.values})
+            end
+
+            before do
+              toggle_flag(:employer_sponsored_insurance)
+
+              ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', kind: kind, insurance_kind: 'employer_sponsored_insurance')
+              ben.build_employer_address(kind: 'home', address_1: '300 Circle Dr.', city: 'Dummy City', state: 'DC', zip: '20001')
+              ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
+              applicant.benefits << ben
+              applicant.save!
+
+              override_subsection_reference(kind == :is_eligible ? eligble_label : enrolled_label)
+            end
+
+            it_behaves_like "subsection structure", expected_title: "Health Coverage nested Coverages subsection", expected_rows: expected_coverage_subsection_rows
+          end
+        end
+
+        describe "when there are coverages" do
+          context "when the coverage is eligible" do
+            it_behaves_like "coverage type", :is_eligible, expected_coverage_subsection_rows: {
+              "Coverage through a job (or another person's job, like a spouse or parent)" => " - Present",
+              "Employer Name" => "Test Employer",
+              "Employer Address Line 1" => "300 Circle Dr.",
+              "City" => "Dummy City",
+              "State" => "DC",
+              "ZIP" => 20_001,
+              "Phone Number" => "(123) 456-7890",
+              "Employer Identification No. (Ein)" => nil,
+              "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
+              "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
+              "Who can be covered?" => "N/A",
+              "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil
+            }
+          end
+
+          context "when the coverage is enrolled" do
+            it_behaves_like "coverage type", :is_enrolled, expected_coverage_subsection_rows: {
+              "Coverage through a job (or another person's job, like a spouse or parent)" => " - Present",
+              "Employer Name" => "Test Employer",
+              "Employer Address Line 1" => "300 Circle Dr.",
+              "City" => "Dummy City",
+              "State" => "DC",
+              "ZIP" => 20_001,
+              "Phone Number" => "(123) 456-7890",
+              "Employer Identification No. (Ein)" => nil,
+              "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
+              "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
+              "Who can be covered?" => "N/A",
+              "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil
+            }
+          end
         end
       end
 
