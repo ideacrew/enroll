@@ -319,6 +319,16 @@ describe ".current_plan_for_badge", dbclean: :after_each do
       expect(current_plan).not_to eq(active_enrollment.product.id)
     end
   end
+
+  context "when consumer no current coverage" do
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return nil" do
+      expect(family.current_plan_for_badge(shopping_enrollment)).to be_nil
+    end
+  end
 end
 
 describe ".checkbook_enrollments", dbclean: :after_each do
