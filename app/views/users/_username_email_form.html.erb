@@ -10,9 +10,9 @@
 
   <h2 class='mb-3'><%= l10n('hbx_profiles.user_accounts.actions.edit.header') %></h2>
   <div id="credentials-matches" class="hidden">
-    <h4 class="text-center"><%= l10n('hbx_profiles.user_accounts.actions.edit.result.failure') %></h4>
+    <h3 class="text-center"><%= l10n('hbx_profiles.user_accounts.actions.edit.result.failure') %></h3>
     <div id="credentials-error-message"></div>
-    <h5><%= l10n('hbx_profiles.actions.failure.resolve') %></h5>
+    <h4><%= l10n('hbx_profiles.actions.failure.resolve') %></h4>
   </div>
   <%= form_tag(confirm_change_username_and_email_user_path, method: :put, id: "change-username-email-form", class: "form-horizontal needs-validation s508", remote: true) do %>
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>

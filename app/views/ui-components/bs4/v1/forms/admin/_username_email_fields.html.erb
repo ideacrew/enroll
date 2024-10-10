@@ -1,71 +1,23 @@
 <div class='row mb-3'>
-  <div class="col-md-4 pl-0 pr-2">
-    <%= label_tag 'currentUsername', l10n('hbx_profiles.user_accounts.actions.edit.current_username') %>
-    <%= text_field_tag :oim_id, @error_params ? @error_params[:oim_id] : @user.oim_id, readonly: true, disabled: true, id: 'currentUsername', class: 'form-control w-100' %>
-    <div class="invalid-feedback">
-      <%= l10n("invalid_first_name") %>
-    </div>
-  </div>
-
-  <div class="col-md-4 px-1">
+  <div class="col-md-6 px-1">
     <%= label_tag 'inputNewUsername', l10n('hbx_profiles.user_accounts.actions.edit.username'), class: 'required' %>
-    <%= text_field_tag :new_oim_id, '',
+    <%= text_field_tag :new_oim_id, @user.oim_id,
       id: 'inputNewUsername',
-      class: 'form-control change-username-field w-100',
+      class: 'form-control w-100',
       placeholder: l10n('hbx_profiles.user_accounts.actions.edit.username_placeholder'),
-      minimum_length: max_username_length,
+      minimum_length: min_username_length,
       maximum_length: max_username_length,
       required: true
     %>
-    <div class="invalid-feedback">
-      <%= l10n("invalid_first_name") %>
-    </div>
   </div>
 
-  <div class="col-md-4 pr-0 pl-2">
-    <%= label_tag 'inputConfirmNewUsername', l10n('hbx_profiles.user_accounts.actions.edit.confirm_username'), class: 'required' %>
-    <%= text_field_tag :confirm_new_oim_id, '',
-      id: 'inputConfirmNewUsername',
-      class: 'form-control change-username-field w-100',
-      placeholder: l10n('hbx_profiles.user_accounts.actions.edit.username_placeholder'),
-      minimum_length: max_username_length,
-      maximum_length: max_username_length,
-      required: true
-    %>
-    <div class="invalid-feedback">
-      <%= l10n("invalid_first_name") %>
-    </div>
-  </div>
-</div>
-
-<div class='row mb-4'>
-  <div class="col-md-4 col-sm-6 pl-0 pr-2">
-    <%= label_tag 'currentEmail', l10n('hbx_profiles.user_accounts.actions.edit.current_email') %>
-    <%= text_field_tag :email, @error_params ? @error_params[:email] : @user.email, readonly: true, disabled: true, class:"form-control w-100", id:'currentEmail' %>
-  </div>
-
-  <div class="col-md-4 col-sm-6 px-1">
+  <div class="col-md-6 col-sm-6 px-1">
     <%= label_tag "inputNewEmail", l10n('hbx_profiles.user_accounts.actions.edit.email'), class: 'required' %>
-    <%= text_field_tag :new_email, '', class:"form-control w-100", id:'inputNewEmail', placeholder: l10n('hbx_profiles.user_accounts.actions.edit.email_placeholder') %>
+    <%= text_field_tag :new_email, @user.email,
+      class:"form-control w-100",
+      id:'inputNewEmail',
+      placeholder: l10n('hbx_profiles.user_accounts.actions.edit.email_placeholder')
+    %>
     <%= hidden_field :family_actions_id, :value => "family_actions_#{@user.id.to_s}" %>
-    <span class="help-block email-block"></span>
-  </div>
-
-  <div class="col-md-4 pr-0 pl-2">
-    <%= label_tag "inputConfirmNewEmail", l10n('hbx_profiles.user_accounts.actions.edit.confirm_email'), class: 'required' %>
-    <%= text_field_tag :confirm_new_email, '', class:"form-control w-100", id:'inputNewEmail', placeholder: l10n('hbx_profiles.user_accounts.actions.edit.email_placeholder') %>
-    <span class="help-block email-block"></span>
   </div>
 </div>
-
-<script>
-  function allowBrokerAgencyFormSubmission() {
-    var broker_attestation_fields = document.getElementsByClassName("broker-attestation-field");
-    var form_button = document.getElementById("broker-btn");
-    if (Array.from(broker_attestation_fields).every(form_element => form_element.checked == true) == true) {
-      form_button.disabled = false;
-    } else {
-      form_button.disabled = true;
-    };
-  }
-</script>
