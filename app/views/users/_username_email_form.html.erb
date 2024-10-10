@@ -26,7 +26,7 @@
     </div>
     <%= render partial: 'ui-components/bs4/v1/forms/admin/username_email_fields' %>
     <div class="row mb-2">
-      <%= button_tag l10n('reset'), class:'btn btn-info outline mr-2' %>
+      <%= button_tag l10n('reset'), class:'btn btn-info outline mr-2', id: 'resetUsernameEmailFields' %>
       <%= submit_tag l10n('save_changes'), class:'btn btn-primarygs', data: { confirm: l10n('confirm') } %>
     </div>
   <% end %>
@@ -79,16 +79,16 @@
       </div>
     </div>
   <% end %>
-
-  <script type="text/javascript" charset="utf-8">
-      $(document).ready(function(){
-          var resetButton = document.getElementById('resetUsernameEmailFields');
-          resetButton.addEventListener('click', function(event){
-              event.preventDefault();
-              document.getElementById('inputNewUsername').value="";
-              document.getElementById('inputNewEmail').value="";
-          });
-      });
-  </script>
 <% end %>
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        var resetButton = document.getElementById('resetUsernameEmailFields');
+        resetButton.addEventListener('click', function(event){
+            event.preventDefault();
+            document.getElementById('inputNewUsername').value="";
+            document.getElementById('inputNewEmail').value="";
+        });
+    });
+</script>
 
