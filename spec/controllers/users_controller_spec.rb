@@ -166,7 +166,7 @@ describe UsersController, dbclean: :after_each do
         get :reset_password, params: {id: user_id, format: :js}
       end
       it do
-        get :reset_password, params:{id: user_id, format: :js}
+        get :reset_password, params: {id: user_id, format: :js}
         expect(flash[:error]).to be_present
         expect(flash[:error]).to include('Access not allowed for hbx_profile_policy.reset_password?, (Pundit policy)')
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe UsersController do
@@ -19,7 +21,7 @@ describe UsersController do
     it 'routes to #confirm_reset_password' do
       expect(put('/users/2/confirm_reset_password')).to route_to('users#confirm_reset_password', id: '2')
     end
-    
+
   end
 
 end

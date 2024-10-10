@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 describe UserPolicy do
@@ -9,11 +11,11 @@ describe UserPolicy do
     subject { UserPolicy.new(user, target_user) }
 
     it "is not lockable" do
-      expect(subject.lockable?).to be_falsey 
+      expect(subject.lockable?).to be_falsey
     end
 
     it "can not reset the password" do
-      expect(subject.reset_password?).to be_falsey 
+      expect(subject.reset_password?).to be_falsey
     end
   end
 
@@ -27,11 +29,11 @@ describe UserPolicy do
     subject { UserPolicy.new(user, target_user) }
 
     it "is not lockable" do
-      expect(subject.lockable?).to be_falsey 
+      expect(subject.lockable?).to be_falsey
     end
 
     it "can not reset the password" do
-      expect(subject.reset_password?).to be_falsey 
+      expect(subject.reset_password?).to be_falsey
     end
   end
 
@@ -48,11 +50,11 @@ describe UserPolicy do
     subject { UserPolicy.new(user, target_user) }
 
     it "is not lockable" do
-      expect(subject.lockable?).to be_falsey 
+      expect(subject.lockable?).to be_falsey
     end
 
     it "can not reset the password" do
-      expect(subject.reset_password?).to be_falsey 
+      expect(subject.reset_password?).to be_falsey
     end
   end
 
@@ -74,7 +76,7 @@ describe UserPolicy do
       )
     end
 
-    let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => permission ) }
+    let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => permission) }
 
     let(:current_user_person) { instance_double(Person, :hbx_staff_role => hbx_staff_role, :primary_family => nil) }
     let(:user) { instance_double(User, :person => current_user_person) }
@@ -82,11 +84,11 @@ describe UserPolicy do
     subject { UserPolicy.new(user, target_user) }
 
     it "is not lockable" do
-      expect(subject.lockable?).to be_falsey 
+      expect(subject.lockable?).to be_falsey
     end
 
     it "can not reset the password" do
-      expect(subject.reset_password?).to be_falsey 
+      expect(subject.reset_password?).to be_falsey
     end
   end
 
@@ -108,7 +110,7 @@ describe UserPolicy do
       )
     end
 
-    let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => permission ) }
+    let(:hbx_staff_role) { instance_double(HbxStaffRole, :permission => permission) }
 
     let(:current_user_person) { instance_double(Person, :hbx_staff_role => hbx_staff_role, :primary_family => nil) }
     let(:user) { instance_double(User, :person => current_user_person) }
