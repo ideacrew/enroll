@@ -25,6 +25,41 @@ Given(/^that the user is on the FAA Household Info page$/) do
   find('a.interaction-click-control-continue').click
 end
 
+Given(/^that the user is on the FAA Household Info page with bs4 enabled$/) do
+  login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
+  hbx_profile = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
+  hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+    ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
+    bcp.update_attributes!(slcsp_id: ivl_product.id)
+  end
+
+  visit help_paying_coverage_insured_consumer_role_index_path
+  find(".interaction-choice-control-value-radio1").click
+  find("#continue_button").click
+  find("#btn-continue").click
+  find_all(".interaction-click-control-begin-application")[0].click
+end
+
+And(/^the user clicks add Income and Coverage Information$/) do
+  find_all(".interaction-click-control-add-income---coverage-info")[0].click
+end
+
+And(/^the user selects they are filing jointly$/) do
+  find("#is_required_to_file_taxes_yes").click
+  find("#is_joint_tax_filing_yes").click
+  find("#is_claimed_as_tax_dependent_no").click
+  find("#btn-continue").click
+end
+
+And(/^the user navigates back to the tax info page$/) do
+  find(".interaction-click-control-previous").click
+end
+
+Then(/^the user will see that the is filing jointly question is true$/) do
+  expect(find("#is_joint_tax_filing_yes").checked?).to be_truthy
+end
+
 Given(/^the applicant has no saved data$/) do
   expect(page).to have_content('Info Needed')
 end
