@@ -138,10 +138,9 @@ class PeopleController < ApplicationController
         end
       end
     end
-
     if person_params["phones_attributes"].present?
       person_params["phones_attributes"].each do |key, phone|
-        if phone["full_phone_number"].blank?
+        if phone["full_phone_number"].blank? && phone["full_phone_number"].gsub(/\D/, '') == '0000000000'
           params["person"]["phones_attributes"].delete("#{key}")
         end
       end

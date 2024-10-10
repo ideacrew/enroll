@@ -727,10 +727,14 @@ var PersonValidations = (function (window, undefined) {
       }
 
       if ($('#contact_type_text').prop('checked')) {
-        if (document.querySelector('.mobile-phone-number').value.length < 1) {
-          alert(
-            'You must enter a mobile phone number to receive notices and updates by text.'
-          );
+        const phoneInput = document.querySelector('.mobile-phone-number');
+        const phoneValue = phoneInput.value.replace(/\D/g, '');
+
+        if (/^0+$/.test(phoneValue)) {
+          alert('Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
+        } else if (phoneValue.length < 1 || phoneValue.length < 10) {
+          alert('You must enter a mobile phone number to receive notices and updates by text.');
           PersonValidations.restoreRequiredAttributes(e);
         }
         if (
