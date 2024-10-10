@@ -104,6 +104,10 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_info.requested_by" => "Requested by @%{name}",
 	"en.hbx_profiles.user_info.nil" => "Nil",
 	# User Accounts Tab Actions
+	"en.hbx_profiles.user_accounts.table.username" => "Username",
+	"en.hbx_profiles.user_accounts.table.user_email" => "User Email",
+	"en.hbx_profiles.user_accounts.table.role_type" => "Role Type",
+	"en.hbx_profiles.user_accounts.table.permission_level" => "Permission Level",
 	"en.hbx_profiles.user_accounts.actions.edit.header" => "Edit User Credentials",
 	"en.hbx_profiles.user_accounts.actions.edit.username" => "New Username",
 	"en.hbx_profiles.user_accounts.actions.edit.email" => "New Email",

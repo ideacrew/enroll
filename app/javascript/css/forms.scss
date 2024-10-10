@@ -408,6 +408,7 @@ input[type='date']:invalid::-webkit-datetime-edit {
   width: 100px;
 }
 
+// id specifically added to override default table cell bg color
 #admin-edit-username-email {
   background-color: var(--primary-white);
 
