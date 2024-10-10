@@ -20,10 +20,10 @@ module Effective
           link_to_with_noopener_noreferrer(h(row.primary_applicant.person.full_name), resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id))
         }, :filter => false, :sortable => true
         unless EnrollRegistry.feature_disabled?(:mask_ssn_ui_fields) # rubocop:disable Style/IfUnlessModifier --> not disabling this rule will break the code or result in more rubocop errors, and will be remedied when feature flag is removed
-          table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
+          table_column :ssn, :label => l10n('dob'), :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         end
-        table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
+        table_column :dob, :label => l10n('dob'), :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
+        table_column :hbx_id, :label => l10n('hbx_id'), :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => proc { |row| row.vlp_documents_status}, :filter => false, :sortable => true
         table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(row.best_verification_due_date) || format_date(default_verification_due_date) }, :filter => false, :sortable => true

@@ -111,6 +111,10 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure" => "User Account Update Failed",
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure.username_subheader" => "The username matches with the following user:",
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure.email_subheader" => "The email matches with the following user:",
+  # Outstanding Verfications Tab
+  "en.hbx_profiles.outstanding_verifications.header" => "Outstanding Verifications",
+  "en.hbx_profiles.outstanding_verifications.table.count" => "Count",
+  "en.hbx_profiles.outstanding_verifications.table.documents_uploaded" => "Documents Uploaded",
 	# Admin
   'en.admin.config.header' => 'Configuration',
   'en.admin.announcements' => 'Announcements',
