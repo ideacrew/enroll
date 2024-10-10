@@ -82,6 +82,11 @@ describe ::FinancialAssistance::Services::SummaryService do
       allow(registry).to receive(:feature_enabled?).with(flag).and_return(true) if is_enabled
     end
 
+    def toggle_fa_flags(flags)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_return(false)
+      flags.each { |flag| allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(flag).and_return(true) }
+    end
+
     # enforce section structure
     describe "applicant sections" do
       let(:is_concise) { false }
@@ -188,7 +193,7 @@ describe ::FinancialAssistance::Services::SummaryService do
 
           # enforce nested coverage subsection structure
           describe "Health Coverage nested Coverages subsection" do
-            # intercept lazily loaded subsection reference used in `subsection structure` and override it with the nested coverage subsection under test
+            # intercept lazily loaded `subsection` reference later used in `subsection structure` helper and override it with the nested coverage subsection under test
             def override_subsection_reference(row_label)
               coverage_nested_subsection = subsection[:rows].find { |row| row[:key] == row_label }[:coverages].first.first
               allow(self).to receive(:subsection).and_return({rows: coverage_nested_subsection.values})
@@ -211,8 +216,8 @@ describe ::FinancialAssistance::Services::SummaryService do
         end
 
         describe "when there are coverages" do
-          context "when the coverage is eligible" do
-            it_behaves_like "coverage type", :is_eligible, expected_coverage_subsection_rows: {
+          let(:expected_rows) do
+            {
               "Coverage through a job (or another person's job, like a spouse or parent)" => " - Present",
               "Employer Name" => "Test Employer",
               "Employer Address Line 1" => "300 Circle Dr.",
@@ -227,22 +232,13 @@ describe ::FinancialAssistance::Services::SummaryService do
               "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil
             }
           end
-
+        
+          context "when the coverage is eligible" do
+            it_behaves_like "coverage type with expected rows", :is_eligible, expected_rows
+          end
+        
           context "when the coverage is enrolled" do
-            it_behaves_like "coverage type", :is_enrolled, expected_coverage_subsection_rows: {
-              "Coverage through a job (or another person's job, like a spouse or parent)" => " - Present",
-              "Employer Name" => "Test Employer",
-              "Employer Address Line 1" => "300 Circle Dr.",
-              "City" => "Dummy City",
-              "State" => "DC",
-              "ZIP" => 20_001,
-              "Phone Number" => "(123) 456-7890",
-              "Employer Identification No. (Ein)" => nil,
-              "Is the employee currently in a waiting period and eligible to enroll in the next 3 months?" => "N/A",
-              "Does this employer offer a health plan that meets the minimum value standard?" => "N/A",
-              "Who can be covered?" => "N/A",
-              "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil
-            }
+            it_behaves_like "coverage type with expected rows", :is_enrolled, expected_rows
           end
         end
       end
