@@ -70,6 +70,11 @@ Feature: A dedicated page that gives the user access to Tax Info page for a give
     When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
     Then a modal should show asking the user are you sure you want to leave this page
 
+  Scenario: Applicant can go to previous page
+    Given the user is on the Tax Info page for a given applicant
+    When the user clicks the PREVIOUS link1
+    Then the user will navigate to the FAA Household Infor: Family Members page
+
   Scenario: Can choose primary applicant claiming dependent from dropdown
     Given a plan year, with premium tables, exists
     And the user navigates to the Tax Info page for a given applicant

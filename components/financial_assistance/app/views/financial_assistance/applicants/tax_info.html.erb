@@ -95,7 +95,7 @@
         <%= submit_tag l10n("faa.tax_info.continue"), class: "btn", id: 'btn-continue', disabled: !@applicant.tax_info_complete? %>
       <% end %>
       <%= render partial: 'financial_assistance/shared/progress_navigation_buttons', locals: {
-        previous_link: edit_application_path(@application, @applicant), show_back_to_household_button: true } %>
+        previous_link: financial_assistance.edit_application_path(@application), show_back_to_household_button: true } %>
     </div>
   <% end %>
 <% else %>
@@ -219,7 +219,7 @@
       <% end %>
 
       <div class='col-md-3'>
-        <%= render partial: 'financial_assistance/shared/right_nav', locals: { previous_url: edit_application_path(@application, @applicant) } %>
+        <%= render partial: 'financial_assistance/shared/right_nav', locals: { previous_url: financial_assistance.edit_application_path(@application) } %>
       </div>
 
     </div>
