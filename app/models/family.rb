@@ -451,9 +451,7 @@ class Family
   end
 
   def current_plan_for_badge(enrollment)
-    current_enrollments = checkbook_enrollments(enrollment)
-    return nil unless current_enrollments
-    current_enrollments.map(&:id)&.first
+    checkbook_enrollments(enrollment)&.map(&:id)&.first
   end
 
   def checkbook_enrollments(enrollment)
