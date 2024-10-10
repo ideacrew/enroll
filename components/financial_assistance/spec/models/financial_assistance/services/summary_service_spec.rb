@@ -82,11 +82,6 @@ describe ::FinancialAssistance::Services::SummaryService do
       allow(registry).to receive(:feature_enabled?).with(flag).and_return(true) if is_enabled
     end
 
-    def toggle_fa_flags(flags)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_return(false)
-      flags.each { |flag| allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(flag).and_return(true) }
-    end
-
     # enforce section structure
     describe "applicant sections" do
       let(:is_concise) { false }
@@ -175,14 +170,11 @@ describe ::FinancialAssistance::Services::SummaryService do
       end
 
       shared_examples "base Health Coverage subsection" do
-        let!(:eligble_label) { "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?" }
-        let!(:enrolled_label) { "Is this person currently enrolled in health coverage?" }
-
-        shared_examples "a Health Coverage subsection with nested coverages subsection" do |kind, insurance_kind:, expected_coverage_subsection_rows:|
+        shared_context "a benefit exists" do |kind, insurance_kind:, is_insurance_kind_valid: true|
           before do
             allow(FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled)).to receive(:item).and_return(true)
             allow(FinancialAssistanceRegistry[:has_eligible_health_coverage].setting(:currently_eligible)).to receive(:item).and_return(true)
-            toggle_flag(insurance_kind)
+            toggle_flag(insurance_kind, is_enabled: is_insurance_kind_valid)
 
             ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer', kind: kind, insurance_kind: insurance_kind.to_s)
             ben.build_employer_address(kind: 'home', address_1: '300 Circle Dr.', city: 'Dummy City', state: 'DC', zip: '20001')
@@ -191,6 +183,10 @@ describe ::FinancialAssistance::Services::SummaryService do
             applicant.update_attributes!(has_enrolled_health_coverage: kind == :is_enrolled, has_eligible_health_coverage: kind == :is_eligible)
             applicant.save!
           end
+        end
+
+        shared_examples "a Health Coverage subsection with nested coverages subsection" do |kind, insurance_kind:, expected_coverage_subsection_rows:|
+          include_context "a benefit exists", kind, insurance_kind: insurance_kind
 
           # enforce base structure on top-level rows
           it_behaves_like "subsection structure", expected_title: "Health Coverage", expected_rows: {
@@ -201,11 +197,17 @@ describe ::FinancialAssistance::Services::SummaryService do
           # enforce nested coverage subsection structure
           describe "nested coverage subsection" do
             # intercept lazily loaded `subsection` reference later used in `subsection structure` helper and override it with the nested coverage subsection under test
-            def override_subsection_reference(row_label)
+            def override_subsection_reference(kind)
+              row_label = if kind == :is_eligible
+                            "Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person?"
+                          else
+                            "Is this person currently enrolled in health coverage?"
+                          end
+              # find the nested coverage subsection under test using the expected parent label
               coverage_nested_subsection = subsection[:rows].find { |row| row[:key] == row_label }[:coverages].first.first
               allow(self).to receive(:subsection).and_return({rows: coverage_nested_subsection.values})
             end
-            before { override_subsection_reference(kind == :is_eligible ? eligble_label : enrolled_label) }
+            before { override_subsection_reference(kind) }
 
             it_behaves_like "subsection structure", expected_title: "Health Coverage nested Coverages subsection", expected_rows: expected_coverage_subsection_rows
           end
@@ -226,6 +228,14 @@ describe ::FinancialAssistance::Services::SummaryService do
             "Who can be covered?" => "N/A",
             "How much would the employee only pay for the lowest cost minimum value standard plan?" => nil
           }
+        end
+
+        context "when the coverage exists but its insurance kind is invalid" do
+          include_context "a benefit exists", :is_enrolled, :insurance_kind => :employer_sponsored_insurance, is_insurance_kind_valid: false
+
+          it "does not include the nested coverage subsection" do
+            expect(subsection[:rows].find { |row| row[:key] == "Is this person currently enrolled in health coverage?" }[:coverages]).to be_nil
+          end
         end
       end
 
