@@ -10,5 +10,8 @@ module ParseDateHelper
     return nil if string.blank?
     date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
     Date.strptime(string, date_format)
+  rescue Date::Error => e
+    Rails.logger.info("parse_date error for #{string}: #{e}")
+    nil
   end
 end
