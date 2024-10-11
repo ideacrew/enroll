@@ -23,7 +23,7 @@ $( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
 <td colspan="90%">
   <%if @hbxs.present?%>
     <%= form_tag update_terminate_enrollment_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
-      <h3 class='title'>Terminate Enrollment</h3>
+      <h3 class='title'><%= @bs4 ? l10n('hbx_profiles.terminate_enrollment') : 'Terminate Enrollment'%></h3>
       <br />
       <table  class="table table-striped">
         <tr>
@@ -31,9 +31,9 @@ $( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
             <th><%= l10n('insured.families.hbx_id') %></th>
             <th><%= l10n('plan') %></th>
             <th><%= l10n('hbx_profiles.effective_date') %></th>
-            <th><%= l10n('termination_date') %></th>
-            <th><%= l10n('terminate_enrollment') %></th>
-            <th><%= l10n('hbx_profiles.edi') %></th>
+            <th id="termination-date-header"><%= l10n('termination_date') %></th>
+            <th id="termination-enrollment-header"><%= l10n('terminate_enrollment') %></th>
+            <th id="edi-header"><%= l10n('hbx_profiles.edi') %></th>
           <% else %>
             <th>HBX ID</th>
             <th>Plan</th>
@@ -50,30 +50,21 @@ $( "[id^=edit_hbx_enrollment]" ).submit(function( event ) {
           <td><%= hbx.effective_on %></td>
           <td>
             <% if @bs4 %>
-              <label class="d-block weight-n">
-                <%= l10n("termination_date") %>
-                <%= date_field_tag "termination_date_#{hbx.id}", nil, value: set_default_termination_date_value(hbx).strftime('%Y-%m-%d'), id: "termination-date-picker_#{hbx.id}", min: set_date_min_to_effective_on(hbx).strftime('%Y-%m-%d'), max: set_date_max_to_plan_end_of_year(hbx).strftime('%Y-%m-%d'), class: 'd-block' %>
-              </label>
+              <%= date_field_tag "termination_date_#{hbx.id}", nil, value: set_default_termination_date_value(hbx).strftime('%Y-%m-%d'), id: "termination-date-picker_#{hbx.id}", min: set_date_min_to_effective_on(hbx).strftime('%Y-%m-%d'), max: set_date_max_to_plan_end_of_year(hbx).strftime('%Y-%m-%d'), class: 'd-block', 'aria-labelledby' => "termination-date-header" %>
             <% else %>
               <%= text_field_tag "termination_date_#{hbx.id}", nil, readonly: true, value:  set_default_termination_date_value(hbx), id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  set_date_min_to_effective_on(hbx), "data-date-max" =>  set_date_max_to_plan_end_of_year(hbx) %>
             <% end %>
           </td>
           <td>
             <% if @bs4 %>
-              <label class="d-block weight-n">
-                <%= check_box_tag "terminate_hbx_#{hbx.id}", hbx.id %>
-                <%= l10n('terminate') %>
-              </label>
+              <%= check_box_tag "terminate_hbx_#{hbx.id}", hbx.id, false, 'aria-labelledby' => "termination-enrollment-header" %>
             <% else %>
               <%= check_box_tag "terminate_hbx_#{hbx.id}", hbx.id %>
             <% end %>
           </td>
           <td>
             <% if @bs4 %>
-              <label class="d-block weight-n">
-                <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%>
-                <%= l10n('transmit') %>
-              </label>
+                <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true, 'aria-labelledby' => "edi-header" %>
             <% else %>
               <%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%>
             <% end %>
