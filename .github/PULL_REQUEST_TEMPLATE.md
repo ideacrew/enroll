@@ -2,7 +2,7 @@
 
 Please check if your PR fulfills the following requirements:
 - [ ] The title follows our [guidelines](https://github.com/ideacrew/enroll/blob/trunk/CONTRIBUTING.md#commit)
-- [ ] Tests for the changes have been added (for bugfixes/features), and they use `let` helpers and `before` blocks.
+- [ ] Tests for the changes have been added (for bug fixes/features), and they use `let` helpers and `before` blocks.
 - [ ] For all UI changes, there is Cucumber coverage.
 - [ ] Any endpoint touched in the PR has an appropriate Pundit policy. For open endpoints, the reasoning is documented in the PR and code.
 - [ ] Any endpoint modified in the PR only responds to the expected MIME types.
@@ -19,7 +19,7 @@ What kind of change does this PR introduce?:
 
 - [ ] Bugfix
 - [ ] Feature (requires Feature flag)
-- [ ] Data fix, Migration or Report (inert code, no impact until run)
+- [ ] Data fix, Migration, or Report (inert code, no impact until run)
 - [ ] Refactoring (no functional changes, no API changes)
 - [ ] Build related changes
 - [ ] CI related changes
@@ -27,7 +27,7 @@ What kind of change does this PR introduce?:
 
 # What is the ticket # detailing the issue?
 
-Ticket: 
+Ticket:
 
 # A brief description of the changes:
 
