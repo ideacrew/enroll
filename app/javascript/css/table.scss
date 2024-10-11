@@ -225,4 +225,7 @@ table {
   .row {
     margin: 0
   }
+  input[type="search"] {
+    margin-left: $spacer / 2;
+  }
 }
