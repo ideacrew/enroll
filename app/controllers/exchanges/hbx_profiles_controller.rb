@@ -410,7 +410,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::OutstandingVerificationDataTable.new(params[:scopes])
     respond_to do |format|
-      format.html { render "/exchanges/hbx_profiles/outstanding_verification_datatable" }
+      format.html { render "/exchanges/hbx_profiles/outstanding_verification_datatable.html.erb" }
     end
   end
 
