@@ -171,6 +171,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
       enrollment_kind: "special_enrollment",
       special_enrollment_period_id: sep.id,
       rating_area_id: rating_area.id,
+      coverage_kind: "health",
       consumer_role_id: (consumer_role.id if consumer_role.present?),
       employee_role_id: (@employee_role.id if @employee_role.present?),
       benefit_group_id: (@benefit_group.id if @benefit_group.present?)
@@ -216,6 +217,7 @@ And(/(.*) also has a dental enrollment with primary person covered/) do |role|
                                                   enrollment_kind: "special_enrollment",
                                                   special_enrollment_period_id: sep.id,
                                                   rating_area_id: rating_area.id,
+                                                  coverage_kind: "dental",
                                                   employee_role_id: (@employee_role.id if @employee_role.present?),
                                                   benefit_group_id: (@benefit_group.id if @benefit_group.present?))
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.primary_applicant.id,
@@ -904,6 +906,10 @@ end
 
 Given(/the enrollment is a Dental plan/) do
   @family.enrollments.first.update_attributes!(coverage_kind: "dental")
+end
+
+Given(/the last enrollment is a Dental plan/) do
+  @family.enrollments.last.update_attributes!(coverage_kind: "dental")
 end
 
 Given(/the coverall enrollment flag is TRUE/) do
