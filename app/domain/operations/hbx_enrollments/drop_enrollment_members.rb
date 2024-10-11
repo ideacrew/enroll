@@ -5,6 +5,7 @@ module Operations
     # This class terminates an existing enrollment and reinstates a new enrollment without members selected to be dropped from coverage
     class DropEnrollmentMembers
       include Dry::Monads[:do, :result]
+      include ::ParseDateHelper
 
       attr_reader :new_effective_date, :termination_date, :base_enrollment, :new_enrollment, :future_effective
 
@@ -37,12 +38,6 @@ module Operations
         return Failure('Unable to disenroll member(s) because of retroactive date selection.') if termination_date < TimeKeeper.date_of_record && EnrollRegistry[:drop_retro_scenario].disabled?
 
         Success(params)
-      end
-
-      def parse_date(string)
-        return nil if string.blank?
-        date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
-        Date.strptime(string, date_format)
       end
 
       def drop_enrollment_members(params)
@@ -87,7 +82,7 @@ module Operations
         new_enrollment.hbx_enrollment_members.delete_if {|mem| non_eligible_members.pluck(:applicant_id).include?(mem.applicant_id)}
       end
 
-      def notify_trading_partner(params)
+      def notify_trading_partner(_params)
         base_enrollment.notify_enrollment_cancel_or_termination_event(true)
         new_enrollment.notify_of_coverage_start(true)
       end

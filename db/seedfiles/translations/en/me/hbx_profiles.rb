@@ -1,4 +1,5 @@
 HBX_PROFILES_TRANSLATIONS = {
+	"en.hbx_profiles.apply_filters" => "Apply Filters",
 	"en.hbx_profiles.employer_name" => "Employer Name",
 	"en.hbx_profiles.effective_date" => "Effective Date",
 	"en.hbx_profiles.open_enrollment_end_date" => "Open Enrollment End Date",
@@ -115,6 +116,7 @@ HBX_PROFILES_TRANSLATIONS = {
   "en.hbx_profiles.outstanding_verifications.header" => "Outstanding Verifications",
   "en.hbx_profiles.outstanding_verifications.table.count" => "Count",
   "en.hbx_profiles.outstanding_verifications.table.documents_uploaded" => "Documents Uploaded",
+  "en.hbx_profiles.tables.apply_filters" => "Apply Filters",
 	# Admin
   'en.admin.config.header' => 'Configuration',
   'en.admin.announcements' => 'Announcements',
