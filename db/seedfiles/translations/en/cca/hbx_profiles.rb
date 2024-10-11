@@ -29,6 +29,7 @@ HBX_PROFILES_TRANSLATIONS = {
   :'en.hbx_profiles.warning' => 'Warning:',
   :'en.hbx_profiles.confirm' => 'Confirm',
   :'en.hbx_profiles.publish_application' => 'Publish Application',
+  :'en.hbx_profiles.user_accounts.table.title' => "Account Updates",
   :'en.hbx_profiles.force_publish_success' => 'Force Publish Successful',
   :'en.hbx_profiles.force_published_application_review' => 'Force Published Application Under Review'
 }.freeze
