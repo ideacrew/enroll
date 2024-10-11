@@ -25,9 +25,15 @@ module Effective
         table_column :dob, :label => l10n('dob'), :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => l10n('hbx_id'), :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => l10n('count'), :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
-        table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row| row.vlp_documents_status}, :filter => false, :sortable => true
-        table_column :verification_due, :label => l10n('hbx_profiles.outstanding_verifications.table.verification_due'),:proc => proc { |row|  format_date(row.best_verification_due_date) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
-        table_column :outstanding_verification_types, :label => l10n('hbx_profiles.outstanding_verifications.table.outstanding_verification_types'),:proc => proc { |row|  outstanding_person_verification_types(row) }, :filter => false, :sortable => false
+        table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row|
+          row.vlp_documents_status
+        }, :filter => false, :sortable => true
+        table_column :verification_due, :label => l10n('hbx_profiles.outstanding_verifications.table.verification_due'),:proc => proc { |row|
+          format_date(row.best_verification_due_date) || format_date(default_verification_due_date)
+        }, :filter => false, :sortable => true
+        table_column :outstanding_verification_types, :label => l10n('hbx_profiles.outstanding_verifications.table.outstanding_verification_types'), :proc => proc { |row|
+          outstanding_person_verification_types(row)
+        }, :filter => false, :sortable => false
         table_column :actions, :label => l10n('actions'), :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => row.primary_applicant.person.id),"static"]
@@ -46,9 +52,15 @@ module Effective
         table_column :dob, :label => l10n('dob'), :proc => proc { |row| format_date(eligibility_primary_family_member(row).dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => l10n('hbx_id'), :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false
         table_column :count, :label => l10n('hbx_profiles.outstanding_verifications.table.count'), :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
-        table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row| document_status_for(row)}, :filter => false, :sortable => true
-        table_column :verification_due, :label => l10n('hbx_profiles.outstanding_verifications.table.verification_due'),:proc => proc { |row|  format_date(eligibility_earliest_due_date(row)) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
-        table_column :outstanding_verification_types, :label => l10n('hbx_profiles.outstanding_verifications.table.outstanding_verification_types'),:proc => proc { |row|  outstanding_verification_types(row) }, :filter => false, :sortable => false
+        table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row|
+          document_status_for(row)
+        }, :filter => false, :sortable => true
+        table_column :verification_due, :label => l10n('hbx_profiles.outstanding_verifications.table.verification_due'),:proc => proc { |row|
+          format_date(eligibility_earliest_due_date(row)) || format_date(default_verification_due_date)
+        }, :filter => false, :sortable => true
+        table_column :outstanding_verification_types, :label => l10n('hbx_profiles.outstanding_verifications.table.outstanding_verification_types'),:proc => proc { |row|
+          outstanding_verification_types(row)
+        }, :filter => false, :sortable => false
         table_column :actions, :label => l10n('actions'), :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => eligibility_primary_family_member(row).person_id),"static"]
