@@ -94,6 +94,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.edit_dob_ssn.result.failure" => "DOB / SSN Update Failed",
 	"en.hbx_profiles.edit_dob_ssn.result.failure.subheader" => "SSN matches with the following user:",
 	"en.hbx_profiles.send_message.write_here" => "Write here...",
+	"en.hbx_profiles.send_message.document" => "Document: (optional)",
 	"en.hbx_profiles.send_message.modal.body" => "Are you sure you want to Send/Upload this message?",
 	"en.hbx_profiles.send_message.success" => "Message sent successfully",
 	"en.hbx_profiles.user_info.header" => "UserName/eMail view",
