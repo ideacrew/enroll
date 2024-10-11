@@ -2,7 +2,6 @@ Feature: Enrollment Tiles
 
   Background:
     Given bs4_consumer_flow feature is disable
-    Given the generic_redirect setting is disabled
     Given the display enrollment summary configuration is enabled
     Given a Hbx admin with hbx_staff role exists
     Given a consumer exists
