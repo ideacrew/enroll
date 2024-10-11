@@ -94,6 +94,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.edit_dob_ssn.result.failure" => "DOB / SSN Update Failed",
 	"en.hbx_profiles.edit_dob_ssn.result.failure.subheader" => "SSN matches with the following user:",
 	"en.hbx_profiles.send_message.write_here" => "Write here...",
+	"en.hbx_profiles.send_message.document" => "Document: (optional)",
 	"en.hbx_profiles.send_message.modal.body" => "Are you sure you want to Send/Upload this message?",
 	"en.hbx_profiles.send_message.success" => "Message sent successfully",
 	"en.hbx_profiles.user_info.header" => "UserName/eMail view",
@@ -105,6 +106,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_info.requested_by" => "Requested by @%{name}",
 	"en.hbx_profiles.user_info.nil" => "Nil",
 	# User Accounts Tab Actions
+	"en.hbx_profiles.user_accounts.table.title" => "Account Updates",
 	"en.hbx_profiles.user_accounts.actions.edit.header" => "Edit User Credentials",
 	"en.hbx_profiles.user_accounts.actions.edit.username" => "New Username",
 	"en.hbx_profiles.user_accounts.actions.edit.email" => "New Email",
