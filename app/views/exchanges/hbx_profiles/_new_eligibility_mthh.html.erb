@@ -20,7 +20,7 @@
           <th><%= l10n('hbx_profiles.program') %></th>
           <th><%= l10n('hbx_profiles.csr') %></th>
           <th><%= l10n('hbx_profiles.tax_group') %></th>
-          <th><%= l10n('hbx_profiles.filer') %></th>
+          <th id="filer-header"><%= l10n('hbx_profiles.filer') %></th>
         </thead>
         <tbody>
           <% family.active_family_members.each do |family_member| %>
@@ -42,10 +42,7 @@
                 <%= select_tag "person[family_members][#{member_id}][tax_group]", options_for_select([1, 2, 3, 4], @tax_household_group_data&.dig(member_id, 'tax_group')), prompt: l10n('select'), class: 'form-control', required: true %>
               </td>
               <td>
-                <label>
-                  <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer') %>
-                  <%= l10n('yes') %>
-                </label>
+                  <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer'), 'aria-labelledby' => "filer-header"  %>
               </td>
             </tr>
           <% end %>

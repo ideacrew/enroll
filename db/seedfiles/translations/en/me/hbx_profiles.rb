@@ -68,6 +68,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.csr" => "CSR",
 	"en.hbx_profiles.tax_group" => "Tax Group",
 	"en.hbx_profiles.filer" => "Filer?",
+	"en.hbx_profiles.terminate_enrollment" => "Terminate Enrollment",
 	"en.hbx_profiles.edi" => "Transmit to Carrier ?",
 	"en.hbx_profiles.enrollment_end_date.header" => "Terminated Enrollment To Update End Date",
 	"en.hbx_profiles.enrollment_end_date.new_end_date" => "New End Date",
