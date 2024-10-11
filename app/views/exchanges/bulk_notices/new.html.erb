@@ -32,7 +32,7 @@
             <td><%= f.text_area :body, rows: 5, placeholder: l10n('hbx_profiles.send_message.write_here'), required: true  %></td>
           </tr>
           <tr>
-            <th><label for="file" class="weight-n"><%= l10n('document') %></label></th>
+            <th><label for="file" class="weight-n"><%= l10n('hbx_profiles.send_message.document') %></label></th>
             <td><%= file_field_tag :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file"%></td>
           </tr>
           </tbody>

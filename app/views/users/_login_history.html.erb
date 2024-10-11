@@ -1,26 +1,74 @@
-<div class="modal <%= 'fade' unless @bs4 %>" id="user-login-history-modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><%= l10n('devise.login_history.admin.history_for_user', email: h(@user.email || @user.oim_id)) %></h4>
-      </div>
-      <div class="modal-body">
-        <ul>
-          <% login_history.each do |login| %>
-            <li><%= login.sign_in_outcome || "Successful" %> login on: <%= TimeKeeper.local_time(login.created_at).strftime('%D %r') %> from: <%= login.ip_address || "IP NOT FOUND" %></li>
+<% if @bs4 %>
+  <div class="modal" id="user-login-history-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header flex-column border-bottom-0 pb-0">
+          <div class='d-flex align-items-start justify-content-between w-100 mb-4'>
+            <div class='d-flex align-items-center'>
+              <div class="info-icon icon mr-3" alt="info">&nbsp;</div>
+              <h2 class='mb-0'><%= l10n('devise.login_history.admin.title') %></h2>
+            </div>
+            <div class="d-flex pl-1">
+              <a class="close-icon icon icon-sm pr-1" data-dismiss="modal" alt="<%= l10n("close") %>" href="#">&nbsp;<span class="sr-only"><%= l10n("close") %></span></a>
+            </div>
+          </div>
+          <% if @user_login_history.size >= 1 %>
+            <p class='mb-0'><%= l10n('devise.login_history.admin.subtitle', number_of_logins: h(@user_login_history.size), email: h(@user.email || @user.oim_id)) %></p>
           <% end %>
-        </ul>
-        <div class="row text-center">
-          <%= paginate login_history, window: @bs4 ? 2 : nil, remote: true %>
         </div>
-        <div class="row text-center">
-          <%= page_entries_info login_history, entry_name: 'login records' %>
+        <div class="modal-body">
+          <div class='container'>
+            <ul>
+              <% login_history.each do |login| %>
+                <li>
+                  <div class='row'>
+                    <div class='col-3'><%= l10n('devise.login_history.admin.login_status', status: h(login.sign_in_outcome || l10n('devise.login_history.admin.login_success'))) %></div>
+                    <div class='col-3 p-0'><%= TimeKeeper.local_time(login.created_at).strftime('%D %r') %></div>
+                    <div class='col-1 pl-0'><%= l10n('devise.login_history.admin.login_from') %></div>
+                    <div class='col-5'><%= login.ip_address || l10n('devise.login_history.admin.ip_not_found') %></div>
+                  </div>  
+                </li>
+              <% end %>
+            </ul>
+          </div>
+          <div class="row text-center mt-4">
+            <%= paginate login_history, window: 2, remote: true %>
+          </div>
+          <div class="w-100 text-center">
+            <%= page_entries_info login_history, entry_name: 'login records' %>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        <div class="modal-footer border-top-0">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+<% else %>
+  <div class="modal fade" id="user-login-history-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title"><%= l10n('devise.login_history.admin.history_for_user', email: h(@user.email || @user.oim_id)) %></h4>
+        </div>
+        <div class="modal-body">
+          <ul>
+            <% login_history.each do |login| %>
+              <li><%= login.sign_in_outcome || "Successful" %> login on: <%= TimeKeeper.local_time(login.created_at).strftime('%D %r') %> from: <%= login.ip_address || "IP NOT FOUND" %></li>
+            <% end %>
+          </ul>
+          <div class="row text-center">
+            <%= paginate login_history, window: nil, remote: true %>
+          </div>
+          <div class="row text-center">
+            <%= page_entries_info login_history, entry_name: 'login records' %>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+<% end %>
