@@ -6,13 +6,7 @@
   title='<%= error %>'>
   <%= hidden_field_tag 'admin_bulk_notice[audience_ids][]', id %>
   <%= hbx_id || id %>
-  <% if bs4 %>
-    <button data-action='bulk-notice#deleteIdentifier' class='text-white unstyled'>
-      <i class="far fa-times-circle"></i>
-    </button>
-  <% else %>
-    <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
+    <a data-action='bulk-notice#deleteIdentifier' class='text-white' aria-label="Close" href>
       <i class="far fa-times-circle"></i>
     </a>
-  <% end %>
 </span>
