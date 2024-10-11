@@ -48,7 +48,7 @@ class Insured::FamiliesController < FamiliesController
                                        @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
                                      end
     # Sort by effective_on again. The latest enrollment will display at the top.
-    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by{|enr| [enr.effective_on, enr.coverage_kind]}.reverse
+    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin&.sort_by{|enr| [enr.effective_on, enr.coverage_kind]}.reverse
     @enrollment_filter = @family.enrollments_for_display
 
     valid_display_enrollments = []
@@ -58,15 +58,15 @@ class Insured::FamiliesController < FamiliesController
     update_changing_hbxs(@hbx_enrollments)
 
     @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family) if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
-    @hbx_enrollments.sort_by.sort_by{|enr| [enr.effective_on, enr.coverage_kind]}.reverse!
+    @hbx_enrollments&.sort_by{|enr| [enr.effective_on, enr.coverage_kind]}&.reverse!
 
     @employee_role = @person.active_employee_roles.first if is_shop_or_fehb_market_enabled?
     @tab = params['tab']
     @family_members = @family.active_family_members
 
     if EnrollRegistry.feature_enabled?(:home_tiles_current_and_future_only)
-      @hbx_enrollments = @hbx_enrollments.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
-      @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
+      @hbx_enrollments = @hbx_enrollments.select { |d| d[:effective_on] >= TimeKeeper.date_of_record.beginning_of_year }
+      @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d[:effective_on] >= TimeKeeper.date_of_record.beginning_of_year }
     end
 
     respond_to do |format|

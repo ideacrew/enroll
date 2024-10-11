@@ -51,7 +51,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: Date.today) }
+  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: Date.today, coverage_kind: "health") }
   let(:person) { FactoryBot.create(:person, addresses: [], is_homeless: false, is_temporarily_out_of_state: false) }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
   let(:user) { FactoryBot.create(:user, person: person) }
