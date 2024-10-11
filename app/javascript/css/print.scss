@@ -1,6 +1,6 @@
 @media screen {
   #printSection {
-    display: none !important;
+    display: block !important;
   }
 }
 @media print {
@@ -16,7 +16,7 @@
     background: none !important;
   }
   body * {
-    visibility: visible;
+    visibility: hidden;
   }
   #printSection,
   #printSection * {
