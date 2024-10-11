@@ -82,7 +82,7 @@ module Operations
         new_enrollment.hbx_enrollment_members.delete_if {|mem| non_eligible_members.pluck(:applicant_id).include?(mem.applicant_id)}
       end
 
-      def notify_trading_partner(_params)
+      def notify_trading_partner(params)
         base_enrollment.notify_enrollment_cancel_or_termination_event(true)
         new_enrollment.notify_of_coverage_start(true)
       end
