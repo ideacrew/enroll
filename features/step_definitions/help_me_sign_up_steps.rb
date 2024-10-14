@@ -37,6 +37,10 @@ And(/^Individual selects a broker?/) do
   find(".broker_select_button", wait: 5).click
 end
 
+And(/^Individual should see a Previous step button?/) do
+  expect(page).to have_content(l10n("previous_step"))
+end
+
 And(/^Individual confirms a broker/) do
   find(IvlHomepage.select_this_broker).click
 end

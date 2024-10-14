@@ -38,3 +38,8 @@ Feature: Contrast level AA is enabled - existing consumer visits the my expert p
     And Individual clicks on close button
     And the page is refreshed
     And Individual sees your expert widget
+
+  Scenario: the user should see Previous step button
+    And Individual clicks on the Help from an Expert link
+    And Individual selects a broker
+    Then Individual should see a Previous step button
