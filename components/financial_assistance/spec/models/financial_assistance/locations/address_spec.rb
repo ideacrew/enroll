@@ -178,7 +178,6 @@ module FinancialAssistance
             end
 
             context 'with valid county/zip' do
-             
               it 'returns true' do
                 expect(address.valid?).to eq true
               end

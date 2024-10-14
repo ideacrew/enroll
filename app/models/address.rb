@@ -97,16 +97,10 @@ class Address
     if county.blank?
       errors.add(:county, 'not present')
     else
-      county_name = county.present? ? county.titlecase : ''
+      county_name = county.titlecase
       formatted_zip = zip.match?(/-/) ? zip.split("-").first : zip
-      errors.add(:county, 'invalid county/zip') unless ::BenefitMarkets::Locations::CountyZip.where(zip: formatted_zip).present?
+      errors.add(:county, 'invalid county/zip') unless ::BenefitMarkets::Locations::CountyZip.where(zip: formatted_zip, county_name: county_name).present?
     end
-    
-    # 1. if the state is Maine does the zip code included in the possible counties
-    # 2. If the zip code is hypenated, does the first part of the hyphenated zip code match the possible counties
-    #3. If neither of these things are true, then add an error that says county does not match zip code.
-    #4. Make sure that the county is properly formatted before running the query
-    
   end
 
   # @note Add support for GIS location

@@ -66,7 +66,7 @@ module FinancialAssistance
         if county.blank?
           errors.add(:county, 'not present')
         else
-          county_name = county.blank? ? '' : county.titlecase
+          county_name = county.titlecase
           formatted_zip = zip.match?(/-/) ? zip.split("-").first : zip
           errors.add(:county, 'invalid county/zip') if ::BenefitMarkets::Locations::CountyZip.where(zip: formatted_zip, county_name: county_name).blank?
         end
