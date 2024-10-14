@@ -408,6 +408,15 @@ input[type='date']:invalid::-webkit-datetime-edit {
   width: 100px;
 }
 
+// id specifically added to override default table cell bg color
+#admin-edit-username-email {
+  background-color: var(--primary-white);
+
+  &:hover {
+    background-color: var(--primary-white);
+  }
+}
+
 .was-validated {
   input:invalid, select:invalid, textarea:invalid {
     border-color: var(--error-color);
