@@ -731,12 +731,21 @@ var PersonValidations = (function (window, undefined) {
         const phoneValue = phoneInput.value.replace(/\D/g, '');
 
         if (/^0+$/.test(phoneValue)) {
-          alert('Phone number cannot be all zeros.');
+          alert('Mobile Phone number cannot be all zeros.');
           PersonValidations.restoreRequiredAttributes(e);
         } else if (phoneValue.length < 1 || phoneValue.length < 10) {
           alert('You must enter a mobile phone number to receive notices and updates by text.');
           PersonValidations.restoreRequiredAttributes(e);
         }
+
+        const homePhoneInput = document.querySelector('.home-phone-number');
+        const homePhoneValue = homePhoneInput.value.replace(/\D/g, '');
+
+        if (/^0+$/.test(homePhoneValue)) {
+          alert('Home Phone number cannot be all zeros1.');
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+
         if (
           $('.contact-method input:checked').length <= 1 &&
           $('.contact-method').hasClass('flag-enabled')
@@ -749,31 +758,24 @@ var PersonValidations = (function (window, undefined) {
       }
 
       if (!$('#contact_type_text').prop('checked')) {
-        const phoneInput = document.querySelector('.mobile-phone-number');
-        const phoneValue = phoneInput.value.replace(/\D/g, '');
 
-        if (/^0+$/.test(phoneValue)) {
-          alert('Phone number cannot be all zeros.');
-          PersonValidations.restoreRequiredAttributes(e);
-        } else if (phoneValue.length > 1 && phoneValue.length < 10) {
-          alert('You must enter a mobile phone number to receive notices and updates by text.');
+        // Check mobile phone number
+        const mobilePhoneInput = document.querySelector('.mobile-phone-number');
+        const mobilePhoneValue = mobilePhoneInput.value.replace(/\D/g, '');
+
+        if (/^0+$/.test(mobilePhoneValue)) {
+          alert('Mobile Phone number cannot be all zeros.');
           PersonValidations.restoreRequiredAttributes(e);
         }
-      }
 
-      const phoneInput = document.querySelector('.home-phone-number');
-      const phoneValue = phoneInput.value.replace(/\D/g, '');
-      const isTextChecked = $('#contact_type_text').prop('checked');
+        // Check home phone number
+        const homePhoneInput = document.querySelector('.home-phone-number');
+        const homePhoneValue = homePhoneInput.value.replace(/\D/g, '');
 
-      if (/^0+$/.test(phoneValue)) {
-        alert('Phone number cannot be all zeros.');
-        PersonValidations.restoreRequiredAttributes(e);
-      } else if (
-        (isTextChecked && (phoneValue.length < 1 || phoneValue.length < 10)) ||
-        (!isTextChecked && phoneValue.length > 1 && phoneValue.length < 10)
-      ) {
-        alert('You must enter a home phone number to receive notices and updates by text.');
-        PersonValidations.restoreRequiredAttributes(e);
+        if (/^0+$/.test(homePhoneValue)) {
+          alert('Home Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
+        }
       }
     }
   }

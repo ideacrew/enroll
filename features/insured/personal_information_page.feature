@@ -40,3 +40,12 @@ Feature: Insured Plan Shopping on Individual market
     And the continue button has a data disabled attribute
     And Individual clicks on the Continue button of the Account Setup page
     And Individual sees form to enter personal information
+
+  Scenario: Consumer clicks the personal match page continue button
+    Given bs4_consumer_flow feature is enabled
+    Given the Continue button is visible on Account Setup page
+    And the continue button has a data disabled attribute
+    And Individual clicks on the Continue button of the Account Setup page
+    And Individual sees form to enter personal information with invalid phone number
+    Then Individual clicks on continue
+    Then Individual should see an message warning about invalid phone
