@@ -437,7 +437,7 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
 
     before do
       params.merge!({'csr' => 0})
-      household100.tax_households.first.tax_household_members.first.update_attributes!(is_ia_eligible: false)
+      household100.tax_households.first.tax_household_members.first.set(is_ia_eligible: false)
       household100.create_new_tax_household(params)
     end
 
@@ -492,7 +492,7 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
       year = TimeKeeper.date_of_record.year
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(year, 8, 4))
-      HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: current_enr.product.id)
+      HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.set(slcsp_id: current_enr.product.id)
       household100.create_new_tax_household(params.merge({'max_aptc' => '1000.00'}))
       @new_enr = family100.reload.hbx_enrollments.last
     end

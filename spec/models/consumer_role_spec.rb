@@ -364,8 +364,8 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       end
       shared_examples_for 'ensures native american field value' do |action, state, consumer_kind, tribe, tribe_state|
         it "#{action} #{state} for #{consumer_kind}" do
-          person.update_attributes!(:tribal_id => '444444444') if tribe
-          person.consumer_role.update_attributes!(:native_validation => tribe_state) if tribe_state
+          person.set(:tribal_id => '444444444') if tribe
+          person.consumer_role.set(:native_validation => tribe_state) if tribe_state
           expect(person.consumer_role.native_validation).to eq(state)
         end
       end
@@ -379,7 +379,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
           allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
           allow(EnrollRegistry[:indian_alaskan_tribe_codes].feature).to receive(:is_enabled).and_return(true)
           allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
-          person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
+          person.set(tribal_state: "ME", tribe_codes: ["", "PE"])
           v_type = VerificationType.new(type_name: "American Indian Status", validation_status: 'outstanding', inactive: false)
           person1.verification_types << v_type
           person1.save!
@@ -387,7 +387,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
         it "does not deactivate native american verification type" do
           ai_an_type = person1.verification_types.where(type_name: "American Indian Status").first
-          ai_an_type.update_attributes!(validation_status: 'negative_response_received')
+          ai_an_type.set(validation_status: 'negative_response_received')
           person1.save!
           expect(ai_an_type.inactive).to eql(false)
         end
@@ -417,7 +417,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       context "tribal state is ME" do
 
         before do
-          person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
+          person.set(tribal_state: "ME", tribe_codes: ["", "PE"])
         end
 
         it "returns tribal codes" do
@@ -427,7 +427,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
       context "tribal state is outside ME" do
         before do
-          person.update_attributes!(tribal_state: "CA", tribe_codes: [], tribal_name: 'tribal name1')
+          person.set(tribal_state: "CA", tribe_codes: [], tribal_name: 'tribal name1')
         end
 
         it "returns tribal name" do
@@ -686,7 +686,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
             before do
               allow(person).to receive(:ssn).and_return nil
               allow(consumer).to receive(:citizen_status).and_return "not_lawfully_present_in_us"
-              consumer.lawful_presence_determination.update_attributes!(citizen_status: "not_lawfully_present_in_us")
+              consumer.lawful_presence_determination.set(citizen_status: "not_lawfully_present_in_us")
               consumer.coverage_purchased! verification_attr
               consumer.reload
               consumer.fail_dhs! verification_attr
@@ -1192,7 +1192,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
     context 'Responses from local hub and ssa hub' do
       it 'aasm state should be in fully_verified if dc response is valid and consumer is tribe member' do
-        person.update_attributes!(tribal_id: "12345")
+        person.set(tribal_id: "12345")
         consumer_role.coverage_purchased!(verification_attr)
         consumer_role.pass_residency!
         consumer_role.ssn_valid_citizenship_valid!(verification_attr)
@@ -1220,7 +1220,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
       it 'aasm state should be in verification_outstanding if dc response is positive and consumer is a tribe member' do
         consumer_role.update_attributes(is_state_resident: nil)
-        person.update_attributes!(tribal_id: "12345")
+        person.set(tribal_id: "12345")
         consumer_role.ssn_valid_citizenship_valid!(verification_attr)
         consumer_role.pass_residency!
         expect(consumer_role.aasm_state).to eq 'verification_outstanding'
@@ -1229,7 +1229,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
     context 'american indian verification type on coverage purchase' do
       it 'aasm state should be in verification negative_response_received and american indian status in outstanding upon coverage purchase' do
-        person.update_attributes!(tribal_id: "12345")
+        person.set(tribal_id: "12345")
         consumer_role.coverage_purchased!(verification_attr)
         american_indian_status = consumer_role.verification_types.by_name("American Indian Status").first
         expect(american_indian_status.validation_status).to eq 'negative_response_received'
@@ -1239,7 +1239,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
     context 'admin verifies american indian status' do
       it 'consumer aasm state should be in fully_verified if all verification types are verified' do
-        person.update_attributes!(tribal_id: "12345")
+        person.set(tribal_id: "12345")
         consumer_role.coverage_purchased!(verification_attr)
         consumer_role.pass_residency!
         consumer_role.ssn_valid_citizenship_valid!(verification_attr)
@@ -1253,7 +1253,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
 
     context 'admin rejects american indian status document' do
       it 'consumer aasm state should be in fully_verified if all verification types are verified' do
-        person.update_attributes!(tribal_id: "12345")
+        person.set(tribal_id: "12345")
         consumer_role.coverage_purchased!(verification_attr)
         consumer_role.pass_residency!
         consumer_role.ssn_valid_citizenship_valid!(verification_attr)

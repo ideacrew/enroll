@@ -35,7 +35,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
 
       it 'should end date the old bga with the benefit package start on' do
         period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
-        initial_application.update_attributes!(effective_period: period)
+        initial_application.set(effective_period: period)
         benefit_group_assignment.update_attributes(start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.create_benefit_group_assignment(initial_application.benefit_packages, off_cycle: false, reinstated: false)
         census_employee.reload
@@ -50,7 +50,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
 
       before do
         period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
-        initial_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+        initial_application.set(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
         benefit_group_assignment.update_attributes(start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
         census_employee.save
@@ -74,7 +74,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
 
     before do
       period = initial_application.effective_period.min + 1.year..(initial_application.effective_period.max + 1.year)
-      initial_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+      initial_application.set(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
       benefit_group_assignment.update_attributes(start_on: initial_application.start_on, end_on: initial_application.end_on)
       census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
       census_employee.save
@@ -89,7 +89,7 @@ RSpec.describe Eligibility::EmployeeBenefitPackages, type: :model, dbclean: :aro
       end
 
       it 'should return nil if no reinstated PY present' do
-        initial_application.update_attributes!(aasm_state: :enrollment_open, reinstated_id: nil)
+        initial_application.set(aasm_state: :enrollment_open, reinstated_id: nil)
         benefit_group_assignment.update_attributes(start_on: initial_application.start_on, end_on: initial_application.end_on)
         census_employee.benefit_sponsorship = abc_profile.benefit_sponsorships.first
         expect(census_employee.reinstated_benefit_group_with_future_date).to eq nil

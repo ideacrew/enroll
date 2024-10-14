@@ -79,7 +79,7 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         end
 
         before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
           user
           matching_basr
         end
@@ -103,9 +103,9 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         end
 
         before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
           user
-          matching_basr.update_attributes!(aasm_state: 'active')
+          matching_basr.set(aasm_state: 'active')
         end
 
         it 'returns newly created BrokerAgencyStaffRole' do
@@ -129,7 +129,7 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         end
 
         before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
           user
           non_matching_basr
         end
@@ -149,7 +149,7 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         - person does not have a broker agency staff role' do
 
         before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
           user
         end
 

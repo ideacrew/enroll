@@ -26,7 +26,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
     let!(:sep) do
       local_sep = FactoryBot.create(:special_enrollment_period, family: family)
-      local_sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month'])
+      local_sep.qualifying_life_event_kind.set(termination_on_kinds: ['end_of_event_month'])
       local_sep
     end
 

@@ -76,7 +76,7 @@ end
 
 describe '#start_ssa_process' do
   before :each do
-    consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+    consumer_role.set(aasm_state: 'verification_outstanding')
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
@@ -159,7 +159,7 @@ describe '#start_ssa_process' do
       let(:lawful_presence) { FactoryBot.create(:lawful_presence_determination, :us_citizen, ivl_role: ivl_role) }
       let(:citizenship_v_type) { ivl_role.verification_types.citizenship_type.first }
 
-      before { non_ssn_person.update_attributes!(encrypted_ssn: nil) }
+      before { non_ssn_person.set(encrypted_ssn: nil) }
 
       it 'modifies aasm_state of lawful_presence_determination' do
         expect(lawful_presence.verification_successful?).to be_truthy
@@ -283,7 +283,7 @@ end
 
 describe '#start_vlp_process' do
   before :each do
-    consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+    consumer_role.set(aasm_state: 'verification_outstanding')
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
@@ -310,8 +310,8 @@ describe '#start_vlp_process' do
       - vlp document is invalid
       - vlp verification request is not successful" do
         before do
-          consumer_role.update_attributes!(aasm_state: 'dhs_pending')
-          consumer_role.vlp_documents.first.update_attributes!(alien_number: nil)
+          consumer_role.set(aasm_state: 'dhs_pending')
+          consumer_role.vlp_documents.first.set(alien_number: nil)
           consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
         end
 
@@ -330,8 +330,8 @@ describe '#start_vlp_process' do
         - vlp document is invalid
         - vlp verification request is not successful" do
         before do
-          consumer_role.update_attributes!(aasm_state: 'ssa_pending')
-          consumer_role.vlp_documents.first.update_attributes!(alien_number: nil)
+          consumer_role.set(aasm_state: 'ssa_pending')
+          consumer_role.vlp_documents.first.set(alien_number: nil)
           consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
         end
 

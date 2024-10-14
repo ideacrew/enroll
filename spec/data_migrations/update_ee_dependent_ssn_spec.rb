@@ -39,10 +39,10 @@ describe UpdateEeDependentSSN, dbclean: :after_each do
     it "if given dependent is not found" do
       census_employee.census_dependents = []
       expect(census_employee.census_dependents.first).to be_falsey
-   end 
+   end
   end
 
-  describe "when Cron job recives" do 
+  describe "when Cron job recives" do
     context "env_params" do
 
       before :each do
@@ -56,7 +56,7 @@ describe UpdateEeDependentSSN, dbclean: :after_each do
       end
 
       it "allow dependent ssn's to be updated" do
-        census_employee.census_dependents.first.update_attributes!(ssn: "123456789")
+        census_employee.census_dependents.first.set(ssn: "123456789")
         run_env_specific
         census_employee.reload
         expect(census_employee.census_dependents.first.ssn).to match("123456789")

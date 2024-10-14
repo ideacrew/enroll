@@ -72,8 +72,8 @@ RSpec.describe Operations::BenefitGroupAssignments::Clone, :type => :model, dbcl
   context 'Success' do
     before do
       initial_application.terminate_enrollment!
-      initial_application.update_attributes!(terminated_on: initial_application.end_on - 2.months)
-      benefit_group_assignment.update_attributes!(end_on: initial_benefit_package.end_on - 2.months)
+      initial_application.set(terminated_on: initial_application.end_on - 2.months)
+      benefit_group_assignment.set(end_on: initial_benefit_package.end_on - 2.months)
       @result = subject.call({benefit_group_assignment: benefit_group_assignment, options: {start_on: benefit_group_assignment.end_on.next_day, benefit_package_id: renewal_benefit_package.id}})
     end
 

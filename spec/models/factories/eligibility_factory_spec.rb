@@ -11,7 +11,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
   def reset_premium_tuples
     p_table = @product.premium_tables.first
-    p_table.premium_tuples.each { |pt| pt.update_attributes!(cost: pt.age)}
+    p_table.premium_tuples.each { |pt| pt.set(cost: pt.age)}
     ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   end
 
@@ -30,7 +30,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
       before :each do
         @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
         benefit_sponsorship = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship
-        benefit_sponsorship.benefit_coverage_periods.each { |bcp| bcp.update_attributes!(slcsp_id: @product.id) }
+        benefit_sponsorship.benefit_coverage_periods.each { |bcp| bcp.set(slcsp_id: @product.id) }
       end
 
       context 'for AvailableEligibilityService' do
@@ -93,7 +93,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
 
           before :each do
-            tax_household_member.update_attributes!(is_ia_eligible: false, is_medicaid_chip_eligible: true)
+            tax_household_member.set(is_ia_eligible: false, is_medicaid_chip_eligible: true)
             @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
             @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
           end
@@ -147,7 +147,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
         context 'for one member enrollment' do
           before :each do
             allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
-            enrollment1.update_attributes!(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
+            enrollment1.set(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
           end
 
           context 'for ehb_premium less than selected_aptc' do
@@ -190,7 +190,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
         @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
         reset_premium_tuples
         benefit_sponsorship = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship
-        benefit_sponsorship.benefit_coverage_periods.each { |bcp| bcp.update_attributes!(slcsp_id: @product.id) }
+        benefit_sponsorship.benefit_coverage_periods.each { |bcp| bcp.set(slcsp_id: @product.id) }
       end
 
       context 'for AvailableEligibilityService' do
@@ -379,7 +379,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
           before :each do
             @product_id = @product.id.to_s
             allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
-            enrollment1.update_attributes!(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
+            enrollment1.set(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
           end
 
           context 'where ehb_premium less than selected_aptc and available_aptc' do
@@ -562,7 +562,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
         before :each do
           @product_id = @product.id.to_s
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
-          enrollment.update_attributes!(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
+          enrollment.set(product_id: @product.id, aasm_state: 'coverage_selected', consumer_role_id: person.consumer_role.id)
         end
 
         let(:current_date) {TimeKeeper.date_of_record.beginning_of_month}
@@ -612,7 +612,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
         @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
         reset_premium_tuples
         benefit_sponsorship = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship
-        benefit_sponsorship.benefit_coverage_periods.each { |bcp| bcp.update_attributes!(slcsp_id: @product.id) }
+        benefit_sponsorship.benefit_coverage_periods.each { |bcp| bcp.set(slcsp_id: @product.id) }
       end
       let(:year_start_date) {TimeKeeper.date_of_record.beginning_of_year}
       let!(:agg_person) {FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 35.years)}

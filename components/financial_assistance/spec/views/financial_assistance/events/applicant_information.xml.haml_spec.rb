@@ -23,7 +23,7 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
 
       context 'applicant not applying for coverage' do
         before :each do
-          applicant.update_attributes!(is_applying_coverage: false)
+          applicant.set(is_applying_coverage: false)
           render 'financial_assistance/events/applicant_information', applicant: applicant
         end
 
@@ -35,7 +35,7 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
 
       context 'applicant is not in is_former_foster_care' do
         before :each do
-          applicant.update_attributes!(is_applying_coverage: true, is_former_foster_care: false)
+          applicant.set(is_applying_coverage: true, is_former_foster_care: false)
           render 'financial_assistance/events/applicant_information', applicant: applicant
         end
 
@@ -47,7 +47,7 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
 
       context 'applicant is in is_former_foster_care' do
         before :each do
-          applicant.update_attributes!(is_applying_coverage: true,
+          applicant.set(is_applying_coverage: true,
                                        is_former_foster_care: true,
                                        age_left_foster_care: 15,
                                        foster_care_us_state: 'DC',
@@ -66,7 +66,7 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
 
       context 'applicant not applying for coverage' do
         before :each do
-          applicant.update_attributes!(is_applying_coverage: false)
+          applicant.set(is_applying_coverage: false)
           render 'financial_assistance/events/applicant_information', applicant: applicant
         end
 
@@ -78,7 +78,7 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
 
       context 'applicant is not a student' do
         before :each do
-          applicant.update_attributes!(is_applying_coverage: true, is_student: false)
+          applicant.set(is_applying_coverage: true, is_student: false)
           render 'financial_assistance/events/applicant_information', applicant: applicant
         end
 
@@ -90,7 +90,7 @@ RSpec.describe 'components/financial_assistance/app/views/financial_assistance/e
 
       context 'applicant is a student' do
         before :each do
-          applicant.update_attributes!(is_applying_coverage: true,
+          applicant.set(is_applying_coverage: true,
                                        is_student: true,
                                        student_kind: 'full_time',
                                        student_school_kind: 'high_school',

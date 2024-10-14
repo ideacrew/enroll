@@ -537,7 +537,7 @@ describe PersonPolicy, "given a user who is a primary family member" do
     subject { described_class.new(user, record) }
 
     before do
-      user_person.consumer_role.update_attributes!(identity_validation: 'valid')
+      user_person.consumer_role.set(identity_validation: 'valid')
     end
 
     it "may delete documents" do

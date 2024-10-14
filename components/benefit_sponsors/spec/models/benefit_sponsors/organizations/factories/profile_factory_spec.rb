@@ -329,7 +329,7 @@ module BenefitSponsors
                             owner_profile_id: employer_profile.id,
                             sponsor_profile_id: broker_agency_profile.id)
         end
-        let!(:update_plan_design) {plan_design_organization.update_attributes!(has_active_broker_relationship: true)}
+        let!(:update_plan_design) {plan_design_organization.set(has_active_broker_relationship: true)}
 
         let(:valid_employer_params_update) do
           {

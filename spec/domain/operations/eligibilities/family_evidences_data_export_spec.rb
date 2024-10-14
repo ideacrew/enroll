@@ -193,7 +193,7 @@ RSpec.describe ::Operations::Eligibilities::FamilyEvidencesDataExport,
   end
 
   context 'with a deactivated family_member' do
-    before { family_member.update_attributes!(is_active: false) }
+    before { family_member.set(is_active: false) }
 
     it 'includes primary and not dependent' do
       result = subject.call(required_params)

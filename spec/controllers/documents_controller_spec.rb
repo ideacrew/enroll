@@ -153,7 +153,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         consumer_person.save!
         consumer_person.consumer_role.update_attributes(aasm_state: 'verification_outstanding', active_vlp_document_id: consumer_person.consumer_role.vlp_documents.first.id)
         @immigration_type = consumer_person.verification_types.where(type_name: 'Immigration status').first
-        @immigration_type.update_attributes!(inactive: false)
+        @immigration_type.set(inactive: false)
       end
 
       it 'should redirect if verification type is Immigration status' do
@@ -168,7 +168,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
           consumer_person.consumer_role.vlp_documents = [bad_document]
           consumer_person.consumer_role.active_vlp_document_id = bad_document.id
           consumer_person.save!
-          @immigration_type.update_attributes!(inactive: false)
+          @immigration_type.set(inactive: false)
         end
 
         it 'should redirect if verification type is Immigration status' do
@@ -181,7 +181,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         before do
           consumer_person.consumer_role.vlp_documents = []
           consumer_person.save!
-          @immigration_type.update_attributes!(inactive: false)
+          @immigration_type.set(inactive: false)
         end
 
         it 'should redirect if verification type is Immigration status' do
@@ -238,7 +238,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         consumer_person.save!
         @immigration_type = consumer_person.verification_types.where(type_name: 'Immigration status').first
         @immigration_type.pending_type
-        @immigration_type.update_attributes!(inactive: false)
+        @immigration_type.set(inactive: false)
         [
           :financial_assistance,
           :'gid://enroll_app/Family',
@@ -463,7 +463,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         end
 
         it 'downloads document even if Consumer is not RIDP verified' do
-          consumer_person.consumer_role.update_attributes!(identity_validation: 'na', application_validation: 'na')
+          consumer_person.consumer_role.set(identity_validation: 'na', application_validation: 'na')
           get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
           expect(response.status).to eq(200)
           expect(response.headers["Content-Disposition"]).to eq 'attachment'

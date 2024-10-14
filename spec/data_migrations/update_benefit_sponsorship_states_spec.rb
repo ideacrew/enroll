@@ -27,7 +27,7 @@ describe UpdateBenefitSponosorshipStates, dbclean: :after_each do
       context "when benefit sponsorship is in any of the initial states" do
 
         before do
-          benefit_sponsorship.update_attributes!(aasm_state: old_state)
+          benefit_sponsorship.set(aasm_state: old_state)
         end
 
         it "should update benefit sponsorship state to applicant" do
@@ -44,7 +44,7 @@ describe UpdateBenefitSponosorshipStates, dbclean: :after_each do
       context "when benefit sponsorship is in any state other than initial state" do
 
         before do
-          benefit_sponsorship.update_attributes!(aasm_state: valid_state)
+          benefit_sponsorship.set(aasm_state: valid_state)
         end
 
         it "should not update benefit sponsorship state" do
@@ -60,8 +60,8 @@ describe UpdateBenefitSponosorshipStates, dbclean: :after_each do
       let(:benefit_application) { benefit_sponsorship.benefit_applications.first }
 
       before do
-        benefit_sponsorship.update_attributes!(aasm_state: :initial_enrollment_eligible)
-        benefit_application.update_attributes!(aasm_state: :enrollment_eligible)
+        benefit_sponsorship.set(aasm_state: :initial_enrollment_eligible)
+        benefit_application.set(aasm_state: :enrollment_eligible)
       end
 
       it "should update benefit application to binder paid state" do

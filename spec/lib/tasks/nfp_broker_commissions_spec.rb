@@ -14,7 +14,7 @@ RSpec.describe 'upload commission-statements to s3 and create respective documen
 
   context "upload commission-statements to S3 and create respective documents for broker_agency_profile" do
     before :each do
-      broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+      broker_agency_profile.set(primary_broker_role_id: broker_role.id)
       broker_agency_profile.approve!
       FileUtils.mkdir "commission_statements"
       FileUtils.mkdir "commission_statements/#{sub_folder}"
@@ -32,7 +32,7 @@ RSpec.describe 'upload commission-statements to s3 and create respective documen
     end
 
     it "cannot create commission-statements as cannot find broker_role with given npn" do
-      broker_role.update_attributes!(npn: "40115264")
+      broker_role.set(npn: "40115264")
       Rake::Task['nfp:commission_statements_upload'].invoke
       expect(broker_agency_profile.commission_statements.count).to eq 0
     end

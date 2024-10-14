@@ -25,7 +25,7 @@ describe EeWithoutEmployeeRole, dbclean: :after_each do
 
     before do
       allow(person).to receive(:employee_roles).and_return([employee_role1, employee_role2])
-      census_employee1.update_attributes!(aasm_state:"rehired", employee_role_id: employee_role1.id)
+      census_employee1.set(aasm_state:"rehired", employee_role_id: employee_role1.id)
     end
 
     context "for census employee without an employee role" do

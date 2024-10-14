@@ -30,7 +30,7 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
   let!(:bad_county_address_person) do
     person = FactoryBot.create(:person, :with_consumer_role)
     person.addresses.each do |address|
-      address.update_attributes!(county: BenefitMarkets::Locations::CountyZip.new, zip: maine_zip)
+      address.set(county: BenefitMarkets::Locations::CountyZip.new, zip: maine_zip)
     end
   end
   let(:create_instate_addresses) do
@@ -90,8 +90,8 @@ RSpec.describe 'migrations:fix_maine_nil_counties', :type => :task, dbclean: :af
 
   context "Rake task" do
     before do
-      person.addresses.first.update_attributes!(zip: maine_zip, county: "Zip code outside supported area")
-      person2.addresses.first.update_attributes!(zip: maine_zip, county: "Monterey County")
+      person.addresses.first.set(zip: maine_zip, county: "Zip code outside supported area")
+      person2.addresses.first.set(zip: maine_zip, county: "Monterey County")
       #applicant1.addresses.first.update_attributes(county: "Monterey County")
       ::BenefitMarkets::Locations::CountyZip.create!(
         county_name: "Hampden",

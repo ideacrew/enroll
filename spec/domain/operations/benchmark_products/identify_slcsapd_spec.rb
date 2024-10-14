@@ -108,7 +108,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
     context 'with all Family-Tier Rates' do
       before do
         ::BenefitMarkets::Products::DentalProducts::DentalProduct.each do |dental|
-          dental.update_attributes!(rating_method: 'Family-Tier Rates')
+          dental.set(rating_method: 'Family-Tier Rates')
         end
         household_params = @benchmark_product_model.households.first.to_h
         household_params.merge!({ type_of_household: 'child_only' })
@@ -131,7 +131,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
     context 'No Dental Products' do
       before do
         ::BenefitMarkets::Products::DentalProducts::DentalProduct.each do |dental_pro|
-          dental_pro.update_attributes!(benefit_market_kind: :aca_shop)
+          dental_pro.set(benefit_market_kind: :aca_shop)
         end
         @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
           { family: family, benchmark_product_model: @benchmark_product_model, household_params: @benchmark_product_model.households.first.to_h }
@@ -203,7 +203,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
     context 'with non Family-Tier Rates' do
       before do
         ::BenefitMarkets::Products::DentalProducts::DentalProduct.each do |dental|
-          dental.update_attributes!(rating_method: 'Age-Based Rates')
+          dental.set(rating_method: 'Age-Based Rates')
         end
 
         household_params = @benchmark_product_model.households.first.to_h
@@ -239,7 +239,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
 
       before do
         ::BenefitMarkets::Products::DentalProducts::DentalProduct.each do |dental|
-          dental.update_attributes!(rating_method: 'Age-Based Rates')
+          dental.set(rating_method: 'Age-Based Rates')
         end
 
         household_params = @benchmark_product_model.households.first.to_h

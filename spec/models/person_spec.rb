@@ -690,7 +690,7 @@ describe Person, :dbclean => :after_each do
       end
 
       it "should have an error saved to their person if the age isn't imported properly" do
-        greg.update_attributes!(dob: nil)
+        greg.set(dob: nil)
         greg.age_on(Date.today)
         expect(greg.errors.full_messages.first).to eq l10n("exceptions.valid_birthdate")
       end
@@ -1563,8 +1563,8 @@ describe Person, :dbclean => :after_each do
     before do
       Person.create_indexes
       FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
-      person.broker_role.update_attributes!(aasm_state: "active")
-      person.broker_role.update_attributes!(npn: "11111111")
+      person.broker_role.set(aasm_state: "active")
+      person.broker_role.set(npn: "11111111")
       person.save!
     end
 

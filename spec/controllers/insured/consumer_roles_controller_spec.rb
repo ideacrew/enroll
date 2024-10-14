@@ -504,19 +504,19 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       end
 
       it "should not show shop coverage if no enrollments exist" do
-        shop_enrollment.update_attributes!(aasm_state: 'coverage_terminated')
+        shop_enrollment.set(aasm_state: 'coverage_terminated')
         put :update, params: { person: person_params, id: "test" }
         expect(assigns['shop_coverage_result']).to eq false
       end
 
       it "should return a success for existing shop coverage" do
-        shop_enrollment.update_attributes!(aasm_state: 'coverage_selected')
+        shop_enrollment.set(aasm_state: 'coverage_selected')
         put :update, params: { person: person_params, id: "test" }
         expect(assigns['shop_coverage_result']).to eq true
       end
 
       it "should return a success for waived shop coverage" do
-        shop_enrollment.update_attributes!(aasm_state: 'inactive')
+        shop_enrollment.set(aasm_state: 'inactive')
         put :update, params: { person: person_params, id: "test" }
         expect(assigns['shop_coverage_result']).to eq true
       end

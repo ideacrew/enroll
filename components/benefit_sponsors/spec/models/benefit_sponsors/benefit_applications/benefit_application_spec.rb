@@ -443,7 +443,7 @@ module BenefitSponsors
 
           context 'from_state reinstated' do
             before do
-              benefit_application.update_attributes!(aasm_state: :reinstated)
+              benefit_application.set(aasm_state: :reinstated)
               benefit_application.activate_enrollment!
             end
 
@@ -505,7 +505,7 @@ module BenefitSponsors
         let!(:initial_application) do
           application = FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :termination_pending, effective_period: effective_period, benefit_sponsorship: benefit_sponsorship)
           terminated_period = effective_period.min..termination_date
-          application.update_attributes!(effective_period: terminated_period)
+          application.set(effective_period: terminated_period)
           application
         end
         let!(:offcycle_application) do
@@ -1053,7 +1053,7 @@ module BenefitSponsors
           people.each_with_index do |person, i|
             ce = census_employees[i]
             family = person.primary_family
-            ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+            ce.set(employee_role_id: person.employee_roles.first.id)
             FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
           end
         end
@@ -1074,7 +1074,7 @@ module BenefitSponsors
           people.each_with_index do |person, i|
             ce = census_employees[i]
             family = person.primary_family
-            ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+            ce.set(employee_role_id: person.employee_roles.first.id)
             FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
           end
         end
@@ -1090,7 +1090,7 @@ module BenefitSponsors
           let!(:dental_sponsored_benefit) { true }
           let(:dental_census_employee) do
             ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
-            ce.update_attributes!(employee_role_id: dental_person.employee_roles.first.id)
+            ce.set(employee_role_id: dental_person.employee_roles.first.id)
             ce
           end
 
@@ -1126,14 +1126,14 @@ module BenefitSponsors
         include_context "setup employees with benefits"
 
         before :each do
-          renewal_application.benefit_packages.first.update_attributes!(_id: CensusEmployee.all.first.benefit_group_assignments.first.benefit_package_id)
+          renewal_application.benefit_packages.first.set(_id: CensusEmployee.all.first.benefit_group_assignments.first.benefit_package_id)
         end
 
         it 'should not return the terminated EEs' do
           expect(renewal_application.active_census_employees_under_py.count).to eq 5
           term_date = renewal_application.effective_period.min - 10.days
           ce = renewal_application.active_census_employees_under_py.first
-          ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
+          ce.benefit_group_assignments.first.set(start_on: renewal_application.effective_period.min + 1.day)
           ce.aasm_state = 'employment_terminated'
           ce.employment_terminated_on = term_date
           ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
@@ -1145,7 +1145,7 @@ module BenefitSponsors
           expect(renewal_application.active_census_employees_under_py.count).to eq 5
           term_date = renewal_application.effective_period.min - 10.days
           ce = renewal_application.active_census_employees_under_py.first
-          ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
+          ce.benefit_group_assignments.first.set(start_on: renewal_application.effective_period.min + 1.day)
           ce.aasm_state = 'employee_termination_pending'
           ce.employment_terminated_on = term_date
           ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
@@ -1205,13 +1205,13 @@ module BenefitSponsors
           people.each_with_index do |person, i|
             ce = census_employees[i]
             family = person.primary_family
-            ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+            ce.set(employee_role_id: person.employee_roles.first.id)
             FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
           end
         end
 
         it 'should return enrolled families count' do
-          owner_employee.update_attributes!(:is_business_owner => true)
+          owner_employee.set(:is_business_owner => true)
           expect(initial_application.total_enrolled_and_waived_count).to eq 4
         end
       end

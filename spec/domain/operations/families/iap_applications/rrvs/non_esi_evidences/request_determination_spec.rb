@@ -150,7 +150,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
-      applicant2.update_attributes!(ssn: "756841234")
+      applicant2.set(ssn: "756841234")
       @result = subject.call({ application_hbx_id: application.hbx_id })
       application.reload
     end
@@ -187,7 +187,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
-      applicant2.update_attributes!(ssn: "756841234", is_applying_coverage: false, is_ia_eligible: false)
+      applicant2.set(ssn: "756841234", is_applying_coverage: false, is_ia_eligible: false)
       @result = subject.call({ application_hbx_id: application.hbx_id })
       application.reload
     end
@@ -218,8 +218,8 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
-      applicant.update_attributes!(is_applying_coverage: false, is_ia_eligible: false)
-      applicant2.update_attributes!(ssn: "756841234")
+      applicant.set(is_applying_coverage: false, is_ia_eligible: false)
+      applicant2.set(ssn: "756841234")
       @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
       application.reload
     end
@@ -283,7 +283,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
-        applicant2.update_attributes!(is_applying_coverage: false, is_ia_eligible: false)
+        applicant2.set(is_applying_coverage: false, is_ia_eligible: false)
         @result = subject.call({ application_hbx_id: application.hbx_id })
         application.reload
       end
@@ -353,7 +353,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
         application.applicants.each do |applicant|
           applicant.unset(:encrypted_ssn)
         end
-        applicant2.update_attributes!(is_applying_coverage: false, is_ia_eligible: false)
+        applicant2.set(is_applying_coverage: false, is_ia_eligible: false)
         application.save!
         @result = subject.call({ application_hbx_id: application.hbx_id })
         application.reload

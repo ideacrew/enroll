@@ -80,7 +80,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       end
 
       it 'should update for set values' do
-        broker_role.update_attributes!(carrier_appointments: {})
+        broker_role.set(carrier_appointments: {})
         broker_role.reload
         expect(broker_role.carrier_appointments).to eq({})
         put(
@@ -430,10 +430,10 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(true)
 
-        broker_agency_profile_A.update_attributes!(primary_broker_role_id: broker_role_A.id)
+        broker_agency_profile_A.set(primary_broker_role_id: broker_role_A.id)
         basr_1_A
 
-        broker_agency_profile_B.update_attributes!(primary_broker_role_id: broker_role_B.id)
+        broker_agency_profile_B.set(primary_broker_role_id: broker_role_B.id)
         basr_2_A
         basr_2_B
 

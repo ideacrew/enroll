@@ -41,7 +41,7 @@ describe RemoveEnrolledContingentState, dbclean: :after_each do
 
     context "for unsuccessful migration" do
       before :each do
-        hbx_enrollment.update_attributes!(aasm_state: "shopping")
+        hbx_enrollment.set(aasm_state: "shopping")
         subject.migrate
       end
 

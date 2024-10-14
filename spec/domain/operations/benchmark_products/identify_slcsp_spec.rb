@@ -86,7 +86,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsp do
     context 'with all Family-Tier Rates' do
       before do
         ::BenefitMarkets::Products::HealthProducts::HealthProduct.each do |health|
-          health.update_attributes!(rating_method: 'Family-Tier Rates')
+          health.set(rating_method: 'Family-Tier Rates')
         end
         household_params = @benchmark_product_model.households.first.to_h
         household_params.merge!({ type_of_household: 'child_only' })
@@ -110,7 +110,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsp do
     context 'No health Products' do
       before do
         ::BenefitMarkets::Products::HealthProducts::HealthProduct.each do |health_pro|
-          health_pro.update_attributes!(benefit_market_kind: :aca_shop)
+          health_pro.set(benefit_market_kind: :aca_shop)
         end
         @result = ::Operations::BenchmarkProducts::IdentifySlcsp.new.call(
           { family: family, benchmark_product_model: @benchmark_product_model, household_params: @benchmark_product_model.households.first.to_h }
@@ -180,7 +180,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsp do
     context 'with non Family-Tier Rates' do
       before do
         ::BenefitMarkets::Products::HealthProducts::HealthProduct.each do |health|
-          health.update_attributes!(rating_method: 'Age-Based Rates')
+          health.set(rating_method: 'Age-Based Rates')
         end
 
         household_params = @benchmark_product_model.households.first.to_h

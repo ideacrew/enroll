@@ -11,7 +11,7 @@ class ChildDoc
 
   embedded_in :parent_doc
   embeds_many :grand_child_docs
-end  
+end
 
 class GrandChildDoc
   include Mongoid::Document
@@ -19,7 +19,7 @@ class GrandChildDoc
   embedded_in :child_doc
   field :name_column, type: String
   field :date_column, type: Date
-end  
+end
 
 describe "Mongoid without bugs on deeply nested documents" do
   let(:parent_doc) { ParentDoc.new({
@@ -46,7 +46,7 @@ describe "Mongoid without bugs on deeply nested documents" do
     gc_docs = p_doc.child_docs.first.grand_child_docs
     last_gc = gc_docs.last
     @last_gc_id = last_gc.id
-    last_gc.update_attributes!(:date_column => date_val)
+    last_gc.set(:date_column => date_val)
     reloaded_p_doc = ParentDoc.find(p_doc_id)
     @gc_reloaded_docs = reloaded_p_doc.child_docs.first.grand_child_docs
   end

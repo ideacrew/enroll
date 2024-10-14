@@ -483,7 +483,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
     it "should build resident role for a person and with their consumer role contact method" do
       expect(consumer_person.consumer_role.contact_method). to eq "Paper and Electronic communications"
-      consumer_person.consumer_role.update_attributes!(contact_method: "Only Electronic communications")
+      consumer_person.consumer_role.set(contact_method: "Only Electronic communications")
       helper.build_resident_role(consumer_person, consumer_person.primary_family)
       expect(consumer_person.resident_role.present?). to eq true
       expect(consumer_person.resident_role.contact_method). to eq "Only Electronic communications"

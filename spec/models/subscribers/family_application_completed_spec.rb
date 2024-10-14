@@ -112,7 +112,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:family) { consumer_role.person.primary_family }
 
           before do
-            family.update_attributes!(e_case_id: "curam_landing_for#{consumer_role.person.id}")
+            family.set(e_case_id: "curam_landing_for#{consumer_role.person.id}")
             allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
           end
 
@@ -165,7 +165,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it "shouldn't log any errors the first time" do
-            family.update_attributes!(e_case_id: nil)
+            family.set(e_case_id: nil)
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, message)
           end
@@ -227,7 +227,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should not log any errors and set the broker for the family" do
             broker_agency_profile.primary_broker_role.update_attributes(npn: "1234567890", benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile_id: broker_agency_profile.id)
-            person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
+            person.primary_family.set(e_case_id: "curam_landing_for#{person.id}")
             expect(subject).not_to receive(:log)
             expect_any_instance_of(Events::Family::Brokers::BrokerHired).to receive(:publish)
             subject.call(nil, nil, nil, nil, message)
@@ -300,7 +300,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:consumer_role_db) { person_db.consumer_role }
 
         it "should not log any errors" do
-          person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
+          person.primary_family.set(e_case_id: "curam_landing_for#{person.id}")
           expect(subject).not_to receive(:log)
           subject.call(nil, nil, nil, nil, message)
         end
@@ -378,7 +378,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:consumer_role_db) { person_db.consumer_role }
 
         it "should not log any errors initially" do
-          person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
+          person.primary_family.set(e_case_id: "curam_landing_for#{person.id}")
           expect(subject).not_to receive(:log)
           subject.call(nil, nil, nil, nil, message)
         end
@@ -489,7 +489,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it "should not log any errors" do
-          person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
+          person.primary_family.set(e_case_id: "curam_landing_for#{person.id}")
           expect(subject).not_to receive(:log)
           subject.call(nil, nil, nil, nil, message)
         end

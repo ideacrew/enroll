@@ -136,14 +136,14 @@ describe GeneralAgencyStaffRole, dbclean: :after_each do
       end
       context "general_agency_pending" do
         it "should update the state of staff role to general_agency_pending" do
-          staff_role.update_attributes!(aasm_state: :general_agency_terminated)
+          staff_role.set(aasm_state: :general_agency_terminated)
           staff_role.general_agency_pending!
           expect(staff_role.aasm_state).to eq('general_agency_pending')
         end
       end
       context "general_agency_terminate" do
         it "should update the state of staff role to general_agency_terminated" do
-          staff_role.update_attributes!(aasm_state: :general_agency_pending)
+          staff_role.set(aasm_state: :general_agency_pending)
           staff_role.general_agency_terminate!
           expect(staff_role.aasm_state).to eq('general_agency_terminated')
         end

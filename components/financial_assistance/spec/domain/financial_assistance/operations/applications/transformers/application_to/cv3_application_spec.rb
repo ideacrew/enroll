@@ -920,7 +920,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         card_number: 'abg1234567890',
         expiration_date: TimeKeeper.date_of_record.to_datetime
       }
-      applicant.update_attributes!(vlp_params)
+      applicant.set(vlp_params)
     end
 
     before do
@@ -1303,7 +1303,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before :each do
-      application.update_attributes!(assistance_year: application.assistance_year - 1)
+      application.set(assistance_year: application.assistance_year - 1)
       update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
@@ -1326,7 +1326,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     before :each do
-      application.update_attributes!(assistance_year: application.assistance_year + 1)
+      application.set(assistance_year: application.assistance_year + 1)
       update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
@@ -1339,7 +1339,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
   context 'for has_daily_living_help' do
     let!(:has_daily_living_help) do
-      applicant.update_attributes!({ has_daily_living_help: true,
+      applicant.set({ has_daily_living_help: true,
                                      is_self_attested_long_term_care: false })
     end
 
@@ -1369,7 +1369,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       allow(EnrollRegistry).to receive(:[]).with(:dependent_income_filing_thresholds).and_return(setting)
       allow(setting).to receive(:setting).with("unearned_income_filing_threshold_#{application.assistance_year}").and_return(double(item: 1_100))
       allow(setting).to receive(:setting).with("earned_income_filing_threshold_#{application.assistance_year}").and_return(double(item: 12_400))
-      applicant.update_attributes!(is_required_to_file_taxes: false)
+      applicant.set(is_required_to_file_taxes: false)
       create_income
       update_benchmark_premiums
       result = subject.call(application.reload)
@@ -1482,7 +1482,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'deduction with end_on in previous year than assistance year' do
       before do
-        applicant.deductions.first.update_attributes!(start_on: (Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
+        applicant.deductions.first.set(start_on: (Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
         update_benchmark_premiums
       end
 
@@ -1495,7 +1495,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'deduction with end_on in future year than assistance year' do
       before do
-        applicant.deductions.first.update_attributes!(end_on: (Date.new(application.assistance_year) + 1.year))
+        applicant.deductions.first.set(end_on: (Date.new(application.assistance_year) + 1.year))
         update_benchmark_premiums
       end
 
@@ -1507,7 +1507,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'deduction with end_on in same year as assistance year in non-leap year' do
       before do
-        applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
+        applicant.deductions.first.set(end_on: Date.new(application.assistance_year,3,1))
         update_benchmark_premiums
       end
 
@@ -1521,7 +1521,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'deduction with end_on in same year as assistance year in leap year' do
       before do
-        applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
+        applicant.deductions.first.set(end_on: Date.new(application.assistance_year,3,1))
         update_benchmark_premiums
       end
 
@@ -1604,7 +1604,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }
       end
       application.applicants.each do |applicant|
-        applicant.update_attributes!(
+        applicant.set(
           { benchmark_premiums: { health_only_lcsp_premiums: premium_info, health_only_slcsp_premiums: premium_info } }
         )
       end
@@ -1640,7 +1640,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
           { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }
         end
         application.applicants.each do |applicant|
-          applicant.update_attributes!(
+          applicant.set(
             { benchmark_premiums: { health_only_lcsp_premiums: premium_info, health_only_slcsp_premiums: premium_info } }
           )
         end
@@ -1677,7 +1677,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
           { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }
         end
         application.applicants.each do |applicant|
-          applicant.update_attributes!(
+          applicant.set(
             { benchmark_premiums: { health_only_lcsp_premiums: premium_info, health_only_slcsp_premiums: premium_info } }
           )
         end
@@ -1705,7 +1705,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
           { member_identifier: applicant.person_hbx_id, monthly_premium: 90.0 }
         end
         application.applicants.each do |applicant|
-          applicant.update_attributes!(
+          applicant.set(
             { benchmark_premiums: { health_only_lcsp_premiums: premium_info, health_only_slcsp_premiums: premium_info } }
           )
         end
@@ -1736,7 +1736,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'success' do
       before do
         application.applicants.each do |applicant|
-          applicant.update_attributes!(
+          applicant.set(
             {
               is_pregnant: true,
               pregnancy_due_on: nil,
@@ -1793,7 +1793,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       create_job_income1
       create_job_income2
       create_job_income3
-      application.update_attributes!(assistance_year: prospective_year, effective_date: Date.new(prospective_year))
+      application.set(assistance_year: prospective_year, effective_date: Date.new(prospective_year))
       update_benchmark_premiums
       result = subject.call(application.reload)
       @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
@@ -2456,7 +2456,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
     context 'with blank due date' do
       before do
-        applicant.local_mec_evidence.update_attributes!(due_on: nil)
+        applicant.local_mec_evidence.set(due_on: nil)
       end
 
       let(:code_description) { nil }

@@ -259,7 +259,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           before :each do
             allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
-            broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+            broker_person.broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
             sign_in broker_user
             get :new, params: {profile_type: "broker_agency", portal: true}
           end

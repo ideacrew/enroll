@@ -175,7 +175,7 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :ar
 
   describe "POST publish_quote", :dbclean => :around_each do
     it "should publish_quote" do
-      quote.quote_benefit_groups.first.relationship_benefit_for("employee").update_attributes!(:premium_pct => "60")
+      quote.quote_benefit_groups.first.relationship_benefit_for("employee").set(:premium_pct => "60")
       allow(quote).to receive(:may_publish?).and_return(true)
       post :publish_quote, params: {broker_role_id: person.broker_role.id, id: quote}
       expect(response).to have_http_status(:success)

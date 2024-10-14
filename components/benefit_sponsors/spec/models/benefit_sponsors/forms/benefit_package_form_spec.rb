@@ -118,7 +118,7 @@ module BenefitSponsors
     end
 
     before do
-      issuer_profile.organization.update_attributes!(site_id: site.id)
+      issuer_profile.organization.set(site_id: site.id)
     end
 
     describe "validate form" do
@@ -198,7 +198,7 @@ module BenefitSponsors
       }
 
       before do
-        benefit_package.sponsored_benefits.first.reference_product.update_attributes!(:issuer_profile_id => issuer_profile.id)
+        benefit_package.sponsored_benefits.first.reference_product.set(:issuer_profile_id => issuer_profile.id)
         benefit_package.reload
       end
 

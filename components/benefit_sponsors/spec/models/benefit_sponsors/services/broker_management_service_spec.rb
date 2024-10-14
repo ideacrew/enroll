@@ -39,14 +39,14 @@ module BenefitSponsors
 
     before :each do
       active_benefit_sponsorship.save!
-      broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
+      broker_agency_profile1.set(primary_broker_role_id: broker_role1.id)
       broker_agency_profile1.approve!
       organization.reload
     end
 
     describe 'for assign_agencies' do
       before :each do
-        broker_agency_profile1.update_attributes!(default_general_agency_profile_id: general_agency_profile.id)
+        broker_agency_profile1.set(default_general_agency_profile_id: general_agency_profile.id)
         subject.assign_agencies(broker_management_form_create)
       end
 

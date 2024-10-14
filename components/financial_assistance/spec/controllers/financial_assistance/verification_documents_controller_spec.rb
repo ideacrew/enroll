@@ -339,11 +339,11 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
         family.reload
 
         sign_in(broker_user)
-        writing_agent.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)
+        writing_agent.set(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)
         person.create_broker_agency_staff_role(
           benefit_sponsors_broker_agency_profile_id: writing_agent.benefit_sponsors_broker_agency_profile_id
         )
-        broker_agency_profile.update_attributes!(primary_broker_role_id: writing_agent.id, market_kind: market_kind)
+        broker_agency_profile.set(primary_broker_role_id: writing_agent.id, market_kind: market_kind)
         writing_agent.approve!
         broker_agency_account
       end

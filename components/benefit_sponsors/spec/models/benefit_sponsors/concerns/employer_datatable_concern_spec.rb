@@ -12,7 +12,7 @@ module BenefitSponsors
       include_context "setup initial benefit application"
 
       before do
-        initial_application.update_attributes!(aasm_state: :binder_paid)
+        initial_application.set(aasm_state: :binder_paid)
       end
 
       context "when billing date is given" do

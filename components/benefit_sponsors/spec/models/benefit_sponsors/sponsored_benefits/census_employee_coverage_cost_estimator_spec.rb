@@ -8,7 +8,7 @@ module BenefitSponsors
     - with a domestic partner
     - a disabled child > age 26", :dbclean => :after_each do
 
-    let(:census_employee) do 
+    let(:census_employee) do
       double({
         :id => "census_employee_id",
         :dob => Date.new(1965, 12, 3),
@@ -32,7 +32,7 @@ module BenefitSponsors
       })
     end
     let(:reference_product) { instance_double(::BenefitMarkets::Products::Product, :id => "reference_product_id") }
-    let(:sponsored_benefit) do 
+    let(:sponsored_benefit) do
       instance_double(
         ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit,
         {
@@ -88,8 +88,8 @@ module BenefitSponsors
       let!(:ces)                 { create_list(:census_employee, 5, :with_enrolled_census_employee, benefit_sponsorship_id: benefit_sponsorship.id)}
 
       before :each do
-        ces.first.update_attributes!(expected_selection: "enroll")
-        ces[1].update_attributes!(expected_selection: "waive")
+        ces.first.set(expected_selection: "enroll")
+        ces[1].set(expected_selection: "waive")
         ce2.update_attribute(:aasm_state, 'employment_terminated')
         ce_cost_instance = ::BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_sponsorship, TimeKeeper.date_of_record)
         @census_employees = ce_cost_instance.send(:eligible_employee_criteria)
@@ -148,7 +148,7 @@ module BenefitSponsors
 
     let!(:census_employee) do
       ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package, aasm_state: employee_status, cobra_begin_date: cobra_begin_date)
-      ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+      ce.set(employee_role_id: person.employee_roles.first.id)
       person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
       ce
     end

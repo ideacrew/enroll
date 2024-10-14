@@ -113,7 +113,7 @@ describe UpdateBenchmarkForContinuousCoverageAndChildMemberEnrs, dbclean: :after
 
     context 'with children_aged_20_or_below' do
       before do
-        person.update_attributes!(dob: Date.new(system_year - 19, 1, 19))
+        person.set(dob: Date.new(system_year - 19, 1, 19))
       end
 
       it 'updates household_benchmark_ehb_premium' do

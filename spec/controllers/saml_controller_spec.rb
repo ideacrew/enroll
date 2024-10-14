@@ -40,7 +40,7 @@ RSpec.describe SamlController do
 
         context "with last activity at greater than 60 days" do
           before do
-            admin_user.update_attributes!(last_activity_at: 61.days.ago)
+            admin_user.set(last_activity_at: 61.days.ago)
           end
 
           it "redirects to account expired path" do

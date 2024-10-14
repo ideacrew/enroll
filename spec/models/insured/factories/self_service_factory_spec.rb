@@ -34,9 +34,9 @@ module Insured
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual, metal_level_kind: {"$ne" => "catastrophic"}).first
         @product.update_attributes(ehb: 0.9844)
         enrollment.update_attributes(product: @product)
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        person.update_attributes!(dob: (enrollment.effective_on - 61.years))
-        family.family_members.detect { |fm| !fm.is_primary_applicant }.person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: @product.id)}
+        person.set(dob: (enrollment.effective_on - 61.years))
+        family.family_members.detect { |fm| !fm.is_primary_applicant }.person.set(dob: (enrollment.effective_on - 59.years))
       end
 
       context "#find" do
@@ -142,10 +142,10 @@ module Insured
         premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 679.8)
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record)
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: @product.id)}
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-        person.update_attributes!(dob: (enrollment.effective_on - 61.years))
-        family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+        person.set(dob: (enrollment.effective_on - 61.years))
+        family.family_members[1].person.set(dob: (enrollment.effective_on - 59.years))
         allow(enrollment).to receive(:is_eligible_for_osse_grant?).and_return(true)
       end
 
@@ -203,10 +203,10 @@ module Insured
         @product.update_attributes(ehb: 0.9966)
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record.beginning_of_month)
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: @product.id)}
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-        person.update_attributes!(dob: (enrollment.effective_on - 32.years))
-        family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 61.years))
+        person.set(dob: (enrollment.effective_on - 32.years))
+        family.family_members[1].person.set(dob: (enrollment.effective_on - 61.years))
       end
 
       it 'should return updated enrollment with aptc fields' do
@@ -288,7 +288,7 @@ module Insured
         premium_table.update_attributes(effective_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "auto_renewing")
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: @product.id)}
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
         cr1 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
         family.family_members[1].person.consumer_role = cr1
@@ -429,7 +429,7 @@ module Insured
         context 'when one of the member is not applying for coverage' do
           it 'should reinstate enrollment with 2 valid members' do
             expect(enrollment.hbx_enrollment_members.count).to eq 3
-            family.family_members[2].person.consumer_role.update_attributes!(is_applying_coverage: false)
+            family.family_members[2].person.consumer_role.set(is_applying_coverage: false)
             subject.update_aptc(enrollment.id, 1000)
             enrollment.reload
             family.reload
@@ -442,7 +442,7 @@ module Insured
         context 'when one of the member is incarcerated' do
           it 'should reinstate enrollment with 2 valid members' do
             expect(enrollment.hbx_enrollment_members.count).to eq 3
-            family.family_members[2].person.update_attributes!(is_incarcerated: true)
+            family.family_members[2].person.set(is_incarcerated: true)
             subject.update_aptc(enrollment.id, 1000)
             enrollment.reload
             family.reload
@@ -455,7 +455,7 @@ module Insured
         context 'when one of the member is not_lawfully_present' do
           it 'should reinstate enrollment with 2 valid members' do
             expect(enrollment.hbx_enrollment_members.count).to eq 3
-            family.family_members[2].person.consumer_role.lawful_presence_determination.update_attributes!(citizen_status: "not_lawfully_present_in_us")
+            family.family_members[2].person.consumer_role.lawful_presence_determination.set(citizen_status: "not_lawfully_present_in_us")
             subject.update_aptc(enrollment.id, 1000)
             enrollment.reload
             family.reload
@@ -489,10 +489,10 @@ module Insured
         premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 679.8)
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: TimeKeeper.date_of_record, applied_aptc_amount: applied_aptc_amount)
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: @product.id)}
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-        person.update_attributes!(dob: (enrollment.effective_on - 61.years))
-        family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+        person.set(dob: (enrollment.effective_on - 61.years))
+        family.family_members[1].person.set(dob: (enrollment.effective_on - 59.years))
       end
 
       it 'should return default_tax_credit_value' do

@@ -40,7 +40,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   let(:create_relationships) do
-    application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
+    application.applicants.first.set(is_primary_applicant: true) unless application.primary_applicant.present?
     application.ensure_relationship_with_primary(applicant2, 'spouse')
     application.ensure_relationship_with_primary(applicant3, 'child')
     application.add_or_update_relationships(applicant2, applicant3, 'parent')
@@ -174,14 +174,14 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'income_verification_required' do
       it 'should return only income_verification_required applications' do
         state = 'income_verification_extension_required'
-        application.update_attributes!(aasm_state: state)
+        application.set(aasm_state: state)
         applications = FinancialAssistance::Application.all.income_verification_extension_required
         expect(applications.map(&:aasm_state)).to include state
       end
 
       it 'should not return any income_verification_required applications' do
         state = 'submitted'
-        application.update_attributes!(aasm_state: state)
+        application.set(aasm_state: state)
         expect(FinancialAssistance::Application.all.income_verification_extension_required.to_a).to eq []
       end
     end
@@ -433,14 +433,14 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let(:family_id)       { BSON::ObjectId.new }
     let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
-      application.update_attributes!(assistance_year: nil)
+      application.set(assistance_year: nil)
       application.configure_assistance_year
       expect(application.assistance_year).to eq(FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value!)
     end
 
     context 'for existing assistance_year' do
       before do
-        application.update_attributes!(assistance_year: (TimeKeeper.date_of_record.year + 3))
+        application.set(assistance_year: (TimeKeeper.date_of_record.year + 3))
         application.configure_assistance_year
       end
 
@@ -467,7 +467,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'for existing effective_date' do
       before do
-        application.update_attributes!(effective_date: Date.new(TimeKeeper.date_of_record.year + 3))
+        application.set(effective_date: Date.new(TimeKeeper.date_of_record.year + 3))
         application.send(:assign_effective_date)
       end
 
@@ -678,7 +678,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     it 'should prevent state transition for invalid application' do
-      invalid_app.update_attributes!(hbx_id: nil)
+      invalid_app.set(hbx_id: nil)
       expect(invalid_app).to receive(:report_invalid)
       invalid_app.submit!
       expect(invalid_app.aasm_state).to eq 'draft'
@@ -704,7 +704,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     it 'should not create verification documents for schema invalid application' do
-      invalid_app.update_attributes!(hbx_id: nil)
+      invalid_app.set(hbx_id: nil)
       expect(invalid_app).to receive(:report_invalid)
       invalid_app.submit!
       expect(invalid_app.aasm_state).to eq 'draft'
@@ -816,7 +816,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     before do
-      ed.update_attributes!(hbx_assigned_id: '205828')
+      ed.set(hbx_assigned_id: '205828')
       application10.add_eligibility_determination(message)
     end
 
@@ -867,7 +867,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context "when there are relationships without applicant or relative" do
       it 'should return false' do
-        application.relationships.where(kind: 'parent', applicant_id: applicant1.id).first.update_attributes!(applicant_id: "619ce9d9eab5e7c59bc2485f")
+        application.relationships.where(kind: 'parent', applicant_id: applicant1.id).first.set(applicant_id: "619ce9d9eab5e7c59bc2485f")
         expect(application.relationships_complete?).to eq(false)
       end
     end
@@ -983,7 +983,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'renewal_draft' do
       context 'event: submit' do
         before do
-          application.update_attributes!(aasm_state: 'renewal_draft')
+          application.set(aasm_state: 'renewal_draft')
         end
 
         context 'from renewal_draft to submitted' do
@@ -1069,7 +1069,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'income_verification_extension_required' do
       context 'event: set_income_verification_extension_required' do
         before do
-          application.update_attributes!(aasm_state: 'renewal_draft')
+          application.set(aasm_state: 'renewal_draft')
         end
 
         context 'from renewal_draft to income_verification_extension_required' do
@@ -1151,7 +1151,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   context 'have_permission_to_renew' do
     context 'no value for aasistance_year' do
       before do
-        application.update_attributes!({ assistance_year: nil,
+        application.set({ assistance_year: nil,
                                          renewal_base_year: TimeKeeper.date_of_record.year })
       end
 
@@ -1162,7 +1162,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'no value for renewal_base_year' do
       before do
-        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year,
+        application.set({ assistance_year: TimeKeeper.date_of_record.year,
                                          renewal_base_year: nil })
       end
 
@@ -1173,7 +1173,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'expired permission for renewal' do
       before do
-        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+        application.set({ assistance_year: TimeKeeper.date_of_record.year.next,
                                          renewal_base_year: TimeKeeper.date_of_record.year })
       end
 
@@ -1184,7 +1184,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'maximum number of years(5) permission for renewal' do
       before do
-        application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+        application.set({ assistance_year: TimeKeeper.date_of_record.year.next,
                                          renewal_base_year: TimeKeeper.date_of_record.year + 5 })
       end
 
@@ -1196,7 +1196,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'limited permission for renewal' do
       [1, 2, 3, 4, 5].each do |year|
         before do
-          application.update_attributes!({ assistance_year: TimeKeeper.date_of_record.year.next,
+          application.set({ assistance_year: TimeKeeper.date_of_record.year.next,
                                            renewal_base_year: TimeKeeper.date_of_record.year + year })
         end
 
@@ -1212,7 +1212,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let(:applicant3) { application.applicants[2] }
 
     before do
-      application.applicants.first.update_attributes!(is_primary_applicant: true)
+      application.applicants.first.set(is_primary_applicant: true)
       application.ensure_relationship_with_primary(applicant2, 'spouse')
       application.ensure_relationship_with_primary(applicant3, 'child')
       application.add_or_update_relationships(applicant2, applicant3, 'parent')
@@ -1234,7 +1234,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'expired permission for renewal' do
       before do
-        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: false, years_to_renew: 0 })
+        application.set({ aasm_state: 'draft', is_renewal_authorized: false, years_to_renew: 0 })
         application.submit!
       end
 
@@ -1245,7 +1245,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'maximum number of years(5) permission for renewal' do
       before do
-        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: true })
+        application.set({ aasm_state: 'draft', is_renewal_authorized: true })
         application.submit!
       end
 
@@ -1259,7 +1259,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'limited permission for renewal' do
       before do
-        application.update_attributes!({ aasm_state: 'draft', is_renewal_authorized: false, years_to_renew: 3 })
+        application.set({ aasm_state: 'draft', is_renewal_authorized: false, years_to_renew: 3 })
         application.submit!
       end
 
@@ -1270,7 +1270,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'for renewal_base_year already set' do
       before do
-        application.update_attributes!(
+        application.set(
           { aasm_state: 'draft',
             is_renewal_authorized: false,
             years_to_renew: 0,
@@ -1289,7 +1289,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe 'calculate_total_net_income_for_applicants' do
     before do
-      application.applicants.first.update_attributes!(is_primary_applicant: true, net_annual_income: nil)
+      application.applicants.first.set(is_primary_applicant: true, net_annual_income: nil)
       primary_appli = application.primary_applicant
       primary_appli.incomes << FinancialAssistance::Income.new(
         { title: 'Financial Income',
@@ -1320,8 +1320,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'with existing value for net_annual_income' do
       before do
-        application.primary_applicant.update_attributes!(net_annual_income: 1000.00)
-        application.update_attributes!({ aasm_state: 'draft' })
+        application.primary_applicant.set(net_annual_income: 1000.00)
+        application.set({ aasm_state: 'draft' })
         application.submit!
       end
 
@@ -1332,7 +1332,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'without existing value for net_annual_income' do
       before do
-        application.update_attributes!({ aasm_state: 'draft' })
+        application.set({ aasm_state: 'draft' })
         application.submit!
       end
 
@@ -1541,7 +1541,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:medicaid_gateway_determination).and_return(false)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(false)
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
       end
 
       it 'should not raise error NoMagiMedicaidEngine' do
@@ -1706,7 +1706,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary)
       create_instate_addresses
       create_relationships
-      application.update_attributes!(aasm_state: app_state)
+      application.set(aasm_state: app_state)
       application.submit!
     end
 
@@ -1734,7 +1734,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'when received determination' do
 
       before do
-        application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+        application.active_applicants.each{|applicant| applicant.set(is_ia_eligible: true) }
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
@@ -1774,7 +1774,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'create_rrv_evidence_histories' do
 
     before do
-      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      application.active_applicants.each{|applicant| applicant.set(is_ia_eligible: true) }
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
       application.create_rrv_evidences
@@ -1814,7 +1814,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
-      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      application.active_applicants.each{|applicant| applicant.set(is_ia_eligible: true) }
       application.send(:create_evidences)
       application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
       application.save!
@@ -1850,8 +1850,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:totally_ineligible_notice).and_return(true)
 
-      application.update_attributes!(eligibility_response_payload: response_payload.to_json)
-      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      application.set(eligibility_response_payload: response_payload.to_json)
+      application.active_applicants.each{|applicant| applicant.set(is_ia_eligible: true) }
       application.send(:create_evidences)
       application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
       application.save!
@@ -1863,7 +1863,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     it "should notify members when any applicants are totally_ineligible" do
-      application.active_applicants.first.update_attributes!(is_totally_ineligible: true)
+      application.active_applicants.first.set(is_totally_ineligible: true)
 
       result = application.notify_totally_ineligible_members
       expect(result).to_not eq nil
@@ -1898,7 +1898,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe 'update_or_build_relationship' do
     let(:create_individual_rels) do
-      application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
+      application.applicants.first.set(is_primary_applicant: true) unless application.primary_applicant.present?
       application.update_or_build_relationship(application.primary_applicant, applicant2, 'spouse')
       application.update_or_build_relationship(applicant2, application.primary_applicant, 'spouse')
       application.update_or_build_relationship(application.primary_applicant, applicant3, 'child')
@@ -2278,43 +2278,43 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '#aptc_applicants' do
     it 'returns only aptc_eligible applicants' do
-      applicant2.update_attributes!(is_ia_eligible: true)
+      applicant2.set(is_ia_eligible: true)
       expect(application.aptc_applicants).to match([applicant2])
     end
   end
 
   describe '#medicaid_or_chip_applicants' do
     it 'returns only medicaid_or_chip_eligible applicants' do
-      applicant2.update_attributes!(is_medicaid_chip_eligible: true)
+      applicant2.set(is_medicaid_chip_eligible: true)
       expect(application.medicaid_or_chip_applicants).to match([applicant2])
     end
   end
 
   describe '#uqhp_applicants' do
     it 'returns only uqhp_eligible applicants' do
-      applicant2.update_attributes!(is_without_assistance: true)
+      applicant2.set(is_without_assistance: true)
       expect(application.uqhp_applicants).to match([applicant2])
     end
   end
 
   describe '#ineligible_applicants' do
     it 'returns only ineligible applicants' do
-      applicant2.update_attributes!(is_totally_ineligible: true)
+      applicant2.set(is_totally_ineligible: true)
       expect(application.ineligible_applicants).to match([applicant2])
     end
   end
 
   describe '#applicants_with_non_magi_reasons' do
     it 'returns only eligible_for_non_magi_reasons applicants' do
-      applicant2.update_attributes!(is_eligible_for_non_magi_reasons: true)
+      applicant2.set(is_eligible_for_non_magi_reasons: true)
       expect(application.applicants_with_non_magi_reasons).to match([applicant2])
     end
   end
 
   describe '#applicants_applying_coverage' do
     it 'returns only eligible_for_non_magi_reasons applicants' do
-      applicant2.update_attributes!(is_applying_coverage: false)
-      applicant3.update_attributes!(is_applying_coverage: false)
+      applicant2.set(is_applying_coverage: false)
+      applicant3.set(is_applying_coverage: false)
       expect(application.applicants_applying_coverage).to match([applicant1])
     end
   end
@@ -2443,7 +2443,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'skip renewals feature enabled and application has all ineligible applicants' do
       before do
         application.applicants.each do |appl|
-          appl.update_attributes!(is_applying_coverage: false)
+          appl.set(is_applying_coverage: false)
         end
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
       end
@@ -2456,7 +2456,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'skip renewals feature enabled and application has all non applying coverage applicants' do
       before do
         application.applicants.each do |appl|
-          appl.update_attributes!(is_totally_ineligible: true)
+          appl.set(is_totally_ineligible: true)
         end
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
       end
@@ -2469,7 +2469,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context 'skip renewals feature enabled and application has all medicaid chip applicants' do
       before do
         application.applicants.each do |appl|
-          appl.update_attributes!(is_medicaid_chip_eligible: true)
+          appl.set(is_medicaid_chip_eligible: true)
         end
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
       end
@@ -2481,8 +2481,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     context 'skip renewals feature enabled and application has medicaid chip applicant and ia_eligible applicant' do
       before do
-        application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
-        application.applicants[1].update_attributes!(is_without_assistance: true)
+        application.applicants[0].set(is_medicaid_chip_eligible: true)
+        application.applicants[1].set(is_without_assistance: true)
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
       end
 
@@ -2536,14 +2536,14 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should return true if application has eligible applicants' do
       application.applicants.each do |appl|
-        appl.update_attributes!(is_ia_eligible: true)
+        appl.set(is_ia_eligible: true)
       end
       expect(application.has_eligible_applicants_for_assistance?).to eq(true)
     end
 
     it 'should return false if application has no eligible applicants' do
       application.applicants.each do |appl|
-        appl.update_attributes!(is_totally_ineligible: true)
+        appl.set(is_totally_ineligible: true)
       end
       expect(application.has_eligible_applicants_for_assistance?).to eq(false)
     end
@@ -2593,7 +2593,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should return true if all applicants are totally ineligible' do
       application.applicants.each do |appl|
-        appl.update_attributes!(is_totally_ineligible: true)
+        appl.set(is_totally_ineligible: true)
       end
       expect(application.all_applicants_totally_ineligible?).to eq(true)
     end
@@ -2643,7 +2643,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should return true if all applicants are not applyling for coverage' do
       application.applicants.each do |appl|
-        appl.update_attributes!(is_applying_coverage: false)
+        appl.set(is_applying_coverage: false)
       end
       expect(application.all_applicants_without_applying_for_coverage?).to eq(true)
     end
@@ -2693,7 +2693,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should return true if all applicants are not applyling for coverage' do
       application.applicants.each do |appl|
-        appl.update_attributes!(is_medicaid_chip_eligible: true)
+        appl.set(is_medicaid_chip_eligible: true)
       end
       expect(application.all_applicants_medicaid_or_chip_eligible?).to eq(true)
     end

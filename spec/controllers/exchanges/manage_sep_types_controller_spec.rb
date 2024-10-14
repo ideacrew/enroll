@@ -18,7 +18,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     let!(:person) do
       per = FactoryBot.create(:person, :with_hbx_staff_role)
       permission = FactoryBot.create(:permission, can_manage_qles: true)
-      per.hbx_staff_role.update_attributes!(permission_id: permission.id)
+      per.hbx_staff_role.set(permission_id: permission.id)
       per
     end
 
@@ -28,7 +28,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
     context 'for new' do
       before do
-        q1.update_attributes!(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
+        q1.set(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
         allow(q1).to receive(:has_valid_title?).and_return(true)
         q1.publish!
         sign_in(current_user)
@@ -53,7 +53,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           get :new
         end
@@ -158,7 +158,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           post :create, params: post_params
         end
@@ -177,7 +177,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
     context 'for edit' do
       before do
-        q1.update_attributes!(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
+        q1.set(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
         allow(q1).to receive(:has_valid_title?).and_return(true)
         q1.publish!
         sign_in(current_user)
@@ -218,7 +218,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           get :edit, params: {id: q1.id}
         end
@@ -331,7 +331,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
         context 'success case', :dbclean => :after_each do
           before do
-            q1.update_attributes!(market_kind: 'individual', aasm_state: :draft)
+            q1.set(market_kind: 'individual', aasm_state: :draft)
             sign_in(current_user)
             post :update, params: post_params
           end
@@ -351,7 +351,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
         context 'failure case', :dbclean => :after_each do
           before :each do
-            q1.update_attributes!(market_kind: 'individual', title: 'title_new', reason: 'birth_new')
+            q1.set(market_kind: 'individual', title: 'title_new', reason: 'birth_new')
             sign_in(current_user)
             post :update, params: post_params
           end
@@ -372,7 +372,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           post :update, params: post_params
         end
@@ -414,7 +414,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           get :edit, params: {id: q1.id}
         end
@@ -457,7 +457,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         context 'success case', :dbclean => :after_each do
           before do
             q2.update_attributes(start_on: TimeKeeper.date_of_record.last_month.beginning_of_month, end_on: TimeKeeper.date_of_record.last_month.end_of_month)
-            q1.update_attributes!(start_on: TimeKeeper.date_of_record.beginning_of_month)
+            q1.set(start_on: TimeKeeper.date_of_record.beginning_of_month)
             post :expire_sep_type, params: {
               qualifying_life_event_kind: {end_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d")},
               qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id}"
@@ -479,7 +479,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
         context 'failure case', :dbclean => :after_each do
           before do
-            q1.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days)
+            q1.set(start_on: TimeKeeper.date_of_record - 10.days)
             post :expire_sep_type, params: {
               qualifying_life_event_kind: {end_on: nil},
               qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id}"
@@ -506,7 +506,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           post :expire_sep_type, params: {qle_id: q1.id, end_on: nil}, format: :js, xhr: true
         end
@@ -572,7 +572,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           get :sorting_sep_types
         end
@@ -623,7 +623,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           patch :update_list, params: params
         end
@@ -661,7 +661,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'updateable?' do
         before do
-          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          person.hbx_staff_role.permission.set(can_manage_qles: false)
           sign_in(current_user)
           get :sep_types_dt
         end

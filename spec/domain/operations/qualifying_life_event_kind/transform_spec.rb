@@ -12,7 +12,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
   context 'for failure case' do
     context 'no end date' do
       before :each do
-        qlek.update_attributes!(start_on: TimeKeeper.date_of_record - 20.days)
+        qlek.set(start_on: TimeKeeper.date_of_record - 20.days)
         @result = subject.call({ qle_id: qlek.id.to_s, end_on: '' })
       end
 
@@ -46,7 +46,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
 
     context 'end date before start on' do
       before :each do
-        qlek.update_attributes!(aasm_state: :active,
+        qlek.set(aasm_state: :active,
                                 start_on: (TimeKeeper.date_of_record - 10.days),
                                 end_on: (TimeKeeper.date_of_record - 9.days))
         @end_on = TimeKeeper.date_of_record - 20.days
@@ -65,7 +65,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
 
     context 'with past end date' do
       before :each do
-        qlek.update_attributes!(aasm_state: :active,
+        qlek.set(aasm_state: :active,
                                 start_on: (TimeKeeper.date_of_record - 10.days),
                                 end_on: (TimeKeeper.date_of_record - 4.days))
         @end_on = TimeKeeper.date_of_record - 3.days
@@ -85,7 +85,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
     context 'end date overlaps with active SEP' do
       let!(:qlek2) { FactoryBot.create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month, end_on: TimeKeeper.date_of_record.next_month.end_of_month, is_active: true) }
       before :each do
-        qlek.update_attributes!(aasm_state: :active,
+        qlek.set(aasm_state: :active,
                                 start_on: TimeKeeper.date_of_record.beginning_of_month,
                                 end_on: TimeKeeper.date_of_record.end_of_month)
         @end_on = TimeKeeper.date_of_record.next_month.beginning_of_month
@@ -105,7 +105,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
 
   context 'for expired case with future date' do
     before :each do
-      qlek.update_attributes!(aasm_state: :active,
+      qlek.set(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
       @result = subject.call(
@@ -132,7 +132,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
 
   context 'for expire case with current date' do
     before :each do
-      qlek.update_attributes!(aasm_state: :active,
+      qlek.set(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
       @result = subject.call(
@@ -160,7 +160,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
   context 'for expire case with current date - 1.day' do
     let(:user) {FactoryBot.create(:user)}
     before :each do
-      qlek.update_attributes!(aasm_state: :active,
+      qlek.set(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
       @result = subject.call(

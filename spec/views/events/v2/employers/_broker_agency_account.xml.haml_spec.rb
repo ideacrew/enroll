@@ -24,7 +24,7 @@ RSpec.describe "app/views/events/v2/employers/_broker_agency_account.xml.haml", 
       end
 
       context "with ga_assignment" do
-        let!(:update_plan_design) {plan_design_organization_with_assigned_ga.update_attributes!(has_active_broker_relationship: true, owner_profile_id: owner_profile.id, sponsor_profile_id: employer_profile.id)}
+        let!(:update_plan_design) {plan_design_organization_with_assigned_ga.set(has_active_broker_relationship: true, owner_profile_id: owner_profile.id, sponsor_profile_id: employer_profile.id)}
         let!(:general_agency_account) {plan_design_organization.general_agency_accounts.unscoped.first}
         let!(:update_general_agency_account) {general_agency_account.update_attributes(broker_role_id: broker_role.id)}
 

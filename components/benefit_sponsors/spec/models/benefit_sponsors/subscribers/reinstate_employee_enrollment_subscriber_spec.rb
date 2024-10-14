@@ -32,7 +32,7 @@ RSpec.describe BenefitSponsors::Subscribers::ReinstateEmployeeEnrollmentSubscrib
   let(:family) { person.primary_family }
   let!(:census_employee) do
     ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
-    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    ce.set(employee_role_id: person.employee_roles.first.id)
     person.employee_roles.first.update_attributes(census_employee_id: ce.id)
     ce
   end
@@ -56,7 +56,7 @@ RSpec.describe BenefitSponsors::Subscribers::ReinstateEmployeeEnrollmentSubscrib
 
   before do
     period = initial_application.effective_period.min..(initial_application.end_on - 6.months).end_of_month
-    initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+    initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
     initial_application.terminate_enrollment!
     effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
     cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success

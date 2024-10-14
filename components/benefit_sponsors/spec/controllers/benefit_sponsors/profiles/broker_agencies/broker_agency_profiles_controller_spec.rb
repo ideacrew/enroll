@@ -42,7 +42,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
     let(:initialize_and_login_broker) do
       lambda { |org|
-        person01.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active')
+        person01.broker_role.set(benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active')
         allow(org.broker_agency_profile).to receive(:primary_broker_role).and_return(person01.broker_role)
       # all brokers in an agency also have a 'broker_agency_staff_role'
         role = person01.create_broker_agency_staff_role({benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active'})
@@ -1003,7 +1003,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       let!(:user_with_broker_role2) { FactoryBot.create(:user, person: person02) }
 
       before do
-        person02.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: organization2.broker_agency_profile.id, aasm_state: 'active')
+        person02.broker_role.set(benefit_sponsors_broker_agency_profile_id: organization2.broker_agency_profile.id, aasm_state: 'active')
         allow(organization2.broker_agency_profile).to receive(:primary_broker_role).and_return(person02.broker_role)
         role = person02.create_broker_agency_staff_role({benefit_sponsors_broker_agency_profile_id: organization2.broker_agency_profile.id, aasm_state: 'active'})
         role.broker_agency_accept!

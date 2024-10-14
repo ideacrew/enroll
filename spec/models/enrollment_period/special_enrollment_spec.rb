@@ -407,9 +407,9 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
     end
 
     it "should not return true" do
-      census_employee.update_attributes!(employee_role_id: employee_role.id)
-      employee_role.update_attributes!(census_employee_id: census_employee.id)
-      initial_application.update_attributes!(aasm_state: 'draft')
+      census_employee.set(employee_role_id: employee_role.id)
+      employee_role.set(census_employee_id: census_employee.id)
+      initial_application.set(aasm_state: 'draft')
       result = shop_sep.send(:next_poss_effective_date_within_range)
       expect(result.message).to eq "No eligible plan years present"
     end

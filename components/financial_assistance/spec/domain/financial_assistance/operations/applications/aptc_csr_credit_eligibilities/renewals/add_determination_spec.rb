@@ -13,7 +13,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   end
   let!(:ed) do
     eli_d = FactoryBot.create(:financial_assistance_eligibility_determination, application: application)
-    eli_d.update_attributes!(hbx_assigned_id: '12345')
+    eli_d.set(hbx_assigned_id: '12345')
     eli_d
   end
   let!(:applicant) do
@@ -109,7 +109,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           application.destroy
           application = FactoryBot.create(:financial_assistance_application, hbx_id: '200000126', aasm_state: "submitted")
           ed = FactoryBot.create(:financial_assistance_eligibility_determination, application: application)
-          ed.update_attributes!(hbx_assigned_id: '12345')
+          ed.set(hbx_assigned_id: '12345')
           FactoryBot.create(:financial_assistance_applicant,
                             eligibility_determination_id: ed.id,
                             person_hbx_id: '95',

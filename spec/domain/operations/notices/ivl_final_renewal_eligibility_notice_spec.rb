@@ -42,7 +42,7 @@ RSpec.describe ::Operations::Notices::IvlFinalRenewalEligibilityNotice, dbclean:
 
     context 'payload' do
       before do
-        issuer.office_locations.first.phone.update_attributes!(full_phone_number: '1234567890', extension: nil)
+        issuer.office_locations.first.phone.set(full_phone_number: '1234567890', extension: nil)
       end
 
       let(:payload) { ::Operations::Notices::IvlFinalRenewalEligibilityNotice.new.send('build_payload', family).success }

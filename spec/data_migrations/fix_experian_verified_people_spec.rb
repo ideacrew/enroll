@@ -12,7 +12,7 @@ describe FixExperianVerifiedPeople, dbclean: :after_each do
 
   it "moves identity and application documents to verified state" do
     person.user = FactoryBot.create(:user)
-    person.user.update_attributes!("identity_final_decision_code" => "acc")
+    person.user.set("identity_final_decision_code" => "acc")
     subject.migrate
     person.reload
     consumer = person.consumer_role

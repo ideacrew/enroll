@@ -159,8 +159,8 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
     context 'for valid arguments' do
       before do
-        person.update_attributes!(dob: (hbx_enrollment10.effective_on - 61.years))
-        person2.update_attributes!(dob: (hbx_enrollment10.effective_on - 59.years))
+        person.set(dob: (hbx_enrollment10.effective_on - 61.years))
+        person2.set(dob: (hbx_enrollment10.effective_on - 59.years))
       end
 
       context 'for persisted enrollment object' do
@@ -452,8 +452,8 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 879.8)
       @product.save!
       ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-      person.update_attributes!(dob: (hbx_enrollment.effective_on - 61.years))
-      person2.update_attributes!(dob: (hbx_enrollment.effective_on - 59.years))
+      person.set(dob: (hbx_enrollment.effective_on - 61.years))
+      person2.set(dob: (hbx_enrollment.effective_on - 59.years))
       @upcd_1 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment, 1700.00, tax_household10)
     end
 

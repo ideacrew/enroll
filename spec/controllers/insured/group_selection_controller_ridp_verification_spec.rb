@@ -79,11 +79,11 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
   end
 
   before do
-    broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+    broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
     broker_person.create_broker_agency_staff_role(
       benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
     )
-    broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id, market_kind: :both)
+    broker_agency_profile.set(primary_broker_role_id: broker_role.id, market_kind: :both)
     broker_role.approve!
     broker_agency_account
     broker_staff
@@ -110,7 +110,7 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
       let(:logged_in_user) { user }
 
       before :each do
-        user.update_attributes!(:identity_final_decision_code => "acc")
+        user.set(:identity_final_decision_code => "acc")
       end
 
       it 'does not redirect to root_path with a flash message' do

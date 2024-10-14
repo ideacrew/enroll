@@ -35,7 +35,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
   let(:family) { person.primary_family }
   let!(:census_employee) do
     ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
-    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    ce.set(employee_role_id: person.employee_roles.first.id)
     person.employee_roles.first.update_attributes(census_employee_id: ce.id)
     ce
   end
@@ -67,7 +67,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 1))
       initial_application.benefit_packages.each do |bp|
         bp.sponsored_benefits.each do |spon_benefit|
-          spon_benefit.update_attributes!(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
+          spon_benefit.set(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
           create_pd(spon_benefit)
           update_contribution_levels(spon_benefit) if initial_application.employer_profile.is_a_fehb_profile?
         end
@@ -78,7 +78,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       context 'reinstate terminated benefit application' do
         before do
           period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
-          initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
+          initial_application.set(termination_reason: 'nonpayment', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           initial_application.terminate_enrollment!
           @new_ba = subject.call({ benefit_application: initial_application }).success
           @first_wfst = @new_ba.workflow_state_transitions.first
@@ -229,7 +229,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         before do
           initial_application.schedule_enrollment_termination!
           period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
-          initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
+          initial_application.set(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           @new_ba = subject.call({ benefit_application: initial_application }).success
         end
 
@@ -274,7 +274,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           overlapping_ba.save!
           initial_application.terminate_enrollment!
           period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
-          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
+          initial_application.set(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           @result = subject.call({ benefit_application: initial_application })
         end
 
@@ -293,7 +293,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           overlapping_ba.save!
           initial_application.terminate_enrollment!
           period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
-          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
+          initial_application.set(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           @result = subject.call({ benefit_application: initial_application })
         end
 
@@ -306,8 +306,8 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
     context "benefit_application's effective starting" do
       before do
         min = TimeKeeper.date_of_record.prev_year.beginning_of_month
-        initial_application.update_attributes!(aasm_state: :terminated, effective_period: min..(min.next_year.prev_day))
-        initial_application.benefit_sponsor_catalog.update_attributes!(effective_period: min..(min.next_year.prev_day))
+        initial_application.set(aasm_state: :terminated, effective_period: min..(min.next_year.prev_day))
+        initial_application.benefit_sponsor_catalog.set(effective_period: min..(min.next_year.prev_day))
         @result = subject.call({ benefit_application: initial_application })
       end
 
@@ -361,7 +361,7 @@ end
 
 def update_contribution_levels(spon_benefit)
   spon_benefit.sponsor_contribution.contribution_levels.each do |cl|
-    cl.update_attributes!({contribution_cap: 0.5, flat_contribution_amount: 100.00})
+    cl.set({contribution_cap: 0.5, flat_contribution_amount: 100.00})
   end
 end
 

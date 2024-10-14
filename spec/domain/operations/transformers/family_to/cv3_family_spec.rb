@@ -40,7 +40,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
     application.save!
   end
   let(:create_relationships) do
-    application.applicants.first.update_attributes!(is_primary_applicant: true) unless application.primary_applicant.present?
+    application.applicants.first.set(is_primary_applicant: true) unless application.primary_applicant.present?
     application.ensure_relationship_with_primary(applicant2, 'child')
     application.ensure_relationship_with_primary(applicant3, 'child')
     application.build_relationship_matrix

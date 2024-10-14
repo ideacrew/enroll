@@ -33,7 +33,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :around_each do
 
     context "it should update the due. date and enrollment state" do
       before :each do
-        consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        consumer_role.set(aasm_state: "verification_outstanding")
         subject.migrate
         hbx_enrollment.reload
         consumer_role.verification_types.map(&:reload)
@@ -52,7 +52,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :around_each do
     context "it should not update the due date if none of the enrolled members are outstanding" do
 
       before :each do
-        consumer_role.update_attributes!(aasm_state: "verified")
+        consumer_role.set(aasm_state: "verified")
         subject.migrate
         hbx_enrollment.reload
         consumer_role.reload
@@ -69,14 +69,14 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :around_each do
 
     context "it should consider only dep in verification outstanding" do
       before :each do
-        dep_consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        dep_consumer_role.set(aasm_state: "verification_outstanding")
         subject.migrate
         hbx_enrollment.reload
         dep_consumer_role.verification_types.map(&:reload)
       end
 
       it "should update the aasm_state to verification type's due date" do
-        dep_consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        dep_consumer_role.set(aasm_state: "verification_outstanding")
         dep_consumer_role.verification_types[2].update_attribute("validation_status","verification_outstanding")
         expect(hbx_enrollment.is_any_member_outstanding?).to be_truthy
       end

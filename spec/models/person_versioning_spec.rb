@@ -11,7 +11,7 @@ RSpec.shared_examples "tracked history" do |field, new_value|
     old_value = subject.send(field)
 
     expect do
-      subject.update_attributes! field => new_value
+      subject.set field => new_value
     end.to change { subject.history_tracks.count }.by(1)
 
     expect(subject.history_tracks.last['original'][field]).to eql(old_value)
@@ -24,7 +24,7 @@ describe Person, :dbclean => :after_each do
 
   context "after updating" do
     before do
-      person.update_attributes! first_name: "Something", last_name: "Different"
+      person.set first_name: "Something", last_name: "Different"
     end
 
     it 'changes the name' do

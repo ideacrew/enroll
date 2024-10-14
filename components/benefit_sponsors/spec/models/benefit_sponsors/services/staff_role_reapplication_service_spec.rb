@@ -23,7 +23,7 @@ module BenefitSponsors
       shared_examples_for "broker re-application" do |from_state, to_state|
 
         before :each do
-          primary_broker_role.update_attributes!(aasm_state: from_state)
+          primary_broker_role.set(aasm_state: from_state)
           service = ::BenefitSponsors::Services::StaffRoleReapplicationService.new({profile_id: broker_agency_profile.id, person_id: broker_person.id})
           service.re_apply
         end
@@ -42,7 +42,7 @@ module BenefitSponsors
       shared_examples_for "general agency re-application" do |from_state, to_state|
 
         before :each do
-          primary_general_agency_staff_role.update_attributes!(aasm_state: from_state)
+          primary_general_agency_staff_role.set(aasm_state: from_state)
           service = ::BenefitSponsors::Services::StaffRoleReapplicationService.new({profile_id: general_agency_profile.id, person_id: ga_person.id})
           service.re_apply
         end

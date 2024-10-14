@@ -22,7 +22,7 @@ describe HandleCoverageSelected do
       allow(enrollment_member_1).to receive(:ivl_coverage_selected)
       allow(enrollment_member_2).to receive(:ivl_coverage_selected)
       allow(Time).to receive(:now).and_return(the_update_time)
-      allow(hbx_enrollment).to receive(:update_attributes!).with({:published_to_bus_at => the_update_time})
+      allow(hbx_enrollment).to receive(:set).with({:published_to_bus_at => the_update_time})
     end
 
     it "has a successful result" do
@@ -45,7 +45,7 @@ describe HandleCoverageSelected do
     end
 
     it "records that the enrollment was transmitted to the bus" do
-      expect(hbx_enrollment).to receive(:update_attributes!).with({:published_to_bus_at => the_update_time})
+      expect(hbx_enrollment).to receive(:set).with({:published_to_bus_at => the_update_time})
       HandleCoverageSelected.call(context)
     end
   end
@@ -81,7 +81,7 @@ describe HandleCoverageSelected do
       end
 
       it "does not record that the enrollment was transmitted to the bus" do
-        expect(hbx_enrollment).not_to receive(:update_attributes!)
+        expect(hbx_enrollment).not_to receive(:set)
         HandleCoverageSelected.call(context)
       end
     end
@@ -91,7 +91,7 @@ describe HandleCoverageSelected do
 
       before(:each) do
         allow(Time).to receive(:now).and_return(the_update_time)
-        allow(hbx_enrollment).to receive(:update_attributes!).with({:published_to_bus_at => the_update_time})
+        allow(hbx_enrollment).to receive(:set).with({:published_to_bus_at => the_update_time})
       end
 
       it "has a successful result" do
@@ -114,7 +114,7 @@ describe HandleCoverageSelected do
       end
 
       it "records that the enrollment was transmitted to the bus" do
-        expect(hbx_enrollment).to receive(:update_attributes!).with({:published_to_bus_at => the_update_time})
+        expect(hbx_enrollment).to receive(:set).with({:published_to_bus_at => the_update_time})
         HandleCoverageSelected.call(context)
       end
     end

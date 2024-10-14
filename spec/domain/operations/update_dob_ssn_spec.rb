@@ -27,7 +27,7 @@ RSpec.describe Operations::UpdateDobSsn, type: :model, dbclean: :after_each do
 
     context 'success' do
       before do
-        person.consumer_role.update_attributes!(active_vlp_document_id: person.consumer_role.vlp_documents.first.id)
+        person.consumer_role.set(active_vlp_document_id: person.consumer_role.vlp_documents.first.id)
         @result = subject.call(person_id: person.id.to_s, params: test_params, current_user: 'c_user', ssn_require: false)
       end
 
@@ -42,7 +42,7 @@ RSpec.describe Operations::UpdateDobSsn, type: :model, dbclean: :after_each do
 
     context 'success' do
       before do
-        person.consumer_role.update_attributes!(active_vlp_document_id: person.consumer_role.vlp_documents.first.id)
+        person.consumer_role.set(active_vlp_document_id: person.consumer_role.vlp_documents.first.id)
         @result = subject.call(person_id: person.id.to_s, params: no_ssn_test_params, current_user: 'c_user', ssn_require: false)
       end
 

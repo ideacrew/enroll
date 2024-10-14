@@ -228,8 +228,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         context 'children aged above 26' do
           before do
-            child1.person.update_attributes!(dob: TimeKeeper.date_of_record - 27.years)
-            child2.person.update_attributes!(dob: TimeKeeper.date_of_record - 21.years)
+            child1.person.set(dob: TimeKeeper.date_of_record - 27.years)
+            child2.person.set(dob: TimeKeeper.date_of_record - 21.years)
           end
 
           context 'age_off_excluded for children set to true' do
@@ -484,7 +484,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           before do
-            enrollment.family.primary_person.update_attributes!(tribal_id: '123456789', tribal_state: 'ME')
+            enrollment.family.primary_person.set(tribal_id: '123456789', tribal_state: 'ME')
             enrollment.hbx_enrollment_members = [enrollment.hbx_enrollment_members.first]
             enrollment.save!
           end
@@ -505,7 +505,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         context 'unassisted renewal one AI AN member and others non-AI AN members' do
           before do
-            enrollment.family.primary_person.update_attributes!(tribal_id: '123456789', tribal_state: 'ME')
+            enrollment.family.primary_person.set(tribal_id: '123456789', tribal_state: 'ME')
           end
 
           it 'will generate renewal with CSR variant' do
@@ -1081,7 +1081,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context "When consumer covered under catastrophic product with assisted" do
         before do
-          current_cat_product.update_attributes!(hios_base_id: nil, catastrophic_age_off_product_id: renewal_cat_age_off_product.id)
+          current_cat_product.set(hios_base_id: nil, catastrophic_age_off_product_id: renewal_cat_age_off_product.id)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
         end
         let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: Date.new(Date.current.year + 1,1,1))}
@@ -1259,7 +1259,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         before :each do
           ::BenefitMarkets::Products::HealthProducts::HealthProduct.silver_plans.update_all(metal_level_kind: :bronze)
-          enrollment.product.update_attributes!(renewal_product_id: renewal_product.id)
+          enrollment.product.set(renewal_product_id: renewal_product.id)
           subject.instance_variable_set(:@cross_walk_product, renewal_product)
         end
         it "should default to 01 variant if no other plan found" do
@@ -1296,7 +1296,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                        else
                          active_csr_87_product.id
                        end
-            bcp.update_attributes!(slcsp_id: slcsp_id)
+            bcp.set(slcsp_id: slcsp_id)
           end
           hbx_profile.reload
           family_assisted.active_household.reload
@@ -1356,7 +1356,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
   def update_age_off_excluded(fam, true_or_false)
     fam.family_members.map(&:person).each do |per|
-      per.update_attributes!(age_off_excluded: true_or_false)
+      per.set(age_off_excluded: true_or_false)
     end
   end
 end

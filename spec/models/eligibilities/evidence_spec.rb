@@ -320,8 +320,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         before do
           allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Success({}))
           allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
-          esi_evidence.update_attributes!(aasm_state: 'unverified')
-          income_evidence.update_attributes!(aasm_state: 'unverified')
+          esi_evidence.set(aasm_state: 'unverified')
+          income_evidence.set(aasm_state: 'unverified')
           @result = esi_evidence.request_determination(action, update_reason, updated_by)
           esi_evidence.reload
         end
@@ -365,8 +365,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
         context 'with an applicant without an active enrollment' do
           before do
-            esi_evidence.update_attributes!(aasm_state: 'unverified')
-            income_evidence.update_attributes!(aasm_state: 'unverified')
+            esi_evidence.set(aasm_state: 'unverified')
+            income_evidence.set(aasm_state: 'unverified')
             @result = esi_evidence.request_determination(action, update_reason, updated_by)
             esi_evidence.reload
           end
@@ -409,7 +409,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
             before do
               # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
               hbx_enrollment.product.update(csr_variant_id: '01')
-              esi_evidence.update_attributes!(aasm_state: 'unverified')
+              esi_evidence.set(aasm_state: 'unverified')
               @result = esi_evidence.request_determination(action, update_reason, updated_by)
               esi_evidence.reload
             end
@@ -440,7 +440,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
           context 'and using aptc' do
             before do
               hbx_enrollment.update(applied_aptc_amount: 720)
-              esi_evidence.update_attributes!(aasm_state: 'unverified')
+              esi_evidence.set(aasm_state: 'unverified')
               @result = esi_evidence.request_determination(action, update_reason, updated_by)
               esi_evidence.reload
             end
@@ -782,8 +782,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
     before do
       create_embedded_docs_for_evidence(income_evidence)
-      income_evidence.verification_histories.first.update_attributes!(date_of_action: TimeKeeper.date_of_record - 1.day)
-      income_evidence.request_results.first.update_attributes!(date_of_action: TimeKeeper.date_of_record - 1.day)
+      income_evidence.verification_histories.first.set(date_of_action: TimeKeeper.date_of_record - 1.day)
+      income_evidence.request_results.first.set(date_of_action: TimeKeeper.date_of_record - 1.day)
       income_evidence.clone_embedded_documents(income_evidence2)
       @new_verification_history = income_evidence.verification_histories.first
       @new_request_result = income_evidence.request_results.first

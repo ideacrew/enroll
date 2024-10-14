@@ -118,11 +118,11 @@ module Insured
     describe "valid params #for_view" do
       before(:each) do
         # This effective on mock to compensate for new yaers
-        enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
+        enrollment.set(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
         @product = product
         @product.update_attributes(ehb: 0.9844)
         enrollment.update_attributes(product: @product, applied_aptc_amount: applied_aptc_amount)
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: @product.id)}
         site_key = EnrollRegistry[:enroll_app].setting(:site_key).item.upcase
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       end
@@ -200,11 +200,11 @@ module Insured
       end
 
       before(:each) do
-        enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
+        enrollment.set(effective_on: TimeKeeper.date_of_record - 1.day) if enrollment.effective_on.year != TimeKeeper.date_of_record.year
         tax_household_member1.update_attributes(csr_percent_as_integer: 87)
         tax_household_member2.update_attributes(csr_percent_as_integer: 87)
         enrollment.update_attributes(product: product, applied_aptc_amount: applied_aptc_amount)
-        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: product.id)}
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.set(slcsp_id: product.id)}
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       end
 
@@ -312,7 +312,7 @@ module Insured
       let(:system_year) { Date.today.year }
 
       before do
-        enrollment.update_attributes!(effective_on: Date.today.beginning_of_month)
+        enrollment.set(effective_on: Date.today.beginning_of_month)
       end
 
       context 'before OpenEnrollment or after start of OpenEnrollment in Prospective Year' do

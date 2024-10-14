@@ -441,8 +441,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
 
     before do
-      applicant.update_attributes!(is_applying_coverage: true)
-      applicant2.update_attributes!(is_applying_coverage: true)
+      applicant.set(is_applying_coverage: true)
+      applicant2.set(is_applying_coverage: true)
     end
 
     context "primary applicant updating information" do
@@ -579,8 +579,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       before do
         allow(dependent).to receive(:relation_with_primary).and_return('spouse')
         dependent_params[:id] = dependent.id
-        dependent.update_attributes!(relationship: 'spouse')
-        dependent.update_attributes!(same_with_primary: true)
+        dependent.set(relationship: 'spouse')
+        dependent.set(same_with_primary: true)
         allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
@@ -631,8 +631,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         allow(dependent).to receive(:relation_with_primary).and_return('spouse')
         primary_applicant.addresses << FinancialAssistance::Locations::Address.new({kind: 'home', city: 'Bar Harbor', county: 'Cumberland', state: 'ME', zip: '04401', address_1: '1600 Main St'})
         dependent_params[:id] = dependent.id
-        dependent.update_attributes!(relationship: 'spouse')
-        dependent.update_attributes!(same_with_primary: true)
+        dependent.set(relationship: 'spouse')
+        dependent.set(same_with_primary: true)
         allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)

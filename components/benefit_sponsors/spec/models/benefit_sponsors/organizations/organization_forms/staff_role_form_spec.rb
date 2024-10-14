@@ -323,7 +323,7 @@ module BenefitSponsors
           end
 
           it "should search for broker agencies and return result if broker profile is approved" do
-            broker_agency_profile.update_attributes!(aasm_state: "is_approved", market_kind: :shop)
+            broker_agency_profile.set(aasm_state: "is_approved", market_kind: :shop)
             expect(broker_search_form.broker_agency_search).to eq [broker_agency_profile]
           end
 
@@ -365,7 +365,7 @@ module BenefitSponsors
           end
 
           it "should search for general agencies and return result if ga profile is approved" do
-            general_agency_profile.update_attributes!(aasm_state: "is_approved")
+            general_agency_profile.set(aasm_state: "is_approved")
             expect(general_agency_search_form.general_agency_search).to eq [general_agency_profile]
           end
 

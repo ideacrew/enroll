@@ -218,17 +218,17 @@ module BenefitSponsors
           current_bp.renew(renewal_bp)
         end
 
-        context "when renewal product available for both health and dental" do 
+        context "when renewal product available for both health and dental" do
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
-  
+
           it "does build valid renewal benefit package" do
             expect(subject.valid?).to be_truthy
           end
 
           it "does renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_present 
+            expect(subject.sponsored_benefit_for(:health)).to be_present
           end
 
           it "does renew health reference product" do
@@ -242,7 +242,7 @@ module BenefitSponsors
           end
 
           it "does renew dental sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:dental)).to be_present 
+            expect(subject.sponsored_benefit_for(:dental)).to be_present
           end
 
           it "does renew dental reference product" do
@@ -266,13 +266,13 @@ module BenefitSponsors
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
-  
+
           it "does build valid renewal benefit package" do
             expect(subject.valid?).to be_truthy
           end
 
           it "does renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_present 
+            expect(subject.sponsored_benefit_for(:health)).to be_present
           end
 
           it "does renew health reference product" do
@@ -286,7 +286,7 @@ module BenefitSponsors
           end
 
           it "does not renew dental sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:dental)).to be_blank 
+            expect(subject.sponsored_benefit_for(:dental)).to be_blank
           end
         end
 
@@ -301,17 +301,17 @@ module BenefitSponsors
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
-  
+
           it "does build valid renewal benefit package" do
             expect(subject.valid?).to be_truthy
           end
 
           it "does not renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_blank 
+            expect(subject.sponsored_benefit_for(:health)).to be_blank
           end
 
           it "does renew dental sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:dental)).to be_present 
+            expect(subject.sponsored_benefit_for(:dental)).to be_present
           end
 
           it "does renew dental reference product" do
@@ -325,7 +325,7 @@ module BenefitSponsors
           end
         end
 
-        context "when renewal product not available for both health and dental" do 
+        context "when renewal product not available for both health and dental" do
           before :each do
             BenefitMarkets::Products::Product.where({
               "application_period.min" => renewal_benefit_market_catalog.application_period.min
@@ -334,21 +334,21 @@ module BenefitSponsors
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
-  
+
           it "does build valid renewal benefit package" do
             expect(subject.valid?).to be_truthy
           end
 
           it "does not renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_blank 
+            expect(subject.sponsored_benefit_for(:health)).to be_blank
           end
 
           it "does not renew dental sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:dental)).to be_blank 
+            expect(subject.sponsored_benefit_for(:dental)).to be_blank
           end
         end
 
-        context "when employer has conversion dental sponsored benefit" do 
+        context "when employer has conversion dental sponsored benefit" do
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefits.unscoped.detect{|sb| sb.product_kind == :dental } }
@@ -363,7 +363,7 @@ module BenefitSponsors
           end
 
           it "does renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_present 
+            expect(subject.sponsored_benefit_for(:health)).to be_present
           end
 
           it "does renew health reference product" do
@@ -379,7 +379,7 @@ module BenefitSponsors
           it "does renew dental sponsored benefit" do
             expect(dental_sb.source_kind).to eq :conversion
             expect(subject.sponsored_benefit_for(:dental)).to be_present
-            expect(subject.sponsored_benefit_for(:dental).source_kind).to eq :benefit_sponsor_catalog 
+            expect(subject.sponsored_benefit_for(:dental).source_kind).to eq :benefit_sponsor_catalog
           end
 
           it "does renew dental reference product" do
@@ -627,7 +627,7 @@ module BenefitSponsors
         reference_product.renewal_product = product
         reference_product.save!
       end
-      
+
       let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
       let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
       let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
@@ -663,7 +663,7 @@ module BenefitSponsors
 
         before do
           allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products)
-          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
+          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit)
         end
 
         it 'should return true' do
@@ -686,7 +686,7 @@ module BenefitSponsors
 
         before do
           allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products)
-          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
+          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit)
         end
 
         it "should return false" do
@@ -736,22 +736,22 @@ module BenefitSponsors
       context 'when application got canceled due to ineligble state' do
 
 
-        context 'given employee coverages got canceled after application cancellation' do 
+        context 'given employee coverages got canceled after application cancellation' do
 
-          it 'should reinstate their canceled coverages' do 
+          it 'should reinstate their canceled coverages' do
           end
         end
 
         context 'given employee coverages got canceled before application cancellation' do
 
-          it 'should not reinstate their canceled coverages' do 
-          end 
+          it 'should not reinstate their canceled coverages' do
+          end
         end
       end
 
-      context 'when application not canceled due to ineligble state' do 
+      context 'when application not canceled due to ineligble state' do
 
-        it 'should not process any reinstatements on enrollments' do 
+        it 'should not process any reinstatements on enrollments' do
         end
       end
     end
@@ -949,7 +949,7 @@ module BenefitSponsors
       context "when coverage_selected enrollments are present", :dbclean => :after_each do
 
         before do
-          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "")
+          initial_application.set(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "")
           benefit_package.terminate_member_benefits
           hbx_enrollment.reload
           hbx_enrollment_1.reload
@@ -979,9 +979,9 @@ module BenefitSponsors
         let(:hbx_enrollment_terminated_on) { end_on.prev_month }
 
         before do
-          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "nonpayment")
-          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
-          hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on + 2.months)
+          initial_application.set(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "nonpayment")
+          hbx_enrollment.set(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
+          hbx_enrollment_1.set(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on + 2.months)
           benefit_package.terminate_member_benefits(enroll_term_reason: "nonpayment")
           hbx_enrollment.reload
           hbx_enrollment_1.reload
@@ -1008,9 +1008,9 @@ module BenefitSponsors
         let(:hbx_enrollment_terminated_on) { end_on.prev_month }
 
         before do
-          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
-          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: hbx_enrollment_terminated_on)
-          hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: end_on + 2.months)
+          initial_application.set(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          hbx_enrollment.set(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: hbx_enrollment_terminated_on)
+          hbx_enrollment_1.set(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: end_on + 2.months)
           benefit_package.terminate_member_benefits
           hbx_enrollment.reload
           hbx_enrollment_1.reload
@@ -1028,7 +1028,7 @@ module BenefitSponsors
 
           before :each do
             @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
-            @bga.update_attributes!(end_on: benefit_package.end_on)
+            @bga.set(end_on: benefit_package.end_on)
           end
 
           it "should update benefit_group_assignment end_on if end_on < benefit_application end on" do
@@ -1065,7 +1065,7 @@ module BenefitSponsors
       let(:family) { person.primary_family }
       let!(:census_employee) do
         ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
-        ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+        ce.set(employee_role_id: person.employee_roles.first.id)
         person.employee_roles.first.update_attributes(census_employee_id: ce.id)
         ce
       end
@@ -1089,7 +1089,7 @@ module BenefitSponsors
       context 'given employee coverages got terminated after application termination' do
         before do
           period = initial_application.effective_period.min..(initial_application.end_on - 6.months).end_of_month
-          initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+          initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
           initial_application.terminate_enrollment!
           effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
           cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
@@ -1144,7 +1144,7 @@ module BenefitSponsors
           census_employee.benefit_group_assignments.first.update_attributes(start_on: initial_application.start_on)
           census_employee.reload
           period = (initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month)
-          initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+          initial_application.set(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
           initial_application.schedule_enrollment_termination!
           effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
           cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
@@ -1350,7 +1350,7 @@ module BenefitSponsors
       let(:end_on) { TimeKeeper.date_of_record.next_month }
 
       before do
-        initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "")
+        initial_application.set(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "")
         benefit_package.termination_pending_member_benefits
         hbx_enrollment.reload
       end
@@ -1374,9 +1374,9 @@ module BenefitSponsors
         let(:hbx_enrollment_terminated_on) { end_on.prev_month }
 
         before do
-          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "nonpayment")
-          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
-          hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on + 2.months)
+          initial_application.set(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "nonpayment")
+          hbx_enrollment.set(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
+          hbx_enrollment_1.set(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on + 2.months)
           benefit_package.termination_pending_member_benefits(enroll_term_reason: "nonpayment")
           hbx_enrollment.reload
           hbx_enrollment_1.reload
@@ -1400,7 +1400,7 @@ module BenefitSponsors
         context "pending terminate_benefit_group_assignments", :dbclean => :after_each do
           before :each do
             @bga = initial_application.benefit_sponsorship.census_employees.first.benefit_group_assignments.first
-            @bga.update_attributes!(end_on: nil)
+            @bga.set(end_on: nil)
           end
 
           it "should update benefit_group_assignment end_on if end_on > benefit_application end on" do
@@ -1417,8 +1417,8 @@ module BenefitSponsors
         let(:hbx_enrollment_terminated_on) { end_on.prev_month }
 
         before do
-          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
-          hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: hbx_enrollment_terminated_on)
+          initial_application.set(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          hbx_enrollment.set(effective_on: initial_application.start_on, aasm_state: "coverage_terminated", terminated_on: hbx_enrollment_terminated_on)
           benefit_package.termination_pending_member_benefits
           hbx_enrollment.reload
         end

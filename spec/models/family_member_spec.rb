@@ -216,7 +216,7 @@ describe FamilyMember, 'call back deactivate_tax_households on update', dbclean:
   it 'should deactivate eligibility when member is updated' do
     family.active_household.tax_households << tax_household
     family.save!
-    family.primary_applicant.update_attributes!(is_active: false)
+    family.primary_applicant.set(is_active: false)
     family.reload
     expect(family.active_household.tax_households.first.effective_ending_on).not_to eq nil
   end
@@ -237,7 +237,7 @@ describe '#deactivate_tax_households' do
     context 'family member is deleted' do
       it 'deactivates active tax household group' do
         expect(tax_household_group.end_on).to be_nil
-        primary_family_member.update_attributes!(is_active: false)
+        primary_family_member.set(is_active: false)
         expect(tax_household_group.reload.end_on).not_to be_nil
       end
     end
@@ -245,7 +245,7 @@ describe '#deactivate_tax_households' do
     context 'family member is updated' do
       it 'does not deactivate active tax household group' do
         expect(tax_household_group.end_on).to be_nil
-        primary_family_member.update_attributes!(external_member_id: '100992')
+        primary_family_member.set(external_member_id: '100992')
         expect(tax_household_group.reload.end_on).to be_nil
       end
     end

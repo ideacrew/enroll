@@ -22,7 +22,7 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
       sign_in(user)
       assign :employer_profile, employer_profile
       assign :benefit_sponsorship, benefit_sponsorship
-      initial_application.update_attributes!(aasm_state: :terminated)
+      initial_application.set(aasm_state: :terminated)
       render "exchanges/employer_applications/index", employers_action_id: "employers_action_#{employer_profile.id}", employer_id: benefit_sponsorship
     end
 

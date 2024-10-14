@@ -30,7 +30,7 @@ describe ExtendBrokerApplication, dbclean: :after_each do
 
     shared_examples_for "broker re-application" do |from_state, to_state|
       before :each do
-        primary_broker_role.update_attributes!(aasm_state: from_state)
+        primary_broker_role.set(aasm_state: from_state)
       end
 
       it "should transition from #{from_state} to #{to_state}" do

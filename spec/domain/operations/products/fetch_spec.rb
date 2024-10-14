@@ -74,7 +74,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
     context 'all members without rating area' do
       before do
         family.family_members.each do |f_member|
-          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'work') }
+          f_member.person.addresses.each { |addr| addr.set(kind: 'work') }
         end
         @result = subject.call(params)
       end
@@ -132,7 +132,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       before do
         family.primary_applicant.person.addresses.first.update_attributes(state: 'dc')
         family.family_members.where(is_primary_applicant: false).each do |f_member|
-          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
+          f_member.person.addresses.each { |addr| addr.set(kind: 'home', state: 'co', zip: "41001")}
         end
 
         @result = subject.call(params)
@@ -156,7 +156,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       before do
         family.primary_applicant.person.addresses.first.update_attributes(state: 'pa')
         family.family_members.where(is_primary_applicant: false).each do |f_member|
-          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
+          f_member.person.addresses.each { |addr| addr.set(kind: 'home', state: 'co', zip: "41001")}
         end
 
         @result = subject.call(params)
@@ -176,7 +176,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       before do
         family.family_members.last.update_attributes(is_active: false)
         family.family_members.where(is_active: false).each do |f_member|
-          f_member.person.addresses.each { |addr| addr.update_attributes!([])}
+          f_member.person.addresses.each { |addr| addr.set([])}
         end
 
         @result = subject.call(params)
@@ -240,7 +240,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       before do
         family.primary_applicant.person.addresses.first.update_attributes(state: 'me', zip: '04007', county: 'york')
         family.family_members.where(is_primary_applicant: false).each do |f_member|
-          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
+          f_member.person.addresses.each { |addr| addr.set(kind: 'home', state: 'co', zip: "41001")}
         end
         BenefitMarkets::Locations::RatingArea.update_all(covered_states: ['ME'])
         ::BenefitMarkets::Locations::CountyZip.all.update_all(county_name: 'york',zip: "04007", state: "ME")
@@ -266,7 +266,7 @@ RSpec.describe ::Operations::Products::Fetch, dbclean: :after_each do
       before do
         family.primary_applicant.person.addresses.first.update_attributes(state: 'pa')
         family.family_members.where(is_primary_applicant: false).each do |f_member|
-          f_member.person.addresses.each { |addr| addr.update_attributes!(kind: 'home', state: 'co', zip: "41001")}
+          f_member.person.addresses.each { |addr| addr.set(kind: 'home', state: 'co', zip: "41001")}
         end
 
         BenefitMarkets::Locations::RatingArea.update_all(covered_states: ['ME'])

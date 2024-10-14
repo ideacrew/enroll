@@ -163,8 +163,8 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
         - person does not have broker_agency_staff_role' do
 
         before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_agency_profile.set(primary_broker_role_id: broker_role.id)
           broker_role.approve!
         end
 
@@ -185,8 +185,8 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
         before do
           broker_agency_staff_role
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_agency_profile.set(primary_broker_role_id: broker_role.id)
           broker_role.approve!
         end
 
@@ -208,8 +208,8 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
         before do
           broker_agency_staff_role.broker_agency_accept!
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id)
-          broker_agency_profile2.update_attributes!(primary_broker_role_id: broker_role.id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id)
+          broker_agency_profile2.set(primary_broker_role_id: broker_role.id)
           broker_role.approve!
         end
 
@@ -229,8 +229,8 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
         before do
           broker_agency_staff_role
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_agency_profile.set(primary_broker_role_id: broker_role.id)
           broker_role.approve!
         end
 
@@ -250,8 +250,8 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
         before do
           broker_agency_staff_role.broker_agency_accept!
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+          broker_role.set(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+          broker_agency_profile.set(primary_broker_role_id: broker_role.id)
           broker_role.approve!
         end
 

@@ -43,7 +43,7 @@ describe AddFamilyMemberToCoverageHousehold, dbclean: :after_each do
 
     context 'inactive family member' do
       before do
-        @dep_member.update_attributes!(is_active: false)
+        @dep_member.set(is_active: false)
         @dep_member.save!
       end
 

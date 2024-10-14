@@ -62,7 +62,7 @@ RSpec.describe 'events/v2/employers/_plan_year.haml', dbclean: :after_each do
       end
 
       before do
-        initial_application.update_attributes!(:aasm_state => :terminated, effective_period: effective_period)
+        initial_application.set(:aasm_state => :terminated, effective_period: effective_period)
         abc_profile.benefit_applications << [reinstated_application1]
         abc_profile.save!
         render partial: 'events/v2/employers/plan_year', :collection => [reinstated_application1], as: :plan_year

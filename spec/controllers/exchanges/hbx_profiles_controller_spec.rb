@@ -944,7 +944,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it "should render update enrollment if the save is successful" do
-      person1.consumer_role.update_attributes!(active_vlp_document_id: person1.consumer_role.vlp_documents.first.id)
+      person1.consumer_role.set(active_vlp_document_id: person1.consumer_role.vlp_documents.first.id)
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       allow(person1).to receive(:primary_family).and_return family1
       sign_in(user)
@@ -983,7 +983,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     it "should set instance variable dont_update_ssn to nil if employer has ssn/tin functionality disabled" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
-      employer_profile.active_benefit_sponsorship.update_attributes!(is_no_ssn_enabled: true)
+      employer_profile.active_benefit_sponsorship.set(is_no_ssn_enabled: true)
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
@@ -993,7 +993,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     it "can update ssn for employee if employer has ssn/tin functionality disabled" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
-      employer_profile.active_benefit_sponsorship.update_attributes!(is_no_ssn_enabled: true)
+      employer_profile.active_benefit_sponsorship.set(is_no_ssn_enabled: true)
       sign_in(user)
       expect(response).to have_http_status(:success)
       @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
@@ -1411,7 +1411,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
 
       it "should drop members if there would only be minors left after drop" do
-        enrollment.hbx_enrollment_members.last.person.update_attributes!(dob: TimeKeeper.date_of_record - 15.years)
+        enrollment.hbx_enrollment_members.last.person.set(dob: TimeKeeper.date_of_record - 15.years)
 
         post :update_enrollment_member_drop, params: { "termination_date_#{enrollment.id}".to_sym => (TimeKeeper.date_of_record + 1.day).to_s,
                                                        "terminate_member_#{enrollment.hbx_enrollment_members.first.id}".to_sym => enrollment.hbx_enrollment_members.first.id.to_s,
@@ -2049,7 +2049,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:person) do
       FactoryBot.create(:person, :with_hbx_staff_role, :with_family).tap do |person|
         FactoryBot.create(:permission, :super_admin).tap do |permission|
-          person.hbx_staff_role.update_attributes!(permission_id: permission.id)
+          person.hbx_staff_role.set(permission_id: permission.id)
         end
       end
     end

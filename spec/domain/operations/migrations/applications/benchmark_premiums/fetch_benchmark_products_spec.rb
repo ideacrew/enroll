@@ -27,7 +27,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
         application: application
       )
 
-      appl1.rating_address.update_attributes!(county: 'York', zip: '04001', state: 'ME')
+      appl1.rating_address.set(county: 'York', zip: '04001', state: 'ME')
       appl1
     end
 
@@ -46,7 +46,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
         application: application
       )
 
-      appl2.rating_address.update_attributes!(valid_county_zip_params)
+      appl2.rating_address.set(valid_county_zip_params)
       appl2
     end
 
@@ -90,7 +90,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
       " do
 
       before do
-        applicant1.home_address.update_attributes!(**invalid_county_zip_params)
+        applicant1.home_address.set(**invalid_county_zip_params)
         applicant1.addresses.create(
           {
             kind: 'mailing',
@@ -133,7 +133,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
       " do
 
       before do
-        applicant1.home_address.update_attributes!(**invalid_county_zip_params)
+        applicant1.home_address.set(**invalid_county_zip_params)
         applicant1.addresses.create(
           {
             kind: 'mailing',
@@ -177,7 +177,7 @@ RSpec.describe Operations::Migrations::Applications::BenchmarkPremiums::FetchBen
       " do
 
       before do
-        applicant1.home_address.update_attributes!(**invalid_county_zip_params)
+        applicant1.home_address.set(**invalid_county_zip_params)
         applicant1.addresses.create(
           {
             kind: 'mailing',

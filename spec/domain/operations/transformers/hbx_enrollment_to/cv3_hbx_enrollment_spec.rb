@@ -9,7 +9,7 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
 
   let(:enr_product) do
     product = BenefitMarkets::Products::DentalProducts::DentalProduct.by_year(TimeKeeper.date_of_record.year).detect(&:family_based_rating?)
-    product.update_attributes!(dental_level: nil)
+    product.set(dental_level: nil)
     product
   end
 

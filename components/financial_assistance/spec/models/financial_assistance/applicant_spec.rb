@@ -35,35 +35,35 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     describe '.aptc_eligible' do
       it 'returns only aptc_eligible applicants' do
-        applicant.update_attributes!(is_ia_eligible: true)
+        applicant.set(is_ia_eligible: true)
         expect(application.applicants.aptc_eligible).to match([applicant])
       end
     end
 
     describe '.medicaid_or_chip_eligible' do
       it 'returns only medicaid_or_chip_eligible applicants' do
-        applicant.update_attributes!(is_medicaid_chip_eligible: true)
+        applicant.set(is_medicaid_chip_eligible: true)
         expect(application.applicants.medicaid_or_chip_eligible).to match([applicant])
       end
     end
 
     describe '.uqhp_eligible' do
       it 'returns only uqhp_eligible applicants' do
-        applicant.update_attributes!(is_without_assistance: true)
+        applicant.set(is_without_assistance: true)
         expect(application.applicants.uqhp_eligible).to match([applicant])
       end
     end
 
     describe '.ineligible' do
       it 'returns only ineligible applicants' do
-        applicant.update_attributes!(is_totally_ineligible: true)
+        applicant.set(is_totally_ineligible: true)
         expect(application.applicants.ineligible).to match([applicant])
       end
     end
 
     describe '.eligible_for_non_magi_reasons' do
       it 'returns only eligible_for_non_magi_reasons applicants' do
-        applicant.update_attributes!(is_eligible_for_non_magi_reasons: true)
+        applicant.set(is_eligible_for_non_magi_reasons: true)
         expect(application.applicants.eligible_for_non_magi_reasons).to match([applicant])
       end
     end
@@ -382,7 +382,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
   context 'is_csr_73_87_or_94' do
     before do
-      applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: [73, 87, 94].sample })
+      applicant.set({ is_ia_eligible: true, csr_percent_as_integer: [73, 87, 94].sample })
     end
 
     it 'should return true' do
@@ -392,7 +392,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
   context 'is_csr_100' do
     before do
-      applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: 100 })
+      applicant.set({ is_ia_eligible: true, csr_percent_as_integer: 100 })
     end
 
     it 'should return true' do
@@ -403,7 +403,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   context 'is_csr_limited' do
     context 'aqhp' do
       before do
-        applicant.update_attributes!({ is_ia_eligible: true, csr_percent_as_integer: -1 })
+        applicant.set({ is_ia_eligible: true, csr_percent_as_integer: -1 })
       end
 
       it 'should return true' do
@@ -413,7 +413,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'uqhp' do
       before do
-        applicant.update_attributes!({ indian_tribe_member: true })
+        applicant.set({ indian_tribe_member: true })
       end
 
       it 'should return true' do
@@ -550,7 +550,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   context '#other_questions_complete?' do
     context "when not applying for coverage, has_unemployment_income: nil and is_pregnant" do
       before do
-        applicant.update_attributes!(has_unemployment_income: nil, pregnancy_due_on: TimeKeeper.date_of_record - 10.days, children_expected_count: 1, is_pregnant: true, is_applying_coverage: false)
+        applicant.set(has_unemployment_income: nil, pregnancy_due_on: TimeKeeper.date_of_record - 10.days, children_expected_count: 1, is_pregnant: true, is_applying_coverage: false)
       end
 
       it "return true for other_questions_complete?" do
@@ -567,7 +567,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       context "and other_questions_complete? is independent of has_unemployment_income" do
         [true, false, nil].each do |has_unemployment_income|
           before do
-            applicant.update_attributes!(has_unemployment_income: has_unemployment_income, is_pregnant: false, is_applying_coverage: false)
+            applicant.set(has_unemployment_income: has_unemployment_income, is_pregnant: false, is_applying_coverage: false)
           end
 
           it "return false for other_questions_complete?" do
@@ -586,7 +586,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       context "and other_questions_complete? is independent of has_unemployment_income" do
         [true, false, nil].each do |has_unemployment_income|
           before do
-            applicant.update_attributes!(has_unemployment_income: has_unemployment_income, is_pregnant: false, is_applying_coverage: true)
+            applicant.set(has_unemployment_income: has_unemployment_income, is_pregnant: false, is_applying_coverage: true)
           end
 
           it "return false for other_questions_complete?" do
@@ -603,7 +603,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'pregnancy_due_on' do
       before do
-        applicant.update_attributes!({
+        applicant.set({
                                        is_pregnant: true,
                                        children_expected_count: 1,
                                        pregnancy_due_on: nil,
@@ -638,7 +638,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'is_enrolled_on_medicaid' do
       before do
-        applicant.update_attributes!({
+        applicant.set({
                                        is_pregnant: false,
                                        is_applying_coverage: true,
                                        is_post_partum_period: true,
@@ -674,7 +674,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context '#applicant_validation_complete?' do
       before do
-        applicant.update_attributes!({is_applying_coverage: true,
+        applicant.set({is_applying_coverage: true,
                                       is_required_to_file_taxes: false,
                                       is_claimed_as_tax_dependent: false,
                                       has_job_income: false,
@@ -700,7 +700,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
-          applicant.update_attributes!({is_temporarily_out_of_state: nil})
+          applicant.set({is_temporarily_out_of_state: nil})
         end
 
         it 'should validate applicant as complete' do
@@ -711,7 +711,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       context 'has_medicare_cubcare_eligible feature disabled' do
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
-          applicant.update_attributes!({
+          applicant.set({
                                          has_eligible_medicaid_cubcare: nil,
                                          has_eligibility_changed: nil,
                                          has_household_income_changed: nil,
@@ -728,7 +728,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
             allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
             allow(applicant).to receive(:medicare_eligible_qns).and_return(true)
             allow(applicant).to receive(:valid?).and_return(true)
-            applicant.update_attributes!({has_job_income: nil,
+            applicant.set({has_job_income: nil,
                                           has_self_employment_income: nil,
                                           has_other_income: nil,
                                           has_unemployment_income: nil})
@@ -773,7 +773,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'medicare_eligible_qns not answered' do
           before do
-            applicant.update_attributes!({
+            applicant.set({
                                            has_eligible_medicaid_cubcare: false,
                                            has_eligibility_changed: true,
                                            has_household_income_changed: nil,
@@ -787,7 +787,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
           context 'person_coverage_end_on not given after selecting yes to has_eligibility_changed' do
             before do
-              applicant.update_attributes!({
+              applicant.set({
                                              has_eligible_medicaid_cubcare: false,
                                              has_eligibility_changed: true,
                                              has_household_income_changed: false,
@@ -803,7 +803,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'medicare_eligible_qns answered' do
           before do
-            applicant.update_attributes!({
+            applicant.set({
                                            has_eligible_medicaid_cubcare: false,
                                            has_eligibility_changed: true,
                                            has_household_income_changed: true,
@@ -819,7 +819,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
       context 'applicant not applying for coverage and ssn is not present' do
         before do
-          applicant.update_attributes!(ssn: nil, no_ssn: nil, is_applying_coverage: false)
+          applicant.set(ssn: nil, no_ssn: nil, is_applying_coverage: false)
         end
 
         it 'should return true as ssn is not mandatory for non applicant' do
@@ -830,7 +830,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       context 'applicant applying for coverage and ssn is not present' do
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
-          applicant.update_attributes!(ssn: nil, no_ssn: '0', is_applying_coverage: true)
+          applicant.set(ssn: nil, no_ssn: '0', is_applying_coverage: true)
         end
 
         it 'should return false as ssn is mandatory for an applicant' do
@@ -845,12 +845,12 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it 'should return false if non_ssn_apply_reason is not given' do
-          applicant.update_attributes!(ssn: nil, no_ssn: '1', is_ssn_applied: false, is_applying_coverage: true)
+          applicant.set(ssn: nil, no_ssn: '1', is_ssn_applied: false, is_applying_coverage: true)
           expect(applicant.applicant_validation_complete?).to eq false
         end
 
         it 'should return true if non_ssn_apply_reason is given' do
-          applicant.update_attributes!(ssn: nil, no_ssn: '1', is_ssn_applied: false, is_applying_coverage: true, non_ssn_apply_reason: 'test reason')
+          applicant.set(ssn: nil, no_ssn: '1', is_ssn_applied: false, is_applying_coverage: true, non_ssn_apply_reason: 'test reason')
           expect(applicant.applicant_validation_complete?).to eq true
         end
       end
@@ -858,7 +858,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'is_physically_disabled' do
       before do
-        applicant.update_attributes!({
+        applicant.set({
                                        is_pregnant: true,
                                        children_expected_count: 1,
                                        pregnancy_due_on: nil,
@@ -891,7 +891,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
   context "#covering_applicant_exists" do
     before do
-      applicant.update_attributes!({
+      applicant.set({
                                      first_name: "Dusty",
                                      last_name: "Roberts",
                                      is_applying_coverage: true,
@@ -953,7 +953,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'application is not in draft' do
       before do
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
         application.applicants.first.save!
       end
 
@@ -1062,7 +1062,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context 'application is not in draft' do
       before do
-        application.update_attributes!(aasm_state: 'submitted')
+        application.set(aasm_state: 'submitted')
         applicant.destroy!
       end
 
@@ -1664,7 +1664,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         context "with evidence in review" do
 
           before do
-            current_evidence.update_attributes!(aasm_state: 'review', due_on: desired_due_date)
+            current_evidence.set(aasm_state: 'review', due_on: desired_due_date)
           end
           it 'should move evidence to rejected and set due date' do
             applicant.set_evidence_rejected(current_evidence)
@@ -1935,7 +1935,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'where applicant is indian_tribe_member' do
           before do
-            applicant.update_attributes!(indian_tribe_member: true, has_american_indian_alaskan_native_income: nil)
+            applicant.set(indian_tribe_member: true, has_american_indian_alaskan_native_income: nil)
             @result = applicant.embedded_document_section_entry_complete?(:other_income)
           end
 
@@ -1946,7 +1946,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'where applicant is not indian_tribe_member' do
           before do
-            applicant.update_attributes!(indian_tribe_member: false, has_other_income: false)
+            applicant.set(indian_tribe_member: false, has_other_income: false)
             @result = applicant.embedded_document_section_entry_complete?(:other_income)
           end
 
@@ -1963,7 +1963,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'where applicant is indian_tribe_member' do
           before do
-            applicant.update_attributes!(indian_tribe_member: true, has_american_indian_alaskan_native_income: nil, has_other_income: false)
+            applicant.set(indian_tribe_member: true, has_american_indian_alaskan_native_income: nil, has_other_income: false)
             @result = applicant.embedded_document_section_entry_complete?(:other_income)
           end
 
@@ -1974,7 +1974,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'where applicant is not indian_tribe_member' do
           before do
-            applicant.update_attributes!(indian_tribe_member: false, has_other_income: false)
+            applicant.set(indian_tribe_member: false, has_other_income: false)
             @result = applicant.embedded_document_section_entry_complete?(:other_income)
           end
 
@@ -1993,7 +1993,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'when applicant has other_income with incompleted social security benefit' do
           before do
-            applicant.update_attributes!(has_other_income: true)
+            applicant.set(has_other_income: true)
             inc = ::FinancialAssistance::Income.new({
                                                       kind: 'social_security_benefit',
                                                       frequency_kind: 'yearly',
@@ -2012,7 +2012,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'when applicant has_other_income without other incomes' do
           before do
-            applicant.update_attributes!(has_other_income: true)
+            applicant.set(has_other_income: true)
             @result = applicant.embedded_document_section_entry_complete?(:other_income)
           end
 
@@ -2023,7 +2023,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'where applicant has_other_income with completed social security benefit' do
           before do
-            applicant.update_attributes!(has_other_income: true)
+            applicant.set(has_other_income: true)
             inc = ::FinancialAssistance::Income.new({
                                                       kind: 'social_security_benefit',
                                                       frequency_kind: 'yearly',
@@ -2050,7 +2050,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'when applicant has other_income with incompleted social security benefit' do
           before do
-            applicant.update_attributes!(has_other_income: true)
+            applicant.set(has_other_income: true)
             inc = ::FinancialAssistance::Income.new({
                                                       kind: 'social_security_benefit',
                                                       frequency_kind: 'yearly',
@@ -2069,7 +2069,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'when applicant has_other_income without other incomes' do
           before do
-            applicant.update_attributes!(has_other_income: true)
+            applicant.set(has_other_income: true)
             @result = applicant.embedded_document_section_entry_complete?(:other_income)
           end
 
@@ -2080,7 +2080,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         context 'where applicant has_other_income with completed social security benefit' do
           before do
-            applicant.update_attributes!(has_other_income: true)
+            applicant.set(has_other_income: true)
             inc = ::FinancialAssistance::Income.new({
                                                       kind: 'social_security_benefit',
                                                       frequency_kind: 'yearly',

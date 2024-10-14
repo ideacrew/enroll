@@ -78,7 +78,7 @@ describe FakesController do
         vlp_doc2 = FactoryBot.build(:vlp_document, :subject => 'I-551 (Permanent Resident Card)', updated_at: (TimeKeeper.date_of_record + 1.day))
         consumer_role.vlp_documents = [vlp_doc1, vlp_doc2]
         consumer_role.save!
-        consumer_role.update_attributes!(active_vlp_document_id: consumer_role.vlp_documents.first.id)
+        consumer_role.set(active_vlp_document_id: consumer_role.vlp_documents.first.id)
       end
 
       it 'should return vlp document which is active and not the one which has the latest updated at' do

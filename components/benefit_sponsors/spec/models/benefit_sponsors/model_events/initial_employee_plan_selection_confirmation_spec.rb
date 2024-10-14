@@ -41,7 +41,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployeePlanSelectionConfir
 
   before do
     census_employee.update_attributes(employee_role_id: employee_role.id)
-    benefit_group_assignment.update_attributes!(hbx_enrollment_id: hbx_enrollment.id, benefit_package_id: benefit_package.id)
+    benefit_group_assignment.set(hbx_enrollment_id: hbx_enrollment.id, benefit_package_id: benefit_package.id)
   end
 
   describe "Plan selection confirmation when ER made binder payment" do

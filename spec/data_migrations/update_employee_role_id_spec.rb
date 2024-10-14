@@ -107,7 +107,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
       before :each do
         allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         employee_role.person.save!
-        person.active_employee_roles.first.census_employee.update_attributes!(employee_role_id: employee_role.id )
+        person.active_employee_roles.first.census_employee.set(employee_role_id: employee_role.id )
       end
 
       around do |example|
@@ -117,7 +117,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
       end
 
       it 'should update the ee_role_id on census_employee if the id on EE role is not similar' do
-        person.active_employee_roles.first.census_employee.update_attributes!(employee_role_id: '111111111111111111111111')
+        person.active_employee_roles.first.census_employee.set(employee_role_id: '111111111111111111111111')
         expect(person.active_employee_roles.first.id).not_to eq person.active_employee_roles.first.census_employee.employee_role_id
         subject.migrate
         person.active_employee_roles.first.census_employee.reload

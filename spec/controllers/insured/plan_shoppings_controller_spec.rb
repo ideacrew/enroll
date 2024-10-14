@@ -414,7 +414,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         controller.instance_variable_set(:@elected_aptc, aptc_value1)
         controller.instance_variable_set(:@max_aptc, aptc_value1)
         controller.instance_variable_set(:@aptc_grants, double)
-        hbx_enrollment11.update_attributes!(product_id: product11.id)
+        hbx_enrollment11.set(product_id: product11.id)
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
       end
@@ -747,8 +747,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "should redirect to the group selection page if IVL enrollment effective date doesn't match product dates" do
       allow(EnrollRegistry[:enrollment_product_date_match].feature).to receive(:is_enabled).and_return(false)
-      hbx_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
-      product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
+      hbx_enrollment.set(effective_on: Date.new(year, 1, 1))
+      product.set(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
       sign_in(user)
       get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id, market_kind: 'individual'}
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id))
@@ -756,8 +756,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "should render thank you page if SHOP enrollment effective date doesn't match product dates" do
       allow(EnrollRegistry[:enrollment_product_date_match].feature).to receive(:is_enabled).and_return(false)
-      shop_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
-      shop_enrollment.product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
+      shop_enrollment.set(effective_on: Date.new(year, 1, 1))
+      shop_enrollment.product.set(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
       BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.00)
       sign_in(user)

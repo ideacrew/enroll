@@ -635,7 +635,7 @@ RSpec.describe Plan, dbclean: :after_each do
 
       before :each do
         Plan.delete_all
-        tax_household.tax_household_members.first.update_attributes!(applicant_id: family.family_members.first.id)
+        tax_household.tax_household_members.first.set(applicant_id: family.family_members.first.id)
       end
 
       it "should return dental plans" do

@@ -73,7 +73,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           context "with e case id updated", dbclean: :after_each do
             before do
-              person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
+              person.primary_family.set(e_case_id: "curam_landing_for#{person.id}")
               subject.call(nil, nil, nil, nil, message)
             end
 

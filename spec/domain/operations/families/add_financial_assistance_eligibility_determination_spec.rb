@@ -158,7 +158,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
   context 'success' do
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      bcp.update_attributes!(slcsp_id: product.id)
+      bcp.set(slcsp_id: product.id)
       @result = subject.call(application)
       family.reload
       @thhs = family.active_household.tax_households
@@ -233,7 +233,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
   context 'csr_percent_as_integer' do
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      bcp.update_attributes!(slcsp_id: product.id)
+      bcp.set(slcsp_id: product.id)
       params[:applicants].first.merge!(appli_addnl_params)
       @result = subject.call(application)
       family.reload
@@ -340,7 +340,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
   context 'failure' do
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      bcp.update_attributes!(slcsp_id: product.id)
+      bcp.set(slcsp_id: product.id)
       params.except!(:family_id)
       @result = subject.call(application)
       family.reload
@@ -359,7 +359,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
   describe '#call' do
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      bcp.update_attributes!(slcsp_id: product.id)
+      bcp.set(slcsp_id: product.id)
       eligibility_determination = params[:eligibility_determinations].first
       eligibility_determination.merge!('yearly_expected_contribution' => nil)
       @result = subject.call(application)

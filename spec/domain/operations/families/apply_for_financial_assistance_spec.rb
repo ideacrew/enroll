@@ -47,7 +47,7 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
     let!(:address10) do
       person10.addresses.destroy_all
       addr = FactoryBot.create(:address, person: person10)
-      addr.update_attributes!({ location_state_code: addr.state, full_text: 'full_text' })
+      addr.set({ location_state_code: addr.state, full_text: 'full_text' })
       addr
     end
 

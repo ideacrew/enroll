@@ -40,7 +40,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       it 'should trigger first reminder notice for unassisted families after 10 days of ENR notice' do
         person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
         family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
-        person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        person.consumer_role.set(aasm_state: "verification_outstanding")
         hbx_enrollment.save!
         expect(IvlNoticesNotifierJob).to receive(:perform_later)
         subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
@@ -49,7 +49,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       it 'should not trigger first reminder notice for unassisted families before 10 days of ENR notice' do
         person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 88.days)}
         family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 88.days)
-        person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        person.consumer_role.set(aasm_state: "verification_outstanding")
         hbx_enrollment.save!
         expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
         subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
@@ -62,8 +62,8 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
           end
 
           it 'should not trigger reminder notice for families from curam' do
-            family.update_attributes!(:e_case_id => "someecaseid")
-            person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+            family.set(:e_case_id => "someecaseid")
+            person.consumer_role.set(aasm_state: "verification_outstanding")
             hbx_enrollment.save!
             expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
             subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
@@ -80,8 +80,8 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
           it 'should trigger reminder notice for families from curam' do
             person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: due_date)}
-            family.update_attributes!(e_case_id: "someecaseid", min_verification_due_date: due_date)
-            person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+            family.set(e_case_id: "someecaseid", min_verification_due_date: due_date)
+            person.consumer_role.set(aasm_state: "verification_outstanding")
             hbx_enrollment.save!
             expect(IvlNoticesNotifierJob).to receive(:perform_later)
             subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
@@ -90,7 +90,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       end
 
       it 'should not trigger reminder notice for unassisted families with verified consumers' do
-        person.consumer_role.update_attributes!(aasm_state: "fully_verified")
+        person.consumer_role.set(aasm_state: "fully_verified")
         hbx_enrollment.save!
         expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
         subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
@@ -105,7 +105,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
         it 'should not trigger document reminder events to polypress' do
           person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
           family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
-          person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+          person.consumer_role.set(aasm_state: "verification_outstanding")
           hbx_enrollment.save!
           # expect(::Operations::Notices::IvlDocumentReminderNotice).not_to receive(:new)
           subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
@@ -121,7 +121,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
         it 'should trigger document reminder events to polypress' do
           person.verification_types.each{|type| type.fail_type && type.update_attributes(due_date: TimeKeeper.date_of_record + 85.days)}
           family.update_attributes(min_verification_due_date: TimeKeeper.date_of_record + 85.days)
-          person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+          person.consumer_role.set(aasm_state: "verification_outstanding")
           hbx_enrollment.save!
           # expect(::Operations::Notices::IvlDocumentReminderNotice).to receive(:new)
           subject.send_reminder_notices_for_ivl(TimeKeeper.date_of_record)
@@ -166,7 +166,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
         allow(EnrollRegistry[:include_faa_outstanding_verifications].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature).to receive(:is_enabled).and_return(false)
         family.update_attributes(min_verification_due_date: due_on)
-        person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
+        person.consumer_role.set(aasm_state: "verification_outstanding")
         hbx_enrollment.save!
       end
 
