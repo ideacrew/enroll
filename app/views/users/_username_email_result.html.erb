@@ -1,18 +1,19 @@
 <% if @bs4 %>
   <div>
     <% if @matches != true %>
-      <h3 class="title text-center"><%= l10n('hbx_profiles.user_accounts.actions.edit.result.success') %></h3>
+      <h2 class="title text-center"><%= l10n('hbx_profiles.user_accounts.actions.edit.result.success') %></h2>
       
       <table class="table table-border">
-        <thead></thead>
+        <thead>
+          <tr>
+            <th class='weight-n'><%= l10n('name') %>: <b><%= @user.person.try(:full_name) %></b></th>
+            <th class='weight-n'><%= l10n('hbx_id') %>: <b><%= @user.person.try(:hbx_id)%></b></th>
+          </tr>
+        </thead>
         <tbody>
           <tr>
-            <td><%= l10n('name') %>: <b><%= @user.person.try(:full_name) %></b></td>
-            <td><%= l10n('hbx_id') %>: <b><%= @user.person.try(:hbx_id)%></b></td>
-          </tr>
-          <tr>
             <td><%= l10n('username') %>: <b><%= @user.oim_id  %></b></td>
-            <td><%= l10n('email') %>: <b><%= @person.email %></b></td>
+            <td><%= l10n('email') %>: <b><%= @person&.email %></b></td>
           </tr>
         </tbody>
       </table>
