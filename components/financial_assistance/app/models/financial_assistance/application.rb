@@ -366,15 +366,14 @@ module FinancialAssistance
 
       enrollment.hbx_enrollment_members.each do |enrollment_member|
         family_member_id =  enrollment_member.applicant_id
-        applicant = applicants.where(family_member_id: family_member_id).first
-
+        applicant = applicants.find_by(family_member_id: family_member_id)
         applicant&.enrolled_with(enrollment)
       end
 
       enrolled_member_ids = active_enrollments.by_health.by_year(enrollment.effective_on.year).flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
-      family_member_ids = family.active_family_members.map(&:id)
+      family_member_ids = family.active_family_members.pluck(:id)
       ids_not_in_health_enrolled = family_member_ids - enrolled_member_ids
-      applicants.where(:family_member_id.in => ids_not_in_health_enrolled).map(&:move_outstanding_to_nrr_status)
+      applicants.where(:family_member_id.in => ids_not_in_health_enrolled).each(&:move_outstanding_to_nrr_status)
     end
 
     # fetch existing relationships matrix
