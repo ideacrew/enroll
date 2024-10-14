@@ -1,4 +1,3 @@
-import Rails from 'rails-ujs';
 import Turbolinks from 'turbolinks';
 import { Application } from "stimulus";
 import { definitionsFromContext } from "stimulus/webpack-helpers";
@@ -18,7 +17,6 @@ import 'sweetalert2';
 
 import 'channels';
 
-Rails.start()
 Turbolinks.start()
 
 const importAll = (r) => r.keys().map(r)
