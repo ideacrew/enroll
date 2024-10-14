@@ -173,7 +173,11 @@ module FinancialAssistance
               # Loads the coverage subtables for the specified kind only when the applicant has the kind.
               # After reading the kind, it formats it into a human-readable string and constructs the coverage subtables if needed.
               def load_coverages_map(hash, kind)
-                has_kind = hash[:health_coverage][:rows][kind][:value]
+                hash[:health_coverage] ||= {}
+                hash[:health_coverage][:rows] ||= {}
+                hash[:health_coverage][:rows][kind] ||= {}
+
+                has_kind = hash.dig(:health_coverage, :rows, kind, :value)
                 hash[:health_coverage][:rows][kind][:value] = human_value(has_kind)
                 return unless has_kind
 
