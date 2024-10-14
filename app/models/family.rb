@@ -450,8 +450,12 @@ class Family
     current_enrolled_or_termed_coverages(enrollment).map(&:product)
   end
 
+  def current_plan_for_badge(enrollment)
+    checkbook_enrollments(enrollment)&.map(&:id)&.first
+  end
+
   def checkbook_enrollments(enrollment)
-    coverages = active_household.hbx_enrollments.by_coverage_kind("health")
+    coverages = active_household.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind)
 
     results = coverages.where(
       "$or" => [

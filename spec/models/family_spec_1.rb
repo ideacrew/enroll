@@ -256,6 +256,81 @@ describe ".current_enrolled_or_termed_coverages", dbclean: :after_each do
   end
 end
 
+describe ".current_plan_for_badge", dbclean: :after_each do
+  include_context "setup families enrollments"
+
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_renewal_product,
+                      benefit_market_kind: :aca_individual,
+                      kind: :health,
+                      csr_variant_id: '01',
+                      service_area: service_area,
+                      renewal_service_area: renewal_service_area)
+  end
+  let(:renewal_product) { product.renewal_product }
+  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
+  let!(:subscriber_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
+  let!(:active_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      product: product,
+                      aasm_state: 'coverage_selected',
+                      hbx_enrollment_members: [subscriber_enrollment_member])
+  end
+  let!(:shopping_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      effective_on: effective_on,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      aasm_state: 'shopping',
+                      hbx_enrollment_members: [subscriber_enrollment_member])
+  end
+
+  context "when consumer has has existing enrollment" do
+    it 'should include active_enrollment' do
+      current_plan = family.current_plan_for_badge(shopping_enrollment)
+
+      expect(current_plan).to eq active_enrollment.product.id
+    end
+  end
+
+  context "when consumer has has a renewal" do
+    let!(:renewal_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        effective_on: effective_on,
+                        household: family.active_household,
+                        product: renewal_product,
+                        coverage_kind: "health",
+                        aasm_state: 'auto_renewing',
+                        hbx_enrollment_members: [subscriber_enrollment_member])
+    end
+
+    it 'should return renewal_enrollment' do
+      current_plan = family.current_plan_for_badge(shopping_enrollment)
+
+      expect(current_plan).to eq(renewal_enrollment.product.id)
+      expect(current_plan).not_to eq(active_enrollment.product.id)
+    end
+  end
+
+  context "when consumer no current coverage" do
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return nil" do
+      expect(family.current_plan_for_badge(shopping_enrollment)).to be_nil
+    end
+  end
+end
+
 describe ".checkbook_enrollments", dbclean: :after_each do
   include_context "setup families enrollments"
   let!(:person) { FactoryBot.create(:person)}
@@ -268,6 +343,14 @@ describe ".checkbook_enrollments", dbclean: :after_each do
                       csr_variant_id: '01',
                       service_area: service_area,
                       renewal_service_area: renewal_service_area)
+  end
+  let!(:dental_product) do
+    FactoryBot.create(:benefit_markets_products_dental_products_dental_product,
+                      :with_renewal_product,
+                      product_package_kinds: [:single_product],
+                      service_area: service_area,
+                      renewal_service_area: renewal_service_area,
+                      metal_level_kind: :dental)
   end
   let(:renewal_product) { product.renewal_product }
   let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
@@ -293,12 +376,40 @@ describe ".checkbook_enrollments", dbclean: :after_each do
                       hbx_enrollment_members: [subscriber_enrollment_member])
   end
 
+  let!(:dental_shopping_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      effective_on: effective_on,
+                      household: family.active_household,
+                      coverage_kind: "dental",
+                      aasm_state: 'shopping',
+                      hbx_enrollment_members: [subscriber_enrollment_member])
+  end
+
   context "when consumer has has existing enrollment" do
-    it 'should return renewal_enrollment' do
+    it 'should include active_enrollment' do
       current_coverages = family.checkbook_enrollments(shopping_enrollment)
 
       expect(current_coverages).to include(active_enrollment.product)
       expect(current_coverages).not_to include(shopping_enrollment)
+    end
+  end
+
+  context "when consumer has has existing dental enrollment" do
+    let!(:dental_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "dental",
+                        product: dental_product,
+                        aasm_state: 'coverage_selected',
+                        hbx_enrollment_members: [subscriber_enrollment_member])
+    end
+    it 'should return dental_enrollment' do
+      current_coverages = family.checkbook_enrollments(dental_shopping_enrollment)
+
+      expect(current_coverages).to include(dental_enrollment.product)
+      expect(current_coverages).not_to include(active_enrollment)
     end
   end
 
