@@ -67,6 +67,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
 
   before :each do
+    # allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    # allow(EnrollRegistry).to receive(:feature_enabled?).with(:home_tiles_current_and_future_only).and_return(false)
     allow(hbx_enrollments).to receive(:+).with(HbxEnrollment.family_canceled_enrollments(family)).and_return(
       HbxEnrollment.family_canceled_enrollments(family) + [hbx_enrollments]
     )
@@ -74,7 +76,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(hbx_enrollments).to receive(:non_external).and_return(hbx_enrollments)
-    allow(hbx_enrollments).to receive(:sort_by!).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:sort_by).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:reverse).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:reverse!).and_return(hbx_enrollments)
     allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)
