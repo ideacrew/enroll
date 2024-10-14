@@ -48,7 +48,7 @@
       </div>
       <div>
         <div class="d-flex justify-content-between">
-          <% if @person.primary_family.enrolled_hbx_enrollments.map(&:product).map(&:id).include?(plan.id) %>
+          <% if @current_plan == plan.id %>
             <span class="badge badge-pill badge-lg badge-current-plan d-flex align-items-center">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <title>Star</title>
