@@ -165,7 +165,6 @@ module FinancialAssistance
 
               let(:zip) { '0285864' }
               it 'returns false' do
-                # binding.irb
                 expect(address.valid?).to eq false
               end
             end

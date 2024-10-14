@@ -165,9 +165,6 @@ describe Address, "with proper validations" do
 
         context 'with hyphenated zip code' do
           let(:zip) { '02863-1234' }
-          before do
-            # address.update_attributes!(zip: "#{zip}-1234")
-          end
 
           it "returns true" do
             expect(address.valid?).to eq true
