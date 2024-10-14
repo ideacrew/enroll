@@ -144,14 +144,41 @@ describe Address, "with proper validations" do
     end
 
     context 'when county enabled' do
-      before do
+      let(:county) { 'Cumberland' }
+      let(:zip) { '02863' }
+      let(:county_zip_code) { '02863' }
+      before :each do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+        county_zip = BenefitMarkets::Locations::CountyZip.new(county_name: county, state: 'ME', zip: county_zip_code)
+        county_zip.save
       end
 
       context 'when county present' do
 
-        it 'returns true' do
-          expect(address.valid?).to eq true
+        context 'with invalid county/zip combination' do
+          it 'returns false' do
+            expect(address.valid?).to eq false
+          end
+        end
+
+        context 'with hyphenated zip code' do
+          let(:zip) { '02863-1234' }
+          before do
+            # address.update_attributes!(zip: "#{zip}-1234")
+          end
+
+          it "returns true" do
+            expect(address.valid?).to eq true
+          end
+        end
+
+        context 'with valid county/zip' do
+          let(:county) { county}
+          let(:zip) { zip}
+
+          it 'returns true' do
+            expect(address.valid?).to eq true
+          end
         end
       end
 

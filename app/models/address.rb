@@ -91,10 +91,23 @@ class Address
   end
 
   def county_check
+    binding.irb
     return unless EnrollRegistry.feature_enabled?(:display_county)
-    return if self.county.present?
     return if self.state&.downcase != EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase
-    errors.add(:county, 'not present')
+
+    if county.empty?
+      errors.add(:county, 'not present')
+    else
+      county_name = county.present? ? county.titlecase : ''
+      formatted_zip = zip.match?(/-/) ? zip.split("-").first : zip
+      errors.add(:county, 'invalid county/zip') unless ::BenefitMarkets::Locations::CountyZip.where(zip: formatted_zip).first.present?
+    end
+    
+    # 1. if the state is Maine does the zip code included in the possible counties
+    # 2. If the zip code is hypenated, does the first part of the hyphenated zip code match the possible counties
+    #3. If neither of these things are true, then add an error that says county does not match zip code.
+    #4. Make sure that the county is properly formatted before running the query
+    
   end
 
   # @note Add support for GIS location
@@ -328,7 +341,7 @@ class Address
   def same_address?(another_address)
     return(false) if another_address.nil?
     attrs_to_match = [:address_1, :address_2, :address_3, :city, :state, :zip]
-    attrs_to_match << :county if EnrollRegistry.feature_enabled?(:display_county)
+    attrs_to_match << :county if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
     attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
   end
 

@@ -233,6 +233,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:sensor_tobacco_carrier_usage).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
         consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
         consumer_person.consumer_role.vlp_documents = []
         consumer_person.save!
@@ -247,7 +248,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
           :health_product_enrollment_status,
           :dental_product_enrollment_status
         ].each do |feature_key|
-          EnrollRegistry[feature_key].feature.stub(:is_enabled).and_return(true)
+          EnrollRegistry[:check_for_crm_updates].feature.stub(:is_enabled).and_return(true)
         end
       end
 

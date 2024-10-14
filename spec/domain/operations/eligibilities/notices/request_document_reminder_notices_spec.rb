@@ -132,7 +132,7 @@ RSpec.describe ::Operations::Eligibilities::Notices::RequestDocumentReminderNoti
     end
 
     before :each do
-      allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+      allow(EnrollApp).to receive(:enabled?).and_call_original
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:alive_status).and_return(true)
       allow(EnrollRegistry[:alive_status]).to receive(:enabled?).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:trigger_document_reminder_notices_at_individual_level).and_return(true)
