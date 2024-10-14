@@ -793,7 +793,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.preferences.instructions' => "Tell us your preferences. When you’re finished, select",
   :'en.insured.preferences.instructions_continue' => "“Continue to Next Step”",
   :'en.insured.preferences.agreements' => "Agreements",
-  :'en.insured.preferences.question1' => "To make it easier to determine my eligibility for premium reductions in future years, I agree to allow %{site_short_name} to use my income date, including information from tax returns, for the next five years. %{site_short_name} will send me a notice, let me make any changes, and I can opt out at any time. ",
+  :'en.insured.preferences.question1' => "To make it easier to determine my eligibility for premium reductions in future years, I agree to allow %{site_short_name} to use my income data, including information from tax returns for the next five years. %{site_short_name} will send me a notice, let me make any changes, and I can opt out at any time.",
   :'en.insured.preferences.i_agree' => 'I Agree',
   :'en.insured.preferences.i_disagree' => 'I Disagree',
   :'en.insured.preferences.question2_description' => 'When it’s time to renew or change coverage, I authorize %{site_short_name} to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility:',
