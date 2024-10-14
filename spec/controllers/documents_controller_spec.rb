@@ -248,7 +248,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
           :health_product_enrollment_status,
           :dental_product_enrollment_status
         ].each do |feature_key|
-          EnrollRegistry[:check_for_crm_updates].feature.stub(:is_enabled).and_return(true)
+          EnrollRegistry[feature_key].feature.stub(:is_enabled).and_return(true)
         end
       end
 

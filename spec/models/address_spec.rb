@@ -156,6 +156,8 @@ describe Address, "with proper validations" do
       context 'when county present' do
 
         context 'with invalid county/zip combination' do
+
+          let(:zip) { '02865' }
           it 'returns false' do
             expect(address.valid?).to eq false
           end
@@ -173,8 +175,6 @@ describe Address, "with proper validations" do
         end
 
         context 'with valid county/zip' do
-          let(:county) { county}
-          let(:zip) { zip}
 
           it 'returns true' do
             expect(address.valid?).to eq true
