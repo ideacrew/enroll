@@ -300,6 +300,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @plan_hsa_status = Products::Qhp.plan_hsa_status_map(@plans)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @current_plan = @hbx_enrollment.family.current_plan_for_badge(@hbx_enrollment)
   end
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
