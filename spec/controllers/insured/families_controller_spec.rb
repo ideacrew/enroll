@@ -2125,10 +2125,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       sign_in(ivl_user)
     end
 
-    context "without any FF " do
-      it "should previous year and this year" do
+    context "without 'current and future only' FF on" do
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:home_tiles_current_and_future_only).and_return(false)
         get :home, params: {:family => ivl_family.id.to_s}
-        expect(assigns(:hbx_enrollments)).to eq([previous_year_ivl, ivl_enrollment])
+      end
+      it "should previous year and this year" do
+        expect(assigns(:hbx_enrollments)).to eq([ivl_enrollment, previous_year_ivl])
       end
     end
 
