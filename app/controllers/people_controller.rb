@@ -23,7 +23,7 @@ class PeopleController < ApplicationController
     @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
       unless validate_person_params
-        format.html { redirect_to personal_insured_families_path, alert: "Person update failed. phone invalid" }
+        format.html { redirect_to personal_insured_families_path, alert: l10n('insured.invalid_phone_error') }
         # format.html { redirect_to edit_insured_employee_path(@person) }
         format.json { render json: "@person.errors", status: :unprocessable_entity }
       end

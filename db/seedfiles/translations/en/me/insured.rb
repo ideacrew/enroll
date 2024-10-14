@@ -880,5 +880,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.eligibility.created' => 'THH & Eligibility created successfully.',
   :'en.insured.terminated_by_employer' => "You have been terminated by your employer %{employer_name} with an effective date of %{date}",
   :'en.insured.enroll_today' => "enroll today",
-  :'en.insured.coverage_will_begin' => "coverage will begin %{date}"
+  :'en.insured.coverage_will_begin' => "coverage will begin %{date}",
+  :'en.insured.invalid_phone_error' => "Person update failed, Phone number is invalid",
 }.freeze
