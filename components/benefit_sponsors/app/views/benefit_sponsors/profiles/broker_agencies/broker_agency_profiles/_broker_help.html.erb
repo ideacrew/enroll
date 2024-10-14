@@ -44,7 +44,7 @@
       <dt><%= l10n("language")%>:</dt>
       <dd><%= broker_agency_profile.languages %></dd>
     </dl>
-    <button type="button" class="outline close_broker_select"><%= l10n("close")%></button>
+    <button type="button" class="outline close_broker_select"><%= l10n("previous_step")%></button>
     <%= h(link_to "Go To My Expert", main_app.brokers_insured_families_path(tab: l10n("brokers_tab")), class: "button hidden go-to-expert mt-4") %>
     <button type="button" <%= 'disabled' if !broker_agency_profile.accept_new_clients %> class="select-broker" data-broker='<%=@staff.id%>'><%= l10n("broker_agencies.profiles.select_this_broker")%></button>
   </section>
@@ -121,7 +121,7 @@
         <p class="lg"> <b><%= l10n("broker_agencies.profiles.not_accepting_clients") if !broker_agency_profile.accept_new_clients %></b> </p>
         <p class="lg"> <b><%= l10n("broker_agencies.profiles.warning_for_existing_broker")%></b></p>
         <button type="button" <%= 'disabled' if !broker_agency_profile.accept_new_clients %> class="btn btn-primary btn-small help_button close_broker_select" data-cuke="select_this_broker" data-broker='<%=@staff.id%>'><%= l10n("broker_agencies.profiles.select_this_broker")%></button>
-        <button type="button" class="btn btn-default btn-default btn-small close_broker_select"><%= l10n("close")%></button>
+        <button type="button" class="btn btn-default btn-default btn-small close_broker_select"><%= l10n("previous_step") %></button>
       </div>
     </div>
   </div>
