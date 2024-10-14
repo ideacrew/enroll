@@ -25,6 +25,34 @@ Given(/^that the user is on the FAA Household Info page$/) do
   find('a.interaction-click-control-continue').click
 end
 
+
+And(/^the user clicks add Income and Coverage Information$/) do
+  find_all(".interaction-click-control-add-income---coverage-info")[0].click
+end
+
+And(/^the user is on the tax info page$/) do
+  find(".interaction-choice-control-value-is-required-to-file-taxes-yes")
+end
+
+And(/^the user selects they are filing jointly$/) do
+  find("#is_required_to_file_taxes_yes").click
+  find("#is_joint_tax_filing_yes").click
+  find("#is_claimed_as_tax_dependent_no").click
+  find("#btn-continue").click
+end
+
+And(/^the user lands on the Job Incomes Page$/) do
+  find(".incomes")
+end
+
+And(/^the user navigates back to the tax info page$/) do
+  find(".interaction-click-control-previous").click
+end
+
+Then(/^the user will see that the is filing jointly question is true$/) do
+  expect(find("#is_joint_tax_filing_yes").checked?).to be_truthy
+end
+
 Given(/^the applicant has no saved data$/) do
   expect(page).to have_content('Info Needed')
 end

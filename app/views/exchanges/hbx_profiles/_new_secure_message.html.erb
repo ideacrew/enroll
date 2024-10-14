@@ -28,7 +28,7 @@
                 <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: l10n('hbx_profiles.send_message.write_here'), include_blank: false, required: true  %></td>
               </tr>
               <tr>
-                <th><label for="file" class="weight-n"><%= l10n('document') %></label></th>
+                <th><label for="file" class="weight-n"><%= l10n('hbx_profiles.send_message.document') %></label></th>
                 <td><%= file_field_tag "file", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file"%></td>
               </tr>
               </tbody>
@@ -38,7 +38,7 @@
             <%= hidden_field_tag :resource_name, resource.class %>
             <%= hidden_field_tag :actions_id, @element_to_replace_id %>
             <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
-            <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
+            <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)"><%= l10n('cancel') %></button>
           </div>
         </div>
       </div>
