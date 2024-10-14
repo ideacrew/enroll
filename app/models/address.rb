@@ -99,7 +99,7 @@ class Address
     else
       county_name = county.titlecase
       formatted_zip = zip.match?(/-/) ? zip.split("-").first : zip
-      errors.add(:county, 'invalid county/zip') unless ::BenefitMarkets::Locations::CountyZip.where(zip: formatted_zip, county_name: county_name).present?
+      errors.add(:county, 'invalid county/zip') if ::BenefitMarkets::Locations::CountyZip.where(zip: formatted_zip, county_name: county_name).blank?
     end
   end
 
