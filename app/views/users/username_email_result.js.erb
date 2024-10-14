@@ -5,7 +5,7 @@ if ( $('tr.child-row:visible').length > 0 ) {
 }
 if ( $containing_row.next().hasClass('child-row') ) {
 } else {
-    $containing_row.after('<tr class="child-row"><td colspan="100"><%= j render partial: "users/username_email_result", locals: {user: @user} %></td></tr>');
+    $containing_row.after('<tr class="child-row" id="admin-edit-username-email"><td colspan="100"><%= j render partial: "users/username_email_result", locals: {user: @user} %></td></tr>');
     $("li>a:contains('Collapse Form')").eq($containing_row.index()).removeClass('disabled');
     $('.dropdown.pull-right').removeClass('open');
 }
