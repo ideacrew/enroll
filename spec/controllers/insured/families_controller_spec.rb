@@ -51,7 +51,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: Date.today) }
+  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: Date.today, coverage_kind: "health") }
   let(:person) { FactoryBot.create(:person, addresses: [], is_homeless: false, is_temporarily_out_of_state: false) }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
   let(:user) { FactoryBot.create(:user, person: person) }
@@ -67,6 +67,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   let(:permission) { FactoryBot.create(:permission, :hbx_staff) }
 
   before :each do
+    # allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    # allow(EnrollRegistry).to receive(:feature_enabled?).with(:home_tiles_current_and_future_only).and_return(false)
     allow(hbx_enrollments).to receive(:+).with(HbxEnrollment.family_canceled_enrollments(family)).and_return(
       HbxEnrollment.family_canceled_enrollments(family) + [hbx_enrollments]
     )
@@ -74,7 +76,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(hbx_enrollments).to receive(:non_external).and_return(hbx_enrollments)
-    allow(hbx_enrollments).to receive(:sort_by!).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:reverse!).and_return(hbx_enrollments)
     allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)
@@ -314,6 +315,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         allow(Announcement).to receive(:current_msg_for_employee).and_return(["msg for Employee"])
         allow(Announcement).to receive(:audience_kinds).and_return(%w[Employer Employee IVL Broker GA Web_Page])
+        allow(hbx_enrollments).to receive(:sort_by).and_return(hbx_enrollments)
+        allow(hbx_enrollments).to receive(:reverse).and_return(hbx_enrollments)
         sign_in user
         get :home
       end
@@ -354,6 +357,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(person).to receive(:employee_roles).and_return(nil)
         allow(family).to receive(:active_family_members).and_return(family_members)
         allow(family).to receive(:check_for_consumer_role).and_return true
+        allow(hbx_enrollments).to receive(:sort_by).and_return(hbx_enrollments)
+        allow(hbx_enrollments).to receive(:reverse).and_return(hbx_enrollments)
         sign_in user
         get :home
       end
@@ -2120,10 +2125,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       sign_in(ivl_user)
     end
 
-    context "without any FF " do
-      it "should previous year and this year" do
+    context "without 'current and future only' FF on" do
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:home_tiles_current_and_future_only).and_return(false)
         get :home, params: {:family => ivl_family.id.to_s}
-        expect(assigns(:hbx_enrollments)).to eq([previous_year_ivl, ivl_enrollment])
+      end
+      it "should previous year and this year" do
+        expect(assigns(:hbx_enrollments)).to eq([ivl_enrollment, previous_year_ivl])
       end
     end
 
