@@ -22,6 +22,11 @@ class PeopleController < ApplicationController
     @person.consumer_role.update_is_applying_coverage_status(person_params[:is_applying_coverage]) if @person.is_consumer_role_active?
     @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
+      unless validate_person_params
+        format.html { redirect_to personal_insured_families_path, alert: "Person update failed. phone invalid" }
+        # format.html { redirect_to edit_insured_employee_path(@person) }
+        format.json { render json: "@person.errors", status: :unprocessable_entity }
+      end
       if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
         if @person.is_consumer_role_active? && person_params[:is_applying_coverage] == "true"
           @person.consumer_role.check_native_status(@family, @native_status_changed)
@@ -130,26 +135,10 @@ class PeopleController < ApplicationController
     dependent.person.save!
   end
 
-  def sanitize_person_params
-    if person_params["addresses_attributes"].present?
-      person_params["addresses_attributes"].each do |key, address|
-        if address["city"].blank? && address["zip"].blank? && address["address_1"].blank? && address['state']
-          params["person"]["addresses_attributes"].delete("#{key}")
-        end
-      end
-    end
-
+  def validate_person_params
     if person_params["phones_attributes"].present?
       person_params["phones_attributes"].each do |key, phone|
-        params["person"]["phones_attributes"].delete(key.to_s) if phone["full_phone_number"].blank? && phone["full_phone_number"].gsub(/\D/, '') == '0000000000'
-      end
-    end
-
-    if person_params["emails_attributes"].present?
-      person_params["emails_attributes"].each do |key, email|
-        if email["address"].blank?
-          params["person"]["emails_attributes"].delete("#{key}")
-        end
+        return false if phone["full_phone_number"].blank? || phone["full_phone_number"].gsub(/\D/, '') == '0000000000'
       end
     end
   end

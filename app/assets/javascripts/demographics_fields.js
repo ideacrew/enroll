@@ -747,6 +747,34 @@ var PersonValidations = (function (window, undefined) {
           PersonValidations.restoreRequiredAttributes(e);
         }
       }
+
+      if (!$('#contact_type_text').prop('checked')) {
+        const phoneInput = document.querySelector('.mobile-phone-number');
+        const phoneValue = phoneInput.value.replace(/\D/g, '');
+
+        if (/^0+$/.test(phoneValue)) {
+          alert('Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
+        } else if (phoneValue.length > 1 && phoneValue.length < 10) {
+          alert('You must enter a mobile phone number to receive notices and updates by text.');
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+      }
+
+      const phoneInput = document.querySelector('.home-phone-number');
+      const phoneValue = phoneInput.value.replace(/\D/g, '');
+      const isTextChecked = $('#contact_type_text').prop('checked');
+
+      if (/^0+$/.test(phoneValue)) {
+        alert('Phone number cannot be all zeros.');
+        PersonValidations.restoreRequiredAttributes(e);
+      } else if (
+        (isTextChecked && (phoneValue.length < 1 || phoneValue.length < 10)) ||
+        (!isTextChecked && phoneValue.length > 1 && phoneValue.length < 10)
+      ) {
+        alert('You must enter a home phone number to receive notices and updates by text.');
+        PersonValidations.restoreRequiredAttributes(e);
+      }
     }
   }
 
