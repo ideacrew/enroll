@@ -76,8 +76,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(hbx_enrollments).to receive(:non_external).and_return(hbx_enrollments)
-    allow(hbx_enrollments).to receive(:sort_by).and_return(hbx_enrollments)
-    allow(hbx_enrollments).to receive(:reverse).and_return(hbx_enrollments)
     allow(hbx_enrollments).to receive(:reverse!).and_return(hbx_enrollments)
     allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)
@@ -317,6 +315,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         allow(Announcement).to receive(:current_msg_for_employee).and_return(["msg for Employee"])
         allow(Announcement).to receive(:audience_kinds).and_return(%w[Employer Employee IVL Broker GA Web_Page])
+        allow(hbx_enrollments).to receive(:sort_by).and_return(hbx_enrollments)
+        allow(hbx_enrollments).to receive(:reverse).and_return(hbx_enrollments)
         sign_in user
         get :home
       end
@@ -357,6 +357,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(person).to receive(:employee_roles).and_return(nil)
         allow(family).to receive(:active_family_members).and_return(family_members)
         allow(family).to receive(:check_for_consumer_role).and_return true
+        allow(hbx_enrollments).to receive(:sort_by).and_return(hbx_enrollments)
+        allow(hbx_enrollments).to receive(:reverse).and_return(hbx_enrollments)
         sign_in user
         get :home
       end
