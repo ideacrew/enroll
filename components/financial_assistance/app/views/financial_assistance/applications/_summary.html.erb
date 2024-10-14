@@ -68,12 +68,10 @@
 <%# Summary sections: Applicant summaries, Family Relationships, My Preferences, and My Household %>
 <% @summary_helper.sections.each do |section| %>
   <section>
-    <% subsections = section[:subsections] || [section] %> <%# handle standalone subsections like My Preferences and My Household %>
     <% if section[:section_title].present? %>
       <h2 class="mb-4"><%= section[:section_title] %></h2>
     <% end %>
-    <% subsections.each do |subsection| %>
-      <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: subsection} %>
-    <% end %>
+    <% subsections = section[:subsections] || [section] %> <%# handle standalone subsections like My Preferences and My Household %>
+    <%= render partial: 'financial_assistance/applications/summary_subsection', collection: subsections, as: :subsection %>
   </section>
 <% end %>

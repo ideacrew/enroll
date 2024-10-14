@@ -28,9 +28,7 @@
     <dl class=<%= 'mb-0' if is_nested %>>
       <% subsection[:rows].each do |row| %>
         <% if row.is_a?(Array) %> <%# nested section %>
-          <% row.each do |nested_section| %>
-            <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {subsection: nested_section, is_nested: true} %>
-          <% end %>
+          <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {is_nested: true}, collection: row, as: :subsection %>
         <% else %> <%# single row %>
           <div class="d-flex justify-content-between align-items-center">
             <dt class="col-8 px-0"><%= row[:key] %></dt>
