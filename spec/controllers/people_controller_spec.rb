@@ -51,7 +51,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
       allow(Person).to receive(:find).and_return(person)
       allow(Person).to receive(:where).and_return(Person)
       allow(Person).to receive(:first).and_return(person)
-      allow(controller).to receive(:validate_person_params).and_return(true)
+      allow(controller).to receive(:sanitize_person_params).and_return(true)
       allow(person).to receive(:consumer_role).and_return(consumer_role)
       allow(person).to receive(:employee_roles).and_return [employee_role]
       allow_any_instance_of(VlpDoc).to receive(:sensitive_info_changed?).and_return([false, false])
