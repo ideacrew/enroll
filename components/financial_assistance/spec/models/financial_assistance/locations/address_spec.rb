@@ -152,8 +152,34 @@ module FinancialAssistance
 
           context 'when county present' do
 
-            it 'returns true' do
-              expect(address.valid?).to eq true
+            let(:zip) {'02863'}
+            let(:county_zip_code) {'02863'}
+            let(:county) { 'Cumberland'}
+
+            before do
+              county_zip = BenefitMarkets::Locations::CountyZip.new(county_name: county, state: 'ME', zip: county_zip_code)
+              county_zip.save
+            end
+
+            context 'with invalid county/zip combination' do
+
+              let(:zip) { '0285864' }
+              it 'returns false' do
+                expect(address.valid?).to eq false
+              end
+            end
+
+            context 'with hyphenated zip code' do
+
+              it "returns true" do
+                expect(address.valid?).to eq true
+              end
+            end
+
+            context 'with valid county/zip' do
+              it 'returns true' do
+                expect(address.valid?).to eq true
+              end
             end
           end
 

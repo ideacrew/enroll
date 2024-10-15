@@ -92,9 +92,15 @@ class Address
 
   def county_check
     return unless EnrollRegistry.feature_enabled?(:display_county)
-    return if self.county.present?
     return if self.state&.downcase != EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase
-    errors.add(:county, 'not present')
+
+    if county.blank?
+      errors.add(:county, 'not present')
+    else
+      county_name = county.titlecase
+      formatted_zip = zip.match?(/-/) ? zip.split("-").first : zip
+      errors.add(:county, 'invalid county/zip') if ::BenefitMarkets::Locations::CountyZip.where(zip: formatted_zip, county_name: county_name).blank?
+    end
   end
 
   # @note Add support for GIS location
