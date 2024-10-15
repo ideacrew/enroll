@@ -2,6 +2,7 @@ module Forms
   class BulkActionsForAdmin
     include Acapi::Notifiers
     include Insured::FamiliesHelper
+    include ::ParseDateHelper
 
     attr_reader :result, :row, :family_id, :enrollment_id, :params, :config
 
@@ -137,12 +138,6 @@ module Forms
           "is_trading_partner_publishable" => transmit_flag
         }
       )
-    end
-
-    def parse_date(string)
-      return nil if string.blank?
-      date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
-      Date.strptime(string, date_format)
     end
   end
 end
