@@ -740,7 +740,7 @@ var PersonValidations = (function (window, undefined) {
         const homePhoneValue = homePhoneInput.value.replace(/\D/g, '');
 
         if (/^0+$/.test(homePhoneValue)) {
-          alert('Home Phone number cannot be all zeros1.');
+          alert('Home Phone number cannot be all zeros.');
         }
 
         if (
