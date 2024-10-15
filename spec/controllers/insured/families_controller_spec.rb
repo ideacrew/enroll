@@ -1364,7 +1364,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           let(:county_zip) { BenefitMarkets::Locations::CountyZip.create(zip: '04057', county_name: 'Cumberland', state: 'ME') }
 
           it 'should return true' do
-            binding.irb
             expect(response.body).to eq approved_response
           end
         end
