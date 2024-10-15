@@ -27,9 +27,11 @@ module Operations
       end
 
       def fetch_enrollments(values)
-        ::HbxEnrollment.by_year(values[:current_year]).where(
+        enrollments = ::HbxEnrollment.by_year(values[:current_year]).where(
           :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"])
         )
+        Failure("No enrollments found for year: #{values[:current_year]}") if enrollments.blank?
+        Success(enrollments)
       end
 
       def fetch_notice_report_file_name
@@ -48,18 +50,17 @@ module Operations
           ]
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def generate_report(enrollments, current_year)
         CSV.open(fetch_notice_report_file_name, 'w+', headers: true) do |csv|
           csv << fetch_notice_report_headers
-          puts "Generating report for #{enrollments.count} enrollments"
+          enrollment_count = enrollments.count
+          puts "Generating report for #{enrollment_count} enrollments"
           batch_size = 1000
           offset = 0
           renewal_year = current_year + 1
-
-          enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
-            puts "batch_size: #{batch_size}, offset: #{offset}"
-
-            begin
+          while offset < enrollment_count
+            enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
               renewal_enrollment = ::HbxEnrollment.by_year(renewal_year).where(predecessor_id: enrollment.id).first
               next if renewal_enrollment.blank?
 
@@ -74,7 +75,7 @@ module Operations
 
               renewal_enr_hbx_id = renewal_enrollment.hbx_id
               renewal_enr_product = renewal_enrollment.product
-              renewal_enr_product_hios_id = renewal_enr_product.hios_base_id
+              renewal_enr_product_hios_id = renewal_enr_product&.hios_base_id
 
               county = enrollment.consumer_role&.rating_address&.county
 
@@ -82,7 +83,11 @@ module Operations
             rescue StandardError => e
               Failure("Error raised while processing enrollment with id: #{enrollment_id}, error_message: #{e.message}, backtrace: #{e.backtrace}")
             end
+
+            puts "Processed #{offset} enrollments"
+            offset += batch_size
           end
+          # rubocop:enable Metrics/CyclomaticComplexity
 
           Success("Generated enrollments report successfully")
         end
