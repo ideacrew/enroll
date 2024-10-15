@@ -805,5 +805,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.employer_datatable_disabled_warning' => 'The Employer Data Table is Disabled',
   :'en.insured.plan_shopping.thankyou.agreement_terms_conditions' => 'You must complete Agreement and Terms and Conditions sections to continue.',
   :'en.insured.terminated_by_employer' => "You have been terminated by your employer %{employer_name} with an effective date of %{date}",
-  :'en.insured.coverage_will_begin' => "coverage will begin %{date}"
+  :'en.insured.coverage_will_begin' => "coverage will begin %{date}",
+  :'en.insured.invalid_phone_error' => "Person update failed, Phone number is invalid",
 }.freeze
