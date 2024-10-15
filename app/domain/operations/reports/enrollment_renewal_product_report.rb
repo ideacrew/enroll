@@ -27,7 +27,7 @@ module Operations
       end
 
       def fetch_enrollments(values)
-        enrollments = ::HbxEnrollment.by_year(values[:current_year]).where(
+        enrollments = ::HbxEnrollment.by_year(2024).where(
           :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"])
         )
         Failure("No enrollments found for year: #{values[:current_year]}") if enrollments.blank?
@@ -61,7 +61,7 @@ module Operations
           renewal_year = current_year + 1
           while offset < enrollment_count
             enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
-              renewal_enrollment = ::HbxEnrollment.by_year(renewal_year).where(predecessor_id: enrollment.id).first
+              renewal_enrollment = ::HbxEnrollment.by_year(renewal_year).where(predecessor_enrollment_id: enrollment.id).first
               next if renewal_enrollment.blank?
 
               family = enrollment.family
