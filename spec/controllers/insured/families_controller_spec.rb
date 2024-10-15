@@ -1372,7 +1372,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
           let(:old_zip) { '12312' }
 
-          it "should accept JS format" do
+          it "should accept JSON format" do
             expect(response).to have_http_status(:success)
           end
         end
