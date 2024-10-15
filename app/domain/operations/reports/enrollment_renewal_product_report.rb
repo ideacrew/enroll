@@ -35,7 +35,7 @@ module Operations
       end
 
       def fetch_notice_report_file_name
-        "#{Rails.root}/public/enrollment_renewal_product_report_#{TimeKeeper.date_of_record.strftime('%Y%m%d')}.csv"
+        "#{Rails.root}/enrollment_renewal_product_report_#{TimeKeeper.date_of_record.strftime('%Y%m%d')}.csv"
       end
 
       def fetch_notice_report_headers
@@ -84,14 +84,14 @@ module Operations
               Failure("Error raised while processing enrollment with id: #{enrollment_id}, error_message: #{e.message}, backtrace: #{e.backtrace}")
             end
 
-            puts "Processed #{offset} enrollments"
             offset += batch_size
+            puts "Processed #{offset} enrollments"
           end
-          # rubocop:enable Metrics/CyclomaticComplexity
 
           Success("Generated enrollments report successfully")
         end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
     end
   end
 end
