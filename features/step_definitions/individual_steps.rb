@@ -1533,6 +1533,10 @@ Then(/^.+ sees form to enter personal information with invalid phone number$/) d
     fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
   end
   fill_in IvlPersonalInformation.home_phone, :with => "2456765439"
+  sleep 10
+end
+
+And(/^Individual selects contact text check box/i) do
   find(IvlPersonalInformation.text_checkbox).click
   sleep 30
 end
