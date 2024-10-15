@@ -1306,7 +1306,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     # TODO: Refactor this
     # Will need to make it work without this
     # Also for MA too
-    if EnrollRegistry[:enroll_app].setting(:site_key) == 'me'
+    if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s == 'me'
       let!(:service_area) { FactoryBot.create(:benefit_markets_locations_service_area, covered_states: nil, county_zip_ids: [county_zip.id]) }
       let(:county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04330', county_name: 'Kennebec')}
       let(:approved_response) do
@@ -1317,7 +1317,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
       before(:each) do
         sign_in(user)
-        get :sep_zip_compare, params: {old_zip: old_zip, new_zip: new_zip}
+        get :sep_zip_compare, params: {old_zip: old_zip, new_zip: new_zip}, format: :json
       end
 
       context 'new zip is outside state' do
@@ -1359,9 +1359,22 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
             )
           end
           let(:old_zip) { old_county_zip.zip }
+          let(:new_zip) { '04057' }
+
+          let(:county_zip) { BenefitMarkets::Locations::CountyZip.create(zip: '04057', county_name: 'Cumberland', state: 'ME') }
 
           it 'should return true' do
+            binding.irb
             expect(response.body).to eq approved_response
+          end
+        end
+
+        context "with valid mime types" do
+
+          let(:old_zip) { '12312' }
+
+          it "should accept JS format" do
+            expect(response).to have_http_status(:success)
           end
         end
       end
