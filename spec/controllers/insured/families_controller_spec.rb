@@ -1306,13 +1306,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     # TODO: Refactor this
     # Will need to make it work without this
     # Also for MA too
-
-    before(:each) do
-      allow()
-      sign_in(user)
-      get :sep_zip_compare, params: {old_zip: old_zip, new_zip: new_zip}, format: :json
-    end
-
     if EnrollRegistry[:enroll_app].setting(:site_key) == 'me'
       let!(:service_area) { FactoryBot.create(:benefit_markets_locations_service_area, covered_states: nil, county_zip_ids: [county_zip.id]) }
       let(:county_zip) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04330', county_name: 'Kennebec')}
@@ -1321,6 +1314,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
       let(:rejected_response) do
         {is_approved: false}.to_json
+      end
+      before(:each) do
+        sign_in(user)
+        get :sep_zip_compare, params: {old_zip: old_zip, new_zip: new_zip}, format: :json
       end
 
       context 'new zip is outside state' do
