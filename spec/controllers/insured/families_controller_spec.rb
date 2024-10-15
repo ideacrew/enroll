@@ -1042,6 +1042,12 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           expect(response).to have_http_status(:success)
           expect(assigns['qualified_date']).to eq(true)
         end
+
+        it "returns qualified_date as true when date is in yyyy-mm-dd format" do
+          get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%Y-%m-%d"), :format => 'js'}, xhr: true
+          expect(response).to have_http_status(:success)
+          expect(assigns['qualified_date']).to eq(true)
+        end
       end
 
       context 'with the incorrect mime type' do

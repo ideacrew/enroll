@@ -1,9 +1,30 @@
-<div>
-<h4><%= filter_name %></h4>
-From:
-<input type="text" id="custom_datatable_date_from" class="datepicker">&nbsp;<i class="fa fa-calendar datepicker" aria-hidden="true"></i>
-&nbsp;&nbsp;&nbsp;&nbsp;To:
-<input type="text" id="custom_datatable_date_to" class="datepicker">&nbsp;<i class="fa fa-calendar datepicker" aria-hidden="true"></i>
-&nbsp;&nbsp;<div class="btn btn-default" id="date_range_apply">Apply</div>
-</div>
-<br>
+<% if @bs4 %>
+  <div class='pb-2'>
+    <legend class='mt-4 mb-2'><%= filter_name %></legend>
+    <div class='row mx-0 align-items-end'>
+      <div class='col-2 pl-0 pr-2 pb-3 border-bottom'>
+        <%= label_tag 'custom_datatable_date_from', l10n('from'), class: 'datepicker required' %>
+        <%= date_field_tag 'custom_datatable_date_from', nil, id: 'custom_datatable_date_from', class: 'w-100' %>
+      </div>
+      <div class='col-2 pr-0 pl-2 pb-3 border-bottom'>
+        <%= label_tag 'custom_datatable_date_to', l10n('to'), class: 'datepicker required' %>
+        <%= date_field_tag "custom_datatable_date_to", nil, id: 'custom_datatable_date_to', class: 'w-100' %>
+      </div>
+      <div class='col-2 pl-3 pb-3 border-bottom'>
+        <div class="btn btn-default" id="date_range_apply"><%=  l10n('hbx_profiles.apply_filters') %></div>
+      </div>
+    </div>
+  </div>
+  <br>
+<% else %>
+  <div>
+    <h4><%= filter_name %></h4>
+    From:
+    <input type="text" id="custom_datatable_date_from" class="datepicker">&nbsp;<i class="fa fa-calendar datepicker" aria-hidden="true"></i>
+    &nbsp;&nbsp;&nbsp;&nbsp;To:
+    <input type="text" id="custom_datatable_date_to" class="datepicker">&nbsp;<i class="fa fa-calendar datepicker" aria-hidden="true"></i>
+    &nbsp;&nbsp;<div class="btn btn-default" id="date_range_apply">Apply</div>
+  </div>
+  <br>
+<% end %>
+
