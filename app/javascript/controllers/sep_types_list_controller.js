@@ -1,6 +1,5 @@
 import { Controller } from "stimulus"
 import Sortable from "sortablejs"
-import Rails from 'rails-ujs';
 
 var bs4 = document.documentElement.dataset.bs4 == "true";
 
@@ -13,7 +12,7 @@ export default class extends Controller {
     return this.marketTabTarget.id;
   }
 
-  /** 
+  /**
   * Create the managers used to handle update list requests.
   */
   initialize() {
@@ -23,14 +22,14 @@ export default class extends Controller {
     }
   }
 
-  /** 
+  /**
   * Configure the order manager to handle sorting the QLE list.
   */
 	connect() {
     this.orderManager.configureSortable();
 	}
 
-  /** 
+  /**
   * Update the threshold in the threshold manager.
   */
   setThreshold() {
@@ -58,7 +57,7 @@ class UpdateListManager {
       body: JSON.stringify(body),
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-Token': Rails.csrfToken()
+        'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
       }
     });
 
@@ -86,14 +85,14 @@ class UpdateListManager {
       var flashDiv = $("#sort_notification_msg");
       var flashHeader = flashDiv.find(".toast-header");
       flashDiv.show();
-      
+
       flashDiv.removeClass("success").removeClass("error");
       flashDiv.toggleClass("success", isSuccess).toggleClass("error", !isSuccess);
       flashHeader.removeClass("success").removeClass("error");
       flashHeader.toggleClass("success", isSuccess).toggleClass("error", !isSuccess);
-      
+
       flashHeader.find("strong").text(bannerTitle);
-     
+
       var flashBody = flashDiv.find(".toast-body");
       if (bannerDescription) {
         flashBody.removeClass("hidden").text(bannerDescription);
@@ -110,13 +109,13 @@ class UpdateListManager {
 
 // Manages the sorting of the SEP types list.
 class UpdateOrderManager extends UpdateListManager {
-  
+
   constructor(marketKind, qleListTarget) {
     super(marketKind);
     this.qleListTarget = qleListTarget;
   }
 
-  /** 
+  /**
   * Initialize the sortable library and set the endDrag callback.
   */
   configureSortable() {
@@ -126,14 +125,14 @@ class UpdateOrderManager extends UpdateListManager {
 		});
   }
 
-  /** 
+  /**
   * Handle updating the sort order for a QLE list.
   * Performs the PATCH request and shows the response banner.
   */
 	endDrag(event) {
     let card = event.item;
     let originalPosition = parseInt(card.dataset.index);
-    
+
     let cards = $(this.qleListTarget).find('.card').get();
     if (cards[originalPosition].dataset.id === card.dataset.id) { // If the card was not moved, do not sort the list
       return;
@@ -159,7 +158,7 @@ class UpdateThresholdManager extends UpdateListManager {
     this.qleList = $(qleListTarget);
   }
 
-  /** 
+  /**
   * Handle updating the commonality threshold for a QLE list.
   * Performs the PATCH request, then updates the threshold marker element and shows the banner based on the response.
   */
