@@ -19,6 +19,7 @@ ADMIN_ACTIONS_TRANSLATIONS = {
   'en.admin.config.set_day_failure' => "Failed to set date of record, %{error_message}",
   'en.admin_actions.bulk_upload.new.description_text' => 'Use this tool to send the same message or notice to a specific set of users. Copy and paste the FEINs or HBX IDs for the users who should get the message in their secure inbox. Remember, each FEIN or HBX ID must be separated by a comma.',
   'en.admin_actions.bulk_upload.new.description_sub_text' => 'The message and any attachments will be the same for everyone on the recipient list – they cannot be personalized. You can attach files in PDF, JPEG, or PNG formats.',
+  'en.admin_actions.bulk_upload.audience_type' => 'Select audience type',
   'en.admin_actions.bulk_upload.new.zero_more' => '0 more...',
   'en.admin_actions.bulk_upload.new.less' => 'Less...',
   'en.admin_actions.bulk_upload.new.recipient_placeholder' => 'FEINs or HBX IDs, comma separated',

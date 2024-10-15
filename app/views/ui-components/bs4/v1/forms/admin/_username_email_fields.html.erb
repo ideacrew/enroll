@@ -1,0 +1,23 @@
+<div class='row mb-3'>
+  <div class="col-md-6 pl-0">
+    <%= label_tag 'inputNewUsername', l10n('hbx_profiles.user_accounts.actions.edit.username'), class: 'required' %>
+    <%= text_field_tag :new_oim_id, @user.oim_id,
+      id: 'inputNewUsername',
+      class: 'form-control w-100',
+      placeholder: l10n('hbx_profiles.user_accounts.actions.edit.username_placeholder'),
+      minimum_length: min_username_length,
+      maximum_length: max_username_length,
+      required: true
+    %>
+  </div>
+
+  <div class="col-md-6 col-sm-6 pr-0">
+    <%= label_tag "inputNewEmail", l10n('hbx_profiles.user_accounts.actions.edit.email'), class: 'required' %>
+    <%= text_field_tag :new_email, @user.email,
+      class:"form-control w-100",
+      id:'inputNewEmail',
+      placeholder: l10n('hbx_profiles.user_accounts.actions.edit.email_placeholder')
+    %>
+    <%= hidden_field :family_actions_id, :value => "family_actions_#{@user.id.to_s}" %>
+  </div>
+</div>
