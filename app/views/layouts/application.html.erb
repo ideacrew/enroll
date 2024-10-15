@@ -15,7 +15,7 @@
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
     <%= csrf_meta_tags %>
 
-
+    <meta name="csp-nonce" content="<%= content_security_policy_nonce %>"/>
 
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
