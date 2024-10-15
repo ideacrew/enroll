@@ -46,6 +46,7 @@ RSpec.describe ::Operations::IvlOsseEligibilities::RenewIvlOsseEligibility,
 
   before do
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
     catalog_eligibility
   end
 
