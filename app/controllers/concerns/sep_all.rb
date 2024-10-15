@@ -1,4 +1,5 @@
 module SepAll
+  include ::ParseDateHelper
 
   def calculateDates
     @family = Family.find(params[:person]) if params[:person].present?
@@ -248,11 +249,5 @@ module SepAll
       end
     end
    returnData == 'yes' ? init_arr : init_arr.length;
-  end
-
-  def parse_date(string)
-    return nil if string.blank?
-    date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
-    Date.strptime(string, date_format)
   end
 end

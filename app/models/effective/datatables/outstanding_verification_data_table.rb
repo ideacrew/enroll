@@ -16,19 +16,25 @@ module Effective
       end
 
       def load_verification_type_columns
-        table_column :name, :label => 'Name', :proc => proc { |row|
+        table_column :name, :label => l10n('name'), :proc => proc { |row|
           link_to_with_noopener_noreferrer(h(row.primary_applicant.person.full_name), resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id))
         }, :filter => false, :sortable => true
         unless EnrollRegistry.feature_disabled?(:mask_ssn_ui_fields) # rubocop:disable Style/IfUnlessModifier --> not disabling this rule will break the code or result in more rubocop errors, and will be remedied when feature flag is removed
-          table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
+          table_column :ssn, :label => l10n('ssn'), :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         end
-        table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
-        table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
-        table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => proc { |row| row.vlp_documents_status}, :filter => false, :sortable => true
-        table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(row.best_verification_due_date) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
-        table_column :outstanding_verification_types, :label => 'Outstanding Verification Types',:proc => proc { |row|  outstanding_person_verification_types(row) }, :filter => false, :sortable => false
-        table_column :actions, :width => '50px', :proc => proc { |row|
+        table_column :dob, :label => l10n('dob'), :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
+        table_column :hbx_id, :label => l10n('hbx_id'), :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
+        table_column :count, :label => l10n('count'), :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
+        table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row|
+          row.vlp_documents_status
+        }, :filter => false, :sortable => true
+        table_column :verification_due, :label => l10n('hbx_profiles.outstanding_verifications.table.verification_due'),:proc => proc { |row|
+          format_date(row.best_verification_due_date) || format_date(default_verification_due_date)
+        }, :filter => false, :sortable => true
+        table_column :outstanding_verification_types, :label => l10n('hbx_profiles.outstanding_verifications.table.outstanding_verification_types'), :proc => proc { |row|
+          outstanding_person_verification_types(row)
+        }, :filter => false, :sortable => false
+        table_column :actions, :label => l10n('actions'), :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => row.primary_applicant.person.id),"static"]
           ]
@@ -37,19 +43,25 @@ module Effective
       end
 
       def load_eligibility_determination_columns
-        table_column :name, :label => 'Name', :proc => proc { |row|
+        table_column :name, :label => l10n('name'), :width => '20%', :proc => proc { |row|
           link_to_with_noopener_noreferrer(eligibility_primary_name(row), resume_enrollment_exchanges_agents_path(person_id: eligibility_primary_family_member(row).person_id))
         }, :filter => false, :sortable => true
         unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) # rubocop:disable Style/IfUnlessModifier --> not disabling this rule will break the code or result in more rubocop errors, and will be remedied when feature flag is removed
-          table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(eligibility_primary_ssn(row))) }, :filter => false, :sortable => false
+          table_column :ssn, :label => l10n('ssn'), :proc => proc { |row| truncate(number_to_obscured_ssn(eligibility_primary_ssn(row))) }, :filter => false, :sortable => false
         end
-        table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(eligibility_primary_family_member(row).dob)}, :filter => false, :sortable => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false
-        table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
-        table_column :documents_uploaded, :label => 'Documents Uploaded', :proc => proc { |row| document_status_for(row)}, :filter => false, :sortable => true
-        table_column :verification_due, :label => 'Verification Due',:proc => proc { |row|  format_date(eligibility_earliest_due_date(row)) || format_date(default_verification_due_date) }, :filter => false, :sortable => true
-        table_column :outstanding_verification_types, :label => 'Outstanding Verification Types',:proc => proc { |row|  outstanding_verification_types(row) }, :filter => false, :sortable => false
-        table_column :actions, :width => '50px', :proc => proc { |row|
+        table_column :dob, :label => l10n('dob'), :proc => proc { |row| format_date(eligibility_primary_family_member(row).dob)}, :filter => false, :sortable => false
+        table_column :hbx_id, :label => l10n('hbx_id'), :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false
+        table_column :count, :label => l10n('hbx_profiles.outstanding_verifications.table.count'), :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
+        table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row|
+          document_status_for(row)
+        }, :filter => false, :sortable => true
+        table_column :verification_due, :label => l10n('hbx_profiles.outstanding_verifications.table.verification_due'),:proc => proc { |row|
+          format_date(eligibility_earliest_due_date(row)) || format_date(default_verification_due_date)
+        }, :filter => false, :sortable => true
+        table_column :outstanding_verification_types, :label => l10n('hbx_profiles.outstanding_verifications.table.outstanding_verification_types'),:proc => proc { |row|
+          outstanding_verification_types(row)
+        }, :filter => false, :sortable => false
+        table_column :actions, :label => l10n('actions'), :width => '50px', :proc => proc { |row|
           dropdown = [
            ["Review", show_docs_documents_path(:person_id => eligibility_primary_family_member(row).person_id),"static"]
           ]

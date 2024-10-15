@@ -2064,10 +2064,19 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     before do
       controller.instance_variable_set("@name", person.first_name)
       allow(controller).to receive(:sep_params).and_return(sep_params)
+      sign_in(user)
     end
 
     it "sets effective date to match next poss effective date if present" do
-      sign_in(user)
+      post :add_new_sep, params: sep_params, format: :js, xhr: true
+      person.primary_family.reload
+      expect(effective_on).to eql(next_poss_effective_date)
+    end
+
+    it "sets effective date to match next poss effective date if present in yyyy-mm-dd format" do
+      sep_params[:start_on] = Date.strptime(sep_params[:start_on], '%m/%d/%Y').strftime('%Y-%m-%d')
+      sep_params[:end_on] = Date.strptime(sep_params[:end_on], '%m/%d/%Y').strftime('%Y-%m-%d')
+
       post :add_new_sep, params: sep_params, format: :js, xhr: true
       person.primary_family.reload
       expect(effective_on).to eql(next_poss_effective_date)
