@@ -638,5 +638,6 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.contact_option.email' => "Email",
   :'en.insured.contact_option.mail' => "Mail",
   :'en.insured.terminated_by_employer' => "You have been terminated by your employer %{employer_name} with an effective date of %{date}",
-  :'en.insured.coverage_will_begin' => "coverage will begin %{date}"
+  :'en.insured.coverage_will_begin' => "coverage will begin %{date}",
+  :'en.insured.invalid_phone_error' => "Person update failed, Phone number is invalid",
 }.freeze

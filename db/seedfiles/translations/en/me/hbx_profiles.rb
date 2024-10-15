@@ -1,4 +1,5 @@
 HBX_PROFILES_TRANSLATIONS = {
+	"en.hbx_profiles.apply_filters" => "Apply Filters",
 	"en.hbx_profiles.employer_name" => "Employer Name",
 	"en.hbx_profiles.effective_date" => "Effective Date",
 	"en.hbx_profiles.open_enrollment_end_date" => "Open Enrollment End Date",
@@ -120,6 +121,11 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure" => "User Account Update Failed",
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure.username_subheader" => "The username matches with the following user:",
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure.email_subheader" => "The email matches with the following user:",
+  # Outstanding Verfications Tab
+  "en.hbx_profiles.outstanding_verifications.header" => "Outstanding Verifications",
+  "en.hbx_profiles.outstanding_verifications.table.documents_uploaded" => "Docs Uploaded",
+  "en.hbx_profiles.outstanding_verifications.table.verification_due" => "Verification Due",
+  "en.hbx_profiles.outstanding_verifications.table.outstanding_verification_types" => "Outstanding Verification Types",
 	# Admin
   'en.admin.config.header' => 'Configuration',
   'en.admin.announcements' => 'Announcements',

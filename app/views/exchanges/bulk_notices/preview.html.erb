@@ -20,7 +20,7 @@
                   <span class="badge badge-status badge-grey mb-2 mr-1">
                     <%= f.hidden_field :audience_ids, multiple: true, value: identifier %>
                     <%= BenefitSponsors::Organizations::Organization.find(identifier).hbx_id %>&nbsp;
-                    <a data-action='bulk-notice#deleteIdentifier' class='text-white' aria-label="Close" href>
+                    <a data-action='bulk-notice#deleteIdentifier' class='text-white' aria-label="<%= l10n('close') %>" href>
                       <i class="far fa-times-circle"></i>
                     </a>
                   </span>
@@ -47,7 +47,7 @@
             <td>
               <% @bulk_notice.documents.each_with_index do |document, i| %>
                 <div class='py-1'>
-                  <span><%= document.title %>&nbsp;<a data-action='bulk-notice#deleteFile' href><i class="fas fa-times-circle"></i></a></span>
+                  <span><%= document.title %>&nbsp;<a data-action='bulk-notice#deleteFile' aria-label="<%= l10n('remove') %>" href><i class="fas fa-times-circle"></i></a></span>
                   <%= f.hidden_field "documents_attributes][#{i}][id", value: document.id %>
                   <%= f.hidden_field "documents_attributes][#{i}][_destroy", value: 'false' %>
                 </div>

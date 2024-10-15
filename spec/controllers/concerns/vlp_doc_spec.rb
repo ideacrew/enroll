@@ -13,12 +13,22 @@ describe FakesController do
   context "documents updating" do
     shared_examples_for "updating consumer documents" do |params|
       let(:person_kind) { params.split("_").first.to_sym }
+      let(:params_date) { person_params[:person][:consumer_role][:vlp_documents_attributes]['0'][:expiration_date] }
+      let(:yyyy_mm_dd_date) { Date.strptime(params_date, '%m/%d/%Y').strftime('%Y-%m-%d') }
+
       before :each do
         subject.instance_variable_set("@params", send(params))
         allow(subject).to receive(:params).and_return(send(params))
       end
 
       it "should convert the date string to dateTime instance" do
+        expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(String)
+        expect(subject.update_vlp_documents(consumer_role, person_kind))
+        expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(Date)
+      end
+
+      it "should convert the date string to dateTime instance when date is yyyy-mm-dd format" do
+        subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = yyyy_mm_dd_date
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(String)
         expect(subject.update_vlp_documents(consumer_role, person_kind))
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(Date)
@@ -40,13 +50,13 @@ describe FakesController do
   end
 
   context "#get_vlp_doc_subject_by_consumer_role" do
-    let(:vlp_doc_naturalized) { FactoryBot.build(:vlp_document, :subject => "Certificate of Citizenship" ) }
-    let(:vlp_doc_immigrant) { FactoryBot.build(:vlp_document, :subject => "I-327 (Reentry Permit)" ) }
+    let(:vlp_doc_naturalized) { FactoryBot.build(:vlp_document, :subject => "Certificate of Citizenship") }
+    let(:vlp_doc_immigrant) { FactoryBot.build(:vlp_document, :subject => "I-327 (Reentry Permit)") }
     shared_examples_for "returns vlp document subject" do |doc_subject, citizen_status|
       before do
         consumer_role.vlp_documents = [vlp_doc_naturalized, vlp_doc_immigrant]
       end
-      describe "#{citizen_status}" do
+      describe citizen_status.to_s do
         before do
           consumer_role.vlp_documents = []
           consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :subject => doc_subject)

@@ -179,6 +179,18 @@ describe Forms::BulkActionsForAdmin do
         expect(hbx_enrollment.terminated_on).to eq current_effective_date.end_of_month
       end
 
+      it "should terminate enrollment and not trigger terminate event with date format yyyy-mm-dd" do
+        yyyy_date = current_effective_date.end_of_month.strftime('%Y-%m-%d')
+        subject.params["termination_date_#{hbx_enrollment.id}"] = yyyy_date
+        expect(subject).not_to receive(:notify).with("acapi.info.events.hbx_enrollment.terminated", {:reply_to => glue_event_queue_name, "hbx_enrollment_id" => hbx_enrollment.hbx_id,
+                                                                                                     "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+                                                                                                     "is_trading_partner_publishable" => false})
+        subject.terminate_enrollments
+        hbx_enrollment.reload
+        expect(hbx_enrollment.aasm_state).to eq "coverage_termination_pending"
+        expect(hbx_enrollment.terminated_on).to eq current_effective_date.end_of_month
+      end
+
       context "not a shop enrollment" do
         before do
           hbx_enrollment.update_attributes(kind: "individual", sponsored_benefit_package_id: nil)

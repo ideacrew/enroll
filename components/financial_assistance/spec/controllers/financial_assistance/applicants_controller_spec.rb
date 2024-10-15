@@ -745,3 +745,37 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     end
   end
 end
+
+RSpec.describe FinancialAssistance::ApplicantsController, type: :controller do
+  let(:date) { Date.today }
+  let(:slash_date) { date.strftime('%m/%d/%Y') }
+  let(:hyphen_date) { date.strftime('%Y-%m-%d') }
+  let(:fake_date) { '12/47' }
+
+  describe 'private methods' do
+    controller(FinancialAssistance::ApplicantsController) do
+      public :format_date_params
+    end
+
+    it 'format_date_params parses mm/dd/yyyy strings correctly' do
+      model_params = { 'student_status_end_on' => slash_date }
+
+      @controller.send(:format_date_params, model_params)
+      expect(model_params['student_status_end_on']).to eq(date)
+    end
+
+    it 'format_date_params parses yyyy-mm-dd strings correctly' do
+      model_params = { 'person_coverage_end_on' => hyphen_date }
+
+      @controller.send(:format_date_params, model_params)
+      expect(model_params['person_coverage_end_on']).to eq(date)
+    end
+
+    it 'format_date_params returns nil on invalid date' do
+      model_params = { 'medicaid_cubcare_due_on' => fake_date }
+
+      @controller.send(:format_date_params, model_params)
+      expect(model_params['medicaid_cubcare_due_on']).to eq(nil) # invalid date returns nil
+    end
+  end
+end
