@@ -70,7 +70,7 @@ module Operations
 
               enr_product = enrollment&.product
               enr_base_hios_id = enr_product&.hios_base_id
-              renewal_product = enrollment&.renewal_product
+              renewal_product = enr_product&.renewal_product
               renewal_product_hios_id = renewal_product&.hios_base_id
 
               renewal_enr_hbx_id = renewal_enrollment.hbx_id
