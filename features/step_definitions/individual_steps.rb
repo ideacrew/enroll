@@ -185,32 +185,6 @@ Then(/^.+ sees form to enter personal information$/) do
   sleep 30
 end
 
-Then(/^.+ sees form to enter personal information with invalid phone number$/) do
-  find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
-  find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
-  find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
-  find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  #find(IvlPersonalInformation.tobacco_user_yes_radiobtn).click if tobacco_user_field_enabled?
-  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
-  fill_in IvlPersonalInformation.address_line_two, :with => "212"
-
-  if EnrollRegistry[:bs4_consumer_flow].enabled?
-    fill_in IvlPersonalInformation.city, with: 'Augusta'
-    find(IvlPersonalInformation.select_me_state).click
-    fill_in IvlPersonalInformation.zip, with: '04330'
-    fill_in IvlPersonalInformation.mobile_phone, :with => "0000000000"
-  else
-    fill_in IvlPersonalInformation.city, with: personal_information[:city]
-    find_all(IvlPersonalInformation.select_state_dropdown).first.click
-    fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
-    find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
-    fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
-  end
-  fill_in IvlPersonalInformation.home_phone, :with => "2456765439"
-  find(IvlPersonalInformation.text_checkbox).click
-  sleep 30
-end
-
 Then(/Individual should see an message warning about invalid phone/) do
   text = page.driver.browser.switch_to.alert.text
   expect(text).to eq 'Mobile Phone number cannot be all zeros.'
@@ -1535,4 +1509,35 @@ end
 And(/^the Continue button is visible on Account Setup page/i) do
   continue_button = find('a.interaction-click-control-continue')
   expect(continue_button).to be_visible
+end
+
+Then(/^.+ sees form to enter personal information with invalid phone number$/) do
+  find('#person_us_citizen_true').click
+  find('#person_naturalized_citizen_false').click
+  find('#indian_tribe_member_no').click
+  find("#radio_incarcerated_no").click
+  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
+  fill_in IvlPersonalInformation.address_line_two, :with => "212"
+
+  if EnrollRegistry[:bs4_consumer_flow].enabled?
+    fill_in IvlPersonalInformation.city, with: 'Augusta'
+    find("#inputState").click
+    find_all('.interaction-choice-control-inputstate-24').first.click
+    fill_in IvlPersonalInformation.zip, with: '04330'
+    fill_in IvlPersonalInformation.mobile_phone, :with => "0000000000"
+  else
+    fill_in IvlPersonalInformation.city, with: personal_information[:city]
+    find_all(IvlPersonalInformation.select_state_dropdown).first.click
+    fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+    find_all(:xpath, "//li[contains(., '#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}')]").last.click
+    fill_in IvlPersonalInformation.zip, :with => EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item
+  end
+  fill_in IvlPersonalInformation.home_phone, :with => "2456765439"
+  find(IvlPersonalInformation.text_checkbox).click
+  sleep 30
+end
+
+And(/^.+ clicks? on the Continue button of the Account Setup page with bs4 enabled$/i) do
+  wait_for_ajax
+  find(".interaction-click-control-continue").click
 end
