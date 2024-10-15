@@ -27,7 +27,7 @@ module Operations
       end
 
       def fetch_enrollments(values)
-        enrollments = ::HbxEnrollment.by_year(2024).where(
+        enrollments = ::HbxEnrollment.by_year(values[:current_year]).where(
           :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"])
         )
         Failure("No enrollments found for year: #{values[:current_year]}") if enrollments.blank?
