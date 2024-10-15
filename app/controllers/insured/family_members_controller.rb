@@ -357,9 +357,9 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def reset_consumer_coverage_fields
-    permitted_dependent_params = params.require(:dependent).permit!.to_h
+    dependent_params = dependent_person_params[:dependent].to_h
 
-    if permitted_dependent_params["is_applying_coverage"] == "false"
+    if dependent_params["is_applying_coverage"] == "false"
       fields_to_unset = {
         us_citizen: nil,
         naturalized_citizen: nil,
@@ -369,11 +369,11 @@ class Insured::FamilyMembersController < ApplicationController
       }
 
       fields_to_unset.each do |field, value|
-        permitted_dependent_params[field.to_s] = value
+        dependent_params[field.to_s] = value
       end
     end
 
-    params[:dependent] = permitted_dependent_params
+    params[:dependent] = dependent_params
   end
 
   def init_address_for_dependent
