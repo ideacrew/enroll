@@ -662,7 +662,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         message = {error: e.to_s}
       end
     else
-      message = {notice: "Unable to find Enrollment."}
+      message = {notice: @bs4 ? l10n("hbx_profiles.reinstate.result.failure") : "Unable to find Enrollment."}
       redirect_to exchanges_hbx_profiles_root_path, flash: message
     end
   end
