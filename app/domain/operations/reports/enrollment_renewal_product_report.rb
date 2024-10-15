@@ -68,9 +68,9 @@ module Operations
               primary_hbx_id = family&.primary_applicant&.person&.hbx_id
               enr_hbx_id = enrollment.hbx_id
 
-              enr_product = enrollment.product
-              enr_base_hios_id = enr_product.hios_base_id
-              renewal_product = enrollment.renewal_product
+              enr_product = enrollment&.product
+              enr_base_hios_id = enr_product&.hios_base_id
+              renewal_product = enrollment&.renewal_product
               renewal_product_hios_id = renewal_product&.hios_base_id
 
               renewal_enr_hbx_id = renewal_enrollment.hbx_id
