@@ -2307,6 +2307,7 @@ RSpec.describe ConsumerRole, dbclean: :after_each, type: :model do
       before do
         allow(EnrollRegistry).to receive(:feature?).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
         catalog_eligibility
       end
 
