@@ -51,4 +51,15 @@ module TimeHelper
 
     has_only_employee_role || (has_dual_roles && %w[shop fehb].include?(market_kind))
   end
+
+  # Fetches the transformed input_time as a string.
+  # If the transformation fails, returns the original input_time.
+  #
+  # @param input_time [Time] The time to be transformed.
+  # @return [String, Time] The transformed input_time as a string or the original input_time.
+  def convert_time_to_string(input_time)
+    ::AcaEntities::Operations::DateTimeTransforms::ConvertTimeToString.new.call(
+      { time: input_time }
+    ).success || input_time
+  end
 end
