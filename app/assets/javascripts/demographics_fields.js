@@ -734,6 +734,7 @@ var PersonValidations = (function (window, undefined) {
           alert('Mobile Phone number cannot be all zeros.');
         } else if (phoneValue.length < 1 || phoneValue.length < 10) {
           alert('You must enter a mobile phone number to receive notices and updates by text.');
+          PersonValidations.restoreRequiredAttributes(e);
         }
 
         const homePhoneInput = document.querySelector('.home-phone-number');
@@ -741,6 +742,7 @@ var PersonValidations = (function (window, undefined) {
 
         if (/^0+$/.test(homePhoneValue)) {
           alert('Home Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
         }
 
         if (
@@ -750,8 +752,8 @@ var PersonValidations = (function (window, undefined) {
           alert(
             'An additional contact method is required if only Text is selected.'
           );
+          PersonValidations.restoreRequiredAttributes(e);
         }
-      PersonValidations.restoreRequiredAttributes(e);
       }
 
       if (!$('#contact_type_text').prop('checked')) {
@@ -762,6 +764,7 @@ var PersonValidations = (function (window, undefined) {
 
         if (/^0+$/.test(mobilePhoneValue)) {
           alert('Mobile Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
         }
 
         // Check home phone number
@@ -770,8 +773,8 @@ var PersonValidations = (function (window, undefined) {
 
         if (/^0+$/.test(homePhoneValue)) {
           alert('Home Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
         }
-      PersonValidations.restoreRequiredAttributes(e);
       }
     }
   }
