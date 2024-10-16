@@ -10,7 +10,6 @@ class Insured::FamilyMembersController < ApplicationController
 
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
-  # before_action :set_dependent_and_family, only: [:edit]
   before_action :set_dependent_and_family, only: [:destroy, :show, :update, :edit]
   before_action :set_cache_headers, only: [:edit, :new]
 
