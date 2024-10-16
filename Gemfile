@@ -117,6 +117,7 @@ gem 'dry-configurable', '0.13.0'
 gem 'dry-container', '0.9.0'
 gem 'devise-security'
 gem 'file_validators'
+gem 'actiontext', '6.1.7.9'
 
 group :development do
   gem "certified",              '~> 1'
