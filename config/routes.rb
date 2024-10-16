@@ -39,7 +39,7 @@ Rails.application.routes.draw do
   get 'unsupported_browser' => 'users#unsupported_browser'
 
   match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
-  match "hbx_admin/registry" => "hbx_admin#registry", as: :registry, via: :get
+  match "hbx_admin/registry" => "exchanges/hbx_profiles#registry", as: :registry, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
   get "qna_bot", to: 'welcome#qna_bot'
   post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
@@ -55,8 +55,8 @@ Rails.application.routes.draw do
     post "/security_question_responses/replace", controller: "users/security_question_responses", action: 'replace'
 
     member do
-      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email
-      put :confirm_reset_password, :confirm_change_username_and_email
+      get :login_history, :change_username_and_email
+      put :confirm_change_username_and_email
 
       post :unlock
     end

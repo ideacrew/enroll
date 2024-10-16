@@ -3,6 +3,7 @@
 module Queries
   # Datatable query for eligibilities in outtstanding verification state
   class EligibilitiesOutstandingVerificationDatatableQuery
+    include ::ParseDateHelper
 
     attr_reader :search_string, :custom_attributes
 
@@ -23,10 +24,11 @@ module Queries
       family = klass
       family = family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
-        from_date = Date.strptime(@custom_attributes[:custom_datatable_date_from], "%m/%d/%Y")
-        to_date = Date.strptime(@custom_attributes[:custom_datatable_date_to], "%m/%d/%Y")
+        from_date = parse_date(@custom_attributes[:custom_datatable_date_from])
+        to_date = parse_date(@custom_attributes[:custom_datatable_date_to])
         family = family.eligibility_due_date_in_range(from_date, to_date)
       end
+
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
 

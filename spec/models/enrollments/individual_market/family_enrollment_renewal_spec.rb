@@ -328,6 +328,44 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
 
+      context "fetch cross walk product for renewal" do
+        let!(:cross_product) do
+          prod =
+            FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile,
+                              benefit_market_kind: :aca_individual, kind: :health, service_area: renewal_service_area, csr_variant_id: '01',
+                              metal_level_kind: 'silver', hios_id: "33653ME0560006-01", hios_base_id: "33653ME0560006",
+                              application_period: renewal_application_period)
+          prod.premium_tables = [renewal_premium_table]
+          prod.save
+          prod
+        end
+
+        before do
+          subject.enrollment.product.update_attributes(hios_base_id: "33653ME0560001", hios_id: "33653ME0560001-01")
+        end
+
+        it "should fetch cross walk product for renewal for year 2025" do
+          subject.enrollment&.consumer_role&.rating_address&.update_attributes(county: "Hancock")
+          renewal = subject.renew
+          if subject.renewal_coverage_start.year == 2025
+            expect(renewal.product.hios_id).to eq cross_product.hios_id
+          else
+            expect(renewal.product.hios_id).to eq renewal_product.hios_id
+          end
+        end
+
+        it "should fetch renewal product for renewal" do
+          renewal = subject.renew
+          expect(renewal.product.hios_id).to eq renewal_product.hios_id
+        end
+
+        it "should fetch renewal product for renewal for dental" do
+          subject.enrollment.update_attributes(coverage_kind: "dental")
+          renewal = subject.renew
+          expect(renewal.product.hios_id).to eq renewal_product.hios_id
+        end
+      end
+
       context "renew coverall product" do
         subject do
           enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
@@ -1019,6 +1057,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:child1_dob) { current_date.next_month - 25.years }
 
           it "should return renewal product" do
+            subject.instance_variable_set(:@cross_walk_product, renewal_product)
             expect(subject.renewal_product).to eq renewal_product.id
           end
         end
@@ -1124,6 +1163,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let!(:csr_02_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-02", hios_base_id: "11111111122302", csr_variant_id: "02") }
         let!(:csr_03_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-03", hios_base_id: "11111111122302", csr_variant_id: "03") }
 
+        before do
+          subject.instance_variable_set(:@cross_walk_product, renewal_product)
+        end
+
         context "and have different CSR amount for renewal product year" do
           let(:aptc_values) {{ csr_amt: "87" }}
 
@@ -1148,6 +1191,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it "should return renewal product id" do
             family_enrollment_instance.enrollment = enrollment
             family_enrollment_instance.aptc_values = {}
+            family_enrollment_instance.instance_variable_set(:@cross_walk_product, renewal_product)
             expect(family_enrollment_instance.assisted_renewal_product).to eq renewal_product.id
           end
         end
@@ -1195,6 +1239,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let!(:renewal_product) { FactoryBot.create(:renewal_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
         let!(:current_product) { FactoryBot.create(:active_ivl_gold_health_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
 
+        before do
+          subject.instance_variable_set(:@cross_walk_product, renewal_product)
+        end
+
         it "should return regular renewal product" do
           expect(subject.assisted_renewal_product).to eq renewal_product.id
         end
@@ -1212,6 +1260,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         before :each do
           ::BenefitMarkets::Products::HealthProducts::HealthProduct.silver_plans.update_all(metal_level_kind: :bronze)
           enrollment.product.update_attributes!(renewal_product_id: renewal_product.id)
+          subject.instance_variable_set(:@cross_walk_product, renewal_product)
         end
         it "should default to 01 variant if no other plan found" do
           expect(subject.assisted_renewal_product).to eq csr_01_product.id
@@ -1253,6 +1302,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           family_assisted.active_household.reload
           update_age_off_excluded(family_assisted, false)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+          subject.instance_variable_set(:@cross_walk_product, renewal_product)
         end
 
         it "should append APTC values" do

@@ -2324,7 +2324,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       context 'when qnc is false on applicant' do
         before do
-          applicant.update!(qualified_non_citizen: false)
+          applicant.update!(qualified_non_citizen: false, citizen_status: 'alien_lawfully_present')
           update_benchmark_premiums
           result = subject.call(application.reload)
 
@@ -2339,7 +2339,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       context 'when qnc is true on applicant' do
         before do
-          applicant.update!(qualified_non_citizen: true)
+          applicant.update!(qualified_non_citizen: true, citizen_status: 'not_lawfully_present_in_us')
           update_benchmark_premiums
           result = subject.call(application.reload)
 
@@ -2354,7 +2354,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       context 'when qnc is nil on applicant' do
         it 'should include qualified_non_citizen in payload' do
-          applicant.update!(qualified_non_citizen: nil)
+          applicant.update!(qualified_non_citizen: nil, citizen_status: 'not_lawfully_present_in_us')
           update_benchmark_premiums
           result = subject.call(application.reload)
 

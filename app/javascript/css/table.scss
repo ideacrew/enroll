@@ -35,7 +35,7 @@ table {
       font-weight: 400;
       padding: 0.75rem;
 
-      &:first-of-type {
+      &:first-of-type:not(.standard) {
         font-size: 16px;
         line-height: 20px;
         font-weight: 400;
@@ -61,6 +61,7 @@ table {
   caption {
     text-align: left;
     margin: 1em 0;
+    color: var(--text-secondary);
   }
 }
 
@@ -223,5 +224,8 @@ table {
   }
   .row {
     margin: 0
+  }
+  input[type="search"] {
+    margin-left: $spacer / 2;
   }
 }

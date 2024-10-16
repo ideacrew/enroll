@@ -1,4 +1,4 @@
-<span class="badge badge-danger mr-1 mb-1 p-2"
+ <span class="badge <%= bs4 ? 'badge-status badge-danger mb-2' : 'badge-danger mb-1 p-2' %> mr-1"
   data-target="bulk-notice.recipientBadge"
   data-toggle='tooltip'
   data-placement='bottom'
@@ -6,7 +6,7 @@
   title='<%= error %>'>
   <%= hidden_field_tag 'admin_bulk_notice[audience_ids][]', id %>
   <%= hbx_id || id %>
-  <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
-    <i class="far fa-times-circle"></i>
-  </a>
+    <a data-action='bulk-notice#deleteIdentifier' class='text-white' aria-label="<%= l10n('close') %>" href>
+      <i class="far fa-times-circle"></i>
+    </a>
 </span>
