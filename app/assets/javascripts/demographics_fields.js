@@ -732,6 +732,7 @@ var PersonValidations = (function (window, undefined) {
 
         if (/^0+$/.test(phoneValue)) {
           alert('Mobile Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
         } else if (phoneValue.length < 1 || phoneValue.length < 10) {
           alert('You must enter a mobile phone number to receive notices and updates by text.');
           PersonValidations.restoreRequiredAttributes(e);
