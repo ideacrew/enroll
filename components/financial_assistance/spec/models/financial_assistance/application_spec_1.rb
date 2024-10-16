@@ -146,5 +146,60 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         expect(applicant2.income_evidence).to be_negative_response_received
       end
     end
+
+    context 'when only dental enrollment is present' do
+      let(:dental_enrollment2) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :with_enrollment_members,
+          family: family,
+          consumer_role_id: person.consumer_role.id,
+          enrollment_members: family.family_members,
+          coverage_kind: "dental"
+        )
+      end
+
+      before do
+        family.hbx_enrollments.delete_all
+        applicant2.income_evidence.move_to_outstanding!
+      end
+
+      it 'move dependent outstanding evidence to nrr' do
+        application.enrolled_with(dental_enrollment2)
+        applicant2.income_evidence.reload
+        expect(applicant2.income_evidence).to be_outstanding
+      end
+    end
+
+    context 'when all applicants evidences are in NRR and only primary is enrolled' do
+      let(:health_enrollment2) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :with_enrollment_members,
+          :individual_assisted,
+          family: family,
+          applied_aptc_amount: Money.new(44_500),
+          consumer_role_id: person.consumer_role.id,
+          enrollment_members: [family.primary_applicant],
+          coverage_kind: "health"
+        )
+      end
+
+      before do
+        family.hbx_enrollments.delete_all
+        applicant1.income_evidence.negative_response_received!
+        applicant2.income_evidence.negative_response_received!
+        application.enrolled_with(health_enrollment2)
+      end
+
+      it 'move only primary nrr evidence to outstanding' do
+        applicant1.income_evidence.reload
+        expect(applicant1.income_evidence).to be_outstanding
+      end
+      it 'dependent evident does not change' do
+        applicant2.income_evidence.reload
+        expect(applicant2.income_evidence).to be_negative_response_received
+      end
+    end
   end
 end

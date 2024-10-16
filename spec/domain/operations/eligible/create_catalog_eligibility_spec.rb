@@ -99,6 +99,7 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
       context "with valid params" do
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
         end
 
         it "should create eligibility" do

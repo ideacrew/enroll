@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   include Acapi::Notifiers
   include ::L10nHelper
   include ::FileUploadHelper
+  include ::ParseDateHelper
 
   after_action :update_url, :unless => :format_js?
   helper BenefitSponsors::Engine.helpers
@@ -483,11 +484,5 @@ class ApplicationController < ActionController::Base
     flash.now[:warning] = announcements.map do |announcement|
       { is_announcement: true, announcement: announcement }
     end
-  end
-
-  def parse_date(string)
-    return nil if string.blank?
-    date_format = string.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y"
-    Date.strptime(string, date_format)
   end
 end
