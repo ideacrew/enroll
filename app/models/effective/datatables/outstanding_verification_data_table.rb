@@ -51,7 +51,7 @@ module Effective
         end
         table_column :dob, :label => l10n('dob'), :proc => proc { |row| format_date(eligibility_primary_family_member(row).dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => l10n('hbx_id'), :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false
-        table_column :count, :label => l10n('hbx_profiles.outstanding_verifications.table.count'), :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
+        table_column :count, :label => l10n('count'), :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row|
           document_status_for(row)
         }, :filter => false, :sortable => true
