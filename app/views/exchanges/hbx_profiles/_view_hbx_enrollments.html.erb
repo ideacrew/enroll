@@ -12,9 +12,8 @@
                 <th><%= l10n('hbx_profiles.effective_date') %></th>
                 <th><%= l10n('termination_date') %></th>
                 <th><%= l10n('hbx_profiles.reinstate.effective_date') %></th>
-                <th><%= l10n('hbx_profiles.reinstate.transmit_carrier') %></th>
+                <th id="transmit_header"><%= l10n('hbx_profiles.reinstate.transmit_carrier') %></th>
                 <th><%= EnrollRegistry[:enroll_app].setting(:short_name).item %> <%= l10n('id') %></th>
-                <th><%= l10n('insured.families.hbx_id') %></th>
               </tr>
               </thead>
 
@@ -27,6 +26,12 @@
                       </label>
                     </td>
                     <td><%= enrollment.kind.camelcase %></td>
+                    <td><%= enrollment.effective_on.year %></td>
+                    <td><%= enrollment.effective_on %></td>
+                    <td><%= enrollment.fetch_term_or_expiration_date %></td>
+                    <td id="reinstate"><%= enrollment.fetch_term_or_expiration_date.next_day %></td>
+                    <td><input type="checkbox" name="edi_required" value="checked" checked aria-labelledby="transmit_header" /></td>
+                    <td id="hbx_id"><%= enrollment.hbx_id %></td>
                     <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
                     <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
                     <td id="term_reason_eligible_for_reinstate" class="hidden"><%= enrollment.term_reason_eligible_for_reinstate? %></td>
@@ -34,17 +39,6 @@
                     <td id="cobra_employee" class="hidden"><%= enrollment.is_shop? && enrollment.employee_role.is_cobra_status? %></td>
                     <td id="cobra_enrollment" class="hidden"><%= enrollment.is_shop? && enrollment.is_cobra_status? %></td>
                     <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_term_or_expired_exists_for_reinstated_date? %></td>
-                    <td><%= enrollment.effective_on.year %></td>
-                    <td><%= enrollment.effective_on %></td>
-                    <td><%= enrollment.fetch_term_or_expiration_date %></td>
-                    <td id="reinstate"><%= enrollment.fetch_term_or_expiration_date.next_day %></td>
-                    <td>
-                      <label class="weight-n">
-                        <input type="checkbox" name="edi_required" value="checked" checked />
-                        <%= l10n("hbx_profiles.reinstate.transmit") %>
-                      </label>
-                    </td>
-                    <td id="hbx_id"><%= enrollment.hbx_id %></td>
                   </tr>
               <%end%>
             </table>
@@ -74,17 +68,17 @@
                 <h4 class="modal-title"><%= l10n('hbx_profiles.reinstate.modal.header', name: @person.full_name) %></h4>
               </div>
               <br>
-              <div>
-                <label for="planName" class="col-sm-3 control-label"><%= l10n('plan_name')%></label>
-                <div class="col-sm-9"><div id="reinstate-plan-name"></div></div>
+              <div class='d-flex mb-1'>
+                <label for="planName" class="col-sm-4 control-label"><%= l10n('plan_name')%></label>
+                <div class="col-sm-8"><div id="reinstate-plan-name"></div></div>
+              </div>
+              <div class='d-flex mb-1'>
+                <label for="effectiveDate" class="col-sm-4 control-label"><%= l10n('hbx_profiles.effective_date') %></label>
+                <div class="col-sm-8"><div id="effective-date"></div></div>
               </div>
               <div>
-                <label for="effectiveDate" class="col-sm-3 control-label"><%= l10n('hbx_profiles.effective_date') %></label>
-                <div class="col-sm-9"><div id="effective-date"></div></div>
-              </div>
-              <div>
-                <label for="comments" class="col-sm-3 control-label"><%= l10n('hbx_profiles.reinstate.modal.comments') %></label>
-                <div class="col-sm-9"><textarea id="comments" class="form-control comments" rows="3"></textarea></div>
+                <label for="comments" class="col-sm-4 control-label"><%= l10n('hbx_profiles.reinstate.modal.comments') %></label>
+                <div class="col-sm-8"><textarea id="comments" class="form-control comments" rows="3"></textarea></div>
               </div>
             </div>
           </div>

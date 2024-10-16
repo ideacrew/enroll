@@ -11,7 +11,7 @@
       <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
 
 
-      <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+      <%= javascript_pack_tag 'no_jquery_application', 'data-turbolinks-track': 'reload' %>
       <%= javascript_include_tag "application", 'data-turbolinks-track': 'reload' %>
       <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
       <%= javascript_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>

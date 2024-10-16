@@ -400,7 +400,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
     @datatable = Effective::Datatables::UserAccountDatatable.new
     respond_to do |format|
-      format.html { render '/exchanges/hbx_profiles/user_account_index_datatable.html.slim' }
+      format.html { render '/exchanges/hbx_profiles/user_account_index_datatable' }
     end
   end
 
@@ -412,6 +412,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     respond_to do |format|
       format.html { render "/exchanges/hbx_profiles/outstanding_verification_datatable.html.erb" }
     end
+  end
+
+  def registry
+    authorize EnrollRegistry, :show?
   end
 
   def hide_form
@@ -599,7 +603,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @datatable = Effective::Datatables::BrokerAgencyDatatable.new
 
     respond_to do |format|
-      format.html { render 'exchanges/hbx_profiles/broker_agency_index_datatable.html.slim' }
+      format.html { render 'exchanges/hbx_profiles/broker_agency_index_datatable' }
     end
   end
 
@@ -794,12 +798,14 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def set_date
     authorize HbxProfile, :modify_admin_tabs?
+
     forms_time_keeper = Forms::TimeKeeper.new(timekeeper_params.to_h)
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
-      flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+      date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+      flash[:notice] = l10n('admin.config.set_day_success', date: date)
     rescue Exception => e # rubocop:disable Lint/RescueException
-      flash[:error] = "Failed to set date of record, " + e.message
+      flash[:error] = l10n('admin.config.set_day_failure', error_message: e.message)
     end
     redirect_to exchanges_hbx_profiles_root_path
   end

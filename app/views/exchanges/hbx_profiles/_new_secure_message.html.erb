@@ -1,9 +1,22 @@
 <%if @error_on_save %>
-  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
-    <%@error_on_save.each do |err|%>
-      <li><%=err[1][0]%></li>
-    <%end%>
-  </div>
+  <% if @bs4 %>
+    <div class="alert alert-error d-flex align-items-start">
+      <div class="col mr-auto p-0 align-self-center">
+        <%@error_on_save.each do |err|%>
+          <li><%=err[1][0]%></li>
+        <%end%>
+      </div>
+      <div class="d-flex pl-1">
+        <a class="close-icon icon icon-sm pr-1" data-dismiss="alert" alt="<%= l10n("close") %>" href="#">&nbsp;<span class="sr-only"><%= l10n("close") %></span></a>
+      </div>
+    </div>
+  <% else %>
+    <div class='alert alert-error'>
+      <%@error_on_save.each do |err|%>
+        <li><%=err[1][0]%></li>
+      <%end%>
+    </div>
+  <% end %>
 <%end%>
 
 <% if @bs4 %>
@@ -13,7 +26,7 @@
         <div class="row no-buffer">
           <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
             <h3><%= l10n('new_message') %></h3>
-            <table class="table">
+            <table>
               <tbody>
               <tr>
                 <th><%= l10n('recipient') %>:</th>
@@ -28,7 +41,7 @@
                 <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: l10n('hbx_profiles.send_message.write_here'), include_blank: false, required: true  %></td>
               </tr>
               <tr>
-                <th><label for="file" class="weight-n required"><%= l10n('document') %></label></th>
+                <th><label for="file" class="weight-n"><%= l10n('hbx_profiles.send_message.document') %></label></th>
                 <td><%= file_field_tag "file", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file"%></td>
               </tr>
               </tbody>
@@ -38,7 +51,7 @@
             <%= hidden_field_tag :resource_name, resource.class %>
             <%= hidden_field_tag :actions_id, @element_to_replace_id %>
             <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
-            <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
+            <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)"><%= l10n('cancel') %></button>
           </div>
         </div>
       </div>

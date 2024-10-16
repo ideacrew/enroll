@@ -4,3 +4,12 @@ if ($("#user-login-history-modal").length == 0) {
   $('#user-login-history-modal').replaceWith("<%=escape_javascript(render('login_history', login_history: @user_login_history)) %>");
 }
 $('#user-login-history-modal').modal('show');
+
+function removeExtraBackdrop() {
+  let backdrops = document.querySelectorAll(".modal-backdrop");
+  for (var i = 0; i < backdrops.length; i++) {
+    if (i !== backdrops.length - 1) { backdrops[i].parentElement.removeChild(backdrops[i]) };
+  }
+}
+
+removeExtraBackdrop();

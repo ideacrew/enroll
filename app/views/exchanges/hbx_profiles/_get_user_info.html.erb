@@ -21,13 +21,13 @@
           <td><%= user.present? ? user.email : l10n('hbx_profiles.user_info.nil') %></td>
           <% if user.present? %>
             <% current_sign_in_at = user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)") %>
-            <td><%= current_sign_in_at.to_date %><strong>(<%= current_sign_in_at.strftime("%I:%M%p") %>)</strong></td>
+            <td><%= current_sign_in_at.to_date %> <strong> (<%= current_sign_in_at.strftime("%I:%M%p") %>)</strong></td>
           <% else %>
             <td><%= l10n('hbx_profiles.user_info.nil') %></td>
           <% end %>
           <td>
             <% created_at = @person.created_at.in_time_zone("Eastern Time (US & Canada)") %>
-            <%= created_at.to_date %><strong>(<%= created_at.strftime("%I:%M%p") %>)</strong>
+            <%= created_at.to_date %> <strong> (<%= created_at.strftime("%I:%M%p") %>)</strong>
           </td>
           <td style="word-wrap:break-word;"><%= @person.primary_family.e_case_id || l10n('hbx_profiles.user_info.nil') %></td>
           <td><%= person_roles.join(", ") %></td>

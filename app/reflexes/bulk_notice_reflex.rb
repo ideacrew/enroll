@@ -2,6 +2,8 @@
 
 # Class to hold reflex methods
 class BulkNoticeReflex < ApplicationReflex
+  before_reflex :enable_bs4_layout, only: [:new_identifier, :audience_select] if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+
   # Add Reflex methods in this file.
   #
   # All Reflex instances expose the following properties:
@@ -43,6 +45,8 @@ class BulkNoticeReflex < ApplicationReflex
     morph '#recipient-list', org_badges_for(audience_ids, audience_type)
   end
 
+  private
+
   def org_badges_for(audience_ids, audience_type)
     # this method loops through the given audience_ids and displays a normal badge or error badge if the types are wrong
     audience_ids.reduce('') do |badges, identifier|
@@ -50,11 +54,11 @@ class BulkNoticeReflex < ApplicationReflex
       if badges.include?(identifier) # already has a badge for this identifier
         badges
       elsif org_attrs.key?(:error)
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: identifier, error: org_attrs[:error], hbx_id: org_attrs[:hbx_id] })
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: identifier, error: org_attrs[:error], hbx_id: org_attrs[:hbx_id], bs4: @bs4 })
       elsif org_attrs[:types].include?(audience_type)
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: org_attrs[:id], hbx_id: org_attrs[:hbx_id] })
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: org_attrs[:id], hbx_id: org_attrs[:hbx_id], bs4: @bs4 })
       else
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: org_attrs[:id], error: 'Wrong audience type', hbx_id: org_attrs[:hbx_id] })
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: org_attrs[:id], error: 'Wrong audience type', hbx_id: org_attrs[:hbx_id], bs4: @bs4 })
       end
     end
   end
@@ -77,5 +81,9 @@ class BulkNoticeReflex < ApplicationReflex
     else
       session[:bulk_notice][:audience][org_identifier] = { id: org_identifier, error: 'Not found' }
     end
+  end
+
+  def enable_bs4_layout
+    @bs4 = true
   end
 end

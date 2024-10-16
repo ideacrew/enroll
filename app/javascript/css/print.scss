@@ -1,12 +1,13 @@
 @media screen {
   #printSection {
-    display: none !important;
+    display: block !important;
   }
 }
+
 @media print {
   html,
   body {
-    height: 100vh;
+    height: auto;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden;
@@ -15,18 +16,24 @@
   body {
     background: none !important;
   }
+
   body * {
     visibility: hidden;
   }
+
   #printSection,
   #printSection * {
     visibility: visible;
   }
+
   #printSection {
-    position: absolute;
+    position: static !important;
+    page-break-inside: avoid;
+    overflow: visible;
     left: 0;
     top: 0;
   }
+
   #printArea {
     display: none !important;
   }
