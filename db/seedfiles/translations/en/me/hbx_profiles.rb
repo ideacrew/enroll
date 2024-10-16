@@ -123,6 +123,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure.email_subheader" => "The email matches with the following user:",
   # Outstanding Verfications Tab
   "en.hbx_profiles.outstanding_verifications.header" => "Outstanding Verifications",
+  "en.hbx_profiles.outstanding_verifications.table.date_filter_title" => "Verification Due Date Range",
   "en.hbx_profiles.outstanding_verifications.table.documents_uploaded" => "Docs Uploaded",
   "en.hbx_profiles.outstanding_verifications.table.verification_due" => "Verification Due",
   "en.hbx_profiles.outstanding_verifications.table.outstanding_verification_types" => "Outstanding Verification Types",
