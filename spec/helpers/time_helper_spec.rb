@@ -412,4 +412,22 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       end
     end
   end
+
+  describe '#convert_time_to_string' do
+    context 'when input_time is a Time object' do
+      it 'returns the input_time as a string' do
+        expect(
+          helper.convert_time_to_string(Time.zone.now)
+        ).to be_a(String)
+      end
+    end
+
+    context 'when input_time is not a Time object' do
+      it 'returns the input_time as is' do
+        expect(
+          helper.convert_time_to_string('not a time object')
+        ).to eq('not a time object')
+      end
+    end
+  end
 end
