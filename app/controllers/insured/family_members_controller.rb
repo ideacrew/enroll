@@ -10,7 +10,8 @@ class Insured::FamilyMembersController < ApplicationController
 
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
-  before_action :set_dependent_and_family, only: [:destroy, :show, :edit, :update]
+  # before_action :set_dependent_and_family, only: [:edit]
+  before_action :set_dependent_and_family, only: [:destroy, :show, :update, :edit]
   before_action :set_cache_headers, only: [:edit, :new]
 
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
@@ -405,7 +406,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def set_dependent_and_family
-    @dependent = ::Forms::FamilyMember.find(params.require(:id))
+    @dependent = ::Forms::FamilyMember.find(params.require(:id), params.require(:action))
     @family = Family.find(@dependent.family_id)
 
     authorize_family_access
