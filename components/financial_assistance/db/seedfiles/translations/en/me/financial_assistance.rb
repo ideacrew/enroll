@@ -339,6 +339,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.review.personal.document_type" => "Document Type",
   "en.faa.review.personal.citizenship_number" => "Citizenship Number",
   "en.faa.review.personal.receipt_number" => "Receipt Number",
+  "en.faa.review.personal.vlp_description" => "Vlp Description",
   "en.faa.review.personal.expiration_date" => "Expiration Date",
   "en.faa.review.personal.issuing_country" => "Issuing Country",
   "en.faa.review.personal.ai_an_member" => "Are you a member of an American Indian or Alaska Native Tribe?",
