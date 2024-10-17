@@ -47,8 +47,8 @@ module Operations
             people.each do |person|
               updated_info = {}
 
-              updated_info[:ethnicity] = [] if person.ethnicity.nil?
-              updated_info[:tribe_codes] = [] if person.tribe_codes.nil?
+              updated_info[:ethnicity] = [] if person.read_attribute(:ethnicity).nil?
+              updated_info[:tribe_codes] = [] if person.read_attribute(:tribe_codes).nil?
 
               unless updated_info.empty?
                 updated_info[:updated_at] = Time.now.utc
