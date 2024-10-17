@@ -415,13 +415,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     it "should destroy the dependent" do
-      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id, "destroy").and_return(dependent)
       expect(dependent).to receive(:destroy!)
       delete :destroy, params: {id: dependent_id}
     end
 
     it "should render the index template" do
-      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id, "destroy").and_return(dependent)
       allow(dependent).to receive(:destroy!)
       delete :destroy, params: {id: dependent_id}
       expect(response).to have_http_status(:success)
@@ -465,7 +465,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     before :each do
       sign_in(user)
-      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(Forms::FamilyMember).to receive(:find).with(dependent_id, "edit").and_return(dependent)
       allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
       get :edit, params: {id: dependent_id}
     end

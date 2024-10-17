@@ -20,10 +20,12 @@
               <% @enrollments.each_with_index do |enrollment, index| %>
                   <tr>
                     <td>
-                      <label class="weight-n">
-                        <%= radio_button_tag("enrollment_id", enrollment.id, (index.zero? ? true : false)) %>
-                        <span id="name"><%= enrollment.product.name %></span>
-                      </label>
+                      <div class="d-flex">
+                        <label class="weight-n">
+                          <%= radio_button_tag("enrollment_id", enrollment.id, (index.zero? ? true : false)) %>
+                          <span id="name"><%= enrollment.product.name %></span>
+                        </label>
+                      </div>
                     </td>
                     <td><%= enrollment.kind.camelcase %></td>
                     <td><%= enrollment.effective_on.year %></td>
