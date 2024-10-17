@@ -268,49 +268,64 @@ module Forms
       @family ||= Family.find(family_id)
     end
 
-    def self.find(family_member_id)
+    def self.find(family_member_id, action = nil)
       found_family_member = ::FamilyMember.find(family_member_id)
-      has_same_address_with_primary = compare_address_with_primary(found_family_member);
+      has_same_address_with_primary = compare_address_with_primary(found_family_member)
       home_address = if has_same_address_with_primary
-                  Address.new(kind: 'home')
-                else
-                  found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
-                end
+                       Address.new(kind: 'home')
+                     else
+                       found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
+                     end
       mailing_address = found_family_member.person.has_mailing_address? ? found_family_member.person.mailing_address : Address.new(kind: 'mailing')
       record = self.new({
-        :relationship => found_family_member.primary_relationship,
         :id => family_member_id,
-        :family => found_family_member.family,
-        :family_id => found_family_member.family_id,
-        :first_name => found_family_member.first_name,
-        :last_name => found_family_member.last_name,
-        :middle_name => found_family_member.middle_name,
-        :name_pfx => found_family_member.name_pfx,
-        :name_sfx => found_family_member.name_sfx,
-        :dob => (found_family_member.dob.is_a?(Date) ? found_family_member.dob.try(:strftime, "%Y-%m-%d") : found_family_member.dob),
-        :gender => found_family_member.gender,
-        :ssn => found_family_member.ssn,
-        :no_ssn => found_family_member.no_ssn,
-        :race => found_family_member.race,
-        :ethnicity => found_family_member.ethnicity,
-        :language_code => found_family_member.language_code,
-        :is_incarcerated => found_family_member.is_incarcerated,
-        :citizen_status => found_family_member.citizen_status,
-        :naturalized_citizen => found_family_member.naturalized_citizen,
-        :eligible_immigration_status => found_family_member.eligible_immigration_status,
-        :indian_tribe_member => found_family_member.indian_tribe_member,
-        :tribal_id => found_family_member.tribal_id,
-        :tribal_state => found_family_member.tribal_state,
-        :tribal_name => found_family_member.tribal_name,
-        :tribe_codes => found_family_member.tribe_codes,
         :same_with_primary => has_same_address_with_primary.to_s,
         :is_homeless => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_homeless),
         :is_temporarily_out_of_state => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_temporarily_out_of_state),
-        :addresses => [home_address, mailing_address],
-        :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded),
-        :is_moving_to_state => found_family_member.try(:person).try(:is_moving_to_state),
-        :is_tobacco_user => found_family_member&.person&.is_tobacco_user
-      })
+        :addresses => [home_address, mailing_address]
+      }.merge(member_params(found_family_member, action)))
+    end
+
+    def self.member_params(member, action)
+      params = {:relationship => member.primary_relationship,
+                :family => member.family,
+                :family_id => member.family_id,
+                :first_name => member.first_name,
+                :last_name => member.last_name,
+                :middle_name => member.middle_name,
+                :name_pfx => member.name_pfx,
+                :name_sfx => member.name_sfx,
+                :dob => (member.dob.is_a?(Date) ? member.dob.try(:strftime, "%Y-%m-%d") : member.dob),
+                :gender => member.gender,
+                :ssn => member.ssn,
+                :no_ssn => member.no_ssn,
+                :race => member.race,
+                :ethnicity => member.ethnicity,
+                :language_code => member.language_code,
+                :tribal_id => member.tribal_id,
+                :tribal_state => member.tribal_state,
+                :tribal_name => member.tribal_name,
+                :tribe_codes => member.tribe_codes,
+                :age_off_excluded => member.try(:person).try(:age_off_excluded),
+                :is_moving_to_state => member.try(:person).try(:is_moving_to_state),
+                :is_tobacco_user => member&.person&.is_tobacco_user}
+
+      consumer_fields = if action == "edit" && member.person.consumer_role.is_applying_coverage == false
+                          { :citizen_status => nil,
+                            :naturalized_citizen => nil,
+                            :eligible_immigration_status => nil,
+                            :indian_tribe_member => nil,
+                            :is_incarcerated => nil}
+                        else
+                          {:citizen_status => member.citizen_status,
+                           :naturalized_citizen => member.naturalized_citizen,
+                           :eligible_immigration_status => member.eligible_immigration_status,
+                           :indian_tribe_member => member.indian_tribe_member,
+                           :is_incarcerated => member.is_incarcerated}
+                        end
+
+      params.merge!(consumer_fields)
+      params
     end
 
     def self.compare_address_with_primary(family_member)
