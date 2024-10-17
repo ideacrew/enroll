@@ -30,7 +30,7 @@ registry:
           - key: :nondiscrimination_notice_url
             item: ''
           - key: :submit_docs_url
-            item: 'https://www.CoverME.gov/forms'
+            item: 'https://www.coverme.gov/support/forms'
           - key: :state_residency
             item: 'ME Residency'
           - key: :site_key
