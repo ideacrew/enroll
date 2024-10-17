@@ -74,6 +74,7 @@ class Insured::FamilyMembersController < ApplicationController
     @family = Family.find(params[:dependent][:family_id])
     authorize @family, :create?
 
+    reset_consumer_coverage_fields if params[:dependent][:is_applying_coverage] == "false"
     @dependent = ::Forms::FamilyMember.new(params[:dependent].merge({skip_consumer_role_callbacks: true}))
     @address_errors = validate_address_params(params)
 
@@ -179,6 +180,7 @@ class Insured::FamilyMembersController < ApplicationController
   def update
     authorize @family, :update?
 
+    reset_consumer_coverage_fields if params[:dependent][:is_applying_coverage] == "false"
     @dependent.skip_consumer_role_callbacks = true
     @address_errors = validate_address_params(params)
 
@@ -354,6 +356,26 @@ class Insured::FamilyMembersController < ApplicationController
     params.permit(:dependent => {})
   end
 
+  def reset_consumer_coverage_fields
+    dependent_params = dependent_person_params[:dependent].to_h
+
+    if dependent_params["is_applying_coverage"] == "false"
+      fields_to_unset = {
+        us_citizen: nil,
+        naturalized_citizen: nil,
+        eligible_immigration_status: nil,
+        indian_tribe_member: nil,
+        is_incarcerated: nil
+      }
+
+      fields_to_unset.each do |field, value|
+        dependent_params[field.to_s] = value
+      end
+    end
+
+    params[:dependent] = dependent_params
+  end
+
   def init_address_for_dependent
     if @dependent.same_with_primary == "true"
       @dependent.addresses = [Address.new(kind: 'home'), Address.new(kind: 'mailing')]
@@ -383,7 +405,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def set_dependent_and_family
-    @dependent = ::Forms::FamilyMember.find(params.require(:id))
+    @dependent = ::Forms::FamilyMember.find(params.require(:id), params.require(:action))
     @family = Family.find(@dependent.family_id)
 
     authorize_family_access

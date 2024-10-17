@@ -727,12 +727,25 @@ var PersonValidations = (function (window, undefined) {
       }
 
       if ($('#contact_type_text').prop('checked')) {
-        if (document.querySelector('.mobile-phone-number').value.length < 1) {
-          alert(
-            'You must enter a mobile phone number to receive notices and updates by text.'
-          );
+        const phoneInput = document.querySelector('.mobile-phone-number');
+        const phoneValue = phoneInput.value.replace(/\D/g, '');
+
+        if (/^0+$/.test(phoneValue)) {
+          alert('Mobile Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
+        } else if (phoneValue.length < 1 || phoneValue.length < 10) {
+          alert('You must enter a mobile phone number to receive notices and updates by text.');
           PersonValidations.restoreRequiredAttributes(e);
         }
+
+        const homePhoneInput = document.querySelector('.home-phone-number');
+        const homePhoneValue = homePhoneInput.value.replace(/\D/g, '');
+
+        if (/^0+$/.test(homePhoneValue)) {
+          alert('Home Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+
         if (
           $('.contact-method input:checked').length <= 1 &&
           $('.contact-method').hasClass('flag-enabled')
@@ -740,6 +753,27 @@ var PersonValidations = (function (window, undefined) {
           alert(
             'An additional contact method is required if only Text is selected.'
           );
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+      }
+
+      if (!$('#contact_type_text').prop('checked')) {
+
+        // Check mobile phone number
+        const mobilePhoneInput = document.querySelector('.mobile-phone-number');
+        const mobilePhoneValue = mobilePhoneInput.value.replace(/\D/g, '');
+
+        if (/^0+$/.test(mobilePhoneValue)) {
+          alert('Mobile Phone number cannot be all zeros.');
+          PersonValidations.restoreRequiredAttributes(e);
+        }
+
+        // Check home phone number
+        const homePhoneInput = document.querySelector('.home-phone-number');
+        const homePhoneValue = homePhoneInput.value.replace(/\D/g, '');
+
+        if (/^0+$/.test(homePhoneValue)) {
+          alert('Home Phone number cannot be all zeros.');
           PersonValidations.restoreRequiredAttributes(e);
         }
       }

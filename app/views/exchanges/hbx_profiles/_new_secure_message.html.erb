@@ -1,9 +1,22 @@
 <%if @error_on_save %>
-  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
-    <%@error_on_save.each do |err|%>
-      <li><%=err[1][0]%></li>
-    <%end%>
-  </div>
+  <% if @bs4 %>
+    <div class="alert alert-error d-flex align-items-start">
+      <div class="col mr-auto p-0 align-self-center">
+        <%@error_on_save.each do |err|%>
+          <li><%=err[1][0]%></li>
+        <%end%>
+      </div>
+      <div class="d-flex pl-1">
+        <a class="close-icon icon icon-sm pr-1" data-dismiss="alert" alt="<%= l10n("close") %>" href="#">&nbsp;<span class="sr-only"><%= l10n("close") %></span></a>
+      </div>
+    </div>
+  <% else %>
+    <div class='alert alert-error'>
+      <%@error_on_save.each do |err|%>
+        <li><%=err[1][0]%></li>
+      <%end%>
+    </div>
+  <% end %>
 <%end%>
 
 <% if @bs4 %>
