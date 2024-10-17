@@ -61,7 +61,7 @@ module Queries
                   user.all
                 end
               end
-      users
+      @order_by.present? ? users.order_by(@order_by) : users
     end
 
     def user_datatable_search(query)

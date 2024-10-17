@@ -28,9 +28,7 @@ module Effective
     end
 
     def order_column_with_defaults(collection, table_column, direction, sql_column)
-
-      sql_direction = (direction == :desc ? -1 : 1)
-      collection.order_by(sql_column => sql_direction)
+      collection.order_by(sql_column => direction)
     end
 
     def search(collection)
