@@ -16,15 +16,17 @@ function show_broker(broker_id) {
 }
 
 $('.broker_select_button').click(function(e) {
-  show_broker(this.getAttribute('data-broker'))
-  $('#close_help_modal').addClass('hide')
-  $('#help_index_status').html('')
+  show_broker(this.getAttribute('data-broker'));
+  $('#close_help_modal').addClass('hide');
+  $('#inbox_provider_form').addClass('hide');
+  $('#help_index_status').html('');
   e.stopPropagation();
 })
 $('.close_broker_select').click(function(){
-  $("#broker_index_view").removeClass('hide')
-  $(".broker_selection_choice").addClass('hide')
-  $('#close_help_modal').removeClass('hide')
+  $('#inbox_provider_form').removeClass('hide');
+  $("#broker_index_view").removeClass('hide');
+  $(".broker_selection_choice").addClass('hide');
+  $('#close_help_modal').removeClass('hide');
 })
 
 $(document).on('click', '#help_list a.expert_link', function(){
