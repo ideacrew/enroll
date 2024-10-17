@@ -145,7 +145,6 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                                  :is_primary_applicant => true,
                                  :is_consent_applicant => false,
                                  :is_disabled => false,
-                                 :ethnicity => [],
                                  :family_member_id => BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
                                  :relationship => "child")
         appl.addresses = [FactoryBot.build(:financial_assistance_address, :address_1 => '1111 Awesome Street NE', :address_2 => '#111', :address_3 => '', :city => 'Washington', :country_name => '', :kind => 'work', :state => 'DC', :zip => '20001',
@@ -170,7 +169,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          :dob => (Date.today - 10.years).strftime("%d/%m/%Y"),
          :emails => [{:address => "example1@example.com", :kind => "work"}],
          :encrypted_ssn => "wFDFw1whehQ1Udku1/79DA==\n",
-         :ethnicity => [],
+         :ethnicity => nil,
          :expiration_date => nil,
          :family_member_id => BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
          :first_name => "james",

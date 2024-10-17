@@ -462,18 +462,6 @@ module FinancialAssistance
       application.ensure_relationship_with_primary(self, value)
     end
 
-    def ethnicity
-      # Retrieve the raw 'ethnicity' value from the database
-      # Return an empty array if 'ethnicity' is nil, ensuring consistent array behavior
-      read_attribute(:ethnicity) || []
-    end
-
-    def tribe_codes
-      # Retrieve the raw 'tribe_codes' value from the database
-      # Return an empty array if 'tribe_codes' is nil, ensuring consistent array behavior
-      read_attribute(:tribe_codes) || []
-    end
-
     def self.encrypt_ssn(val)
       return nil if val.blank?
       ssn_val = val.to_s.gsub(/\D/, '')

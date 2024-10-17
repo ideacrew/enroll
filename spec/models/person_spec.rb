@@ -772,38 +772,6 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe '#tribe_codes' do
-    context "when tribe codes is set to nil" do
-      it "should return an empty array" do
-        person = FactoryBot.create(:person, tribe_codes: nil)
-        expect(person.tribe_codes).to eq []
-      end
-    end
-
-    context "when tribe codes is set to array of strings" do
-      it "should return value set in DB" do
-        person = FactoryBot.create(:person, tribe_codes: ["", ""])
-        expect(person.tribe_codes).to eq ["", ""]
-      end
-    end
-  end
-
-  describe '#ethnicity' do
-    context "when ethnicity is set to nil" do
-      it "should return an empty array" do
-        person = FactoryBot.create(:person, ethnicity: nil)
-        expect(person.ethnicity).to eq []
-      end
-    end
-
-    context "when ethnicity is set to array of strings" do
-      it "should return value set in DB" do
-        person = FactoryBot.create(:person, ethnicity: ["", ""])
-        expect(person.ethnicity).to eq ["", ""]
-      end
-    end
-  end
-
   describe '#phones' do
     it "sets person's home telephone number" do
       person = Person.new
