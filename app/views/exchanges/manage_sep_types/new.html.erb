@@ -60,13 +60,13 @@
               <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
             </div>
             <div class="col-6">
-              <%= build_option_field(EnrollRegistry[:sep_types].setting(:qle_event_date_kind)) %>
+              <%= build_option_field(EnrollRegistry[:sep_types].setting(:qle_event_date_kind),f) %>
               <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
               <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
               <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
             </div>
             <div class="col-6" id="effective_on_kinds">
-              <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds)) %>
+              <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
             </div>
             <div class="col-6">
               <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_start_on),f) %>
