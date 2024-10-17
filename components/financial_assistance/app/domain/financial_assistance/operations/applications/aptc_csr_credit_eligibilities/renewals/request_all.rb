@@ -15,7 +15,12 @@ module FinancialAssistance
             include Dry::Monads[:result, :do, :try]
             include EventSource::Command
 
+            # Calls the method with the given parameters.
+            #
+            # @param params [Hash] the parameters for the method, including :renewal_year
+            # @return [Success] the result containing the family IDs
             def call(params)
+              @exclusion_family_ids = yield validate(params)
               family_ids = yield renewal_eligible_family_ids(params[:renewal_year])
               family_ids = yield generate_renewal_events(params[:renewal_year], family_ids)
 
@@ -24,11 +29,45 @@ module FinancialAssistance
 
             private
 
+            # Validates the given parameters.
+            #
+            # @param [Hash] params the parameters to validate
+            # @option params [Array<String, BSON::ObjectId>] :exclusion_family_ids the family IDs to be excluded
+            # @return [Success, Failure] the result of the validation
+            def validate(params)
+              return Failure('Invalid input. Params is expected to be a hash.') unless params.is_a?(Hash)
+              return Failure('Missing key exclusion_family_ids. Must include exclusion_family_ids key with array as value.') if !params.key?(:exclusion_family_ids) || !params[:exclusion_family_ids].is_a?(Array)
+
+              exclusion_family_ids = transform_ids_to_bson_ids(params[:exclusion_family_ids])
+              return Failure("Unable to transform exclusion_family_ids: #{params[:exclusion_family_ids]} to BSON ObjectIds.") if exclusion_family_ids.blank? && params[:exclusion_family_ids].present?
+
+              Success(exclusion_family_ids)
+            end
+
+            # Transforms the given family IDs to BSON ObjectIds.
+            #
+            # @param [Array<String, BSON::ObjectId>] exclusion_family_ids the family IDs to transform
+            # @return [Array<BSON::ObjectId>] the transformed BSON ObjectIds
+            def transform_ids_to_bson_ids(exclusion_family_ids)
+              exclusion_family_ids.map do |family_id|
+                if family_id.is_a?(BSON::ObjectId)
+                  family_id
+                else
+                  BSON::ObjectId.from_string(family_id)
+                end
+              end
+            rescue StandardError => e
+              Rails.logger.error "Error raised when transforming IDs: #{exclusion_family_ids} with error: #{e.message}"
+              []
+            end
+
             # Returns all family_ids where the family has a current enrollment and their most recent determined
             # fa application for the previous year is renewal eligible
-            # @return [Array] family_ids
+            #
+            # @param renewal_year [Integer] the year for which renewal eligibility is being checked
+            # @return [Dry::Monads::Result::Success, Dry::Monads::Result::Failure] a Success object containing an array of eligible family_ids or a Failure object with an error message
             def renewal_eligible_family_ids(renewal_year)
-              family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
+              family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id) - @exclusion_family_ids
 
               eligible_family_ids = ::FinancialAssistance::Application.by_year(
                 renewal_year.pred
