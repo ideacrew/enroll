@@ -55,8 +55,8 @@ module Operations
               application.applicants.each do |applicant|
                 updated_info = {}
 
-                updated_info[:ethnicity] = [] if applicant.ethnicity.nil?
-                updated_info[:tribe_codes] = [] if applicant.tribe_codes.nil?
+                updated_info[:ethnicity] = [] if applicant.read_attribute(:ethnicity).nil?
+                updated_info[:tribe_codes] = [] if applicant.read_attribute(:tribe_codes).nil?
 
                 unless updated_info.empty?
                   updated_info[:updated_at] = Time.now.utc
