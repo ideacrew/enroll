@@ -125,7 +125,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
 
   it "should have print area" do
     expect(rendered).to have_selector('#printArea')
-    expect(rendered).to have_selector('a#btnPrint')
+    expect(rendered).to have_selector('a.btn-print')
   end
 
   it "should have market" do
