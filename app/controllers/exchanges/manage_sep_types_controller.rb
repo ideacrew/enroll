@@ -5,6 +5,7 @@ module Exchanges
     include ::DataTablesAdapter #TODO: check
     include ::Pundit
     include ::L10nHelper
+    include ::ViewControlsHelper
 
     before_action :set_cache_headers, only: [:sep_types_dt, :sorting_sep_types, :clone, :new, :edit]
     before_action :updateable?
