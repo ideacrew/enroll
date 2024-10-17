@@ -6,6 +6,7 @@ require 'dry/monads/do'
 module Operations
   class UpdateDobSsn
     include Dry::Monads[:do, :result]
+    include ::ParseDateHelper
 
     def call(person_id:, params:, current_user:, ssn_require:)
       person = yield fetch_person(person_id)
@@ -31,7 +32,8 @@ module Operations
 
     def update_person(person, params, current_user, ssn_require)
       dob_param = params.dig(:jq_datepicker_ignore_person, :dob).present? ? params[:jq_datepicker_ignore_person][:dob] : params[:person][:dob]
-      person.dob = Date.strptime(dob_param, dob_param.match(/\d{4}-\d{2}-\d{2}/) ? "%Y-%m-%d" : "%m/%d/%Y")
+      person.dob = parse_date(dob_param)
+
       if params[:person][:ssn].blank?
         if ssn_require
           dont_update_ssn = true
