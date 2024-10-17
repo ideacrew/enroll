@@ -405,7 +405,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def set_dependent_and_family
-    @dependent = ::Forms::FamilyMember.find(params.require(:id))
+    @dependent = ::Forms::FamilyMember.find(params.require(:id), params.require(:action))
     @family = Family.find(@dependent.family_id)
 
     authorize_family_access
