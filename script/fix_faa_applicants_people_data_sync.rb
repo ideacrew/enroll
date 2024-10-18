@@ -107,7 +107,7 @@ def trigger_update_to_main_app(applicant, application)
 
   if create_or_update_result.success?
     response_family_member_id = create_or_update_result.success[:family_member_id]
-    applicant.update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?
+    applicant.update_attributes!(family_member_id: response_family_member_id) if applicant.family_member_id.nil?
   end
 end
 
