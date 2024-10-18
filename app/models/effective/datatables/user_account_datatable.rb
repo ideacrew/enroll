@@ -21,6 +21,12 @@ module Effective
           current_user_permission = current_user&.person&.hbx_staff_role&.permission
           dropdown << ['View Login History',login_history_user_path(id: row.id), 'ajax'] if current_user_permission&.view_login_history
           dropdown << ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax'] if current_user_permission&.can_change_username_and_email
+          if current_user_permission&.can_reset_password && row.email.present?
+            dropdown << ['Reset Password', reset_password_user_path(row), 'ajax']
+          elsif current_user_permission&.can_reset_password
+            dropdown << ['Reset Password', edit_user_path(row.id), 'ajax']
+          end
+          dropdown << ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id}"), 'ajax'] if current_user_permission&.can_lock_unlock
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "user_action_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end

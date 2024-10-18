@@ -4,7 +4,6 @@ Feature: User Account page
   Background: Setup permissions, HBX Admin, users, and organizations and employer profiles
     Given the shop market configuration is enabled
     Given all permissions are present
-    And bs4_admin_flow feature is disable
     And that a user with a HBX staff role with HBX staff subrole exists and is logged in
     And that a user with a Employee Role role exists and is not logged in
     And that a user with a Employer Role role exists and is not logged in
