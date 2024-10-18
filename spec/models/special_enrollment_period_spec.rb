@@ -456,8 +456,9 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
   end
 
   context 'store user id on sep' do
-    let(:current_user) { FactoryBot.create(:user) }
+    let(:current_user) { FactoryBot.create(:user, email: "currenuser@gmail.com") }
     let(:qle_on_date)  { TimeKeeper.date_of_record.beginning_of_month }
+    let(:admin_user) { FactoryBot.create(:user, email: "adminuser@gmail.com") }
 
     let(:sep) do
       family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on_date,
@@ -473,7 +474,26 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     it 'should store user_id on sep on save' do
       expect(sep.user_id).to eq current_user.id
     end
+
+    context 'when admin user is logged in and sep is updated' do
+      let(:sep) do
+        family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on_date,
+                                                start_on: qle_on_date - 1.month, end_on: qle_on_date + 1.month,
+                                                effective_on_kind: "date_of_event")
+      end
+
+      it 'should not update user_id on sep on save' do
+        SAVEUSER[:current_user_id] = current_user.try(:id)
+        sep.save
+        expect(sep.user_id).to eq current_user.id
+
+        SAVEUSER[:current_user_id] = admin_user.try(:id)
+        sep.update!(effective_on_kind: "first_of_month")
+        expect(sep.reload.user_id).to eq current_user.id
+      end
+    end
   end
+
 
   context "Family experiences IVL Qualifying Life Event" do
 
