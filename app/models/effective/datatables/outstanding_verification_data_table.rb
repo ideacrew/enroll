@@ -23,8 +23,8 @@ module Effective
           table_column :ssn, :label => l10n('ssn'), :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         end
         table_column :dob, :label => l10n('dob'), :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
-        table_column :hbx_id, :label => l10n('hbx_id'), :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
-        table_column :count, :label => l10n('count'), :width => '100px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
+        table_column :hbx_id, :label => l10n('hbx_id'), :width => '100px', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
+        table_column :count, :label => l10n('count'), :width => '70px', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row|
           row.vlp_documents_status
         }, :filter => false, :sortable => true
@@ -50,8 +50,8 @@ module Effective
           table_column :ssn, :label => l10n('ssn'), :proc => proc { |row| truncate(number_to_obscured_ssn(eligibility_primary_ssn(row))) }, :filter => false, :sortable => false
         end
         table_column :dob, :label => l10n('dob'), :proc => proc { |row| format_date(eligibility_primary_family_member(row).dob)}, :filter => false, :sortable => false
-        table_column :hbx_id, :label => l10n('hbx_id'), :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false
-        table_column :count, :label => l10n('hbx_profiles.outstanding_verifications.table.count'), :width => '100px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
+        table_column :hbx_id, :label => l10n('hbx_id'), :width => '100px', :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false
+        table_column :count, :label => l10n('count'), :width => '70px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row|
           document_status_for(row)
         }, :filter => false, :sortable => true
@@ -89,7 +89,7 @@ module Effective
       end
 
       def date_filter_name_definition
-        "Verification Due Date Range"
+        l10n('hbx_profiles.outstanding_verifications.table.date_filter_title')
       end
 
       def eligibility_primary_family_member(family)

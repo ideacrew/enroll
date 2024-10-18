@@ -55,6 +55,9 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.sep_history_for" => "SEP History for %{name}",
 	"en.hbx_profiles.sep_creator" => "SEP Creator",
 	"en.hbx_profiles.sep_creation_date" => "Creation Date",
+  "en.hbx_profiles.fifteenth" => "15th of Month",
+  "en.hbx_profiles.end_of_month" => "End of Month",
+  "en.hbx_profiles.na" => "N/A",
 	"en.hbx_profiles.sep_optional_dates" => "Option Dates",
 	"en.hbx_profiles.new_eligibility.header" => "Create Eligibility",
 	"en.hbx_profiles.new_eligibility.subheader" => "Please fill out all relevant information for each family member and continue to step 2 of 2.",
@@ -125,6 +128,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure.email_subheader" => "The email matches with the following user:",
   # Outstanding Verfications Tab
   "en.hbx_profiles.outstanding_verifications.header" => "Outstanding Verifications",
+  "en.hbx_profiles.outstanding_verifications.table.date_filter_title" => "Verification Due Date Range",
   "en.hbx_profiles.outstanding_verifications.table.documents_uploaded" => "Docs Uploaded",
   "en.hbx_profiles.outstanding_verifications.table.verification_due" => "Verification Due",
   "en.hbx_profiles.outstanding_verifications.table.outstanding_verification_types" => "Outstanding Verification Types",

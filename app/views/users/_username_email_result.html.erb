@@ -6,14 +6,14 @@
       <table class="table table-border">
         <thead>
           <tr>
-            <th class='weight-n'><%= l10n('name') %>: <b><%= @user.person.try(:full_name) %></b></th>
-            <th class='weight-n'><%= l10n('hbx_id') %>: <b><%= @user.person.try(:hbx_id)%></b></th>
+            <th class='weight-n'><%= l10n('name') %>: <%= @user.person.try(:full_name) %></th>
+            <th class='weight-n'><%= l10n('hbx_id') %>: <%= @user.person.try(:hbx_id)%></th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><%= l10n('username') %>: <b><%= @user.oim_id  %></b></td>
-            <td><%= l10n('email') %>: <b><%= @person&.email %></b></td>
+            <td><p class='mb-0'><%= l10n('username') %>: <%= @user.oim_id  %></p></td>
+            <td><p class='mb-0'><%= l10n('email') %>: <%= @user&.email %></p></td>
           </tr>
         </tbody>
       </table>
