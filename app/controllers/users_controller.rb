@@ -5,6 +5,16 @@
 # @see ApplicationController
 class UsersController < ApplicationController
 
+  # Redirect to the user account index page if :reset_password_lock_unlock_user feature is disabled.
+  unless EnrollRegistry.feature_enabled?(:reset_password_lock_unlock_user)
+    before_action :redirect_to_user_account_index, only: [
+      :lockable,
+      :confirm_lock,
+      :reset_password,
+      :confirm_reset_password
+    ]
+  end
+
   # Sets the user before each action, except for :confirm_lock and :unsupported_browser.
   before_action :set_user, except: [:confirm_lock, :unsupported_browser]
   before_action :enable_bs4_layout, except: [:unsupported_browser] if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
@@ -131,6 +141,14 @@ class UsersController < ApplicationController
     respond_to do |format|
       format.html { render 'unsupported_browser' }
     end
+  end
+
+  # Redirects admin user back to user account index page if :reset_password_lock_unlock_user feature is disabled.
+  #
+  # @return [void]
+  def redirect_to_user_account_index
+    redirect_to user_account_index_exchanges_hbx_profiles_path
+    flash[:error] = l10n('controllers.flag_disabled', feature_name: 'reset_password_lock_unlock_user')
   end
 
   private
