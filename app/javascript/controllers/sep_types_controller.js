@@ -12,7 +12,7 @@ export default class extends Controller {
       market:       this.metadataTarget.dataset.qleMarket,
       draft:        this.metadataTarget.dataset.qleDraft
     }
-    var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
+    var market = document.getElementById('market_kind').querySelector('input[type=radio]:checked')
     this.disableOrEnable(market)
     this.initializeReasons()
     this.showorhideOtherReason()
@@ -20,7 +20,7 @@ export default class extends Controller {
 
     initializeReasons(){
       var qlek_reasons = this.metadata.qlek_reasons
-      var reason_options = document.getElementById("reason")
+      var reason_options = document.querySelector("#reasonContainer select")
       for (var qlek_reason of qlek_reasons) {
         if (Array.from(reason_options.options).map(option => option.value).includes(qlek_reason) == false){
           reason_options.options[reason_options.options.length] = new Option(qlek_reason.toLocaleLowerCase().split('_').join(' '), qlek_reason)
@@ -34,14 +34,14 @@ export default class extends Controller {
     }
 
     reasonChange(event) {
-      var reason = document.getElementById("reason").value
+      var reason = document.querySelector("#reasonContainer select").value
       this.showorhideOtherReason()
     }
 
     checkSelectedReason() {
       var reason = this.metadata.reason
       var other_reason = this.metadata.other_reason
-      var reasons = document.getElementById("reason").options
+      var reasons = document.querySelector("#reasonContainer select").options
       var sele_reason = reason == "other" && other_reason ? "other" : reason
       for (var reason of reasons) {
         if (sele_reason == reason.value) {
@@ -53,7 +53,7 @@ export default class extends Controller {
     setSelectedReason(){
       var reason = this.metadata.reason
       var other_reason = this.metadata.other_reason
-      var reason_options = document.getElementById("reason")
+      var reason_options = document.querySelector("#reasonContainer select")
       if (reason == "Choose..." ) return;
       var sele_reason = reason == "other" && other_reason ? "other" : reason
       if (sele_reason.length != 0 && Array.from(reason_options.options).map(option => option.value).includes(sele_reason) == false){
@@ -63,13 +63,21 @@ export default class extends Controller {
 
     showorhideOtherReason(){
       var other_reason = this.metadata.other_reason
-      var reason = document.getElementById("reason").value
+      var reason = document.querySelector("#reasonContainer select").value
       if (other_reason != "" && reason == "other" || reason == "other"){
         document.getElementById("other_reason").setAttribute("type", "show");
-        document.querySelector("label[for='other_reason']").style.display = "block";
+        document.getElementById("other_reason").setAttribute("required", "required");
+        document.getElementById("other_reason").classList.remove("hidden");
+        if (document.querySelector("label[for='other_reason']")) {
+          document.querySelector("label[for='other_reason']").style.display = "block";
+        }
       }else{
         document.getElementById("other_reason").setAttribute("type", "hidden");
-        document.querySelector("label[for='other_reason']").style.display = "none";
+        document.getElementById("other_reason").removeAttribute("required");
+        document.getElementById("other_reason").classList.add("hidden");
+        if (document.querySelector("label[for='other_reason']")) {
+          document.querySelector("label[for='other_reason']").style.display = "none";
+        }
       }
     }
 
@@ -131,7 +139,9 @@ export default class extends Controller {
       if(selected_effec_on_kinds.includes(effective_on_kind.value) == true && sele_market == market.value){
         effective_on_kind.checked = true
         effective_on_kind.disabled = false
-        effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
+        if (effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0]) {
+          effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
+        }
       }
     }
   }
@@ -145,7 +155,6 @@ export default class extends Controller {
       var checkbox = document.querySelectorAll('input[type=checkbox]');
       for (var i = 0; i < checkbox.length; i++) {
         checkbox[i].disabled = true;
-
       }
       var inputs = document.getElementsByTagName("select");
       for (var i = 0; i < inputs.length; i++) {

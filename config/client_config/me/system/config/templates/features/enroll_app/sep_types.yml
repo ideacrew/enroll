@@ -74,20 +74,20 @@ registry:
             item: <%= ENV[':market_kind'] %>
             meta:
               label: Market *
+              description: exchange.manage_sep_types.market_kind
               content_type: :radio_select
               enum: [{individual: "Individual"}]
               default: :individual
-              description: ''
               is_required: true
               is_visible: true
           - key: :is_self_attested
             item: <%= ENV['is_self_attested'] %>
             meta:
               label: Self Attestation *
+              description: exchange.manage_sep_types.self_attestation
               content_type: :radio_select
               default: true
               enum: [ {'true': 'Self-Service' }, { 'false': 'Admin Only'} ]
-              description: ''
               is_required: true
               is_visible: true
           - key: :reason
@@ -122,6 +122,7 @@ registry:
             item: <%= ENV['effective_on_kinds'] %>
             meta:
               label: Effective Date Rules *
+              description: exchange.manage_sep_types.effective_date_rules
               enum: [{date_of_event: Date of Event},
               {date_of_event_plus_one: Date of event + 1},
               {first_of_this_month: First of Event Month},
@@ -135,17 +136,16 @@ registry:
               {first_of_the_month_coinciding: First of the Month (Coinciding)}]
               content_type: :checkbox_select
               default: ''
-              description: ''
               is_required: false
               is_visible: true
           - key: :termination_on_kinds
             item: <%= ENV['termination_on_kinds'] %>
             meta:
               label: Termination On
+              description: exchange.manage_sep_types.terminate_on
               enum: [{end_of_event_month: Last Day of Event Month}, {date_before_event: Day before Event}, {end_of_last_month_of_reporting: Last Day of Month before Reporting}, {end_of_reporting_month: Last Day of Reporting Month}, {end_of_month_before_last: Last Day of Two Months Before Reporting}, {exact_date: Exact Date}]
               content_type: :checkbox_select
               default: ''
-              description: ''
               is_required: false
               is_visible: true
           - key: :coverage_start_on
@@ -170,20 +170,20 @@ registry:
             item: <%= ENV['is_visible'] %>
             meta:
               label: Visibility *
+              description: exchange.manage_sep_types.visibility
               content_type: :radio_select
               default: true
               enum: [ {'true': 'Customer & Admin' }, { 'false': 'Admin Only'} ]
-              description: ''
               is_required: true
               is_visible: true
           - key: :date_options_available
             item: <%= ENV['date_options_available'] %>
             meta:
               label: Date Options Available *
+              description: exchange.manage_sep_types.date_options
               content_type: :radio_select
               default: false
               enum: [ {'true': 'True' }, { 'false': 'False'} ]
-              description: ''
               is_required: true
               is_visible: true
           - key: :event_kind_label
@@ -199,10 +199,10 @@ registry:
             item: <%= ENV['qle_event_date_kind'] %>
             meta:
               label: SEP Eligibility Kind *
+              description: exchange.manage_sep_types.sep_eligibility_kinds
               content_type: :radio_select
               enum: [ {qle_on: 'Event Date' }, { submitted_at: 'Reported Date'} ]
               default: :qle_on
-              description: ''
               is_required: true
               is_visible: true
       - key: :expire_sep_type
@@ -228,6 +228,6 @@ registry:
       - key: :update_sep_types_list
         item: Operations::QualifyingLifeEventKind::UpdateList.new
         is_enabled: true
-      - key: :sep_effective_date_match 
+      - key: :sep_effective_date_match
         item: :sep_effective_date_match
         is_enabled: false

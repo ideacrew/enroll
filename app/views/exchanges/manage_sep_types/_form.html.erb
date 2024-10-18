@@ -1,0 +1,114 @@
+<div data-controller="sep-types">
+  <meta data-target='sep-types.metadata'
+    data-qle-reason="<%= @qle.reason %>"
+    data-qlek-reasons="<%= @qle.qle_kind_reason_options %>"
+    data-other-reason="<%= @qle.other_reason || ''%>"
+    data-qle-market="<%= @qle.market_kind %>"
+    data-termination-kinds="<%= @qle.termination_on_kinds || []%>"
+    data-effective-kinds="<%= @qle.effective_on_kinds || [] %>"
+    data-qle-draft="<%= @qle.draft %>">
+  <% if @failure.present? %>
+    <div class="alert alert-error d-flex align-items-start">
+      <div class="d-flex pl-1">
+        <div class="error-icon icon" alt="info">&nbsp;</div>
+      </div>
+      <div class="col mr-auto p-0 align-self-center">
+        <% @failure[0].errors.to_h.each do |name, message| %>
+          <ul>
+            <li><%= "#{name.to_s.humanize}: #{message.first}" %></li>
+          </ul>
+        <% end %>
+      </div>
+      <div class="d-flex pl-1">
+        <a class="close-icon icon icon-sm pr-1" data-dismiss="alert" alt="<%= l10n("close") %>" href="#">&nbsp;<span class="sr-only"><%= l10n("close") %></span></a>
+      </div>
+    </div>
+  <% end %>
+  <h1>
+    <% if @qle.draft %>
+      <%= l10n("exchange.manage_sep_types.update_sep_type")%>
+    <% elsif !@qle.draft.present? %>
+      <%= l10n("exchange.manage_sep_types.create_sep_type")%>
+    <% else %>
+      <%= l10n("exchange.manage_sep_types.sep_type_details")%>
+    <% end %>
+  </h1>
+  <p><%= l10n("exchange.manage_sep_types.description") %></p>
+  <div class="col-9 px-0">
+    <div class="d-flex justify-content-start my-4">
+      <div class="col-6 pl-0">
+        <%= f.label :start_on, l10n("exchange.employer_applications.start_date"), class: "required" %>
+        <%= f.date_field :start_on, placeholder: "MM/DD/YYYY", required: true, class: "w-100" %>
+      </div>
+      <div class="col-6 pr-0">
+        <%= f.label :end_on, l10n("exchange.employer_applications.end_date"), class: "required" %>
+        <%= f.date_field :end_on, placeholder: "MM/DD/YYYY", required: true, class: "w-100" %>
+      </div>
+    </div>
+    <div class="my-4">
+      <%= f.label :title, l10n("exchange.manage_sep_types.sep_name"), class: "required" %>
+      <%= f.text_field :title, required: true, placeholder: l10n("title"), class: "w-100" %>
+    </div>
+    <div class="my-4">
+      <%= f.label :tool_tip, l10n("exchange.manage_sep_types.tooltip") %>
+      <%= f.text_field :tool_tip, placeholder: l10n("exchange.manage_sep_types.tooltip_content"), class: "w-100" %>
+    </div>
+    <div class="my-4">
+      <%= f.label :event_kind_label, l10n("exchange.manage_sep_types.event_date_label"), class: "required" %>
+      <%= f.text_field :event_kind_label, required: true, placeholder: l10n("exchange.manage_sep_types.event_date_label"), class: "w-100" %>
+    </div>
+    <div data-action='change->sep-types#reasonChange' id="reasonContainer">
+      <div class="my-4">
+        <%= f.label :reason, l10n("exchange.manage_sep_types.reason"), class: 'required'  %>
+        <%= f.select :reason, EnrollRegistry[:sep_types].setting(:reason)&.meta&.enum&.map{|option| [l10n("exchange.manage_sep_types.reason.#{option.keys.first}"), option.keys.first]}, {prompt: l10n("select_option")}, {required: true, class: "w-100"} %>
+      </div>
+      <div class="my-4" id="other_reason">
+        <%= f.label :other_reason, l10n("exchange.manage_sep_types.reason.other"), class: "required" %>
+        <%= f.text_field :other_reason, placeholder: l10n("exchange.manage_sep_types.reason.other"), class: "w-100" %>
+      </div>
+    </div>
+    <div class="d-flex justify-content-start my-4">
+      <div class="pl-0 col-6">
+        <%= f.label :pre_event_sep_in_days, l10n("exchange.manage_sep_types.eligible_before"), class: "required" %>
+        <%= f.number_field :pre_event_sep_in_days, required: true, class: "w-100" %>
+      </div>
+      <div class="pr-0 col-6">
+        <%= f.label :post_event_sep_in_days, l10n("exchange.manage_sep_types.eligible_after"), class: "required" %>
+        <%= f.number_field :post_event_sep_in_days, required: true, class: "w-100" %>
+      </div>
+    </div>
+    <div class="my-4">
+      <div id="market_kind" data-action='change->sep-types#marketChange'>
+        <%= build_fieldset_inputs_from_rr(EnrollRegistry[:sep_types].setting(:market_kind), f) %>
+      </div>
+    </div>
+    <div class="my-4">
+      <%= build_fieldset_inputs_from_rr(EnrollRegistry[:sep_types].setting(:qle_event_date_kind), f) %>
+    </div>
+    <div class="my-4">
+      <%= build_fieldset_inputs_from_rr(EnrollRegistry[:sep_types].setting(:is_self_attested), f) %>
+    </div>
+    <div class="my-4" id="effective_on_kinds">
+      <%= build_fieldset_inputs_from_rr(EnrollRegistry[:sep_types].setting(:effective_on_kinds), f) %>
+    </div>
+    <div class="d-flex justify-content-start">
+      <div class="col-6 pl-0">
+        <%= f.label :coverage_start_on, l10n("Eligibility Start Date") %>
+        <%= f.date_field :coverage_start_on, placeholder: "MM/DD/YYYY", class: "w-100" %>
+      </div>
+      <div class="col-6 pr-0">
+        <%= f.label :coverage_end_on, l10n("Eligibility End Date") %>
+        <%= f.date_field :coverage_end_on, placeholder: "MM/DD/YYYY", class: "w-100" %>
+      </div>
+    </div>
+    <div class="my-4">
+      <%= build_fieldset_inputs_from_rr(EnrollRegistry[:sep_types].setting(:is_visible), f) %>
+    </div>
+    <div class="my-4">
+      <%= build_fieldset_inputs_from_rr(EnrollRegistry[:sep_types].setting(:date_options_available), f) %>
+    </div>
+    <div class="my-4" id="termination_on_kinds" >
+      <%= build_fieldset_inputs_from_rr(EnrollRegistry[:sep_types].setting(:termination_on_kinds), f) if is_shop_or_fehb_market_enabled? %>
+    </div>
+  </div>
+</div>
