@@ -30,3 +30,13 @@ end
 Then(/^the Terminate Enrollment option should be disabled$/) do
   find_link('Terminate Enrollment')[:disabled] == 'true'
 end
+
+#Note this step will be used in the future when APTC is completed
+Then(/^the Edit APTC\/CSR option should be enabled$/) do
+  find_link('Edit APTC / CSR')['data-remote'].should == 'true'
+end
+
+#Note this step will be used in the future when APTC is completed
+Then(/^the Edit APTC\/CSR option should be disabled$/) do
+  find_link('Edit APTC / CSR').should be_disabled
+end

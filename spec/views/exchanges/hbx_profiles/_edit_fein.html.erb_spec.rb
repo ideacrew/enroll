@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "hbx_admin/_edit_fein", :dbclean => :after_each do
+RSpec.describe "hbx_admin/_edit_aptc_csr", :dbclean => :after_each do
 
   let(:site) do
     FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)

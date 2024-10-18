@@ -1,5 +1,13 @@
 class HbxProfilePolicy < ApplicationPolicy
 
+  def edit_aptc_csr?
+    staff_can_edit_aptc?
+  end
+
+  def calculate_aptc_csr?
+    edit_aptc_csr?
+  end
+
   def oe_extendable_applications?
     staff_can_extend_open_enrollment?
   end

@@ -26,6 +26,14 @@ When(/^Hbx Admin click Families dropdown/) do
   wait_for_ajax
 end
 
+Then(/^Hbx Admin should see an Edit APTC \/ CSR link$/) do
+  find_link('Edit APTC / CSR').visible?
+end
+
+Then(/Hbx Admin clicks the Edit APTC CSR link/) do
+  find_all(EditAptc.edit_aptc_csr_action).first.click
+end
+
 Then(/Hbx Admin should see individual level csr percent/) do
   expect(page.has_css?(EditAptc.csr_pct_as_integer)).to eq true
   expect(page).to have_select("csr_percentage_#{Person.first.id}", :selected => '0')
@@ -40,6 +48,11 @@ Given(/Tax household member info exists for user/) do
   thm.update_attributes!(family_member: Family.first.family_members.first)
   BenefitMarkets::Products::Product.first.update_attributes!(metal_level_kind: :silver)
 end
+
+When(/^Hbx Admin clicks on the Update APTC CSR button$/) do
+  find_link('Edit APTC / CSR').click
+end
+
 
 Then(/^Hbx Admin should see cat plan error message$/) do
   wait_for_ajax

@@ -21,6 +21,7 @@ ADMIN_ACTIONS_TRANSLATIONS = {
   'en.admin_actions.bulk_upload.new.description_sub_text' => 'The message and any attachments will be the same for everyone on the recipient list – they cannot be personalized. You can attach files in PDF, JPEG, or PNG formats.',
   'en.admin_actions.bulk_upload.new.zero_more' => '0 more...',
   'en.admin_actions.bulk_upload.new.less' => 'Less...',
+  'en.admin_actions.edit_aptc_csr' => 'Edit APTC / CSR',
   'en.admin_actions.drop_enrollment_members' => 'Disenroll Member(s)',
   'en.admin_actions.drop_member_description' => 'This tool allows Admins to disenroll members from an active Individual Market enrollment. The tool will only be available for families where more than one member exists in the family and there is at least one active individual market health or dental enrollment.',
   'en.admin_actions.enrollment_hbx_id' => 'Enrollment HBX ID',
