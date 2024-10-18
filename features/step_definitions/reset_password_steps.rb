@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+Given(/^the reset password and unlock lock user feature is enabled$/) do
+  allow(EnrollRegistry[:reset_password_lock_unlock_user].feature).to receive(:is_enabled).and_return(true)
+end
+
 Then(/^Hbx Admin should see the list of primary applicants and Action buttons$/) do
   within('.effective-datatable') do
     expect(page).to have_css('.dropdown-toggle', count: 2)
@@ -10,10 +14,6 @@ When(/^Hbx Admin clicks on the Action button of primary applicant$/) do
   within('.effective-datatable') do
     find_all('.dropdown-toggle').last.click
   end
-end
-
-Then(/^Hbx Admin should see (.*?) link in action drop down$/) do |text|
-  find_link(text).visible?
 end
 
 Then(/^Hbx Admin should not see (.*?) link in action drop down$/) do |text|

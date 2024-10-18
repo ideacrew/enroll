@@ -15,6 +15,7 @@ describe UsersController, dbclean: :after_each do
   end
 
   before :each do
+    allow(EnrollRegistry[:reset_password_lock_unlock_user].feature).to receive(:is_enabled).and_return(true)
     allow(User).to receive(:find).with(user_id).and_return(user)
   end
 
