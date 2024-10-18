@@ -89,7 +89,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   context 'for success' do
     context 'query and publish renewal draft application' do
       before do
-        @result = subject.call(renewal_year: renewal_year)
+        @result = subject.call({ renewal_year: renewal_year, exclusion_family_ids: [] })
       end
 
       it 'should return IVL family id' do
@@ -159,11 +159,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                             ])
         end
 
-
         before do
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_call_original
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
-          @result = subject.call(renewal_year: renewal_year)
+          @result = subject.call({ renewal_year: renewal_year, exclusion_family_ids: [] })
         end
 
         it 'returns family ids with all determined apps irrespective of application eligibility' do
@@ -171,6 +170,96 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           expect(@result.success).to include(family.id)
           expect(@result.success).to include(family2.id)
         end
+      end
+    end
+  end
+
+  context 'for exclusion_family_ids' do
+    let(:person21) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:family21) { FactoryBot.create(:family, :with_primary_family_member, person: person21) }
+
+    let(:application21) do
+      FactoryBot.create(
+        :financial_assistance_application,
+        family_id: family21.id,
+        assistance_year: current_year,
+        aasm_state: 'determined'
+      )
+    end
+
+    let(:applicant21) do
+      FactoryBot.create(
+        :financial_assistance_applicant,
+        person_hbx_id: person21.hbx_id,
+        family_member_id: family21.primary_applicant.id,
+        application: application21
+      )
+    end
+
+    let(:active_enrollment21) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        family: family21,
+        kind: "individual",
+        coverage_kind: "health",
+        aasm_state: 'coverage_selected',
+        effective_on: effective_on,
+        hbx_enrollment_members: [
+          FactoryBot.build(:hbx_enrollment_member, applicant_id: family21.primary_applicant.id, eligibility_date: effective_on, coverage_start_on: effective_on, is_subscriber: true)
+        ]
+      )
+    end
+
+    before do
+      applicant21
+      active_enrollment21
+    end
+
+    context 'missing params' do
+      it 'returns failure' do
+        expect(
+          subject.call(nil).failure
+        ).to eq('Invalid input. Params is expected to be a hash.')
+      end
+    end
+
+    context 'missing exclusion_family_ids key' do
+      it 'returns failure' do
+        expect(
+          subject.call({ renewal_year: renewal_year }).failure
+        ).to eq('Missing key exclusion_family_ids. Must include exclusion_family_ids key with array as value.')
+      end
+    end
+
+    context 'invalid value for exclusion_family_ids key' do
+      it 'returns failure' do
+        expect(
+          subject.call({ renewal_year: renewal_year, exclusion_family_ids: "DUMMY VALUE" }).failure
+        ).to eq('Missing key exclusion_family_ids. Must include exclusion_family_ids key with array as value.')
+      end
+    end
+
+    context 'invalid family_id in exclusion_family_ids' do
+      it 'returns failure' do
+        expect(
+          subject.call({ renewal_year: renewal_year, exclusion_family_ids: ["DUMMY VALUE"] }).failure
+        ).to eq("Unable to transform exclusion_family_ids: [\"DUMMY VALUE\"] to BSON ObjectIds.")
+      end
+    end
+
+    context 'including exclusion_family_ids' do
+      it 'returns only one family' do
+        expect(
+          subject.call({ renewal_year: renewal_year, exclusion_family_ids: [family21.id] }).success
+        ).to eq [family.id]
+      end
+    end
+
+    context 'excluding exclusion_family_ids' do
+      it 'returns both the families' do
+        expect(
+          subject.call({ renewal_year: renewal_year, exclusion_family_ids: [] }).success.sort
+        ).to eq [family.id, family21.id].sort
       end
     end
   end
