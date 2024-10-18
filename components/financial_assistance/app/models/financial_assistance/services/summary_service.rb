@@ -409,11 +409,11 @@ module FinancialAssistance
 
             return if fr_hash.empty?
             section_hash(title: l10n('faa.review.your_household'),
-                        subsections: [subsection_hash(
-                          title: l10n('faa.nav.family_relationships'),
-                          edit_link: application_relationships_path(@application),
-                          rows: fr_hash.compact
-                        )])
+                         subsections: [subsection_hash(
+                           title: l10n('faa.nav.family_relationships'),
+                           edit_link: application_relationships_path(@application),
+                           rows: fr_hash.compact
+                         )])
           end
 
           # @method preferences_summary
