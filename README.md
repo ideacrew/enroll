@@ -1,4 +1,5 @@
 ![code coverage](https://raw.githubusercontent.com/ideacrew/enroll/coverage-artifacts/badge_linecoverage.svg?raw=true)
+[![full check suite](https://github.com/ideacrew/enroll/actions/workflows/full-suite.yml/badge.svg?branch=trunk&event=schedule)](https://github.com/ideacrew/enroll/actions/workflows/full-suite.yml)
 
 # Enroll
 
