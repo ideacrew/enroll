@@ -1,12 +1,16 @@
 <% if @bs4 %>
-  <%if @errors && @errors.any? %>
-    <div class='alert alert-error'>
-      <a class='close-icon icon icon-sm float-right' data-dismiss='alert'>x</a>
-      <% @errors.each do |err| %>
-        <li><%= err[0].to_s == "oim_id" ? l10n("username") : l10n("email") %> <%= err[1][0] %></li>
-      <%end%>
+  <% if @errors && @errors.any? %>
+    <div class="alert alert-error d-flex align-items-start">
+      <div class="col mr-auto p-0 align-self-center">
+        <% @errors.each do |err| %>
+          <li><%= err[0].to_s == "oim_id" ? l10n("username") : l10n("email") %> <%= err[1][0] %></li>
+        <%end%>
+      </div>
+      <div class="d-flex pl-1">
+        <a class="close-icon icon icon-sm pr-1" data-dismiss="alert" alt="<%= l10n("close") %>" href="#">&nbsp;<span class="sr-only"><%= l10n("close") %></span></a>
+      </div>
     </div>
-  <%end%>
+  <% end %>
 
   <h2 class='mb-3'><%= l10n('hbx_profiles.user_accounts.actions.edit.header') %></h2>
   <div id="credentials-matches" class="hidden">
