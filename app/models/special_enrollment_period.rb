@@ -90,7 +90,7 @@ class SpecialEnrollmentPeriod
   scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id) ) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
-  before_save :set_user_id
+  before_save :set_user_id, if: :new_record?
 
   after_initialize :set_submitted_at
 
