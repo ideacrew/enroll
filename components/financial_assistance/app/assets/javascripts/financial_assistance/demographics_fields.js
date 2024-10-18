@@ -19,6 +19,7 @@ function isApplyingCoverage(target){
 
     }
     $(fields).change(function () {
+      resetFormFields();
       if ($(fields).not(":checked").val() == "true"){
         $("#consumer_fields_sets").hide();
         $("#employer-coverage-msg").show();
@@ -42,6 +43,23 @@ function isApplyingCoverage(target){
       }
     });
   }
+}
+
+function resetFormFields() {
+  // Set radio buttons to unchecked
+  $('#us_citizen_true').prop('checked', false);
+  $('#us_citizen_false').prop('checked', false);
+  $('#naturalized_citizen_true').prop('checked', false);
+  $('#naturalized_citizen_false').prop('checked', false);
+  $('#eligible_immigration_status_true').prop('checked', false);
+  $('#eligible_immigration_status_false').prop('checked', false);
+  $('#is_incarcerated_true').prop('checked', false);
+  $('#is_incarcerated_false').prop('checked', false);
+  $('#indian_tribe_member_yes').prop('checked', false);
+  $('#indian_tribe_member_no').prop('checked', false);
+
+  // Set checkboxes to unchecked
+  $('#applicant_eligible_immigration_status').prop('checked', false);
 }
 
 function addEventOnNoSsn(target){
