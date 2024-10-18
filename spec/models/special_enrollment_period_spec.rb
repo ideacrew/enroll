@@ -494,7 +494,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     end
   end
 
-
   context "Family experiences IVL Qualifying Life Event" do
 
   end
