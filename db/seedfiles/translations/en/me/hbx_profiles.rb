@@ -89,6 +89,8 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.reinstate.plans" => "Medical/Dental Plans",
 	"en.hbx_profiles.reinstate.modal.header" => " You are about to reinstate the following enrollment on behalf of %{name}",
 	"en.hbx_profiles.reinstate.modal.comments" => "Comments",
+	"en.hbx_profiles.reinstate.result.success" => "Enrollment Reinstated successfully",
+	"en.hbx_profiles.reinstate.result.failure" => "Unable to find Enrollment.",
 	"en.hbx_profiles.edit_dob_ssn.header" => "Edit DOB / SSN",
 	"en.hbx_profiles.edit_dob_ssn.result.success" => "DOB / SSN Update Successful",
 	"en.hbx_profiles.edit_dob_ssn.result.cannot_remove" => "SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN",
@@ -123,6 +125,7 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.user_accounts.actions.edit.result.failure.email_subheader" => "The email matches with the following user:",
   # Outstanding Verfications Tab
   "en.hbx_profiles.outstanding_verifications.header" => "Outstanding Verifications",
+  "en.hbx_profiles.outstanding_verifications.table.date_filter_title" => "Verification Due Date Range",
   "en.hbx_profiles.outstanding_verifications.table.documents_uploaded" => "Docs Uploaded",
   "en.hbx_profiles.outstanding_verifications.table.verification_due" => "Verification Due",
   "en.hbx_profiles.outstanding_verifications.table.outstanding_verification_types" => "Outstanding Verification Types",

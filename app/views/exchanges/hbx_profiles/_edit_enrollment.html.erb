@@ -15,7 +15,7 @@
           <div>
             <%= f.label :dob, l10n('new_dob'), class: "weight-n align-self-start d-block" %>
             <% dob = params[:new_dob].present? ? params[:new_dob] : @person.dob.strftime('%Y-%m-%d') %>
-            <%= f.date_field :dob, required: true, :value => dob, placeholder: "MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", class: "col-2" %>
+            <%= f.date_field :dob, required: true, :value => dob, placeholder: "MM/DD/YYYY", min: "0000-01-01", max: TimeKeeper.date_of_record, class: "col-2" %>
           </div>
           <div>
             <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>

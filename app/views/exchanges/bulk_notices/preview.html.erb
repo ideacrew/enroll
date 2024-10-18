@@ -9,7 +9,7 @@
 
     <%= form_for(@bulk_notice, url: exchanges_bulk_notice_path(@bulk_notice)) do |f| %>
       <%= f.label :audience_type, l10n('admin_actions.bulk_upload.audience_type') %>
-      <%= f.select :audience_type, { 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { reflex: 'change->BulkNotice#audience_select' } %>
+      <%= f.select :audience_type, Admin::BulkNotice::RECIPIENTS, { selected: @bulk_notice.audience_type }, class: 'form-control w-auto pr-4', data: { reflex: 'change->BulkNotice#audience_select' } %>
       <table>
         <tbody>
           <tr>
