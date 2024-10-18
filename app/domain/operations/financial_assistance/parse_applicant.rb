@@ -69,7 +69,7 @@ module Operations
 
       def fetch_indian_tribe_member(consumer_role)
         if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
-          return nil if consumer_role.tribal_state.blank? && consumer_role.tribal_name.blank? && consumer_role.tribe_codes.all?(&:blank?)
+          return nil if consumer_role.is_applying_coverage.to_s == 'false' && consumer_role.tribal_state.blank? && consumer_role.tribal_name.blank? && consumer_role.tribe_codes.all?(&:blank?)
           return false if consumer_role.tribal_state.blank? || (consumer_role.tribal_name.blank? && consumer_role.tribe_codes.blank?)
           !consumer_role.tribal_state.blank? && (!consumer_role.tribal_name.blank? || !consumer_role.tribe_codes.blank?)
         else
