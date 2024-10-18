@@ -94,7 +94,7 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   # Using this as a seperate step was deleting the rest of the form
   role = "Primary Broker"
   location = 'default_office_location'
-  location = eval(location) if location.class == String
+  location = eval(location) if location.instance_of?(String) # rubocop:disable Security/Eval
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
@@ -106,7 +106,7 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
   if role.include? 'Employer'
     wait_for_ajax
-    select "#{location[:county]}", :from => "agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][county]"
+    select (location[:county]).to_s, :from => "agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][county]"
   end
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
@@ -146,7 +146,7 @@ Then(/^.+ click the current broker applicant show button$/) do
 end
 
 And(/^.+ should see the broker application with carrier appointments$/) do
-  if (Settings.aca.broker_carrier_appointments_enabled)
+  if Settings.aca.broker_carrier_appointments_enabled
     find_all("[id^=person_broker_role_attributes_carrier_appointments_]").each do |checkbox|
       checkbox.should be_checked
     end
@@ -164,7 +164,7 @@ end
 
 When(/^(.*?) go[es]+ to the brokers tab$/) do |legal_name|
   profile = @organization[legal_name].employer_profile
-  visit  benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'brokers')
+  visit benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab => 'brokers')
 end
 
 And(/^.+ should receive an invitation email$/) do
@@ -183,7 +183,7 @@ end
 
 When(/^.+ visits? invitation url in email$/) do
   invitation_link = links_in_email(current_email).detect { |link| link.include?("/invitation")}.gsub(/[,()'".]+\z/,'')
-  invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
+  invitation_link.sub!(%r{http://127\.0\.0\.1:3000}, '')
   visit(invitation_link)
 end
 
@@ -291,7 +291,7 @@ Then(/^.+ should see Employer (.*?) and click on legal name$/) do |legal_name|
   click_link legal_name
 end
 
-Then(/^.+ should see the Employer (.*?) page as Broker$/) do |legal_name|
+Then(/^.+ should see the Employer (.*?) page as Broker$/) do |_legal_name|
   expect(page).to have_content(employer.legal_name)
   expect(page).to have_content("I'm a Broker")
 end
@@ -325,7 +325,7 @@ Then(/^.* creates and publishes a plan year$/) do
   find('.interaction-click-control-create-plan-year').click
   find('.alert-notice')
 
-  if (Settings.aca.enforce_employer_attestation.to_s == "true")
+  if Settings.aca.enforce_employer_attestation.to_s == "true"
     find('.interaction-click-control-documents').click
     wait_for_ajax
     find('.interaction-click-control-upload').click
@@ -404,14 +404,13 @@ end
 
 Given(/^zip code for county exists as rate reference$/) do
   FactoryBot.create(:rating_area, zip_code: '01010', county_name: 'Worcester', rating_area: Settings.aca.rating_areas.first,
-    zip_code_in_multiple_counties: true)
+                                  zip_code_in_multiple_counties: true)
 end
 
 Given(/^a valid ach record exists$/) do
   FactoryBot.create(:ach_record, routing_number: '123456789', bank_name: 'Big Bank')
 end
 
-#
 Given(/^enters the existing zip code$/) do
   fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01010'
 end
@@ -451,6 +450,14 @@ end
 
 Then(/^.+ should see broker (.*?) under extended tab$/) do |broker_name|
   expect(page).to have_content(broker_name)
+end
+
+Then(/^.+ should see on the page broker (.*?)$/) do |broker_name|
+  expect(page).to have_content(broker_name)
+end
+
+Then(/^.+ should not see on the page broker (.*?)$/) do |broker_name|
+  expect(page).not_to have_content(broker_name)
 end
 
 When(/^.+ click deny broker button$/) do
