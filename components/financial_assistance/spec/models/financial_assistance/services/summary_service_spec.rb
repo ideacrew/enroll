@@ -269,7 +269,7 @@ describe ::FinancialAssistance::Services::SummaryService do
             "Issuing Country" => "N/A",
             "Are you a member of an American Indian or Alaska Native Tribe?" => "N/A",
             "Is this person currently incarcerated?" => "N/A",
-            "Race/Ethnicity" => nil
+            "Race/Ethnicity" => []
           }
 
           it_behaves_like "conditional rows", expected_row_labels: ["Tribe State", "Tribe Name", "Tribe Codes"], precondition: { desc: "tribes_information_raw_review flag is enabled", proc: -> { toggle_flag(:tribes_information_raw_review) } }
