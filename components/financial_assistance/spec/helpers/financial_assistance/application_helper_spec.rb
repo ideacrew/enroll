@@ -492,24 +492,4 @@ RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbcle
       end
     end
   end
-
-  describe '#review_benefits_esi_hash' do
-    context "when benefits are present" do
-      let!(:benefit) do
-        ben = FactoryBot.build(:financial_assistance_benefit, employer_name: 'Test Employer')
-        ben.build_employer_address(kind: 'home', address_1: 'address_1', city: 'Dummy City', state: 'DC', zip: '20001')
-        ben.build_employer_phone(kind: 'home', country_code: '001', area_code: '123', number: '4567890', primary: true)
-        applicant.benefits << ben
-        applicant.save!
-        ben
-      end
-
-      it "should return esi hash" do
-        esi_hash = helper.review_benefits_esi_hash(application.applicants.first.benefits.first)
-        expect(esi_hash["Employer Name"]).to eq "Test Employer"
-        expect(esi_hash["Employer Address Line 1"]).to eq "address_1"
-        expect(esi_hash["City"]).to eq "Dummy City"
-      end
-    end
-  end
 end

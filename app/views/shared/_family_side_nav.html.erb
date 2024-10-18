@@ -30,7 +30,7 @@
       <% end %>
       <% if @person.has_consumer_role? && EnrollRegistry.feature_enabled?(:financial_assistance) %>
         <li>
-          <%= h(link_to(financial_assistance.applications_path(tab: 'cost_savings'), class: "#{'active' if ['index', 'index_with_filter', 'applications', 'review'].include?(action_name)}") do %>
+          <%= h(link_to(financial_assistance.applications_path(tab: 'cost_savings'), class: "#{'active' if ['index', 'index_with_filter', 'applications', 'review', 'raw_application'].include?(action_name)}") do %>
             <%= l10n("faa.cost_savings_nav") %>
           <% end) %>
         </li>
