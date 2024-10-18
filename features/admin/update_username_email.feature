@@ -4,7 +4,6 @@ Feature: Update User Credentials
 
   Scenario: Admin enters valid credentials
     Given Hbx Admin Tier 3 exists
-    And bs4_admin_flow feature is disable
     When Hbx Admin Tier 3 logs on to the Hbx Portal
     Then Hbx Admin Tier 3 sees User Accounts link
     When Hbx Admin Tier 3 clicks on User Accounts link
@@ -18,7 +17,6 @@ Feature: Update User Credentials
 
   Scenario: Admin enters invalid credentials
     Given Hbx Admin Tier 3 exists
-    And bs4_admin_flow feature is disable
     When Hbx Admin Tier 3 logs on to the Hbx Portal
     Then Hbx Admin Tier 3 sees User Accounts link
     When Hbx Admin Tier 3 clicks on User Accounts link

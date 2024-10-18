@@ -932,4 +932,7 @@ registry:
       - key: :ssn_ui_fields
         item: :ssn_ui_fields
         is_enabled: <%= ENV['SSN_UI_FIELDS'] || false %>
+      - key: :reset_password_lock_unlock_user
+        item: :reset_password_lock_unlock_user
+        is_enabled: <%= ENV['ADMIN_RESET_USER_PASSWORD_AND_LOCK_UNLOCK_USER_IS_ENABLED'] || false %>
 

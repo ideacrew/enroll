@@ -22,6 +22,12 @@ end
 namespace :dc_permissions do
   desc 'hbx admin can complete resident application'
   DcDefinePermissions.define_task :hbx_admin_can_complete_resident_application => :environment
+
+  desc 'hbx admin can lock and unlock a user'
+  DcDefinePermissions.define_task :hbx_admin_can_lock_unlock => :environment
+
+  desc 'hbx admin can reset password a user'
+  DcDefinePermissions.define_task :hbx_admin_can_reset_password => :environment
 end
 
 namespace :dc_permissions do

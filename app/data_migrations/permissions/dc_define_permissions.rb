@@ -14,8 +14,8 @@ class DcDefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: false, revert_application: false, list_enrollments: false,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false,
                           view_the_configuration_tab: true, can_submit_time_travel_request: false, can_access_pay_now: true, can_access_age_off_excluded: true,
-                          can_add_pdc: false, can_update_ssn: false, can_complete_resident_application: false, can_add_sep: false,
-                          can_transition_family_members: false, can_access_user_account_tab: false, view_login_history: false,
+                          can_add_pdc: false, can_update_ssn: false, can_complete_resident_application: false, can_add_sep: false, can_lock_unlock: false,
+                          can_transition_family_members: false, can_access_user_account_tab: false, view_login_history: false, can_reset_password: false,
                           can_modify_plan_year: false, can_create_benefit_application: false, can_change_fein: false, can_force_publish: false, can_change_username_and_email: false,
                           can_view_application_types: false, can_access_outstanding_verification_sub_tab: false, can_access_accept_reject_identity_documents: false,
                           can_delete_identity_application_documents: false, can_send_secure_message: false, can_manage_qles: false, view_agency_staff: false,
@@ -26,8 +26,8 @@ class DcDefinePermissions < MigrationTask
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false, view_admin_tabs: false,
                           view_the_configuration_tab: true, can_submit_time_travel_request: false, can_access_pay_now: true, can_access_age_off_excluded: true,
-                          can_add_pdc: false, can_update_ssn: false, can_complete_resident_application: false, can_add_sep: false,
-                          can_transition_family_members: false, can_access_user_account_tab: false, view_login_history: false,
+                          can_add_pdc: false, can_update_ssn: false, can_complete_resident_application: false, can_add_sep: false, can_lock_unlock: false,
+                          can_transition_family_members: false, can_access_user_account_tab: false, view_login_history: false, can_reset_password: false,
                           can_modify_plan_year: false, can_create_benefit_application: false, can_change_fein: false, can_force_publish: false,
                           can_view_application_types: false, can_access_outstanding_verification_sub_tab: false, can_access_accept_reject_identity_documents: false,
                           can_delete_identity_application_documents: false, can_send_secure_message: false, can_manage_qles: false, view_agency_staff: false,
@@ -41,8 +41,8 @@ class DcDefinePermissions < MigrationTask
                           send_broker_agency_message: false, approve_broker: false, approve_ga: false, modify_admin_tabs: false,
                           view_admin_tabs: false, view_the_configuration_tab: true, can_submit_time_travel_request: false, can_access_pay_now: true,
                           can_access_age_off_excluded: true, can_add_pdc: false, can_update_ssn: false, can_complete_resident_application: false,
-                          can_add_sep: false, can_transition_family_members: false, can_access_user_account_tab: false,
-                          view_login_history: false, can_modify_plan_year: false, can_create_benefit_application: false,
+                          can_add_sep: false, can_lock_unlock: false, can_transition_family_members: false, can_access_user_account_tab: false,
+                          view_login_history: false, can_reset_password: false, can_modify_plan_year: false, can_create_benefit_application: false,
                           can_change_fein: false, can_force_publish: false, can_view_application_types: false, can_access_outstanding_verification_sub_tab: false,
                           can_access_accept_reject_identity_documents: false, can_delete_identity_application_documents: false, can_send_secure_message: false,
                           can_manage_qles: false, view_agency_staff: false, manage_agency_staff: false, can_edit_aptc: false, can_change_username_and_email: false,
@@ -55,17 +55,17 @@ class DcDefinePermissions < MigrationTask
     Permission
       .find_or_initialize_by(name: 'hbx_staff')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-                          send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_change_username_and_email: false,
+                          send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_lock_unlock: false, can_change_username_and_email: false,
                           modify_admin_tabs: true, view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false,
                           view_agency_staff: true, manage_agency_staff: true, can_access_pay_now: true, can_access_age_off_excluded: true,
-                          view_login_history: false, can_modify_plan_year: false, can_create_benefit_application: false,
+                          view_login_history: false, can_reset_password: false, can_modify_plan_year: false, can_create_benefit_application: false,
                           can_change_fein: false, can_force_publish: false, can_send_secure_message: false, can_manage_qles: false, can_edit_aptc: true,
                           can_view_sep_history: true, can_reinstate_enrollment: true, can_cancel_enrollment: true, can_terminate_enrollment: true,
                           change_enrollment_end_date: true, can_drop_enrollment_members: false, can_call_hub: true)
     Permission
       .find_or_initialize_by(name: 'super_admin')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_change_username_and_email: true,
-                          send_broker_agency_message: true, approve_broker: true, approve_ga: true, modify_admin_tabs: true,
+                          send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_lock_unlock: true, modify_admin_tabs: true,
                           view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false, view_agency_staff: true,
                           manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true, can_access_age_off_excluded: true,
                           can_edit_aptc: true, can_view_sep_history: true, can_reinstate_enrollment: true, can_cancel_enrollment: true, can_terminate_enrollment: true,
@@ -77,10 +77,10 @@ class DcDefinePermissions < MigrationTask
     Permission
       .find_or_initialize_by(name: 'hbx_tier3')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true, can_change_username_and_email: false,
-                          send_broker_agency_message: true, approve_broker: true, approve_ga: true, modify_admin_tabs: true,
+                          send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_lock_unlock: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false, view_agency_staff: true,
                           manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true, can_access_age_off_excluded: true,
-                          view_login_history: false, can_edit_aptc: true, can_view_sep_history: true, can_reinstate_enrollment: true,
+                          view_login_history: false, can_reset_password: false, can_edit_aptc: true, can_view_sep_history: true, can_reinstate_enrollment: true,
                           can_cancel_enrollment: true, can_terminate_enrollment: true, change_enrollment_end_date: true, can_drop_enrollment_members: false, can_call_hub: true)
     Permission
       .find_or_initialize_by(name: 'developer')
@@ -104,8 +104,10 @@ class DcDefinePermissions < MigrationTask
     hbx_admin_csr_view_personal_info_page
     hbx_admin_can_complete_resident_application
     hbx_admin_can_add_sep
+    hbx_admin_can_lock_unlock
     hbx_admin_can_add_pdc
     hbx_admin_can_view_username_and_email
+    hbx_admin_can_reset_password
     hbx_admin_can_change_fein
     hbx_admin_can_force_publish
     hbx_admin_can_send_secure_message
@@ -232,6 +234,10 @@ class DcDefinePermissions < MigrationTask
     Permission.hbx_tier3.update_attributes!(can_add_sep: true)
   end
 
+  def hbx_admin_can_lock_unlock
+    Permission.super_admin.update_attributes(can_lock_unlock: true)
+  end
+
   def hbx_admin_can_add_pdc
     Permission.hbx_staff.update_attributes!(can_add_pdc: true)
     Permission.super_admin.update_attributes!(can_add_pdc: true)
@@ -250,6 +256,10 @@ class DcDefinePermissions < MigrationTask
 
   def hbx_admin_can_change_username_and_email
     Permission.super_admin.update_attributes!(can_change_username_and_email: true)
+  end
+
+  def hbx_admin_can_reset_password
+    Permission.super_admin.update_attributes(can_reset_password: true)
   end
 
   def hbx_admin_can_change_fein

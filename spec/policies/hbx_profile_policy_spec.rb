@@ -386,6 +386,10 @@ describe HbxProfilePolicy do
     it_behaves_like 'access without role', :set_date?
     it_behaves_like 'access without role', :aptc_csr_family_index?, false
     it_behaves_like 'access without role', :update_setting?
+    it_behaves_like 'access without role', :confirm_lock?
+    it_behaves_like 'access without role', :lockable?
+    it_behaves_like 'access without role', :reset_password?
+    it_behaves_like 'access without role', :confirm_reset_password?
     it_behaves_like 'access without role', :change_username_and_email?
     it_behaves_like 'access without role', :confirm_change_username_and_email?
     it_behaves_like 'access without role', :login_history?
@@ -580,6 +584,18 @@ describe HbxProfilePolicy do
 
     it_behaves_like 'with role and permission', :update_setting?, :modify_admin_tabs, true, true
     it_behaves_like 'with role and permission', :update_setting?, :modify_admin_tabs, false, false
+
+    it_behaves_like 'with role and permission', :confirm_lock?, :can_lock_unlock, true, true
+    it_behaves_like 'with role and permission', :confirm_lock?, :can_lock_unlock, false, false
+
+    it_behaves_like 'with role and permission', :lockable?, :can_lock_unlock, true, true
+    it_behaves_like 'with role and permission', :lockable?, :can_lock_unlock, false, false
+
+    it_behaves_like 'with role and permission', :reset_password?, :can_reset_password, true, true
+    it_behaves_like 'with role and permission', :reset_password?, :can_reset_password, false, false
+
+    it_behaves_like 'with role and permission', :confirm_reset_password?, :can_reset_password, true, true
+    it_behaves_like 'with role and permission', :confirm_reset_password?, :can_reset_password, false, false
 
     it_behaves_like 'with role and permission', :change_username_and_email?, :can_change_username_and_email, true, true
     it_behaves_like 'with role and permission', :change_username_and_email?, :can_change_username_and_email, false, false
