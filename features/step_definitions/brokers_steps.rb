@@ -94,7 +94,7 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   # Using this as a seperate step was deleting the rest of the form
   role = "Primary Broker"
   location = 'default_office_location'
-  location = eval(location) if location.instance_of?(String)
+  location = eval(location) if location.instance_of?(String) # rubocop:disable Security/Eval
   RatingArea.where(zip_code: "01001").first || FactoryBot.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
@@ -452,11 +452,11 @@ Then(/^.+ should see broker (.*?) under extended tab$/) do |broker_name|
   expect(page).to have_content(broker_name)
 end
 
-Then(/^.+ should see broker (.*?)$/) do
+Then(/^.+ should see on the page broker (.*?)$/) do |broker_name|
   expect(page).to have_content(broker_name)
 end
 
-Then(/^.+ should not see broker (.*?)$/) do
+Then(/^.+ should not see on the page broker (.*?)$/) do |broker_name|
   expect(page).not_to have_content(broker_name)
 end
 
