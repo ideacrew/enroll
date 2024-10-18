@@ -10,7 +10,7 @@ registry:
     - :hbx_admin_config
     features:
         - key: :issuers_tab
-          is_enabled: true
+          is_enabled: <%= ENV['ISSUERS_TAB_IS_ENABLED'] || true %>
         - key: :notices_tab
           is_enabled: false
         - key: :staff_tab
