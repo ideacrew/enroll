@@ -3,37 +3,14 @@
 # This script is used to sync the data between FAA applicants and people who has data mismatch starting
 # 2024/5/6. This script will compare the attributes of the applicant and person and if there is any mismatch
 # then it will update the person with the applicant attributes and update the family member id in the applicant.
-# bundle exec rails runner script/fix_faa_applicants_people_data_sync.rb '2024' -e production
+# bundle exec rails runner script/fix_faa_applicants_people_data_sync.rb 'faa_applicants_and_people_data_mismatch.csv' -e production
 
 include Dry::Monads[:do, :result]
 require 'csv'
 
-assistance_year = if ARGV[0].present? && ARGV[0].to_i.to_s == ARGV[0]
-                    ARGV[0].to_i
-                  else
-                    TimeKeeper.date_of_record.year
-                  end
-
-# Fetch all the family ids of the enrolled families in the current year
-family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
-
-# Fetch all the applications of the enrolled families in the current year and who has applicants without tribe codes and ethnicity
-applications = ::FinancialAssistance::Application.by_year(assistance_year).determined.where(
-  :family_id.in => family_ids,
-  :updated_at.gte => Date.new(2024,5,6).beginning_of_day,
-  :applicants => {
-    :$exists => true,
-    :$elemMatch => {
-      :$or => [
-        { :tribe_codes => { :$exists => false } },
-        { :tribe_codes => nil },
-        { :ethnicity => { :$exists => false } },
-        { :ethnicity => nil }
-      ]
-    }
-  })
-
-eligible_family_ids = applications.distinct(:family_id)
+file_name = if ARGV[0].present?
+              ARGV[0].to_s
+            end
 
 def address_comparision(applicant_addresses, person_addresses)
   return false if applicant_addresses.blank? || person_addresses.blank?
@@ -60,6 +37,19 @@ def address_comparision(applicant_addresses, person_addresses)
   true
 end
 
+def trigger_update_to_main_app(applicant, application)
+  create_or_update_member_params = { applicant_params: applicant.attributes_for_export, family_id: application.family_id }
+  create_or_update_result = if FinancialAssistanceRegistry[:avoid_dup_hub_calls_on_applicant_create_or_update].enabled?
+                              create_or_update_member_params[:applicant_params].merge!(is_primary_applicant: applicant.is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
+                              ::Operations::Families::CreateOrUpdateMember.new.call(create_or_update_member_params)
+                            end
+
+  if create_or_update_result.success?
+    response_family_member_id = create_or_update_result.success[:family_member_id]
+    applicant.update_attributes!(family_member_id: response_family_member_id) if applicant.family_member_id.nil?
+  end
+end
+
 def compare_attributes(applicant, person)
   {
     first_name: applicant.first_name.downcase == person.first_name.downcase,
@@ -76,79 +66,28 @@ def compare_attributes(applicant, person)
   }
 end
 
-def applicant_info(keys, applicant)
-  applicant_mismatch_hash = {}
-  keys.each do |key|
-    next if key == "ssn"
+file_path = "#{Rails.root}/#{file_name}"
 
-    applicant_mismatch_hash[key] = applicant.send(key.to_sym)
+CSV.foreach(file_path, headers: true) do |row|
+  application = ::FinancialAssistance::Application.where(hbx_id: row['Application HBX ID']).first
+  applicant = application.applicants.where(person_hbx_id: row['Person HBX ID']).first
+
+  person_hbx_id = applicant.person_hbx_id
+  application_updated_at = application.updated_at
+
+  person = Person.where(hbx_id: person_hbx_id).first
+  person_updated_at = person.updated_at if person.present?
+
+  next if person_updated_at.present? && person_updated_at > application_updated_at
+
+  comparisions = compare_attributes(applicant, person)
+
+  mismatch_info = comparisions.select { |k, v| v == false }.keys
+
+  if mismatch_info.present?
+    trigger_update_to_main_app(applicant, application)
   end
-
-  applicant_mismatch_hash
-end
-
-def person_info(keys, person)
-  person_mismatch_hash = {}
-  keys.each do |key|
-    next if key == "ssn"
-
-    person_mismatch_hash[key] = person.send(key.to_sym)
-  end
-
-  person_mismatch_hash
-end
-
-def trigger_update_to_main_app(applicant, application)
-  create_or_update_member_params = { applicant_params: applicant.attributes_for_export, family_id: application.family_id }
-  create_or_update_result = if FinancialAssistanceRegistry[:avoid_dup_hub_calls_on_applicant_create_or_update].enabled?
-                              create_or_update_member_params[:applicant_params].merge!(is_primary_applicant: applicant.is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
-                              ::Operations::Families::CreateOrUpdateMember.new.call(create_or_update_member_params)
-                            end
-
-  if create_or_update_result.success?
-    response_family_member_id = create_or_update_result.success[:family_member_id]
-    applicant.update_attributes!(family_member_id: response_family_member_id) if applicant.family_member_id.nil?
-  end
-end
-
-csv_file = "#{Rails.root}/faa_applicants_and_people_data_mismatch.csv"
-
-CSV.open(csv_file, 'w', force_quotes: true) do |csv|
-  csv << ['Application HBX ID', 'Person HBX ID', 'Applicant BSON ID', "Mismatch Info",  'Applicant Info', 'Person Info']
-
-  puts 'Started running the FAA Applicants/Person sync'
-
-  eligible_family_ids.each do |family_id|
-    applications_by_family = ::FinancialAssistance::Application.where(family_id: family_id)
-    application = applications_by_family.by_year(assistance_year).determined.created_asc.last
-
-    application.applicants.each do |applicant|
-      tribe_code = applicant.read_attribute(:tribe_codes)
-      ethnicity = applicant.read_attribute(:ethnicity)
-
-      if tribe_code.nil? || ethnicity.nil?
-        person_hbx_id = applicant.person_hbx_id
-        application_updated_at = application.updated_at
-
-        person = Person.where(hbx_id: person_hbx_id).first
-        person_updated_at = person.updated_at if person.present?
-
-        next if person_updated_at.present? && person_updated_at > application_updated_at
-
-        comparisions = compare_attributes(applicant, person)
-
-        mismatch_info = comparisions.select { |k, v| v == false }.keys
-
-        if mismatch_info.present?
-          csv << [application.hbx_id, person_hbx_id, applicant.id.to_s, mismatch_info.join(", "), applicant_info(mismatch_info, applicant), person_info(mismatch_info, person)]
-
-          trigger_update_to_main_app(applicant, application)
-        end
-      end
-    rescue => e
-      puts "Error occurred for application #{application.hbx_id} due to #{e.inspect}"
-      Rails.logger.error "Error occurred for application #{application.hbx_id}: #{e.message} - #{e.backtrace&.join("\n")}"
-    end
-  end
-  puts 'Completed running the FAA Applicants/Person sync'
+rescue => e
+  puts "Error occurred for application #{row['Application HBX ID']} due to #{e.inspect}"
+  Rails.logger.error "Error occurred for application #{row['Application HBX ID']}: #{e.message} - #{e.backtrace&.join("\n")}"
 end
