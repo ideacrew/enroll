@@ -18,9 +18,52 @@ module Queries
       return Family if search_string.blank?
     end
 
-    def build_scope()
-      family = Family.where("is_active" => true)
-      person = Person
+    def sort_query(query, order_by)
+      sort_column, sort_direction = order_by.to_a.flatten
+      case sort_column
+      when 'name'
+        sort_by_name_col(query, sort_direction == :asc ? 1 : -1)
+      else
+        query
+      end
+    end
+
+    def sort_by_name_col(scope, sort_direction)
+      # Family name column is calculated using Family.family_members.primary_applicant.full_name
+      # primary_applicant is a Family model method, not a DB field
+      # full_name is a Person model method, not a DB field
+      # use an aggregation to perform the sort on name
+
+      # build the pipeline to sort by primary applicant's full name
+      sort_direction == :asc ? 1 : -1
+      pipeline = [
+        {:$unwind=>"$family_members"},
+        {:$match=>{:"family_members.is_primary_applicant"=>true}},
+        {:$lookup=>{:from=>"people", :localField=>"family_members.person_id", :foreignField=>"_id", :as=>"person"}},
+        {:$unwind=>"$person"},
+        {:$addFields=>
+          {:"person.full_name"=>
+            {:$trim=>
+              {:input=>
+                {:$concat=>
+                  [{:$cond=>{:if=>{:$ne=>["$person.name_pfx", nil]}, :then=>{:$concat=>["$person.name_pfx", " "]}, :else=>""}},
+                   {:$cond=>{:if=>{:$ne=>["$person.first_name", nil]}, :then=>{:$concat=>["$person.first_name", " "]}, :else=>""}},
+                   {:$cond=>{:if=>{:$ne=>["$person.middle_name", nil]}, :then=>{:$concat=>["$person.middle_name", " "]}, :else=>""}},
+                   {:$cond=>{:if=>{:$ne=>["$person.last_name", nil]}, :then=>{:$concat=>["$person.last_name", " "]}, :else=>""}},
+                   {:$cond=>{:if=>{:$ne=>["$person.name_sfx", nil]}, :then=>{:$concat=>["$person.name_sfx", " "]}, :else=>""}}]}}}}},
+        {:$sort => {:"person.full_name" => sort_direction}},
+        {:$skip => @skip},
+        {:$limit => @limit}
+      ]
+
+      # aggregate returns json, so we need to transform back to Family objects for the mongoid datatable to handle
+      ids = scope.collection.aggregate(pipeline).map { |doc| doc["_id"] }
+      families = Family.where(:_id.in => ids).to_a
+      ids.map { |id| families.find { |family| family.id == id } }
+    end
+
+    def build_scope
+      family = klass.where("is_active" => true)
       if @custom_attributes['families'] == 'by_enrollment_individual_market'
         family = family.all_enrollments
         family = family.by_enrollment_individual_market
@@ -63,9 +106,7 @@ module Queries
       person_id = build_people_id_criteria(@search_string)
       #Caution Mongo optimization on chained "$in" statements with same field
       #is to do a union, not an interactionl
-      family_scope = family.and('family_members.person_id' => {"$in" => person_id})
-      return family_scope if @order_by.blank?
-      family_scope.order_by(@order_by)
+      family.and('family_members.person_id' => {"$in" => person_id})
     end
 
     def build_people_id_criteria(s_string)
@@ -132,8 +173,13 @@ module Queries
     private
 
     def build_iteration_caches
-      skipped_scope = apply_skip(build_scope)
-      limited_scope = apply_limit(skipped_scope)
+      limited_scope = build_scope
+      if @order_by
+        limited_scope = sort_query(limited_scope, @order_by)
+      else
+        limited_scope = apply_skip(limited_scope)
+        limited_scope = apply_limit(limited_scope)
+      end
       family_ids = limited_scope.pluck(:id)
       enrollment_cache = load_enrollment_cache_for(family_ids)
       [limited_scope, enrollment_cache]
@@ -156,6 +202,5 @@ module Queries
       return scope unless @limit
       scope.limit(@limit)
     end
-
   end
 end
