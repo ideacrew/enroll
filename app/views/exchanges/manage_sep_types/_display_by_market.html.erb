@@ -4,27 +4,32 @@
 <% threshold_index = common_number - 1 %>
 <% if @bs4 %>
   <div id="<%= market_kind %>" class="<%= display %>" data-controller="sep-types-list" data-target="sep-types-list.marketTab">
-    <h2><%= l10n("exchange.manage_sep_types.titles")%></h2>
+    <h1><%= l10n("exchange.manage_sep_types.titles")%></h1>
     <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
 
     <% if is_commonality_threshold_enabled %>
-      <div class="my-3">
-        <% input_id = "commonality-threshold-input-#{market_kind}" %>
-        <label class="required" for="<%= input_id %>"><%= l10n('exchange.manage_sep_types.threshold') %></label>
-        <input id="<%= input_id %>" type="number" min="1" max=<%= qles.length %> data-target="sep-types-list.thresholdInput" data-action="sep-types-list#setThreshold" data-initial-value="<%= common_number %>" value="<%= common_number %>">
-      </div>
+      <section>
+        <h2><%= l10n('exchange.manage_sep_types.threshold') %></h2>
+        <div class="my-3">
+          <% input_id = "commonality-threshold-input-#{market_kind}" %>
+          <label class="required" for="<%= input_id %>"><%= l10n('exchange.manage_sep_types.threshold_amount') %></label>
+          <input id="<%= input_id %>" type="number" min="1" max=<%= qles.length %> data-target="sep-types-list.thresholdInput" data-action="sep-types-list#setThreshold" data-initial-value="<%= common_number %>" value="<%= common_number %>">
+        </div>
+      </section>
     <% end %>
-  
+
     <div data-target="sep-types-list.qleList">
       <% qles.each_with_index do |sort, i| %>
         <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" class="card card-body mb-4">
           <%= sort.title %>
         </div>
         <% if is_commonality_threshold_enabled && i == threshold_index %>
+          <section>
           <div id="threshold-marker" class=<%= 'hidden' if i == qles.length - 1 %>>
             <hr>
             <h2><%= l10n('exchange.manage_sep_types.rare_header') %></h2>
           </div>
+          </section>
         <% end %>
       <% end %>
     </div>
