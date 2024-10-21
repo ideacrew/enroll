@@ -23,6 +23,8 @@ module Effective
           dropdown << ['Edit User', change_username_and_email_user_path(row.id, user_id: row.id.to_s), 'ajax'] if current_user_permission&.can_change_username_and_email
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "user_action_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
+
+        default_order :oim_id, nil
       end
 
       def collection

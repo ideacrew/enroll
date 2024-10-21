@@ -28,6 +28,7 @@ module Effective
           end
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "sep_type_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
+
         default_order :title, nil
       end
 

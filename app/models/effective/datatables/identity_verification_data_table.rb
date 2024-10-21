@@ -14,6 +14,8 @@ module Effective
         table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
         table_column :document_type, :label => 'Document Type', :proc => proc { |row| link_to_with_noopener_noreferrer(document_type(row), document_uploaded_path(row))}, :filter => false, :sortable => false
         table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => proc { |row| document_uploaded_date(row) }, :filter => false, :sortable => false
+
+        default_order :full_name, nil
       end
 
       scopes do
