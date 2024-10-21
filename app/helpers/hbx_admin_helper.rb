@@ -21,6 +21,22 @@ module HbxAdminHelper
     eligible_member_ids.include?(family_member_id.to_s) ? 'Yes' : 'No'
   end
 
+  def reinstatement_failure_message(enrollment)
+    return "" unless (enrollment.can_be_reinstated? == false) || enrollment.has_active_term_or_expired_exists_for_reinstated_date? || employee_eligibility_status(enrollment)
+    return reinstate_failure_reason_message(enrollment) if enrollment.can_be_reinstated? == false
+    return l10n("exchange.employer_applications.reinstate.coverage_exists") + enrollment.fetch_term_or_expiration_date.next_day if enrollment.has_active_term_or_expired_exists_for_reinstated_date?
+    return l10n("exchange.employer_applications.reinstate.cobra_not_active") if employee_eligibility_status(enrollment) == "CobraTerminated"
+    l10n("exchange.employer_applications.reinstate.employee_not_active")
+  end
+
+  def reinstate_failure_reason_message(enrollment)
+    return l10n("exchange.employer_applications.reinstate.not_eligible_term_reason") if enrollment.term_reason_eligible_for_reinstate?
+    return l10n("exchange.employer_applications.reinstate.ivl_term", date: enrollment.fetch_term_or_expiration_date.next_day) unless enrollment.market_name == "Employer Sponsored"
+    return l10n("exchange.employer_applications.reinstate.employer_cobra") if enrollment.employee_role.is_cobra_status? && !(enrollment.is_shop? && enrollment.is_cobra_status?)
+    return l10n("exchange.employer_applications.reinstate.cobra_employee") if !enrollment.employee_role.is_cobra_status? && (enrollment.is_shop? && enrollment.is_cobra_status?)
+    l10n("exchange.employer_applications.reinstate.esi_coverage_date") + enrollment.fetch_term_or_expiration_date.next_day
+  end
+
   def prior_py_sep?(family, effective_date, market)
     return false if effective_date.blank?
     person = family.primary_person

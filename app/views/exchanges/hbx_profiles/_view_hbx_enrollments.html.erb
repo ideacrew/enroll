@@ -2,7 +2,6 @@
   <div class = "col-sm-11 table-responsive" id="terminated_enrollemnts">
     <% if @enrollments.present? %>
         <%= form_tag reinstate_enrollment_exchanges_hbx_profiles_path, method: :post, id: 'reinstate-form' do %>
-
             <table class = "table table-striped table-bordered">
               <thead>
               <tr>
@@ -18,7 +17,8 @@
               </thead>
 
               <% @enrollments.each_with_index do |enrollment, index| %>
-                  <tr>
+                <% reinstate_failure_reason = reinstatement_failure_message(enrollment)%>
+                  <tr data-cant-reinstate="<%= !reinstate_failure_reason.blank? %>">
                     <td>
                       <div class="d-flex">
                         <label class="weight-n">
@@ -34,13 +34,7 @@
                     <td id="reinstate"><%= enrollment.fetch_term_or_expiration_date.next_day %></td>
                     <td><input type="checkbox" name="edi_required" value="checked" checked aria-labelledby="transmit_header" /></td>
                     <td id="hbx_id"><%= enrollment.hbx_id %></td>
-                    <td id="employee_status" class="hidden"><%= employee_eligibility_status(enrollment) %></td>
-                    <td id="enrollment_can_be_reinstated" class="hidden"><%= enrollment.can_be_reinstated? %></td>
-                    <td id="term_reason_eligible_for_reinstate" class="hidden"><%= enrollment.term_reason_eligible_for_reinstate? %></td>
-                    <td id="enrollment_market" class="hidden"><%= enrollment.market_name %></td>
-                    <td id="cobra_employee" class="hidden"><%= enrollment.is_shop? && enrollment.employee_role.is_cobra_status? %></td>
-                    <td id="cobra_enrollment" class="hidden"><%= enrollment.is_shop? && enrollment.is_cobra_status? %></td>
-                    <td id="active_enroll_exists_with_reinstate_date" class="hidden"><%= enrollment.has_active_term_or_expired_exists_for_reinstated_date? %></td>
+                    <td class="cant_reinstate_reason hidden"><%= reinstate_failure_reason %></td>
                   </tr>
               <%end%>
             </table>
@@ -57,41 +51,87 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-
+          <div class="d-flex pl-1">
+            <div class="info-icon icon" alt="info">&nbsp;</div>
+            <b class="warning-text hidden">Unable to Reinstate</b>
+          </div>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <div class="row">
-            <p class="bg-warning"></p>
-            <div id="show_reinstate">
-              <div>
-                <h4 class="modal-title"><%= l10n('hbx_profiles.reinstate.modal.header', name: @person.full_name) %></h4>
-              </div>
-              <br>
-              <div class='d-flex mb-1'>
-                <label for="planName" class="col-sm-4 control-label"><%= l10n('plan_name')%></label>
-                <div class="col-sm-8"><div id="reinstate-plan-name"></div></div>
-              </div>
-              <div class='d-flex mb-1'>
-                <label for="effectiveDate" class="col-sm-4 control-label"><%= l10n('hbx_profiles.effective_date') %></label>
-                <div class="col-sm-8"><div id="effective-date"></div></div>
-              </div>
-              <div>
-                <label for="comments" class="col-sm-4 control-label"><%= l10n('hbx_profiles.reinstate.modal.comments') %></label>
-                <div class="col-sm-8"><textarea id="comments" class="form-control comments" rows="3"></textarea></div>
-              </div>
+          <div id="unableToReinstate"></div>
+          <div id="show_reinstate" class="px-2">
+            <div>
+              <h4 class="modal-title"><%= l10n('hbx_profiles.reinstate.modal.header', name: @person.full_name) %></h4>
+            </div>
+            <br>
+            <div class='d-flex mb-1'>
+              <label for="planName" class="col-sm-4 control-label"><%= l10n('plan_name')%></label>
+              <div class="col-sm-8"><div id="reinstate-plan-name"></div></div>
+            </div>
+            <div class='d-flex mb-1'>
+              <label for="effectiveDate" class="col-sm-4 control-label"><%= l10n('hbx_profiles.effective_date') %></label>
+              <div class="col-sm-8"><div id="effective-date"></div></div>
+            </div>
+            <div>
+              <label for="comments" class="col-sm-4 control-label"><%= l10n('hbx_profiles.reinstate.modal.comments') %></label>
+              <div class="col-sm-8"><textarea id="comments" class="form-control comments" rows="3"></textarea></div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-default" data-dismiss="modal"><%= l10n('cancel') %></button>
+          <button type="button" class="btn btn-error outline" data-dismiss="modal"><%= l10n('cancel') %></button>
           <button type="button" class="btn btn-primary btn-confirmation"><%= l10n('confirm_selection') %></button>
         </div>
       </div>
     </div>
   </div>
+  <script type="text/javascript">
+    var ReinstateModal = function () {
+      var failure = document.querySelector('tr[data-cant-reinstate] input[type=radio]:checked');
+      if (failure) {
+        var failureReason = failure.closest("tr").querySelector(".cant_reinstate_reason").textContent;
+        $('.modal-header .icon').removeClass('info-icon').addClass('warning-icon');
+        $('b.warning-text').removeClass('hidden');
+        $('#unableToReinstate').text(failureReason);
+        $('#show_reinstate').hide();
+        $(".btn-confirmation").hide();
+      } else {
+        $('.modal-header .icon').removeClass('warning-icon').addClass('info-icon');
+        $('b.warning-text').addClass('hidden');
+        $('#unableToReinstate').text('');
+        $('#show_reinstate').show();
+        $(".btn-confirmation").show();
+      }
+      $('#reinstate_confirm').modal('show');
+    }
+
+    function confirmReinstate(event){
+      $("#reinstate-form #comments").val($('.modal-dialog .comments').val());
+      $(".btn-confirmation").prop('disabled', true);
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      var formData = new FormData($('#reinstate-form')[0]);
+
+      $.ajax({
+        url: '/exchanges/hbx_profiles/reinstate_enrollment.js',
+        type: "POST",
+        data : formData,
+        contentType: false,
+        processData: false,
+      });
+    }
+    $('.btn-confirmation').on('click', function() {
+      confirmReinstate(event);
+      return false;
+    });
+</script>
 <% else %>
   <br/>
   <div class="row">
@@ -193,9 +233,7 @@
       </div>
     </div>
   </div>
-<% end %>
-
-<script type="text/javascript">
+  <script type="text/javascript">
     var ReinstateModal = function () {
         $('#reinstate_confirm').modal('show');
         $('#terminated_enrollemnts :radio:checked').each(function (){
@@ -283,10 +321,5 @@
             }
         });
     });
-  <% if @bs4 %>
-    $('.btn-confirmation').on('click', function() {
-      confirmReinstate(event); 
-      return false;
-    });
-  <% end %>
 </script>
+<% end %>
