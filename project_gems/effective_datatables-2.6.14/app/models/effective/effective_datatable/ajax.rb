@@ -37,13 +37,14 @@ module Effective
 
       def order_direction
         @order_direction ||= if params[:order].present?
-          params[:order]['0'][:dir] == 'desc' ? :desc : :asc
-        elsif @default_order.present?
-          return nil if @default_order.values.first.nil?
-          @default_order.values.first.to_s.downcase == 'desc' ? :desc : :asc
-        else
-          :asc
-        end
+                               return nil if params[:order]['0'][:dir].blank?
+                               params[:order]['0'][:dir] == 'desc' ? :desc : :asc
+                             elsif @default_order.present?
+                               return nil if @default_order.values.first.nil?
+                               @default_order.values.first.to_s.downcase == 'desc' ? :desc : :asc
+                             else
+                               :asc
+                             end
       end
 
       def display_entries
