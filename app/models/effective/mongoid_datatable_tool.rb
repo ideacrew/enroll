@@ -14,6 +14,7 @@ module Effective
     end
 
     def order_by_column
+      return nil if @datatable.order_direction.nil?
       sort_column = table_columns[@datatable.order_name]
       if sort_column[:sortable]
         @order_by_column ||= table_columns[@datatable.order_name]

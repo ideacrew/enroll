@@ -238,6 +238,12 @@ table {
         cursor: pointer;
       }
 
+      .sorting:not(.sorting_asc):not(.sorting_desc):after {
+        content: url('data:image/svg+xml,<svg width="12" height="13" viewBox="485 241 10 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 495.665 250.497 L 491.372 254.619 C 490.981 254.994 490.348 254.994 489.958 254.619 L 485.665 250.497" stroke="%23605E5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M 485.646 245.83 L 489.939 241.537 C 490.329 241.147 490.962 241.147 491.353 241.537 L 495.646 245.83" stroke="%23605E5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><line x1="490.665" y1="254.731" x2="490.665" y2="241.223" stroke="%23605E5C" stroke-width="1.5" stroke-linecap="round"></line></svg>');
+        display: inline-block;
+        margin-left: 4px;
+      }
+
       .sorting_asc:after {
         content: url('data:image/svg+xml,<svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6L5.29289 1.70711C5.68342 1.31658 6.31658 1.31658 6.70711 1.70711L11 6" stroke="%23605E5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="1.75" x2="6" y2="12.25" stroke="%23605E5C" stroke-width="1.5" stroke-linecap="round"/></svg>');
         display: inline-block;

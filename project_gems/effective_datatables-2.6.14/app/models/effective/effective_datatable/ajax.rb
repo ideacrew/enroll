@@ -39,6 +39,7 @@ module Effective
         @order_direction ||= if params[:order].present?
           params[:order]['0'][:dir] == 'desc' ? :desc : :asc
         elsif @default_order.present?
+          return nil if @default_order.values.first.nil?
           @default_order.values.first.to_s.downcase == 'desc' ? :desc : :asc
         else
           :asc

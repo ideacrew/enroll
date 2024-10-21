@@ -17,7 +17,7 @@ module Effective
             h(row.primary_applicant.person.full_name),
             resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)
           )
-        }, :filter => false, :sortable => false
+        }, :filter => false, :sortable => true
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
         table_column :external_app_id, :label => 'External ID', :proc => proc { |row| row.external_app_id }, :filter => false, :sortable => false if EnrollRegistry[:display_external_id_in_family_datatable].enabled?
@@ -86,6 +86,7 @@ module Effective
 
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
+        default_order :name, nil
       end
 
       scopes do
