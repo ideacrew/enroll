@@ -4,7 +4,7 @@
 <% threshold_index = common_number - 1 %>
 <% if @bs4 %>
   <div id="<%= market_kind %>" class="<%= display %>" data-controller="sep-types-list" data-target="sep-types-list.marketTab">
-    <h1><%= l10n("exchange.manage_sep_types.titles")%></h1>
+    <h2><%= l10n("exchange.manage_sep_types.titles")%></h2>
     <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
 
     <% if is_commonality_threshold_enabled %>
