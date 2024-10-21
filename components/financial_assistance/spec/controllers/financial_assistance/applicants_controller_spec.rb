@@ -690,7 +690,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           tribal_state: 'DC',
           tribal_name: 'Cherokee',
           tribe_codes: ['123'],
-          us_citizen: true,
+          us_citizen: us_citizen,
           naturalized_citizen: false,
           eligible_immigration_status: true,
           is_incarcerated: false
@@ -701,14 +701,34 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
       end
 
-      context "when dependent is applying for coverage" do
-        let(:is_applying_coverage) { true }
+      context "when dependent without us_citizen is applying for coverage" do
+        let!(:is_applying_coverage) { true }
+        let(:us_citizen) { true }
 
         it "should update tribe details " do
           patch :update, params: dependent_params.merge(applicant: applicant_params.merge(same_with_primary: "true"))
           application.reload
           dependent.reload
           expect(dependent.us_citizen).to eq true
+          expect(dependent.naturalized_citizen).to eq false
+          expect(dependent.eligible_immigration_status).to eq nil
+          expect(dependent.indian_tribe_member).to eq true
+          expect(dependent.tribal_state).to eq 'DC'
+          expect(dependent.tribal_name).to eq 'Cherokee'
+          expect(dependent.tribe_codes).to eq ['123']
+        end
+      end
+
+      context "when dependent without us_citizen is applying for coverage" do
+        let!(:is_applying_coverage) { true }
+        let(:us_citizen) { false }
+
+
+        it "should update tribe details " do
+          patch :update, params: dependent_params.merge(applicant: applicant_params.merge(same_with_primary: "true"))
+          application.reload
+          dependent.reload
+          expect(dependent.us_citizen).to eq false
           expect(dependent.naturalized_citizen).to eq false
           expect(dependent.eligible_immigration_status).to eq true
           expect(dependent.indian_tribe_member).to eq true
@@ -719,7 +739,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       context "when dependent is applying for coverage" do
-        let(:is_applying_coverage) { false }
+        let!(:is_applying_coverage) { false }
+        let(:us_citizen) { true }
 
         it "should update tribe details " do
           patch :update, params: dependent_params.merge(applicant: applicant_params.merge(same_with_primary: "true"))
