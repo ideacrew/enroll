@@ -17,9 +17,9 @@
           <th><%= l10n('dob') %></th>
           <th><%= l10n('insured.families.hbx_id') %></th>
           <th><%= l10n('hbx_profiles.current_eligibility') %></th>
-          <th><%= l10n('hbx_profiles.program') %></th>
-          <th><%= l10n('hbx_profiles.csr') %></th>
-          <th><%= l10n('hbx_profiles.tax_group') %></th>
+          <th id="new_eligibility_program"><%= l10n('hbx_profiles.program') %></th>
+          <th id="new_eligibility_csr"><%= l10n('hbx_profiles.csr') %></th>
+          <th id="new_eligibility_tax_group"><%= l10n('hbx_profiles.tax_group') %></th>
           <th id="filer-header"><%= l10n('hbx_profiles.filer') %></th>
         </thead>
         <tbody>
@@ -28,18 +28,18 @@
             <% member_name = person.full_name.humanize %>
             <% member_id = family_member.id.to_s %>
             <%= hidden_field_tag "person[family_members][#{member_id}][member_name]", member_name %>
-            
+
             <tr>
               <td><%= member_name %></td>
               <td><%= person.dob %></td>
               <td><%= person.hbx_id %></td>
               <td><%= mthh_active_eligibility?(current_eligible_member_ids, member_id) %></td>
-              <td><%= select_tag "person[family_members][#{member_id}][pdc_type]", options_for_select(TaxHouseholdMember::PDC_TYPES, @tax_household_group_data&.dig(member_id, 'pdc_type')), class: 'form-control required', required: true %></td>
+              <td><%= select_tag "person[family_members][#{member_id}][pdc_type]", options_for_select(TaxHouseholdMember::PDC_TYPES, @tax_household_group_data&.dig(member_id, 'pdc_type')), class: 'form-control required', required: true, aria: {labelledby: "new_eligibility_program"} %></td>
               <td class="select_person_csr">
-                <%= select_tag "person[family_members][#{member_id}][csr]", options_for_select(csr_percentage_options_for_select, @tax_household_group_data&.dig(member_id, 'csr')), prompt: l10n('select'), class: 'form-control', required: true %>
+                <%= select_tag "person[family_members][#{member_id}][csr]", options_for_select(csr_percentage_options_for_select, @tax_household_group_data&.dig(member_id, 'csr')), prompt: l10n('select'), class: 'form-control', required: true, aria: {labelledby: "new_eligibility_csr"} %>
               </td>
               <td class="select_person_tax_group">
-                <%= select_tag "person[family_members][#{member_id}][tax_group]", options_for_select([1, 2, 3, 4], @tax_household_group_data&.dig(member_id, 'tax_group')), prompt: l10n('select'), class: 'form-control', required: true %>
+                <%= select_tag "person[family_members][#{member_id}][tax_group]", options_for_select([1, 2, 3, 4], @tax_household_group_data&.dig(member_id, 'tax_group')), prompt: l10n('select'), class: 'form-control', required: true, aria: {labelledby: "new_eligibility_tax_group"} %>
               </td>
               <td>
                   <%= check_box_tag "person[family_members][#{member_id}][is_filer]", nil, @tax_household_group_data&.dig(member_id, 'is_filer'), 'aria-labelledby' => "filer-header"  %>
@@ -96,7 +96,7 @@
             <% member_name = person.full_name.humanize %>
             <% member_id = family_member.id.to_s %>
             <%= hidden_field_tag "person[family_members][#{member_id}][member_name]", member_name %>
-            
+
             <tr>
               <td><h5><%= member_name %></h5></td>
               <td><h5><%= person.dob %> </h5></td>
