@@ -1,15 +1,16 @@
 <% if EnrollRegistry.feature_enabled?(:sep_types) %>
 	<div class="container mt-3">
 
-		<h4 class='title'><%= l10n("exchange.manage_sep_types.sort_sep_types")%></h4>
 		<!-- Nav tabs -->
-    <% if @bs4 %> <%# TODO: Move this into dedicated BS4 block when we uplift the Admin Sort SEP page %>
+    <% if @bs4 %>
+      <h1 class='title'><%= l10n("exchange.manage_sep_types.sort_sep_types")%></h1>
       <% ['success', 'error'].each do |flash_type| %>
         <div id="<%= flash_type %>-flash" class="hidden">
           <%= render partial: "layouts/flash", locals: {message: l10n("exchange.manage_sep_types.update_#{flash_type}"), type: flash_type} %>
         </div>
       <% end %>
     <% else %>
+      <h4 class='title'><%= l10n("exchange.manage_sep_types.sort_sep_types")%></h4>
       <div id="sort_notification_msg"  class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
           <span aria-hidden="true">&times;</span>
