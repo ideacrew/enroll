@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Given(/^the reset password and unlock lock user feature is enabled$/) do
+Given(/the reset password and unlock lock user feature is enabled/) do
   allow(EnrollRegistry[:reset_password_lock_unlock_user].feature).to receive(:is_enabled).and_return(true)
 end
 
@@ -18,6 +18,10 @@ end
 
 Then(/^Hbx Admin should not see (.*?) link in action drop down$/) do |text|
   expect(page).to_not have_content(text)
+end
+
+Then(/^Hbx Admin should see (.*?) link in action drop down$/) do |text|
+  expect(page).to have_content(text)
 end
 
 When(/^Hbx Admin click on (.*?) link in action drop down$/) do |link|
