@@ -25,6 +25,8 @@ RSpec.describe UsersController, type: :controller do
 
     before do
       hbx_staff_role.update_attributes!(permission_id: permission.id)
+
+      allow(EnrollRegistry[:reset_password_lock_unlock_user].feature).to receive(:is_enabled).and_return(true)
       sign_in(admin)
     end
 
