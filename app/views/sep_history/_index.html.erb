@@ -1,3 +1,22 @@
+<% if @bs4 %>
+  <div class="sep-display">
+    <h2><%= l10n("hbx_profiles.sep_history_for", name: h(@family.primary_person.full_name)) %></h2>
+    <div class="panel-heading" role="tab">
+      <div class="d-flex">
+        <div class="col-md-6 pl-0">
+          <b><%= l10n("hbx_profiles.sep_reason") %></b>
+        </div>
+        <div class="col-md-3">
+          <b><%= l10n("hbx_profiles.sep_start_date") %></b>
+        </div>
+        <div class="col-md-3 pr-0">
+          <b><%= l10n("hbx_profiles.sep_end_date") %></b>
+        </div>
+      </div>
+    </div>
+    <%= render partial: 'sep_history/sep_history_display' %>
+  </div>
+<% else %>
 <div style="margin: 15px" class="sep-display">
   <h3 class='title'><%= l10n("hbx_profiles.sep_history_for", name: h(@family.primary_person.full_name)) %></h3>
   <div class="panel-heading" role="tab">
@@ -15,7 +34,7 @@
   </div>
   <%= render partial: 'sep_history/sep_history_display' %>
 </div>
-
+<% end %>
 <script>
   function addStyleToPanel(id) {
     var ele = $('#viewSepPanel_'+id)
