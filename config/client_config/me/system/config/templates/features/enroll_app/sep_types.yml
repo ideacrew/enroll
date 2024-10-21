@@ -136,7 +136,7 @@ registry:
               {first_of_the_month_coinciding: First of the Month (Coinciding)}]
               content_type: :checkbox_select
               default: ''
-              is_required: false
+              is_required: true
               is_visible: true
           - key: :termination_on_kinds
             item: <%= ENV['termination_on_kinds'] %>
