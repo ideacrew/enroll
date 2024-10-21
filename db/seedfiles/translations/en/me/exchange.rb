@@ -23,6 +23,7 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.reinstate.ivl_term" => "Unable to reinstate Individual Market enrollment for effective date %{date}. Previous year terminated enrollment can't be reinstated, Please reinstate for current year terminated enrollment.",
   "en.exchange.employer_applications.reinstate.employee_cobra" => "Unable to reinstate employer sponsored enrollment for cobra employee.",
   "en.exchange.employer_applications.reinstate.cobra_employee" => "Unable to reinstate cobra enrollment for active employee.",
+  "en.exchange.employer_applications.reinstate.esi_coverage_date" => "Unable to reinstate Employer Sponsored enrollment, Employer not offering coverage for the effective date ",
   "en.exchange.employer_applications.voluntary_term" => "Voluntary Termination",
   "en.exchange.employer_applications.non_payment_term" => "Non-Pay Termination",
   "en.exchange.employer_applications.transmit_to_carrier" => "Transmit to Carrier",
