@@ -24,11 +24,9 @@
           <%= sort.title %>
         </div>
         <% if is_commonality_threshold_enabled && i == threshold_index %>
-          <section>
-          <div id="threshold-marker" class=<%= 'hidden' if i == qles.length - 1 %>>
+          <section id="threshold-marker" class=<%= 'hidden' if i == qles.length - 1 %>>
             <hr>
             <h2><%= l10n('exchange.manage_sep_types.rare_header') %></h2>
-          </div>
           </section>
         <% end %>
       <% end %>
