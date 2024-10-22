@@ -28,7 +28,7 @@ class Exchanges::AnnouncementsController < ApplicationController
   def create
     @announcement = Announcement.new(announcement_params)
     if @announcement.save
-      redirect_to exchanges_announcements_path, notice: 'Create Announcement Successful.'
+      redirect_to exchanges_announcements_path, flash: {success: 'Create Announcement Successful.'}
     else
       @announcements = Announcement.current
       render :index
@@ -38,7 +38,7 @@ class Exchanges::AnnouncementsController < ApplicationController
   def destroy
     @announcement = Announcement.find_by(id: params[:id])
     @announcement.destroy
-    redirect_to exchanges_announcements_path, notice: 'Destroy Announcement Successful.'
+    redirect_to exchanges_announcements_path, flash: {success: 'Destroy Announcement Successful.'}
   end
 
   private

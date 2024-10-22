@@ -660,6 +660,102 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         end
       end
     end
+
+    context "dependent's indian tribe member" do
+      let(:dependent) { application.applicants.last }
+
+      let(:dependent_params) do
+        {
+          application_id: application.id,
+          id: dependent.id,
+          is_dependent: "true"
+        }
+      end
+
+      let(:applicant_params) do
+        {
+          same_with_primary: "true",
+          is_applying_coverage: is_applying_coverage,
+          :is_homeless => '0',
+          :is_temporarily_out_of_state => '0',
+          relationship: 'spouse',
+          first_name: 'update',
+          last_name: 'updated',
+          gender: 'male',
+          dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+          ssn: nil,
+          addresses_attributes: {'0': {kind: 'home', city: '', county: '', state: '', zip: '', address_1: ''}},
+          is_consumer_role: false,
+          indian_tribe_member: true,
+          tribal_state: 'DC',
+          tribal_name: 'Cherokee',
+          tribe_codes: ['123'],
+          us_citizen: us_citizen,
+          naturalized_citizen: false,
+          eligible_immigration_status: true,
+          is_incarcerated: false
+        }
+      end
+
+      before do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+      end
+
+      context "when dependent without us_citizen is applying for coverage" do
+        let!(:is_applying_coverage) { true }
+        let(:us_citizen) { true }
+
+        it "should update tribe details " do
+          patch :update, params: dependent_params.merge(applicant: applicant_params.merge(same_with_primary: "true"))
+          application.reload
+          dependent.reload
+          expect(dependent.us_citizen).to eq true
+          expect(dependent.naturalized_citizen).to eq false
+          expect(dependent.eligible_immigration_status).to eq nil
+          expect(dependent.indian_tribe_member).to eq true
+          expect(dependent.tribal_state).to eq 'DC'
+          expect(dependent.tribal_name).to eq 'Cherokee'
+          expect(dependent.tribe_codes).to eq ['123']
+        end
+      end
+
+      context "when dependent without us_citizen is applying for coverage" do
+        let!(:is_applying_coverage) { true }
+        let(:us_citizen) { false }
+
+
+        it "should update tribe details " do
+          patch :update, params: dependent_params.merge(applicant: applicant_params.merge(same_with_primary: "true"))
+          application.reload
+          dependent.reload
+          expect(dependent.us_citizen).to eq false
+          expect(dependent.naturalized_citizen).to eq false
+          expect(dependent.eligible_immigration_status).to eq true
+          expect(dependent.indian_tribe_member).to eq true
+          expect(dependent.tribal_state).to eq 'DC'
+          expect(dependent.tribal_name).to eq 'Cherokee'
+          expect(dependent.tribe_codes).to eq ['123']
+        end
+      end
+
+      context "when dependent is applying for coverage" do
+        let!(:is_applying_coverage) { false }
+        let(:us_citizen) { true }
+
+        it "should update tribe details " do
+          patch :update, params: dependent_params.merge(applicant: applicant_params.merge(same_with_primary: "true"))
+          application.reload
+          dependent.reload
+          expect(dependent.us_citizen).to eq nil
+          expect(dependent.naturalized_citizen).to eq nil
+          expect(dependent.eligible_immigration_status).to eq nil
+          expect(dependent.indian_tribe_member).to eq nil
+          expect(dependent.tribal_state).to eq nil
+          expect(dependent.tribal_name).to eq nil
+          expect(dependent.tribe_codes).to eq []
+        end
+      end
+    end
   end
 
   context "DELETE destroy" do

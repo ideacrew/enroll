@@ -1,5 +1,6 @@
 HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.apply_filters" => "Apply Filters",
+  "en.hbx_profiles.show.heading" => "Admin Home",
 	"en.hbx_profiles.employer_name" => "Employer Name",
 	"en.hbx_profiles.effective_date" => "Effective Date",
 	"en.hbx_profiles.open_enrollment_end_date" => "Open Enrollment End Date",
