@@ -58,10 +58,8 @@ module Queries
     end
 
     def sort_by_name_col(scope, sort_direction)
-      # Family name column is calculated using Family.family_members.primary_applicant.full_name
-      # primary_applicant is a Family model method, not a DB field
-      # full_name is a Person model method, not a DB field
-      # use an aggregation to perform the sort on name
+      # Family name column is calculated using eligibility_determination.subjects.full_name/last_name on the primary
+      # use an aggregation to access the fields and perform the sort
 
       # build the pipeline to sort by primary applicant's full name
       sort_direction == :asc ? 1 : -1
