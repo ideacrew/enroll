@@ -92,6 +92,10 @@ SHARED_TRANSLATIONS = {
     "en.help_sign_up" => "Help Me Sign Up",
     "en.get_help_sign_up" => "Get Help Signing Up",
     "en.close" => "Close",
+
+    # feature flags
+    "en.controllers.flag_disabled" => "%{feature_name} is currently disabled.",
+
     # event log
     "en.event_log.eligibility" => "Eligibility",
     "en.event_log.outcome" => "Outcome",
