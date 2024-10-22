@@ -58,13 +58,34 @@ module Operations
                      citizen_status: person.citizen_status,
                      is_consumer_role: true,
                      same_with_primary: same_with_primary?(family_member),
-                     indian_tribe_member: consumer_role.is_tribe_member?,
+                     indian_tribe_member: fetch_indian_tribe_member_status(consumer_role),
                      is_incarcerated: person.is_incarcerated,
                      addresses: construct_association_fields(person.addresses),
                      phones: construct_association_fields(person.phones),
                      emails: construct_association_fields(person.emails))
 
         attrs.merge(vlp_document_params(person.consumer_role))
+      end
+
+      def fetch_indian_tribe_member_status(consumer_role)
+        if EnrollRegistry[:indian_alaskan_tribe_details].enabled?
+          return nil if consumer_role.is_applying_coverage.to_s == 'false'
+          return false if should_return_false_for_tribe?(consumer_role)
+          return true if valid_tribal_details?(consumer_role)
+        else
+          return false if consumer_role.tribal_id.blank?
+          return true unless consumer_role.tribal_id.empty?
+        end
+      end
+
+      def should_return_false_for_tribe?(consumer_role)
+        consumer_role.tribal_state.blank? ||
+          (consumer_role.tribal_name.blank? && consumer_role.tribe_codes.blank?)
+      end
+
+      def valid_tribal_details?(consumer_role)
+        !consumer_role.tribal_state.blank? &&
+          (!consumer_role.tribal_name.blank? || !consumer_role.tribe_codes.blank?)
       end
 
       def same_with_primary?(family_member)
