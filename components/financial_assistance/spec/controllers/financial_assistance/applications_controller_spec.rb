@@ -386,6 +386,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       post :save_preferences, params: { id: application.id, application: application_valid_params }
       expect(response).to redirect_to(submit_your_application_application_path(application))
     end
+
+    it "should set years_to_renew on application" do
+      post :save_preferences, params: { id: application.id, application: application_valid_params.merge!("is_renewal_authorized" => "true") }
+      application.reload
+      expect(application.years_to_renew).to eq 5
+    end
   end
 
   context "POST submit" do
