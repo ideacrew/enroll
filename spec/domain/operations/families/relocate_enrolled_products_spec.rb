@@ -177,12 +177,7 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
       end
     end
 
-    context "when the family has an enrollment in the current plan year and an enrollment in the prospective year" do
-      let!(:enrollment_3) do
-        FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, coverage_kind: "health", kind: "individual",
-                                           aasm_state: "coverage_selected", effective_on: Date.new(TimeKeeper.date_of_record.next_year.year), :product => product)
-      end
-
+    context 'prospective year enrollment' do
       before do
         allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
         allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
@@ -207,12 +202,35 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
         @result = subject.call(@params)
       end
 
-      it "should return success" do
-        expect(@result).to be_success
+      context "when the family has an enrollment in the current plan year and an coverage selected enrollment in the prospective year" do
+        let!(:enrollment_3) do
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, coverage_kind: "health", kind: "individual",
+                                             aasm_state: "coverage_selected", effective_on: Date.new(TimeKeeper.date_of_record.next_year.year), :product => product)
+        end
+
+
+        it "should return success" do
+          expect(@result).to be_success
+        end
+
+        it "should have prospective year enrollment" do
+          expect(@result.success[enrollment_3.hbx_id][:enrollment_hbx_id]).to eql(enrollment_3.hbx_id)
+        end
       end
 
-      it "should have prospective year enrollment" do
-        expect(@result.success[enrollment_3.hbx_id][:enrollment_hbx_id]).to eql(enrollment_3.hbx_id)
+      context "when the family has an enrollment in the current plan year and an auto renewing enrollment in the prospective year" do
+        let!(:enrollment_3) do
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, coverage_kind: "health", kind: "individual",
+                                             aasm_state: "auto_renewing", effective_on: Date.new(TimeKeeper.date_of_record.next_year.year), :product => product)
+        end
+
+        it "should return success" do
+          expect(@result).to be_success
+        end
+
+        it "should have prospective year enrollment" do
+          expect(@result.success[enrollment_3.hbx_id][:enrollment_hbx_id]).to eql(enrollment_3.hbx_id)
+        end
       end
     end
   end
