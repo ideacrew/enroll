@@ -45,7 +45,7 @@ class PersonRelationship
     "unrelated",
     'ward',
     'cousin'
-  ] + (EnrollRegistry.feature_enabled?(:mitc_relationships) ? %w[domestic_partners_child parents_domestic_partner] : []).freeze
+  ] + (EnrollRegistry.feature_enabled?(:mitc_relationships) ? %w[domestic_partner's_child parent's_domestic_partner] : []).freeze
 
   Relationships_UI = [
     "spouse",
@@ -58,7 +58,7 @@ class PersonRelationship
     "nephew_or_niece",
     "grandchild",
     'grandparent'
-  ] + (EnrollRegistry.feature_enabled?(:mitc_relationships) ? %w[father_or_mother_in_law daughter_or_son_in_law brother_or_sister_in_law cousin domestic_partners_child parents_domestic_partner] : []).freeze
+  ] + (EnrollRegistry.feature_enabled?(:mitc_relationships) ? %w[father_or_mother_in_law daughter_or_son_in_law brother_or_sister_in_law cousin domestic_partner's_child parent's_domestic_partner] : []).freeze
 
   InverseMap = {
     "child" => "parent",
@@ -75,8 +75,8 @@ class PersonRelationship
     "daughter_or_son_in_law" => "father_or_mother_in_law",
     "guardian" => "ward",
     "ward" => "guardian",
-    'domestic_partners_child' => 'parents_domestic_partner',
-    'parents_domestic_partner' => 'domestic_partners_child',
+    'domestic_partner\'s_child' => 'parent\'s_domestic_partner',
+    'parent\'s_domestic_partner' => 'domestic_partner\'s_child',
 
     # bi directional
     "self" => "self",
