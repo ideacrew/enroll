@@ -41,13 +41,13 @@
         <%= f.date_field :start_on, placeholder: "MM/DD/YYYY", required: true, class: "w-100" %>
       </div>
       <div class="col-6 pr-0">
-        <%= f.label :end_on, l10n("exchange.employer_applications.end_date"), class: "required" %>
-        <%= f.date_field :end_on, placeholder: "MM/DD/YYYY", required: true, class: "w-100" %>
+        <%= f.label :end_on, l10n("exchange.employer_applications.end_date") %>
+        <%= f.date_field :end_on, placeholder: "MM/DD/YYYY", class: "w-100" %>
       </div>
     </div>
     <div class="my-4">
       <%= f.label :title, l10n("exchange.manage_sep_types.sep_name"), class: "required" %>
-      <%= f.text_field :title, required: true, placeholder: l10n("title"), class: "w-100" %>
+      <%= f.text_field :title, required: true, placeholder: l10n("exchange.manage_sep_types.enter_sep_name"), class: "w-100" %>
     </div>
     <div class="my-4">
       <%= f.label :tool_tip, l10n("exchange.manage_sep_types.tooltip") %>
@@ -55,7 +55,7 @@
     </div>
     <div class="my-4">
       <%= f.label :event_kind_label, l10n("exchange.manage_sep_types.event_date_label"), class: "required" %>
-      <%= f.text_field :event_kind_label, required: true, placeholder: l10n("exchange.manage_sep_types.event_date_label"), class: "w-100" %>
+      <%= f.text_field :event_kind_label, required: true, placeholder: l10n("exchange.manage_sep_types.event_date_label_placeholder"), class: "w-100" %>
     </div>
     <div data-action='change->sep-types#reasonChange' id="reasonContainer">
       <div class="my-4">

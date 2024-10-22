@@ -5,12 +5,12 @@
       <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: {class: 'needs-validation', data: {controller: 'signup'}, novalidate: true }) do |f| %>
         <%= devise_error_messages! %>
         <div class="form-group">
-          <%= f.label :email %>
+          <%= f.label :email, l10n('email') %>
           <br>
           <%= f.email_field :email, autofocus: true, class: "form-control", required: true %>
           <%= f.hidden_field :identity_confirmed_token %>
           <div class="invalid-feedback">
-            Please enter an email address.
+            <%= l10n('devise.passwords.new.please_enter_email') %>
           </div>
           <br>
           <% if forgot_password_recaptcha_enabled? %>
