@@ -1,6 +1,8 @@
 module Effective
   module Datatables
     class BrokerAgencyDatatable < Effective::MongoidDatatable
+
+
       datatable do
         # bulk_actions_column do
         #    bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
