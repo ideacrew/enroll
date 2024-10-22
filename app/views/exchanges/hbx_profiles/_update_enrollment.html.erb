@@ -7,15 +7,15 @@
       <table class="table table-border">
         <thead>
           <tr>
-            <th><%= l10n('name') %>: <b><%= @person.first_name %> <%= @person.last_name %></b></th>
-            <th><%= l10n('hbx_id') %>: <b><%= @person.hbx_id %></b></th>
+            <th><%= l10n('name') %>: <span class="weight-n"><%= @person.first_name %> <%= @person.last_name %></span></th>
+            <th><%= l10n('hbx_id') %>: <span class="weight-n"><%= @person.hbx_id %></span></th>
           </tr>
         </thead>
         <tbody>
           <tr>
           </tr>
           <tr>
-            <td class="standard"><%= l10n('dob') %>: <b><%= @person.dob %></b></td>
+            <td class="standard"><b><%= l10n('dob') %></b>: <%= @person.dob %></td>
             <td>
             <% if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields) %>
               <%= render partial: 'shared/person/ssn/admin_ssn_block',
@@ -31,7 +31,7 @@
     <% elsif  @dont_update_ssn %>
       <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.cannot_remove') %></h3>
     <% else %>
-      <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.failure') %></h3> 
+      <h3><%= l10n('hbx_profiles.edit_dob_ssn.result.failure') %></h3>
       <h4><%= l10n('hbx_profiles.edit_dob_ssn.result.failure.subheader') %></h4>
       <div><%= l10n('first_name') %>: <b><%= @ssn_match.first_name %></b></div>
       <div><%= l10n('last_name') %>: <b><%= @ssn_match.last_name %></b></div>
