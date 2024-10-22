@@ -136,6 +136,7 @@ module FinancialAssistance
 
       authorize @application, :submit?
       if params[:application].present?
+        @application.clean_conditional_params(params[:application])
         @application.assign_attributes(permit_params(params[:application]))
 
         if @application.save

@@ -412,11 +412,15 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
         allow(controller).to receive(:build_error_messages)
 
-        post :submit_your_application_save, params: { id: application.id, application: application_valid_params }
+        post :submit_your_application_save, params: { id: application.id, application: application_valid_params.merge!("parent_living_out_of_home_terms" => "false") }
       end
 
       it "should render error page when there is an incomplete or already submitted application" do
         expect(response).to redirect_to(application_publish_error_application_path(application))
+      end
+
+      it "should set attestation terms to nil" do
+        expect(application.reload.attestation_terms).to eq nil
       end
     end
 
