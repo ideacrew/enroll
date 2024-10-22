@@ -36,26 +36,8 @@ module Queries
 
       # build the pipeline to sort by primary applicant's full name
       sort_direction == :asc ? 1 : -1
-      pipeline = [
-        {:$unwind=>"$family_members"},
-        {:$match=>{:"family_members.is_primary_applicant"=>true}},
-        {:$lookup=>{:from=>"people", :localField=>"family_members.person_id", :foreignField=>"_id", :as=>"person"}},
-        {:$unwind=>"$person"},
-        {:$addFields=>
-          {:"person.full_name"=>
-            {:$trim=>
-              {:input=>
-                {:$concat=>
-                  [{:$cond=>{:if=>{:$ne=>["$person.name_pfx", nil]}, :then=>{:$concat=>["$person.name_pfx", " "]}, :else=>""}},
-                   {:$cond=>{:if=>{:$ne=>["$person.first_name", nil]}, :then=>{:$concat=>["$person.first_name", " "]}, :else=>""}},
-                   {:$cond=>{:if=>{:$ne=>["$person.middle_name", nil]}, :then=>{:$concat=>["$person.middle_name", " "]}, :else=>""}},
-                   {:$cond=>{:if=>{:$ne=>["$person.last_name", nil]}, :then=>{:$concat=>["$person.last_name", " "]}, :else=>""}},
-                   {:$cond=>{:if=>{:$ne=>["$person.name_sfx", nil]}, :then=>{:$concat=>["$person.name_sfx", " "]}, :else=>""}}]}}}}},
-        {:$sort => {:"person.full_name" => sort_direction}},
-        {:$skip => @skip},
-        {:$limit => @limit}
-      ]
-
+      pipeline = Family.sort_by_primary_full_name_pipeline(sort_direction)
+      pipeline = pipeline + [{:$skip => @skip}, {:$limit => @limit}]
       # aggregate returns json, so we need to transform back to Family objects for the mongoid datatable to handle
       ids = scope.collection.aggregate(pipeline).map { |doc| doc["_id"] }
       families = Family.where(:_id.in => ids).to_a

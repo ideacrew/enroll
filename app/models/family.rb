@@ -1235,6 +1235,17 @@ class Family
       bcp = HbxProfile.bcp_by_oe_dates
       bcp&.start_on&.year || TimeKeeper.date_of_record.year
     end
+
+    def sort_by_primary_full_name_pipeline(sort_direction)
+      [
+        {:$unwind=>"$family_members"},
+        {:$match=>{:"family_members.is_primary_applicant"=>true}},
+        {:$lookup=>{:from=>"people", :localField=>"family_members.person_id", :foreignField=>"_id", :as=>"person"}},
+        {:$unwind=>"$person"},
+        {:$addFields=>{:"person.full_name"=> Person.build_full_name_field_pipeline}},
+        {:$sort => {:"person.full_name" => sort_direction}},
+      ]
+    end
   end
 
   def build_consumer_role(family_member, opts = {})
