@@ -386,6 +386,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       post :save_preferences, params: { id: application.id, application: application_valid_params }
       expect(response).to redirect_to(submit_your_application_application_path(application))
     end
+
+    it "should set years_to_renew on application" do
+      post :save_preferences, params: { id: application.id, application: application_valid_params.merge!("is_renewal_authorized" => "true") }
+      application.reload
+      expect(application.years_to_renew).to eq 5
+    end
   end
 
   context "POST submit" do
@@ -406,11 +412,15 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
         allow(controller).to receive(:build_error_messages)
 
-        post :submit_your_application_save, params: { id: application.id, application: application_valid_params }
+        post :submit_your_application_save, params: { id: application.id, application: application_valid_params.merge!("parent_living_out_of_home_terms" => "false") }
       end
 
       it "should render error page when there is an incomplete or already submitted application" do
         expect(response).to redirect_to(application_publish_error_application_path(application))
+      end
+
+      it "should set attestation terms to nil" do
+        expect(application.reload.attestation_terms).to eq nil
       end
     end
 
