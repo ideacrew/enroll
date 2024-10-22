@@ -38,11 +38,60 @@ module Queries
     end
 
     def skip(num)
-      build_scope.skip(num)
+      @skip = num
+      self
     end
 
     def limit(num)
-      build_scope.limit(num)
+      @limit = num
+      self
+    end
+
+    def sort_query(query, order_by)
+      sort_column, sort_direction = order_by.to_a.flatten
+      case sort_column
+      when 'name'
+        sort_by_name_col(query, sort_direction == :asc ? 1 : -1)
+      else
+        query
+      end
+    end
+
+    def sort_by_name_col(scope, sort_direction)
+      # Family name column is calculated using Family.family_members.primary_applicant.full_name
+      # primary_applicant is a Family model method, not a DB field
+      # full_name is a Person model method, not a DB field
+      # use an aggregation to perform the sort on name
+
+      # build the pipeline to sort by primary applicant's full name
+      sort_direction == :asc ? 1 : -1
+      pipeline = Family.sort_by_subject_primary_full_name_pipeline(sort_direction)
+      pipeline += [{:$skip => @skip}, {:$limit => @limit}]
+      # aggregate returns json, so we need to transform back to Family objects for the mongoid datatable to handle
+      ids = scope.collection.aggregate(pipeline).map { |doc| doc["_id"] }
+      families = Family.where(:_id.in => ids).to_a
+      ids.map { |id| families.find { |family| family.id == id } }
+    end
+
+    def build_query
+      limited_scope = build_scope
+      if @order_by
+        sort_query(limited_scope, @order_by)
+      else
+        limited_scope.skip(@skip).limit(@limit)
+      end
+    end
+
+    def each(&block)
+      return to_enum(:each) unless block
+
+      build_query.each(&block)
+    end
+
+    def each_with_index(&block)
+      return to_enum(:each_with_index) unless block
+
+      build_query.each_with_index(&block)
     end
 
     def order_by(var)

@@ -67,6 +67,8 @@ module Effective
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
+
+        default_order :name, nil
       end
 
       def collection

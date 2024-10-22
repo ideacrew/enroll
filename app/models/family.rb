@@ -1238,12 +1238,20 @@ class Family
 
     def sort_by_primary_full_name_pipeline(sort_direction)
       [
-        {:$unwind=>"$family_members"},
-        {:$match=>{:"family_members.is_primary_applicant"=>true}},
-        {:$lookup=>{:from=>"people", :localField=>"family_members.person_id", :foreignField=>"_id", :as=>"person"}},
-        {:$unwind=>"$person"},
-        {:$addFields=>{:"person.full_name"=> Person.build_full_name_field_pipeline}},
-        {:$sort => {:"person.full_name" => sort_direction}},
+        {:$unwind => "$family_members"},
+        {:$match => {:"family_members.is_primary_applicant" => true}},
+        {:$lookup => {:from => "people", :localField => "family_members.person_id", :foreignField => "_id", :as => "person"}},
+        {:$unwind => "$person"},
+        {:$addFields => {:"person.full_name" => Person.build_full_name_field_pipeline}},
+        {:$sort => {:"person.full_name" => sort_direction}}
+      ]
+    end
+
+    def sort_by_subject_primary_full_name_pipeline(sort_direction)
+      [
+        { :$unwind => "$eligibility_determination.subjects" },
+        { :$match => { "eligibility_determination.subjects.is_primary": true } },
+        { :$sort => { "eligibility_determination.subjects.first_name": sort_direction, "eligibility_determination.subjects.last_name": 1 } }
       ]
     end
   end

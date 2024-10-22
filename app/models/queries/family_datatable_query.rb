@@ -37,7 +37,7 @@ module Queries
       # build the pipeline to sort by primary applicant's full name
       sort_direction == :asc ? 1 : -1
       pipeline = Family.sort_by_primary_full_name_pipeline(sort_direction)
-      pipeline = pipeline + [{:$skip => @skip}, {:$limit => @limit}]
+      pipeline += [{:$skip => @skip}, {:$limit => @limit}]
       # aggregate returns json, so we need to transform back to Family objects for the mongoid datatable to handle
       ids = scope.collection.aggregate(pipeline).map { |doc| doc["_id"] }
       families = Family.where(:_id.in => ids).to_a
