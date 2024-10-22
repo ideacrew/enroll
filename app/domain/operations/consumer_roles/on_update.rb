@@ -48,6 +48,7 @@ module Operations
           logger.info "ConsumerRole DetermineVerifications success: #{result.success}"
           Success("ConsumerRole DetermineVerifications success: #{result.success}")
         else
+          Rails.logger.info { "ConsumerRole DetermineVerifications for consumer role: #{role.id}; failure: #{result.failure}"}
           logger.info "ConsumerRole DetermineVerifications failure: #{result.failure}"
           Failure("ConsumerRole DetermineVerifications failure: #{result.failure}")
         end

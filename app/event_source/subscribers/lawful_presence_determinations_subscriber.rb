@@ -30,6 +30,7 @@ module Subscribers
 
       result = ::Operations::Individual::DetermineVerifications.new.call({id: payload[:consumer_role_id]})
       result_str = result.success? ? "Success: #{result.success}" : "Failure: #{result.failure}"
+      Rails.logger.info { "LawfulPresenceDeterminationsSubscriber, determine_verifications Failure for consumer role: #{payload[:consumer_role_id]}; failure reason: #{result_str}" } if result.failure?
       subscriber_logger.info "LawfulPresenceDeterminationsSubscriber, determine_verifications result: #{result_str}"
     rescue StandardError => e
       subscriber_logger.error "Error: LawfulPresenceDeterminationsSubscriber, error message: #{e.message}, backtrace: #{e.backtrace}"
