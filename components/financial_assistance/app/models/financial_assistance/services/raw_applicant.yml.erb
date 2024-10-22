@@ -77,7 +77,7 @@ demographics:
             key: <%= l10n('insured.consumer_roles.docs_shared.country_of_citizenship') %>
             value: <%= immigration_field_value(:country_of_citizenship) %>
         vlp_description:
-            key: <%= l10n('insured.consumer_roles.docs_shared.document_description') %>
+            key: <%= l10n('faa.review.personal.vlp_description') %>
             value: <%= immigration_field_value(:vlp_description) %>
         expiration_date:
             key: <%= l10n('faa.review.personal.expiration_date') %>
@@ -299,13 +299,13 @@ other_questions:
             key: <%= other_questions_prompt('is_student') %>
             value: "<%= human_boolean(@applicant.is_student) %>"
         student_kind:
-            key: <%= l10n('student_type') %>
+            key: <%= l10n('faa.other_ques.student_type') %>
             value: <%= human_value(@applicant.student_kind) %>
         student_status_end_on:
-            key: <%= l10n('student_status_end_on') %>
+            key: <%= l10n('faa.other_ques.student_status_end') %>
             value: <%= human_value(@applicant.student_status_end_on) %>
         student_school_kind:
-            key: <%= l10n('student_school_kind') %>
+            key: <%= l10n('faa.other_ques.student_school_type') %>
             value: <%= @applicant.student_school_kind %>
         is_blind:
             key: <%= other_questions_prompt('is_blind') %>
