@@ -70,7 +70,7 @@ RSpec.describe Exchanges::AnnouncementsController do
       end
 
       it "should get successful notice" do
-        expect(flash[:notice]).to eq "Create Announcement Successful."
+        expect(flash[:success]).to eq "Create Announcement Successful."
       end
     end
 
@@ -131,7 +131,7 @@ RSpec.describe Exchanges::AnnouncementsController do
       end
 
       it "should get successful notice" do
-        expect(flash[:notice]).to eq "Destroy Announcement Successful."
+        expect(flash[:success]).to eq "Destroy Announcement Successful."
       end
     end
 
