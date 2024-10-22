@@ -29,6 +29,7 @@ module FinancialAssistance
 
     def create
       authorize @application, :create?
+      sanitized_applicant_params
       @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
       @applicant.application_id = params[:application_id]
       @applicant.is_dependent = params[:is_dependent]
@@ -58,11 +59,13 @@ module FinancialAssistance
 
     def update
       authorize @applicant, :update?
+
       if params[:financial_assistance_applicant].present?
         format_date_params params[:financial_assistance_applicant]
         @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
         head :ok, content_type: "text/html"
       else
+        sanitized_applicant_params
         @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
         @applicant.is_dependent = params[:is_dependent]
         @applicant.application_id = params[:application_id]
@@ -180,6 +183,29 @@ module FinancialAssistance
     end
 
     private
+
+    def sanitized_applicant_params
+      applicant_params = params.permit(:applicant => {})[:applicant].to_h
+
+      if applicant_params["is_applying_coverage"] == 'false'
+        fields_to_unset = {
+          us_citizen: nil,
+          naturalized_citizen: nil,
+          eligible_immigration_status: nil,
+          indian_tribe_member: nil,
+          is_incarcerated: nil,
+          tribal_state: nil,
+          tribal_name: nil,
+          tribe_codes: []
+        }
+
+        fields_to_unset.each do |field, value|
+          applicant_params[field.to_s] = value
+        end
+      end
+
+      params[:applicant] = applicant_params
+    end
 
     def applicant_is_spouse_of_primary(applicant)
       has_spouse_relationship = applicant.relationships.where(kind: 'spouse', relative_id: @application.primary_applicant.id).count > 0

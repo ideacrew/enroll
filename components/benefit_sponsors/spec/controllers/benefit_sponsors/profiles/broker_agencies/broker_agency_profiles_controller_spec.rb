@@ -228,7 +228,9 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         context "with the correct permissions" do
           before :each do
             initialize_and_login_admin[super_permission]
-            get :staff_index, params: { id: bap_id }, xhr: true
+            broker_agency1.set(market_kind: :both, aasm_state: 'is_approved')
+            person01.broker_role.set(aasm_state: "active", benefit_sponsors_broker_agency_profile_id: broker_agency1.id)
+            get :staff_index, params: { id: bap_id, q: "#{person01.first_name} #{person01.last_name} " }, xhr: true
           end
 
           it "should return http success" do
@@ -237,6 +239,10 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
           it "should render the staff_index template" do
             expect(response).to render_template("staff_index")
+          end
+
+          it "should assign a staff var" do
+            expect(assigns(:staff).count).to eq(1)
           end
         end
 
