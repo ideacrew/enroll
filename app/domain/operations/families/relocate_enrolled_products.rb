@@ -58,7 +58,7 @@ module Operations
       end
 
       def fetch_existing_coverage_by_families(family_ids)
-        all_enrollments = HbxEnrollment.where({:family_id.in => family_ids, :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES }})
+        all_enrollments = HbxEnrollment.where({:family_id.in => family_ids, :aasm_state => {"$in" => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES }})
         Success(all_enrollments)
       end
 
