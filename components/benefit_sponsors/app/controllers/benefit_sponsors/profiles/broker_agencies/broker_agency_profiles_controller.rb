@@ -64,9 +64,9 @@ module BenefitSponsors
                    else
                      broker_profile_ids = BenefitSponsors::Organizations::Organization.where(legal_name: /^#{Regexp.escape(@q)}/i).map(&:profiles).flatten.map(&:id)
                      find_by_agency_name = @staff.where(:'broker_role.benefit_sponsors_broker_agency_profile_id'.in => broker_profile_ids)
-                     find_by_last_name = @staff.where(last_name: /^#{Regexp.escape(@q)}/i)
-                     find_by_first_name = @staff.where(first_name: /^#{Regexp.escape(@q)}/i)
-                     unsorted_search = find_by_agency_name + find_by_last_name + find_by_first_name
+                     search_hash = @staff.search_hash(@q)
+                     find_by_search_hash = @staff.where(search_hash)
+                     unsorted_search = find_by_agency_name + find_by_search_hash
                      unsorted_search.sort_by(&:last_name).uniq
                    end
         end
