@@ -62,17 +62,17 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
           rubygems: latest
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
@@ -86,7 +86,7 @@ jobs:
       - name: Run tests
         run: bundle exec rspec spec/${{ matrix.folder }} --format json --out ci/rspec/${{matrix.folder}}-rspec-report.json
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.folder }}
           path: ci/rspec/${{ matrix.folder }}-rspec-report.json
@@ -128,13 +128,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Restore project gems
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: v3-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
@@ -147,7 +147,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_v14_modules-${{ hashFiles('yarn.lock') }}
@@ -161,7 +161,7 @@ jobs:
       - name: Run tests
         run: bundle exec rspec components/${{ matrix.folder }} --format json --out ci/rspec/components-${{matrix.folder}}-rspec-report.json
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: components-${{ matrix.folder }}
           path: ci/rspec/components-${{ matrix.folder }}-rspec-report.json
@@ -169,10 +169,10 @@ jobs:
     needs: [rspec-report, rspec-engines-report]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Download all artifacts into the provided directory
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: ci/rspec/compressed-reports
 

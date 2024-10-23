@@ -17,7 +17,7 @@ jobs:
   view_linter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -29,7 +29,7 @@ jobs:
   brakeman:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -37,10 +37,11 @@ jobs:
       - run: gem install brakeman
       - run: brakeman -i config/brakeman.ignore --add-checks-path checks --format html --out brakeman.html
       - name: upload brakeman failure report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: Security Reports
+          # currently runs brakeman on main_app and all engines, so non-specific name here
+          name: security-reports
           path: brakeman.html
   brakeman-engines:
     runs-on: ubuntu-20.04
@@ -57,7 +58,7 @@ jobs:
           - transport_profiles
           - ui_helpers
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -68,10 +69,10 @@ jobs:
           cd components/${{ matrix.engine }}
           brakeman -i config/brakeman.ignore --add-checks-path ../../engine_checks/ --format html --out ../../${{ matrix.engine }}.brakeman.html
       - name: upload brakeman failure report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: Security Reports
+          name: security-reports.${{ matrix.engine }}
           path: ${{ matrix.engine }}.brakeman.html
   engines:
     needs: [brakeman-engines]
@@ -120,20 +121,20 @@ jobs:
             'transport_profiles'
           ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: restore Project Gems
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
-          key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: v6-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
+            v6-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system --quiet --silent
@@ -147,7 +148,7 @@ jobs:
           bundle install
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -176,13 +177,13 @@ jobs:
         run: |
           root=`pwd -P`
           cd $root/components/${{ matrix.engine-name }}
-          cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.engine-name }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: code-coverage
-          path: ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          name: code-coverage.engines-${{ matrix.engine-name }}_${{ strategy.job-total }}
+          path: ${{ github.workspace }}/engines-${{ matrix.engine-name }}_${{ strategy.job-total }}-coverage.xml
   financial-assistance:
     needs: [brakeman-engines]
     runs-on: ubuntu-20.04
@@ -223,19 +224,19 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Install Test Boosters gem
         run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -252,13 +253,13 @@ jobs:
       - name: copy coverage report
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
-          cp coverage/coverage.xml ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          cp coverage/coverage.xml ${{ github.workspace }}/coverage/fa-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
-          name: code-coverage
-          path: ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          name: code-coverage.fa-${{ matrix.group }}_${{ strategy.job-total }}
+          path: ${{ github.workspace }}/coverage/fa-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
   benefit-sponsors:
     needs: [brakeman-engines]
     runs-on: ubuntu-20.04
@@ -299,15 +300,15 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Restore Project Gems
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
@@ -324,7 +325,7 @@ jobs:
           gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -349,13 +350,13 @@ jobs:
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           cd components/benefit_sponsors
-          cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: code-coverage
-          path: ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          name: code-coverage.bs-${{ matrix.group }}_${{ strategy.job-total }}
+          path: ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
   rspec:
     needs: [brakeman, brakeman-engines]
     runs-on: ubuntu-latest
@@ -421,19 +422,19 @@ jobs:
             23,
           ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Install Test Boosters gem
         run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -451,13 +452,13 @@ jobs:
       - name: copy coverage report
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
-          cp coverage/coverage.xml ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          cp coverage/coverage.xml ${{ github.workspace }}/coverage/rspec-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
-          name: code-coverage
-          path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          name: code-coverage.rspec-${{ matrix.group }}_${{ strategy.job-total }}
+          path: ${{ github.workspace }}/coverage/rspec-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
   cucumber:
     needs: [brakeman, brakeman-engines]
     runs-on: ubuntu-latest
@@ -544,19 +545,19 @@ jobs:
             44,
           ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
           rubygems: 3.3.26
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - name: Install Test boosters gem
         run: gem install treye-semaphore_test_boosters --version '2.5.2'
       - name: Restore Node Modules
         id: npm-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
@@ -578,13 +579,13 @@ jobs:
       - name: copy coverage report
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
-          cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v3
         if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         with:
-          name: code-coverage
-          path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          name: code-coverage.cukes-${{ matrix.group }}_${{ strategy.job-total }}
+          path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}-coverage.xml
   quality-workbench:
     needs: [engines, benefit-sponsors, rspec, cucumber]
     if: always()
@@ -603,27 +604,27 @@ jobs:
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download code coverage artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: code-coverage
+          pattern: code-coverage.*
           path: coverage
       - name: Setup .NET Core # Required to execute ReportGenerator
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.x
+          dotnet-version: 8.x
           dotnet-quality: 'ga'
       - name: ReportGenerator
-        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.24
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.3.9
         with:
-          reports: coverage/*.xml
+          reports: coverage/**/*.xml
           targetdir: coveragereport
           reporttypes: HtmlInline;MarkdownSummary;MarkdownSummaryGithub;Badges
       - name: Display structure of downloaded files
         run: ls -R
       - name: Upload coverage report artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: code-coverage-report
           path: coveragereport/*
