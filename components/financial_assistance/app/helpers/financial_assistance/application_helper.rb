@@ -2,7 +2,6 @@
 
 module FinancialAssistance
   module ApplicationHelper
-    include RelationshipDropdownHelper
 
     def to_est(datetime)
       datetime.in_time_zone("Eastern Time (US & Canada)") if datetime.present?
@@ -209,6 +208,15 @@ module FinancialAssistance
       relationships = FinancialAssistance::Relationship::RELATIONSHIPS_UI
 
       options_for_select(relationships.map{|r| [display_relationship(r.to_s), r.to_s] }, selected: dependent.relation_with_primary)
+    end
+
+    def display_relationship(relationship)
+      relationship_mapping = {
+        l10n("insured.domestic_partner_key") => l10n("insured.domestic_partner_value"),
+        l10n("insured.parents_partner_key") => l10n("insured.parents_partner_value")
+      }
+
+      relationship_mapping[relationship].try(:humanize) || relationship.try(:humanize)
     end
 
     def applicant_currently_enrolled
