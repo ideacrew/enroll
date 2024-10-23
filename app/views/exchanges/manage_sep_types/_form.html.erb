@@ -1,3 +1,4 @@
+<% new = local_assigns[:new].present? ? local_assigns[:new] : false %>
 <div data-controller="sep-types">
   <meta data-target='sep-types.metadata'
     data-qle-reason="<%= @qle.reason %>"
@@ -6,7 +7,7 @@
     data-qle-market="<%= @qle.market_kind %>"
     data-termination-kinds="<%= @qle.termination_on_kinds || []%>"
     data-effective-kinds="<%= @qle.effective_on_kinds || [] %>"
-    data-qle-draft="<%= @qle.draft %>">
+    data-qle-draft="<%= @qle.draft || new == true %>">
   <% if @failure.present? %>
     <div class="alert alert-error d-flex align-items-start">
       <div class="d-flex pl-1">
@@ -25,10 +26,10 @@
     </div>
   <% end %>
   <h1>
-    <% if @qle.draft %>
-      <%= l10n("exchange.manage_sep_types.update_sep_type")%>
-    <% elsif !@qle.draft.present? %>
+    <% if new %>
       <%= l10n("exchange.manage_sep_types.create_sep_type")%>
+    <% elsif @qle.draft %>
+      <%= l10n("exchange.manage_sep_types.update_sep_type")%>
     <% else %>
       <%= l10n("exchange.manage_sep_types.sep_type_details")%>
     <% end %>

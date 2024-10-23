@@ -68,7 +68,18 @@ window.addEventListener('keydown', function(event) {
   if (event.keyIdentifier == 'U+000A' || event.keyIdentifier == 'Enter' || event.key === 'Enter') {
     if (event.target.nodeName == 'INPUT' && event.target.type !== 'text' && event.target.type !== 'textarea') {
       var form = event.target.closest('form');
-      if (form.checkValidity() === false) {
+      var reqCheckboxLists = form.querySelectorAll('.req-checkbox-group');
+      var requiredChecklists = [...reqCheckboxLists];
+      var checkListFail = false;
+      requiredChecklists.forEach(function(reqCheckbox) {
+        if (reqCheckbox.querySelectorAll('input[type="checkbox"]:checked').length == 0) {
+          checkListFail = true
+          reqCheckbox.classList.add('invalid');
+        } else {
+          reqCheckbox.classList.remove('invalid');
+        }
+      });
+      if (form.checkValidity() === false || checkListFail) {
         event.preventDefault();
         event.stopPropagation();
         form.classList.add('was-validated');

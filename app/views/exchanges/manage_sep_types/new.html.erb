@@ -1,7 +1,7 @@
 <% if EnrollRegistry.feature_enabled?(:sep_types) %>
   <% if @bs4 %>
     <%= form_for @qle, url: exchanges_manage_sep_types_path, rel: 'noopener noreferrer', method: :post do |f| %>
-      <%= render partial: "exchanges/manage_sep_types/form", locals: {f: f} %>
+      <%= render partial: "exchanges/manage_sep_types/form", locals: {f: f, new: true} %>
       <div class="<%= pundit_class(QualifyingLifeEventKind, :can_manage_qles?) %>">
         <div class="col-sm-10 px-0">
           <%= f.hidden_field :created_by, value: current_user.id %>
