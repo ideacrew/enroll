@@ -7,7 +7,6 @@ class UsersController < ApplicationController
 
   # Sets the user before each action, except for :confirm_lock and :unsupported_browser.
   before_action :set_user, except: [:confirm_lock, :unsupported_browser]
-  before_action :enable_bs4_layout, only: [:login_history, :change_username_and_email, :confirm_change_username_and_email] if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
 
   # Changes a user's username and email.
   #
@@ -57,6 +56,8 @@ class UsersController < ApplicationController
     authorize HbxProfile, :login_history?
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
 
+    @bs4 = true if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+
     respond_to do |format|
       format.js { render 'login_history' }
     end
@@ -75,27 +76,7 @@ class UsersController < ApplicationController
 
   private
 
-  helper_method :user, :min_username_length, :max_username_length
-
-  def enable_bs4_layout
-    @bs4 = true
-  end
-
-  # Helper method to display maximum character length for username.
-  #
-  # @return Integer
-  # @note Authentication and Authorization are not required
-  def max_username_length
-    User::MAX_USERNAME_LENGTH
-  end
-
-  # Helper method to display minimum character length for username.
-  #
-  # @return Integer
-  # @note Authentication and Authorization are not required
-  def min_username_length
-    User::MIN_USERNAME_LENGTH
-  end
+  helper_method :user
 
   def email_update_params
     params.require(:user).permit(:email)
