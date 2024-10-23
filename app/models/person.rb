@@ -31,9 +31,6 @@ class Person
 
   include Orms::Mongoid::DomainModel
 
-  # includes TimeHelper module for time related helper methods
-  include TimeHelper
-
   track_history :on => [:first_name,
                         :middle_name,
                         :last_name,
@@ -506,12 +503,11 @@ class Person
         changed_email_attributes: changed_email_attributes,
         changed_relationship_attributes: changed_relationship_attributes
       }
-
       event(
         'events.private.person_saved',
         headers: {
-          after_updated_at: convert_time_to_string(updated_at),
-          before_updated_at: convert_time_to_string(changed_attributes.deep_symbolize_keys[:updated_at])
+          after_updated_at: updated_at,
+          before_updated_at: changed_attributes.deep_symbolize_keys[:updated_at]
         },
         attributes: {
           after_save_version: to_hash,

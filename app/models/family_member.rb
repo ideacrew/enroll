@@ -7,9 +7,6 @@ class FamilyMember
   include GlobalID::Identification
   include EventSource::Command
 
-  # includes TimeHelper module for time related helper methods
-  include TimeHelper
-
   embedded_in :family
 
   # Responsible for updating eligibility when family member is created/updated
@@ -179,11 +176,7 @@ class FamilyMember
   end
 
   def publish_private_family_member_created_event
-    event(
-      'events.private.family_member_created',
-      attributes: { family: family },
-      headers: { after_updated_at: convert_time_to_string(created_at) }
-    )&.success&.publish
+    event('events.private.family_member_created', attributes: { family: family }, headers: { after_updated_at: created_at })&.success&.publish
   end
 
   def notify_family

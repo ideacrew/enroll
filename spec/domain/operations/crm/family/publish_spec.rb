@@ -3,8 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Operations::Crm::Family::Publish do
-  include TimeHelper
-
   before :all do
     DatabaseCleaner.clean
   end
@@ -22,8 +20,8 @@ RSpec.describe Operations::Crm::Family::Publish do
 
       it 'publishes the event successfully' do
         result = subject.call(hbx_id: hbx_id)
-        expect(result.success).to match(
-          "Successfully published event: events.families.created_or_updated for family with primary person hbx_id: #{hbx_id} with headers: "
+        expect(result.success).to eq(
+          "Successfully published event: events.families.created_or_updated for family with primary person hbx_id: #{hbx_id}"
         )
       end
     end

@@ -7,7 +7,6 @@ module Operations
       class Publish
         include Dry::Monads[:do, :result]
         include EventSource::Command
-        include TimeHelper
 
         # Publishes an event for a given person identified by hbx_id.
         #
@@ -20,7 +19,7 @@ module Operations
           transformed_cv    = yield construct_cv_transform(family, hbx_id)
           family_entity     = yield create_family_entity(transformed_cv)
           es_event          = yield create_es_event(family_entity, headers)
-          published_result  = yield publish_es_event(es_event, headers, hbx_id)
+          published_result  = yield publish_es_event(es_event, hbx_id)
 
           Success(published_result)
         end
@@ -63,7 +62,7 @@ module Operations
         def headers(family, person)
           eligible_dates = [person.created_at, person.updated_at, family.created_at, family.updated_at].compact
 
-          Success({ after_updated_at: convert_time_to_string(eligible_dates.max), before_updated_at: convert_time_to_string(eligible_dates.min) })
+          Success({ after_updated_at: eligible_dates.max, before_updated_at: eligible_dates.min })
         end
 
         # Constructs a CV transform for the family.
@@ -103,9 +102,9 @@ module Operations
         # @param es_event [EventSource::Event] The event source event.
         # @param hbx_id [String] The HBX ID of the person.
         # @return [Dry::Monads::Result] The result of the publish operation.
-        def publish_es_event(es_event, headers, hbx_id)
+        def publish_es_event(es_event, hbx_id)
           es_event.publish
-          Success("Successfully published event: #{es_event.name} for family with primary person hbx_id: #{hbx_id} with headers: #{headers}")
+          Success("Successfully published event: #{es_event.name} for family with primary person hbx_id: #{hbx_id}")
         end
       end
     end
