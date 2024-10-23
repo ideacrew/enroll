@@ -28,18 +28,17 @@ module Queries
       end
     end
 
-    def sort_by_name_col(scope, sort_direction)
+    def sort_by_name_col(query, sort_direction)
       # Family name column is calculated using Family.family_members.primary_applicant.full_name
       # primary_applicant is a Family model method, not a DB field
       # full_name is a Person model method, not a DB field
       # use an aggregation to perform the sort on name
 
       # build the pipeline to sort by primary applicant's full name
-      sort_direction == :asc ? 1 : -1
       pipeline = Family.sort_by_primary_full_name_pipeline(sort_direction)
       pipeline += [{:$skip => @skip}, {:$limit => @limit}]
       # aggregate returns json, so we need to transform back to Family objects for the mongoid datatable to handle
-      ids = scope.collection.aggregate(pipeline).map { |doc| doc["_id"] }
+      ids = query.collection.aggregate(pipeline).map { |doc| doc["_id"] }
       families = Family.where(:_id.in => ids).to_a
       ids.map { |id| families.find { |family| family.id == id } }
     end

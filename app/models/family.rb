@@ -290,9 +290,7 @@ class Family
     )
   }
 
-  scope :eligibility_determination_outstanding_verifications, -> (skip = 0, limit = 50, order_by = { :'eligibility_determination.outstanding_verification_earliest_due_date' => :asc }){
-        where(:'eligibility_determination.outstanding_verification_status' => 'outstanding').limit(limit).skip(skip).order_by(order_by)
-      }
+  scope :eligibility_determination_outstanding_verifications, -> { where(:'eligibility_determination.outstanding_verification_status' => 'outstanding') }
 
   scope :eligibility_determination_family_member_search, ->(search_string){
       any_of(
@@ -1247,12 +1245,32 @@ class Family
       ]
     end
 
-    def sort_by_subject_primary_full_name_pipeline(sort_direction)
+    def sort_by_eligible_primary_full_name_pipeline(sort_direction)
       [
         { :$unwind => "$eligibility_determination.subjects" },
         { :$match => { "eligibility_determination.subjects.is_primary": true } },
         { :$sort => { "eligibility_determination.subjects.first_name": sort_direction, "eligibility_determination.subjects.last_name": 1 } }
       ]
+    end
+
+    def sort_by_eligible_verification_earliest_due_date_pipeline(sort_direction)
+      [
+        {
+          "$addFields": {
+            "eligibility_determination.outstanding_verification_earliest_due_date_with_default": {
+              "$ifNull": [
+                "$eligibility_determination.outstanding_verification_earliest_due_date",
+                TimeKeeper.date_of_record + EnrollRegistry[:verification_document_due_in_days].item
+              ]
+            }
+          }
+        },
+        {
+          "$sort": {
+            "eligibility_determination.outstanding_verification_earliest_due_date_with_default": sort_direction
+          }
+        }
+    ]
     end
   end
 
