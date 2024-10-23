@@ -346,6 +346,16 @@ RSpec.describe ApplicationHelper, :type => :helper do
       end
     end
 
+    describe "#display_relationship" do
+      it "returns humanized name for known relationships" do
+        expect(helper.display_relationship('domestic_partners_child')).to eq("Domestic partner's child")
+        expect(helper.display_relationship('parents_domestic_partner')).to eq("Parent's domestic partner")
+      end
+
+      it "returns humanized name for spouse relationships" do
+        expect(helper.display_relationship('spouse')).to eq("Spouse")
+      end
+    end
   end
 
   describe "#may_update_census_employee?" do
