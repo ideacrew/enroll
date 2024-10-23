@@ -1,0 +1,68 @@
+<% unless subsection.nil? || subsection.empty? %>
+  <% is_nested = local_assigns[:is_nested].present? ? local_assigns[:is_nested] : false %>
+  <section class="mb-<%= is_nested ? '0' : '5' %>">
+
+    <%# Subsection title %>
+    <% title = subsection[:title] %>
+    <% if is_nested %>
+      <h4 class="mb-0"><%= title %></h4>
+    <% else %>
+      <div class="d-flex justify-content-between">
+        <% if title.present? %>
+          <h3 class="mb-0"><%= title %></h3>
+        <% end %>
+        <% edit_link = subsection[:edit_link] %>
+        <% if edit_link.present? %>
+          <div class="mb-2">
+            <%= h(link_to(subsection[:edit_link], class: "btn-secondary") do %>
+              <i class="fas fa-pencil-alt ml-0 mr-2"></i>
+              <span><%= l10n("edit") %></span>
+            <% end) %>
+          </div>
+        <% end %>
+      </div>
+      <hr class="my-1">
+    <% end %>
+
+    <%# Summary rows %>
+    <dl class=<%= 'mb-0' if is_nested %>>
+      <% subsection[:rows].each do |row| %>
+        <% if row.is_a?(Array) %> <%# nested section %>
+          <%= render partial: 'financial_assistance/applications/summary_subsection', locals: {is_nested: true}, collection: row, as: :subsection %>
+        <% else %> <%# single row %>
+          <div class="d-flex justify-content-between align-items-center">
+            <dt class="col-8 px-0"><%= row[:key] %></dt>
+            <dd class="text-right"><%= row[:value] %></dd>
+          </div>
+          <% row[:coverages]&.each do |coverage_set| %> <%# coverage subtables for Health Coverage section eligible or enrolled rows %>
+            <table>
+              <thead>
+                <tr>
+                  <th><%= l10n("faa.review.income.review_benefits_table.coverage_types") %></th>
+                  <th><%= l10n("faa.review.income.table.dates") %></th>
+                </tr>
+              </thead>
+              <tbody>
+              <% coverage_set.each do |benefit| %>
+                <% benefit.values.each_with_index do |row, index| %>
+                  <tr>
+                    <td class="col-6">
+                      <% key = row[:key] %>
+                      <% if index == 0 %>
+                        <b><%= key %></b>
+                      <% else %>
+                        <%= key %>
+                      <% end %>
+                    </td>
+                    <td class="col-6"><%= row[:value] %></td>
+                  </tr>
+                <% end %>
+              <% end %>
+              </tbody>
+            </table>
+          <% end %>
+        <% end %>
+      <% end %>
+    </dl>
+  </section>
+<% end %>

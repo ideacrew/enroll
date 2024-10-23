@@ -105,6 +105,7 @@ module FinancialAssistance
     scope :eligible, -> { where(kind: 'is_eligible')}
     scope :enrolled, -> { where(kind: 'is_enrolled')}
     scope :of_insurance_kind, ->(insurance_kind) { where(insurance_kind: insurance_kind) }
+    scope :has_valid_insurance_kind, -> { where(:insurance_kind.in => valid_insurance_kinds) }
 
     scope :any_medicare, -> { where(:insurance_kind.in => ['medicare', 'medicare_advantage', 'medicare_part_b']) }
 

@@ -121,5 +121,47 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
         expect(result.success[:same_with_primary]).to be_falsey
       end
     end
+
+    context 'indian_tribe_member' do
+      before do
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        dependent.person.addresses << Address.new(family_member.person.home_address.attributes.slice("kind", "city", "county", "state", "zip", "address_1", "address_2"))
+        dependent.person.save!
+        dependent.person.consumer_role.update_attributes!(is_applying_coverage: is_applying_coverage)
+        dependent.person.reload
+      end
+
+      context "when member not applying for coverage" do
+        let!(:is_applying_coverage) { false }
+
+        it 'should set indian_tribe_member as nil' do
+          result = subject.call({family_member: dependent})
+          expect(result.success[:indian_tribe_member]).to eq nil
+        end
+      end
+
+      context "when member is applying for coverage and tribal values are nil" do
+        let!(:is_applying_coverage) { true }
+
+        it 'should set indian_tribe_member as false' do
+          result = subject.call({family_member: dependent})
+          expect(result.success[:indian_tribe_member]).to eq(false)
+        end
+      end
+
+      context "when member is applying for coverage and tribal values are present" do
+        let!(:is_applying_coverage) { true }
+
+        before do
+          dependent.person.update_attributes!(tribal_state: 'DC', tribal_name: 'tribal_name', tribe_codes: ['tribe_codes'])
+          dependent.person.reload
+        end
+
+        it 'should set indian_tribe_member as true' do
+          result = subject.call({family_member: dependent})
+          expect(result.success[:indian_tribe_member]).to eq(true)
+        end
+      end
+    end
   end
 end

@@ -1,0 +1,329 @@
+# This file enforces the structure of the applicant summary sections in review pages in FAA:
+# 1. Consumer FAA Review & Submit (following the Application flow)
+# 2. Consumer FAA Review (accessible from the Home > Applications > Application dropdown)
+# 3. Admin FAA Full Application Review (accessible from the Home > Applications > Application dropdown)
+#
+# The configuration ties together both the translation keys and field values used on the key-value pair rows in the applicant summary.
+# `FinancialAssistance::Services::SummaryService::Summary::ApplicantSummary` and its subclasses drives the parsing of this file, view mapping, and conditional row/section display for the above pages.
+# Shared conditional row/section display logic between all three pages is managed in this config; conditional display logic which varies by page is managed in the helper.
+
+personal_info:
+    title: <%= l10n('personal_information') %>
+    rows:
+        dob:
+            key: <%= l10n('dob') %>
+            value: <%= @applicant.dob %>
+        age: 
+            key: <%= l10n('age') %>
+            value: <%= @applicant.age_of_the_applicant %>
+        gender:
+            key: <%= l10n('gender') %>
+            value: <%= @applicant.gender.humanize %>
+        relationship:
+            key: <%= l10n('relationship') %>
+            value: <%= @applicant.is_primary_applicant? ? l10n('self') : @applicant.relationships.find_by(relative_id: @application.primary_applicant.id).kind.humanize %>
+        coverage:
+            key: <%= l10n('faa.review.personal.needs_coverage') %>
+            value: "<%= human_boolean(@applicant.is_applying_coverage) %>"
+        status:
+            key: <%= l10n('status') %>
+            value: <%= @applicant.citizen_status.present? ? @applicant.format_citizen : nil %>
+        is_incarcerated:
+            key: <%= l10n('faa.review.personal.incarcerated') %>
+            value: "<%= human_boolean(@applicant.is_incarcerated) %>"
+
+demographics:
+    rows:
+        us_citizen:
+            key: <%= l10n('insured.us_citizen') %>
+            value: "<%= human_boolean(@applicant.us_citizen) %>"
+        naturalized_citizen:
+            key: <%= l10n('insured.consumer_roles.naturalized_question') %>
+            value: "<%= human_boolean(@applicant.naturalized_citizen) %>"
+        eligible:
+            key: <%= l10n('faa.question.eligible_immigration_status') %>
+            value: "<%= human_boolean(@applicant.eligible_immigration_status) %>"
+        document_type:
+            key: <%= l10n('faa.review.personal.document_type') %>
+            value: <%= immigration_field_value(:vlp_subject) %>
+        citizenship_number:
+            key: <%= l10n('faa.review.personal.citizenship_number') %>
+            value: <%= immigration_field_value(:citizenship_number) %>
+        alien_number:
+            key: <%= l10n('insured.consumer_roles.docs_shared.alien_number') %>
+            value: <%= immigration_field_value(:alien_number) %>
+        i94_number:
+            key: <%= l10n('insured.consumer_roles.docs_shared.i94_number') %>
+            value: <%= immigration_field_value(:i94_number) %>
+        visa_number:
+            key: <%= l10n('insured.consumer_roles.docs_shared.visa_number') %>
+            value: <%= immigration_field_value(:visa_number) %>
+        passport_number:
+            key: <%= l10n('insured.passport_number') %>
+            value: <%= immigration_field_value(:passport_number) %>
+        sevis_id:
+            key: <%= l10n('insured.consumer_roles.docs_shared.sevis_id') %>
+            value: <%= immigration_field_value(:sevis_id) %>
+        naturalization_number:
+            key: <%= l10n('insured.consumer_roles.docs_shared.naturalization_number') %>
+            value: <%= immigration_field_value(:naturalization_number) %>
+        receipt_number:
+            key: <%= l10n('faa.review.personal.receipt_number') %>
+            value: <%= immigration_field_value(:receipt_number) %>
+        card_number:
+            key: <%= l10n('insured.consumer_roles.docs_shared.card_number') %>
+            value: <%= immigration_field_value(:card_number) %>
+        country_of_citizenship:
+            key: <%= l10n('insured.consumer_roles.docs_shared.country_of_citizenship') %>
+            value: <%= immigration_field_value(:country_of_citizenship) %>
+        vlp_description:
+            key: <%= l10n('faa.review.personal.vlp_description') %>
+            value: <%= immigration_field_value(:vlp_description) %>
+        expiration_date:
+            key: <%= l10n('faa.review.personal.expiration_date') %>
+            value: <%= immigration_field_value(:expiration_date) %>
+        issuing_country:
+            key: <%= l10n('faa.review.personal.issuing_country') %>
+            value: <%= immigration_field_value(:issuing_country) %>
+        american_indian_or_alaska_native_tribe:
+            key: <%= l10n('faa.review.personal.ai_an_member') %>
+            value: "<%= human_boolean(@applicant.indian_tribe_member) %>"
+        <% if FinancialAssistanceRegistry.feature_enabled?(:tribes_information_raw_review) %>
+        tribe_state:
+            key: <%= l10n('faa.review.personal.tribal_state') %>
+            value: "<%= human_value(@applicant.tribal_state) %>"
+        tribe_name:
+            key: <%= l10n('faa.review.personal.tribal_name') %>
+            value: "<%= human_value(@applicant.tribal_name) %>"
+        tribe_codes:
+            key: <%= l10n('faa.review.personal.tribe_codes') %>
+            value: <%= @applicant.tribe_codes %>
+        <% end %>
+        is_incarcerated:
+            key: <%= l10n('insured.incarcerated') %>
+            value: <%= human_boolean(@applicant.is_incarcerated) %>
+        race_ethnicity:
+            key: <%= l10n('race_or_ethnicity') %>
+            value: <%= @applicant.ethnicity %>
+        <% addresses = @applicant.addresses %>
+        <% if addresses.present? %>
+        addresses:
+            <% addresses.each do |address| %>
+            -   title: "<%= address.kind.titleize %> <%= l10n('address') %>"
+                rows:
+                    line_1:
+                        key: <%= l10n('address_line_1').titleize %>
+                        value: "<%= address&.address_1 %>"
+                    line_2:
+                        key: <%= l10n('address_line_2').titleize %>
+                        value: "<%= address&.address_2 %>"
+                    city:
+                        key: <%= l10n('city') %>
+                        value: "<%= address&.city %>"
+                    zip:
+                        key: <%= l10n('zip') %>
+                        value: "<%= address&.zip %>"
+                    state:
+                        key: <%= l10n('state') %>
+                        value: "<%= address&.state %>"
+                    county:
+                        key: <%= l10n('county') %>
+                        value: "<%= address&.county %>"
+            <% end %>
+        <% end %>
+
+tax_info:
+    title: <%= l10n('faa.review.tax_info') %>
+    edit_link: <%= go_to_step_application_applicant_path(@application, @applicant, 1) %>
+    rows:
+        will_file_taxes:
+            key: <%= l10n('faa.tax_info.question1', year: @application.assistance_year) %>
+            value: "<%= human_boolean(@applicant.is_required_to_file_taxes) %>"
+        claimed_as_tax_dependent:
+            key: <%= l10n('faa.tax_info.question4', year: @application.assistance_year) %>
+            value: "<%= human_boolean(@applicant.is_claimed_as_tax_dependent) %>"
+        filing_jointly:
+            key: <%= l10n('faa.tax_info.question2', year: @application.assistance_year) %>
+            value: "<%= human_boolean(@applicant.is_joint_tax_filing) %>"
+        claimed_by:
+            key: <%= l10n('faa.tax_info.claimed_by') %>
+            value: <%= human_value(@applicant.claimed_as_tax_dependent_by ? @application.active_applicants.find(@applicant.claimed_as_tax_dependent_by.to_s).full_name : nil) %>
+
+income:
+    title: <%= l10n('faa.evidence_type_income') %>
+    edit_link: <%= application_applicant_incomes_path(@application, @applicant) %>
+    rows:
+        <% assistance_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!.to_s %>
+        has_job_income:
+            key: <%= l10n('faa.incomes.from_employer', assistance_year: assistance_year) %>
+            value: "<%= human_boolean(@applicant.has_job_income) %>"
+        <% jobs = @applicant.incomes.jobs %>
+        <% if jobs.present? %>
+        jobs:
+            <% jobs.each do |job| %>
+            -   title: <%= job.employer_name %>
+                has_address: <%= job.employer_address.present? %>
+                rows:
+                    line_1:
+                        key: <%= l10n('employer_address_line_1') %>
+                        value: "<%= job&.employer_address&.address_1 %>"
+                    line_2:
+                        key: <%= l10n('employer_address_line_2') %>
+                        value: "<%= job&.employer_address&.address_2 %>"
+                    city:
+                        key: <%= l10n('city') %>
+                        value: "<%= job&.employer_address&.city %>"
+                    zip:
+                        key: <%= l10n('zip') %>
+                        value: "<%= job&.employer_address&.zip %>"
+                    state:
+                        key: <%= l10n('state') %>
+                        value: "<%= job&.employer_address&.state %>"
+                    phone:
+                        key: <%= l10n('faa.incomes.employer_phone') %>
+                        value: "<%= format_phone(job.employer_phone&.full_phone_number) %>"
+            <% end %>
+        <% end %>
+        self_employment:
+            key: <%= l10n('faa.incomes.from_self_employment', assistance_year: assistance_year) %>
+            value: "<%= human_boolean(@applicant.has_self_employment_income) %>"
+        other_sources:
+            key: <%= l10n('faa.other_incomes.other_sources', assistance_year: assistance_year) %>
+            value: "<%= human_boolean(@applicant.has_other_income) %>"
+        <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
+        unemployment:
+            key: <%= l10n('faa.other_incomes.unemployment', assistance_year: assistance_year) %>
+            value: "<%= human_boolean(@applicant.has_unemployment_income) %>"
+        <% end %>
+        <% if EnrollRegistry.feature_enabled?(:american_indian_alaskan_native_income) %>
+        ai_an_income:
+            key: <%= l10n('faa.other_incomes.alaska_native') %>
+            value: "<%= human_boolean(@applicant.has_american_indian_alaskan_native_income) %>"
+        <% end %>
+
+income_adjustments:
+    title: <%= l10n('faa.review.income_adjustments') %>
+    edit_link: <%= application_applicant_deductions_path(@application, @applicant) %>
+    rows:
+        income_adjustments:
+            key: <%= l10n('faa.deductions.income_adjustments', subject: l10n('faa.this_person'), assistance_year: @application.assistance_year) %>
+            value: "<%= human_boolean(@applicant.has_deductions) %>"
+
+health_coverage:
+    title: <%= l10n('health_coverage') %>
+    edit_link: <%= application_applicant_benefits_path(@application, @applicant) %>
+    rows:
+        is_enrolled:
+            key: <%= l10n(applicant_currently_enrolled_short_key) %>
+            value: <%= @applicant.has_enrolled_health_coverage %> # defer formatting to allow the `ApplicantSummary` to handle inserting the coverages subtable if needed
+        is_eligible:
+            key: <%= l10n(applicant_eligibly_enrolled_short_key) %>
+            value: <%= @applicant.has_eligible_health_coverage %> # defer formatting to allow the `ApplicantSummary` to handle inserting the coverages subtable if needed
+        indian_health_service_eligible:
+            key: <%= l10n('faa.indian_health_service_eligible') %>
+            value: "<%= human_boolean(@applicant.health_service_eligible) %>"
+        indian_health_service_through_referral:
+            key: <%= l10n('faa.indian_health_service') %>
+            value: "<%= human_boolean(@applicant.health_service_through_referral) %>"
+        not_eligible_for_medicaid_cubcare:
+            key: <%= l10n('faa.medicaid_not_eligible') %>
+            value: "<%= human_boolean(@applicant.has_eligible_medicaid_cubcare) %>"
+        medicaid_cubcare_due_on:
+            key: <%= l10n('faa.medicaid_cubcare_end_date') %>
+            value: <%= human_value(@applicant.medicaid_cubcare_due_on&.to_s) %>
+        eligibility_change_due_to_medicaid_cubcare:
+            key: <%= l10n('faa.change_eligibility_status') %>
+            value: "<%= human_boolean(@applicant.has_eligibility_changed) %>"
+        household_income_change:
+            key: <%= l10n('faa.household_income_changed') %>
+            value: "<%= human_boolean(@applicant.has_household_income_changed) %>"
+        medicaid_last_day:
+            key: <%= l10n('faa.person_medicaid_last_day') %>
+            value: <%= human_value(@applicant.person_coverage_end_on&.to_s) %>
+        medicaid_chip_ineligible:
+            key: <%= l10n('faa.medicaid_chip_ineligible', year: @application.assistance_year - 5) %>
+            value: "<%= human_boolean(@applicant.medicaid_chip_ineligible) %>"
+        immigration_status_changed:
+            key: <%= l10n('faa.immigration_status_changed') %>
+            value: "<%= human_boolean(@applicant.immigration_status_changed) %>"
+        <% if @applicant.age_of_the_applicant < 19 && FinancialAssistanceRegistry.feature_enabled?(:has_dependent_with_coverage) %>
+        dependent_coverage_end:
+            key: <%= l10n('faa.has_dependent_with_coverage') %>
+            value: "<%= human_boolean(@applicant.has_dependent_with_coverage) %>"
+        dependent_coverage_end_date:
+            key: <%= l10n('faa.dependent_job_end_on') %>
+            value: <%= human_value(@applicant.dependent_job_end_on&.to_s) %>
+        <% end %>
+
+other_questions:
+    title: <%= l10n('faa.review.other_questions') %>
+    edit_link: <%= other_questions_application_applicant_path(@application, @applicant) %>
+    rows:
+        ssn_applied:
+            key: <%= other_questions_prompt('ssn_apply') %>
+            value: "<%= human_boolean(@applicant.is_ssn_applied) %>"
+        non_ssn_reason:
+            key: <%= other_questions_prompt('ssn_reason') %>
+            value: <%= human_value(@applicant.non_ssn_apply_reason_readable&.to_s) %>
+        is_pregnant:
+            key: <%= other_questions_prompt('is_pregnant') %>
+            value: "<%= human_boolean(@applicant.is_pregnant) %>"
+        pregnancy_due_date:
+            key: <%= other_questions_prompt('pregnancy_due_date') %>
+            value: <%= human_value(@applicant.pregnancy_due_on&.to_s) %>
+        children_expected_count:
+            key: <%= other_questions_prompt('children_expected') %>
+            value: <%= human_value(@applicant.children_expected_count) %>
+        post_partum_period:
+            key: <%= other_questions_prompt(FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) ? 'pregnant_last_year' : 'pregnant_last_60d') %>
+            value: "<%= human_boolean(@applicant.is_post_partum_period) %>"
+        pregnancy_end_on:
+            key: "<%= l10n('faa.other_ques.pregnancy_end') %>"
+            value: <%= human_value(@applicant.pregnancy_end_on&.to_s) %>
+        is_enrolled_on_medicaid:
+            key: <%= other_questions_prompt('is_enrolled_on_medicaid') %>
+            value: "<%= human_boolean(@applicant.is_enrolled_on_medicaid) %>"
+        former_foster_care:
+            key: <%= other_questions_prompt('foster_care_at18') %>
+            value: "<%= human_boolean(@applicant.is_former_foster_care) %>"
+        foster_care_us_state:
+            key: <%= other_questions_prompt('foster_care_state') %>
+            value: <%= human_value(@applicant.foster_care_us_state) %>
+        age_left_foster_care:
+            key: <%= other_questions_prompt('foster_care_age_left') %>
+            value: <%= human_value(@applicant.age_left_foster_care) %>
+        medicaid_during_foster_care:
+            key: <%= other_questions_prompt('foster_care_medicaid') %>
+            value: "<%= human_boolean(@applicant.had_medicaid_during_foster_care) %>"
+        is_student:
+            key: <%= other_questions_prompt('is_student') %>
+            value: "<%= human_boolean(@applicant.is_student) %>"
+        student_kind:
+            key: <%= l10n('faa.other_ques.student_type') %>
+            value: <%= human_value(@applicant.student_kind) %>
+        student_status_end_on:
+            key: <%= l10n('faa.other_ques.student_status_end') %>
+            value: <%= human_value(@applicant.student_status_end_on) %>
+        student_school_kind:
+            key: <%= l10n('faa.other_ques.student_school_type') %>
+            value: <%= @applicant.student_school_kind %>
+        is_blind:
+            key: <%= other_questions_prompt('is_blind') %>
+            value: "<%= human_boolean(@applicant.is_self_attested_blind) %>"
+        has_daily_living_help:
+            key: <%= other_questions_prompt('daily_living_help') %>
+            value: "<%= human_boolean(@applicant.has_daily_living_help) %>"
+        need_help_paying_bills:
+            key: <%= other_questions_prompt('help_paying_bills') %>
+            value: "<%= human_boolean(@applicant.need_help_paying_bills) %>"
+        is_physically_disabled:
+            key: <%= other_questions_prompt('disability_question') %>
+            value: "<%= human_boolean(@applicant.is_physically_disabled) %>"
+        <% if @applicant.age_of_the_applicant >= 19 && @applicant.is_applying_coverage %>
+        primary_caregiver:
+            key: <%= other_questions_prompt('primary_caretaker_question_text') %>
+            value: "<%= human_boolean(@applicant.is_primary_caregiver) %>"
+        primary_caregiver_for:
+            key: <%= other_questions_prompt('primary_caretaker_for_text') %>
+            value: <%= @applicant.is_primary_caregiver_for&.collect{|hbx_id| applicants_name_by_hbx_id_hash[hbx_id]}&.compact %>
+        <% end %>

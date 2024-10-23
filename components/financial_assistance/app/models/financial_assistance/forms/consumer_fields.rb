@@ -25,7 +25,7 @@ module FinancialAssistance
           end
 
           def eligible_immigration_status=(val)
-            @eligible_immigration_status = (val.to_s == "true")
+            @eligible_immigration_status = (val.present? ? (val.to_s == "true") : nil)
           end
 
           def expiration_date

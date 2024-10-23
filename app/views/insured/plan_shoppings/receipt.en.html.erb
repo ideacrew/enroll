@@ -160,7 +160,7 @@
 
     <p><%= l10n("plans.plan_shopping.receipt.when_finished")%></p>
     <div class="mt-4 no-print">
-      <%= h(link_to l10n("plans.plan_shopping.receipt.print"), '#', id: 'btnPrint', class: "btn outline interaction-click-control-print-purchase-confirmation mr-2") %>
+      <%= h(link_to l10n("plans.plan_shopping.receipt.print"), '#', class: "btn outline btn-print interaction-click-control-print-purchase-confirmation mr-2") %>
       <%= h(link_to l10n("exceptions.go_to_my_account"), main_app.family_account_path, class: "btn secondary text-center", id: 'btn-continue') %>
     </div>
   </div>
@@ -217,7 +217,7 @@
           <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'how_to_pay_button')" id="how_to_pay_button" class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
         <% end %>
         <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Plan Shopping", hbx_enrollment: @enrollment }%>
-        <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
+        <%= link_to 'Print', '#', class: "btn btn-default btn-print interaction-click-control-print-purchase-confirmation" %>
       </div>
 
       <div id="how_to_pay" class="modal fade" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
