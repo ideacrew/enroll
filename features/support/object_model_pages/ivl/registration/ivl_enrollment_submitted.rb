@@ -20,7 +20,7 @@ class IvlEnrollmentSubmitted
   end
 
   def self.print_btn
-    '#btnPrint'
+    '.btn-print'
   end
 
   def self.go_to_my_acct_btn

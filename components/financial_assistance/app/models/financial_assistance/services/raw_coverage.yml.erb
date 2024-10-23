@@ -1,0 +1,68 @@
+# This file is used to DRY up the two coverage subtables in the raw_application ("financial_assistance/services/raw_application.yml.erb") health_coverage row mapping. 
+# See `FinancialAssistance::Services::SummaryService.Summary::ApplicantSummary.load_coverages_map` for more information.
+
+<% @benefits.group_by(&:insurance_kind).each do |insurance_kind, benefits| %>
+-
+    <% benefits.each do |benefit| %>
+    -   description:
+            key: <%= l10n(benefit.eligible_through_esi? ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
+            value: "<%= start_to_end_dates(benefit) %>"
+        <% if display_esi_fields?(benefit.insurance_kind, benefit.kind) %>
+        employer_name:
+            key: <%= l10n('employer_name') %>
+            value: "<%= benefit.employer_name %>"
+        <% unless FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>
+        employer_address_line_1:
+            key: <%= l10n('employer_address_line_1') %>
+            value: <%= benefit.employer_address.address_1 %>
+        <% if benefit.employer_address.address_2.present? %>
+        employer_address_line_2:
+            key: <%= l10n('employer_address_line_2') %>
+            value: <%= benefit.employer_address.address_2 %>
+        <% end %>
+        city:
+            key: <%= l10n('city') %>
+            value: <%= benefit.employer_address.city %>
+        state:
+            key: <%= l10n('state') %>
+            value: <%= benefit.employer_address.state %>
+        zip:
+            key: <%= l10n('zip') %>
+            value: <%= benefit.employer_address.zip %>
+        <% end %>
+        phone:
+            key: <%= l10n('faa.incomes.employer_phone') %>
+            value: <%= format_phone(benefit&.employer_phone&.full_phone_number) %>
+        esi_employer_ein:
+            key: <%= l10n('esi_employer_ein').titleize %>
+            value: <%= benefit.employer_id %>
+        <% if benefit.insurance_kind == 'employer_sponsored_insurance' %>
+        esi_employee_waiting_period:
+            key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_waiting_period') %>
+            value: "<%= human_value benefit.is_esi_waiting_period %>"
+        esi_employer_minimum_standard:
+            key: <%= l10n('faa.review.income.review_benefits_table.esi.employer_minimum_standard') %>
+            value: "<%= human_value benefit.is_esi_mec_met %>"
+        esi_covered:
+            key: <%= l10n('faa.review.income.review_benefits_table.esi.covered') %>
+            value: <%= human_value benefit.esi_covered&.titleize %>
+        esi_employee_minimum:
+            key: <%= l10n('faa.review.income.review_benefits_table.esi.employee_minimum') %>
+            value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
+        <% if display_minimum_value_standard_question?(benefit.insurance_kind) %>
+        affordable_question:
+            key: <%= l10n('health_plan_meets_mvs_and_affordable_question_short') %>
+            value: "<%= human_value benefit.health_plan_meets_mvs_and_affordable %>"
+        <% end %>
+        <% end %>
+        <% if benefit.insurance_kind == 'health_reimbursement_arrangement' %>
+        type_of_hra:
+            key: <%= l10n('faa.question.type_of_hra') %>
+            value: <%= benefit.hra_type %>
+        max_employer_reimbursement:
+            key: <%= l10n('faa.question.max_employer_reimbursement') %>
+            value: <%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %>
+        <% end %>
+        <% end %>
+    <% end %>
+<% end %>

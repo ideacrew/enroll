@@ -11,7 +11,7 @@ module FinancialAssistance
       before_action :enable_bs4_layout, only: [:application_year_selection, :application_checklist, :edit, :eligibility_results, :review_and_submit, :review,
                                                :submit_your_application, :wait_for_eligibility_response, :preferences, :application_publish_error, :eligibility_response_error, :index, :index_with_filter]
     end
-    before_action :enable_admin_bs4_layout, only: [:transfer_history] if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
+    before_action :enable_admin_bs4_layout, only: [:transfer_history, :raw_application] if EnrollRegistry.feature_enabled?(:bs4_admin_flow)
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -22,7 +22,7 @@ module FinancialAssistance
     require 'securerandom'
 
     before_action :check_eligibility, only: [:copy]
-    before_action :init_cfl_service, only: [:review_and_submit, :review, :raw_application]
+    before_action :set_summary_helpers, only: [:review_and_submit, :review, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
     # This is a before_action that checks if the application is a renewal draft and if it is, it sets a flash message and redirects to the applications_path
@@ -207,7 +207,6 @@ module FinancialAssistance
       set_admin_bookmark_url
       @all_relationships = @application.relationships
       @application.calculate_total_net_income_for_applicants
-      @applicants = @application.active_applicants if @application.present?
       build_applicants_name_by_hbx_id_hash
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
       @has_outstanding_local_mec_evidence = has_outstanding_local_mec_evidence?(@application) if EnrollRegistry.feature_enabled?(:mec_check)
@@ -227,7 +226,6 @@ module FinancialAssistance
       return redirect_to applications_path if @application.blank?
 
       authorize @application, :review?
-      @applicants = @application.active_applicants
       build_applicants_name_by_hbx_id_hash
 
       respond_to :html
@@ -243,23 +241,24 @@ module FinancialAssistance
       if @application.nil? || @application.is_draft?
         redirect_to applications_path
       else
-        @applicants = @application.active_applicants
         @all_relationships = @application.relationships
         @demographic_hash = {}
         @income_coverage_hash = {}
         build_applicants_name_by_hbx_id_hash
 
-        @applicants.each do |applicant|
-          file = if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
-                   File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
-                 else
-                   File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application_hra.yml.erb")
-                 end
-          application_hash = YAML.safe_load(ERB.new(file).result(binding))
-          @demographic_hash[applicant.id] = application_hash[0]["demographics"]
-          application_hash[0]["demographics"]["ADDRESSES"] = generate_address_hash(applicant)
-          application_hash[1]["financial_assistance_info"]["INCOME"] = generate_income_hash(applicant)
-          @income_coverage_hash[applicant.id] = application_hash[1]["financial_assistance_info"]
+        unless @bs4
+          @applicants.each do |applicant|
+            file = if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
+                     File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application.yml.erb")
+                   else
+                     File.read("./components/financial_assistance/app/views/financial_assistance/applications/raw_application_hra.yml.erb")
+                   end
+            application_hash = YAML.safe_load(ERB.new(file).result(binding))
+            @demographic_hash[applicant.id] = application_hash[0]["demographics"]
+            application_hash[0]["demographics"]["ADDRESSES"] = generate_address_hash(applicant)
+            application_hash[1]["financial_assistance_info"]["INCOME"] = generate_income_hash(applicant)
+            @income_coverage_hash[applicant.id] = application_hash[1]["financial_assistance_info"]
+          end
         end
       end
 
@@ -425,7 +424,7 @@ module FinancialAssistance
         params.keys.include?('cur') ? "financial_assistance_nav" : "financial_assistance"
       when "wait_for_eligibility_response"
         EnrollRegistry.feature_enabled?(:bs4_consumer_flow) ? "bs4_financial_assistance" : "financial_assistance"
-      when "transfer_history"
+      when "transfer_history", "raw_application"
         EnrollRegistry.feature_enabled?(:bs4_admin_flow) ? "financial_assistance_progress" : "financial_assistance"
       else
         "financial_assistance"
@@ -491,8 +490,12 @@ module FinancialAssistance
       return FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination if medicaid_gateway_determination_is_enabled?
     end
 
-    def init_cfl_service
+    def set_summary_helpers
       @cfl_service = ::FinancialAssistance::Services::ConditionalFieldsLookupService.new
+      @applicants = @application&.active_applicants
+      return unless @bs4
+
+      @summary_helper = ::FinancialAssistance::Services::SummaryService.instance_for_action(action_name, @cfl_service, @application, @applicants)
     end
 
     def check_eligibility
