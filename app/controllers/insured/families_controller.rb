@@ -47,8 +47,10 @@ class Insured::FamiliesController < FamiliesController
                                      else
                                        @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
                                      end
-
+    # Sort by effective_on again. The latest enrollment will display at the top.
+    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
     @enrollment_filter = @family.enrollments_for_display
+
     valid_display_enrollments = []
     @enrollment_filter.each  { |e| valid_display_enrollments.push e['_id'] }
 
@@ -56,6 +58,7 @@ class Insured::FamiliesController < FamiliesController
     update_changing_hbxs(@hbx_enrollments)
 
     @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family) if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
+    @hbx_enrollments.sort_by!(&:effective_on).reverse!
 
     @employee_role = @person.active_employee_roles.first if is_shop_or_fehb_market_enabled?
     @tab = params['tab']
@@ -65,10 +68,6 @@ class Insured::FamiliesController < FamiliesController
       @hbx_enrollments = @hbx_enrollments.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
       @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
     end
-
-    # Sort by effective_on and coverage kind again. The latest enrollment will display at the top in order of health -> dental.
-    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin&.sort_by{|enr| [enr.effective_on, enr.coverage_kind]}&.reverse
-    @hbx_enrollments = @hbx_enrollments&.sort_by{|enr| [enr.effective_on, enr.coverage_kind]}&.reverse!
 
     respond_to do |format|
       format.html
@@ -83,6 +82,7 @@ class Insured::FamiliesController < FamiliesController
 
     @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
     @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family)
+    @hbx_enrollments.sort_by!(&:effective_on).reverse!
 
     @all_hbx_enrollments_for_admin = if EnrollRegistry.feature_enabled?(:include_external_enrollment_in_display_all_enrollments)
                                        @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family) + HbxEnrollment.family_external_enrollments(@family)
@@ -90,8 +90,7 @@ class Insured::FamiliesController < FamiliesController
                                        @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
                                      end
     # Sort by effective_on again. The latest enrollment will display at the top.
-    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.uniq&.sort_by{|enr| [enr.effective_on, enr.coverage_kind]}&.reverse
-    @hbx_enrollments = @hbx_enrollments&.sort_by{|enr| [enr.effective_on, enr.coverage_kind]}&.reverse!
+    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.uniq.sort_by(&:effective_on).reverse
 
     respond_to do |format|
       format.html

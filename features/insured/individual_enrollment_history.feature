@@ -27,16 +27,3 @@ Feature: Enrollment History Page
     And the Enrollments link is visible
     When the consumer clicks the Enrollments link
     Then the consumer will navigate to the Enrollment History page
-
-  Scenario: Enrollment History Page Feature Is Enabled - Dental plans should appear below health plans
-    And consumer also has a dental enrollment with primary person covered
-    And consumer also has a health enrollment with primary person covered
-    Given EnrollRegistry enrollment_history_page feature is enabled
-    # below step is needed for passing locally, commented out because fails in GHA
-    # Given the generic_redirect setting is disabled
-    Given the display enrollment summary configuration is enabled
-    Given consumer visits home page
-    And the Enrollments link is visible
-    When the consumer clicks the Enrollments link
-    Then the consumer will navigate to the Enrollment History page
-    Then consumer should see the dental plan below the health plan
