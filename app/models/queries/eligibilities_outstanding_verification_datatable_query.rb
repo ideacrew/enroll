@@ -18,9 +18,9 @@ module Queries
       def sort_query(query, order_by)
         case order_by.keys.first
         when 'name', 'verification_due'
-          aggregate_sort(query, order_by)
+          aggregate_sort(query, order_by) # perform the sort via an aggregation and return the sorted array of Family objects
         else
-          query.order_by(order_by)
+          query.order_by(order_by) # perform the sort directly on the Mongoid query and return the sorted Mongoid::Criteria object
         end
       end
 
@@ -57,6 +57,7 @@ module Queries
         base_pipeline + [{:$skip => @skip}, {:$limit => @limit}]
       end
     end
+
     include Sorter
 
     attr_reader :search_string, :custom_attributes
