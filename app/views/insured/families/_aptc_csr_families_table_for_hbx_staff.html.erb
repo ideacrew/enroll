@@ -22,6 +22,7 @@ $(document).ready(function(){
         <th><%= l10n("ssn") %></th>
         <th><%= l10n("family") %><br /><%= l10n("count") %></th>
         <th><%= l10n("active") %><br /><%= l10n("enrollments") %>?</th>
+        <th><%= l10n("edit") %><br /><%= l10n("insured.aptc_or_csr") %></th>
       </tr>
     </thead>
     <tbody>
@@ -44,6 +45,13 @@ $(document).ready(function(){
               <%else%>
                 <span class="glyphicon glyphicon-unchecked">
               <%end%>
+          </td>
+          <td>
+                <%if all_active_enrollment_with_aptc(family).blank?%>
+                    <%= link_to l10n("edit"), edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
+                <%else%>
+                    <%= link_to l10n("edit"), edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
+                <%end%>
           </td>
         </tr>
 
