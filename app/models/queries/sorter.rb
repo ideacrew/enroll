@@ -14,7 +14,7 @@ module Queries
     #
     # @return [Array<Family>|Mongoid::Criteria] The sorted array of Family objects if using an aggregated sort, or a Mongoid::Criteria object if using a direct sort.
     def sort_query(query, order_by)
-      if aggregatable_columns.key?(@order_by.keys.first)
+      if aggregatable_columns&.key?(@order_by.keys.first)
         aggregate_sort(query, order_by) # perform the sort via an aggregation and return the sorted array of Family objects
       else
         query.order_by(order_by) # perform the sort directly on the Mongoid query and return the sorted Mongoid::Criteria object
@@ -24,7 +24,7 @@ module Queries
     private
 
     def aggregatable_columns
-      self.class::AGGREGATABLE_COLUMNS
+      self.class::AGGREGATABLE_COLUMNS if self.class.const_defined?(:AGGREGATABLE_COLUMNS)
     end
 
     # @method aggregate_sort(scope, order_by)
