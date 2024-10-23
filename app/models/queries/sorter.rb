@@ -21,6 +21,18 @@ module Queries
       end
     end
 
+    # @method paginate(scope)
+    # Paginate the query based on the skip and limit instance variables if the scope is a Mongoid::Criteria.
+    # If it is not a Mongoid::Criteria, we can assume it is an array of `klass` objects sorted AND paginated already, so return it as is.
+    #
+    # @param [Array<Family>|Mongoid::Criteria] scope The query to be paginated.
+    #
+    # @return [Array<Family>|Mongoid::Criteria] The paginated scope.
+    def paginate(scope)
+      return scope unless scope.is_a?(Mongoid::Criteria)
+      scope.skip(@skip).limit(@limit)
+    end
+
     private
 
     def aggregatable_columns
@@ -43,7 +55,7 @@ module Queries
     end
 
     # @method pipeline_for_sort_column(order_by)
-    # Construct the aggregation pipeline for sorting the query based on the order_by params.
+    # Construct the aggregation pipeline for sorting and paginating the query based on the order_by params.
     #
     # @param [Hash] order_by The sort column key and direction param hash.
     #
@@ -54,18 +66,6 @@ module Queries
 
       base_pipeline = klass.send(aggregatable_columns[sort_column], sort_direction)
       base_pipeline + [{:$skip => @skip}, {:$limit => @limit}]
-    end
-
-    # @method paginate(scope)
-    # Paginate the query based on the skip and limit instance variables if the scope is a Mongoid::Criteria.
-    # If it is not a Mongoid::Criteria, we can assume it is an array of `klass` objects sorted AND paginated already, so return it as is.
-    #
-    # @param [Array<Family>|Mongoid::Criteria] scope The query to be paginated.
-    #
-    # @return [Array<Family>|Mongoid::Criteria] The paginated scope.
-    def paginate(scope)
-      return scope unless scope.is_a?(Mongoid::Criteria)
-      scope.skip(@skip).limit(@limit)
     end
   end
 end
