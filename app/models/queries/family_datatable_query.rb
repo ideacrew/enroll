@@ -4,6 +4,8 @@ module Queries
 
     attr_reader :search_string, :custom_attributes
 
+    AGGREGATABLE_COLUMNS = {"name" => :sort_by_primary_full_name_pipeline}.freeze
+
     def datatable_search(string)
       @search_string = string
       self
@@ -13,7 +15,6 @@ module Queries
       @custom_attributes = attributes
       @skip = 0
       @limit = 25
-      @aggregatable_columns = {"name" => :sort_by_primary_full_name_pipeline}
     end
 
     def person_search search_string
@@ -132,12 +133,8 @@ module Queries
 
     def build_iteration_caches
       limited_scope = build_scope
-      if @order_by
-        limited_scope = sort_query(limited_scope, @order_by)
-      else
-        limited_scope = apply_skip(limited_scope)
-        limited_scope = apply_limit(limited_scope)
-      end
+      limited_scope = sort_query(limited_scope, @order_by) if @order_by
+      limited_scope = paginate(limited_scope)
       family_ids = limited_scope.pluck(:id)
       enrollment_cache = load_enrollment_cache_for(family_ids)
       [limited_scope, enrollment_cache]
@@ -149,16 +146,6 @@ module Queries
         enrollment_cache[en.family_id] = enrollment_cache[en.family_id] + [en]
       end
       enrollment_cache
-    end
-
-    def apply_skip(scope)
-      return scope unless @skip
-      scope.skip(@skip)
-    end
-
-    def apply_limit(scope)
-      return scope unless @limit
-      scope.limit(@limit)
     end
   end
 end

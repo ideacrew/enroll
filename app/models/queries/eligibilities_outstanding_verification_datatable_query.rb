@@ -10,6 +10,11 @@ module Queries
 
     attr_reader :search_string, :custom_attributes
 
+    AGGREGATABLE_COLUMNS = {
+      "name" => :sort_by_eligible_primary_full_name_pipeline,
+      "verification_due" => :sort_by_eligible_verification_earliest_due_date_pipeline
+    }.freeze
+
     def datatable_search(string)
       @search_string = string
       self
@@ -17,10 +22,6 @@ module Queries
 
     def initialize(attributes)
       @custom_attributes = attributes
-      @aggregatable_columns = {
-        "name" => :sort_by_eligible_primary_full_name_pipeline,
-        "verification_due" => :sort_by_eligible_verification_earliest_due_date_pipeline
-      }
     end
 
     def person_search(search_string)
@@ -53,11 +54,8 @@ module Queries
 
     def build_query
       limited_scope = build_scope
-      if @order_by
-        sort_query(limited_scope, @order_by)
-      else
-        limited_scope.skip(@skip).limit(@limit)
-      end
+      limited_scope = sort_query(limited_scope, @order_by) if @order_by
+      paginate(limited_scope)
     end
 
     def each(&block)
