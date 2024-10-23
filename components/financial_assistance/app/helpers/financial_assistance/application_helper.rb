@@ -320,7 +320,7 @@ module FinancialAssistance
     end
 
     def humanize_relationships
-      FinancialAssistance::Relationship::RELATIONSHIPS_UI.map {|r| [r.to_s.humanize, r.to_s] }
+      FinancialAssistance::Relationship::RELATIONSHIPS_UI.map {|r| [display_relationship(r.to_s).humanize, r.to_s] }
     end
 
     def calculated_application_year
