@@ -1249,7 +1249,7 @@ class Family
       [
         { :$unwind => "$eligibility_determination.subjects" },
         { :$match => { "eligibility_determination.subjects.is_primary": true } },
-        { :$sort => { "eligibility_determination.subjects.first_name": sort_direction, "eligibility_determination.subjects.last_name": 1 } }
+        { :$sort => { "eligibility_determination.subjects.first_name": sort_direction, "eligibility_determination.subjects.last_name": sort_direction } }
       ]
     end
 
