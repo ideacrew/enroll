@@ -610,7 +610,17 @@ module ApplicationHelper
                     else
                       PersonRelationship::Relationships_UI
                     end
-    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
+
+    options_for_select(relationships.map{|r| [display_relationship(r.to_s), r.to_s] }, selected: dependent.try(:relationship))
+  end
+
+  def display_relationship(relationship)
+    relationship_mapping = {
+      'domestic_partners_child' => "Domestic partner's child",
+      'parents_domestic_partner' => "Parent's domestic partner",
+    }
+
+    relationship_mapping[relationship].try(:humanize) || relationship.try(:humanize)
   end
 
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})

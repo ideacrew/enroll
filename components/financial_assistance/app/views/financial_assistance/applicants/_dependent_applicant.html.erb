@@ -22,7 +22,7 @@
         </div>
         <div>
           <label for="dependent-<%= dependent.id%>-relation"><%= l10n("relationship")%></label>
-          <input id="dependent-<%= dependent.id%>-relation" type="text" value="<%= dependent.relationship.try(:humanize) || dependent.relation_with_primary.try(:humanize) %>" disabled >
+          <input id="dependent-<%= dependent.id%>-relation" type="text" value="<%= display_relationship(dependent.relationship) || display_relationship(dependent.relation_with_primary) %>" disabled >
         </div>
       </div>
 
