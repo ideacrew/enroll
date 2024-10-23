@@ -43,18 +43,22 @@
           <%= render partial: 'shared/modal_support_text_household', locals: {key: "naturalized_citizen"} %>
         </div>
 
-      <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_immigration_status_container(f.object) %>" id="immigration_status_container">
-        <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg top-buffer">
-          <label>
-            <%= l10n('faa.question.eligible_immigration_status') %>
-            <%= l10n('faa.question.immigration_continue_note_1') %>
-            <%= l10n('faa.question.immigration_continue_note_2') %>
-          </label>
-        </div>
-        <% if EnrollRegistry[:immigration_status_checkbox].enabled? %>
-          <div class="col-lg-4 col-md-4 col-sm-8 col-xs-6 form-group form-group-lg no-pd">
-            <div id="immigration-checkbox" class="checkbox">
-              <%= f.check_box :eligible_immigration_status, {}, "true", "" %><%= l10n('yes') %>
+        <div class="<%= 'hidden_field' unless show_immigration_status_container(f.object) %> mb-4" id="immigration_status_container">
+          <% if EnrollRegistry[:immigration_status_checkbox].enabled? %>
+            <%= f.label :eligible_immigration_status do %>
+              <%= l10n('faa.question.eligible_immigration_status') %>
+              <div class="alert alert-info d-flex" role="info">
+                <div>
+                  <div class="info-icon icon" alt="info" aria-hidden="true">&nbsp;</div>
+                </div>
+                <div class="mt-1 mb-1">
+                  <%= l10n('faa.question.immigration_continue_note_1') %>
+                  <%= l10n('faa.question.immigration_continue_note_2') %>
+                </div>
+              </div>
+            <% end %>
+            <div id="immigration-checkbox">
+              <%= f.check_box :eligible_immigration_status, {}, "true", "false" %> <span class="ml-1"><%= l10n('yes') %></span>
             </div>
           <% else %>
             <fieldset>
