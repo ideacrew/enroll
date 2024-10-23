@@ -1,4 +1,4 @@
-$(document).on('click', '#btnPrint', function(){
+$(document).on('click', '.btn-print', function(){
 
   var payment_text = document.getElementById("how_to_pay");
   var payment_text_val;
