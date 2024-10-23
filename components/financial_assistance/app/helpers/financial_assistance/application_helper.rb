@@ -210,7 +210,6 @@ module FinancialAssistance
     end
 
     def display_relationship(relationship)
-
       relationship_mapping = {
         'domestic_partners_child' => "Domestic partner's child",
         'parents_domestic_partner' => "Parent's domestic partner"
