@@ -359,21 +359,35 @@ module FinancialAssistance
     end
 
     def enrolled_with(enrollment)
-      return if enrollment.dental?
-
       family = enrollment.family
       active_enrollments = family.hbx_enrollments.enrolled_and_renewing
 
       enrollment.hbx_enrollment_members.each do |enrollment_member|
         family_member_id =  enrollment_member.applicant_id
-        applicant = applicants.find_by(family_member_id: family_member_id)
+        applicant = applicants.where(family_member_id: family_member_id).first
+        next if ineligible_for_evidence_update?(enrollment, active_enrollments, family_member_id)
+
         applicant&.enrolled_with(enrollment)
       end
 
       enrolled_member_ids = active_enrollments.by_health.by_year(enrollment.effective_on.year).flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
-      family_member_ids = family.active_family_members.pluck(:id)
-      ids_not_in_health_enrolled = family_member_ids - enrolled_member_ids
-      applicants.where(:family_member_id.in => ids_not_in_health_enrolled).each(&:move_outstanding_to_nrr_status)
+
+      family.active_family_members.where(:id.nin => enrollment.hbx_enrollment_members.map(&:applicant_id)).each do |family_member|
+        next if enrolled_member_ids.include?(family_member.id)
+
+        applicant = applicants.where(family_member_id: family_member.id).first
+        applicant&.move_outstanding_to_nrr_status
+      end
+    end
+
+    def ineligible_for_evidence_update?(enrollment, active_enrollments, family_member_id)
+      return false if enrollment.health?
+      family_member_enrollments = active_enrollments
+                                  .by_year(enrollment.effective_on.year)
+                                  .by_health
+                                  .map { |en| en.hbx_enrollment_members.any? { |member| member.applicant_id == family_member_id } }
+
+      family_member_enrollments.any?
     end
 
     # fetch existing relationships matrix

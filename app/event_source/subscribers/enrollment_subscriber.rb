@@ -104,7 +104,7 @@ module Subscribers
         family.update_verification_types
         application = fetch_application(enrollment)
         subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}"
-        application&.enrolled_with(enrollment) if enrollment.health?
+        application&.enrolled_with(enrollment)
       end
 
       family.update_due_dates_on_vlp_docs_and_evidences(assistance_year)
