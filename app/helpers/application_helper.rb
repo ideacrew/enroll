@@ -619,7 +619,7 @@ module ApplicationHelper
       'parents_domestic_partner' => "parent's domestic partner",
     }
 
-    relationship_mapping[relationship] || relationship.try(:humanize)
+    relationship_mapping[relationship].try(:humanize) || relationship.try(:humanize)
   end
 
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
