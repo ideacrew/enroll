@@ -348,8 +348,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     describe "#display_relationship" do
       it "returns humanized name for known relationships" do
-        expect(helper.display_relationship('domestic_partners_child')).to eq("Domestic partner's child")
-        expect(helper.display_relationship('parents_domestic_partner')).to eq("Parent's domestic partner")
+        expect(helper.display_relationship(l10n("insured.domestic_partner_key"))).to eq(l10n("insured.domestic_partner_value"))
+        expect(helper.display_relationship(l10n("insured.parents_partner_key")).to eq(l10n("insured.parents_partner_value"))
       end
 
       it "returns humanized name for spouse relationships" do
