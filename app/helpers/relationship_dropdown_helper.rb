@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# This module is a utility module that is used to display dropdowns with apostrophes.
 module RelationshipDropdownHelper
   def display_relationship(relationship)
     relationship_mapping = {
