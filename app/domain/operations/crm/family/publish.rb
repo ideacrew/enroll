@@ -13,10 +13,11 @@ module Operations
         #
         # @param hbx_id [String] The HBX ID of the person.
         # @return [Dry::Monads::Result] The result of the publish operation.
-        def call(hbx_id:)
+        def call(params)
+          hbx_id, force_sync = yield validate(params)
           person            = yield find_person(hbx_id)
           family            = yield find_primary_family(person)
-          headers           = yield headers(family, person)
+          headers           = yield headers(family, person, force_sync)
           transformed_cv    = yield construct_cv_transform(family, hbx_id)
           family_entity     = yield create_family_entity(transformed_cv)
           es_event          = yield create_es_event(family_entity, headers)
@@ -31,6 +32,13 @@ module Operations
         #
         # @param hbx_id [String] The HBX ID of the person.
         # @return [Dry::Monads::Result] The result containing the person or an error message.
+
+        def validate(params)
+          return Failure("Missing hbx_id") if params[:hbx_id].blank?
+          return Failure("Missing force_sync value") if params[:force_sync].blank?
+
+          Success([params[:hbx_id], params[:force_sync]])
+        end
         def find_person(hbx_id)
           result = ::Operations::People::Find.new.call({ person_hbx_id: hbx_id })
 
@@ -60,10 +68,10 @@ module Operations
         # @param family [Family] The family object.
         # @param person [Person] The person object.
         # @return [Dry::Monads::Result] The result containing the headers.
-        def headers(family, person)
+        def headers(family, person, force_sync)
           eligible_dates = [person.created_at, person.updated_at, family.created_at, family.updated_at].compact
 
-          Success({ after_updated_at: convert_time_to_string(eligible_dates.max), before_updated_at: convert_time_to_string(eligible_dates.min) })
+          Success({ force_sync: force_sync, after_updated_at: convert_time_to_string(eligible_dates.max), before_updated_at: convert_time_to_string(eligible_dates.min) })
         end
 
         # Constructs a CV transform for the family.
