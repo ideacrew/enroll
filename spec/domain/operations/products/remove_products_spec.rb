@@ -29,12 +29,13 @@ RSpec.describe ::Operations::Products::RemoveProducts, dbclean: :after_each do
     let(:plan4) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile1)}
     let(:plan5) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile1)}
     let(:plan6) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile1, renewal_product_id: plan1.id)}
-    let(:benefit_package) { FactoryBot.build(:benefit_package,
-      benefit_coverage_period: hbx_profile.benefit_sponsorship.benefit_coverage_periods.first,
-      title: "individual_health_benefits",
-      elected_premium_credit_strategy: "unassisted",
-      benefit_ids: [plan1.id, plan2.id, plan3.id, plan4.id, plan5.id]
-      )}
+    let(:benefit_package) do
+      FactoryBot.build(:benefit_package,
+                       benefit_coverage_period: hbx_profile.benefit_sponsorship.benefit_coverage_periods.first,
+                       title: "individual_health_benefits",
+                       elected_premium_credit_strategy: "unassisted",
+                       benefit_ids: [plan1.id, plan2.id, plan3.id, plan4.id, plan5.id])
+    end
 
     let(:products) { BenefitMarkets::Products::Product.where(issuer_profile_id: issuer_profile.id) }
     let(:params) do
@@ -55,7 +56,7 @@ RSpec.describe ::Operations::Products::RemoveProducts, dbclean: :after_each do
     end
 
     it 'updates benefit package benefit ids' do
-      expect(benefit_package.benefit_ids).to eq ([plan3.id, plan4.id, plan5.id, plan6.id])
+      expect(benefit_package.benefit_ids).to eq([plan3.id, plan4.id, plan5.id, plan6.id])
     end
 
     it 'removes products' do

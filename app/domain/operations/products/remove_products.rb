@@ -43,7 +43,7 @@ module Operations
 
       def update_renewal_product_ids(products)
         product_ids = products.map(&:id)
-        previous_products = BenefitMarkets::Products::Product.where(:'renewal_product_id'.in => product_ids)
+        previous_products = BenefitMarkets::Products::Product.where(:renewal_product_id.in => product_ids)
         previous_products.each do |product|
           next unless product.present?
           product.update_attributes!(renewal_product_id: nil)
@@ -52,8 +52,8 @@ module Operations
       end
 
       def destroy_products(products)
-       products.destroy_all
-       Success("Removed products")
+        products.destroy_all
+        Success("Removed products")
       end
     end
   end
