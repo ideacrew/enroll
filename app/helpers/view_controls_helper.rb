@@ -13,6 +13,7 @@ module ViewControlsHelper
     else
       input_type = "checkbox"
       fieldset_classes = ["d-block two-column"]
+      fieldset_classes << "req-checkbox-group" if setting.meta.is_required
     end
     legend = setting.meta.description.present? ? setting.meta.description : setting.meta.label
     choices = build_fieldset_choices(setting, form)
@@ -52,7 +53,7 @@ module ViewControlsHelper
         next unless input[:label].present? && input[:name].present? && input[:value].present?
         input_id = input[:id] || input[:name]
         input_args = input.except(:label, :label_classes)
-        input_args[:required] = true if required
+        input_args[:required] = true if required && content_type == "radio"
         concat(content_tag(:label, nil, class: input[:label_classes] || ["weight-n"], for: input_id) do
           concat(content_tag(:input, nil, type: content_type, **input_args))
           concat(content_tag(:span, input[:label], class: ["ml-1"], id: input_id))
