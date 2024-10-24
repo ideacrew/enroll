@@ -1,0 +1,91 @@
+// status and tile badges
+// should just be slight color variations of the same default bootstrap badge.
+.badge-lg {
+  font-size: 1em;
+}
+.badge-status {
+  border-radius: 10px;
+  color: var(--default-font-color);
+  font-size: 16px;
+  font-weight: 600;
+
+  &.badge-success,
+  &.badge-green {
+    background-color: var(--success-status-tint);
+    border: 1px solid var(--success-color);
+  }
+
+  &.badge-danger,
+  &.badge-red {
+    background-color: var(--danger-status-tint);
+    border: 1px solid var(--enrollment-status-red);
+  }
+
+  &.badge-warning,
+  &.badge-yellow {
+    background-color: var(--warning-status-tint);
+    border: 1px solid var(--warning-border);
+  }
+
+  &.badge-info,
+  &.badge-blue {
+    background-color: var(--info-tint);
+    border: 1px solid var(--info-color);
+  }
+
+  &.badge-absent,
+  &.badge-grey {
+    background-color: var(--grey-040);
+    border: 1px solid var(--grey-160);
+  }
+}
+
+.badge-current-plan {
+  background-color: var(--badge-current-bg);
+  border: 1px solid var(--badge-current-border);
+  padding: 1px 8px;
+}
+
+.badge-standard {
+  background-color: var(--badge-standard-bg);
+  border: 1px solid var(--badge-standard-border);
+}
+
+.badge-platinum {
+  font-weight: 400;
+  background-color: var(--platinum-bg);
+  border: 1px solid var(--platinum-border);
+}
+
+.badge-gold {
+  font-weight: 400;
+  background-color: var(--gold-bg);
+  border: 1px solid var(--gold-border);
+}
+
+.badge-silver {
+  font-weight: 400;
+  background-color: var(--silver-bg);
+  border: 1px solid var(--silver-border);
+}
+
+.badge-bronze {
+  font-weight: 400;
+  background-color: var(--bronze-bg);
+  border: 1px solid var(--bronze-border);
+}
+
+.badge-catastrophic {
+  font-weight: 400;
+  background-color: var(--error-tint);
+  border: 1px solid var(--error-shade);
+}
+
+.badge-current-application {
+  border-radius: 10px;
+  color: var(--default-font-color);
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--complete-tint);
+  border: 1px solid var(--complete-color);
+}

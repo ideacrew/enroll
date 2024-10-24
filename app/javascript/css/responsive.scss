@@ -1,0 +1,74 @@
+// responsiveness
+// medium breakpoint
+@media screen and (max-width: 767px) {
+  .d-flex.sm-block {
+    display: block !important;
+  }
+
+  .progress-nav-container {
+    margin-left: $spacer;
+    margin-right: $spacer;
+  }
+
+  .sm-space,
+  .col-sm {
+    margin-bottom: $spacer;
+  }
+
+  .ethnicity-container label,
+  .w-75,
+  .w-25 {
+    width: 100% !important;
+  }
+
+  .sm-hide {
+    display: none;
+  }
+
+  .vertically-centered-row {
+    flex-direction: column;
+
+    & > * {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: $spacer;
+      width: 100%;
+    }
+  }
+
+  .navbar-brand img {
+    padding-left: $spacer / 2;
+  }
+}
+
+// large breakpoint
+@media screen and (max-width: 992px) {
+  .mobile-drawer {
+    position: absolute;
+    top: 76px;
+    margin-top: 0;
+    padding: $spacer;
+    width: 75vw;
+    transition: all 0.4s ease;
+    display: block;
+  }
+
+  .mobile-drawer.collapsing {
+    height: auto !important;
+    margin-left: 50%;
+    left: 50%;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-drawer.show {
+    background: var(--grey-000);
+    height: 100vh;
+    padding-top: $spacer;
+    z-index: 105;
+    right: 0px;
+
+    .align-items-md-end {
+      margin-top: $spacer;
+    }
+  }
+}

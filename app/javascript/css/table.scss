@@ -1,3 +1,4 @@
+// all table related styles are in this file, including datatables
 table {
   font-size: 1em;
   width: 100%;
@@ -227,5 +228,12 @@ table {
   }
   input[type="search"] {
     margin-left: $spacer / 2;
+  }
+}
+
+.border-top-0 {
+  th,
+  td {
+    border-top: 0;
   }
 }

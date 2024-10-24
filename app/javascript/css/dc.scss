@@ -1,3 +1,4 @@
+// these styles will be loaded for client "dc" only
 // all contents of this file must be nested within the data-theme="dc" selector to make sure they don't leak to other clients.
 [data-theme='dc'] {
   --font: 'Open Sans', sans-serif;
