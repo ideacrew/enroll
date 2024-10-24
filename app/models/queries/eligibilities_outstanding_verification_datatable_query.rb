@@ -4,8 +4,16 @@ module Queries
   # Datatable query for eligibilities in outtstanding verification state
   class EligibilitiesOutstandingVerificationDatatableQuery
     include ::ParseDateHelper
+    include Sorter
+
+    # Helpers driving the sort query
 
     attr_reader :search_string, :custom_attributes
+
+    AGGREGATABLE_COLUMNS = {
+      "name" => :sort_by_eligible_primary_full_name_pipeline,
+      "verification_due" => :sort_by_eligible_verification_earliest_due_date_pipeline
+    }.freeze
 
     def datatable_search(string)
       @search_string = string
@@ -21,7 +29,7 @@ module Queries
     end
 
     def build_scope
-      family = klass
+      family = klass.eligibility_determination_outstanding_verifications
       family = family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
         from_date = parse_date(@custom_attributes[:custom_datatable_date_from])
@@ -31,18 +39,35 @@ module Queries
 
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
-
-      family_scope = family.eligibility_determination_family_member_search(@search_string.to_s.strip)
-      return family_scope if @order_by.blank?
-      family_scope.order_by(@order_by)
+      family.eligibility_determination_family_member_search(@search_string.to_s.strip)
     end
 
     def skip(num)
-      build_scope.skip(num)
+      @skip = num
+      self
     end
 
     def limit(num)
-      build_scope.limit(num)
+      @limit = num
+      self
+    end
+
+    def build_query
+      limited_scope = build_scope
+      limited_scope = sort_query(limited_scope, @order_by) if @order_by
+      paginate(limited_scope)
+    end
+
+    def each(&block)
+      return to_enum(:each) unless block
+
+      build_query.each(&block)
+    end
+
+    def each_with_index(&block)
+      return to_enum(:each_with_index) unless block
+
+      build_query.each_with_index(&block)
     end
 
     def order_by(var)
@@ -53,12 +78,11 @@ module Queries
     def klass
       return @klass if defined? @klass
 
-      @klass = Family.eligibility_determination_outstanding_verifications
+      @klass = Family
     end
 
     def size
       build_scope.count
     end
-
   end
 end

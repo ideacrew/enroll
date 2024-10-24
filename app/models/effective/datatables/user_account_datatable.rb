@@ -5,7 +5,7 @@ module Effective
       include DropdownHelper
 
       datatable do
-        table_column :name, :label => l10n('hbx_profiles.user_accounts.table.username'), :proc => proc { |row| row.oim_id }, :filter => false, :sortable => true
+        table_column :oim_id, :label => l10n('hbx_profiles.user_accounts.table.username'), :proc => proc { |row| row.oim_id }, :filter => false, :sortable => true
         unless EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
           table_column :ssn, :label => l10n('ssn'), :proc => proc { |row| truncate(number_to_obscured_ssn(row.person.ssn)) if row.person.present? }, :filter => false, :sortable => false
         end

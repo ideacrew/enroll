@@ -1,9 +1,9 @@
 module Effective
   module Datatables
     class BrokerAgencyDatatable < Effective::MongoidDatatable
+
+
       datatable do
-
-
         # bulk_actions_column do
         #    bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
         #    bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
@@ -14,7 +14,7 @@ module Effective
           #(link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home')) + raw("<br>") + truncate(row.id.to_s, length: 8, omission: '' )
           #link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile)
                                                                            link_to h(row.legal_name), benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(row.broker_agency_profile)
-                                                                         }, :sortable => false, :filter => false, :width => '40%'
+                                                                         }, :sortable => true, :filter => false, :width => '40%'
 
         table_column :dba, :label => l10n('dba_caps'), :proc => proc { |row|
           h(row.dba)
@@ -23,7 +23,6 @@ module Effective
 
         table_column :entity_kind, :label => l10n('entity_kind'), :proc => proc { |row| row.entity_kind.to_s.titleize }, :sortable => false, :filter => false, :width => '10%'
         table_column :market_kind, :label => l10n('market'), :proc => proc { |row| row.broker_agency_profile.market_kind.to_s.titleize }, :sortable => false, :filter => false, :width => '10%'
-
       end
 
       def collection

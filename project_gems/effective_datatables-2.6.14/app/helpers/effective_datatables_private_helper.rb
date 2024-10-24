@@ -3,7 +3,7 @@
 module EffectiveDatatablesPrivateHelper
 
   def datatable_default_order(datatable)
-    [datatable.order_index, datatable.order_direction.downcase].to_json()
+    [datatable.order_index, datatable.order_direction&.downcase].to_json()
   end
 
   # https://datatables.net/reference/option/columns

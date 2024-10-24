@@ -54,7 +54,7 @@ module Effective
         table_column :count, :label => l10n('count'), :width => '70px', :proc => proc { |row| eligibility_enrolled_family_members(row).count }, :filter => false, :sortable => false
         table_column :documents_uploaded, :label => l10n('hbx_profiles.outstanding_verifications.table.documents_uploaded'), :proc => proc { |row|
           document_status_for(row)
-        }, :filter => false, :sortable => true
+        }, :filter => false, :sortable => false
         table_column :verification_due, :label => l10n('hbx_profiles.outstanding_verifications.table.verification_due'),:proc => proc { |row|
           format_date(eligibility_earliest_due_date(row)) || format_date(default_verification_due_date)
         }, :filter => false, :sortable => true
@@ -67,6 +67,8 @@ module Effective
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: @bs4 ? map_legacy_dropdown(dropdown) : dropdown, row_actions_id: "family_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
+
+        default_order :verification_due, :asc
       end
 
       def collection

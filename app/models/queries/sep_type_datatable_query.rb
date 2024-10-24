@@ -20,6 +20,7 @@ module Queries
       qles = ivl_market_kind_scope(qles)
       qles = shop_market_kind_scope(qles)
       qles = fehb_market_kind_scope(qles)
+      qles = qles.order_by(@order_by) if @order_by.present?
       return qles if @search_string.blank? || @search_string.length < 2
       qles.where({"$or" => [{"title" => ::Regexp.compile(::Regexp.escape(@search_string), true)}]})
     end

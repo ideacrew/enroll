@@ -908,7 +908,7 @@ $.extend( ColReorder.prototype, {
         else if ( oState.order ) {
             // 1.10.1+
             for ( i=0 ; i<oState.order.length ; i++ ) {
-                if (oState.order[i].constructor == Array) {
+                if (oState.order[i]?.constructor == Array) {
                     oState.order[i][0] = columns[ oState.order[i][0] ]._ColReorder_iOrigCol;
                 }
             }
