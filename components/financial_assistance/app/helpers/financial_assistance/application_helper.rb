@@ -475,5 +475,37 @@ module FinancialAssistance
         [hr_kind(kind, insurance_kind), insurance_kind, {:'data-esi' => display_esi_fields?(insurance_kind, kind), :'data-mvsq' => display_minimum_value_standard_question?(insurance_kind)}]
       end
     end
+
+    def benefit_coverage_period_info
+      return @benefit_coverage_period_info if defined? @benefit_coverage_period_info
+
+      current_hbx = HbxProfile.current_hbx
+      is_under_open_enrollment = current_hbx.under_open_enrollment?
+      latest_benefit_coverage_period = current_hbx.benefit_sponsorship.benefit_coverage_periods.last
+      open_enrollment_start_on = latest_benefit_coverage_period.open_enrollment_start_on
+      open_enrollment_end_on = latest_benefit_coverage_period.open_enrollment_end_on
+
+      @benefit_coverage_period_info = {
+        is_under_open_enrollment: is_under_open_enrollment,
+        not_under_open_enrollment: !is_under_open_enrollment,
+        open_enrollment_start_on: open_enrollment_start_on,
+        open_enrollment_end_on: open_enrollment_end_on
+      }
+    end
+
+    def can_display_coverage_update_reminder?
+      FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && benefit_coverage_period_info[:is_under_open_enrollment]
+    end
+
+    def can_display_oe_application_warning?
+      FinancialAssistanceRegistry.feature_enabled?(:oe_application_warning_display) && benefit_coverage_period_info[:not_under_open_enrollment] && (TimeKeeper.date_of_record >= bulk_application_renewal_trigger_date)
+    end
+
+    def bulk_application_renewal_trigger_date
+      day = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_day).item
+      month = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_month).item
+      year = TimeKeeper.date_of_record.year
+      Date.new(year, month, day)
+    end
   end
 end
