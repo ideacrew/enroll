@@ -1255,22 +1255,10 @@ class Family
 
     def sort_by_eligible_verification_earliest_due_date_pipeline(sort_direction)
       [
-        {
-          "$addFields": {
-            "eligibility_determination.outstanding_verification_earliest_due_date_with_default": {
-              "$ifNull": [
-                "$eligibility_determination.outstanding_verification_earliest_due_date",
-                TimeKeeper.date_of_record + EnrollRegistry[:verification_document_due_in_days].item
-              ]
-            }
-          }
-        },
-        {
-          "$sort": {
-            "eligibility_determination.outstanding_verification_earliest_due_date_with_default": sort_direction
-          }
+        :$sort => {
+          'eligibility_determination.outstanding_verification_earliest_due_date': sort_direction
         }
-    ]
+      ]
     end
   end
 
