@@ -1,3 +1,4 @@
+// all fonts and typography base styles
 /* latin */
 @font-face {
   font-family: 'Open Sans';
@@ -234,4 +235,15 @@ p {
 
 .default-text {
   color: var(--default-font-color);
+}
+
+a {
+  color: var(--theme-secondary);
+  text-decoration: underline;
+}
+
+ul.plain {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }

@@ -1,3 +1,4 @@
+// historical styles related to the contrast level theme, these can be removed when pre-bs4 is removed
 // all contents of this file must be nested within the data-contrast="true" selector to make sure they don't leak to other themes.
 // These will only be applied if the contrast level is set to true in the layout.
 [data-contrast='true'] {

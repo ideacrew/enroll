@@ -1,5 +1,19 @@
 @import 'colors';
 
+// layout
+body {
+  background-color: var(--body-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// for content we want to always be at the bottom of the page
+.nm-content {
+  height: calc(100vh - 175px);
+  overflow-y: auto;
+}
+
+// component - internal log in page
 .special-cover-header,
 #special-cover-header {
   display: block;
@@ -11,85 +25,7 @@
   border: 1px solid var(--info-tint);
 }
 
-body {
-  background-color: var(--body-color);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.card-body {
-  flex: 1 1 auto;
-  min-height: 1px;
-  padding: 0.25rem;
-}
-
-.nm-content {
-  height: calc(100vh - 175px);
-  overflow-y: auto;
-}
-
-.bulk_notices {
-  padding-bottom: 45px;
-}
-
-footer {
-  font-size: 14px;
-  color: var(--grey-000);
-  background-color: var(--theme-primary-blue, #007bc4);
-  width: 100%;
-
-  a,
-  a:hover {
-    color: var(--grey-000);
-    text-decoration: none;
-  }
-}
-
-footer.page-footer {
-  font-size: 16px;
-  background-color: var(--grey-040);
-  color: var(--grey-150);
-
-  .footer-column {
-    :first-child {
-      font-weight: bold;
-    }
-  }
-
-  .get-help-container {
-    gap: 8px;
-
-    @include media-breakpoint-up(sm) {
-      background-color: var(--grey-030);
-      border-radius: 999px;
-    }
-
-    .btn-group {
-      gap: 8px;
-
-      a.button {
-        color: var(--grey-000);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        &:hover {
-          text-decoration: none;
-          background-color: var(--primary-hover-color);
-        }
-      }
-    }
-  }
-}
-
-.welcome-text {
-  margin-top: $spacer * 2;
-}
-
-nav .login-options li {
-  margin-right: 0;
-}
-
+// component - sort seps
 #sort_notification_msg {
   display: none;
   opacity: 1;
@@ -108,16 +44,7 @@ nav .login-options li {
   }
 }
 
-.hide,
-.hidden {
-  @extend .sr-only;
-  visibility: hidden;
-}
-
-.hidden_field {
-  display: none;
-}
-
+// old component styles pre-bs4
 .nav-stacked li {
   padding: $spacer;
   margin-bottom: ($spacer * 0.25);
@@ -142,64 +69,12 @@ nav .login-options li {
   }
 }
 
-a {
-  color: var(--theme-secondary);
-  text-decoration: underline;
-}
-
-dl.parent {
-  display: grid;
-  grid-template-columns: auto 1fr !important; // !important is needed to override the styles used in enrollment.scss that can be deleted when bs4 flag is removed and bs4 is default
-  grid-row-gap: 4px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 3ch;
-  grid-auto-rows: min-content;
-}
-
-dd,
-dt {
-  margin: 0;
-  padding: 0;
-}
-
-dt {
-  font-weight: 600;
-  color: var(--text-secondary);
-  padding-right: 2ch;
-}
-
-dl.parent.weight-n {
-  dt {
-    font-weight: 400;
-    color: var(--default-font-color);
-    padding-right: 2ch;
-  }
-}
-
+// component - pre-ps4 customization
 .tax_credit_field_container {
   height: 44px !important;
 }
 
-.ethnicity-container {
-  label {
-    font-weight: 400;
-  }
-}
-
-ul.list-right-section {
-  padding: 0 10px;
-
-  li {
-    margin-bottom: $spacer;
-  }
-
-  .sm-hide {
-    display: none;
-  }
-}
-
+// component / utility - card
 .card {
   border: 1px solid var(--grey-060);
   border-radius: 5px;
@@ -221,218 +96,18 @@ ul.list-right-section {
   }
 }
 
-.badge-lg {
-  font-size: 1em;
+.card-body {
+  flex: 1 1 auto;
+  min-height: 1px;
+  padding: 0.25rem;
 }
 
-.badge-status {
-  border-radius: 10px;
-  color: var(--default-font-color);
-  font-size: 16px;
-  font-weight: 600;
-
-  &.badge-success,
-  &.badge-green {
-    background-color: var(--success-status-tint);
-    border: 1px solid var(--success-color);
-  }
-
-  &.badge-danger,
-  &.badge-red {
-    background-color: var(--danger-status-tint);
-    border: 1px solid var(--enrollment-status-red);
-  }
-
-  &.badge-warning,
-  &.badge-yellow {
-    background-color: var(--warning-status-tint);
-    border: 1px solid var(--warning-border);
-  }
-
-  &.badge-info,
-  &.badge-blue {
-    background-color: var(--info-tint);
-    border: 1px solid var(--info-color);
-  }
-
-  &.badge-absent,
-  &.badge-grey {
-    background-color: var(--grey-040);
-    border: 1px solid var(--grey-160);
-  }
-}
-
-.badge-current-plan {
-  background-color: var(--badge-current-bg);
-  border: 1px solid var(--badge-current-border);
-  padding: 1px 8px;
-}
-
-.badge-standard {
-  background-color: var(--badge-standard-bg);
-  border: 1px solid var(--badge-standard-border);
-}
-
-.badge-platinum {
-  font-weight: 400;
-  background-color: var(--platinum-bg);
-  border: 1px solid var(--platinum-border);
-}
-
-.badge-gold {
-  font-weight: 400;
-  background-color: var(--gold-bg);
-  border: 1px solid var(--gold-border);
-}
-
-.badge-silver {
-  font-weight: 400;
-  background-color: var(--silver-bg);
-  border: 1px solid var(--silver-border);
-}
-
-.badge-bronze {
-  font-weight: 400;
-  background-color: var(--bronze-bg);
-  border: 1px solid var(--bronze-border);
-}
-
-.badge-catastrophic {
-  font-weight: 400;
-  background-color: var(--error-tint);
-  border: 1px solid var(--error-shade);
-}
-
-.badge-current-application {
-  border-radius: 10px;
-  color: var(--default-font-color);
-  font-size: 12px;
-  font-weight: 600;
-  background-color: var(--complete-tint);
-  border: 1px solid var(--complete-color);
-}
-
-.float-end {
-  float: inline-end;
-}
-
-.vertically-centered-row {
-  line-height: 40px;
-  flex-direction: row;
-
-  .badge {
-    padding: 0 10px;
-    line-height: 40px;
-  }
-}
-
-.verification-update-reason {
+// component - investigate why not just using hidden classes
+.verification-update-reason, .return-for-def-reason, .fedhub-request, .extend-request, .view-history {
   display: none;
 }
 
-.return-for-def-reason {
-  display: none;
-}
-
-.fedhub-request {
-  display: none;
-}
-
-.extend-request {
-  display: none;
-}
-
-.view-history {
-  display: none;
-}
-
-// medium breakpoint
-@media screen and (max-width: 767px) {
-  .d-flex.sm-block {
-    display: block !important;
-  }
-
-  .progress-nav-container {
-    margin-left: $spacer;
-    margin-right: $spacer;
-  }
-
-  .sm-space,
-  .col-sm {
-    margin-bottom: $spacer;
-  }
-
-  .ethnicity-container label,
-  .w-75,
-  .w-25 {
-    width: 100% !important;
-  }
-
-  .sm-hide {
-    display: none;
-  }
-
-  .vertically-centered-row {
-    flex-direction: column;
-
-    & > * {
-      display: inline-block;
-      vertical-align: middle;
-      margin-bottom: $spacer;
-      width: 100%;
-    }
-  }
-
-  .navbar-brand img {
-    padding-left: $spacer / 2;
-  }
-}
-
-// large breakpoint
-@media screen and (max-width: 992px) {
-  .mobile-drawer {
-    position: absolute;
-    top: 76px;
-    margin-top: 0;
-    padding: $spacer;
-    width: 75vw;
-    transition: all 0.4s ease;
-    display: block;
-  }
-
-  .mobile-drawer.collapsing {
-    height: auto !important;
-    margin-left: 50%;
-    left: 50%;
-    transition: all 0.2s ease;
-  }
-
-  .mobile-drawer.show {
-    background: var(--grey-000);
-    height: 100vh;
-    padding-top: $spacer;
-    z-index: 105;
-    right: 0px;
-
-    .align-items-md-end {
-      margin-top: $spacer;
-    }
-  }
-}
-
-.full-height {
-  height: 70vh;
-}
-
-.card {
-  border: 1px solid var(--grey-060);
-  border-radius: 5px;
-  margin-bottom: $spacer;
-  padding: 13px 12px;
-  background: var(--grey-000);
-}
-
-// modals
+// component - modals
 .backdrop-modal {
   .modal-header {
     border-bottom: 0;
@@ -443,7 +118,11 @@ ul.list-right-section {
   }
 }
 
-// accordion
+.modal-backdrop.in {
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+// component - accordion
 .accordion {
   .accordion-header {
     padding-bottom: $spacer;
@@ -466,26 +145,7 @@ ul.list-right-section {
   }
 }
 
-.modal-backdrop.in {
-  background-color: rgba(0, 0, 0, 0.01);
-}
-
-// lists
-ul.plain {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-// tables
-.border-top-0 {
-  th,
-  td {
-    border-top: 0;
-  }
-}
-
-// pagination
+// pagination, move to own partial
 .pagination {
   li {
     &.page-item {
@@ -554,68 +214,25 @@ ul.plain {
   }
 }
 
+// component - family home page
 .home-widget {
   background-color: var(--grey-000);
   border: 1px solid var(--grey-060);
 }
 
-.primary-blue {
-  color: var(--theme-primary-blue, #007bc4);
-}
-
-div.disabled *:not(:has(*)):not(button, a.button),
-div.disabled ::after {
-  opacity: 0.4;
-}
-
-a.disabled {
-  pointer-events: none;
-  cursor: not-allowed;
-}
-
+// component - glossary items
 .glossary {
   color: var(--primary-color);
   border-bottom: 1px dashed var(--primary-color);
   cursor: pointer;
 }
 
+// components - inbox
 .delete-icon {
   color: var(--status-red);
 }
 
-.nav-stacked li {
-  padding: $spacer;
-  margin-bottom: ($spacer * 0.25);
-  width: 100%;
-  background: var(--grey-010);
-  color: var(--info-color);
-  a {
-    color: var(--info-color);
-  }
-  &.activer {
-    background: var(--info-color);
-    color: var(--grey-000);
-    a {
-      color: var(--grey-000);
-    }
-  }
-  &.active {
-    @extend .font-weight-bold;
-  }
-}
-
-.filter-input-block legend.bb,
-.sort-area legend {
-  padding-bottom: ($spacer / 2);
-  border-bottom: 1px solid var(--body-divider);
-}
-
-.filter-input-block legend.bb,
-.sort-area legend {
-  padding-bottom: ($spacer / 2);
-  border-bottom: 1px solid var(--body-divider);
-}
-
+// component - tab boxes
 .tab-holder {
   margin-bottom: 6px;
 }
@@ -646,6 +263,7 @@ a.disabled {
   border: 1px solid var(--grey-060);
 }
 
+// component - message inbox
 .msg-inbox {
   cursor: pointer;
 
@@ -671,6 +289,7 @@ a.disabled {
   font-weight: 600;
 }
 
+// component - plan shopping filters
 .filter-input-block legend.bb,
 .sort-area legend {
   padding-bottom: ($spacer / 2);
@@ -683,6 +302,7 @@ a.disabled {
   border-bottom: 1px solid var(--body-divider);
 }
 
+// components - admin action drops
 .actions-dropdown {
   border: 1px solid var(--grey-100);
 
@@ -713,6 +333,80 @@ a.disabled {
   }
 }
 
+// component - sep page
+.qle-menu {
+  li::marker {
+    color: var(--primary-color);
+  }
+}
+
+// end components
+
+// utility classes
+.hide,
+.hidden {
+  @extend .sr-only;
+  visibility: hidden;
+}
+
+.hidden_field {
+  display: none;
+}
+
+.primary-blue {
+  color: var(--theme-primary-blue, #007bc4);
+}
+
+div.disabled *:not(:has(*)):not(button, a.button),
+div.disabled ::after {
+  opacity: 0.4;
+}
+
+a.disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.float-end {
+  float: inline-end;
+}
+
+.full-height {
+  height: 70vh;
+}
+
+// utility used for displaying list: value type data when we want the values to start at the same spot
+dl.parent {
+  display: grid;
+  grid-template-columns: auto 1fr !important; // !important is needed to override the styles used in enrollment.scss that can be deleted when bs4 flag is removed and bs4 is default
+  grid-row-gap: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 3ch;
+  grid-auto-rows: min-content;
+}
+
+dd,
+dt {
+  margin: 0;
+  padding: 0;
+}
+
+dt {
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding-right: 2ch;
+}
+
+dl.parent.weight-n {
+  dt {
+    font-weight: 400;
+    color: var(--default-font-color);
+    padding-right: 2ch;
+  }
+}
+
 .pre-line {
   white-space: pre-line;
 }
@@ -720,11 +414,5 @@ a.disabled {
 .two-column {
   @include media-breakpoint-up(sm) {
     columns: 2;
-  }
-}
-
-.qle-menu {
-  li::marker {
-    color: var(--primary-color);
   }
 }
