@@ -21,6 +21,8 @@
     <% end %>
     <%= csrf_meta_tags %>
 
+    <meta name="csp-nonce" content="<%= content_security_policy_nonce %>"/>
+
     <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
       <%= javascript_pack_tag 'contrast_level_aa' %>
       <%= stylesheet_pack_tag 'contrast_level_aa' %>
