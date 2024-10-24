@@ -12,10 +12,10 @@ module Queries
     # @param [MongoidCriteria] query The query to be sorted.
     # @param [Hash] order_by The sort column key and direction param hash.
     #
-    # @return [Array<Family>|Mongoid::Criteria] The sorted array of Family objects if using an aggregated sort, or a Mongoid::Criteria object if using a direct sort.
+    # @return [Array<Klass>|Mongoid::Criteria] The sorted array of Klass objects if using an aggregated sort, or a Mongoid::Criteria object if using a direct sort.
     def sort_query(query, order_by)
       if aggregatable_columns&.key?(@order_by.keys.first)
-        aggregate_sort(query, order_by) # perform the sort via an aggregation and return the sorted array of Family objects
+        aggregate_sort(query, order_by) # perform the sort via an aggregation and return the sorted array of Klass objects
       else
         query.order_by(order_by) # perform the sort directly on the Mongoid query and return the sorted Mongoid::Criteria object
       end
@@ -25,9 +25,9 @@ module Queries
     # Paginate the query based on the skip and limit instance variables if the scope is a Mongoid::Criteria.
     # If it is not a Mongoid::Criteria, we can assume it is an array of `klass` objects sorted AND paginated already, so return it as is.
     #
-    # @param [Array<Family>|Mongoid::Criteria] scope The query to be paginated.
+    # @param [Array<Klass>|Mongoid::Criteria] scope The query to be paginated.
     #
-    # @return [Array<Family>|Mongoid::Criteria] The paginated scope.
+    # @return [Array<Klass>|Mongoid::Criteria] The paginated scope.
     def paginate(scope)
       return scope unless scope.is_a?(Mongoid::Criteria)
       scope.skip(@skip).limit(@limit)
@@ -45,13 +45,13 @@ module Queries
     # @param [MongoidCriteria] scope The query to be sorted.
     # @param [Hash] order_by The sort column key and direction param hash.
     #
-    # @return [Array<Family>|Mongoid::Criteria] The sorted array of `klass` records if using an aggregated sort, or a Mongoid::Criteria object if using a direct sort.
+    # @return [Array<Klass>|Mongoid::Criteria] The sorted array of `klass` records if using an aggregated sort, or a Mongoid::Criteria object if using a direct sort.
     def aggregate_sort(query, order_by)
       pipeline = pipeline_for_sort_column(order_by)
-      # aggregate returns json, so we need to transform back to Family objects for the mongoid datatable to handle
-      ids = query.collection.aggregate(pipeline).map { |doc| doc["_id"] }
-      families = klass.where(:_id.in => ids).to_a
-      ids.map { |id| families.find { |family| family.id == id } }
+      # aggregate returns json, so we need to transform back to Klass objects for the mongoid datatable to handle
+      sorted_ids = query.collection.aggregate(pipeline).map(&:values).map(&:first)
+      records = klass.find(sorted_ids)
+      sorted_ids.map { |id| records.find { |record| record.id == id } }
     end
 
     # @method pipeline_for_sort_column(order_by)
@@ -65,7 +65,7 @@ module Queries
       sort_direction = sort_direction == :asc ? 1 : -1
 
       base_pipeline = klass.send(aggregatable_columns[sort_column], sort_direction)
-      base_pipeline + [{:$skip => @skip}, {:$limit => @limit}]
+      base_pipeline + [{:$project => { '_id': 1 }}, {:$skip => @skip}, {:$limit => @limit}]
     end
   end
 end
