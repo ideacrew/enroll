@@ -6,7 +6,8 @@ module Operations
     class RemoveProducts
       include Dry::Monads[:do, :result]
       def call(params)
-        date, products              = yield validate(params)
+        date, carrier               = yield validate(params)
+        products                    = yield fetch_products(date, carrier)
         _update_benefit_packages    = yield update_benefit_packages(date, products)
         _update_renewal_product_ids = yield update_renewal_product_ids(products)
         _destroy_products           = yield destroy_products(products)
@@ -19,8 +20,18 @@ module Operations
       def validate(params)
         return Failure("Missing date") if params[:date].blank?
         return Failure("Incorrect date format") if params[:date].to_s.match?(/\d{4}-\d{2}-\d{2}/)
-        return Failure("Missing products") if params[:products].blank?
-        Success([params[:date], params[:products]])
+        return Failure("Missing Carrier") if params[:carrier].blank?
+        Success([params[:date], params[:carrier]])
+      end
+
+      def fetch_products(date, carrier)
+        organization = ::BenefitSponsors::Organizations::Organization.where(:legal_name => carrier).first
+        return Failure("Organization not found") if organization.blank?
+        issuer_profile = organization.profiles.first
+        return Failure("Issuer Profile not found") if issuer_profile.blank?
+        products = BenefitMarkets::Products::Product.by_year(date.year).where(:issuer_profile_id => issuer_profile.id)
+        return Failure("Products not found") if products.blank?
+        Success(products)
       end
 
       def update_benefit_packages(date, products)

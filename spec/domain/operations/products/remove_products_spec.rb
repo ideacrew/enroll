@@ -39,7 +39,7 @@ RSpec.describe ::Operations::Products::RemoveProducts, dbclean: :after_each do
 
     let(:products) { BenefitMarkets::Products::Product.where(issuer_profile_id: issuer_profile.id) }
     let(:params) do
-      { date: date, products: products }
+      { date: date, carrier: plan1.issuer_profile.legal_name }
     end
 
     before do

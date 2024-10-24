@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# This script takes a string of the issuer profile id and initiates the remove products operation.
+# This script takes a string of the carrier legal name and a date and initiates the remove products operation.
 
 # Command to trigger the script:
-# CLIENT=me bundle exec rails runner script/products/remove_products.rb '123456780f5040', '2025-01-01'
+# CLIENT=me bundle exec rails runner script/products/remove_products.rb 'XYZ Carrier', '2025-01-01'
 
 unless ARGV[0].present? && ARGV[1].present?
   puts 'Missing Arguments'
@@ -17,10 +17,9 @@ rescue StandardError => e
   exit
 end
 
-year = date.year
-products = BenefitMarkets::Products::Product.by_year(year).where(:issuer_profile_id => ARGV[0])
+carrier = ARGV[0]
 
-result = ::Operations::Products::RemoveProducts.new.call({ date: date, products: products })
+result = ::Operations::Products::RemoveProducts.new.call({ date: date, carrier: carrier })
 
 if result.success?
   puts result.success
