@@ -1,7 +1,7 @@
 <% if EnrollRegistry.feature_enabled?(:sep_types) %>
   <% if @bs4 %>
     <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle._id), rel: 'noopener noreferrer', method: :patch do |f| %>
-      <%= render partial: "exchanges/manage_sep_types/form", locals: {f: f} %>
+      <%= render partial: "exchanges/manage_sep_types/form", locals: {f: f, new: false} %>
       <%= link_to l10n("exchange.manage_sep_types.cancel"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-error outline' %>
       <% if @qle.draft %>
         <%= f.hidden_field :published_by, value: current_user.id %>
