@@ -4,7 +4,7 @@
   <td><%= member.person.hbx_id %></td>
   <td><%= member.age_on(TimeKeeper.date_of_record) %></td>
   <td><%= member.gender.humanize %></td>
-  <td><%= member.relationship.try(:humanize) %></td>
+  <td><%= display_relationship(member.relationship) %></td>
   <td class="p-2">
     <% edit_url = member.is_primary_applicant ? personal_insured_families_path({bs4: @bs4}) : main_app.edit_insured_family_member_path({id: member.id, bs4: @bs4}) %>
     <span class="d-flex">

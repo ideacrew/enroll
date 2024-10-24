@@ -5,6 +5,7 @@ module ApplicationHelper
   include ::FinancialAssistance::VerificationHelper
   include HtmlScrubberUtil
   include DropdownHelper
+  include L10nHelper
 
   def add_external_links_enabled?
     EnrollRegistry.feature_enabled?(:add_external_links)
@@ -610,7 +611,17 @@ module ApplicationHelper
                     else
                       PersonRelationship::Relationships_UI
                     end
-    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
+
+    options_for_select(relationships.map{|r| [display_relationship(r.to_s), r.to_s] }, selected: dependent.try(:relationship))
+  end
+
+  def display_relationship(relationship)
+    relationship_mapping = {
+      l10n("insured.domestic_partner_key") => l10n("insured.domestic_partner_value"),
+      l10n("insured.parents_partner_key") => l10n("insured.parents_partner_value")
+    }
+
+    relationship_mapping[relationship].try(:humanize) || relationship.try(:humanize)
   end
 
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
