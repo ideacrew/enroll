@@ -13,7 +13,7 @@
 
       <%= javascript_pack_tag 'no_jquery_application', 'data-turbolinks-track': 'reload' %>
       <%= javascript_include_tag "application", 'data-turbolinks-track': 'reload' %>
-      <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+      <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload', media: "all" %>
       <%= javascript_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
       <%= stylesheet_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
       <%= yield :head %>
