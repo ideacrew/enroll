@@ -10,7 +10,7 @@
 # If the feature is not enabled, it prints a message and exits the script.
 #
 # @return [void]
-unless true
+unless EnrollRegistry.feature_enabled?(:async_publish_updated_families)
   puts 'The CRM Sync Refactor feature is not enabled. Please enable the feature :async_publish_updated_families to run this script. EXITING.'
   exit
 end
