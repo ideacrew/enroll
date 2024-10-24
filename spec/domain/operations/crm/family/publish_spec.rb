@@ -21,7 +21,7 @@ RSpec.describe Operations::Crm::Family::Publish do
       let(:hbx_id) { family.primary_person.hbx_id }
 
       it 'publishes the event successfully' do
-        result = subject.call(hbx_id: hbx_id)
+        result = subject.call(hbx_id: hbx_id, force_sync: 'false')
         expect(result.success).to match(
           "Successfully published event: events.families.created_or_updated for family with primary person hbx_id: #{hbx_id} with headers: "
         )
@@ -31,7 +31,7 @@ RSpec.describe Operations::Crm::Family::Publish do
     context 'failure' do
       context 'when a person does not exist with the given hbx_id' do
         it 'returns failure' do
-          result = subject.call(hbx_id: 'primary.hbx_id')
+          result = subject.call(hbx_id: 'primary.hbx_id', force_sync: 'false')
           expect(result.failure).to eq(
             "Provide a valid person_hbx_id to fetch person. Invalid input hbx_id: primary.hbx_id"
           )
@@ -40,7 +40,7 @@ RSpec.describe Operations::Crm::Family::Publish do
 
       context 'when person does not have primary family' do
         it 'returns failure' do
-          result = subject.call(hbx_id: primary.hbx_id)
+          result = subject.call(hbx_id: primary.hbx_id, force_sync: 'false')
           expect(result.failure).to eq(
             "Primary Family does not exist with given hbx_id: #{primary.hbx_id}"
           )

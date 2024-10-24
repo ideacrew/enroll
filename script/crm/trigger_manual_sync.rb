@@ -3,7 +3,8 @@
 # This script takes a string of comma separated hbx_ids and initiates the force sync operation.
 
 # Command to trigger the script:
-#   CLIENT=me bundle exec rails runner script/crm/trigger_force_sync.rb 'hbx_id1, hbx_id2, hbx_id3'
+#   The FORCE_SYNC environment variable is used to force sync the provided HBX IDs and is not required.
+#   FORCE_SYNC=true CLIENT=me bundle exec rails runner script/crm/trigger_manual_sync.rb 'hbx_id1, hbx_id2, hbx_id3'
 
 # Checks if the :async_publish_updated_families feature is enabled in the EnrollRegistry.
 # If the feature is not enabled, it prints a message and exits the script.
@@ -30,7 +31,8 @@ end
 # Initiates the force sync operation with the provided HBX IDs.
 # @param [Array<String>] primary_hbx_ids an array of HBX IDs
 # @return [void]
-result = ::Operations::Crm::ForceSync.new.call({ primary_hbx_ids: primary_person_hbx_ids })
+force_sync = ENV['FORCE_SYNC'].present? && ENV['FORCE_SYNC'] == 'true' ? 'true' : 'false'
+result = ::Operations::Crm::ManualSync.new.call({ force_sync: force_sync, primary_hbx_ids: primary_person_hbx_ids })
 if result.success?
   puts result.success
 else

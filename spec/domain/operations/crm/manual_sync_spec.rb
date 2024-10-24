@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Operations::Crm::ForceSync do
+RSpec.describe Operations::Crm::ManualSync do
   include Dry::Monads[:result]
 
   before :all do
@@ -18,7 +18,7 @@ RSpec.describe Operations::Crm::ForceSync do
       let(:primary1_hbx_id) { 'primary1' }
       let(:primary2_hbx_id) { 'primary2' }
       let(:primary3_hbx_id) { 'primary3' }
-      let(:params) { { primary_hbx_ids: [primary1_hbx_id, primary2_hbx_id, primary3_hbx_id] } }
+      let(:params) { { primary_hbx_ids: [primary1_hbx_id, primary2_hbx_id, primary3_hbx_id], force_sync: false} }
 
       let(:publish_instance) { instance_double(Operations::Crm::Family::Publish) }
 
@@ -28,15 +28,15 @@ RSpec.describe Operations::Crm::ForceSync do
 
       before do
         allow(::Operations::Crm::Family::Publish).to receive(:new).and_return(publish_instance)
-        allow(publish_instance).to receive(:call).with(hbx_id: primary1_hbx_id).and_return(
+        allow(publish_instance).to receive(:call).with(hbx_id: primary1_hbx_id, force_sync: false).and_return(
           Success(message1)
         )
 
-        allow(publish_instance).to receive(:call).with(hbx_id: primary2_hbx_id).and_return(
+        allow(publish_instance).to receive(:call).with(hbx_id: primary2_hbx_id, force_sync: false).and_return(
           Failure(message2)
         )
 
-        allow(publish_instance).to receive(:call).with(hbx_id: primary3_hbx_id).and_return(
+        allow(publish_instance).to receive(:call).with(hbx_id: primary3_hbx_id, force_sync: false).and_return(
           Failure(message3)
         )
       end
@@ -92,7 +92,7 @@ RSpec.describe Operations::Crm::ForceSync do
 
   after :all do
     # Clean up the CSV files created during the test
-    Dir.glob("#{Rails.root}/crm_force_sync_*.csv").each do |file|
+    Dir.glob("#{Rails.root}/crm_manual_sync_*.csv").each do |file|
       FileUtils.rm(file)
     end
   end

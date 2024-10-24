@@ -3,7 +3,7 @@
 module Operations
   module Crm
     # This operation is responsible for initiating the force sync operation.
-    class ForceSync
+    class ManualSync
       include Dry::Monads[:do, :result]
       include EventSource::Command
 
@@ -13,9 +13,9 @@ module Operations
       # @option params [Array<String>] :primary_hbx_ids an array of primary HBX IDs
       # @return [Dry::Monads::Result] the result of the operation
       def call(params)
-        primary_person_hbx_ids  = yield validate(params)
-        csv_file_name           = yield publish_families(primary_person_hbx_ids)
-        message                 = yield generate_success_message(csv_file_name)
+        primary_person_hbx_ids, force_sync  = yield validate(params)
+        csv_file_name                       = yield publish_families(primary_person_hbx_ids, force_sync)
+        message                             = yield generate_success_message(csv_file_name)
 
         Success(message)
       end
@@ -27,8 +27,8 @@ module Operations
       # @param params [Hash] the parameters to validate
       # @return [Dry::Monads::Result::Success, Dry::Monads::Result::Failure] the validation result
       def validate(params)
-        if params[:primary_hbx_ids].is_a?(Array) && params[:primary_hbx_ids].present? && params[:primary_hbx_ids].all? { |id| id.is_a?(String) }
-          Success(params[:primary_hbx_ids])
+        if params[:primary_hbx_ids].present? && params[:primary_hbx_ids].is_a?(Array) && params[:primary_hbx_ids].all? { |id| id.is_a?(String) }
+          Success([params[:primary_hbx_ids], params[:force_sync]])
         else
           Failure("Invalid input for primary_hbx_ids: #{params[:primary_hbx_ids]}. Provide an array of HBX IDs.")
         end
@@ -38,14 +38,14 @@ module Operations
       #
       # @param primary_person_hbx_ids [Array<String>] an array of primary HBX IDs
       # @return [Dry::Monads::Result::Success, Dry::Monads::Result::Failure] the result of the publishing operation
-      def publish_families(primary_person_hbx_ids)
-        csv_file_name = "#{Rails.root}/crm_force_sync_#{DateTime.now.strftime('%Y_%m_%d_%H_%M_%S')}.csv"
+      def publish_families(primary_person_hbx_ids, force_sync)
+        csv_file_name = "#{Rails.root}/crm_manual_sync_#{DateTime.now.strftime('%Y_%m_%d_%H_%M_%S')}.csv"
 
         CSV.open(csv_file_name, 'w', force_quotes: true) do |csv|
           csv << ['Hbx ID', 'Result', 'Message']
 
           primary_person_hbx_ids.each do |hbx_id|
-            result = ::Operations::Crm::Family::Publish.new.call(hbx_id: hbx_id)
+            result = ::Operations::Crm::Family::Publish.new.call(force_sync: force_sync, hbx_id: hbx_id)
 
             csv << [
               hbx_id,
